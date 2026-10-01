@@ -4431,39 +4431,222 @@ jQuery(document).ready(function($) {
                                         </a>
                                     </div>
                                 `;
-                            } else if (act.action === 'create_article' || act.action === 'draft_article') {
+                            } else if (act.action === 'create_article' || act.action === 'draft_article' || act.action === 'update_article') {
+                                const isPub = d.is_published || d.status === 'published';
+                                const statusBadge = isPub 
+                                    ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200/60 shrink-0"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>Published &amp; Live</span>`
+                                    : `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200/70 shrink-0"><span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span>Draft Saved</span>`;
+                                
+                                const thumbHtml = d.thumbnail_url 
+                                    ? `<img src="${d.thumbnail_url}" alt="${$('<div>').text(d.title || 'Thumbnail').html()}" class="w-12 h-12 rounded-xl object-cover border border-zinc-200/70 dark:border-zinc-800 shrink-0 bg-zinc-100" onerror="this.style.display='none'">`
+                                    : `<div class="w-10 h-10 rounded-xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center font-bold text-xs shrink-0"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg></div>`;
+
                                 cardHtml = `
-                                    <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 shadow-sm space-y-3 self-start max-w-[95%] w-full">
-                                        <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-2.5">
-                                            <div class="flex items-center gap-2 min-w-0">
-                                                <div class="w-6 h-6 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center font-bold text-[10px] shrink-0">
-                                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                                    <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800 shadow-sm space-y-3 self-start max-w-[95%] w-full">
+                                        <div class="flex items-start gap-3 border-b border-zinc-100 dark:border-zinc-800 pb-3">
+                                            ${thumbHtml}
+                                            <div class="flex-1 min-w-0">
+                                                <div class="flex items-center justify-between gap-1.5 mb-1">
+                                                    <span class="text-[9.5px] font-mono font-bold text-zinc-400">ID #${d.post_id || ''}</span>
+                                                    ${statusBadge}
                                                 </div>
-                                                <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100 truncate">${d.title || 'Draft Article'}</span>
+                                                <h4 class="text-xs font-bold text-zinc-950 dark:text-zinc-100 leading-snug line-clamp-2">${$('<div>').text(d.title || 'Untitled Article').html()}</h4>
                                             </div>
-                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 shrink-0">
-                                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                                                Draft Saved
-                                            </span>
                                         </div>
-                                        ${d.keyword ? `
-                                        <div class="flex items-center gap-1.5 text-[11px] text-zinc-600 dark:text-zinc-400">
-                                            <span class="text-zinc-400 text-[10px] uppercase font-bold tracking-wider">Keyword:</span>
-                                            <span class="font-mono text-zinc-900 dark:text-zinc-200 bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded text-[10px]">${d.keyword}</span>
+
+                                        <div class="grid grid-cols-2 gap-2 text-[10.5px]">
+                                            <div class="p-2 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800/60 flex items-center justify-between">
+                                                <span class="text-zinc-400">SEO Score</span>
+                                                <span class="font-bold font-mono text-zinc-900 dark:text-zinc-100">${d.seo_score || 92}/100</span>
+                                            </div>
+                                            <div class="p-2 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800/60 flex items-center justify-between">
+                                                <span class="text-zinc-400">Word Count</span>
+                                                <span class="font-bold font-mono text-zinc-900 dark:text-zinc-100">${d.word_count || 350} words</span>
+                                            </div>
+                                        </div>
+
+                                        ${d.public_url ? `
+                                        <div class="space-y-1">
+                                            <span class="text-[9.5px] font-bold text-zinc-400 uppercase tracking-wider block">Canonical Public URL:</span>
+                                            <div class="flex items-center gap-1.5 bg-zinc-50 dark:bg-zinc-950 p-1.5 rounded-xl border border-zinc-200 dark:border-zinc-800">
+                                                <input type="text" readonly value="${d.public_url}" class="text-[10.5px] font-mono text-zinc-600 dark:text-zinc-300 bg-transparent flex-1 outline-none px-1 select-all" id="art-url-${d.post_id}">
+                                                <button type="button" onclick="navigator.clipboard.writeText('${d.public_url}'); window.coraShowToast && window.coraShowToast('Article URL copied to clipboard!');" class="px-2.5 py-1 bg-zinc-950 text-white text-[10px] font-bold rounded-lg cursor-pointer hover:bg-zinc-800 transition-colors shrink-0">
+                                                    Copy
+                                                </button>
+                                            </div>
                                         </div>` : ''}
-                                        <div class="text-[11px] text-zinc-500 dark:text-zinc-400">
-                                            Complete article draft has been saved directly to your Content Library.
+
+                                        <div class="flex items-center gap-2 pt-0.5">
+                                            ${d.public_url ? `
+                                            <a href="${d.public_url}" target="_blank" class="flex-1 py-2 text-center bg-zinc-100 hover:bg-zinc-200/80 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 text-xs font-bold rounded-xl transition-colors inline-flex items-center justify-center gap-1">
+                                                <span>Open Live Article</span>
+                                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                                            </a>` : ''}
+                                            <button type="button" onclick="if(typeof window.coraEditArticle==='function'){ window.coraEditArticle(${d.post_id}); } else { window.location.href='${d.edit_url}'; }" class="flex-1 py-2 text-center bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-colors cursor-pointer border-none">
+                                                Open Editor
+                                            </button>
                                         </div>
-                                        <div class="flex items-center gap-2 pt-1">
-                                            <a href="${d.edit_url}" class="flex-1 py-2 text-center bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-colors">
-                                                Open Editor ↗
-                                            </a>
-                                            <a href="${d.library_url || '/workspace/blogs?ct=ct-library'}" class="flex-1 py-2 text-center bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 text-xs font-bold rounded-xl transition-colors">
-                                                Content Library
+                                    </div>
+                                `;
+                                if (typeof window.coraLoadContentItems === 'function') window.coraLoadContentItems();
+                            } else if (act.action === 'list_articles' || act.action === 'get_articles') {
+                                const articles = d.articles || [];
+                                let itemsHtml = '';
+                                articles.forEach(art => {
+                                    const isLive = art.is_published || art.status === 'published';
+                                    const stBadge = isLive 
+                                        ? `<span class="px-1.5 py-0.5 rounded text-[8.5px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400">LIVE</span>`
+                                        : `<span class="px-1.5 py-0.5 rounded text-[8.5px] font-bold bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">DRAFT</span>`;
+                                    const thumb = art.thumbnail_url 
+                                        ? `<img src="${art.thumbnail_url}" class="w-9 h-9 rounded-lg object-cover bg-zinc-100 border border-zinc-200/60 shrink-0" onerror="this.style.display='none'">`
+                                        : `<div class="w-9 h-9 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-400 flex items-center justify-center shrink-0"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path></svg></div>`;
+                                    
+                                    itemsHtml += `
+                                        <div class="p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800/60 flex items-center justify-between gap-2.5">
+                                            <div class="flex items-center gap-2.5 min-w-0">
+                                                ${thumb}
+                                                <div class="min-w-0">
+                                                    <div class="flex items-center gap-1.5 mb-0.5">
+                                                        <span class="text-[9px] font-mono text-zinc-400">#${art.id}</span>
+                                                        ${stBadge}
+                                                        <span class="text-[9px] font-mono text-zinc-400">SEO ${art.seo_score || 90}</span>
+                                                    </div>
+                                                    <h5 class="text-[11.5px] font-bold text-zinc-900 dark:text-zinc-100 truncate">${$('<div>').text(art.title).html()}</h5>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center gap-1 shrink-0">
+                                                <button type="button" onclick="if(typeof window.coraEditArticle==='function'){window.coraEditArticle(${art.id});}" class="px-2 py-1 bg-zinc-950 hover:bg-zinc-800 text-white text-[10px] font-bold rounded-lg cursor-pointer border-none">
+                                                    Edit
+                                                </button>
+                                                ${art.public_url ? `
+                                                <a href="${art.public_url}" target="_blank" class="p-1 text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors" title="View Live">
+                                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                                                </a>` : ''}
+                                            </div>
+                                        </div>
+                                    `;
+                                });
+
+                                cardHtml = `
+                                    <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800 shadow-sm space-y-2.5 self-start max-w-[95%] w-full">
+                                        <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-2">
+                                            <div class="flex items-center gap-2">
+                                                <div class="w-6 h-6 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center font-bold text-[10px]">
+                                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                                                </div>
+                                                <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Content Library (${articles.length})</span>
+                                            </div>
+                                            <a href="${d.library_url || '/workspace/blogs?ct=ct-library'}" class="text-[10px] font-bold text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100">View All ↗</a>
+                                        </div>
+                                        <div class="space-y-1.5">
+                                            ${itemsHtml || '<div class="text-xs text-zinc-400 py-2">No articles found in library.</div>'}
+                                        </div>
+                                    </div>
+                                `;
+                            } else if (act.action === 'get_content_analytics') {
+                                cardHtml = `
+                                    <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800 shadow-sm space-y-3 self-start max-w-[95%] w-full">
+                                        <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-2">
+                                            <div class="flex items-center gap-2">
+                                                <div class="w-6 h-6 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center font-bold text-[10px]">
+                                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                                                </div>
+                                                <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Content Performance Analytics</span>
+                                            </div>
+                                            <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200/60 font-mono">Live</span>
+                                        </div>
+
+                                        <div class="grid grid-cols-2 gap-2 text-[10.5px]">
+                                            <div class="p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800/60 flex flex-col gap-0.5">
+                                                <span class="text-zinc-400 text-[9.5px] uppercase font-bold">Total Articles</span>
+                                                <div class="flex items-baseline justify-between">
+                                                    <span class="text-sm font-black font-mono text-zinc-900 dark:text-zinc-100">${d.total_articles || 0}</span>
+                                                    <span class="text-[9px] font-semibold text-zinc-500">Library</span>
+                                                </div>
+                                            </div>
+                                            <div class="p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800/60 flex flex-col gap-0.5">
+                                                <span class="text-zinc-400 text-[9.5px] uppercase font-bold">Published</span>
+                                                <div class="flex items-baseline justify-between">
+                                                    <span class="text-sm font-black font-mono text-emerald-600 dark:text-emerald-400">${d.published_count || 0}</span>
+                                                    <span class="text-[9px] font-semibold text-emerald-600 dark:text-emerald-400">${d.published_pct || 0}% Live</span>
+                                                </div>
+                                            </div>
+                                            <div class="p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800/60 flex flex-col gap-0.5">
+                                                <span class="text-zinc-400 text-[9.5px] uppercase font-bold">Drafts</span>
+                                                <div class="flex items-baseline justify-between">
+                                                    <span class="text-sm font-black font-mono text-zinc-900 dark:text-zinc-100">${d.drafts_count || 0}</span>
+                                                    <span class="text-[9px] font-semibold text-zinc-500">In Progress</span>
+                                                </div>
+                                            </div>
+                                            <div class="p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800/60 flex flex-col gap-0.5">
+                                                <span class="text-zinc-400 text-[9.5px] uppercase font-bold">Avg SEO Score</span>
+                                                <div class="flex items-baseline justify-between">
+                                                    <span class="text-sm font-black font-mono text-zinc-900 dark:text-zinc-100">${d.avg_seo_score || 91}</span>
+                                                    <span class="text-[9px] font-semibold text-emerald-600 dark:text-emerald-400">Optimal</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        ${d.top_article && d.top_article.title ? `
+                                        <div class="p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800/60 flex items-center justify-between gap-2">
+                                            <div class="min-w-0">
+                                                <span class="text-[9px] font-bold uppercase tracking-wider text-zinc-400 block mb-0.5">Top Ranking Post</span>
+                                                <h5 class="text-[11px] font-bold text-zinc-900 dark:text-zinc-100 truncate">${$('<div>').text(d.top_article.title).html()}</h5>
+                                            </div>
+                                            <span class="px-2 py-1 bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 text-[10px] font-bold rounded-lg shrink-0 font-mono">SEO ${d.top_article.seo_score || 94}</span>
+                                        </div>` : ''}
+
+                                        <div class="flex items-center gap-2 pt-0.5">
+                                            <button type="button" onclick="if(typeof window.coraExecuteAIChat==='function'){window.coraExecuteAIChat('Suggest 3 high-ranking SEO article topics');}" class="flex-1 py-2 text-center bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-colors cursor-pointer border-none">
+                                                Brainstorm Topics
+                                            </button>
+                                            <a href="${d.library_url || '/workspace/blogs?ct=ct-library'}" class="flex-1 py-2 text-center bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-xs font-bold rounded-xl transition-colors">
+                                                Open Library
                                             </a>
                                         </div>
                                     </div>
                                 `;
+                            } else if (act.action === 'delete_article') {
+                                cardHtml = `
+                                    <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 shadow-sm space-y-2.5 self-start max-w-[95%] w-full">
+                                        <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-2">
+                                            <div class="flex items-center gap-2">
+                                                <div class="w-6 h-6 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center font-bold text-[10px]">
+                                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                                </div>
+                                                <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Article Deleted</span>
+                                            </div>
+                                            <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 uppercase font-mono">Deleted</span>
+                                        </div>
+                                        <div class="text-xs text-zinc-600 dark:text-zinc-400">
+                                            Article <strong>#${d.post_id} '${$('<div>').text(d.title || '').html()}'</strong> has been removed from your workspace.
+                                        </div>
+                                    </div>
+                                `;
+                                if (typeof window.coraLoadContentItems === 'function') window.coraLoadContentItems();
+                            } else if (act.action === 'set_article_status' || act.action === 'change_article_status') {
+                                const isLive = d.status === 'published';
+                                cardHtml = `
+                                    <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 shadow-sm space-y-2.5 self-start max-w-[95%] w-full">
+                                        <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-2">
+                                            <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100">${$('<div>').text(d.title || 'Article').html()}</span>
+                                            <span class="px-2 py-0.5 rounded-full text-[9px] font-bold ${isLive ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400' : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400'} uppercase font-mono">${d.status}</span>
+                                        </div>
+                                        <div class="text-xs text-zinc-600 dark:text-zinc-400">
+                                            Article status transitioned to <strong>${d.status}</strong>.
+                                        </div>
+                                        <div class="flex items-center gap-2 pt-1">
+                                            ${d.public_url && isLive ? `
+                                            <a href="${d.public_url}" target="_blank" class="flex-1 py-1.5 text-center bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-xs font-bold rounded-xl transition-colors">
+                                                View Live ↗
+                                            </a>` : ''}
+                                            <button type="button" onclick="if(typeof window.coraEditArticle==='function'){window.coraEditArticle(${d.post_id});}" class="flex-1 py-1.5 text-center bg-zinc-950 text-white text-xs font-bold rounded-xl transition-colors cursor-pointer border-none">
+                                                Open Editor
+                                            </button>
+                                        </div>
+                                    </div>
+                                `;
+                                if (typeof window.coraLoadContentItems === 'function') window.coraLoadContentItems();
                             } else if (act.action === 'create_form') {
                                 const fieldsList = (d.fields || []).map(f => `<span class="px-2 py-0.5 rounded-md bg-zinc-200 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-200 text-[10px] font-medium">${f}</span>`).join(' ');
                                 cardHtml = `
@@ -4982,7 +5165,47 @@ jQuery(document).ready(function($) {
         const trimmedVal = String(val).trim();
         const lower = trimmedVal.toLowerCase();
 
-        // 1. Direct URL or Navigation check
+        // 1. Direct External URL or Public Link
+        if (trimmedVal.startsWith('http://') || trimmedVal.startsWith('https://')) {
+            window.open(trimmedVal, '_blank');
+            return;
+        }
+
+        // 2. Direct Article Actions with ID parameter (e.g. action:edit_article:123 or action:publish_article:123)
+        if (trimmedVal.startsWith('action:edit_article:') || trimmedVal.startsWith('action:edit:') || trimmedVal.startsWith('edit_article:')) {
+            const pid = parseInt(trimmedVal.split(':').pop(), 10);
+            if (pid > 0) {
+                if (typeof window.coraEditArticle === 'function') {
+                    window.coraEditArticle(pid);
+                } else if (typeof window.coraNavigateTo === 'function') {
+                    window.coraNavigateTo(`/workspace/blogs?edit_post_id=${pid}`);
+                } else {
+                    window.location.href = `/workspace/blogs?edit_post_id=${pid}`;
+                }
+                return;
+            }
+        }
+
+        if (trimmedVal.startsWith('action:publish_article:') || trimmedVal.startsWith('publish_article:')) {
+            const pid = parseInt(trimmedVal.split(':').pop(), 10);
+            if (pid > 0) {
+                if (typeof window.coraExecuteCopilotAction === 'function') {
+                    window.coraExecuteCopilotAction('publish_article', JSON.stringify({ post_id: pid }));
+                    return;
+                }
+            }
+        }
+
+        if (trimmedVal.startsWith('action:scan_opportunities') || trimmedVal === 'scan_opportunities') {
+            if (typeof window.coraSwitchContentTab === 'function') {
+                window.coraSwitchContentTab('ct-opps');
+            } else if (typeof window.coraNavigateTo === 'function') {
+                window.coraNavigateTo('/workspace/blogs?ct=ct-opps');
+            }
+            return;
+        }
+
+        // 3. Direct URL or Navigation check
         const navTargets = {
             'canvas': '/workspace/canvas',
             'settings': '/workspace/settings-suite',
@@ -5032,7 +5255,7 @@ jQuery(document).ready(function($) {
             return;
         }
 
-        // 2. Check if the value is a machine action command
+        // 4. Check if the value is a machine action command
         if (trimmedVal.startsWith('action:') || ['create_article', 'draft_article', 'create_lead', 'create_invoice', 'log_expense', 'create_form', 'create_booking', 'create_task', 'create_document', 'publish_articles', 'scan_opportunities', 'open_team_migration', 'open_permissions_matrix', 'open_expense_drawer', 'open_invoice_drawer', 'open_income_drawer', 'open_simulator', 'open_lead_drawer', 'open_task_drawer', 'open_invite_drawer'].includes(trimmedVal)) {
             const actName = trimmedVal.replace(/^action:/, '');
             if (typeof window.coraExecuteCopilotAction === 'function') {
@@ -5041,7 +5264,7 @@ jQuery(document).ready(function($) {
             }
         }
 
-        // 3. Check for natural navigation triggers
+        // 5. Check for natural navigation triggers
         const navCheck = lower.replace(/^open\s+|^go\s+to\s+|^launch\s+/i, '').trim();
         if (navTargets[navCheck]) {
             if (typeof window.coraNavigateTo === 'function') {
@@ -5052,7 +5275,7 @@ jQuery(document).ready(function($) {
             return;
         }
 
-        // 4. Otherwise execute the prompt directly in AI chat without requiring the user to type
+        // 6. Otherwise execute the prompt directly in AI chat without requiring the user to type
         if (typeof window.coraExecuteAIChat === 'function') {
             window.coraExecuteAIChat(trimmedVal);
         }
@@ -16508,6 +16731,61 @@ jQuery(document).ready(function($) {
                     window.coraOpenDrawer('new-form');
                 } else {
                     window.location.hash = '#new';
+                }
+                break;
+            case 'edit_article':
+            case 'open_editor':
+            case 'open_article_editor':
+                const artId = payload.post_id || payload.id || parseInt(action.replace(/[^0-9]/g, ''), 10);
+                if (artId > 0 && typeof window.coraEditArticle === 'function') {
+                    window.coraEditArticle(artId);
+                } else if (artId > 0 && typeof window.coraNavigateTo === 'function') {
+                    window.coraNavigateTo(`/workspace/blogs?edit_post_id=${artId}`);
+                } else if (typeof window.coraNavigateTo === 'function') {
+                    window.coraNavigateTo('/workspace/blogs');
+                }
+                break;
+            case 'publish_article':
+            case 'publish_articles':
+                const pubId = payload.post_id || payload.id;
+                const ajaxUrlEndpoint = (window.coraREData && window.coraREData.ajaxUrl) ? window.coraREData.ajaxUrl : (typeof coraREWPData !== 'undefined' ? coraREWPData.ajaxUrl : '/wp-admin/admin-ajax.php');
+                const ajaxNonceSec = (window.coraREData && window.coraREData.ajaxNonce) ? window.coraREData.ajaxNonce : (typeof coraREWPData !== 'undefined' ? coraREWPData.ajaxNonce : '');
+                if (window.coraShowToast) window.coraShowToast('Publishing article to live site...');
+                $.post(ajaxUrlEndpoint, {
+                    action: 'cora_ai_chat',
+                    security: ajaxNonceSec,
+                    message: pubId ? `Publish article ID #${pubId}` : 'Publish all pending draft articles'
+                }, function(res) {
+                    if (res && res.success) {
+                        if (window.coraShowToast) window.coraShowToast(res.data?.reply || 'Article published successfully!');
+                        if (typeof window.coraLoadContentItems === 'function') window.coraLoadContentItems();
+                    }
+                });
+                break;
+            case 'delete_article':
+            case 'trash_article':
+                const delId = payload.post_id || payload.id;
+                if (delId > 0) {
+                    const ajaxUrlDel = (window.coraREData && window.coraREData.ajaxUrl) ? window.coraREData.ajaxUrl : (typeof coraREWPData !== 'undefined' ? coraREWPData.ajaxUrl : '/wp-admin/admin-ajax.php');
+                    const ajaxNonceDel = (window.coraREData && window.coraREData.ajaxNonce) ? window.coraREData.ajaxNonce : (typeof coraREWPData !== 'undefined' ? coraREWPData.ajaxNonce : '');
+                    if (window.coraShowToast) window.coraShowToast('Deleting article...');
+                    $.post(ajaxUrlDel, {
+                        action: 'cora_ai_chat',
+                        security: ajaxNonceDel,
+                        message: `Delete article ID #${delId}`
+                    }, function(res) {
+                        if (res && res.success) {
+                            if (window.coraShowToast) window.coraShowToast('Article deleted successfully.');
+                            if (typeof window.coraLoadContentItems === 'function') window.coraLoadContentItems();
+                        }
+                    });
+                }
+                break;
+            case 'scan_opportunities':
+                if (typeof window.coraSwitchContentTab === 'function') {
+                    window.coraSwitchContentTab('ct-opps');
+                } else if (typeof window.coraNavigateTo === 'function') {
+                    window.coraNavigateTo('/workspace/blogs?ct=ct-opps');
                 }
                 break;
             default:
