@@ -447,8 +447,8 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         bottom: 0 !important;
         right: 0 !important;
         left: auto !important;
-        width: 620px !important;
-        max-width: 94vw !important;
+        width: 460px !important;
+        max-width: 90vw !important;
         height: 100% !important;
         max-height: 100% !important;
         z-index: 100050 !important;
@@ -3706,174 +3706,174 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
 </aside>
 
 <!-- ═══ AI TEAM MIGRATION & MEMBER ONBOARDING DRAWER (RIGHT-SLIDING DRAWER ON DESKTOP, BOTTOM SHEET ON MOBILE) ═══════════ -->
-<aside id="cora-team-migration-tray" class="cora-drawer cora-portal-drawer collapsed hidden fixed top-0 right-0 z-[100050] h-full w-[620px] max-w-[94vw] bg-white dark:bg-[#121214] border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full pointer-events-none select-none" aria-label="AI Team Migration Hub">
+<aside id="cora-team-migration-tray" class="cora-drawer cora-portal-drawer collapsed hidden fixed top-0 right-0 z-[100050] h-full w-[460px] max-w-[90vw] bg-white dark:bg-[#121214] border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full pointer-events-none select-none" aria-label="AI Team Migration Hub">
     <!-- Top Pull-Down / Drag Handle (Mobile Only) -->
     <div class="md:hidden flex justify-center pt-3 pb-1 cursor-pointer shrink-0" onclick="closeImportTeamDrawer()">
         <div class="w-10 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700"></div>
     </div>
 
     <!-- Drawer Header -->
-    <div class="px-5 py-4 border-b border-zinc-200/80 dark:border-zinc-800/80 flex items-center justify-between bg-zinc-50/70 dark:bg-zinc-900/50 shrink-0">
-        <div class="flex items-center gap-3 min-w-0">
-            <div class="w-9 h-9 rounded-xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center shrink-0 shadow-sm">
-                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+    <div class="px-4 py-3.5 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/60 dark:bg-zinc-900/40 shrink-0">
+        <div class="flex items-center gap-2.5 min-w-0">
+            <div class="w-8 h-8 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center shrink-0 shadow-2xs">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
             </div>
             <div class="min-w-0">
-                <div class="flex items-center gap-2 flex-wrap">
-                    <h3 class="text-sm font-bold text-zinc-900 dark:text-white tracking-tight">AI Team Migration &amp; Onboarding Hub</h3>
-                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                    <h3 class="text-xs font-bold text-zinc-900 dark:text-white tracking-tight">AI Team Migration Hub</h3>
+                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[8px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700">
                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                        Multi-Modal AI Engine
+                        Multi-Modal AI
                     </span>
                 </div>
-                <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 truncate">Effortlessly digitize, review, and import team members from registers, CSV, or voice recall.</p>
+                <p class="text-[10px] text-zinc-500 dark:text-zinc-400 truncate">Digitize and import team members from registers, CSV, or voice.</p>
             </div>
         </div>
-        <button type="button" onclick="closeImportTeamDrawer()" class="text-zinc-400 hover:text-zinc-900 dark:hover:text-white cursor-pointer p-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors shrink-0 ml-2" title="Close" aria-label="Close">
-            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        <button type="button" onclick="closeImportTeamDrawer()" class="text-zinc-400 hover:text-zinc-900 dark:hover:text-white cursor-pointer p-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors shrink-0 ml-1" title="Close" aria-label="Close">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
     </div>
 
     <!-- Drawer Content Scroll Area -->
-    <div class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-5">
+    <div class="flex-1 overflow-y-auto p-4 space-y-3.5">
 
         <!-- ═══ PHASE 1: INGESTION INPUTS ═══ -->
-        <div id="migration-phase-ingest" class="max-w-3xl mx-auto w-full space-y-4">
+        <div id="migration-phase-ingest" class="w-full space-y-3.5">
             <!-- Ingestion Method Tabs (Segmented Controls) -->
-            <div class="p-1 bg-zinc-100 rounded-xl border border-zinc-200/80">
+            <div class="p-1 bg-zinc-100 dark:bg-zinc-800/60 rounded-lg border border-zinc-200 dark:border-zinc-800">
                 <div class="grid grid-cols-3 gap-1 w-full" id="migration-method-pills">
                     <!-- Tab 1: Photos / Register Scan -->
-                    <button type="button" onclick="switchMigrationTab('photos')" id="tab-btn-photos" class="migration-tab-btn active flex items-center justify-center gap-1.5 sm:gap-2 py-2 px-2 sm:px-3 rounded-lg text-xs font-bold transition-all cursor-pointer bg-white text-zinc-950 shadow-sm">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
-                        <span class="truncate">Register Photos (OCR)</span>
+                    <button type="button" onclick="switchMigrationTab('photos')" id="tab-btn-photos" class="migration-tab-btn active flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-md text-[11px] font-bold transition-all cursor-pointer bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white shadow-2xs">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                        <span class="truncate">Register OCR</span>
                     </button>
                     <!-- Tab 2: CSV / Excel -->
-                    <button type="button" onclick="switchMigrationTab('csv')" id="tab-btn-csv" class="migration-tab-btn flex items-center justify-center gap-1.5 sm:gap-2 py-2 px-2 sm:px-3 rounded-lg text-xs font-semibold text-zinc-600 hover:text-zinc-950 transition-all cursor-pointer">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                        <span class="truncate">Spreadsheet / CSV</span>
+                    <button type="button" onclick="switchMigrationTab('csv')" id="tab-btn-csv" class="migration-tab-btn flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-md text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition-all cursor-pointer">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                        <span class="truncate">CSV / Excel</span>
                     </button>
                     <!-- Tab 3: Voice Dictation -->
-                    <button type="button" onclick="switchMigrationTab('voice')" id="tab-btn-voice" class="migration-tab-btn flex items-center justify-center gap-1.5 sm:gap-2 py-2 px-2 sm:px-3 rounded-lg text-xs font-semibold text-zinc-600 hover:text-zinc-950 transition-all cursor-pointer">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
-                        <span class="truncate">Talk to Migrate</span>
+                    <button type="button" onclick="switchMigrationTab('voice')" id="tab-btn-voice" class="migration-tab-btn flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-md text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition-all cursor-pointer">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                        <span class="truncate">Voice Recall</span>
                     </button>
                 </div>
             </div>
 
             <!-- TAB PANEL 1: REGISTER PHOTOS (OCR & VISION AI) -->
-            <div id="panel-migration-photos" class="migration-panel space-y-3.5">
-                <div id="photos-dropzone-box" class="p-5 sm:p-6 rounded-2xl border-2 border-dashed border-zinc-300 hover:border-zinc-500 bg-zinc-50/50 hover:bg-zinc-100/50 flex flex-col items-center justify-center text-center space-y-2.5 cursor-pointer transition-all">
+            <div id="panel-migration-photos" class="migration-panel space-y-3">
+                <div id="photos-dropzone-box" class="p-4 rounded-xl border-2 border-dashed border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-600 bg-zinc-50/50 dark:bg-zinc-900/30 hover:bg-zinc-100/50 flex flex-col items-center justify-center text-center space-y-2 cursor-pointer transition-colors">
                     <input type="file" id="input-register-photos" multiple accept="image/*,.jpg,.jpeg,.png,.webp,.heic,.gif,.bmp" class="hidden" onclick="event.stopPropagation()">
                     <input type="file" id="input-register-camera" capture="environment" accept="image/*,.jpg,.jpeg,.png,.webp,.heic,.gif,.bmp" class="hidden" onclick="event.stopPropagation()">
                     
-                    <div class="w-11 h-11 rounded-2xl bg-white text-zinc-950 border border-zinc-200 shadow-sm flex items-center justify-center pointer-events-none">
-                        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                    <div class="w-9 h-9 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white border border-zinc-200 dark:border-zinc-700 shadow-2xs flex items-center justify-center pointer-events-none">
+                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
                     </div>
-                    <div class="pointer-events-none max-w-md">
-                        <div class="text-xs font-bold text-zinc-900">Click or drag photos of handwritten register pages here</div>
-                        <div class="text-[11px] text-zinc-500 mt-0.5">Supports JPG, PNG, WebP, HEIC scans of attendance sheets, employee diaries, and roster logs.</div>
+                    <div class="pointer-events-none max-w-sm">
+                        <div class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Upload or drop register photos here</div>
+                        <div class="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">Supports JPG, PNG, WebP, HEIC photos of handwritten sheets &amp; attendance logs.</div>
                     </div>
-                    <div class="flex items-center gap-2 pt-1" onclick="event.stopPropagation()">
-                        <button type="button" id="btn-browse-photos" onclick="$('#input-register-photos').trigger('click')" class="px-3.5 py-1.5 rounded-lg bg-white border border-zinc-200 text-zinc-800 text-[11px] font-semibold hover:bg-zinc-100 hover:border-zinc-300 transition-all shadow-2xs cursor-pointer">Browse Files</button>
-                        <button type="button" id="btn-snap-camera" onclick="$('#input-register-camera').trigger('click')" class="px-3.5 py-1.5 rounded-lg bg-zinc-950 text-white text-[11px] font-semibold hover:bg-zinc-800 transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer">
+                    <div class="flex items-center gap-2 pt-0.5" onclick="event.stopPropagation()">
+                        <button type="button" id="btn-browse-photos" onclick="$('#input-register-photos').trigger('click')" class="px-3 py-1.5 rounded-lg bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 text-[11px] font-semibold hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors shadow-2xs cursor-pointer">Browse Files</button>
+                        <button type="button" id="btn-snap-camera" onclick="$('#input-register-camera').trigger('click')" class="px-3 py-1.5 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 text-[11px] font-semibold hover:bg-zinc-800 transition-colors shadow-2xs flex items-center gap-1 cursor-pointer">
                             <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle></svg>
-                            Snap with Camera
+                            Camera
                         </button>
                     </div>
                 </div>
 
                 <!-- Feature Strip -->
-                <div class="flex items-center justify-between px-3 py-2 bg-zinc-50 border border-zinc-200/70 rounded-xl text-[10px] text-zinc-500">
+                <div class="flex items-center justify-between px-3 py-1.5 bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200/70 dark:border-zinc-800 rounded-lg text-[10px] text-zinc-500 dark:text-zinc-400">
                     <span class="flex items-center gap-1">
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                        <span>Client-Side Vision OCR</span>
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700 dark:text-zinc-300"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                        <span>Vision OCR</span>
                     </span>
-                    <span class="text-zinc-300">•</span>
+                    <span class="text-zinc-300 dark:text-zinc-700">•</span>
                     <span class="flex items-center gap-1">
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                        <span>Single Owner Guard</span>
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700 dark:text-zinc-300"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                        <span>Owner Guard</span>
                     </span>
-                    <span class="text-zinc-300">•</span>
+                    <span class="text-zinc-300 dark:text-zinc-700">•</span>
                     <span class="flex items-center gap-1">
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        <span>Auto Role Mapping</span>
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700 dark:text-zinc-300"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <span>Auto Role Map</span>
                     </span>
                 </div>
 
                 <!-- Photos Preview Grid -->
                 <div id="photos-preview-container" class="hidden space-y-2">
-                    <div class="flex items-center justify-between text-xs font-bold text-zinc-800">
+                    <div class="flex items-center justify-between text-xs font-bold text-zinc-800 dark:text-zinc-200">
                         <span>Selected Register Pages (<span id="photos-count">0</span>):</span>
-                        <button type="button" onclick="clearSelectedPhotos()" class="text-zinc-500 hover:text-red-600 text-[11px] font-medium transition-colors">Remove All</button>
+                        <button type="button" onclick="clearSelectedPhotos()" class="text-zinc-500 hover:text-red-600 text-[10px] font-medium transition-colors">Remove All</button>
                     </div>
-                    <div id="photos-thumbnails-grid" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2.5"></div>
+                    <div id="photos-thumbnails-grid" class="grid grid-cols-3 sm:grid-cols-4 gap-2"></div>
                 </div>
 
                 <!-- Action Button -->
                 <div>
-                    <button type="button" id="btn-parse-photos" onclick="processRegisterPhotosOcr()" class="w-full py-2.5 sm:py-3 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-all cursor-pointer shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                        <span>Extract &amp; Digitize Roster with Vision AI</span>
+                    <button type="button" id="btn-parse-photos" onclick="processRegisterPhotosOcr()" class="w-full py-2 bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                        <span>Extract &amp; Digitize Roster</span>
                     </button>
                 </div>
             </div>
 
             <!-- TAB PANEL 2: SPREADSHEET / CSV IMPORT -->
-            <div id="panel-migration-csv" class="migration-panel hidden space-y-3.5">
-                <div class="p-5 sm:p-6 rounded-2xl border-2 border-dashed border-zinc-300 hover:border-zinc-400 bg-zinc-50/50 flex flex-col items-center justify-center text-center space-y-2.5 cursor-pointer transition-colors" onclick="$('#input-team-csv').trigger('click')">
+            <div id="panel-migration-csv" class="migration-panel hidden space-y-3">
+                <div class="p-4 rounded-xl border-2 border-dashed border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-600 bg-zinc-50/50 dark:bg-zinc-900/30 flex flex-col items-center justify-center text-center space-y-2 cursor-pointer transition-colors" onclick="$('#input-team-csv').trigger('click')">
                     <input type="file" id="input-team-csv" accept=".csv, .xlsx, .xls, text/csv, application/vnd.ms-excel" class="hidden" onchange="handleTeamCsvSelect(event)">
                     
-                    <div class="w-11 h-11 rounded-2xl bg-white text-zinc-950 border border-zinc-200 shadow-sm flex items-center justify-center">
-                        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                    <div class="w-9 h-9 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white border border-zinc-200 dark:border-zinc-700 shadow-2xs flex items-center justify-center">
+                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
                     </div>
-                    <div class="max-w-md">
-                        <div class="text-xs font-bold text-zinc-900">Upload CSV or Excel Spreadsheet file</div>
-                        <div class="text-[11px] text-zinc-500 mt-0.5">Auto-maps columns (Name, Phone, Email, Role, Department). Unrecognized columns are preserved as attributes.</div>
+                    <div class="max-w-sm">
+                        <div class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Upload CSV or Excel Spreadsheet</div>
+                        <div class="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">Auto-maps columns (Name, Phone, Email, Role, Department).</div>
                     </div>
-                    <div class="flex items-center gap-2 pt-1" onclick="event.stopPropagation()">
-                        <button type="button" onclick="$('#input-team-csv').trigger('click')" class="px-3.5 py-1.5 rounded-lg bg-zinc-950 text-white text-[11px] font-semibold hover:bg-zinc-800 transition-colors shadow-2xs">Choose Spreadsheet File</button>
-                        <button type="button" onclick="$('#csv-paste-toggle-box').toggleClass('hidden')" class="px-3.5 py-1.5 rounded-lg bg-white border border-zinc-200 text-zinc-700 text-[11px] font-semibold hover:bg-zinc-100 transition-colors shadow-2xs">Paste Raw Text</button>
+                    <div class="flex items-center gap-2 pt-0.5" onclick="event.stopPropagation()">
+                        <button type="button" onclick="$('#input-team-csv').trigger('click')" class="px-3 py-1.5 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 text-[11px] font-semibold hover:bg-zinc-800 transition-colors shadow-2xs">Choose File</button>
+                        <button type="button" onclick="$('#csv-paste-toggle-box').toggleClass('hidden')" class="px-3 py-1.5 rounded-lg bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-[11px] font-semibold hover:bg-zinc-100 transition-colors shadow-2xs">Paste Text</button>
                     </div>
                 </div>
 
                 <!-- CSV Paste Area (Collapsible) -->
-                <div id="csv-paste-toggle-box" class="hidden space-y-2 p-3.5 rounded-xl bg-zinc-50 border border-zinc-200">
-                    <div class="flex items-center justify-between text-[11px] font-bold text-zinc-700">
-                        <span>Paste CSV / TSV Rows or Table Data:</span>
-                        <span class="text-[10px] font-mono text-zinc-400">e.g. Name, Phone, Role, Salary</span>
+                <div id="csv-paste-toggle-box" class="hidden space-y-1.5 p-3 rounded-lg bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800">
+                    <div class="flex items-center justify-between text-[10px] font-bold text-zinc-700 dark:text-zinc-300">
+                        <span>Paste CSV / TSV Rows:</span>
+                        <span class="font-mono text-zinc-400">Name, Phone, Role, Dept</span>
                     </div>
-                    <textarea id="raw-csv-textarea" rows="3" class="w-full px-3 py-2 text-xs font-mono border border-zinc-200 rounded-lg bg-white focus:border-zinc-400 focus:outline-none text-zinc-900 placeholder-zinc-400" placeholder="Rohan Verma, 9876543210, Senior Photographer, Production, 45k&#10;Kavya Patel, 9812345678, Lead Retoucher, Creative, 40k"></textarea>
+                    <textarea id="raw-csv-textarea" rows="3" class="w-full px-2.5 py-1.5 text-xs font-mono border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 focus:border-zinc-400 focus:outline-none text-zinc-900 dark:text-white placeholder-zinc-400" placeholder="Rohan Verma, 9876543210, Senior Photographer, Production&#10;Kavya Patel, 9812345678, Lead Retoucher, Creative"></textarea>
                 </div>
 
                 <!-- Action Button -->
                 <div>
-                    <button type="button" id="btn-parse-csv" onclick="processTeamCsvData()" class="w-full py-2.5 sm:py-3 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-all cursor-pointer shadow-sm flex items-center justify-center gap-2">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+                    <button type="button" id="btn-parse-csv" onclick="processTeamCsvData()" class="w-full py-2 bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:text-zinc-950 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer shadow-sm flex items-center justify-center gap-1.5">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
                         <span>Parse &amp; Auto-Map Columns</span>
                     </button>
                 </div>
             </div>
 
             <!-- TAB PANEL 3: VOICE DICTATION ("TALK TO MIGRATE") -->
-            <div id="panel-migration-voice" class="migration-panel hidden space-y-3.5">
-                <div class="p-5 sm:p-6 rounded-2xl bg-zinc-50 border border-zinc-200 flex flex-col items-center justify-center text-center space-y-3">
+            <div id="panel-migration-voice" class="migration-panel hidden space-y-3">
+                <div class="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-900/30 border border-zinc-200 dark:border-zinc-800 flex flex-col items-center justify-center text-center space-y-2.5">
                     <!-- Mic Button & Waveform -->
                     <div class="relative flex items-center justify-center">
-                        <button type="button" id="btn-migration-voice-record" onclick="toggleMigrationVoiceDictation()" class="w-14 h-14 rounded-full bg-zinc-950 hover:bg-zinc-800 text-white flex items-center justify-center cursor-pointer transition-all active:scale-95 shadow-md z-10">
-                            <svg id="migration-mic-icon" viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                        <button type="button" id="btn-migration-voice-record" onclick="toggleMigrationVoiceDictation()" class="w-12 h-12 rounded-full bg-zinc-950 hover:bg-zinc-800 text-white flex items-center justify-center cursor-pointer transition-all active:scale-95 shadow-sm z-10">
+                            <svg id="migration-mic-icon" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
                         </button>
-                        <div id="migration-voice-wave-ring" class="hidden absolute inset-0 -m-2.5 rounded-full border-2 border-zinc-950/40 animate-ping pointer-events-none"></div>
+                        <div id="migration-voice-wave-ring" class="hidden absolute inset-0 -m-2 rounded-full border-2 border-zinc-950/40 animate-ping pointer-events-none"></div>
                     </div>
 
                     <div>
-                        <div class="text-xs font-bold text-zinc-900" id="migration-voice-status-text">Click mic to start explaining your team roster</div>
-                        <div class="text-[11px] text-zinc-500 mt-0.5">Simply speak naturally. AI extracts names, phone numbers, designations, and working departments.</div>
+                        <div class="text-xs font-bold text-zinc-900 dark:text-white" id="migration-voice-status-text">Click mic to speak roster</div>
+                        <div class="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">Speak names, phones, designations, and departments naturally.</div>
                     </div>
 
                     <!-- Language Selector -->
-                    <div class="flex items-center gap-2">
-                        <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Spoken Language:</span>
-                        <select id="migration-voice-lang-select" onchange="switchMigrationVoiceLanguage(this.value)" class="h-7 px-2.5 text-xs font-medium text-zinc-700 bg-white border border-zinc-200 rounded-lg outline-none cursor-pointer">
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Lang:</span>
+                        <select id="migration-voice-lang-select" onchange="switchMigrationVoiceLanguage(this.value)" class="h-6 px-2 text-[11px] font-medium text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-md outline-none cursor-pointer">
                             <option value="en-IN" selected>🇮🇳 English (India)</option>
                             <option value="hi-IN">🇮🇳 हिन्दी (Hindi)</option>
                             <option value="bn-IN">🇮🇳 বাংলা (Bengali)</option>
@@ -3887,25 +3887,24 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
                     </div>
 
                     <!-- Live Audio Wave Bars Visualizer -->
-                    <div id="migration-audio-visualizer" class="hidden flex items-center justify-center gap-1 h-5">
-                        <span class="w-1 bg-zinc-950 rounded-full h-2.5 animate-pulse"></span>
-                        <span class="w-1 bg-zinc-950 rounded-full h-4 animate-pulse" style="animation-delay: 0.1s;"></span>
-                        <span class="w-1 bg-zinc-950 rounded-full h-2 animate-pulse" style="animation-delay: 0.2s;"></span>
-                        <span class="w-1 bg-zinc-950 rounded-full h-5 animate-pulse" style="animation-delay: 0.15s;"></span>
-                        <span class="w-1 bg-zinc-950 rounded-full h-3 animate-pulse" style="animation-delay: 0.25s;"></span>
+                    <div id="migration-audio-visualizer" class="hidden flex items-center justify-center gap-1 h-4">
+                        <span class="w-1 bg-zinc-950 dark:bg-white rounded-full h-2 animate-pulse"></span>
+                        <span class="w-1 bg-zinc-950 dark:bg-white rounded-full h-3.5 animate-pulse" style="animation-delay: 0.1s;"></span>
+                        <span class="w-1 bg-zinc-950 dark:bg-white rounded-full h-2 animate-pulse" style="animation-delay: 0.2s;"></span>
+                        <span class="w-1 bg-zinc-950 dark:bg-white rounded-full h-4 animate-pulse" style="animation-delay: 0.15s;"></span>
+                        <span class="w-1 bg-zinc-950 dark:bg-white rounded-full h-2.5 animate-pulse" style="animation-delay: 0.25s;"></span>
                     </div>
 
                     <!-- Live Transcript Bubble -->
                     <div class="w-full text-left space-y-1">
-                        <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Captured Speech Transcript:</label>
-                        <textarea id="migration-voice-transcript" rows="2" class="w-full px-3 py-2 text-xs border border-zinc-200 rounded-xl bg-white focus:border-zinc-400 focus:outline-none text-zinc-900 placeholder-zinc-400 resize-none" placeholder="Transcript will stream here as you speak, or you can paste notes directly..."></textarea>
+                        <textarea id="migration-voice-transcript" rows="2" class="w-full px-2.5 py-1.5 text-xs border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 focus:border-zinc-400 focus:outline-none text-zinc-900 dark:text-white placeholder-zinc-400 resize-none" placeholder="Transcript streams here as you speak..."></textarea>
                     </div>
                 </div>
 
                 <!-- Action Button -->
                 <div>
-                    <button type="button" id="btn-parse-voice" onclick="processVoiceDictationData()" class="w-full py-2.5 sm:py-3 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-all cursor-pointer shadow-sm flex items-center justify-center gap-2">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                    <button type="button" id="btn-parse-voice" onclick="processVoiceDictationData()" class="w-full py-2 bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:text-zinc-950 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer shadow-sm flex items-center justify-center gap-1.5">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
                         <span>Extract Team from Speech</span>
                     </button>
                 </div>
@@ -3913,63 +3912,62 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
         </div>
 
         <!-- ═══ PHASE 2: INTERACTIVE STAGING & VERIFICATION TABLE ═══ -->
-        <div id="migration-phase-staging" class="hidden space-y-4">
+        <div id="migration-phase-staging" class="hidden space-y-3">
             <!-- Telemetry & Action Bar -->
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 bg-zinc-50 rounded-2xl border border-zinc-200/80">
-                <div class="flex items-center gap-2">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-2.5 bg-zinc-50 dark:bg-zinc-900/40 rounded-xl border border-zinc-200/80 dark:border-zinc-800">
+                <div class="flex items-center gap-1.5">
                     <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                    <span class="text-xs font-bold text-zinc-900"><span id="staging-total-count">0</span> Member Records Extracted</span>
-                    <span class="text-[10px] text-zinc-500 font-medium">(Review &amp; Edit before Final Import)</span>
+                    <span class="text-xs font-bold text-zinc-900 dark:text-white"><span id="staging-total-count">0</span> Extracted</span>
                 </div>
-                <div class="flex items-center gap-2 w-full sm:w-auto">
-                    <button type="button" onclick="addEmptyStagingRow()" class="px-2.5 py-1.5 bg-white hover:bg-zinc-100 text-zinc-800 border border-zinc-200 rounded-lg text-[11px] font-semibold transition-colors shadow-2xs flex items-center gap-1 cursor-pointer">
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                        Add Row
+                <div class="flex items-center gap-1.5 w-full sm:w-auto">
+                    <button type="button" onclick="addEmptyStagingRow()" class="px-2 py-1 bg-white dark:bg-zinc-800 hover:bg-zinc-100 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 rounded-md text-[10px] font-semibold transition-colors shadow-2xs flex items-center gap-1 cursor-pointer">
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        Add
                     </button>
-                    <button type="button" onclick="autoFillMissingEmails()" class="px-2.5 py-1.5 bg-white hover:bg-zinc-100 text-zinc-800 border border-zinc-200 rounded-lg text-[11px] font-semibold transition-colors shadow-2xs flex items-center gap-1 cursor-pointer" title="Auto-fill placeholder emails for members with missing email">
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                        Auto-Fill Emails
+                    <button type="button" onclick="autoFillMissingEmails()" class="px-2 py-1 bg-white dark:bg-zinc-800 hover:bg-zinc-100 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 rounded-md text-[10px] font-semibold transition-colors shadow-2xs flex items-center gap-1 cursor-pointer" title="Auto-fill placeholder emails for members with missing email">
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                        Auto-Emails
                     </button>
-                    <button type="button" onclick="clearStagingData()" class="px-2.5 py-1.5 text-zinc-500 hover:text-red-600 text-[11px] font-medium transition-colors cursor-pointer">
-                        Clear All
+                    <button type="button" onclick="clearStagingData()" class="px-2 py-1 text-zinc-500 hover:text-red-600 text-[10px] font-medium transition-colors cursor-pointer">
+                        Clear
                     </button>
                 </div>
             </div>
 
             <!-- Staging Data Table -->
-            <div class="overflow-x-auto rounded-2xl border border-zinc-200 bg-white shadow-sm max-h-[48vh] overflow-y-auto">
+            <div class="overflow-x-auto rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xs max-h-[44vh] overflow-y-auto">
                 <table class="w-full text-left text-xs border-collapse" id="table-staging-members">
-                    <thead class="bg-zinc-50/80 sticky top-0 z-10 border-b border-zinc-200 text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
+                    <thead class="bg-zinc-50/80 dark:bg-zinc-800/80 sticky top-0 z-10 border-b border-zinc-200 dark:border-zinc-700 text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
                         <tr>
-                            <th class="px-3 py-2.5 w-10 text-center">#</th>
-                            <th class="px-3 py-2.5 min-w-[160px]">Full Name <span class="text-red-500">*</span></th>
-                            <th class="px-3 py-2.5 min-w-[180px]">Email Address <span class="text-red-500">*</span></th>
-                            <th class="px-3 py-2.5 min-w-[130px]">Phone / Mobile</th>
-                            <th class="px-3 py-2.5 min-w-[140px]">Assigned Role</th>
-                            <th class="px-3 py-2.5 min-w-[130px]">Department</th>
-                            <th class="px-3 py-2.5 min-w-[180px]">Custom Attributes / Notes</th>
-                            <th class="px-2 py-2.5 w-12 text-center">Action</th>
+                            <th class="px-2.5 py-2 w-8 text-center">#</th>
+                            <th class="px-2.5 py-2 min-w-[140px]">Full Name <span class="text-red-500">*</span></th>
+                            <th class="px-2.5 py-2 min-w-[160px]">Email <span class="text-red-500">*</span></th>
+                            <th class="px-2.5 py-2 min-w-[110px]">Phone</th>
+                            <th class="px-2.5 py-2 min-w-[120px]">Role</th>
+                            <th class="px-2.5 py-2 min-w-[110px]">Department</th>
+                            <th class="px-2.5 py-2 min-w-[140px]">Notes</th>
+                            <th class="px-1.5 py-2 w-10 text-center">Action</th>
                         </tr>
                     </thead>
-                    <tbody id="staging-members-tbody" class="divide-y divide-zinc-100 font-normal">
+                    <tbody id="staging-members-tbody" class="divide-y divide-zinc-100 dark:divide-zinc-800 font-normal">
                         <!-- Dynamic Staging Rows Injected Here -->
                     </tbody>
                 </table>
             </div>
 
             <!-- Verification Summary & Primary Actions Footer -->
-            <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 pb-2 border-t border-zinc-200">
-                <button type="button" onclick="switchMigrationPhase('ingest')" class="px-4 py-2 text-xs font-semibold text-zinc-600 hover:text-zinc-950 transition-colors flex items-center gap-1.5 cursor-pointer">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                    Back to Ingestion
+            <div class="flex items-center justify-between gap-2 pt-2.5 pb-1 border-t border-zinc-200 dark:border-zinc-800">
+                <button type="button" onclick="switchMigrationPhase('ingest')" class="px-3 py-1.5 text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition-colors flex items-center gap-1 cursor-pointer">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                    Back
                 </button>
-                <div class="flex items-center gap-2 w-full sm:w-auto">
-                    <button type="button" onclick="closeImportTeamDrawer()" class="px-4 py-2 rounded-xl border border-zinc-200 hover:bg-zinc-50 text-zinc-700 text-xs font-semibold transition-colors cursor-pointer">
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="closeImportTeamDrawer()" class="px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold transition-colors cursor-pointer">
                         Cancel
                     </button>
-                    <button type="button" id="btn-execute-batch-import" onclick="executeBatchTeamImport()" class="flex-1 sm:flex-none px-6 py-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold transition-all cursor-pointer shadow-sm flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><polyline points="16 11 18 13 22 9"></polyline></svg>
-                        <span>Proceed &amp; Import <span id="btn-import-count">0</span> Members</span>
+                    <button type="button" id="btn-execute-batch-import" onclick="executeBatchTeamImport()" class="px-4 py-1.5 rounded-lg bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:text-zinc-950 text-white text-xs font-bold transition-all cursor-pointer shadow-sm flex items-center justify-center gap-1.5 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><polyline points="16 11 18 13 22 9"></polyline></svg>
+                        <span>Import (<span id="btn-import-count">0</span>)</span>
                     </button>
                 </div>
             </div>
