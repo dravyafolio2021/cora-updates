@@ -440,28 +440,26 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         background-color: #202023 !important;
     }
 
-    /* AI Team Migration Bottom Tray (Full Width, Adaptive Height up to 85vh) */
+    /* AI Team Migration Hub (Responsive Centered Sheet on Desktop, Bottom Sheet on Mobile) */
     #cora-team-migration-tray {
         position: fixed !important;
         top: auto !important;
         bottom: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
+        left: 50% !important;
+        right: auto !important;
         width: 100% !important;
-        max-width: 100% !important;
+        max-width: 820px !important;
         height: auto !important;
         min-height: auto !important;
         max-height: 85vh !important;
-        z-index: 100000 !important;
+        z-index: 100050 !important;
         background-color: #ffffff !important;
-        border-top-left-radius: 28px !important;
-        border-top-right-radius: 28px !important;
-        border-top: 1px solid #e4e4e7 !important;
-        border-left: none !important;
-        border-right: none !important;
+        border-top-left-radius: 24px !important;
+        border-top-right-radius: 24px !important;
+        border: 1px solid #e4e4e7 !important;
         border-bottom: none !important;
         box-shadow: 0 -12px 48px rgba(0, 0, 0, 0.16) !important;
-        transform: translateY(100%) !important;
+        transform: translate(-50%, 100%) !important;
         transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1), visibility 300ms ease !important;
         display: flex !important;
         flex-direction: column !important;
@@ -472,13 +470,31 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
         margin: 0 !important;
     }
     #cora-team-migration-tray.open {
-        transform: translateY(0%) !important;
+        transform: translate(-50%, 0%) !important;
         pointer-events: auto !important;
         visibility: visible !important;
+    }
+    @media (max-width: 767px) {
+        #cora-team-migration-tray {
+            left: 0 !important;
+            right: 0 !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            border-left: none !important;
+            border-right: none !important;
+            border-top-left-radius: 24px !important;
+            border-top-right-radius: 24px !important;
+            transform: translateY(100%) !important;
+        }
+        #cora-team-migration-tray.open {
+            transform: translateY(0%) !important;
+        }
     }
     .dark #cora-team-migration-tray {
         background-color: #121214 !important;
         border-top-color: #27272a !important;
+        border-left-color: #27272a !important;
+        border-right-color: #27272a !important;
     }
     .cora-tab-customizer-card {
         transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
@@ -3239,8 +3255,11 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
     </div>
 </div><!-- /.cora-users-wrapper -->
 
+<!-- Universal Users Drawer Backdrop -->
+<div id="cora-drawer-backdrop" class="fixed inset-0 bg-zinc-950/40 backdrop-blur-[2px] z-[100040] hidden transition-opacity cursor-pointer" onclick="window.coraCloseAllDrawers()"></div>
+
 <!-- ═══ OFFICE GEOFENCING DRAWER SHEET ═══════════════════════════════════════ -->
-<aside id="cora-geofence-drawer" class="cora-drawer cora-portal-drawer collapsed hidden fixed top-0 right-0 z-[10000] h-full w-[440px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full pointer-events-none">
+<aside id="cora-geofence-drawer" class="cora-drawer cora-portal-drawer collapsed hidden fixed top-0 right-0 z-[100050] h-full w-[440px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full pointer-events-none">
     <!-- Mobile Drag Indicator Handle -->
     <div class="md:hidden flex justify-center pt-3 pb-1 cursor-pointer shrink-0" onclick="closeGeofenceDrawer()">
         <div class="w-10 h-1 rounded-full bg-zinc-300"></div>
@@ -3342,7 +3361,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
 </aside>
 
 <!-- ═══ AUTOMATED ATTENDANCE REPORT & SHARE SIDE DRAWER SHEET ═════════════════ -->
-<aside id="cora-attendance-reports-drawer" class="cora-drawer cora-portal-drawer collapsed hidden fixed top-0 right-0 z-[10000] h-full w-[440px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full pointer-events-none">
+<aside id="cora-attendance-reports-drawer" class="cora-drawer cora-portal-drawer collapsed hidden fixed top-0 right-0 z-[100050] h-full w-[440px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full pointer-events-none">
     <!-- Mobile Drag Indicator Handle -->
     <div class="md:hidden flex justify-center pt-3 pb-1 cursor-pointer shrink-0" onclick="closeAttendanceReportsDrawer()">
         <div class="w-10 h-1 rounded-full bg-zinc-300"></div>
@@ -3510,7 +3529,7 @@ if ( $is_agency_mode ) {
         'financials'         => 'Financials',
         'settings'           => 'Settings',
     );
-} else {
+} elseif ( $active_industry === 'real_estate' ) {
     $industry_title = 'Invite Brokerage Member';
     $branch_label = 'Assign Office Location';
     $categories_cols = array(
@@ -3519,6 +3538,22 @@ if ( $is_agency_mode ) {
         'feature-hub'        => 'Feature Hub',
         'team-roles'         => 'Team & Roles',
         'equipment'          => 'Property Listings',
+        'canvas'             => 'Canvas',
+        'forms'              => 'Forms',
+        'emails'             => 'Emails',
+        'review_acquisition' => 'Reviews',
+        'financials'         => 'Financials',
+        'settings'           => 'Settings',
+    );
+} else {
+    $industry_title = 'Invite Workspace Member';
+    $branch_label = 'Assign Location / Branch';
+    $categories_cols = array(
+        'dashboard'          => 'Dashboard',
+        'bookings'           => 'Bookings',
+        'feature-hub'        => 'Feature Hub',
+        'team-roles'         => 'Team & Roles',
+        'equipment'          => 'Assets',
         'canvas'             => 'Canvas',
         'forms'              => 'Forms',
         'emails'             => 'Emails',
@@ -3573,7 +3608,7 @@ window.coraTotalWorkspaceTokens = <?php echo intval( $total_workspace_ai_tokens 
 window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
 </script>
 
-<aside id="cora-invite-user-drawer" class="cora-drawer cora-portal-drawer collapsed hidden fixed top-0 right-0 z-[10000] h-full w-[440px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full pointer-events-none">
+<aside id="cora-invite-user-drawer" class="cora-drawer cora-portal-drawer collapsed hidden fixed top-0 right-0 z-[100050] h-full w-[440px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full pointer-events-none">
     <!-- Mobile Drag Indicator Handle -->
     <div class="md:hidden flex justify-center pt-3 pb-1 cursor-pointer shrink-0" onclick="closeInviteDrawer()">
         <div class="w-10 h-1 rounded-full bg-zinc-300"></div>
@@ -3934,7 +3969,7 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
 </section>
 
 <!-- ═══ EDIT USER DRAWER SHEET ═══════════════════════════════════════════════ -->
-<aside id="cora-edit-user-drawer" class="cora-drawer cora-portal-drawer collapsed hidden fixed top-0 right-0 z-[10000] h-full w-[440px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full pointer-events-none">
+<aside id="cora-edit-user-drawer" class="cora-drawer cora-portal-drawer collapsed hidden fixed top-0 right-0 z-[100050] h-full w-[440px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full pointer-events-none">
         <!-- Mobile pull-down handle -->
         <div class="md:hidden flex justify-center pt-2 pb-0 cursor-pointer" onclick="closeEditUserDrawer()">
             <div class="w-10 h-1 rounded-full bg-zinc-300 "></div>
@@ -4336,7 +4371,7 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
 </aside>
 
 <!-- ═══ EDIT CUSTOM ROLE DRAWER SHEET ════════════════════════════════════════ -->
-<aside id="cora-edit-custom-role-drawer" class="cora-drawer cora-portal-drawer collapsed hidden fixed top-0 right-0 z-[10000] h-full w-[460px] max-w-[92vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full pointer-events-none">
+<aside id="cora-edit-custom-role-drawer" class="cora-drawer cora-portal-drawer collapsed hidden fixed top-0 right-0 z-[100050] h-full w-[460px] max-w-[92vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full pointer-events-none">
     <!-- Mobile pull-down handle -->
     <div class="md:hidden flex justify-center pt-3 pb-1 cursor-pointer shrink-0" onclick="closeEditCustomRoleDrawer()">
         <div class="w-10 h-1 rounded-full bg-zinc-300"></div>
@@ -4424,7 +4459,7 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
 </aside>
 
 <!-- ═══ CREATE CUSTOM ROLE DRAWER SHEET (WORKSPACE OWNER ONLY) ══════════════════════════════════════ -->
-<aside id="cora-create-custom-role-drawer" class="cora-drawer cora-portal-drawer collapsed hidden fixed top-0 right-0 z-[10000] h-full w-[460px] max-w-[92vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full pointer-events-none">
+<aside id="cora-create-custom-role-drawer" class="cora-drawer cora-portal-drawer collapsed hidden fixed top-0 right-0 z-[100050] h-full w-[460px] max-w-[92vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full pointer-events-none">
     <!-- Mobile pull-down handle -->
     <div class="md:hidden flex justify-center pt-3 pb-1 cursor-pointer shrink-0" onclick="closeCreateCustomRoleDrawer()">
         <div class="w-10 h-1 rounded-full bg-zinc-300"></div>
@@ -4571,7 +4606,7 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
 </aside>
 
 <!-- ═══ AI TRAINER & DOUBT ASSISTANT DRAWER SHEET ════════════════════════════════ -->
-<aside id="cora-ai-trainer-drawer" class="cora-drawer cora-portal-drawer collapsed hidden fixed top-0 right-0 z-[10000] h-full w-[440px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full pointer-events-none">
+<aside id="cora-ai-trainer-drawer" class="cora-drawer cora-portal-drawer collapsed hidden fixed top-0 right-0 z-[100050] h-full w-[440px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full pointer-events-none">
     <!-- Mobile pull-down handle -->
     <div class="md:hidden flex justify-center pt-3 pb-1 cursor-pointer shrink-0" onclick="closeAiTrainerDrawer()">
         <div class="w-10 h-1 rounded-full bg-zinc-300"></div>
@@ -4700,7 +4735,7 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
 </aside>
 
 <!-- ═══ WALKTHROUGH TUTORIAL DRAWER SHEET ══════════════════════════════════════ -->
-<aside id="cora-permissions-video-drawer" class="cora-drawer cora-portal-drawer collapsed hidden fixed top-0 right-0 z-[10000] h-full w-[440px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full pointer-events-none">
+<aside id="cora-permissions-video-drawer" class="cora-drawer cora-portal-drawer collapsed hidden fixed top-0 right-0 z-[100050] h-full w-[440px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full pointer-events-none">
     <!-- Mobile pull-down handle -->
     <div class="md:hidden flex justify-center pt-3 pb-1 cursor-pointer shrink-0" onclick="closePermissionsVideoDrawer()">
         <div class="w-10 h-1 rounded-full bg-zinc-300"></div>
@@ -4782,7 +4817,7 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
 </aside>
 
 <!-- ═══ PERMANENT DELETE USER CONFIRMATION MODAL ═════════════════════════════ -->
-<div id="cora-delete-user-modal" style="position: fixed; inset: 0; z-index: 10005;" class="hidden fixed inset-0 z-[10005] flex items-center justify-center p-4 animate-in fade-in duration-150">
+<div id="cora-delete-user-modal" style="position: fixed; inset: 0; z-index: 100055;" class="hidden fixed inset-0 z-[100055] flex items-center justify-center p-4 animate-in fade-in duration-150">
     <div class="bg-white border border-zinc-200 rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-5 font-sans relative text-zinc-900" onclick="event.stopPropagation();">
         <input type="hidden" id="cora-delete-target-user-id" value="">
         
@@ -4831,7 +4866,7 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
 </div>
 
 <!-- ═══ MONOCHROMATIC DELETE CUSTOM ROLE MODAL ═══════════════════════════════════ -->
-<div id="cora-delete-custom-role-modal" class="hidden fixed inset-0 z-[10001] flex items-center justify-center p-4 transition-opacity duration-200 opacity-0 pointer-events-none" style="display: none;">
+<div id="cora-delete-custom-role-modal" class="hidden fixed inset-0 z-[100055] flex items-center justify-center p-4 transition-opacity duration-200 opacity-0 pointer-events-none" style="display: none;">
     <div class="bg-white rounded-2xl border border-zinc-200 shadow-2xl max-w-md w-full p-6 space-y-5 transform transition-all scale-95">
         <div class="flex items-start gap-3.5">
             <div class="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center shrink-0 border border-red-100">
@@ -4860,9 +4895,9 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
 </div>
 
 <!-- ═══ TAB CUSTOMIZER RIGHT-SLIDING DRAWER & BACKDROP (DESKTOP ONLY) ═══════════ -->
-<div id="cora-customize-tabs-backdrop" onclick="closeTabCustomizerDrawer()" class="hidden fixed inset-0 z-[9998] transition-opacity duration-200"></div>
+<div id="cora-customize-tabs-backdrop" onclick="closeTabCustomizerDrawer()" class="hidden fixed inset-0 z-[100045] bg-zinc-950/40 backdrop-blur-[2px] transition-opacity duration-200"></div>
 
-<aside id="cora-customize-tabs-drawer" class="cora-drawer cora-portal-drawer collapsed hidden fixed top-0 right-0 z-[9999] h-full w-[440px] max-w-[92vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full pointer-events-none" aria-label="Customize Module Tabs">
+<aside id="cora-customize-tabs-drawer" class="cora-drawer cora-portal-drawer collapsed hidden fixed top-0 right-0 z-[100050] h-full w-[440px] max-w-[92vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full pointer-events-none" aria-label="Customize Module Tabs">
     <!-- Mobile pull-down handle -->
     <div class="md:hidden flex justify-center pt-3 pb-1 cursor-pointer shrink-0" onclick="closeTabCustomizerDrawer()">
         <div class="w-10 h-1 rounded-full bg-zinc-300"></div>
@@ -4909,33 +4944,21 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
 (function($) {
     'use strict';
 
-    var CORA_TAB_PREFS_KEY = 'cora_module_subtabs_preferences';
-    var customizerWorkingState = [];
-
-    window.openTabCustomizerDrawer = function() {
-        initCustomizerState();
-        renderCustomizerListCards();
-        var $drawer = $('#cora-customize-tabs-drawer');
-        var $backdrop = $('#cora-customize-tabs-backdrop');
-        $backdrop.removeClass('hidden').addClass('block opacity-100');
-        $drawer.removeClass('collapsed hidden pointer-events-none translate-x-full').addClass('translate-x-0');
-    };
-
-    window.closeTabCustomizerDrawer = function() {
-        var $drawer = $('#cora-customize-tabs-drawer');
-        var $backdrop = $('#cora-customize-tabs-backdrop');
-        $drawer.removeClass('translate-x-0').addClass('translate-x-full');
-        setTimeout(function() {
-            $drawer.addClass('collapsed hidden pointer-events-none');
-            $backdrop.removeClass('block opacity-100').addClass('hidden');
-        }, 250);
-    };
-
     // ══════════════════════════════════════════════════════════════════
     // TAB CUSTOMIZER & REORDER ENGINE (DESKTOP)
     // ══════════════════════════════════════════════════════════════════
     var CORA_TAB_PREFS_KEY = 'cora_tab_prefs_users';
     var customizerWorkingState = [];
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        return String(text)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
 
     function getAvailableCustomizerTabs() {
         var tabs = [];
@@ -5147,8 +5170,9 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
         renderCustomizerListCards();
         var $drawer = $('#cora-customize-tabs-drawer');
         var $backdrop = $('#cora-customize-tabs-backdrop');
-        $backdrop.removeClass('hidden').addClass('block opacity-100');
-        $drawer.removeClass('collapsed hidden pointer-events-none translate-x-full').addClass('translate-x-0');
+        $backdrop.removeClass('hidden').addClass('block').css({'display': 'block', 'pointer-events': 'auto'});
+        $drawer.removeClass('collapsed hidden pointer-events-none translate-x-full').addClass('translate-x-0').css({'display': 'flex', 'pointer-events': 'auto'});
+        $('body').addClass('cora-drawer-open overflow-hidden');
     };
 
     window.closeTabCustomizerDrawer = function() {
@@ -5156,8 +5180,9 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
         var $backdrop = $('#cora-customize-tabs-backdrop');
         $drawer.removeClass('translate-x-0').addClass('translate-x-full');
         setTimeout(function() {
-            $drawer.addClass('collapsed hidden pointer-events-none');
-            $backdrop.removeClass('block opacity-100').addClass('hidden');
+            $drawer.addClass('collapsed hidden pointer-events-none').css({'display': 'none', 'pointer-events': 'none'});
+            $backdrop.removeClass('block').addClass('hidden').css({'display': 'none', 'pointer-events': 'none'});
+            $('body').removeClass('cora-drawer-open overflow-hidden');
         }, 250);
     };
 
@@ -5618,6 +5643,31 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
         $('#invite-welcome-msg-container').hide();
     }
     window.closeInviteDrawer = closeInviteDrawer;
+
+    // Unified Drawer & Modal Close Hook for Users Module
+    var prevCoraCloseAll = window.coraCloseAllDrawers;
+    window.coraCloseAllDrawers = function() {
+        if (typeof prevCoraCloseAll === 'function') {
+            try { prevCoraCloseAll(); } catch(e) {}
+        }
+        if (typeof window.closeInviteDrawer === 'function') window.closeInviteDrawer();
+        if (typeof window.closeImportTeamDrawer === 'function') window.closeImportTeamDrawer();
+        if (typeof window.closeTabCustomizerDrawer === 'function') window.closeTabCustomizerDrawer();
+        if (typeof window.closeEditUserDrawer === 'function') window.closeEditUserDrawer();
+        if (typeof window.closeGeofenceDrawer === 'function') window.closeGeofenceDrawer();
+        if (typeof window.closeAttendanceReportsDrawer === 'function') window.closeAttendanceReportsDrawer();
+        if (typeof window.closePermissionsVideoDrawer === 'function') window.closePermissionsVideoDrawer();
+        if (typeof window.closeAiTrainerDrawer === 'function') window.closeAiTrainerDrawer();
+        if (typeof window.closeCreateCustomRoleDrawer === 'function') window.closeCreateCustomRoleDrawer();
+        if (typeof window.closeEditCustomRoleDrawer === 'function') window.closeEditCustomRoleDrawer();
+        if (typeof window.closeDeleteCustomRoleModal === 'function') window.closeDeleteCustomRoleModal();
+        if (typeof window.coraCloseDeleteUserModal === 'function') window.coraCloseDeleteUserModal();
+
+        $('aside[id$="-drawer"], aside[id$="-sheet"], .cora-portal-drawer').addClass('collapsed hidden translate-x-full pointer-events-none').css({'display': 'none', 'pointer-events': 'none', 'opacity': '0'});
+        $('#cora-team-migration-tray').removeClass('open');
+        $('#cora-drawer-backdrop, #cora-customize-tabs-backdrop, #cora-team-migration-backdrop').addClass('hidden').removeClass('open active').css({'display': 'none', 'pointer-events': 'none'});
+        $('body').removeClass('cora-drawer-open overflow-hidden');
+    };
 
     $('#invite-email').on('input change', function() {
         var em = $(this).val().toLowerCase().trim();
@@ -8525,12 +8575,12 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
     var speechRecognitionInstance = null;
     var isVoiceRecording = false;
 
-    // Open Bottom Tray (Full Width, 70% Height on All Screens)
+    // Open AI Team Migration Sheet
     function openImportTeamDrawer() {
         if (typeof window.coraCloseAllDrawers === 'function') {
             window.coraCloseAllDrawers();
         } else {
-            $('aside[id$="-drawer"]').addClass('collapsed hidden');
+            $('aside[id$="-drawer"], aside[id$="-sheet"], .cora-portal-drawer').addClass('collapsed hidden translate-x-full pointer-events-none').css({'display': 'none'});
         }
 
         var $tray = $('#cora-team-migration-tray');
@@ -8538,10 +8588,13 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
 
         $('#cora-drawer-backdrop')
             .removeClass('hidden')
+            .addClass('open active')
             .css({
                 'display': 'block',
-                'pointer-events': 'auto'
+                'pointer-events': 'auto',
+                'opacity': '1'
             });
+        $('body').addClass('cora-drawer-open overflow-hidden');
 
         // Default to phase 1 (ingest) and tab 1 (photos) if no staging data
         if (!stagingMembersData || stagingMembersData.length === 0) {
@@ -8551,7 +8604,7 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
     }
     window.openImportTeamDrawer = openImportTeamDrawer;
 
-    // Close Bottom Tray
+    // Close AI Team Migration Sheet
     function closeImportTeamDrawer() {
         if (isVoiceRecording) {
             stopVoiceDictation();
@@ -8561,10 +8614,12 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
 
         $('#cora-drawer-backdrop')
             .addClass('hidden')
+            .removeClass('open active')
             .css({
                 'display': 'none',
                 'pointer-events': 'none'
             });
+        $('body').removeClass('cora-drawer-open overflow-hidden');
     }
     window.closeImportTeamDrawer = closeImportTeamDrawer;
 
