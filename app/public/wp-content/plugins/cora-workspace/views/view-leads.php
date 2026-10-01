@@ -2642,20 +2642,18 @@ cora_render_workspace_header( $leads_header_args );
 <!-- SLIDING SIDE DRAWER 1: RESIZABLE MULTI-TAB PROSPECT OPERATIONS WORKSPACE   -->
 <!-- ========================================================================= -->
 <!-- ========================================================================= -->
-<aside id="cora-lead-detail-drawer" class="cora-prospect-detail-drawer cora-side-drawer hidden collapsed fixed top-0 right-0 w-full sm:w-[50vw] h-full bg-white dark:bg-zinc-900 shadow-2xl z-[100050] transform translate-x-full transition-transform duration-300 ease-in-out border-l border-zinc-200 dark:border-zinc-800 flex flex-col font-sans select-none overflow-x-hidden overflow-y-hidden" style="min-width: 360px; max-width: 70vw; margin: 0; border-radius: 0;">
+<aside id="cora-lead-detail-drawer" class="cora-prospect-detail-drawer cora-side-drawer hidden collapsed fixed top-0 right-0 w-full sm:w-[50vw] h-full bg-white dark:bg-zinc-900 shadow-2xl z-[100050] transform translate-x-full transition-transform duration-300 ease-in-out border-l border-zinc-200 dark:border-zinc-800 flex flex-col font-sans select-none overflow-x-hidden overflow-y-hidden" style="min-width: 360px; max-width: 85vw; margin: 0; border-radius: 0;">
     
-    <!-- Drag Handle Bar on Left Edge (Desktop Resizing strictly between 20% and 70% viewport width) -->
-    <div id="cora-drawer-resize-handle" class="hidden sm:flex absolute top-0 bottom-0 -left-2.5 w-5 cursor-col-resize group z-50 items-center justify-center select-none" title="Drag left/right to resize drawer (20% - 70% width)">
-        <div class="w-1.5 h-20 rounded-full bg-zinc-300 dark:bg-zinc-700 group-hover:bg-zinc-950 dark:group-hover:bg-white group-hover:w-2 transition-all shadow-xs flex items-center justify-center">
-            <div class="w-0.5 h-6 bg-white dark:bg-zinc-900 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
-        </div>
+    <!-- Drag Handle Bar on Left Edge (Desktop Resizing strictly between 360px and 85% viewport width) -->
+    <div id="cora-drawer-resize-handle" class="hidden sm:flex absolute top-0 bottom-0 left-0 w-3 cursor-col-resize group z-[60] items-center justify-center select-none touch-none hover:bg-zinc-500/10 dark:hover:bg-zinc-400/10 transition-colors" title="Drag to resize drawer width">
+        <div class="w-1 h-16 rounded-full bg-zinc-300 dark:bg-zinc-700 group-hover:bg-zinc-950 dark:group-hover:bg-white group-hover:w-1.5 transition-all shadow-xs flex items-center justify-center"></div>
     </div>
 
     <!-- ===================================================================== -->
     <!-- TIER 1 (ORANGE BOX): QUICK CONTROL PANEL & DYNAMIC LEAD PREVIEW CARD  -->
     <!-- ===================================================================== -->
-    <div class="p-3 sm:p-4 border-b border-zinc-200 dark:border-zinc-800 flex flex-col gap-2.5 bg-white dark:bg-zinc-900 shrink-0 w-full shadow-2xs">
-        <!-- Top Row: Avatar + Title & Format + Snap Width Presets + Close Button -->
+    <div class="p-3 sm:p-4 border-b border-zinc-200 dark:border-zinc-800 flex flex-col gap-2.5 bg-white dark:bg-zinc-900 shrink-0 w-full shadow-2xs pl-4 sm:pl-5">
+        <!-- Top Row: Avatar + Title & Format + Close Button -->
         <div class="flex items-center justify-between gap-2.5 w-full">
             <div class="flex items-center gap-2.5 min-w-0 flex-1">
                 <div class="w-10 h-10 rounded-xl bg-zinc-950 dark:bg-zinc-100 flex items-center justify-center shadow-xs shrink-0 select-none border border-zinc-900 dark:border-zinc-200">
@@ -2671,13 +2669,6 @@ cora_render_workspace_header( $leads_header_args );
             </div>
             
             <div class="flex items-center gap-1.5 shrink-0">
-                <!-- Quick Width Snap Presets (30%, 50%, 70%) -->
-                <div class="hidden sm:flex items-center gap-0.5 p-0.5 bg-zinc-100 dark:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-700">
-                    <button type="button" class="px-2 py-0.5 rounded text-[10px] font-bold text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white hover:bg-white dark:hover:bg-zinc-700 transition-all cursor-pointer border-0" onclick="window.coraSnapDrawerWidth(0.30)" title="Snap to 30% Width">30%</button>
-                    <button type="button" class="px-2 py-0.5 rounded text-[10px] font-bold text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white hover:bg-white dark:hover:bg-zinc-700 transition-all cursor-pointer border-0" onclick="window.coraSnapDrawerWidth(0.50)" title="Snap to 50% Width">50%</button>
-                    <button type="button" class="px-2 py-0.5 rounded text-[10px] font-bold text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white hover:bg-white dark:hover:bg-zinc-700 transition-all cursor-pointer border-0" onclick="window.coraSnapDrawerWidth(0.70)" title="Snap to 70% Width">70%</button>
-                </div>
-
                 <button type="button" class="text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white w-8 h-8 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 transition-all cursor-pointer shrink-0 flex items-center justify-center active:scale-95 border border-zinc-200 dark:border-zinc-700" onclick="window.coraCloseAllDrawers()" title="Close Drawer">
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                 </button>
@@ -2749,31 +2740,8 @@ cora_render_workspace_header( $leads_header_args );
         <input type="hidden" id="cora-drawer-lead-id" value="">
 
         <!-- TAB 1: OVERVIEW & MASTER GROUPED PROFILE -->
-        <div id="cora-lead-detail-tab-overview" class="cora-lead-detail-tab-pane space-y-4 text-xs w-full max-w-full overflow-x-hidden box-border">
+        <div id="cora-lead-detail-tab-overview" class="cora-lead-detail-tab-pane space-y-3.5 text-xs w-full max-w-full overflow-x-hidden box-border">
             
-            <!-- ============================================================ -->
-            <!-- TIER 2 (YELLOW BOX): AI LIFECYCLE DEAL INTELLIGENCE SUMMARY   -->
-            <!-- ============================================================ -->
-            <div id="cora-drawer-ai-summary-box" class="p-3.5 sm:p-4 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-2xs space-y-2.5">
-                <div class="flex items-center justify-between gap-2">
-                    <div class="flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-purple-500 animate-pulse"></span>
-                        <h4 class="font-black text-xs text-zinc-950 dark:text-white uppercase tracking-wider">AI Deal Intelligence &amp; Lifecycle Summary</h4>
-                    </div>
-                    <button type="button" id="cora-drawer-ai-refresh-btn" class="h-7 px-2.5 rounded-lg bg-purple-50 hover:bg-purple-100 dark:bg-purple-950/60 dark:hover:bg-purple-900/80 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 font-bold text-[10.5px] flex items-center gap-1.5 transition-all cursor-pointer active:scale-95" onclick="coraRefreshLeadAiSummary()">
-                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
-                        <span>Summarize with AI</span>
-                    </button>
-                </div>
-                <p id="cora-drawer-ai-summary-text" class="text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed font-medium">
-                    Commercial brand production inquiry in Bengaluru with estimated budget of ₹4,50,000. Prospect is seeking full-service creative direction, studio shoot deliverables, and rapid turnaround.
-                </p>
-                <div class="p-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-800/70 border border-zinc-200/80 dark:border-zinc-700/80 flex items-start gap-2">
-                    <span class="px-1.5 py-0.5 rounded bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-black text-[8.5px] uppercase tracking-wider shrink-0">Next Move</span>
-                    <span id="cora-drawer-ai-recommended-move" class="text-[11px] font-semibold text-zinc-900 dark:text-zinc-100">Send curated commercial lookbook and lock creative pitch call within 2 hours.</span>
-                </div>
-            </div>
-
             <!-- ============================================================ -->
             <!-- TIER 3 (PURPLE BOX): PIPELINE CONTROLS & 4-STAT METRIC DECK   -->
             <!-- ============================================================ -->
@@ -2839,25 +2807,60 @@ cora_render_workspace_header( $leads_header_args );
             </div>
 
             <!-- ============================================================ -->
+            <!-- AI LIFECYCLE DEAL INTELLIGENCE SUMMARY (COLLAPSIBLE ACCORDION) -->
+            <!-- ============================================================ -->
+            <div class="cora-accordion-card bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/90 dark:border-zinc-800 overflow-hidden shadow-2xs">
+                <div class="w-full p-3 sm:p-3.5 flex items-center justify-between text-left cursor-pointer hover:bg-zinc-50/70 dark:hover:bg-zinc-800/50 transition-colors select-none" onclick="window.coraToggleDrawerAccordion(this)">
+                    <div class="flex items-center gap-2 min-w-0">
+                        <div class="w-5 h-5 rounded-md bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0 border border-purple-200 dark:border-purple-800">
+                            <span class="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse"></span>
+                        </div>
+                        <div class="min-w-0">
+                            <h4 class="font-bold text-xs text-zinc-950 dark:text-white uppercase tracking-wider truncate">AI Deal Intelligence &amp; Briefing</h4>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <button type="button" id="cora-drawer-ai-refresh-btn" class="h-6 px-2 rounded-md bg-purple-50 hover:bg-purple-100 dark:bg-purple-950/60 dark:hover:bg-purple-900/80 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 font-bold text-[10px] flex items-center gap-1 transition-all cursor-pointer active:scale-95 shrink-0" onclick="event.stopPropagation(); coraRefreshLeadAiSummary();">
+                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                            <span>Synthesize</span>
+                        </button>
+                        <svg class="cora-accordion-icon w-3.5 h-3.5 text-zinc-400 transition-transform duration-200 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
+                </div>
+                <div id="cora-drawer-ai-summary-box" class="cora-accordion-body hidden p-3 sm:p-3.5 pt-2.5 border-t border-zinc-100 dark:border-zinc-800/80 space-y-2">
+                    <p id="cora-drawer-ai-summary-text" class="text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed font-medium">
+                        Commercial brand production inquiry in Bengaluru with estimated budget of ₹4,50,000. Prospect is seeking full-service creative direction, studio shoot deliverables, and rapid turnaround.
+                    </p>
+                    <div class="p-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-800/70 border border-zinc-200/80 dark:border-zinc-700/80 flex items-start gap-2">
+                        <span class="px-1.5 py-0.5 rounded bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-black text-[8.5px] uppercase tracking-wider shrink-0">Next Move</span>
+                        <span id="cora-drawer-ai-recommended-move" class="text-[11px] font-semibold text-zinc-900 dark:text-zinc-100">Send curated commercial lookbook and lock creative pitch call within 2 hours.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================ -->
             <!-- TIER 4: DETAILED, GROUPED & CONTROLLED FORM SECTIONS          -->
             <!-- ============================================================ -->
 
-            <!-- GROUP 1: CONTACT & CLIENT PROFILE -->
-            <div class="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-3.5 sm:p-4 space-y-3.5 shadow-2xs">
-                <div class="flex items-center justify-between pb-2 border-b border-zinc-100 dark:border-zinc-800">
-                    <div class="flex items-center gap-2">
+            <!-- GROUP 1: CONTACT & CLIENT PROFILE (DEFAULT OPEN) -->
+            <div class="cora-accordion-card bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/90 dark:border-zinc-800 overflow-hidden shadow-2xs">
+                <div class="w-full p-3.5 sm:p-4 flex items-center justify-between text-left cursor-pointer hover:bg-zinc-50/70 dark:hover:bg-zinc-800/50 transition-colors select-none" onclick="window.coraToggleDrawerAccordion(this)">
+                    <div class="flex items-center gap-2.5 min-w-0">
                         <div class="w-6 h-6 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 flex items-center justify-center shrink-0 border border-zinc-200 dark:border-zinc-700">
                             <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                         </div>
-                        <div>
-                            <h4 class="font-bold text-xs text-zinc-950 dark:text-white">Contact &amp; Client Profile</h4>
-                            <p class="text-[10px] text-zinc-500 dark:text-zinc-400 font-medium">Full name, company, email, phone &amp; studio hub</p>
+                        <div class="min-w-0">
+                            <h4 class="font-bold text-xs text-zinc-950 dark:text-white truncate">Contact &amp; Client Profile</h4>
+                            <p class="text-[10px] text-zinc-500 dark:text-zinc-400 font-medium truncate">Full name, company, email, phone &amp; studio hub</p>
                         </div>
                     </div>
-                    <span class="text-[9px] font-black text-zinc-400 uppercase tracking-wider bg-zinc-50 dark:bg-zinc-800 px-1.5 py-0.5 rounded border border-zinc-200 dark:border-zinc-700">Group 1</span>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <span class="text-[9px] font-black text-zinc-400 uppercase tracking-wider bg-zinc-50 dark:bg-zinc-800 px-1.5 py-0.5 rounded border border-zinc-200 dark:border-zinc-700">Group 1</span>
+                        <svg class="cora-accordion-icon w-3.5 h-3.5 text-zinc-400 transition-transform duration-200 shrink-0 rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
                 </div>
 
-                <div class="space-y-3">
+                <div class="cora-accordion-body p-3.5 sm:p-4 pt-3 border-t border-zinc-100 dark:border-zinc-800/80 space-y-3">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                         <div>
                             <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1 text-[11px]">Full Name / Prospect Title <span class="text-rose-500">*</span></label>
@@ -2903,22 +2906,25 @@ cora_render_workspace_header( $leads_header_args );
                 </div>
             </div>
 
-            <!-- GROUP 2: COMMERCIAL SCOPE & DEAL TERMS -->
-            <div class="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-3.5 sm:p-4 space-y-3.5 shadow-2xs">
-                <div class="flex items-center justify-between pb-2 border-b border-zinc-100 dark:border-zinc-800">
-                    <div class="flex items-center gap-2">
+            <!-- GROUP 2: COMMERCIAL SCOPE & DEAL TERMS (DEFAULT CLOSED) -->
+            <div class="cora-accordion-card bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/90 dark:border-zinc-800 overflow-hidden shadow-2xs">
+                <div class="w-full p-3.5 sm:p-4 flex items-center justify-between text-left cursor-pointer hover:bg-zinc-50/70 dark:hover:bg-zinc-800/50 transition-colors select-none" onclick="window.coraToggleDrawerAccordion(this)">
+                    <div class="flex items-center gap-2.5 min-w-0">
                         <div class="w-6 h-6 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 flex items-center justify-center shrink-0 border border-zinc-200 dark:border-zinc-700">
                             <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
                         </div>
-                        <div>
-                            <h4 class="font-bold text-xs text-zinc-950 dark:text-white">Commercial Scope &amp; Deal Terms</h4>
-                            <p class="text-[10px] text-zinc-500 dark:text-zinc-400 font-medium">Deal size (₹), project format &amp; online channels</p>
+                        <div class="min-w-0">
+                            <h4 class="font-bold text-xs text-zinc-950 dark:text-white truncate">Commercial Scope &amp; Deal Terms</h4>
+                            <p class="text-[10px] text-zinc-500 dark:text-zinc-400 font-medium truncate">Deal size (₹), project format &amp; online channels</p>
                         </div>
                     </div>
-                    <span class="text-[9px] font-black text-zinc-400 uppercase tracking-wider bg-zinc-50 dark:bg-zinc-800 px-1.5 py-0.5 rounded border border-zinc-200 dark:border-zinc-700">Group 2</span>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <span class="text-[9px] font-black text-zinc-400 uppercase tracking-wider bg-zinc-50 dark:bg-zinc-800 px-1.5 py-0.5 rounded border border-zinc-200 dark:border-zinc-700">Group 2</span>
+                        <svg class="cora-accordion-icon w-3.5 h-3.5 text-zinc-400 transition-transform duration-200 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
                 </div>
 
-                <div class="space-y-3">
+                <div class="cora-accordion-body hidden p-3.5 sm:p-4 pt-3 border-t border-zinc-100 dark:border-zinc-800/80 space-y-3">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                         <div>
                             <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1 text-[11px]">Deal Budget / Value (₹) <span class="text-rose-500">*</span></label>
@@ -2959,22 +2965,25 @@ cora_render_workspace_header( $leads_header_args );
                 </div>
             </div>
 
-            <!-- GROUP 3: TIMELINE & MILESTONE PROGRESSION -->
-            <div class="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-3.5 sm:p-4 space-y-3.5 shadow-2xs">
-                <div class="flex items-center justify-between pb-2 border-b border-zinc-100 dark:border-zinc-800">
-                    <div class="flex items-center gap-2">
+            <!-- GROUP 3: TIMELINE & MILESTONE PROGRESSION (DEFAULT CLOSED) -->
+            <div class="cora-accordion-card bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/90 dark:border-zinc-800 overflow-hidden shadow-2xs">
+                <div class="w-full p-3.5 sm:p-4 flex items-center justify-between text-left cursor-pointer hover:bg-zinc-50/70 dark:hover:bg-zinc-800/50 transition-colors select-none" onclick="window.coraToggleDrawerAccordion(this)">
+                    <div class="flex items-center gap-2.5 min-w-0">
                         <div class="w-6 h-6 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 flex items-center justify-center shrink-0 border border-zinc-200 dark:border-zinc-700">
                             <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                         </div>
-                        <div>
-                            <h4 class="font-bold text-xs text-zinc-950 dark:text-white">Timeline &amp; Milestone Progression</h4>
-                            <p class="text-[10px] text-zinc-500 dark:text-zinc-400 font-medium">Target shoot date, next follow-up &amp; action item</p>
+                        <div class="min-w-0">
+                            <h4 class="font-bold text-xs text-zinc-950 dark:text-white truncate">Timeline &amp; Milestone Progression</h4>
+                            <p class="text-[10px] text-zinc-500 dark:text-zinc-400 font-medium truncate">Target shoot date, next follow-up &amp; action item</p>
                         </div>
                     </div>
-                    <span class="text-[9px] font-black text-zinc-400 uppercase tracking-wider bg-zinc-50 dark:bg-zinc-800 px-1.5 py-0.5 rounded border border-zinc-200 dark:border-zinc-700">Group 3</span>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <span class="text-[9px] font-black text-zinc-400 uppercase tracking-wider bg-zinc-50 dark:bg-zinc-800 px-1.5 py-0.5 rounded border border-zinc-200 dark:border-zinc-700">Group 3</span>
+                        <svg class="cora-accordion-icon w-3.5 h-3.5 text-zinc-400 transition-transform duration-200 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
                 </div>
 
-                <div class="space-y-3">
+                <div class="cora-accordion-body hidden p-3.5 sm:p-4 pt-3 border-t border-zinc-100 dark:border-zinc-800/80 space-y-3">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                         <div>
                             <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1 text-[11px]">Target Shoot / Event Date</label>
@@ -2993,22 +3002,25 @@ cora_render_workspace_header( $leads_header_args );
                 </div>
             </div>
 
-            <!-- GROUP 4: TEAM PRODUCER ASSIGNMENT & NOTES -->
-            <div class="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-3.5 sm:p-4 space-y-3.5 shadow-2xs">
-                <div class="flex items-center justify-between pb-2 border-b border-zinc-100 dark:border-zinc-800">
-                    <div class="flex items-center gap-2">
+            <!-- GROUP 4: TEAM PRODUCER ASSIGNMENT & NOTES (DEFAULT CLOSED) -->
+            <div class="cora-accordion-card bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/90 dark:border-zinc-800 overflow-hidden shadow-2xs">
+                <div class="w-full p-3.5 sm:p-4 flex items-center justify-between text-left cursor-pointer hover:bg-zinc-50/70 dark:hover:bg-zinc-800/50 transition-colors select-none" onclick="window.coraToggleDrawerAccordion(this)">
+                    <div class="flex items-center gap-2.5 min-w-0">
                         <div class="w-6 h-6 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 flex items-center justify-center shrink-0 border border-zinc-200 dark:border-zinc-700">
                             <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
                         </div>
-                        <div>
-                            <h4 class="font-bold text-xs text-zinc-950 dark:text-white">Team Assignment &amp; Internal Notes</h4>
-                            <p class="text-[10px] text-zinc-500 dark:text-zinc-400 font-medium">Assigned producer, deliverables &amp; internal brief</p>
+                        <div class="min-w-0">
+                            <h4 class="font-bold text-xs text-zinc-950 dark:text-white truncate">Team Assignment &amp; Internal Notes</h4>
+                            <p class="text-[10px] text-zinc-500 dark:text-zinc-400 font-medium truncate">Assigned producer, deliverables &amp; internal brief</p>
                         </div>
                     </div>
-                    <span class="text-[9px] font-black text-zinc-400 uppercase tracking-wider bg-zinc-50 dark:bg-zinc-800 px-1.5 py-0.5 rounded border border-zinc-200 dark:border-zinc-700">Group 4</span>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <span class="text-[9px] font-black text-zinc-400 uppercase tracking-wider bg-zinc-50 dark:bg-zinc-800 px-1.5 py-0.5 rounded border border-zinc-200 dark:border-zinc-700">Group 4</span>
+                        <svg class="cora-accordion-icon w-3.5 h-3.5 text-zinc-400 transition-transform duration-200 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
                 </div>
 
-                <div class="space-y-3">
+                <div class="cora-accordion-body hidden p-3.5 sm:p-4 pt-3 border-t border-zinc-100 dark:border-zinc-800/80 space-y-3">
                     <div>
                         <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1 text-[11px]">Assigned Team Producer / Lead Owner</label>
                         <select id="cora-drawer-input-assigned-to" class="w-full h-9 px-3 bg-zinc-50 hover:bg-white focus:bg-white dark:bg-zinc-800 dark:hover:bg-zinc-750 dark:focus:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 focus:border-zinc-950 dark:focus:border-white rounded-lg text-zinc-900 dark:text-zinc-100 text-xs font-bold transition-all cursor-pointer outline-none" onchange="coraUpdateLeadAssignee(document.getElementById('cora-drawer-lead-id').value, this.value)">
@@ -3826,12 +3838,31 @@ cora_render_workspace_header( $leads_header_args );
         });
     };
 
-    // Width Snap Preset Engine (20% to 70% viewport width)
+    // Drawer Accordion Group Collapsible Engine
+    window.coraToggleDrawerAccordion = function(headerBtn) {
+        if (!headerBtn) return;
+        var card = headerBtn.closest('.cora-accordion-card');
+        if (!card) return;
+        var body = card.querySelector('.cora-accordion-body');
+        var icon = card.querySelector('.cora-accordion-icon');
+        if (!body) return;
+        
+        var isHidden = body.classList.contains('hidden');
+        if (isHidden) {
+            body.classList.remove('hidden');
+            if (icon) icon.classList.add('rotate-180');
+        } else {
+            body.classList.add('hidden');
+            if (icon) icon.classList.remove('rotate-180');
+        }
+    };
+
+    // Width Snap Preset Engine (Min 360px to Max 85% viewport width)
     window.coraSnapDrawerWidth = function(ratio) {
         var drawer = document.getElementById('cora-lead-detail-drawer');
         if (!drawer) return;
-        var maxW = Math.floor(window.innerWidth * 0.70);
-        var minW = Math.floor(window.innerWidth * 0.20);
+        var maxW = Math.floor(window.innerWidth * 0.85);
+        var minW = Math.min(maxW, Math.max(360, Math.floor(window.innerWidth * 0.20)));
         var targetW = Math.max(minW, Math.min(maxW, Math.floor(window.innerWidth * ratio)));
         drawer.style.width = targetW + 'px';
         try {
@@ -3897,7 +3928,7 @@ cora_render_workspace_header( $leads_header_args );
         }
     };
 
-    // Show Drawer with Width Persistence & Strict 20%-70% Viewport Constraint
+    // Show Drawer with Width Persistence & Strict 360px - 85vw Viewport Constraint
     window.coraShowSideDrawer = function(drawerSelector) {
         if (window.coraPortalLeadsDrawers) {
             window.coraPortalLeadsDrawers();
@@ -3928,11 +3959,11 @@ cora_render_workspace_header( $leads_header_args );
             if (drawer.id === 'cora-lead-detail-drawer') {
                 if (window.innerWidth >= 640) {
                     var savedW = localStorage.getItem('cora_drawer_width');
-                    var maxW = Math.floor(window.innerWidth * 0.70);
+                    var maxW = Math.floor(window.innerWidth * 0.85);
                     var minW = Math.min(maxW, Math.max(360, Math.floor(window.innerWidth * 0.20)));
                     var targetW = savedW ? Math.max(minW, Math.min(maxW, parseInt(savedW))) : Math.floor(window.innerWidth * 0.50);
                     drawer.style.width = targetW + 'px';
-                    drawer.style.maxWidth = '70vw';
+                    drawer.style.maxWidth = '85vw';
                     drawer.style.minWidth = minW + 'px';
                 } else {
                     drawer.style.width = '100%';
@@ -3956,48 +3987,58 @@ cora_render_workspace_header( $leads_header_args );
         }
     };
 
-    // Desktop Resizing Drag Engine (Min 20% to Max 70% Viewport Width)
+    // Desktop & Touch Resizing Drag Engine (Min 360px / 20vw to Max 85% Viewport Width)
     function initDrawerResizingEngine() {
         var handle = document.getElementById('cora-drawer-resize-handle');
         if (!handle || window.__coraDrawerResizeBound) return;
         window.__coraDrawerResizeBound = true;
 
-        handle.addEventListener('mousedown', function(e) {
-            e.preventDefault();
+        function startResize(e) {
             if (window.innerWidth < 640) return;
             var drawer = document.getElementById('cora-lead-detail-drawer');
             if (!drawer) return;
 
+            if (e.type === 'mousedown') e.preventDefault();
             var isResizing = true;
             document.body.classList.add('select-none');
             document.body.style.cursor = 'col-resize';
-            handle.classList.add('opacity-100');
+            drawer.style.transition = 'none';
+            handle.classList.add('bg-zinc-500/20', 'dark:bg-zinc-400/20');
 
-            function onMouseMove(moveEvent) {
+            function onMove(moveEvent) {
                 if (!isResizing) return;
-                var maxW = Math.floor(window.innerWidth * 0.70);
+                var clientX = moveEvent.touches ? moveEvent.touches[0].clientX : moveEvent.clientX;
+                var maxW = Math.floor(window.innerWidth * 0.85);
                 var minW = Math.min(maxW, Math.max(360, Math.floor(window.innerWidth * 0.20)));
-                var newWidth = window.innerWidth - moveEvent.clientX;
+                var newWidth = window.innerWidth - clientX;
                 newWidth = Math.max(minW, Math.min(maxW, newWidth));
                 drawer.style.width = newWidth + 'px';
             }
 
-            function onMouseUp() {
+            function onEnd() {
                 if (!isResizing) return;
                 isResizing = false;
                 document.body.classList.remove('select-none');
                 document.body.style.cursor = '';
-                handle.classList.remove('opacity-100');
-                window.removeEventListener('mousemove', onMouseMove);
-                window.removeEventListener('mouseup', onMouseUp);
+                drawer.style.transition = '';
+                handle.classList.remove('bg-zinc-500/20', 'dark:bg-zinc-400/20');
+                window.removeEventListener('mousemove', onMove);
+                window.removeEventListener('mouseup', onEnd);
+                window.removeEventListener('touchmove', onMove);
+                window.removeEventListener('touchend', onEnd);
                 try {
                     localStorage.setItem('cora_drawer_width', drawer.offsetWidth);
                 } catch(err) {}
             }
 
-            window.addEventListener('mousemove', onMouseMove);
-            window.addEventListener('mouseup', onMouseUp);
-        });
+            window.addEventListener('mousemove', onMove, { passive: false });
+            window.addEventListener('mouseup', onEnd);
+            window.addEventListener('touchmove', onMove, { passive: false });
+            window.addEventListener('touchend', onEnd);
+        }
+
+        handle.addEventListener('mousedown', startResize);
+        handle.addEventListener('touchstart', startResize, { passive: true });
     }
 
     // Dynamic Outreach Links Updater

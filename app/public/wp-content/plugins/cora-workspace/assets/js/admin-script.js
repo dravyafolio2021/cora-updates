@@ -17661,11 +17661,29 @@ jQuery(document).ready(function($) {
         }
     };
 
-    // Width Snap Preset Engine (20% to 70% viewport width)
+    // Drawer Accordion Group Collapsible Engine
+    window.coraToggleDrawerAccordion = function(headerBtn) {
+        if (!headerBtn) return;
+        const card = $(headerBtn).closest('.cora-accordion-card');
+        if (!card.length) return;
+        const body = card.find('.cora-accordion-body');
+        const icon = card.find('.cora-accordion-icon');
+        if (!body.length) return;
+        
+        if (body.hasClass('hidden')) {
+            body.removeClass('hidden');
+            if (icon.length) icon.addClass('rotate-180');
+        } else {
+            body.addClass('hidden');
+            if (icon.length) icon.removeClass('rotate-180');
+        }
+    };
+
+    // Width Snap Preset Engine (Min 360px to Max 85% viewport width)
     window.coraSnapDrawerWidth = function(ratio) {
         const drawer = $('#cora-lead-detail-drawer');
         if (!drawer.length) return;
-        const maxW = Math.floor(window.innerWidth * 0.70);
+        const maxW = Math.floor(window.innerWidth * 0.85);
         const minW = Math.min(maxW, Math.max(360, Math.floor(window.innerWidth * 0.20)));
         const targetW = Math.max(minW, Math.min(maxW, Math.floor(window.innerWidth * ratio)));
         drawer.css('width', targetW + 'px');
@@ -17690,7 +17708,7 @@ jQuery(document).ready(function($) {
         if (window.coraShowToast) window.coraShowToast('Lead priority set to ' + (score === 'converted' ? 'WON' : score.toUpperCase()), 'info');
     };
 
-    // Drawer Resizing Engine (Clamped strictly between 20% and 70% viewport width)
+    // Drawer Resizing Engine (Clamped strictly between 360px and 85% viewport width)
     (function initDrawerResizingEngine() {
         if (window.__coraDrawerResizeInitialized) return;
         window.__coraDrawerResizeInitialized = true;
@@ -17703,12 +17721,13 @@ jQuery(document).ready(function($) {
             if (e.type === 'mousedown') e.preventDefault();
             let isResizing = true;
             $('body').addClass('select-none').css('cursor', 'col-resize');
-            $('#cora-drawer-resize-handle').addClass('opacity-100');
+            drawer.css('transition', 'none');
+            $('#cora-drawer-resize-handle').addClass('bg-zinc-500/20 dark:bg-zinc-400/20');
 
             function onMove(moveEvent) {
                 if (!isResizing) return;
                 const clientX = moveEvent.touches ? moveEvent.touches[0].clientX : moveEvent.clientX;
-                const maxW = Math.floor(window.innerWidth * 0.70);
+                const maxW = Math.floor(window.innerWidth * 0.85);
                 const minW = Math.min(maxW, Math.max(360, Math.floor(window.innerWidth * 0.20)));
                 let newWidth = window.innerWidth - clientX;
                 newWidth = Math.max(minW, Math.min(maxW, newWidth));
@@ -17719,7 +17738,8 @@ jQuery(document).ready(function($) {
                 if (!isResizing) return;
                 isResizing = false;
                 $('body').removeClass('select-none').css('cursor', '');
-                $('#cora-drawer-resize-handle').removeClass('opacity-100');
+                drawer.css('transition', '');
+                $('#cora-drawer-resize-handle').removeClass('bg-zinc-500/20 dark:bg-zinc-400/20');
                 $(window).off('mousemove touchmove', onMove).off('mouseup touchend', onEnd);
                 const finalWidth = drawer.outerWidth();
                 try {
@@ -17759,15 +17779,15 @@ jQuery(document).ready(function($) {
             }
             const isLeadDetail = drawer.is('#cora-lead-detail-drawer, .cora-prospect-detail-drawer, #cora-prospect-detail-drawer');
             if (isLeadDetail) {
-                // Restore saved width on desktop (clamped strictly between 20vw and 70vw, min 360px)
+                // Restore saved width on desktop (clamped strictly between 360px and 85vw)
                 if (window.innerWidth >= 640) {
                     const savedW = localStorage.getItem('cora_drawer_width');
-                    const maxW = Math.floor(window.innerWidth * 0.70);
+                    const maxW = Math.floor(window.innerWidth * 0.85);
                     const minW = Math.min(maxW, Math.max(360, Math.floor(window.innerWidth * 0.20)));
                     const targetW = savedW ? Math.max(minW, Math.min(maxW, parseInt(savedW))) : Math.floor(window.innerWidth * 0.50);
                     drawer.css({
                         'width': targetW + 'px',
-                        'max-width': '70vw',
+                        'max-width': '85vw',
                         'min-width': minW + 'px'
                     });
                 } else {
