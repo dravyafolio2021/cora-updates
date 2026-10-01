@@ -15497,7 +15497,7 @@ jQuery(document).ready(function($) {
     window.coraToggleIslandState = function(targetState, skipFocus) {
         let newState = targetState;
         
-        const currentState = localStorage.getItem('cora_mobile_island_mode') || 'ai';
+        const currentState = localStorage.getItem('cora_mobile_island_mode') || 'nav';
         if (!newState) {
             newState = currentState === 'ai' ? 'nav' : 'ai';
         }
@@ -16846,8 +16846,8 @@ jQuery(document).ready(function($) {
     };
 
     $(document).ready(function() {
-        const savedMode = localStorage.getItem('cora_mobile_island_mode') || 'ai';
-        if (typeof window.coraToggleIslandState === 'function' && $('#cora-mobile-floating-island').length) {
+        const savedMode = localStorage.getItem('cora_mobile_island_mode') || 'nav';
+        if (savedMode !== 'nav' && typeof window.coraToggleIslandState === 'function' && $('#cora-mobile-floating-island').length) {
             window.coraToggleIslandState(savedMode, true);
         }
 

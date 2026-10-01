@@ -528,9 +528,20 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     <script src="<?php echo includes_url( 'js/jquery/jquery.min.js' ); ?>"></script>
     <script>
         window.$ = window.jQuery;
-        window.coraWorkspaceSlug = '<?php echo esc_js( ! empty( $cora_active_workspace['slug'] ) ? $cora_active_workspace['slug'] : 'workspace' ); ?>';
         window.coraNavigateTo = window.coraNavigateTo || function(targetPageId) {
             if (!targetPageId) return;
+            try {
+                var cleanTarget = String(targetPageId).replace(/^\/workspace\//, '').split('?')[0].split('/')[0];
+                document.querySelectorAll('.cora-island-nav-link').forEach(function(el) {
+                    var elTarget = el.getAttribute('data-island-target');
+                    if (elTarget === cleanTarget || (cleanTarget === 'dashboard' && elTarget === 'home') || (cleanTarget === 'home' && elTarget === 'dashboard')) {
+                        el.classList.add('cora-active');
+                    } else {
+                        el.classList.remove('cora-active');
+                    }
+                });
+            } catch(e) {}
+
             var baseSlug = window.coraWorkspaceSlug || 'workspace';
             if (!baseSlug || baseSlug === 'workspace') {
                 var pathParts = window.location.pathname.split('/').filter(Boolean);
@@ -15734,13 +15745,12 @@ Output ONLY the rewritten text to replace the selection. Do NOT include markdown
 
     <?php if ( ! $is_driver_user ) : ?>
     <!-- Mobile Floating Bottom Navigation (3-State Adaptive Floating Island Bar) -->
-    <div id="cora-mobile-floating-island" class="cora-mobile-island-wrapper lg:hidden fixed bottom-4 left-0 right-0 z-[9980] w-[calc(100vw-32px)] max-w-[460px] mx-auto transition-all duration-300 ease-out" style="position: fixed !important; bottom: 16px !important; left: 0 !important; right: 0 !important; margin: 0 auto !important; z-index: 9980 !important; width: calc(100vw - 32px) !important; max-width: 460px !important; box-sizing: border-box !important;">
-
+    <div id="cora-mobile-floating-island" class="cora-mobile-island-wrapper lg:hidden fixed bottom-4 left-0 right-0 z-[9980] w-[calc(100vw-32px)] max-w-[460px] mx-auto transition-all duration-300 ease-out" style="position: fixed !important; bottom: 16px !important; left: 0 !important; right: 0 !important; margin: 0 auto !important; z-index: 9980 !important; width: calc(100vw - 32px) !important; max-width: 460px !important; box-sizing: border-box !important; will-change: transform; transform: translateZ(0); -webkit-transform: translateZ(0);">
 
         <div class="cora-island-card w-full flex items-center justify-between transition-all duration-300">
             
-            <!-- State 1 & 2: Menu Toggle Button (Left) -->
-            <button type="button" id="cora-island-state-menu-btn" onclick="coraToggleIslandState('nav')" class="cora-island-btn-menu" title="Toggle Navigation Menu">
+            <!-- State 1 & 2: Menu Toggle Button (Left - Hidden in Nav Mode) -->
+            <button type="button" id="cora-island-state-menu-btn" onclick="coraToggleIslandState('nav')" class="cora-island-btn-menu hidden" style="display: none;" title="Toggle Navigation Menu">
                 <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="3" y1="12" x2="21" y2="12"></line>
                     <line x1="3" y1="6" x2="21" y2="6"></line>
@@ -15748,16 +15758,16 @@ Output ONLY the rewritten text to replace the selection. Do NOT include markdown
                 </svg>
             </button>
 
-            <!-- STATE 1: Compact Neutral Bar (Middle) -->
-            <div id="cora-island-view-compact" class="cora-island-view flex-1 mx-2 flex items-center justify-center cursor-pointer rounded-full" onclick="coraToggleIslandState('ai')" style="flex: 1 1 auto; display: flex; align-items: center; justify-content: center; height: 40px !important; cursor: pointer; box-sizing: border-box !important;">
+            <!-- STATE 1: Compact Neutral Bar (Hidden in Nav Mode) -->
+            <div id="cora-island-view-compact" class="cora-island-view hidden flex-1 mx-2 items-center justify-center cursor-pointer rounded-full" onclick="coraToggleIslandState('ai')" style="display: none; flex: 1 1 auto; height: 40px !important; cursor: pointer; box-sizing: border-box !important;">
                 <div class="cora-island-input-pill" style="justify-content: center !important; gap: 8px !important;">
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" style="color: #71717a !important;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                     <span style="font-size: 13px; font-weight: 600; color: #71717a !important;">Search or ask AI...</span>
                 </div>
             </div>
 
-            <!-- STATE 2: AI Input / Prompt Bar (Middle) -->
-            <div id="cora-island-view-ai" class="cora-island-view hidden flex-1 mx-1.5 flex items-center" style="display: none; flex: 1 1 auto; height: 40px !important;">
+            <!-- STATE 2: AI Input / Prompt Bar (Hidden in Nav Mode) -->
+            <div id="cora-island-view-ai" class="cora-island-view hidden flex-1 mx-1.5 items-center" style="display: none; flex: 1 1 auto; height: 40px !important;">
                 <div class="cora-island-input-pill">
                     <div style="display: flex; align-items: center; flex: 1; min-width: 0; height: 100%;">
                         <svg onclick="window.coraOpenCopilot()" viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 shrink-0 cursor-pointer" style="margin-right: 6px; flex-shrink: 0; color: #71717a !important;" title="Open AI Copilot"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
@@ -15773,7 +15783,7 @@ Output ONLY the rewritten text to replace the selection. Do NOT include markdown
                 </div>
             </div>
 
-            <!-- STATE 3: Navigation Tabs Bar (Middle) -->
+            <!-- STATE 3: Navigation Tabs Bar (Default Visible Nav Mode) -->
             <?php
             $cora_active_sub = empty($sub_page) ? 'dashboard' : str_replace('_', '-', $sub_page);
             $super_pages = array( 'super-admin', 'super-users', 'super-finances', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-docs', 'super-ai-tokens', 'super-feature-flags', 'super-emergency', 'super-audit' );
@@ -15794,7 +15804,7 @@ Output ONLY the rewritten text to replace the selection. Do NOT include markdown
                 $is_more_act    = ( ! $is_home_act && ! $is_content_act && ! $is_fin_act && ! $is_users_act );
             }
             ?>
-            <nav id="cora-island-view-nav" class="cora-island-view hidden flex-1 mx-1 flex items-center justify-evenly" style="display: none; flex: 1 1 auto; justify-content: space-around;">
+            <nav id="cora-island-view-nav" class="cora-island-view flex-1 mx-1 flex items-center justify-evenly" style="display: flex; flex: 1 1 auto; justify-content: space-around;">
                 <?php if ( $is_super_mode ) : ?>
                 <!-- Super Admin 1: Workspaces Item -->
                 <a href="<?php echo esc_url( home_url( $cora_nav_prefix . '/super-admin' ) ); ?>" onclick="if(typeof coraNavigateTo==='function' && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0){ event.preventDefault(); coraNavigateTo('super-admin'); }" class="cora-island-nav-link <?php echo $is_ws_act ? 'cora-active' : ''; ?>" data-island-target="super-admin" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
@@ -15873,7 +15883,7 @@ Output ONLY the rewritten text to replace the selection. Do NOT include markdown
                 <?php endif; ?>
             </nav>
 
-            <!-- State 1 & 3: AI Action Button (Right) -->
+            <!-- State 1 & 3: AI Action Button (Right - Visible in Nav Mode) -->
             <button type="button" id="cora-island-state-ai-btn" onclick="coraToggleIslandState('ai')" class="cora-island-btn-ai" title="Ask Cora AI">
                 <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
                     <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path>
@@ -15884,6 +15894,29 @@ Output ONLY the rewritten text to replace the selection. Do NOT include markdown
                 </svg>
             </button>
         </div>
+        <!-- Zero-Flicker Instant Pre-Hydration -->
+        <script>
+        (function() {
+            try {
+                var m = localStorage.getItem('cora_mobile_island_mode') || 'nav';
+                if (m === 'ai') {
+                    var mb = document.getElementById('cora-island-state-menu-btn');
+                    var av = document.getElementById('cora-island-view-ai');
+                    var nv = document.getElementById('cora-island-view-nav');
+                    var ab = document.getElementById('cora-island-state-ai-btn');
+                    if (mb) mb.style.display = 'flex';
+                    if (av) av.style.display = 'flex';
+                    if (nv) nv.style.display = 'none';
+                    if (ab) ab.style.display = 'none';
+                } else if (m === 'compact') {
+                    var cv = document.getElementById('cora-island-view-compact');
+                    var nv = document.getElementById('cora-island-view-nav');
+                    if (cv) cv.style.display = 'flex';
+                    if (nv) nv.style.display = 'none';
+                }
+            } catch(e) {}
+        })();
+        </script>
     </div>
     </div> <!-- .flex.flex-row.flex-1.min-h-0 -->
 </div> <!-- #cora-workspace -->
