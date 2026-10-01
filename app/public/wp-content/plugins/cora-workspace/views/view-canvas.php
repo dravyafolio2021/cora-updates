@@ -11070,6 +11070,17 @@ function cora_get_sparkline_points( $history, $type ) {
     // ============================================================
     // ADD THEME WIZARD JS  — with URL state persistence
     // ============================================================
+    var safeAjaxUrl = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : (window.ajaxurl || '/wp-admin/admin-ajax.php');
+    var safeNonce   = (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : '';
+
+    function showToast(msg, type) {
+        if (typeof window.coraShowToast === 'function') {
+            window.coraShowToast(msg, type || 'info');
+        } else {
+            console.log('[' + (type || 'info') + '] ' + msg);
+        }
+    }
+
     var _wizStep    = 1;
     var _wizBuilder = null;
     var _wizSubMode = 'upload';
@@ -11420,7 +11431,7 @@ function cora_get_sparkline_points( $history, $type ) {
             return;
         }
         if (!pat) {
-            if (!isAuto) showToast('Please enter your GitHub Personal Access Token (PAT).', 'error');
+            if (!isAuto) showToast('Please enter your GitHub Personal Access Token (PAT). For private repos, ensure it has "repo" scope.', 'error');
             return;
         }
 
@@ -11450,7 +11461,7 @@ function cora_get_sparkline_points( $history, $type ) {
                 action: 'cora_nextjs_scan_routes',
                 repo: repo,
                 pat: pat,
-                branch: (branchInp && branchInp.value) ? branchInp.value : 'main',
+                branch: (branchInp && branchInp.value) ? branchInp.value.trim() : 'main',
                 nonce: safeNonce
             },
             dataType: 'text',
@@ -11461,9 +11472,14 @@ function cora_get_sparkline_points( $history, $type ) {
                 if (loading) loading.style.display = 'none';
 
                 var res = wizParseAjaxResponse(rawRes);
-                if (res.success && res.data) {
+                if (res && res.success && res.data) {
                     var branches = res.data.branches || ['main'];
                     var routes = res.data.routes || [];
+                    var defaultBranch = res.data.default_branch || (branches[0] || 'main');
+
+                    if (branchInp && (!branchInp.value || branchInp.value === 'main')) {
+                        branchInp.value = defaultBranch;
+                    }
 
                     // Auto-fill theme name if blank
                     var themeNameInput = document.getElementById('wiz-theme-name');
@@ -11477,16 +11493,25 @@ function cora_get_sparkline_points( $history, $type ) {
                     if (pills) {
                         pills.style.display = 'flex';
                         pills.innerHTML = '';
-                        var defaultBranch = (branchInp && branchInp.value) ? branchInp.value : (branches[0] || 'main');
+                        var currentSelected = (branchInp && branchInp.value) ? branchInp.value : defaultBranch;
                         branches.forEach(function(b) {
-                            var isSel = (b === defaultBranch);
+                            var isSel = (b === currentSelected);
                             var pill = document.createElement('button');
                             pill.type = 'button';
                             pill.className = 'wiz-branch-pill' + (isSel ? ' wiz-branch-selected' : '');
+                            pill.style.cssText = 'padding:4px 10px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;border:1px solid ' + (isSel ? '#18181b' : '#e4e4e7') + ';background:' + (isSel ? '#18181b' : '#ffffff') + ';color:' + (isSel ? '#ffffff' : '#27272a') + ';';
                             pill.textContent = b;
                             pill.onclick = function() {
-                                document.querySelectorAll('#wiz-nextjs-branch-pills .wiz-branch-pill').forEach(function(p){ p.classList.remove('wiz-branch-selected'); });
+                                document.querySelectorAll('#wiz-nextjs-branch-pills .wiz-branch-pill').forEach(function(p){
+                                    p.classList.remove('wiz-branch-selected');
+                                    p.style.borderColor = '#e4e4e7';
+                                    p.style.background = '#ffffff';
+                                    p.style.color = '#27272a';
+                                });
                                 pill.classList.add('wiz-branch-selected');
+                                pill.style.borderColor = '#18181b';
+                                pill.style.background = '#18181b';
+                                pill.style.color = '#ffffff';
                                 if (branchInp) branchInp.value = b;
                             };
                             pills.appendChild(pill);
@@ -11510,18 +11535,23 @@ function cora_get_sparkline_points( $history, $type ) {
                         }
                     }
 
-                    showToast('Next.js project verified! ' + routes.length + ' route' + (routes.length === 1 ? '' : 's') + ' found.', 'success');
+                    var privNote = res.data.is_private ? ' (Private Repo 🔒)' : '';
+                    showToast('Next.js project verified' + privNote + '! ' + routes.length + ' route' + (routes.length === 1 ? '' : 's') + ' found.', 'success');
                 } else {
-                    var errMsg = (res.data && res.data.message) ? res.data.message : 'Could not scan Next.js repository.';
+                    var errMsg = (res && res.data && res.data.message) ? res.data.message : 'Could not scan Next.js repository.';
+                    if (picker && (!res || !res.data || !res.data.branches || res.data.branches.length === 0)) {
+                        picker.style.display = 'none';
+                    }
                     showToast(errMsg, 'error');
                 }
             },
-            error: function() {
+            error: function(xhr, status, error) {
                 if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
                 if (lbl) lbl.textContent = 'Scan Routes';
                 if (icon) icon.style.animation = '';
                 if (loading) loading.style.display = 'none';
-                showToast('Network error while scanning Next.js routes.', 'error');
+                if (picker) picker.style.display = 'none';
+                showToast('Network error while communicating with workspace backend.', 'error');
             }
         });
     };

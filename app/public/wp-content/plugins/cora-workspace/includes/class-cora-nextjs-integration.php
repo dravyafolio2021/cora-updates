@@ -409,15 +409,68 @@ class Cora_NextJS_Integration {
 
         // 1. Fetch Repository Info & Validate Access
         $repo_resp = wp_remote_get( "https://api.github.com/repos/{$repo_slug}", array( 'headers' => $headers, 'timeout' => 15 ) );
-        if ( is_wp_error( $repo_resp ) || wp_remote_retrieve_response_code( $repo_resp ) !== 200 ) {
-            $err_msg = is_wp_error( $repo_resp ) ? $repo_resp->get_error_message() : 'Repository not accessible. Verify token permissions and repo name.';
-            wp_send_json_error( array( 'message' => $err_msg ) );
+        if ( is_wp_error( $repo_resp ) ) {
+            wp_send_json_error( array( 'message' => 'Failed to connect to GitHub: ' . $repo_resp->get_error_message() ) );
         }
 
-        // 2. Fetch Recursive Git Tree
+        $repo_code = wp_remote_retrieve_response_code( $repo_resp );
+        if ( $repo_code === 401 ) {
+            wp_send_json_error( array( 'message' => 'Invalid or expired GitHub Personal Access Token (401 Unauthorized).' ) );
+        } elseif ( $repo_code === 404 ) {
+            wp_send_json_error( array( 'message' => "Repository '{$repo_slug}' not found or is private. If it is private, please ensure your GitHub PAT has the 'repo' scope (Classic) or 'Contents: Read-only' (Fine-Grained)." ) );
+        } elseif ( $repo_code === 403 ) {
+            wp_send_json_error( array( 'message' => 'Access denied by GitHub (403 Forbidden). Rate limit exceeded or token lacks required permissions.' ) );
+        } elseif ( $repo_code !== 200 ) {
+            wp_send_json_error( array( 'message' => "GitHub API error (HTTP {$repo_code}). Verify token permissions and repo name." ) );
+        }
+
+        $repo_data = json_decode( wp_remote_retrieve_body( $repo_resp ), true ) ?: array();
+        $default_branch = $repo_data['default_branch'] ?? 'main';
+        $is_private = ! empty( $repo_data['private'] );
+
+        // 2. Fetch Branches Roster
+        $branches_list = array();
+        $branches_resp = wp_remote_get( "https://api.github.com/repos/{$repo_slug}/branches?per_page=100", array( 'headers' => $headers, 'timeout' => 15 ) );
+        if ( ! is_wp_error( $branches_resp ) && wp_remote_retrieve_response_code( $branches_resp ) === 200 ) {
+            $branches_data = json_decode( wp_remote_retrieve_body( $branches_resp ), true ) ?: array();
+            foreach ( $branches_data as $b_item ) {
+                if ( ! empty( $b_item['name'] ) ) {
+                    $branches_list[] = $b_item['name'];
+                }
+            }
+        }
+
+        if ( empty( $branches_list ) ) {
+            $branches_list = array( $default_branch );
+        } else {
+            // Place default branch first
+            if ( in_array( $default_branch, $branches_list ) ) {
+                $branches_list = array_values( array_unique( array_merge( array( $default_branch ), $branches_list ) ) );
+            }
+        }
+
+        // Use selected branch or fallback to default
+        if ( empty( $branch ) || ( ! in_array( $branch, $branches_list ) && ! empty( $branches_list ) ) ) {
+            $branch = $default_branch;
+        }
+
+        // 3. Fetch Recursive Git Tree
         $tree_resp = wp_remote_get( "https://api.github.com/repos/{$repo_slug}/git/trees/{$branch}?recursive=1", array( 'headers' => $headers, 'timeout' => 25 ) );
         if ( is_wp_error( $tree_resp ) || wp_remote_retrieve_response_code( $tree_resp ) !== 200 ) {
-            wp_send_json_error( array( 'message' => "Could not inspect branch '{$branch}'. Check branch name." ) );
+            // Fallback retry with default branch if different
+            if ( $branch !== $default_branch ) {
+                $branch = $default_branch;
+                $tree_resp = wp_remote_get( "https://api.github.com/repos/{$repo_slug}/git/trees/{$branch}?recursive=1", array( 'headers' => $headers, 'timeout' => 25 ) );
+            }
+        }
+
+        if ( is_wp_error( $tree_resp ) || wp_remote_retrieve_response_code( $tree_resp ) !== 200 ) {
+            wp_send_json_error( array( 
+                'message'        => "Could not inspect branch '{$branch}'. Check branch name or Git permissions.",
+                'branches'       => $branches_list,
+                'default_branch' => $default_branch,
+                'is_private'     => $is_private
+            ) );
         }
 
         $tree_data = json_decode( wp_remote_retrieve_body( $tree_resp ), true );
@@ -519,6 +572,9 @@ class Cora_NextJS_Integration {
         wp_send_json_success( array(
             'repo'           => $repo_slug,
             'branch'         => $branch,
+            'default_branch' => $default_branch,
+            'branches'       => $branches_list,
+            'is_private'     => $is_private,
             'framework'      => $framework_name,
             'is_app_router'  => $is_app_router,
             'has_typescript' => $has_typescript,
