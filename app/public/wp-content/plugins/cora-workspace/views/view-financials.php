@@ -1476,13 +1476,13 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 
             <div class="space-y-1">
                 <label class="text-[10px] font-bold text-zinc-400 uppercase">Client / Business Name <span class="text-rose-500">*</span></label>
-                <input type="text" id="inv-client-name" placeholder="e.g. Acme Studios & Media Pvt Ltd" class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3.5 py-2 text-xs text-zinc-900 focus:outline-none transition-all">
+                <input type="text" id="inv-client-name" placeholder="e.g. Acme Studios & Media Pvt Ltd" value="<?php echo !empty($crm_contacts[0]['name']) ? esc_attr($crm_contacts[0]['name']) : 'Acme Studios & Media Pvt Ltd'; ?>" class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3.5 py-2 text-xs text-zinc-900 focus:outline-none transition-all">
             </div>
 
             <div class="grid grid-cols-2 gap-3">
                 <div class="space-y-1">
                     <label class="text-[10px] font-bold text-zinc-400 uppercase">Client Email</label>
-                    <input type="email" id="inv-client-email" placeholder="finance@acmestudios.in" class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3.5 py-2 text-xs text-zinc-900 focus:outline-none transition-all">
+                    <input type="email" id="inv-client-email" placeholder="finance@acmestudios.in" value="<?php echo !empty($crm_contacts[0]['email']) ? esc_attr($crm_contacts[0]['email']) : 'finance@acmestudios.in'; ?>" class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3.5 py-2 text-xs text-zinc-900 focus:outline-none transition-all">
                 </div>
                 <div class="space-y-1">
                     <label class="text-[10px] font-bold text-zinc-400 uppercase">Client GSTIN (Optional)</label>
@@ -1520,7 +1520,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         <div id="inv-step-2" class="space-y-4 hidden">
             <div class="space-y-1">
                 <label class="text-[10px] font-bold text-zinc-400 uppercase">Package / Project Title <span class="text-rose-500">*</span></label>
-                <input type="text" id="inv-package-name" placeholder="e.g. Commercial Brand Video &amp; Studio Retainer" class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3.5 py-2 text-xs text-zinc-900 focus:outline-none transition-all">
+                <input type="text" id="inv-package-name" placeholder="e.g. Commercial Brand Video &amp; Studio Retainer" value="Commercial Brand Video &amp; Studio Retainer" class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3.5 py-2 text-xs text-zinc-900 focus:outline-none transition-all">
             </div>
 
             <div class="space-y-2">
@@ -2754,15 +2754,16 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         const milestoneSplit = document.getElementById('inv-milestone-split')?.value || '100';
         const clientGstin    = document.getElementById('inv-client-gstin')?.value || '';
 
-        const targetAjaxUrl = (window.coraData && window.coraData.ajax_url) ? window.coraData.ajax_url : ajaxUrl;
-        const targetNonce   = (window.coraData && window.coraData.nonce) ? window.coraData.nonce : nonce;
+        let targetAjaxUrl = (window.coraData && window.coraData.ajax_url) ? window.coraData.ajax_url : ((window.coraREData && window.coraREData.ajax_url) ? window.coraREData.ajax_url : (typeof ajaxurl !== 'undefined' ? ajaxurl : ajaxUrl));
+        let targetNonce   = (window.coraData && window.coraData.nonce) ? window.coraData.nonce : ((window.coraREData && window.coraREData.nonce) ? window.coraREData.nonce : nonce);
 
         const postData = new URLSearchParams({
             action: 'cora_ajax_create_invoice',
             security: targetNonce,
             nonce: targetNonce,
-            client_name: clientName,
-            client_email: clientEmail || 'client@example.com',
+            _wpnonce: targetNonce,
+            client_name: clientName || 'Acme Studios & Media Pvt Ltd',
+            client_email: clientEmail || 'finance@acmestudios.in',
             client_gstin: clientGstin,
             package_name: packageName,
             total_amount: grandTotal,

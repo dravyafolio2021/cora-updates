@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.303
+ * Version:           4.9.304
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.303' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.304' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -52688,30 +52688,120 @@ function cora_ajax_create_invoice() {
         update_option( 'cora_invoices', $invoices );
     }
 
-    // Optional Document Vault Linking
+    // Automatic Document Vault Integration & Contract Generation
     if ( $link_vault ) {
-        $vault_docs = get_option( "cora_vault_documents_{$agency_id}", array() );
-        if ( ! is_array( $vault_docs ) ) {
-            $vault_docs = array();
+        $doc_id     = uniqid( 'doc_' );
+        $doc_number = 'DOC-' . date( 'Y' ) . '-' . rand( 1000, 9999 );
+        $share_hash = wp_hash( $doc_id . 'secured_share_token' );
+
+        $doc_items = array();
+        if ( ! empty( $line_items ) && is_array( $line_items ) ) {
+            foreach ( $line_items as $li ) {
+                $doc_items[] = array(
+                    'desc' => sanitize_text_field( $li['description'] ?? $package_name ),
+                    'sac'  => sanitize_text_field( $li['sac'] ?? '998386' ),
+                    'qty'  => floatval( $li['quantity'] ?? 1 ),
+                    'rate' => floatval( $li['rate'] ?? $subtotal ),
+                    'tax'  => 18
+                );
+            }
         }
-        $doc_id = uniqid( 'doc_' );
-        $vault_docs[] = array(
-            'id'           => $doc_id,
-            'title'        => "Service Contract & Invoice {$invoice_number} — {$client_name}",
-            'client_name'  => $client_name,
-            'client_email' => $client_email,
-            'status'       => 'draft',
-            'type'         => 'contract',
-            'amount'       => $total_amount,
-            'created_at'   => date( 'Y-m-d H:i:s' ),
-            'invoice_id'   => $new_invoice['id'],
-            'invoice_num'  => $invoice_number,
+        if ( empty( $doc_items ) ) {
+            $doc_items[] = array(
+                'desc' => $package_name,
+                'sac'  => '998386',
+                'qty'  => 1,
+                'rate' => $subtotal,
+                'tax'  => 18
+            );
+        }
+
+        $vault_doc_record = array(
+            'id'             => $doc_id,
+            'number'         => $doc_number,
+            'title'          => "Service Agreement & Invoice {$invoice_number} — {$client_name}",
+            'type'           => 'Contract',
+            'client_name'    => $client_name,
+            'client_email'   => $client_email,
+            'client_phone'   => '',
+            'client_gstin'   => $client_gstin,
+            'client_address' => 'Corporate Client Office, India',
+            'pos_state'      => $place_of_supply,
+            'is_igst'        => ( strpos( $place_of_supply, '07_' ) === false ),
+            'amount'         => round( $subtotal, 2 ),
+            'tax_amount'     => round( $total_amount - $subtotal, 2 ),
+            'grand_total'    => round( $total_amount, 2 ),
+            'deposit'        => round( $deposit_amount, 2 ),
+            'currency'       => 'INR',
+            'upi_vpa'        => 'cora@icici',
+            'status'         => 'Draft',
+            'watermark'      => 'OFFICIAL',
+            'signed'         => false,
+            'assignee_name'  => 'Studio Admin',
+            'created_at'     => current_time( 'mysql' ),
+            'invoice_id'     => $new_invoice['id'],
+            'invoice_num'    => $invoice_number,
+            'secured_shares' => array(
+                array(
+                    'hash'        => $share_hash,
+                    'email'       => $client_email ?: 'client@example.com',
+                    'expiry_time' => 0,
+                    'created_at'  => time(),
+                )
+            ),
+            'items'          => $doc_items,
         );
-        update_option( "cora_vault_documents_{$agency_id}", $vault_docs );
+
+        // 1. Sync to global Document Vault option (view-vault.php)
+        $global_docs = get_option( 'cora_documents', array() );
+        if ( ! is_array( $global_docs ) ) {
+            $global_docs = array();
+        }
+        array_unshift( $global_docs, $vault_doc_record );
+        update_option( 'cora_documents', $global_docs );
+
+        // 2. Sync to agency-scoped Document Vault option
+        $agency_docs = get_option( "cora_vault_documents_{$agency_id}", array() );
+        if ( ! is_array( $agency_docs ) ) {
+            $agency_docs = array();
+        }
+        array_unshift( $agency_docs, $vault_doc_record );
+        update_option( "cora_vault_documents_{$agency_id}", $agency_docs );
+
+        // 3. Sync to wp_cora_vault_documents table if table exists
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'cora_vault_documents';
+        if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $table_name ) ) {
+            $wpdb->insert(
+                $table_name,
+                array(
+                    'agency_id'     => $agency_id,
+                    'doc_id'        => $doc_id,
+                    'doc_number'    => $doc_number,
+                    'title'         => $vault_doc_record['title'],
+                    'doc_type'      => 'contract',
+                    'client_name'   => $client_name,
+                    'client_email'  => $client_email,
+                    'grand_total'   => $total_amount,
+                    'status'        => 'draft',
+                    'meta_data'     => json_encode( $vault_doc_record ),
+                    'created_at'    => current_time( 'mysql' ),
+                )
+            );
+        }
+
+        // 4. Dispatch in-app notification
+        if ( function_exists( 'cora_notify' ) ) {
+            cora_notify( 'document_created', 'all_admins', array(
+                'title'    => "Contract Blueprint Generated",
+                'body'     => "{$vault_doc_record['title']} (₹" . number_format($total_amount) . ") has been added to the Document Vault.",
+                'category' => 'Document Vault'
+            ) );
+        }
     }
 
     wp_send_json_success( array(
-        'message' => 'GST Invoice published and linked successfully.',
+        'message' => 'GST Invoice published and linked to Document Vault successfully.',
         'invoice' => $new_invoice,
     ) );
 }
