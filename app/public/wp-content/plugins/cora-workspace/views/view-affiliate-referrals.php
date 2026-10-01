@@ -135,68 +135,121 @@ window.coraAffiliateState = window.coraAffiliateState || {
     screenerBillingMode: 'annual'
 };
 
+window.coraNormalizeAffiliateTabKey = function(key) {
+    if (!key) return 'overview';
+    var k = String(key).toLowerCase().trim();
+    k = k.replace(/^cora-tab-btn-/, '').replace(/^cora-aff-subtab-/, '').replace(/^tab-/, '').replace(/^#/, '');
+    if (k === 'ranks' || k === 'board' || k === 'leaderboards') return 'leaderboard';
+    if (k === 'calc' || k === 'simulator' || k === 'sim' || k === 'earnings') return 'calculator';
+    if (k === 'logs' || k === 'log' || k === 'referral' || k === 'conversions' || k === 'converts') return 'referrals';
+    if (k === 'payout' || k === 'banking' || k === 'withdraw' || k === 'withdrawals' || k === 'disbursements') return 'payouts';
+    if (k === 'meter' || k === 'home' || k === 'summary') return 'overview';
+    return k;
+};
+
 window.coraSwitchAffiliateTab = function(tabKey) {
+    var rawKey = tabKey;
+    tabKey = window.coraNormalizeAffiliateTabKey(tabKey);
     if (!tabKey) return;
+
     try {
         if (window.coraAffiliateState) {
             window.coraAffiliateState.activeTab = tabKey;
         }
+
         var subtabs = ['overview', 'leaderboard', 'calculator', 'referrals', 'payouts'];
 
         subtabs.forEach(function(key) {
             var tabView = document.getElementById('cora-aff-subtab-' + key);
-            var tabBtn = document.getElementById('cora-tab-btn-' + key);
+            var isTarget = (key === tabKey);
 
             if (tabView) {
-                if (key === tabKey) {
+                if (isTarget) {
                     tabView.classList.remove('hidden');
-                    tabView.style.display = 'block';
+                    tabView.style.setProperty('display', 'block', 'important');
                 } else {
                     tabView.classList.add('hidden');
-                    tabView.style.display = 'none';
+                    tabView.style.setProperty('display', 'none', 'important');
                 }
             }
 
-            if (tabBtn) {
-                if (key === tabKey) {
-                    tabBtn.classList.add('active', 'border-zinc-950', 'text-zinc-900', 'dark:border-white', 'dark:text-white', 'font-semibold');
-                    tabBtn.classList.remove('border-transparent', 'text-zinc-500', 'dark:text-zinc-400');
+            // Update all button variants (by ID, class, and data-target)
+            var tabBtns = document.querySelectorAll('#cora-tab-btn-' + key + ', #cora-affiliate-tabs-bar .cora-sub-tab[data-target="' + key + '"], .cora-sub-tabs-container .cora-sub-tab[data-target="' + key + '"]');
+            tabBtns.forEach(function(btn) {
+                if (isTarget) {
+                    btn.classList.add('active', 'border-zinc-950', 'text-zinc-900', 'dark:border-white', 'dark:text-white', 'font-semibold');
+                    btn.classList.remove('border-transparent', 'text-zinc-500', 'dark:text-zinc-400');
                 } else {
-                    tabBtn.classList.remove('active', 'border-zinc-950', 'text-zinc-900', 'dark:border-white', 'dark:text-white');
-                    tabBtn.classList.add('border-transparent', 'text-zinc-500', 'dark:text-zinc-400', 'font-semibold');
+                    btn.classList.remove('active', 'border-zinc-950', 'text-zinc-900', 'dark:border-white', 'dark:text-white');
+                    btn.classList.add('border-transparent', 'text-zinc-500', 'dark:text-zinc-400', 'font-semibold');
                 }
-            }
+            });
         });
 
         if (tabKey === 'calculator' && typeof window.coraRecalculateSimulator === 'function') {
             window.coraRecalculateSimulator();
         }
 
-        var activeBtn = document.getElementById('cora-tab-btn-' + tabKey);
+        if (tabKey === 'referrals' && typeof window.coraFilterReferralTable === 'function') {
+            window.coraFilterReferralTable('all');
+        }
+
+        // Auto-scroll the active tab into view in the tabs bar
+        var activeBtn = document.getElementById('cora-tab-btn-' + tabKey) || document.querySelector('#cora-affiliate-tabs-bar [data-target="' + tabKey + '"]');
         var container = document.getElementById('cora-affiliate-tabs-bar') || document.querySelector('.cora-sub-tabs-container.cora-sticky-sub-tabs');
         if (activeBtn && container) {
             var btnOffset = activeBtn.offsetLeft;
             var btnWidth = activeBtn.offsetWidth;
             var containerWidth = container.offsetWidth;
             container.scrollTo({
-                left: btnOffset - (containerWidth / 2) + (btnWidth / 2),
+                left: Math.max(0, btnOffset - (containerWidth / 2) + (btnWidth / 2)),
                 behavior: 'smooth'
             });
+        }
+
+        // Sync URL hash
+        if (window.history && window.history.replaceState) {
+            window.history.replaceState(null, null, '#' + tabKey);
         }
     } catch (err) {
         console.error('Error switching affiliate tab:', err);
     }
 };
 
+window.coraOpenAffiliateTab = window.coraSwitchAffiliateTab;
+var coraSwitchAffiliateTab = window.coraSwitchAffiliateTab;
+
+// Unified delegated click listener
 document.addEventListener('click', function(e) {
-    var btn = e.target && e.target.closest ? e.target.closest('#cora-affiliate-tabs-bar .cora-sub-tab, #cora-affiliate-tabs-bar button, .cora-sub-tab[id^="cora-tab-btn-"]') : null;
+    if (!e.target || !e.target.closest) return;
+    var btn = e.target.closest('#cora-affiliate-tabs-bar .cora-sub-tab, #cora-affiliate-tabs-bar button, .cora-sub-tab[id^="cora-tab-btn-"], [data-aff-tab]');
     if (btn) {
-        var tabId = btn.getAttribute('data-target') || (btn.id ? btn.id.replace('cora-tab-btn-', '') : '');
+        var tabId = btn.getAttribute('data-target') || btn.getAttribute('data-aff-tab') || (btn.id ? btn.id.replace('cora-tab-btn-', '') : '');
         if (tabId && typeof window.coraSwitchAffiliateTab === 'function') {
+            e.preventDefault();
+            e.stopPropagation();
             window.coraSwitchAffiliateTab(tabId);
         }
     }
-});
+}, true);
+
+// Initialize active tab from URL hash or search params
+(function() {
+    function initAffiliateTabFromUrl() {
+        var params = new URLSearchParams(window.location.search);
+        var urlTab = params.get('tab') || params.get('subtab') || (window.location.hash ? window.location.hash.replace('#', '') : '');
+        if (urlTab && typeof window.coraSwitchAffiliateTab === 'function') {
+            window.coraSwitchAffiliateTab(urlTab);
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initAffiliateTabFromUrl);
+    } else {
+        initAffiliateTabFromUrl();
+    }
+    window.addEventListener('hashchange', initAffiliateTabFromUrl);
+})();
 </script>
 
 <div id="cora-affiliate-root" class="space-y-4 max-w-full">
@@ -622,7 +675,7 @@ $affiliate_header_args = array(
             'label'    => 'Overview & Meter',
             'icon'     => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>',
             'active'   => true,
-            'onclick'  => "coraSwitchAffiliateTab('overview')",
+            'onclick'  => "window.coraSwitchAffiliateTab('overview')",
         ),
         array(
             'id'       => 'leaderboard',
@@ -631,7 +684,7 @@ $affiliate_header_args = array(
             'badge'    => '<span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-zinc-200/60 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300">Podium</span>',
             'icon'     => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.45 1-1 1H7c-.55 0-1-.45-1-1v-2.34"></path><path d="M18 14.66V17c0 .55-.45 1-1 1h-2c-.55 0-1-.45-1-1v-2.34"></path><path d="M6 9v1a6 6 0 0 0 12 0V9H6z"></path></svg>',
             'active'   => false,
-            'onclick'  => "coraSwitchAffiliateTab('leaderboard')",
+            'onclick'  => "window.coraSwitchAffiliateTab('leaderboard')",
         ),
         array(
             'id'       => 'calculator',
@@ -639,7 +692,7 @@ $affiliate_header_args = array(
             'label'    => 'Earnings Simulator',
             'icon'     => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="4" y="2" width="16" height="20" rx="2"></rect><line x1="8" y1="6" x2="16" y2="6"></line><line x1="16" y1="14" x2="16" y2="18"></line><path d="M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M8 18h.01M12 18h.01"></path></svg>',
             'active'   => false,
-            'onclick'  => "coraSwitchAffiliateTab('calculator')",
+            'onclick'  => "window.coraSwitchAffiliateTab('calculator')",
         ),
         array(
             'id'       => 'referrals',
@@ -648,7 +701,7 @@ $affiliate_header_args = array(
             'badge'    => '<span class="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-zinc-200/60 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300">' . count( $referrals ) . '</span>',
             'icon'     => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>',
             'active'   => false,
-            'onclick'  => "coraSwitchAffiliateTab('referrals')",
+            'onclick'  => "window.coraSwitchAffiliateTab('referrals')",
         ),
         array(
             'id'       => 'payouts',
@@ -656,7 +709,7 @@ $affiliate_header_args = array(
             'label'    => 'Payouts & Banking',
             'icon'     => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>',
             'active'   => false,
-            'onclick'  => "coraSwitchAffiliateTab('payouts')",
+            'onclick'  => "window.coraSwitchAffiliateTab('payouts')",
         ),
     ),
 );
@@ -877,7 +930,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         <h3 class="text-xs font-bold text-zinc-900 dark:text-zinc-50">Recent Referral Activity</h3>
                         <p class="text-[11px] text-zinc-400">Latest clients that signed up via your link.</p>
                     </div>
-                    <button type="button" onclick="coraSwitchAffiliateTab('referrals')" class="text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:underline cursor-pointer">View All &rarr;</button>
+                    <button type="button" onclick="window.coraSwitchAffiliateTab('referrals')" class="text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:underline cursor-pointer">View All &rarr;</button>
                 </div>
 
                 <div class="divide-y divide-zinc-100 dark:divide-zinc-800/80">
