@@ -10868,7 +10868,8 @@ jQuery(document).ready(function($) {
         $('#cora-seo-description').val('');
         $('#cora-article-excerpt').val('');
         $('#cora-article-excerpt-bh').val('');
-        $('#cora-article-assignee').val('0');
+        const defaultAssigneeId = $('#cora-article-assignee option:first').val() || '1';
+        $('#cora-article-assignee').val(defaultAssigneeId);
         
         // Reset GEO indicators
         $('#chk-geo-direct-answer').prop('checked', false);
@@ -10907,9 +10908,9 @@ jQuery(document).ready(function($) {
                 const domAuthor = ($(`tr[data-post-id="${id}"] td:nth-child(2) span`).text() || $(`tr[onclick*="coraEditArticle(${id}"] td:nth-child(2) span`).text() || 'Writer').trim();
 
                 // Assignee drop-down
-                const assigneeId = data.assignee_id || '0';
+                const assigneeId = data.assignee_id || $('#cora-article-assignee option:first').val() || '1';
                 $('#cora-article-assignee').val(assigneeId);
-                const assigneeName = $(`.cora-meta-assignee-option[data-value="${assigneeId}"]`).text() || 'Unassigned';
+                const assigneeName = $('#cora-article-assignee option:selected').text() || $(`.cora-meta-assignee-option[data-value="${assigneeId}"]`).text() || 'Workspace Owner';
                 $('#cora-meta-assignee-value').text(assigneeName);
 
                 // Scheduled Date
@@ -11251,7 +11252,7 @@ jQuery(document).ready(function($) {
         }
         if (!title) return;
 
-        const assignee_id = $('#cora-article-assignee').val() || '0';
+        const assignee_id = $('#cora-article-assignee').val() || $('#cora-article-assignee option:first').val() || '1';
         const slug = $('#cora-article-slug').val() || '';
         const comment_status = $('#cora-article-allow-comments').is(':checked') ? 'open' : 'closed';
 
@@ -11523,7 +11524,8 @@ jQuery(document).ready(function($) {
         $('#cora-article-title').val(title);
         $('#cora-seo-keyword').val(keyword);
         $('#cora-seo-description').val(description);
-        $('#cora-article-assignee').val('0');
+        const defaultAssigneeId = $('#cora-article-assignee option:first').val() || '1';
+        $('#cora-article-assignee').val(defaultAssigneeId);
 
         // Reset thumbnail preview
         $('#cora-thumbnail-id').val('');
@@ -12529,7 +12531,7 @@ jQuery(document).ready(function($) {
         const tags = $('#cora-article-tags').val() || [];
         const thumbnail_id = $('#cora-thumbnail-id').val();
         const scheduled_date = $('#cora-article-scheduled-date').val() || '';
-        const assignee_id = $('#cora-article-assignee').val() || '0';
+        const assignee_id = $('#cora-article-assignee').val() || $('#cora-article-assignee option:first').val() || '1';
         const slug = $('#cora-article-slug').val() || '';
         const comment_status = $('#cora-article-allow-comments').is(':checked') ? 'open' : 'closed';
 
@@ -12711,7 +12713,8 @@ jQuery(document).ready(function($) {
     window.coraSyncBeehiivInputsFromOriginal = function() {
         $('#cora-article-excerpt-bh').val($('#cora-article-excerpt').val() || '');
         $('#cora-article-scheduled-date-bh').val($('#cora-article-scheduled-date').val() || '');
-        $('#cora-article-assignee-bh').val($('#cora-article-assignee').val() || '0');
+        const defaultBhAssignee = $('#cora-article-assignee-bh option:first').val() || $('#cora-article-assignee option:first').val() || '1';
+        $('#cora-article-assignee-bh').val($('#cora-article-assignee').val() || defaultBhAssignee);
         if ($('#cora-article-status').length) {
             $('#cora-article-status-bh').val($('#cora-article-status').val() || 'draft');
         }
@@ -15379,8 +15382,11 @@ jQuery(document).ready(function($) {
             $('.cora-meta-category-checkbox, .cora-meta-tag-checkbox').prop('checked', false);
             window.coraSyncCategoriesUI();
             window.coraSyncTagsUI();
-            $('#cora-article-assignee').val('0');
-            $('#cora-meta-assignee-value').text('Unassigned');
+            const firstAssigneeEl = $('#cora-article-assignee option:first');
+            const defUid = firstAssigneeEl.val() || '1';
+            const defName = firstAssigneeEl.text() || 'Workspace Owner';
+            $('#cora-article-assignee').val(defUid);
+            $('#cora-meta-assignee-value').text(defName);
             $('#cora-article-scheduled-date').val('');
             $('#cora-article-slug').val('');
             $('#cora-article-allow-comments').prop('checked', false);

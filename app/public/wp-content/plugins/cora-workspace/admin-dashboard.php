@@ -84,7 +84,7 @@ if ( in_array( $sub_page, array( 'dashboard', 'bookings', 'tasks', 'client-tasks
             'order'   => 'ASC'
         ) );
     } else {
-        // If on super admin view, only show team/staff users with valid roles, excluding subscribers/junk
+        // If on super admin view or single tenant, get users with valid roles
         $cora_users = get_users( array(
             'role__not_in' => array( 'subscriber' ),
             'orderby'      => 'display_name',
@@ -93,7 +93,7 @@ if ( in_array( $sub_page, array( 'dashboard', 'bookings', 'tasks', 'client-tasks
         ) );
     }
 
-    // Always ensure current logged-in user is present in author/user list
+    // Always ensure current logged-in user or workspace owner is present
     $current_uid = get_current_user_id();
     $found_current = false;
     foreach ( $cora_users as $u ) {
@@ -108,6 +108,51 @@ if ( in_array( $sub_page, array( 'dashboard', 'bookings', 'tasks', 'client-tasks
             array_unshift( $cora_users, $curr_user_obj );
         }
     }
+
+    // Filter and sanitize $cora_users:
+    // 1. Purge junk test accounts (short random strings like '2', 'ff', '32g', '2_a5d031', 'klj', 'tes')
+    // 2. Sanitize names for privacy (Rule 3)
+    $clean_users = array();
+    $seen_ids = array();
+    foreach ( $cora_users as $u ) {
+        if ( in_array( $u->ID, $seen_ids ) ) continue;
+        
+        $d_name = trim( $u->display_name );
+        // Filter obvious junk/test names
+        if ( strlen( $d_name ) < 3 && ! is_numeric( $d_name ) ) continue;
+        if ( preg_match( '/^(2|2_a5d031|32g|ff|g|h|klj|sh|tes|[a-z0-9]{1,3})$/i', $d_name ) ) continue;
+        
+        // Sanitize owner name according to Rule 3
+        if ( preg_match( '/(Shruti|Shravya)/i', $d_name ) ) {
+            $u->display_name = 'Workspace Owner';
+        }
+        
+        $seen_ids[] = $u->ID;
+        $clean_users[] = $u;
+    }
+    
+    // Ensure the primary Workspace Owner is explicitly at the top of the list
+    if ( ! empty( $clean_users ) ) {
+        $owner_idx = -1;
+        foreach ( $clean_users as $idx => $cu ) {
+            if ( in_array( 'administrator', (array)$cu->roles ) || in_array( 'cora_super_admin', (array)$cu->roles ) || $cu->ID == $current_uid ) {
+                $owner_idx = $idx;
+                break;
+            }
+        }
+        if ( $owner_idx > 0 ) {
+            $owner_obj = $clean_users[$owner_idx];
+            unset( $clean_users[$owner_idx] );
+            array_unshift( $clean_users, $owner_obj );
+        }
+    } else if ( $current_uid ) {
+        $owner_obj = get_userdata( $current_uid );
+        if ( $owner_obj ) {
+            $owner_obj->display_name = 'Workspace Owner';
+            $clean_users[] = $owner_obj;
+        }
+    }
+    $cora_users = array_values( $clean_users );
 }
 $cora_workspace_listings = ( in_array( $sub_page, array( 'dashboard', 'equipment', 'leads', 'bookings', 'tasks', 'client-tasks', 'client_tasks', 'client-task-manager' ) ) ) ? cora_db_get_properties() : array();
 $cora_permissions = get_option( 'cora_role_permissions', array() );
@@ -13656,7 +13701,6 @@ body.cora-scroll-locked {
                                     <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Select Author</span>
                                     <div class="space-y-1">
                                         <select id="cora-article-assignee-bh" class="w-full text-xs border border-zinc-200 rounded-lg p-2 focus:outline-none focus:border-zinc-400 bg-white text-zinc-800">
-                                            <option value="0">Unassigned</option>
                                             <?php foreach($cora_users as $usr): ?>
                                                 <option value="<?php echo $usr->ID; ?>"><?php echo esc_html($usr->display_name); ?></option>
                                             <?php endforeach; ?>
@@ -14004,7 +14048,6 @@ body.cora-scroll-locked {
                 <div class="p-3 bg-zinc-50/80 border-b border-zinc-200 space-y-1 shrink-0 font-sans">
                     <span class="text-[10px] font-extrabold text-zinc-400 uppercase tracking-wider block">Assignee / Author</span>
                     <select id="cora-article-assignee" class="w-full text-xs border border-zinc-200 rounded-lg p-2.5 bg-white text-zinc-800 focus:outline-none focus:border-zinc-400 shadow-3xs cursor-pointer">
-                        <option value="0">Unassigned</option>
                         <?php foreach($cora_users as $usr): ?>
                             <option value="<?php echo $usr->ID; ?>"><?php echo esc_html($usr->display_name); ?></option>
                         <?php endforeach; ?>

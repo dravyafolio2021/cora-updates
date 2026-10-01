@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.282
+ * Version:           4.9.283
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.282' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.283' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -14110,7 +14110,10 @@ function cora_ajax_get_article() {
     $subtitle = get_post_meta($post_id, '_cora_article_subtitle', true);
     $keyword = get_post_meta($post_id, '_cora_seo_keyword', true);
     $description = get_post_meta($post_id, '_cora_seo_description', true);
-    $assignee_id = get_post_meta($post_id, '_cora_assignee_id', true) ?: '';
+    $assignee_id = get_post_meta($post_id, '_cora_assignee_id', true);
+    if (empty($assignee_id) || $assignee_id === '0' || $assignee_id === 0) {
+        $assignee_id = $post->post_author ?: (get_current_user_id() ?: 1);
+    }
     $editorial_status = get_post_meta($post_id, '_cora_editorial_status', true) ?: ($post->post_status === 'publish' ? 'published' : 'draft');
     $editorial_feedback = get_post_meta($post_id, '_cora_editorial_feedback', true) ?: '';
     $scheduled_date = get_post_meta($post_id, '_cora_scheduled_date', true) ?: '';
@@ -14162,6 +14165,9 @@ function cora_ajax_save_article() {
     $scheduled_date = isset($_POST['scheduled_date']) ? sanitize_text_field($_POST['scheduled_date']) : '';
     
     $assignee_id = isset($_POST['assignee_id']) ? intval($_POST['assignee_id']) : 0;
+    if (empty($assignee_id)) {
+        $assignee_id = get_current_user_id() ?: 1;
+    }
     $editorial_status = isset($_POST['editorial_status']) ? sanitize_key($_POST['editorial_status']) : '';
     $editorial_feedback = isset($_POST['editorial_feedback']) ? sanitize_textarea_field($_POST['editorial_feedback']) : '';
 
@@ -14185,6 +14191,7 @@ function cora_ajax_save_article() {
         'post_title'   => $title,
         'post_content' => $content,
         'post_status'  => $status,
+        'post_author'  => $assignee_id,
         'post_type'    => 'post'
     );
 

@@ -2370,11 +2370,10 @@ $ov_recent_articles = array_slice($cora_posts, 0, 5);
             <?php wp_dropdown_categories(['hide_empty'=>0, 'id'=>'ca-category', 'class'=>'w-full border border-zinc-200 rounded px-3 py-2 text-sm']); ?>
         </div>
         <div>
-            <label class="block text-xs font-bold text-zinc-700 mb-1">Assignee</label>
+            <label class="block text-xs font-bold text-zinc-700 mb-1">Assignee / Author</label>
             <select id="ca-assignee" class="w-full border border-zinc-200 rounded px-3 py-2 text-sm">
-                <option value="">Unassigned</option>
                 <?php foreach($cora_users as $u): 
-                    $u_name = preg_replace('/(Shruti|Shravya)/i', 'Studio Admin', $u->display_name);
+                    $u_name = preg_replace('/(Shruti|Shravya)/i', 'Workspace Owner', $u->display_name);
                 ?>
                     <option value="<?php echo esc_attr($u->ID); ?>"><?php echo esc_html($u_name); ?></option>
                 <?php endforeach; ?>
