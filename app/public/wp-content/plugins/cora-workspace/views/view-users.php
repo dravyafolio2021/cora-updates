@@ -3265,8 +3265,8 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
     </div>
 </div><!-- /.cora-users-wrapper -->
 
-<!-- Universal Users Drawer Backdrop -->
-<div id="cora-drawer-backdrop" class="fixed inset-0 bg-zinc-950/40 backdrop-blur-[2px] z-[100040] hidden transition-opacity cursor-pointer" onclick="window.coraCloseAllDrawers()"></div>
+<!-- Universal Users Drawer Backdrop (Transparent Click-Catcher per Platform Rules) -->
+<div id="cora-drawer-backdrop" class="fixed inset-0 bg-transparent z-[100040] hidden cursor-pointer" onclick="window.coraCloseAllDrawers()"></div>
 
 <!-- ═══ OFFICE GEOFENCING DRAWER SHEET ═══════════════════════════════════════ -->
 <aside id="cora-geofence-drawer" class="cora-drawer cora-portal-drawer collapsed hidden fixed top-0 right-0 z-[100050] h-full w-[440px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full pointer-events-none">
@@ -4905,7 +4905,7 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
 </div>
 
 <!-- ═══ TAB CUSTOMIZER RIGHT-SLIDING DRAWER & BACKDROP (DESKTOP ONLY) ═══════════ -->
-<div id="cora-customize-tabs-backdrop" onclick="closeTabCustomizerDrawer()" class="hidden fixed inset-0 z-[100045] bg-zinc-950/40 backdrop-blur-[2px] transition-opacity duration-200"></div>
+<div id="cora-customize-tabs-backdrop" onclick="closeTabCustomizerDrawer()" class="hidden fixed inset-0 z-[100045] bg-transparent cursor-pointer"></div>
 
 <aside id="cora-customize-tabs-drawer" class="cora-drawer cora-portal-drawer collapsed hidden fixed top-0 right-0 z-[100050] h-full w-[440px] max-w-[92vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out translate-x-full pointer-events-none" aria-label="Customize Module Tabs">
     <!-- Mobile pull-down handle -->
@@ -4972,12 +4972,12 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
 
     function getAvailableCustomizerTabs() {
         var tabs = [];
-        var $container = $('#cora-page-team-roles .cora-sub-tabs-container, #cora-page-users .cora-sub-tabs-container, .cora-users-wrapper .cora-sub-tabs-container, .cora-sub-tabs-container').first();
+        var $container = $('#cora-sub-navigation-tabs, .cora-sub-tabs-container, .cora-sticky-sub-tabs, #cora-page-team-roles .cora-sub-tabs-container, #cora-page-users .cora-sub-tabs-container').first();
         $container.find('.cora-sub-tab').each(function() {
             var $t = $(this);
-            var id = $t.data('target');
+            var id = $t.data('target') || $t.attr('data-target');
             if (!id) return;
-            var text = $t.text().trim();
+            var text = $t.find('span.sm\\:inline').text().trim() || $t.children('span:not(.shrink-0)').first().text().trim() || $t.text().trim();
             var iconHtml = $t.find('svg').prop('outerHTML') || '';
             var isLocked = (id === 'tab-active-members');
             tabs.push({
@@ -5179,8 +5179,12 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
         if (typeof window.coraCloseAllDrawers === 'function') {
             window.coraCloseAllDrawers();
         }
-        initCustomizerState();
-        renderCustomizerListCards();
+        try {
+            initCustomizerState();
+            renderCustomizerListCards();
+        } catch(err) {
+            console.error('Error rendering tab customizer cards:', err);
+        }
         var $drawer = $('#cora-customize-tabs-drawer');
         var $backdrop = $('#cora-customize-tabs-backdrop');
         $backdrop.removeClass('hidden').addClass('block').css({'display': 'block', 'pointer-events': 'auto', 'opacity': '1'});
@@ -5204,6 +5208,14 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
             $('body').removeClass('cora-drawer-open overflow-hidden');
         }, 250);
     };
+
+    $(document).on('click', '#btn-open-tab-customizer, [data-action="open-tab-customizer"]', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (typeof window.openTabCustomizerDrawer === 'function') {
+            window.openTabCustomizerDrawer();
+        }
+    });
 
     window.moveCustomizerTabItem = function(index, direction) {
         var targetIndex = index + direction;
