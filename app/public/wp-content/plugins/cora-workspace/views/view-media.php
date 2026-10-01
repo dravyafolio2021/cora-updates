@@ -361,36 +361,111 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
 #cm-empty { display:none; flex-direction:column; align-items:center; justify-content:center; height:100%; min-height:280px; gap:10px; text-align:center; padding:40px; }
 #cm-loading { display:none; padding:16px 18px; }
 
-/* ─── Centered Modal Dialog Pop-ups ───────────────────────────────────────── */
-#cm-folder-dlg, #cm-gallery-dlg, #cm-folder-settings-dlg, #cm-detail {
-    position: fixed; inset: 0; z-index: 99999;
-    background: rgba(9, 9, 11, 0.6); backdrop-filter: blur(4px);
-    display: flex; align-items: center; justify-content: center;
-    padding: 20px; opacity: 0; pointer-events: none;
+/* ─── Universal Edge-to-Edge Side Drawers & Transparent Backdrops ────────── */
+#cm-folder-dlg, #cm-gallery-dlg, #cm-folder-settings-dlg, #cm-detail, #cm-mobile-filter-dlg {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 100049 !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    display: block !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    opacity: 0;
+    pointer-events: none;
     transition: opacity .2s ease-in-out;
 }
-#cm-folder-dlg.open, #cm-gallery-dlg.open, #cm-folder-settings-dlg.open, #cm-detail.open {
-    opacity: 1; pointer-events: auto;
+#cm-folder-dlg.open, #cm-gallery-dlg.open, #cm-folder-settings-dlg.open, #cm-detail.open, #cm-mobile-filter-dlg.open {
+    opacity: 1 !important;
+    pointer-events: auto !important;
 }
 #cm-folder-card, #cm-gallery-card, #cm-folder-settings-card {
-    background: #fff; border: 1px solid #e4e4e7; border-radius: 16px;
-    width: 100%; max-width: 500px; max-height: 90vh;
-    box-shadow: 0 25px 50px -12px rgba(0,0,0,.25);
-    display: flex; flex-direction: column; overflow: hidden;
-    transform: scale(0.95); transition: transform .2s ease-in-out;
+    position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    left: auto !important;
+    width: 460px !important;
+    max-width: 90vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    max-height: 100vh !important;
+    max-height: 100dvh !important;
+    background: #ffffff !important;
+    border-radius: 0 !important;
+    border: none !important;
+    border-left: 1px solid #e4e4e7 !important;
+    margin: 0 !important;
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.08) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    z-index: 100050 !important;
+    transform: translateX(110%) !important;
+    transition: transform .28s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    pointer-events: none !important;
+    visibility: hidden;
 }
 #cm-detail-card {
-    background: #fff; border: 1px solid #e4e4e7; border-radius: 16px;
-    width: 100%; max-width: 680px; max-height: 90vh;
-    box-shadow: 0 25px 50px -12px rgba(0,0,0,.25);
-    display: flex; flex-direction: column; overflow: hidden;
-    transform: scale(0.95); transition: transform .2s ease-in-out;
+    position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    left: auto !important;
+    width: 620px !important;
+    max-width: 95vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    max-height: 100vh !important;
+    max-height: 100dvh !important;
+    background: #ffffff !important;
+    border-radius: 0 !important;
+    border: none !important;
+    border-left: 1px solid #e4e4e7 !important;
+    margin: 0 !important;
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.08) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    z-index: 100050 !important;
+    transform: translateX(110%) !important;
+    transition: transform .28s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    pointer-events: none !important;
+    visibility: hidden;
 }
 #cm-folder-dlg.open #cm-folder-card,
 #cm-gallery-dlg.open #cm-gallery-card,
 #cm-folder-settings-dlg.open #cm-folder-settings-card,
 #cm-detail.open #cm-detail-card {
-    transform: scale(1) !important;
+    transform: translateX(0) !important;
+    pointer-events: auto !important;
+    visibility: visible !important;
+}
+
+@media (max-width: 768px) {
+    #cm-folder-card, #cm-gallery-card, #cm-folder-settings-card, #cm-detail-card, #cm-mobile-filter-card {
+        top: auto !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        height: auto !important;
+        max-height: 88vh !important;
+        max-height: 88dvh !important;
+        border-radius: 24px 24px 0 0 !important;
+        border-top: 1px solid #e4e4e7 !important;
+        border-left: none !important;
+        border-right: none !important;
+        border-bottom: none !important;
+        transform: translateY(110%) !important;
+    }
+    #cm-folder-dlg.open #cm-folder-card,
+    #cm-gallery-dlg.open #cm-gallery-card,
+    #cm-folder-settings-dlg.open #cm-folder-settings-card,
+    #cm-detail.open #cm-detail-card,
+    #cm-mobile-filter-dlg.open #cm-mobile-filter-card {
+        transform: translateY(0) !important;
+    }
 }
 #cm-detail-header { flex-shrink:0; padding:14px 18px; border-bottom:1px solid #e4e4e7; display:flex; align-items:center; gap:8px; background:#fff; }
 #cm-detail-header h3 { flex:1; font-size:14px; font-weight:700; color:#09090b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin:0; }
@@ -522,28 +597,8 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
 
 
 
-/* ─── Mobile Filter Drawer & Chips ─────────────────────────────────────── */
+/* ─── Mobile Filter Button & Chips ──────────────────────────────────────── */
 #cm-btn-mobile-filter { display: none; }
-#cm-mobile-filter-dlg {
-    position: fixed; inset: 0; z-index: 99999;
-    background: rgba(9, 9, 11, 0.6); backdrop-filter: blur(4px);
-    display: flex; align-items: flex-end; justify-content: center;
-    padding: 0; opacity: 0; pointer-events: none;
-    transition: opacity .25s ease-in-out;
-}
-#cm-mobile-filter-dlg.open {
-    opacity: 1; pointer-events: auto;
-}
-#cm-mobile-filter-card {
-    background: #fff; border-top-left-radius: 20px; border-top-right-radius: 20px;
-    width: 100%; max-width: 600px; max-height: 85vh;
-    box-shadow: 0 -10px 40px rgba(0,0,0,.2);
-    display: flex; flex-direction: column; overflow: hidden;
-    transform: translateY(100%); transition: transform .25s cubic-bezier(0.16, 1, 0.3, 1);
-}
-#cm-mobile-filter-dlg.open #cm-mobile-filter-card {
-    transform: translateY(0);
-}
 
 
 .cm-chip {
@@ -1079,14 +1134,14 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
                 <div style="position:relative;display:inline-block">
                     <button onclick="cmToggleBulkColorMenu(event)" class="cm-hbtn" style="font-size:11px;padding:4px 9px">Folder Color ▾</button>
                     <div id="cm-bulk-color-menu" style="display:none;position:absolute;bottom:100%;left:0;margin-bottom:6px;background:#18181b;border:1px solid #3f3f46;border-radius:10px;padding:8px;gap:6px;box-shadow:0 6px 16px rgba(0,0,0,.3);z-index:900;align-items:center">
-                        <div onclick="cmBulkColorFolders('#3b82f6')" style="width:18px;height:18px;border-radius:50%;background:#3b82f6;cursor:pointer" title="Blue"></div>
-                        <div onclick="cmBulkColorFolders('#ef4444')" style="width:18px;height:18px;border-radius:50%;background:#ef4444;cursor:pointer" title="Red"></div>
-                        <div onclick="cmBulkColorFolders('#f59e0b')" style="width:18px;height:18px;border-radius:50%;background:#f59e0b;cursor:pointer" title="Orange"></div>
-                        <div onclick="cmBulkColorFolders('#10b981')" style="width:18px;height:18px;border-radius:50%;background:#10b981;cursor:pointer" title="Green"></div>
-                        <div onclick="cmBulkColorFolders('#8b5cf6')" style="width:18px;height:18px;border-radius:50%;background:#8b5cf6;cursor:pointer" title="Purple"></div>
-                        <div onclick="cmBulkColorFolders('#ec4899')" style="width:18px;height:18px;border-radius:50%;background:#ec4899;cursor:pointer" title="Pink"></div>
-                        <div onclick="cmBulkColorFolders('#64748b')" style="width:18px;height:18px;border-radius:50%;background:#64748b;cursor:pointer" title="Slate"></div>
-                        <div onclick="cmBulkColorFolders('#09090b')" style="width:18px;height:18px;border-radius:50%;background:#09090b;cursor:pointer;border:1px solid #3f3f46" title="Dark"></div>
+                        <div onclick="cmBulkColorFolders('#09090b')" style="width:18px;height:18px;border-radius:50%;background:#09090b;cursor:pointer;border:1px solid #3f3f46" title="Zinc 950"></div>
+                        <div onclick="cmBulkColorFolders('#27272a')" style="width:18px;height:18px;border-radius:50%;background:#27272a;cursor:pointer" title="Zinc 800"></div>
+                        <div onclick="cmBulkColorFolders('#52525b')" style="width:18px;height:18px;border-radius:50%;background:#52525b;cursor:pointer" title="Zinc 600"></div>
+                        <div onclick="cmBulkColorFolders('#71717a')" style="width:18px;height:18px;border-radius:50%;background:#71717a;cursor:pointer" title="Zinc 500"></div>
+                        <div onclick="cmBulkColorFolders('#a1a1aa')" style="width:18px;height:18px;border-radius:50%;background:#a1a1aa;cursor:pointer" title="Zinc 400"></div>
+                        <div onclick="cmBulkColorFolders('#d4d4d8')" style="width:18px;height:18px;border-radius:50%;background:#d4d4d8;cursor:pointer" title="Zinc 300"></div>
+                        <div onclick="cmBulkColorFolders('#e4e4e7')" style="width:18px;height:18px;border-radius:50%;background:#e4e4e7;cursor:pointer" title="Zinc 200"></div>
+                        <div onclick="cmBulkColorFolders('#f4f4f5')" style="width:18px;height:18px;border-radius:50%;background:#f4f4f5;cursor:pointer;border:1px solid #3f3f46" title="Zinc 100"></div>
                     </div>
                 </div>
                 <button onclick="cmBulkAddGallery()" class="cm-hbtn" style="font-size:11px;padding:4px 9px">Gallery</button>
@@ -1524,7 +1579,7 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
             <!-- Folder Name -->
             <div style="margin-bottom:18px">
                 <label style="display:block;font-size:11px;font-weight:700;color:#27272a;margin-bottom:6px">Folder Name *</label>
-                <input type="text" id="cm-folder-name" placeholder="e.g. Rahul & Neha Pre-Shoot..." maxlength="60" style="width:100%;border:1px solid #e4e4e7;border-radius:8px;padding:8px 12px;font-size:13px;outline:none;box-sizing:border-box">
+                <input type="text" id="cm-folder-name" placeholder="e.g. Commercial Shoot 2026..." maxlength="60" style="width:100%;border:1px solid #e4e4e7;border-radius:8px;padding:8px 12px;font-size:13px;outline:none;box-sizing:border-box">
             </div>
 
             <!-- Parent Folder -->
@@ -1544,7 +1599,7 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
             <!-- Folder Color Tag -->
             <div style="margin-bottom:18px">
                 <label style="display:block;font-size:11px;font-weight:700;color:#27272a;margin-bottom:6px">Folder Color Tag</label>
-                <input type="hidden" id="cm-folder-color" value="#3b82f6">
+                <input type="hidden" id="cm-folder-color" value="#09090b">
                 <div id="cm-folder-color-swatches" style="display:flex;gap:8px;align-items:center;padding:4px 0"></div>
             </div>
 
@@ -1565,7 +1620,7 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
 
 <!-- ═══ CLIENT GALLERY DRAWER ════════════════════════════════════════════════ -->
 <div id="cm-gallery-dlg" onclick="if(event.target===this)document.getElementById('cm-gallery-dlg').classList.remove('open')">
-    <div id="cm-gallery-card" style="background:#fff;border-left:1px solid #e4e4e7;height:100%;width:100%;max-width:420px;box-shadow:-10px 0 30px rgba(0,0,0,.15);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s ease">
+    <div id="cm-gallery-card">
         <div class="cm-drawer-header">
             <h3 style="margin:0;font-size:15px;font-weight:800;letter-spacing:-.02em">Add to Client Gallery</h3>
             <button style="background:none;border:none;color:#a1a1aa;cursor:pointer;padding:4px" onclick="document.getElementById('cm-gallery-dlg').classList.remove('open')">
@@ -1580,7 +1635,7 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
             <div style="border-top:1px solid #f4f4f5;padding-top:14px">
                 <label style="display:block;font-size:11px;font-weight:700;color:#27272a;margin-bottom:6px">Create New Gallery</label>
                 <div style="display:flex;gap:6px">
-                    <input type="text" id="cm-new-gallery-name" placeholder="Gallery title (e.g. Rahul & Neha Shoot)..." style="flex:1;border:1px solid #e4e4e7;border-radius:8px;padding:7px 10px;font-size:12px;outline:none">
+                    <input type="text" id="cm-new-gallery-name" placeholder="Gallery title (e.g. Client Deliverables)..." style="flex:1;border:1px solid #e4e4e7;border-radius:8px;padding:7px 10px;font-size:12px;outline:none">
                     <button onclick="cmCreateGalleryFromPicker()" class="cm-hbtn primary" style="font-size:11px">Create</button>
                 </div>
             </div>
@@ -1612,7 +1667,7 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
             <!-- Folder Color Tag -->
             <div style="margin-bottom:18px">
                 <label style="display:block;font-size:11px;font-weight:700;color:#27272a;margin-bottom:6px">Folder Color Tag</label>
-                <input type="hidden" id="cm-fs-color" value="#3b82f6">
+                <input type="hidden" id="cm-fs-color" value="#09090b">
                 <div id="cm-fs-color-swatches" style="display:flex;gap:8px;align-items:center;padding:4px 0"></div>
             </div>
 
@@ -1683,8 +1738,31 @@ var LABEL_MAP = {
     purple: { hex: '#a855f7', label: 'Exported' }
 };
 
+// ── DOM PORTAL FOR MEDIA DRAWERS ───────────────────────────────────────────
+window.coraPortalMediaDrawersToBody = function() {
+    var drawerIds = [
+        'cm-folder-dlg',
+        'cm-gallery-dlg',
+        'cm-folder-settings-dlg',
+        'cm-detail',
+        'cm-mobile-filter-dlg',
+        'cm-confirm-modal',
+        'cm-ctx-menu',
+        'cm-folder-ctx-menu'
+    ];
+    drawerIds.forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el && el.parentElement !== document.body) {
+            document.body.appendChild(el);
+        }
+    });
+};
+
 // ── INIT ────────────────────────────────────────────────────────────────────
 window.cmInit = function() {
+    if (typeof window.coraPortalMediaDrawersToBody === 'function') {
+        window.coraPortalMediaDrawersToBody();
+    }
     CM.view = localStorage.getItem('cora_media_view') || 'grid';
     if (window.innerWidth <= 768) {
         CM.view = 'grid';
@@ -1757,6 +1835,7 @@ window.cmSelectGallery = function(galleryId, el) {
 
 window.cmBulkAddGallery = function() {
     if (!CM.selIds.length) { coraShowToast('Select files first.'); return; }
+    if (window.coraPortalMediaDrawersToBody) window.coraPortalMediaDrawersToBody();
     cmRenderGalleries();
     document.getElementById('cm-gallery-dlg').classList.add('open');
 };
@@ -2193,9 +2272,12 @@ window.cmRenderList = function(files) {
 
 // ── DETAIL PANEL ─────────────────────────────────────────────────────────────
 window.cmOpenDetail = function(f) {
+    if (typeof window.coraPortalMediaDrawersToBody === 'function') {
+        window.coraPortalMediaDrawersToBody();
+    }
     CM.active = f;
     var panel = document.getElementById('cm-detail');
-    panel.classList.add('open');
+    if (panel) panel.classList.add('open');
 
     // Preview
     var prev = document.getElementById('cm-d-preview');
@@ -2685,6 +2767,9 @@ window.cmUpdateBreadcrumbs = function() {
     }
 };
 window.cmPromptFolder = function(parentId) {
+    if (typeof window.coraPortalMediaDrawersToBody === 'function') {
+        window.coraPortalMediaDrawersToBody();
+    }
     if (typeof cmHideFolderContextMenu === 'function') cmHideFolderContextMenu();
     document.getElementById('cm-folder-name').value = '';
     var parentSel = document.getElementById('cm-folder-parent');
@@ -2701,7 +2786,7 @@ window.cmPromptFolder = function(parentId) {
     }
     if (document.getElementById('cm-folder-desc')) document.getElementById('cm-folder-desc').value = '';
     if (document.getElementById('cm-folder-autoshare')) document.getElementById('cm-folder-autoshare').checked = false;
-    cmRenderSwatches('cm-folder-color-swatches', 'cm-folder-color', '#3b82f6');
+    cmRenderSwatches('cm-folder-color-swatches', 'cm-folder-color', '#09090b');
     var dlg = document.getElementById('cm-folder-dlg');
     if (dlg) dlg.classList.add('open');
     setTimeout(function() { document.getElementById('cm-folder-name').focus(); }, 80);
@@ -2854,6 +2939,7 @@ window.cmUpdatePag = function() {
 window.cmPage = function(d) { var n=CM.page+d; if(n<1||n>CM.pages) return; CM.page=n; cmLoadFiles(); };
 
 window.cmOpenMobileFilters = function() {
+    if (window.coraPortalMediaDrawersToBody) window.coraPortalMediaDrawersToBody();
     var ft = document.getElementById('cm-ft');
     var fc = document.getElementById('cm-fculling');
     var fd = document.getElementById('cm-fd');
@@ -3218,7 +3304,7 @@ window.cmToggleBulkColorMenu = function(e) {
 };
 
 window.cmRenderSwatches = function(containerId, inputId, activeColor) {
-    var colors = ['#3b82f6', '#ef4444', '#f59e0b', '#10b981', '#8b5cf6', '#ec4899', '#64748b', '#09090b'];
+    var colors = ['#09090b', '#27272a', '#52525b', '#71717a', '#a1a1aa', '#d4d4d8', '#e4e4e7', '#f4f4f5'];
     var container = typeof containerId === 'string' ? document.getElementById(containerId) : containerId;
     if (!container) return;
     if (inputId) {
@@ -3227,7 +3313,7 @@ window.cmRenderSwatches = function(containerId, inputId, activeColor) {
     }
     container.innerHTML = colors.map(function(c) {
         var activeStyle = (c.toLowerCase() === (activeColor || '').toLowerCase()) ? 'outline:2px solid #09090b;outline-offset:2px;transform:scale(1.1);' : '';
-        return '<div onclick="cmSelectSwatch(\'' + containerId + '\', \'' + inputId + '\', \'' + c + '\')" style="width:20px;height:20px;border-radius:50%;background:' + c + ';cursor:pointer;transition:all .15s;' + activeStyle + '" data-color="' + c + '"></div>';
+        return '<div onclick="cmSelectSwatch(\'' + containerId + '\', \'' + inputId + '\', \'' + c + '\')" style="width:20px;height:20px;border-radius:50%;background:' + c + ';border:1px solid rgba(0,0,0,0.12);cursor:pointer;transition:all .15s;' + activeStyle + '" data-color="' + c + '"></div>';
     }).join('');
 };
 
@@ -3522,6 +3608,7 @@ window.cmAddWatermark = function() {
 // ── FOLDER SETTINGS & SHARING ──────────────────────────────────────────────────
 window.cmOpenFolderSettings = function(folderId, name) {
     if (!folderId) return;
+    if (window.coraPortalMediaDrawersToBody) window.coraPortalMediaDrawersToBody();
     var folderObj = null;
     (CM.folders || []).forEach(function(x) {
         if (x.id == folderId) folderObj = x;
@@ -3532,7 +3619,7 @@ window.cmOpenFolderSettings = function(folderId, name) {
     if (!name && folderObj) {
         name = folderObj.name;
     }
-    var color = (folderObj && folderObj.color) ? folderObj.color : '#3b82f6';
+    var color = (folderObj && folderObj.color) ? folderObj.color : '#09090b';
     document.getElementById('cm-fs-id').value = folderId;
     document.getElementById('cm-fs-name-input').value = name || '';
     document.getElementById('cm-fs-title').textContent = 'Folder Settings: ' + (name || '');
@@ -3545,7 +3632,7 @@ window.cmOpenFolderSettings = function(folderId, name) {
 window.cmSaveFolderSettings = window.cmSaveRenameFolder = function() {
     var id = document.getElementById('cm-fs-id').value;
     var name = document.getElementById('cm-fs-name-input').value.trim();
-    var color = document.getElementById('cm-fs-color') ? document.getElementById('cm-fs-color').value : '#3b82f6';
+    var color = document.getElementById('cm-fs-color') ? document.getElementById('cm-fs-color').value : '#09090b';
     if (!id || !name) { coraShowToast('Folder name required.'); return; }
     $.ajax({ url: coraREData.ajaxUrl, type: 'POST', data: {
         action: 'cora_media_library_rename_folder', nonce: coraREData.ajaxNonce, term_id: id, name: name, color: color
