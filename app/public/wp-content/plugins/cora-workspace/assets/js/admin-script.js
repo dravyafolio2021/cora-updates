@@ -5160,25 +5160,36 @@ jQuery(document).ready(function($) {
     });
 
 
-    // 13. AI Model Selector — silently save user's model preference on change
-    $('#cora-ai-model-selector').on('change', function() {
-        const val = $(this).val();
+    // 13. AI Model Selector — save user's model preference on change & sync across popovers
+    window.coraSetAiModel = function(val, showToast = true) {
         const labels = {
-            'cora-core-v2': 'Cora AI · Auto',
-            'gemini':        'Cora AI · Gemini',
-            'gpt-4o':        'Cora AI · GPT-4o'
+            'cora-core-v2': 'Gemini 3.5 Flash',
+            'gemini':        'Claude 3.5 Sonnet',
+            'gpt-4o':        'GPT-4o'
         };
+        $('#cora-ai-model-selector, #cora-header-ai-model-selector').val(val);
+        const ajaxUrl = (typeof coraREWPData !== 'undefined' && coraREWPData.ajaxUrl) ? coraREWPData.ajaxUrl : '/wp-admin/admin-ajax.php';
+        const nonce = (typeof coraREWPData !== 'undefined' && coraREWPData.ajaxNonce) ? coraREWPData.ajaxNonce : '';
         $.ajax({
-            url: coraREWPData.ajaxUrl,
+            url: ajaxUrl,
             method: 'POST',
             data: {
                 action: 'cora_workspace_save_ai_keys',
-                security: coraREWPData.ajaxNonce,
+                security: nonce,
                 provider: 'gemini',
                 api_key: '',
                 active_model: val
+            },
+            success: function() {
+                if (showToast && typeof window.coraShowToast === 'function') {
+                    window.coraShowToast('AI Model updated to ' + (labels[val] || val), 'success');
+                }
             }
         });
+    };
+
+    $(document).on('change', '#cora-ai-model-selector, #cora-header-ai-model-selector', function() {
+        window.coraSetAiModel($(this).val(), true);
     });
 
 

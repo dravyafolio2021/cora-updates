@@ -2611,10 +2611,13 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
         /* Popover placement when sidebar is collapsed */
         .cora-sidebar.collapsed-sidebar #cora-profile-popover {
-            left: 4.5rem !important; /* place it to the right of the collapsed sidebar */
+            position: fixed !important;
+            bottom: 12px !important;
+            left: 4.5rem !important;
+            width: 280px !important;
             right: auto !important;
-            width: 180px !important;
-            bottom: 1rem !important;
+            max-height: calc(100vh - 40px) !important;
+            z-index: 9999 !important;
         }
         .cora-main {
             transition: margin-right 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
@@ -3905,20 +3908,56 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             margin: 0 !important;
         }
 
+        /* Sidebar popover positioning across expanded & collapsed states */
+        .cora-sidebar-bottom-block {
+            position: relative !important;
+        }
+        #cora-profile-popover {
+            position: absolute !important;
+            bottom: calc(100% + 8px) !important;
+            left: 10px !important;
+            right: 10px !important;
+            width: calc(100% - 20px) !important;
+            max-height: calc(100vh - 120px) !important;
+            overflow-y: auto !important;
+            z-index: 80 !important;
+        }
+        #cora-sidebar-notif-popover {
+            position: absolute !important;
+            bottom: calc(100% + 8px) !important;
+            left: 10px !important;
+            right: 10px !important;
+            width: calc(100% - 20px) !important;
+            max-height: 380px !important;
+            overflow-y: auto !important;
+            z-index: 80 !important;
+        }
+
         .cora-sidebar.collapsed-sidebar #cora-profile-popover:not(.hidden) {
             position: fixed !important;
             bottom: 12px !important;
-            left: 5rem !important;
-            width: 290px !important;
+            left: 4.5rem !important;
+            width: 280px !important;
             right: auto !important;
+            max-height: calc(100vh - 40px) !important;
+            z-index: 9999 !important;
+        }
+
+        .cora-sidebar.collapsed-sidebar #cora-sidebar-notif-popover:not(.hidden) {
+            position: fixed !important;
+            bottom: 12px !important;
+            left: 4.5rem !important;
+            width: 300px !important;
+            right: auto !important;
+            max-height: 380px !important;
             z-index: 9999 !important;
         }
 
         .cora-sidebar.collapsed-sidebar #cora-workspace-popover:not(.hidden) {
             position: fixed !important;
             top: 12px !important;
-            left: 5rem !important;
-            width: 290px !important;
+            left: 4.5rem !important;
+            width: 280px !important;
             right: auto !important;
             z-index: 9999 !important;
         }
@@ -4975,12 +5014,19 @@ body.cora-scroll-locked {
         <!-- 3. Workspace AI & Quick Links List (Linear / Notion Style) -->
         <div class="flex flex-col gap-0.5 pt-0.5">
             <!-- AI Engine Indicator -->
-            <div class="w-full px-2.5 py-1.5 text-xs text-zinc-600 dark:text-zinc-400 rounded-xl bg-zinc-50/50 dark:bg-zinc-800/30 flex items-center justify-between border border-zinc-100 dark:border-zinc-800/60">
+            <?php
+            $cora_active_ai_model = get_option( 'cora_workspace_active_ai_model', 'cora-core-v2' );
+            ?>
+            <div class="w-full px-2.5 py-1.5 text-xs text-zinc-600 dark:text-zinc-400 rounded-xl bg-zinc-50/50 dark:bg-zinc-800/30 flex items-center justify-between border border-zinc-100 dark:border-zinc-800/60 select-none">
                 <div class="flex items-center gap-2">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                    <span class="text-[11px] font-medium text-zinc-700 dark:text-zinc-300">Cora AI Agent</span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span class="text-[11px] font-medium text-zinc-700 dark:text-zinc-300">Cora AI Model</span>
                 </div>
-                <span class="text-[10px] font-mono text-zinc-400 dark:text-zinc-500">Gemini 3.5 Flash</span>
+                <select id="cora-header-ai-model-selector" class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-700/80 text-zinc-700 dark:text-zinc-300 text-[10.5px] font-medium rounded-md px-1.5 py-0.5 outline-none cursor-pointer">
+                    <option value="cora-core-v2" <?php selected( $cora_active_ai_model, 'cora-core-v2' ); ?>>Gemini 3.5 Flash</option>
+                    <option value="gemini" <?php selected( $cora_active_ai_model, 'gemini' ); ?>>Claude 3.5 Sonnet</option>
+                    <option value="gpt-4o" <?php selected( $cora_active_ai_model, 'gpt-4o' ); ?>>GPT-4o</option>
+                </select>
             </div>
 
             <!-- Profile -->
@@ -5474,9 +5520,9 @@ body.cora-scroll-locked {
         </div><!-- /.flex-1.overflow-y-auto -->
 
         <!-- LOWER BLOCK: PINNED AT BOTTOM (sibling to scrollable nav, not inside it) -->
-        <div class="cora-sidebar-bottom-block shrink-0 border-t border-zinc-200/50 z-20 sticky bottom-0 flex flex-col">
+        <div class="cora-sidebar-bottom-block relative shrink-0 border-t border-zinc-200/50 z-20 sticky bottom-0 flex flex-col">
             <!-- User Profile Popover Card (Notion/Linear Monochromatic Aesthetic) -->
-            <div id="cora-profile-popover" class="hidden absolute bottom-16 left-3 right-3 max-h-[460px] overflow-y-auto bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border border-zinc-200/90 dark:border-zinc-800 rounded-2xl shadow-xl p-3 z-[70] flex flex-col gap-2 animate-in fade-in slide-in-from-bottom-2 duration-150 select-none">
+            <div id="cora-profile-popover" class="hidden absolute bottom-[calc(100%+8px)] left-2.5 right-2.5 max-h-[calc(100vh-130px)] overflow-y-auto bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border border-zinc-200/90 dark:border-zinc-800 rounded-2xl shadow-xl p-3 z-[80] flex flex-col gap-2 animate-in fade-in slide-in-from-bottom-2 duration-150 select-none">
                 <!-- 1. User Profile Header -->
                 <div class="flex items-center gap-2.5 px-1 py-0.5 select-none">
                     <div class="relative w-9 h-9 shrink-0">
@@ -5621,7 +5667,7 @@ body.cora-scroll-locked {
             </div>
 
             <!-- Sidebar Notification Popover Card -->
-            <div id="cora-sidebar-notif-popover" class="hidden absolute bottom-16 left-3 right-3 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border border-zinc-200/90 dark:border-zinc-800 rounded-2xl shadow-xl p-3 z-[70] flex flex-col gap-2 animate-in fade-in slide-in-from-bottom-2 duration-150 select-none text-zinc-900 dark:text-zinc-100">
+            <div id="cora-sidebar-notif-popover" class="hidden absolute bottom-[calc(100%+8px)] left-2.5 right-2.5 max-h-[380px] overflow-y-auto bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border border-zinc-200/90 dark:border-zinc-800 rounded-2xl shadow-xl p-3 z-[80] flex flex-col gap-2 animate-in fade-in slide-in-from-bottom-2 duration-150 select-none text-zinc-900 dark:text-zinc-100">
                 <div class="flex items-center justify-between pb-2 border-b border-zinc-200/80 dark:border-zinc-800 px-1">
                     <span class="text-xs font-bold">Notifications</span>
                     <button class="text-[10px] font-semibold text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors cursor-pointer" onclick="markAllNotificationsRead(event)">Mark all as read</button>
