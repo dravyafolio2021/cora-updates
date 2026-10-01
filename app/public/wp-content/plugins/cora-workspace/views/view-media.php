@@ -1194,14 +1194,17 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
                 <div style="position:relative;display:inline-block">
                     <button onclick="cmToggleBulkColorMenu(event)" class="cm-hbtn" style="font-size:11px;padding:4px 9px">Folder Color ▾</button>
                     <div id="cm-bulk-color-menu" style="display:none;position:absolute;bottom:100%;left:0;margin-bottom:6px;background:#18181b;border:1px solid #3f3f46;border-radius:10px;padding:8px;gap:6px;box-shadow:0 6px 16px rgba(0,0,0,.3);z-index:900;align-items:center">
-                        <div onclick="cmBulkColorFolders('#09090b')" style="width:18px;height:18px;border-radius:50%;background:#09090b;cursor:pointer;border:1px solid #3f3f46" title="Zinc 950"></div>
-                        <div onclick="cmBulkColorFolders('#27272a')" style="width:18px;height:18px;border-radius:50%;background:#27272a;cursor:pointer" title="Zinc 800"></div>
-                        <div onclick="cmBulkColorFolders('#52525b')" style="width:18px;height:18px;border-radius:50%;background:#52525b;cursor:pointer" title="Zinc 600"></div>
-                        <div onclick="cmBulkColorFolders('#71717a')" style="width:18px;height:18px;border-radius:50%;background:#71717a;cursor:pointer" title="Zinc 500"></div>
-                        <div onclick="cmBulkColorFolders('#a1a1aa')" style="width:18px;height:18px;border-radius:50%;background:#a1a1aa;cursor:pointer" title="Zinc 400"></div>
-                        <div onclick="cmBulkColorFolders('#d4d4d8')" style="width:18px;height:18px;border-radius:50%;background:#d4d4d8;cursor:pointer" title="Zinc 300"></div>
-                        <div onclick="cmBulkColorFolders('#e4e4e7')" style="width:18px;height:18px;border-radius:50%;background:#e4e4e7;cursor:pointer" title="Zinc 200"></div>
-                        <div onclick="cmBulkColorFolders('#f4f4f5')" style="width:18px;height:18px;border-radius:50%;background:#f4f4f5;cursor:pointer;border:1px solid #3f3f46" title="Zinc 100"></div>
+                        <div onclick="cmBulkColorFolders('#09090b')" style="width:18px;height:18px;border-radius:50%;background:#09090b;cursor:pointer;border:1px solid #3f3f46" title="Dark (#09090b)"></div>
+                        <div onclick="cmBulkColorFolders('#2563eb')" style="width:18px;height:18px;border-radius:50%;background:#2563eb;cursor:pointer" title="Blue (#2563eb)"></div>
+                        <div onclick="cmBulkColorFolders('#059669')" style="width:18px;height:18px;border-radius:50%;background:#059669;cursor:pointer" title="Emerald (#059669)"></div>
+                        <div onclick="cmBulkColorFolders('#d97706')" style="width:18px;height:18px;border-radius:50%;background:#d97706;cursor:pointer" title="Amber (#d97706)"></div>
+                        <div onclick="cmBulkColorFolders('#dc2626')" style="width:18px;height:18px;border-radius:50%;background:#dc2626;cursor:pointer" title="Red (#dc2626)"></div>
+                        <div onclick="cmBulkColorFolders('#7c3aed')" style="width:18px;height:18px;border-radius:50%;background:#7c3aed;cursor:pointer" title="Purple (#7c3aed)"></div>
+                        <div onclick="cmBulkColorFolders('#db2777')" style="width:18px;height:18px;border-radius:50%;background:#db2777;cursor:pointer" title="Pink (#db2777)"></div>
+                        <div onclick="cmBulkColorFolders('#475569')" style="width:18px;height:18px;border-radius:50%;background:#475569;cursor:pointer" title="Slate (#475569)"></div>
+                        <label style="position:relative;width:18px;height:18px;border-radius:50%;background:conic-gradient(from 180deg, #f43f5e, #eab308, #22c55e, #06b6d4, #3b82f6, #a855f7, #f43f5e);cursor:pointer;display:inline-flex;align-items:center;justify-content:center" title="Custom Color">
+                            <input type="color" value="#09090b" style="position:absolute;opacity:0;inset:0;width:100%;height:100%;cursor:pointer" oninput="cmBulkColorFolders(this.value)">
+                        </label>
                     </div>
                 </div>
                 <button onclick="cmBulkAddGallery()" class="cm-hbtn" style="font-size:11px;padding:4px 9px">Gallery</button>
@@ -2640,7 +2643,7 @@ window.cmRenderFolderTabs = function() {
 
         if (!searchQ || matchParent || matchingChildren.length > 0) {
             if (!searchQ || matchParent) {
-                var fColor = folder.color || '#3b82f6';
+                var fColor = folder.color || '#09090b';
                 var isAct = (CM.folder == folder.id) ? ' active' : '';
                 var fcard = document.createElement('div');
                 fcard.className = 'cm-fcard' + isAct;
@@ -2686,7 +2689,7 @@ window.cmRenderFolderTabs = function() {
 
             // Subfolders
             matchingChildren.forEach(function(s) {
-                var sColor = s.color || '#3b82f6';
+                var sColor = s.color || '#09090b';
                 var sAct = (CM.folder == s.id) ? ' active' : '';
                 var scard = document.createElement('div');
                 scard.className = 'cm-fcard' + sAct;
@@ -3364,17 +3367,34 @@ window.cmToggleBulkColorMenu = function(e) {
 };
 
 window.cmRenderSwatches = function(containerId, inputId, activeColor) {
-    var colors = ['#09090b', '#27272a', '#52525b', '#71717a', '#a1a1aa', '#d4d4d8', '#e4e4e7', '#f4f4f5'];
+    var defaultPresets = ['#09090b', '#2563eb', '#059669', '#d97706', '#dc2626', '#7c3aed', '#db2777', '#475569'];
     var container = typeof containerId === 'string' ? document.getElementById(containerId) : containerId;
     if (!container) return;
+    
+    activeColor = activeColor || defaultPresets[0];
     if (inputId) {
         var inputEl = document.getElementById(inputId);
-        if (inputEl) inputEl.value = activeColor || colors[0];
+        if (inputEl) inputEl.value = activeColor;
     }
-    container.innerHTML = colors.map(function(c) {
-        var activeStyle = (c.toLowerCase() === (activeColor || '').toLowerCase()) ? 'outline:2px solid #09090b;outline-offset:2px;transform:scale(1.1);' : '';
-        return '<div onclick="cmSelectSwatch(\'' + containerId + '\', \'' + inputId + '\', \'' + c + '\')" style="width:20px;height:20px;border-radius:50%;background:' + c + ';border:1px solid rgba(0,0,0,0.12);cursor:pointer;transition:all .15s;' + activeStyle + '" data-color="' + c + '"></div>';
+
+    var isCustom = true;
+    var swatchesHtml = defaultPresets.map(function(c) {
+        var isSelected = (c.toLowerCase() === (activeColor || '').toLowerCase());
+        if (isSelected) isCustom = false;
+        var activeStyle = isSelected ? 'outline:2px solid #09090b;outline-offset:2px;transform:scale(1.1);' : '';
+        return '<div onclick="cmSelectSwatch(\'' + containerId + '\', \'' + inputId + '\', \'' + c + '\')" style="width:20px;height:20px;border-radius:50%;background:' + c + ';border:1px solid rgba(0,0,0,0.12);cursor:pointer;transition:all .15s;' + activeStyle + '" data-color="' + c + '" title="' + c + '"></div>';
     }).join('');
+
+    var customPickerId = 'cm-custom-color-' + (typeof containerId === 'string' ? containerId : 'picker');
+    var customActiveStyle = isCustom ? 'outline:2px solid #09090b;outline-offset:2px;transform:scale(1.1);' : '';
+    var customBg = isCustom ? activeColor : 'conic-gradient(from 180deg, #f43f5e, #eab308, #22c55e, #06b6d4, #3b82f6, #a855f7, #f43f5e)';
+
+    var customPickerHtml = '<label for="' + customPickerId + '" style="position:relative;width:20px;height:20px;border-radius:50%;background:' + customBg + ';border:1px solid rgba(0,0,0,0.15);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all .15s;' + customActiveStyle + '" title="Custom Color Picker">' +
+        '<input type="color" id="' + customPickerId + '" value="' + ((activeColor && activeColor.indexOf('#') === 0 && activeColor.length === 7) ? activeColor : '#09090b') + '" style="position:absolute;opacity:0;inset:0;width:100%;height:100%;cursor:pointer;" oninput="cmSelectSwatch(\'' + containerId + '\', \'' + inputId + '\', this.value)">' +
+        (isCustom ? '' : '<svg viewBox="0 0 24 24" width="9" height="9" stroke="#ffffff" stroke-width="2.6" fill="none" style="filter:drop-shadow(0 1px 1px rgba(0,0,0,0.6));pointer-events:none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>') +
+    '</label>';
+
+    container.innerHTML = swatchesHtml + customPickerHtml;
 };
 
 window.cmSelectSwatch = function(containerId, inputId, color) {
