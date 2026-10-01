@@ -598,6 +598,23 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             }
             window.location.href = '/workspace/' + encodeURIComponent(baseSlug) + '/' + encodeURIComponent(targetPageId);
         };
+
+        window.coraOpenLiveThemeEditor = function(e) {
+            if (e && e.preventDefault) e.preventDefault();
+            if (e && e.stopPropagation) e.stopPropagation();
+            if (typeof window.editTheme === 'function' && window.canvasState && window.canvasState.themes && window.canvasState.themes.length > 0) {
+                var liveTheme = window.canvasState.themes.find(function(t) { return t.status === 'live'; }) || window.canvasState.themes[0];
+                if (liveTheme) {
+                    window.editTheme(liveTheme.id, liveTheme.name, true);
+                    return;
+                }
+            }
+            if (typeof window.coraNavigateTo === 'function') {
+                window.coraNavigateTo('canvas?cv_action=edit_live');
+            } else {
+                window.location.href = '<?php echo esc_js( home_url( $cora_nav_prefix . '/canvas?cv_action=edit_live' ) ); ?>';
+            }
+        };
     </script>
 
     <!-- CRITICAL: Reset any WordPress admin-bar margin-top injected by wp_print_styles() -->
@@ -2062,6 +2079,50 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         .cora-nav-item .cora-nav-icon svg {
             width: 15px !important;
             height: 15px !important;
+        }
+
+        /* Canvas Nav Item Hover Quick-Actions (Shopify Reference) */
+        .cora-canvas-hover-actions {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.15s ease-in-out, visibility 0.15s ease-in-out;
+        }
+        .cora-nav-item:hover .cora-canvas-hover-actions,
+        .cora-nav-item:focus-within .cora-canvas-hover-actions {
+            opacity: 1 !important;
+            visibility: visible !important;
+            pointer-events: auto !important;
+        }
+        .cora-sidebar.collapsed-sidebar .cora-canvas-hover-actions {
+            display: none !important;
+        }
+        .cora-canvas-hover-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+            color: #71717a;
+            background: transparent;
+            border: none;
+            transition: color 0.15s ease, background-color 0.15s ease;
+            cursor: pointer;
+            padding: 0;
+            text-decoration: none;
+            outline: none;
+        }
+        .cora-canvas-hover-btn:hover {
+            color: #09090b !important;
+            background-color: rgba(0, 0, 0, 0.08) !important;
+        }
+        .dark .cora-canvas-hover-btn {
+            color: #a1a1aa;
+        }
+        .dark .cora-canvas-hover-btn:hover {
+            color: #ffffff !important;
+            background-color: rgba(255, 255, 255, 0.12) !important;
         }
 
         /* Shopify Reference Styling for Mobile Navigation */
@@ -5519,14 +5580,25 @@ body.cora-scroll-locked {
                             $nav_url = home_url( $cora_nav_prefix . '/' . $target );
                         ?>
                         <li class="list-none" data-target="<?php echo esc_attr($target); ?>">
-                            <a href="<?php echo esc_url($nav_url); ?>" onclick="if(typeof window.coraNavigateTo==='function' && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0){ event.preventDefault(); window.coraNavigateTo('<?php echo esc_js($target); ?>'); }" class="cora-nav-item <?php echo ( $sub_page === $target || str_replace('_', '-', $sub_page) === str_replace('_', '-', $target) ) ? 'cora-active' : ''; ?> flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer select-none no-underline text-zinc-800 hover:text-zinc-950" data-target="<?php echo esc_attr($target); ?>" data-tooltip="<?php echo esc_attr($item['title']); ?>">
-                                <div class="flex items-center gap-3 select-none">
+                            <a href="<?php echo esc_url($nav_url); ?>" onclick="if(event.target.closest && event.target.closest('.cora-canvas-hover-actions')) { return; } if(typeof window.coraNavigateTo==='function' && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0){ event.preventDefault(); window.coraNavigateTo('<?php echo esc_js($target); ?>'); }" class="cora-nav-item <?php echo ( $sub_page === $target || str_replace('_', '-', $sub_page) === str_replace('_', '-', $target) ) ? 'cora-active' : ''; ?> group flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer select-none no-underline text-zinc-800 hover:text-zinc-950" data-target="<?php echo esc_attr($target); ?>" data-tooltip="<?php echo esc_attr($item['title']); ?>">
+                                <div class="flex items-center gap-3 select-none min-w-0 flex-1">
                                     <span class="cora-nav-icon select-none">
                                         <?php echo $item['icon']; ?>
                                     </span>
-                                    <span class="cora-nav-text select-none font-medium"><?php echo esc_html($item['title']); ?></span>
+                                    <span class="cora-nav-text select-none font-medium truncate"><?php echo esc_html($item['title']); ?></span>
                                 </div>
-                                <?php if ( ! empty( $item['soon'] ) ) : ?>
+                                <?php if ( $target === 'canvas' || $target === 'canvas-frontend' ) : 
+                                    $frontend_site_url = home_url( '/' );
+                                ?>
+                                <div class="cora-canvas-hover-actions flex items-center gap-0.5 ml-auto shrink-0 pl-1.5" onclick="event.stopPropagation();">
+                                    <button type="button" onclick="event.preventDefault(); event.stopPropagation(); window.coraOpenLiveThemeEditor(event);" class="cora-canvas-hover-btn" title="Edit live theme" aria-label="Edit live theme">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
+                                    </button>
+                                    <a href="<?php echo esc_url($frontend_site_url); ?>" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation();" class="cora-canvas-hover-btn" title="View live site in new tab" aria-label="View live site in new tab">
+                                        <svg viewBox="0 0 24 24" width="13.5" height="13.5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                    </a>
+                                </div>
+                                <?php elseif ( ! empty( $item['soon'] ) ) : ?>
                                 <span class="cora-badge cora-badge-sidebar px-1.5 py-0.5 text-[9px] font-bold bg-zinc-100 text-zinc-500 rounded-full border border-zinc-200 select-none flex items-center gap-1">
                                     <svg viewBox="0 0 24 24" width="8" height="8" stroke="currentColor" stroke-width="2.5" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                                     SOON

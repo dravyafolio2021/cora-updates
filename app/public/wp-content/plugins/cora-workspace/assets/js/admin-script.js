@@ -1078,6 +1078,9 @@ jQuery(document).ready(function($) {
     })();
 
     $(document).on('click', '.cora-nav-item, .cora-bottom-nav-item', function(e) {
+        if ($(e.target).closest('.cora-canvas-hover-actions').length > 0) {
+            return;
+        }
         e.preventDefault();
         e.stopPropagation();
         const item = $(this).closest('.cora-nav-item, .cora-bottom-nav-item');

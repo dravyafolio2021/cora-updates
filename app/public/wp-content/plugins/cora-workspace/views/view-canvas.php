@@ -11140,12 +11140,23 @@ function cora_get_sparkline_points( $history, $type ) {
             }
 
             // 2. Active Theme workspace recovery
-            var themeId = params.get('cv_theme');
-            var tabId = params.get('cv_tab');
-            var pageId = params.get('cv_page');
+            var cvAction = params.get('cv_action');
+            var themeId  = params.get('cv_theme');
+            var tabId    = params.get('cv_tab');
+            var pageId   = params.get('cv_page');
             var editorEngine = params.get('cv_editor');
 
-            if (themeId) {
+            if (cvAction === 'edit_live' || themeId === 'live') {
+                var liveTheme = (canvasState.themes && canvasState.themes.length > 0)
+                    ? (canvasState.themes.find(function(t) { return t.status === 'live'; }) || canvasState.themes[0])
+                    : null;
+                if (liveTheme) {
+                    editTheme(liveTheme.id, liveTheme.name, true);
+                    if (tabId) {
+                        switchTab(tabId);
+                    }
+                }
+            } else if (themeId) {
                 var themeObj = canvasState.themes.find(t => t.id == themeId);
                 if (themeObj) {
                     editTheme(themeObj.id, themeObj.name, themeObj.status === 'live');
