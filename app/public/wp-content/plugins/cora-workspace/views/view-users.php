@@ -497,7 +497,7 @@ $cora_permissions = get_option( 'cora_role_permissions', array() );
     }
 </style>
 
-<div class="cora-users-wrapper p-0 m-0 border-0 outline-none w-full">
+<div class="cora-users-wrapper p-0 m-0 border-0 outline-none w-full" id="cora-page-users">
 <?php
     $current_role = wp_get_current_user()->roles[0] ?? '';
     $is_workspace_owner = cora_is_workspace_owner() || cora_is_super_owner() || current_user_can( 'manage_options' ) || in_array( $current_role, array( 'administrator', 'cora_shruti', 'cora_super_admin', 'cora_agency_owner', 'cora_re_broker_owner', 'cora_studio_owner', 'cora_workspace_owner', 'owner' ), true );
@@ -4939,10 +4939,7 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
 
     function getAvailableCustomizerTabs() {
         var tabs = [];
-        var $container = $('#cora-page-users .cora-sub-tabs-container.hidden.md\\:flex');
-        if (!$container.length) {
-            $container = $('#cora-page-users .cora-sub-tabs-container').first();
-        }
+        var $container = $('#cora-page-team-roles .cora-sub-tabs-container, #cora-page-users .cora-sub-tabs-container, .cora-users-wrapper .cora-sub-tabs-container, .cora-sub-tabs-container').first();
         $container.find('.cora-sub-tab').each(function() {
             var $t = $(this);
             var id = $t.data('target');
@@ -5208,10 +5205,7 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
 
     function applyTabPrefsToDOM(prefs) {
         if (!prefs || !Array.isArray(prefs)) return;
-        var $desktopContainer = $('#cora-page-users .cora-sub-tabs-container.hidden.md\\:flex');
-        if (!$desktopContainer.length) {
-            $desktopContainer = $('#cora-page-users .cora-sub-tabs-container').first();
-        }
+        var $desktopContainer = $('#cora-page-team-roles .cora-sub-tabs-container, #cora-page-users .cora-sub-tabs-container, .cora-users-wrapper .cora-sub-tabs-container, .cora-sub-tabs-container').first();
         if (!$desktopContainer.length) return;
 
         var currentActiveTarget = $desktopContainer.find('.cora-sub-tab.active').data('target');
@@ -5247,40 +5241,37 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
         }
     });
 
-
-    // Tab switching for User Management section (scoped strictly to Users module)
-    $(document).on('click', '#cora-page-users .cora-sub-tabs-container .cora-sub-tab, #cora-page-users #mobile-tabs-more-dropdown .cora-sub-tab, #cora-page-users .cora-users-wrapper .cora-sub-tab', function(e) {
-        e.preventDefault();
-        var targetId = $(this).data('target');
+    // Global tab switching function for User Management section
+    window.coraSwitchUsersTab = function(targetId) {
         if (!targetId) return;
 
         // Sync active states on all matching tab buttons
-        $('#cora-page-users .cora-sub-tabs-container .cora-sub-tab, #cora-page-users #mobile-tabs-more-dropdown .cora-sub-tab, #cora-page-users .cora-users-wrapper .cora-sub-tab').each(function() {
+        $('.cora-sub-tabs-container .cora-sub-tab, #mobile-tabs-more-dropdown .cora-sub-tab, .cora-users-wrapper .cora-sub-tab, #cora-page-team-roles .cora-sub-tab, #cora-page-users .cora-sub-tab').each(function() {
             var $t = $(this);
             if ($t.data('target') === targetId) {
-                $t.addClass('active border-zinc-950 text-zinc-950 font-semibold')
-                  .removeClass('border-transparent text-zinc-550 font-medium');
+                $t.addClass('active border-zinc-950 text-zinc-950 font-semibold dark:border-white dark:text-white')
+                  .removeClass('border-transparent text-zinc-500 font-medium');
                 if ($t.closest('#mobile-tabs-more-dropdown').length) {
-                    $t.addClass('bg-zinc-50 ');
+                    $t.addClass('bg-zinc-50 dark:bg-zinc-800');
                 }
-            } else {
-                $t.removeClass('active border-zinc-950 text-zinc-950 font-semibold bg-zinc-50 ')
-                  .addClass('border-transparent text-zinc-550 font-medium');
+            } else if ($t.data('target')) {
+                $t.removeClass('active border-zinc-950 text-zinc-950 font-semibold bg-zinc-50 dark:border-white dark:text-white dark:bg-zinc-800')
+                  .addClass('border-transparent text-zinc-500 font-medium');
             }
         });
         
-        $('#cora-page-users .cora-tab-content, #cora-page-users .cora-users-wrapper .cora-tab-content').addClass('hidden');
-        $('#cora-page-users #' + targetId).removeClass('hidden');
+        $('#cora-page-team-roles .cora-tab-content, #cora-page-users .cora-tab-content, .cora-users-wrapper .cora-tab-content, .cora-tab-content').addClass('hidden');
+        $('#' + targetId).removeClass('hidden');
 
         // Handle More dropdown active styling on mobile
         var isSecondary = ['tab-attendance-logs', 'tab-permissions-matrix', 'tab-custom-roles'].indexOf(targetId) !== -1;
         if (isSecondary) {
             $('#users-more-tab-btn, #mobile-tabs-more-btn')
-                .addClass('active border-zinc-950 text-zinc-950 font-semibold')
+                .addClass('active border-zinc-950 text-zinc-950 font-semibold dark:border-white dark:text-white')
                 .removeClass('border-transparent text-zinc-400 font-medium');
         } else {
             $('#users-more-tab-btn, #mobile-tabs-more-btn')
-                .removeClass('active border-zinc-950 text-zinc-950 font-semibold')
+                .removeClass('active border-zinc-950 text-zinc-950 font-semibold dark:border-white dark:text-white')
                 .addClass('border-transparent text-zinc-400 font-medium');
         }
 
@@ -5310,7 +5301,8 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
         var isDropdownTab = ['tab-permissions-matrix', 'tab-attendance-logs', 'tab-custom-roles'].includes(targetId);
         var $moreBtn = $('#mobile-tabs-more-btn');
         if (isDropdownTab) {
-            var tabName = $(this).text().trim();
+            var $activeBtn = $('.cora-sub-tab[data-target="' + targetId + '"]').first();
+            var tabName = $activeBtn.length ? $activeBtn.text().trim() : 'More';
             $moreBtn.find('span').text(tabName);
             $moreBtn.addClass('active border-zinc-950 text-zinc-950 font-semibold')
                     .removeClass('text-zinc-650 border-zinc-200 ');
@@ -5323,6 +5315,14 @@ window.coraActiveUsersCount = <?php echo intval( $active_users_count ); ?>;
         // Close dropdown
         $('#mobile-tabs-more-dropdown').addClass('hidden');
         $('#more-chevron-icon').removeClass('rotate-180');
+    };
+
+    // Tab switching event listener for User Management section
+    $(document).on('click', '#cora-page-team-roles .cora-sub-tabs-container .cora-sub-tab, #cora-page-team-roles .cora-sub-tab, #cora-page-users .cora-sub-tabs-container .cora-sub-tab, #cora-page-users .cora-sub-tab, .cora-users-wrapper .cora-sub-tab, #mobile-tabs-more-dropdown .cora-sub-tab, .cora-sub-tab[data-target^="tab-"]', function(e) {
+        e.preventDefault();
+        var targetId = $(this).data('target');
+        if (!targetId) return;
+        window.coraSwitchUsersTab(targetId);
     });
 
 
