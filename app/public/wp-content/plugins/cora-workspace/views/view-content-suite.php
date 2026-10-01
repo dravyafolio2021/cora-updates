@@ -456,9 +456,6 @@ $ov_recent_articles = array_slice($cora_posts, 0, 5);
                             <a href="<?php echo esc_url($p_preview_url); ?>" target="_blank" rel="noopener noreferrer" class="w-7 h-7 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-600 hover:text-zinc-950 flex items-center justify-center transition-colors cursor-pointer shadow-3xs" title="View in Browser" onclick="event.stopPropagation(); window.open('<?php echo esc_js($p_preview_url); ?>', '_blank'); return true;">
                                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
                             </a>
-                            <button type="button" class="w-7 h-7 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-600 hover:text-zinc-950 flex items-center justify-center transition-colors cursor-pointer shadow-3xs" title="Content Brief" onclick="openContentBriefDrawer(<?php echo $p->ID; ?>)">
-                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-                            </button>
                             <button type="button" class="px-2.5 py-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white text-[11px] font-semibold flex items-center gap-1 transition-all cursor-pointer shadow-3xs active:scale-95 border-0" onclick="coraEditArticle(<?php echo $p->ID; ?>, '<?php echo esc_js($p->post_title); ?>')">
                                 <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                                 <span>Edit</span>
@@ -998,7 +995,6 @@ $ov_recent_articles = array_slice($cora_posts, 0, 5);
                                     <?php endif; ?>
                                     <div>
                                         <span class="text-xs font-semibold text-zinc-800 dark:text-zinc-200 line-clamp-1 ct-author-name"><?php echo esc_html($author_name); ?></span>
-                                        <button class="text-[10px] font-medium text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300 cursor-pointer block leading-none mt-0.5" onclick="openContentBriefDrawer(<?php echo $post->ID; ?>)">Assign</button>
                                     </div>
                                 </div>
                             </td>
@@ -1026,9 +1022,6 @@ $ov_recent_articles = array_slice($cora_posts, 0, 5);
                             </td>
                             <td class="py-3.5 px-3.5 text-right pr-5" onclick="event.stopPropagation()">
                                 <div class="flex items-center justify-end gap-1.5">
-                                    <button type="button" class="p-1 text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer" title="Content Brief" onclick="openContentBriefDrawer(<?php echo $post->ID; ?>)">
-                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-                                    </button>
                                     <button type="button" class="px-2.5 py-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer shadow-xs" title="Edit Article" onclick="coraEditArticle(<?php echo $post->ID; ?>, '<?php echo esc_js($post->post_title); ?>')">
                                         <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                                         <span>Edit</span>
@@ -1232,12 +1225,8 @@ $ov_recent_articles = array_slice($cora_posts, 0, 5);
 
                     <!-- Bottom Row: Icon Action Buttons & Action Controls -->
                     <div class="flex items-center justify-between pt-2 border-t border-zinc-100">
-                        <!-- Space-saving Icon Action Buttons (Brief, View, Delete) -->
+                        <!-- Space-saving Icon Action Buttons (View, Delete) -->
                         <div class="flex items-center gap-1.5">
-                            <button type="button" class="w-8 h-8 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-600 hover:text-zinc-900 flex items-center justify-center transition-colors cursor-pointer shadow-3xs active:scale-95" title="Content Brief" onclick="event.stopPropagation(); openContentBriefDrawer(<?php echo $post->ID; ?>)">
-                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-                            </button>
-                            
                             <?php $preview_url = function_exists('cora_get_article_preview_url') ? cora_get_article_preview_url($post->ID) : get_permalink($post->ID); ?>
                             <a href="<?php echo esc_url($preview_url); ?>" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-600 hover:text-zinc-900 flex items-center justify-center transition-colors cursor-pointer shadow-3xs active:scale-95" title="View in Browser" onclick="event.stopPropagation(); window.open('<?php echo esc_js($preview_url); ?>', '_blank'); return true;">
                                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
@@ -2484,7 +2473,9 @@ $cora_agent_config = array(
 // Duplicate floating-agent.php unmounted to use Myra as single AI Copilot
 ?>
 
-<?php include CORA_WORKSPACE_PATH . 'views/partials/content-brief-drawer.php'; ?>
+<?php
+// Redundant content brief drawer unmounted - replaced with full Article Editor
+?>
 
 <?php
 if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.php')) {
@@ -2943,33 +2934,13 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
     };
 
     window.openContentBriefDrawer = function(itemId) {
-        if (typeof window.coraCloseAllDrawers === 'function') window.coraCloseAllDrawers();
-        const drawer = document.getElementById('cora-content-brief-sheet');
-        const backdrop = document.getElementById('cora-drawer-backdrop');
-        if(drawer) {
-            if(drawer.parentNode !== document.body) document.body.appendChild(drawer);
-            if(backdrop && backdrop.parentNode !== document.body) document.body.appendChild(backdrop);
-            drawer.classList.remove('collapsed', 'translate-x-full');
-        }
-        showBackdrop();
-
-        if(itemId) {
-            const idEl = document.getElementById('cb-item-id');
-            if(idEl) idEl.value = itemId;
-            if(typeof window.coraREWPData !== 'undefined') {
-                $.post(coraREWPData.ajaxUrl, {
-                    action: 'cora_get_content_item',
-                    nonce: coraREWPData.ajaxNonce,
-                    item_id: itemId
-                }, function(r) {
-                    if(r && r.success && typeof populateBriefDrawer === 'function') populateBriefDrawer(r.data);
-                });
-            }
+        if (itemId && typeof coraEditArticle === 'function') {
+            coraEditArticle(itemId);
         }
     };
 
     window.closeContentBriefDrawer = function() {
-        window.coraCloseAllDrawers();
+        if (typeof window.coraCloseAllDrawers === 'function') window.coraCloseAllDrawers();
     };
 
     // Immediate & DOMReady Init
