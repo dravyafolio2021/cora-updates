@@ -223,117 +223,66 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
 </div>
 
 <!-- Tabs Navigation (Sticky Sub-Navigation Bar) -->
-<div class="cora-sticky-content-tabs flex items-center gap-1 border-b border-zinc-200/80 dark:border-zinc-800 select-none overflow-x-auto scrollbar-hide bg-[#FBFaf7] dark:bg-[#0c0c0e]" id="cora-content-tabs" style="position: -webkit-sticky; position: sticky; left: 0; right: 0; z-index: 35; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; scrollbar-width: none; min-height: 38px;">
-    <button class="cora-tab-btn px-4 py-2.5 border-b-2 text-xs font-semibold cursor-pointer transition-all border-zinc-950 text-zinc-900 flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="ct-overview" onclick="switchContentTab('ct-overview')">
+<div class="cora-sticky-content-tabs flex items-center gap-1 border-b border-zinc-200/80 dark:border-zinc-800 select-none overflow-x-auto scrollbar-hide bg-[#FBFaf7] dark:bg-[#0c0c0e] mb-4" id="cora-content-tabs" style="position: -webkit-sticky; position: sticky; left: 0; right: 0; z-index: 35; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; scrollbar-width: none; min-height: 40px;">
+    <button class="cora-tab-btn px-3.5 py-2.5 border-b-2 text-xs font-bold cursor-pointer transition-all border-zinc-950 text-zinc-950 dark:border-white dark:text-white flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="ct-overview" onclick="switchContentTab('ct-overview')">
         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><rect x="3" y="3" width="7" height="9" rx="1"></rect><rect x="14" y="3" width="7" height="5" rx="1"></rect><rect x="14" y="12" width="7" height="9" rx="1"></rect><rect x="3" y="16" width="7" height="5" rx="1"></rect></svg>
-        Overview
+        <span>Overview</span>
     </button>
-    <button class="cora-tab-btn px-4 py-2.5 border-b-2 text-xs font-semibold cursor-pointer transition-all border-transparent text-zinc-500 hover:text-zinc-900 flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="ct-opportunities" onclick="switchContentTab('ct-opportunities')" id="btn-tab-keywords-explorer">
+    <button class="cora-tab-btn px-3.5 py-2.5 border-b-2 text-xs font-semibold cursor-pointer transition-all border-transparent text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="ct-opportunities" onclick="switchContentTab('ct-opportunities')" id="btn-tab-keywords-explorer">
         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
-        Opportunities
-        <span class="ml-1 px-1.5 py-0.5 bg-zinc-900 text-white text-[9px] font-bold rounded-full">NEW</span>
+        <span>Opportunities</span>
+        <span class="ml-1 px-1.5 py-0.5 bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 text-[9px] font-bold rounded-full">NEW</span>
     </button>
-    <button class="cora-tab-btn px-4 py-2.5 border-b-2 text-xs font-semibold cursor-pointer transition-all border-transparent text-zinc-500 hover:text-zinc-900 flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="ct-library" onclick="switchContentTab('ct-library')" id="btn-tab-articles-list">
+    <button class="cora-tab-btn px-3.5 py-2.5 border-b-2 text-xs font-semibold cursor-pointer transition-all border-transparent text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="ct-library" onclick="switchContentTab('ct-library')" id="btn-tab-articles-list">
         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-        Content Library <?php if ($total_articles > 0): ?><span class="ml-1 px-1.5 py-0.5 bg-zinc-200 text-zinc-700 text-[9px] font-bold rounded-full"><?php echo $total_articles; ?></span><?php endif; ?>
+        <span>Content Library</span>
+        <?php if ($total_articles > 0): ?>
+            <span class="ml-1 px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[9px] font-bold font-mono rounded-full border border-zinc-200/60 dark:border-zinc-700"><?php echo esc_html($total_articles); ?></span>
+        <?php endif; ?>
     </button>
-    <button class="cora-tab-btn px-4 py-2.5 border-b-2 text-xs font-semibold cursor-pointer transition-all border-transparent text-zinc-500 hover:text-zinc-900 flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="ct-seo" onclick="switchContentTab('ct-seo')" id="btn-tab-geo-analytics">
+    <button class="cora-tab-btn px-3.5 py-2.5 border-b-2 text-xs font-semibold cursor-pointer transition-all border-transparent text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="ct-seo" onclick="switchContentTab('ct-seo')" id="btn-tab-geo-analytics">
         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-        SEO & AI Visibility
+        <span>SEO & AI Visibility</span>
     </button>
-    <button class="cora-tab-btn px-4 py-2.5 border-b-2 text-xs font-semibold cursor-not-allowed transition-all border-transparent text-zinc-500 hover:text-zinc-900 flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="ct-calendar" onclick="switchContentTab('ct-calendar')">
+    <button class="cora-tab-btn px-3.5 py-2.5 border-b-2 text-xs font-semibold cursor-not-allowed transition-all border-transparent text-zinc-400 dark:text-zinc-500 flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="ct-calendar" onclick="switchContentTab('ct-calendar')">
         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-        Calendar
-        <span class="ml-1.5 px-1.5 py-0.5 bg-zinc-100 text-zinc-400 text-[9px] font-bold rounded-md tracking-wider">SOON</span>
+        <span>Calendar</span>
+        <span class="ml-1 px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 text-[8.5px] font-bold rounded border border-zinc-200/50 dark:border-zinc-700/50 tracking-wider">SOON</span>
     </button>
-    <button class="cora-tab-btn px-4 py-2.5 border-b-2 text-xs font-semibold cursor-not-allowed transition-all border-transparent text-zinc-500 hover:text-zinc-900 flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="ct-performance" onclick="switchContentTab('ct-performance')">
+    <button class="cora-tab-btn px-3.5 py-2.5 border-b-2 text-xs font-semibold cursor-not-allowed transition-all border-transparent text-zinc-400 dark:text-zinc-500 flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="ct-performance" onclick="switchContentTab('ct-performance')">
         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M23 6l-9.5 9.5-5-5L1 18"></path><polyline points="17 6 23 6 23 12"></polyline></svg>
-        Performance
-        <span class="ml-1.5 px-1.5 py-0.5 bg-zinc-100 text-zinc-400 text-[9px] font-bold rounded-md tracking-wider">SOON</span>
+        <span>Performance</span>
+        <span class="ml-1 px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 text-[8.5px] font-bold rounded border border-zinc-200/50 dark:border-zinc-700/50 tracking-wider">SOON</span>
     </button>
-    <button class="cora-tab-btn px-4 py-2.5 border-b-2 text-xs font-semibold cursor-not-allowed transition-all border-transparent text-zinc-500 hover:text-zinc-900 flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="ct-automations" onclick="switchContentTab('ct-automations')">
+    <button class="cora-tab-btn px-3.5 py-2.5 border-b-2 text-xs font-semibold cursor-not-allowed transition-all border-transparent text-zinc-400 dark:text-zinc-500 flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="ct-automations" onclick="switchContentTab('ct-automations')">
         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg>
-        Automations
-        <span class="ml-1.5 px-1.5 py-0.5 bg-zinc-100 text-zinc-400 text-[9px] font-bold rounded-md tracking-wider">SOON</span>
+        <span>Automations</span>
+        <span class="ml-1 px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 text-[8.5px] font-bold rounded border border-zinc-200/50 dark:border-zinc-700/50 tracking-wider">SOON</span>
     </button>
-    <button class="cora-tab-btn px-4 py-2.5 border-b-2 text-xs font-semibold cursor-not-allowed transition-all border-transparent text-zinc-500 hover:text-zinc-900 flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="ct-brain" onclick="switchContentTab('ct-brain')">
+    <button class="cora-tab-btn px-3.5 py-2.5 border-b-2 text-xs font-semibold cursor-not-allowed transition-all border-transparent text-zinc-400 dark:text-zinc-500 flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="ct-brain" onclick="switchContentTab('ct-brain')">
         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44 2.5 2.5 0 0 1 0-4.12 2.5 2.5 0 0 1 0-4.12A2.5 2.5 0 0 1 9.5 2z"></path><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44 2.5 2.5 0 0 0 0-4.12 2.5 2.5 0 0 0 0-4.12A2.5 2.5 0 0 0 14.5 2z"></path></svg>
-        Business Brain
-        <span class="ml-1.5 px-1.5 py-0.5 bg-zinc-100 text-zinc-400 text-[9px] font-bold rounded-md tracking-wider">SOON</span>
+        <span>Business Brain</span>
+        <span class="ml-1 px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 text-[8.5px] font-bold rounded border border-zinc-200/50 dark:border-zinc-700/50 tracking-wider">SOON</span>
     </button>
 </div>
-
-<!-- PANEL: Overview -->
-<?php
-// Compute 100% Real Overview Metrics from $cora_posts
-$ov_total = count($cora_posts);
-$ov_published = 0;
-$ov_drafts = 0;
-$ov_review = 0;
-$ov_seo_scores = [];
-$ov_geo_scores = [];
-$ov_words_total = 0;
-$ov_stalled_drafts = [];
-$ov_low_seo = [];
-$ov_posts_sorted = $cora_posts;
-
-foreach ($cora_posts as $p) {
-    $st = get_post_meta($p->ID, '_cora_editorial_status', true) ?: ($p->post_status === 'publish' ? 'published' : 'draft');
-    if ($st === 'published') {
-        $ov_published++;
-    } elseif ($st === 'draft') {
-        $ov_drafts++;
-    } else {
-        $ov_review++;
-    }
-
-    $seo = intval(get_post_meta($p->ID, '_cora_seo_score', true) ?: 72);
-    $geo = intval(get_post_meta($p->ID, '_cora_geo_score', true) ?: 68);
-    $ov_seo_scores[] = $seo;
-    $ov_geo_scores[] = $geo;
-    $ov_words_total += str_word_count(strip_tags($p->post_content));
-
-    $mtime = get_post_modified_time('U', false, $p);
-    if ($st === 'draft' && (current_time('timestamp') - $mtime) > (7 * 86400)) {
-        $ov_stalled_drafts[] = $p;
-    }
-    if ($seo < 60) {
-        $ov_low_seo[] = $p;
-    }
-}
-
-$ov_avg_seo = count($ov_seo_scores) ? round(array_sum($ov_seo_scores) / count($ov_seo_scores)) : 0;
-$ov_avg_geo = count($ov_geo_scores) ? round(array_sum($ov_geo_scores) / count($ov_geo_scores)) : 0;
-$ov_pub_pct = $ov_total > 0 ? round(($ov_published / $ov_total) * 100) : 0;
-$ov_draft_pct = $ov_total > 0 ? round(($ov_drafts / $ov_total) * 100) : 0;
-$ov_rev_pct = $ov_total > 0 ? max(0, 100 - $ov_pub_pct - $ov_draft_pct) : 0;
-
-usort($ov_posts_sorted, function($a, $b) {
-    $s_a = intval(get_post_meta($a->ID, '_cora_seo_score', true) ?: 72);
-    $s_b = intval(get_post_meta($b->ID, '_cora_seo_score', true) ?: 72);
-    return $s_b - $s_a;
-});
-$ov_top_articles = array_slice($ov_posts_sorted, 0, 3);
-$ov_recent_articles = array_slice($cora_posts, 0, 5);
-?>
 
 <!-- PANEL: Overview (panel-ct-overview) -->
 <div id="panel-ct-overview" class="cora-ct-panel block space-y-5">
 
     <!-- Strategic Focus & Directive Banner -->
-    <div class="border border-zinc-200/80 rounded-2xl bg-white shadow-2xs p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div class="border border-zinc-200/80 dark:border-zinc-800 rounded-2xl bg-white dark:bg-zinc-900 shadow-2xs p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div class="flex items-start gap-3.5 min-w-0">
-            <div class="w-10 h-10 rounded-xl bg-zinc-100 text-zinc-900 border border-zinc-200/60 flex items-center justify-center shrink-0 shadow-3xs">
+            <div class="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border border-zinc-200/60 dark:border-zinc-700/60 flex items-center justify-center shrink-0 shadow-3xs">
                 <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M12 2c0 5.523 4.477 10 10 10-5.523 0-10 4.477-10 10-5.523 0-10-4.477-10-10 5.523 0 10-4.477 10-10z" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </div>
             <div class="min-w-0">
                 <div class="flex items-center gap-2 flex-wrap">
-                    <h3 class="text-sm font-extrabold text-zinc-950 tracking-tight">Editorial Strategy &amp; Pipeline</h3>
-                    <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-zinc-100 text-zinc-700 border border-zinc-200/70 font-mono"><?php echo esc_html($ov_total); ?> Total Articles</span>
+                    <h3 class="text-sm sm:text-[15px] font-bold text-zinc-950 dark:text-white tracking-tight">Editorial Strategy &amp; Pipeline</h3>
+                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 border border-zinc-200/70 dark:border-zinc-700 font-mono inline-flex items-center"><?php echo esc_html($ov_total); ?> Total Articles</span>
                 </div>
-                <p class="text-xs text-zinc-500 mt-1 leading-relaxed">
+                <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1 leading-relaxed max-w-2xl">
                     <?php if ($ov_drafts > 0): ?>
-                        You have <strong class="text-zinc-900 font-semibold"><?php echo esc_html($ov_drafts); ?> draft articles</strong> in progress. Finalize and publish drafts to expand your search footprint and organic authority.
+                        You have <strong class="text-zinc-900 dark:text-zinc-100 font-semibold"><?php echo esc_html($ov_drafts); ?> draft articles</strong> in progress. Finalize and publish drafts to expand your search footprint and organic authority.
                     <?php else: ?>
                         All active articles are published and live on your site. Discover new topic clusters or optimize existing content.
                     <?php endif; ?>
@@ -342,16 +291,16 @@ $ov_recent_articles = array_slice($cora_posts, 0, 5);
         </div>
 
         <!-- 3 Primary Action Triggers (Clean Notion-Style, 3-Column Responsive Grid on Mobile) -->
-        <div class="grid grid-cols-3 gap-1.5 sm:flex sm:items-center sm:gap-2 w-full sm:w-auto shrink-0">
-            <button type="button" onclick="openCreateArticleDrawer()" class="w-full sm:w-auto justify-center px-2 sm:px-3.5 py-2 bg-zinc-900 hover:bg-zinc-800 text-white font-bold rounded-xl text-[11px] sm:text-xs flex items-center gap-1.5 sm:gap-2 shadow-3xs cursor-pointer transition-all active:scale-95 border-0 truncate">
+        <div class="grid grid-cols-3 gap-2 sm:flex sm:items-center sm:gap-2.5 w-full sm:w-auto shrink-0">
+            <button type="button" onclick="openCreateArticleDrawer()" class="w-full sm:w-auto justify-center px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 font-semibold rounded-xl text-xs flex items-center gap-1.5 sm:gap-2 shadow-xs cursor-pointer transition-all active:scale-97 border-0 truncate">
                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 <span class="truncate">Write Article</span>
             </button>
-            <button type="button" onclick="switchContentTab('ct-opportunities')" class="w-full sm:w-auto justify-center px-2 sm:px-3 py-2 bg-white hover:bg-zinc-50 text-zinc-800 border border-zinc-200/80 font-bold rounded-xl text-[11px] sm:text-xs flex items-center gap-1.5 shadow-3xs cursor-pointer transition-all active:scale-95 truncate">
+            <button type="button" onclick="switchContentTab('ct-opportunities')" class="w-full sm:w-auto justify-center px-3.5 py-2 bg-white hover:bg-zinc-50/90 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-200/80 dark:border-zinc-700 font-semibold rounded-xl text-xs flex items-center gap-1.5 sm:gap-2 shadow-3xs cursor-pointer transition-all active:scale-97 truncate">
                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 <span class="truncate">Topic Ideas</span>
             </button>
-            <button type="button" onclick="switchContentTab('ct-seo')" class="w-full sm:w-auto justify-center px-2 sm:px-3 py-2 bg-white hover:bg-zinc-50 text-zinc-800 border border-zinc-200/80 font-bold rounded-xl text-[11px] sm:text-xs flex items-center gap-1.5 shadow-3xs cursor-pointer transition-all active:scale-95 truncate">
+            <button type="button" onclick="switchContentTab('ct-seo')" class="w-full sm:w-auto justify-center px-3.5 py-2 bg-white hover:bg-zinc-50/90 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-200/80 dark:border-zinc-700 font-semibold rounded-xl text-xs flex items-center gap-1.5 sm:gap-2 shadow-3xs cursor-pointer transition-all active:scale-97 truncate">
                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
                 <span class="truncate">SEO Inspector</span>
             </button>
