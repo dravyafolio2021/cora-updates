@@ -361,8 +361,63 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
 #cm-empty { display:none; flex-direction:column; align-items:center; justify-content:center; height:100%; min-height:280px; gap:10px; text-align:center; padding:40px; }
 #cm-loading { display:none; padding:16px 18px; }
 
-/* ─── Universal Edge-to-Edge Side Drawers & Transparent Backdrops ────────── */
-#cm-folder-dlg, #cm-gallery-dlg, #cm-folder-settings-dlg, #cm-detail, #cm-mobile-filter-dlg {
+/* ─── Centered Pop-up Modals (Folder, Gallery, Folder Settings) ────────── */
+#cm-folder-dlg, #cm-gallery-dlg, #cm-folder-settings-dlg {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 100050 !important;
+    background: rgba(9, 9, 11, 0.45) !important;
+    backdrop-filter: blur(4px) !important;
+    -webkit-backdrop-filter: blur(4px) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 16px !important;
+    margin: 0 !important;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s ease-in-out;
+}
+#cm-folder-dlg.open, #cm-gallery-dlg.open, #cm-folder-settings-dlg.open {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+#cm-folder-card, #cm-gallery-card, #cm-folder-settings-card {
+    position: relative !important;
+    width: 100% !important;
+    max-width: 480px !important;
+    height: auto !important;
+    max-height: calc(100vh - 40px) !important;
+    max-height: calc(100dvh - 40px) !important;
+    background: #ffffff !important;
+    border-radius: 16px !important;
+    border: 1px solid #e4e4e7 !important;
+    margin: auto !important;
+    box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.05) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    z-index: 100051 !important;
+    transform: scale(0.96) translateY(8px) !important;
+    transition: transform .22s cubic-bezier(0.16, 1, 0.3, 1), opacity .2s ease-in-out !important;
+    opacity: 0;
+    pointer-events: none !important;
+    visibility: hidden;
+    overflow: hidden;
+}
+#cm-folder-settings-card {
+    max-width: 520px !important;
+}
+#cm-folder-dlg.open #cm-folder-card,
+#cm-gallery-dlg.open #cm-gallery-card,
+#cm-folder-settings-dlg.open #cm-folder-settings-card {
+    transform: scale(1) translateY(0) !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    visibility: visible !important;
+}
+
+/* ─── Asset Detail Side Drawer (Desktop) & Mobile Filter Sheet ───────────── */
+#cm-detail, #cm-mobile-filter-dlg {
     position: fixed !important;
     inset: 0 !important;
     z-index: 100049 !important;
@@ -376,35 +431,9 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
     pointer-events: none;
     transition: opacity .2s ease-in-out;
 }
-#cm-folder-dlg.open, #cm-gallery-dlg.open, #cm-folder-settings-dlg.open, #cm-detail.open, #cm-mobile-filter-dlg.open {
+#cm-detail.open, #cm-mobile-filter-dlg.open {
     opacity: 1 !important;
     pointer-events: auto !important;
-}
-#cm-folder-card, #cm-gallery-card, #cm-folder-settings-card {
-    position: fixed !important;
-    top: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    left: auto !important;
-    width: 460px !important;
-    max-width: 90vw !important;
-    height: 100vh !important;
-    height: 100dvh !important;
-    max-height: 100vh !important;
-    max-height: 100dvh !important;
-    background: #ffffff !important;
-    border-radius: 0 !important;
-    border: none !important;
-    border-left: 1px solid #e4e4e7 !important;
-    margin: 0 !important;
-    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.08) !important;
-    display: flex !important;
-    flex-direction: column !important;
-    z-index: 100050 !important;
-    transform: translateX(110%) !important;
-    transition: transform .28s cubic-bezier(0.16, 1, 0.3, 1) !important;
-    pointer-events: none !important;
-    visibility: hidden;
 }
 #cm-detail-card {
     position: fixed !important;
@@ -432,9 +461,6 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
     pointer-events: none !important;
     visibility: hidden;
 }
-#cm-folder-dlg.open #cm-folder-card,
-#cm-gallery-dlg.open #cm-gallery-card,
-#cm-folder-settings-dlg.open #cm-folder-settings-card,
 #cm-detail.open #cm-detail-card {
     transform: translateX(0) !important;
     pointer-events: auto !important;
@@ -442,7 +468,7 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
 }
 
 @media (max-width: 768px) {
-    #cm-folder-card, #cm-gallery-card, #cm-folder-settings-card, #cm-detail-card, #cm-mobile-filter-card {
+    #cm-detail-card, #cm-mobile-filter-card {
         top: auto !important;
         bottom: 0 !important;
         left: 0 !important;
@@ -459,12 +485,14 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
         border-bottom: none !important;
         transform: translateY(110%) !important;
     }
-    #cm-folder-dlg.open #cm-folder-card,
-    #cm-gallery-dlg.open #cm-gallery-card,
-    #cm-folder-settings-dlg.open #cm-folder-settings-card,
     #cm-detail.open #cm-detail-card,
     #cm-mobile-filter-dlg.open #cm-mobile-filter-card {
         transform: translateY(0) !important;
+    }
+    #cm-folder-card, #cm-gallery-card, #cm-folder-settings-card {
+        max-width: 94vw !important;
+        max-height: 85vh !important;
+        max-height: 85dvh !important;
     }
 }
 #cm-detail-header { flex-shrink:0; padding:14px 18px; border-bottom:1px solid #e4e4e7; display:flex; align-items:center; gap:8px; background:#fff; }
@@ -556,13 +584,7 @@ $all_doc_types   = array( 'Agreement / Contract', 'KYC Document', 'Brochure', 'F
 #cm-confirm-card p { margin:0 0 20px; font-size:12px; color:#71717a; }
 #cm-confirm-card .btns { display:flex; gap:8px; justify-content:flex-end; }
 
-/* ─── Drawer Overlays ─────────────────────────────────────────────────── */
-#cm-gallery-dlg.open #cm-gallery-card,
-#cm-folder-settings-dlg.open #cm-folder-settings-card { transform:translateX(0) !important; }
-.cm-drawer-header { padding:20px; border-bottom:1px solid #e4e4e7; display:flex; align-items:center; justify-content:space-between; background:#fafafa; }
 
-.cm-drawer-body { flex:1; overflow-y:auto; padding:24px; }
-.cm-drawer-footer { padding:20px; border-top:1px solid #e4e4e7; display:flex; align-items:center; justify-content:flex-end; gap:12px; background:#fafafa; }
 
 
 /* ─── Dark mode ──────────────────────────────────────────────────────────── */
