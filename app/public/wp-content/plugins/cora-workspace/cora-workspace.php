@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.273
+ * Version:           4.9.274
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.273' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.274' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -14452,6 +14452,67 @@ function cora_rag_ingest_event( $agency_id, $category, $title, $content, $source
 }
 }
 
+if ( ! function_exists( 'cora_rag_ingest_conversation_turn' ) ) {
+function cora_rag_ingest_conversation_turn( $agency_id, $user_id, $user_msg, $ai_reply, $current_page = 'dashboard' ) {
+    global $wpdb;
+    if ( empty( $agency_id ) ) {
+        $agency_id = function_exists( 'cora_db_get_agency_id' ) ? ( cora_db_get_agency_id() ?: 1 ) : 1;
+    }
+    $table = $wpdb->prefix . 'cora_rag_knowledge';
+    if ( ! function_exists( 'cora_table_exists' ) || ! cora_table_exists( $table ) ) {
+        return false;
+    }
+
+    $clean_msg = trim( strip_tags( (string)$user_msg ) );
+    $clean_reply = trim( strip_tags( preg_replace( '/\[ACTION:[^\]]+\](?:\{[\s\S]*?\})?\[\/ACTION\]|\[ACTION:[^\]]+\]|\[CTA:[^\]]+\]|\[BUTTON:[^\]]+\]/s', '', (string)$ai_reply ) ) );
+
+    // Filter out trivial one-word small talk
+    if ( strlen( $clean_msg ) < 4 || in_array( strtolower( $clean_msg ), array( 'hi', 'hey', 'hello', 'ok', 'okay', 'cool', 'thanks', 'thank you', 'yes', 'no', 'great', 'fine' ), true ) ) {
+        return false;
+    }
+
+    $title_snippet = substr( $clean_msg, 0, 75 );
+    if ( strlen( $clean_msg ) > 75 ) {
+        $title_snippet .= '...';
+    }
+    $page_label = ucfirst( str_replace( array( '-', '_' ), ' ', $current_page ) );
+    $title = "Discussion on {$page_label}: " . $title_snippet;
+
+    $content = "Context Module: [{$current_page}]\n" .
+               "User Request: " . $clean_msg . "\n" .
+               "Executive Takeaway / Decision: " . substr( $clean_reply, 0, 500 );
+
+    $token_count = ceil( str_word_count( $content ) * 1.3 );
+
+    $inserted = $wpdb->insert(
+        $table,
+        array(
+            'agency_id'   => $agency_id,
+            'title'       => substr( $title, 0, 255 ),
+            'content'     => $content,
+            'source_type' => 'conversation_memory',
+            'source_id'   => intval( $user_id ),
+            'token_count' => $token_count,
+            'created_at'  => current_time( 'mysql' ),
+            'updated_at'  => current_time( 'mysql' )
+        ),
+        array( '%d', '%s', '%s', '%s', '%d', '%d', '%s', '%s' )
+    );
+
+    // Keep memory index clean: retain latest 150 conversation entries per agency
+    $excess_ids = $wpdb->get_col( $wpdb->prepare(
+        "SELECT id FROM {$table} WHERE agency_id = %d AND source_type = 'conversation_memory' ORDER BY id DESC LIMIT 150, 1000",
+        $agency_id
+    ) );
+    if ( ! empty( $excess_ids ) ) {
+        $id_list = implode( ',', array_map( 'intval', $excess_ids ) );
+        $wpdb->query( "DELETE FROM {$table} WHERE id IN ({$id_list})" );
+    }
+
+    return $inserted ? $wpdb->insert_id : false;
+}
+}
+
 /**
  * Strip all unicode emojis to strictly enforce monochromatic visual standard (ZERO emojis)
  */
@@ -14480,6 +14541,7 @@ function cora_rag_get_relevant_memories( $agency_id = null, $query = '', $limit 
     $matched_memories = array();
     $business_rules   = array();
     $recent_timeline  = array();
+    $recent_dialogues = array();
     $clean_query      = trim( $query );
 
     // Tier 1: Multi-keyword Semantic Relevance Search
@@ -14489,7 +14551,7 @@ function cora_rag_get_relevant_memories( $agency_id = null, $query = '', $limit 
         $params = array( $agency_id );
         foreach ( array_slice( $words, 0, 5 ) as $w ) {
             $w = trim( $w );
-            if ( strlen( $w ) >= 3 && ! in_array( strtolower($w), array('the','and','for','with','this','what','can','you','how','about','make','show','tell') ) ) {
+            if ( strlen( $w ) >= 3 && ! in_array( strtolower($w), array('the','and','for','with','this','what','can','you','how','about','make','show','tell','please','should','would','want') ) ) {
                 $like_clauses[] = "(title LIKE %s OR content LIKE %s)";
                 $params[] = '%' . $wpdb->esc_like( $w ) . '%';
                 $params[] = '%' . $wpdb->esc_like( $w ) . '%';
@@ -14509,6 +14571,15 @@ function cora_rag_get_relevant_memories( $agency_id = null, $query = '', $limit 
     ), ARRAY_A );
     if ( ! empty( $rules_rows ) ) {
         $business_rules = $rules_rows;
+    }
+
+    // Tier 2b: Recent Conversation Learnings & Workspace Dialogue Memory
+    $dialogue_rows = $wpdb->get_results( $wpdb->prepare(
+        "SELECT source_type, title, content, updated_at FROM {$table} WHERE agency_id = %d AND source_type = 'conversation_memory' ORDER BY id DESC LIMIT 4",
+        $agency_id
+    ), ARRAY_A );
+    if ( ! empty( $dialogue_rows ) ) {
+        $recent_dialogues = $dialogue_rows;
     }
 
     // Tier 3: Recent Operational Activity Timeline (Last 5 actions across modules)
@@ -14543,6 +14614,17 @@ function cora_rag_get_relevant_memories( $agency_id = null, $query = '', $limit 
             $lines[] = "• [LEARNED RULE] {$title}: {$excerpt}";
         }
         $output_sections[] = "[LEARNED BUSINESS RULES & WORKSPACE PREFERENCES]\n" . implode( "\n", $lines );
+    }
+
+    if ( ! empty( $recent_dialogues ) ) {
+        $lines = array();
+        foreach ( $recent_dialogues as $item ) {
+            $title = cora_strip_all_emojis( $item['title'] ?? 'Prior Discussion' );
+            $raw_c = cora_strip_all_emojis( strip_tags( $item['content'] ?? '' ) );
+            $excerpt = wp_trim_words( $raw_c, 24, '...' );
+            $lines[] = "• [CONVERSATION MEMORY] {$title}: {$excerpt}";
+        }
+        $output_sections[] = "[PRIOR WORKSPACE DISCUSSIONS & USER PREFERENCES]\n" . implode( "\n", $lines );
     }
 
     if ( ! empty( $recent_timeline ) ) {
@@ -20323,9 +20405,23 @@ function cora_extract_and_execute_ai_actions( &$raw_reply ) {
  * Parser that extracts [ACTION:name]{json}[/ACTION] from AI response, executes it, and formats clean response.
  */
 if ( ! function_exists( 'cora_ai_process_response_and_execute_actions' ) ) {
-function cora_ai_process_response_and_execute_actions( $raw_reply, $provider, $model_id ) {
+function cora_ai_process_response_and_execute_actions( $raw_reply, $provider, $model_id, $user_msg = '', $agency_id = 0, $current_page = 'dashboard' ) {
     $clean_reply = $raw_reply;
     $action_results = cora_extract_and_execute_ai_actions( $clean_reply );
+
+    if ( empty( $agency_id ) ) {
+        $agency_id = function_exists( 'cora_db_get_agency_id' ) ? ( cora_db_get_agency_id() ?: 1 ) : 1;
+    }
+    if ( empty( $user_msg ) ) {
+        $user_msg = sanitize_text_field( $_POST['message'] ?? $_POST['query'] ?? '' );
+    }
+    $current_page = sanitize_text_field( $_POST['current_page'] ?? $current_page );
+    $uid = get_current_user_id() ?: 1;
+
+    // Continuous Self-Learning RAG Ingestion: Store conversational turns to learn workspace context
+    if ( ! empty( $user_msg ) && function_exists( 'cora_rag_ingest_conversation_turn' ) ) {
+        cora_rag_ingest_conversation_turn( $agency_id, $uid, $user_msg, $raw_reply, $current_page );
+    }
 
     $tokens_consumed = max( 45, intval( ( strlen( $raw_reply ) ) / 3.8 ) );
     if ( function_exists( 'cora_workspace_record_token_usage' ) ) {
@@ -20761,15 +20857,23 @@ function cora_ajax_ai_chat() {
 You operate across the entire workspace with live database context and 1-click execution actions.
 
 === CONVERSATIONAL & INTERACTION PRINCIPLES (USER-FIRST PHILOSOPHY) ===
-1. LISTEN & ANSWER DIRECTLY: Listen carefully to the user's specific words and intent. Answer what they are actually asking with deep intelligence, insight, and relevance.
-2. NO UNSOLICITED DATA DUMPING: NEVER dump random bank balances, open task numbers, or database counts unless the user specifically asks for workspace metrics, a financial report, or an operational briefing.
-3. CONVERSATIONAL & ADAPTIVE: Speak like a sharp, thoughtful human co-founder having a real discussion. Avoid rigid templates, formulaic answers, robotic preambles, or text dumping. Match the user's tone and context naturally.
-4. GREETINGS & CASUAL INTERACTION: When the user greets you ('hi', 'hey', 'hello', 'good morning', etc.), respond warmly, briefly, and contextually to where they currently are in the workspace.
-5. REAL ACTION-ORIENTATION: When the user requests an action (inviting a team member, updating a role, writing a blog post, building a form, creating an invoice, logging an expense, adding a CRM lead, scheduling a session, or updating settings), provide immediate, high-quality execution and embed the appropriate structured action tag [ACTION:...] so the user can review or apply it in 1 click. When they want to brainstorm, strategize, or ask questions, engage in insightful, intelligent discussion.
-6. ZERO EMOJIS: Do not include emojis in your responses under any circumstances.
-7. MULTI-LINGUAL: Always respond in the user's selected language.
-8. MOBILE-FIRST RICH BREVITY & CARD CONCISENESS: Keep all chat replies concise, structured, and easy to read on mobile screens (avoid massive 10-paragraph essay text dumps). Use compact numbered cards, short focused points, and bold key terms. When asked to draft full articles, guides, or contracts, provide a crisp 2-to-3 sentence executive summary with key takeaways in the chat bubble, and place the complete markdown draft inside the [ACTION:create_article] or [ACTION:create_document] tag so it can be saved and opened as a full draft with 1 click.
-9. STRICT NAME & IDENTITY PRIVACY: NEVER use or mention the names 'Shruti' or 'Shravya' in any response, copy, or metadata. Use generic fictitious placeholders (e.g. Rohan Verma, Kavya Patel, Aarav Mehta, Studio Admin, Workspace Owner).
+1. ULTRA-CONCISE GUIDED CONVERSATION (STRICT 2-TO-3 LINES MAXIMUM):
+   - Keep EVERY response strictly under 2 to 3 lines of text on screen (1 to 2 punchy, insightful sentences).
+   - NEVER generate long paragraphs, essays, or huge walls of text in the chat bubble.
+   - Keep the discussion guided, direct, and focused.
+2. ACTION-ORIENTED CTA BUTTONS FOR EVERY OPTION & PROPOSAL:
+   - Whenever you present choices, ideas, tasks, proposals, or next steps (such as 3 article angles, form actions, invoice drafts, team invites), embed interactive inline action buttons directly in your reply so the user can tap to execute without typing.
+   - Button syntax:
+     • To trigger a 1-click prompt/action: [CTA:Button Title|prompt or action value] (e.g. [CTA:Draft Article 1|Draft complete SEO article for 5 Studio Lighting Setups for Editorial Shoots] or [CTA:Suggest 3 More|Brainstorm 3 fresh content angles])
+     • To offer approvals: [APPROVE:Approve & Generate|Draft the selected article now] or [APPROVE:Confirm Invite|Send invitation to member]
+     • To offer revisions: [REVISE:Explore More Ideas|Suggest 3 alternative content angles] or [REVISE:Adjust Terms|Adjust payment terms to Net 30]
+     • To trigger tool actions: [BUTTON:Configure SEO|cora_open_seo]
+   - Machine execution tags: When creating entities directly, use the structured machine action tag [ACTION:action_name]{\"json_data\"}[/ACTION].
+3. LISTEN & ANSWER DIRECTLY: Listen carefully to the user's specific words and intent. Answer what they are actually asking with sharp co-founder insight.
+4. NO UNSOLICITED DATA DUMPING: NEVER dump random bank balances, open task numbers, or database counts unless the user specifically asks for workspace metrics, a financial report, or an operational briefing.
+5. ZERO EMOJIS: Do not include emojis in your responses under any circumstances.
+6. MULTI-LINGUAL: Always respond in the user's selected language.
+7. STRICT NAME & IDENTITY PRIVACY: NEVER use or mention the names 'Shruti' or 'Shravya'. Use generic fictitious placeholders (e.g. Rohan Verma, Kavya Patel, Aarav Mehta, Studio Admin, Workspace Owner).
 
 [WORKSPACE CONTEXT & BACKGROUND REASONING]
 (Note: Use this internal background knowledge to reason accurately about the workspace, but DO NOT dump it raw to the user unless asked)
@@ -20891,18 +20995,26 @@ You are assisting the user inside the Content Suite.
 
 [CRITICAL FORMATTING & BREVITY RULES]
 1. TOPIC SUGGESTIONS & IDEAS:
-• When the user asks for blog topics, ideas, or content angles, output ONLY 3-4 compact, high-converting items.
-• Each item MUST be 1-2 lines maximum, formatted as:
-  1. **[Compelling Title]** — [1-sentence angle & why it ranks/converts]. Target Keyword: `[keyword]`
-• NEVER output multi-paragraph sub-analyses (like 'Search Intent:', 'Why it works:', 'Key Angle:') per topic unless the user explicitly requests an exhaustive multi-page breakdown.
+• Introduce your suggestions in maximum 1-2 sentences.
+• Output 3 high-converting topic titles. For EACH title, include a direct action button tag so the user can immediately approve and generate it with 1 click:
+  Example:
+  Here are 3 high-ranking content angles for your workspace:
+  1. **[Compelling Title 1]** (Keyword: `target-keyword-1`)
+  2. **[Compelling Title 2]** (Keyword: `target-keyword-2`)
+  3. **[Compelling Title 3]** (Keyword: `target-keyword-3`)
+  [CTA:Draft Article 1|Draft complete SEO article for Title 1]
+  [CTA:Draft Article 2|Draft complete SEO article for Title 2]
+  [CTA:Draft Article 3|Draft complete SEO article for Title 3]
+  [REVISE:Explore 3 More Ideas|Suggest 3 alternative blog angles]
 
 2. ARTICLE WRITING:
-• When asked to write a blog post, article, or guide, output ONLY a 2-sentence executive summary in the chat bubble (Hook + Core Takeaway).
-• Place the entire comprehensive markdown article strictly inside [ACTION:create_article]{\"title\":\"...\",\"content\":\"# Full Article Markdown...\",\"focus_keyword\":\"...\",\"meta_desc\":\"...\"}[/ACTION].
-• NEVER paste the full 500-1000 word article text into the chat bubble.
+• Output ONLY a 2-sentence executive summary in the chat bubble (Hook + Core Takeaway).
+• Place the full comprehensive markdown article strictly inside [ACTION:create_article]{\"title\":\"...\",\"content\":\"# Full Article Markdown...\",\"focus_keyword\":\"...\",\"meta_desc\":\"...\"}[/ACTION].
+• Provide action buttons: [APPROVE:Open in Editor|create_article] [REVISE:Refine Draft|Refine and expand the article content]
+• NEVER paste raw 1000-word articles directly into the chat bubble text.
 
 3. STRICT PRIVACY:
-• NEVER use or mention 'Shruti' or 'Shravya'. Use the active workspace name or generic roles.";
+• NEVER use or mention 'Shruti' or 'Shravya'. Use generic fictitious placeholders (e.g. Rohan Verma, Studio Admin, Workspace Owner).";
     } elseif ( $current_page === 'leads' ) {
         $system_prompt .= "\n\n=== SPECIALIZED ROLE: REVENUE & SALES CO-FOUNDER ===
 You are the workspace's Sales Director and CRM Pipeline Strategist.
@@ -22478,6 +22590,13 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard',
     $ai_usage    = function_exists( 'cora_workspace_get_ai_usage_stats' ) ? cora_workspace_get_ai_usage_stats() : array( 'daily_count' => 1, 'daily_limit' => 100, 'five_hour_count' => 1, 'five_hour_limit' => 30 );
     $token_stats = function_exists( 'cora_workspace_get_token_usage_stats' ) ? cora_workspace_get_token_usage_stats() : array( 'monthly_tokens' => 12500, 'monthly_limit' => 100000, 'percent' => 12.5 );
 
+    // Continuous Self-Learning RAG Ingestion: Store conversational turns to learn workspace context
+    $local_agency_id = function_exists( 'cora_db_get_agency_id' ) ? ( cora_db_get_agency_id() ?: 1 ) : 1;
+    $local_uid = get_current_user_id() ?: 1;
+    if ( function_exists( 'cora_rag_ingest_conversation_turn' ) ) {
+        cora_rag_ingest_conversation_turn( $local_agency_id, $local_uid, $message, $reply, $current_page );
+    }
+
     wp_send_json_success( array(
         'reply'             => $reply,
         'answer'            => $reply,
@@ -22856,6 +22975,13 @@ function cora_ajax_chat_query() {
 
     $clean_reply = $reply;
     $action_results = cora_extract_and_execute_ai_actions( $clean_reply );
+
+    // Continuous Self-Learning RAG Ingestion: Learn from query turns
+    $query_agency_id = function_exists( 'cora_db_get_agency_id' ) ? ( cora_db_get_agency_id() ?: 1 ) : 1;
+    $query_uid = get_current_user_id() ?: 1;
+    if ( function_exists( 'cora_rag_ingest_conversation_turn' ) && ! empty( $message ) ) {
+        cora_rag_ingest_conversation_turn( $query_agency_id, $query_uid, $message, $clean_reply, 'ai_tools' );
+    }
 
     $fallback_notice = '';
     if ( $fallback_activated ) {

@@ -4083,11 +4083,58 @@ jQuery(document).ready(function($) {
                         </div>`;
                     }
 
-                    // Cleanly strip all action tags and any lingering raw action blocks from display text
+                    // Extract Interactive CTA, APPROVE, REVISE, and BUTTON Action Pills
+                    const ctaRegex = /\[(CTA|APPROVE|REVISE|BUTTON):([^\|\]]+)(?:\|([^\]]+))?\]/gi;
+                    const ctaButtons = [];
+                    let ctaMatch;
+                    while ((ctaMatch = ctaRegex.exec(rawReply)) !== null) {
+                        ctaButtons.push({
+                            type: ctaMatch[1].toUpperCase(),
+                            label: ctaMatch[2].trim(),
+                            value: (ctaMatch[3] || ctaMatch[2]).trim()
+                        });
+                    }
+
+                    if (ctaButtons.length > 0) {
+                        let ctaBtnsHtml = '';
+                        ctaButtons.forEach(btn => {
+                            const btnType = btn.type;
+                            const btnLabel = $('<div>').text(btn.label).html();
+                            const safeVal = btn.value.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                            
+                            if (btnType === 'APPROVE') {
+                                ctaBtnsHtml += `
+                                <button type="button" onclick="window.coraHandleCtaAction('${safeVal}', '${btnType}')" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-[11px] font-bold rounded-xl transition-all shadow-3xs cursor-pointer border-none active:scale-97">
+                                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                    <span>${btnLabel}</span>
+                                </button>`;
+                            } else if (btnType === 'REVISE') {
+                                ctaBtnsHtml += `
+                                <button type="button" onclick="window.coraHandleCtaAction('${safeVal}', '${btnType}')" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-zinc-100 hover:bg-zinc-200/90 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-[11px] font-semibold rounded-xl transition-all border border-zinc-200/70 dark:border-zinc-700/60 cursor-pointer active:scale-97">
+                                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
+                                    <span>${btnLabel}</span>
+                                </button>`;
+                            } else {
+                                ctaBtnsHtml += `
+                                <button type="button" onclick="window.coraHandleCtaAction('${safeVal}', '${btnType}')" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-100 hover:bg-zinc-200/90 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 text-[11px] font-semibold rounded-xl transition-all border border-zinc-200/70 dark:border-zinc-700/60 cursor-pointer active:scale-97">
+                                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                    <span>${btnLabel}</span>
+                                </button>`;
+                            }
+                        });
+
+                        actionHtml += `
+                        <div class="flex flex-wrap items-center gap-1.5 mt-2.5 pt-2 border-t border-zinc-200/50 dark:border-zinc-800/60">
+                            ${ctaBtnsHtml}
+                        </div>`;
+                    }
+
+                    // Cleanly strip all action tags and CTA tags from display text
                     rawReply = rawReply.replace(/\[ACTION:[a-zA-Z0-9_]+\][\s\S]*?\[\/ACTION\]/g, '')
                                        .replace(/\[ACTION:[a-zA-Z0-9_]+\]\{[\s\S]*?\}/g, '')
                                        .replace(/\[ACTION:[a-zA-Z0-9_]+:[^\]]+\]/g, '')
                                        .replace(/\[ACTION:[a-zA-Z0-9_]+[\s\S]*/g, '')
+                                       .replace(/\[(CTA|APPROVE|REVISE|BUTTON):[^\]]+\]/gi, '')
                                        .trim();
 
                     let replyHtml = rawReply;
@@ -4879,6 +4926,26 @@ jQuery(document).ready(function($) {
     }
 
     window.coraExecuteAIChat = coraExecuteAIChat;
+
+    // Interactive Action Pill & One-Click CTA Handler
+    window.coraHandleCtaAction = function(val, type) {
+        if (!val) return;
+        const trimmedVal = String(val).trim();
+
+        // 1. Check if the value is a machine action command
+        if (trimmedVal.startsWith('action:') || ['create_article', 'create_lead', 'create_invoice', 'log_expense', 'create_form', 'create_booking', 'create_task', 'create_document', 'publish_articles', 'scan_opportunities', 'open_team_migration', 'open_permissions_matrix'].includes(trimmedVal)) {
+            const actName = trimmedVal.replace(/^action:/, '');
+            if (typeof window.coraExecuteCopilotAction === 'function') {
+                window.coraExecuteCopilotAction(actName, '{}');
+                return;
+            }
+        }
+
+        // 2. Otherwise execute the prompt directly in AI chat without requiring the user to type
+        if (typeof window.coraExecuteAIChat === 'function') {
+            window.coraExecuteAIChat(trimmedVal);
+        }
+    };
 
     window.coraConfirmApplySettings = function(cardId, proposalId) {
         const ajaxUrlEndpoint = (window.coraREData && window.coraREData.ajaxUrl) ? window.coraREData.ajaxUrl : (typeof coraREWPData !== 'undefined' ? coraREWPData.ajaxUrl : '/wp-admin/admin-ajax.php');
@@ -16109,8 +16176,39 @@ jQuery(document).ready(function($) {
                     .replace(/\n\n/g, '<br><br>')
                     .replace(/\n/g, '<br>');
 
+                // Extract interactive CTA, APPROVE, REVISE, and BUTTON pills
+                const ctaRegex = /\[(CTA|APPROVE|REVISE|BUTTON):([^\|\]]+)(?:\|([^\]]+))?\]/gi;
+                const ctaButtons = [];
+                let ctaMatch;
+                while ((ctaMatch = ctaRegex.exec(formatted)) !== null) {
+                    ctaButtons.push({
+                        type: ctaMatch[1].toUpperCase(),
+                        label: ctaMatch[2].trim(),
+                        value: (ctaMatch[3] || ctaMatch[2]).trim()
+                    });
+                }
+
+                if (ctaButtons.length > 0) {
+                    let ctaPills = '';
+                    ctaButtons.forEach(btn => {
+                        const safeVal = btn.value.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                        if (btn.type === 'APPROVE') {
+                            ctaPills += `<button type="button" onclick="window.coraHandleCtaAction('${safeVal}', '${btn.type}')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 hover:bg-zinc-800 cursor-pointer border-0 inline-flex items-center gap-1.5 shadow-3xs active:scale-97"><svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>${btn.label}</button>`;
+                        } else if (btn.type === 'REVISE') {
+                            ctaPills += `<button type="button" onclick="window.coraHandleCtaAction('${safeVal}', '${btn.type}')" class="px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 cursor-pointer border border-zinc-200/70 dark:border-zinc-700 inline-flex items-center gap-1.5 shadow-3xs active:scale-97"><svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>${btn.label}</button>`;
+                        } else {
+                            ctaPills += `<button type="button" onclick="window.coraHandleCtaAction('${safeVal}', '${btn.type}')" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 cursor-pointer border border-zinc-200/70 dark:border-zinc-700 inline-flex items-center gap-1.5 shadow-3xs active:scale-97"><svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>${btn.label}</button>`;
+                        }
+                    });
+                    actionBtnHtml += `<div class="flex flex-wrap items-center gap-1.5 pt-2 border-t border-zinc-200/60 dark:border-zinc-800">${ctaPills}</div>`;
+                }
+
+                // Cleanly strip all remaining bracketed tags from formatted display text
+                formatted = formatted.replace(/\[(CTA|APPROVE|REVISE|BUTTON):[^\]]+\]/gi, '')
+                                     .replace(/\[ACTION:[^\]]+\]/gi, '')
+                                     .trim();
+
                 // Extract action tag [ACTION:name:payload]
-                let actionBtnHtml = '';
                 const actionMatch = formatted.match(/\[ACTION:([a-zA-Z0-9_-]+):(.*?)\]/);
                 if (actionMatch) {
                     const actionName = actionMatch[1];
@@ -16128,11 +16226,11 @@ jQuery(document).ready(function($) {
                         open_task_drawer: 'Create Task'
                     };
                     const label = actionLabels[actionName] || 'Run Action';
-                    actionBtnHtml = `<div class="pt-2"><button type="button" onclick="window.coraExecuteCopilotAction('${actionName}', '${prefillStr}')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 cursor-pointer border-0 inline-flex items-center gap-1.5 shadow-xs">${label} →</button></div>`;
+                    actionBtnHtml += `<div class="pt-2"><button type="button" onclick="window.coraExecuteCopilotAction('${actionName}', '${prefillStr}')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 cursor-pointer border-0 inline-flex items-center gap-1.5 shadow-xs">${label} →</button></div>`;
                 } else if (res.data.action_chip) {
                     const chip = res.data.action_chip;
                     const prefillStr = chip.prefill ? encodeURIComponent(JSON.stringify(chip.prefill)) : '';
-                    actionBtnHtml = `<div class="pt-2"><button type="button" onclick="window.coraExecuteCopilotAction('${chip.action}', '${prefillStr}')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 cursor-pointer border-0 inline-flex items-center gap-1.5 shadow-xs">${chip.text} →</button></div>`;
+                    actionBtnHtml += `<div class="pt-2"><button type="button" onclick="window.coraExecuteCopilotAction('${chip.action}', '${prefillStr}')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-zinc-950 text-white hover:bg-zinc-800 cursor-pointer border-0 inline-flex items-center gap-1.5 shadow-xs">${chip.text} →</button></div>`;
                 }
 
                 const finalAiBubble = document.createElement('div');
