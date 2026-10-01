@@ -5013,20 +5013,13 @@ body.cora-scroll-locked {
 
         <!-- 3. Workspace AI & Quick Links List (Linear / Notion Style) -->
         <div class="flex flex-col gap-0.5 pt-0.5">
-            <!-- AI Engine Indicator -->
-            <?php
-            $cora_active_ai_model = get_option( 'cora_workspace_active_ai_model', 'cora-core-v2' );
-            ?>
-            <div class="w-full px-2.5 py-1.5 text-xs text-zinc-600 dark:text-zinc-400 rounded-xl bg-zinc-50/50 dark:bg-zinc-800/30 flex items-center justify-between border border-zinc-100 dark:border-zinc-800/60 select-none">
+            <!-- AI Status Indicator -->
+            <div class="w-full px-2.5 py-1.5 text-xs rounded-xl bg-zinc-50/50 dark:bg-zinc-800/30 flex items-center justify-between border border-zinc-100 dark:border-zinc-800/60 select-none">
                 <div class="flex items-center gap-2">
                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span class="text-[11px] font-medium text-zinc-700 dark:text-zinc-300">Cora AI Model</span>
+                    <span class="text-[11px] font-medium text-zinc-700 dark:text-zinc-300">Cora AI Agent</span>
                 </div>
-                <select id="cora-header-ai-model-selector" class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-700/80 text-zinc-700 dark:text-zinc-300 text-[10.5px] font-medium rounded-md px-1.5 py-0.5 outline-none cursor-pointer">
-                    <option value="cora-core-v2" <?php selected( $cora_active_ai_model, 'cora-core-v2' ); ?>>Gemini 3.5 Flash</option>
-                    <option value="gemini" <?php selected( $cora_active_ai_model, 'gemini' ); ?>>Claude 3.5 Sonnet</option>
-                    <option value="gpt-4o" <?php selected( $cora_active_ai_model, 'gpt-4o' ); ?>>GPT-4o</option>
-                </select>
+                <span class="text-[10px] font-medium px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60">AI Connected</span>
             </div>
 
             <!-- Profile -->
@@ -5046,28 +5039,6 @@ body.cora-scroll-locked {
                 </div>
                 <span class="text-[10px] text-zinc-400 font-mono px-1 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800">⌘.</span>
             </button>
-
-            <!-- Talk to Founder -->
-            <a href="https://wa.me/919817059266?text=Hi%20Cora%20Founder%2C%20I%20have%20a%20question%20about%20my%20workspace." target="_blank" rel="noopener noreferrer" class="w-full text-left px-2.5 py-1.5 text-xs text-zinc-700 dark:text-zinc-300 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 font-medium flex items-center justify-between cursor-pointer transition-colors no-underline" onclick="window.coraCloseProfilePopover();">
-                <div class="flex items-center gap-2.5">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 shrink-0"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                    <span>Talk to Founder</span>
-                </div>
-                <span class="text-[9.5px] font-medium text-zinc-500 dark:text-zinc-400 px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 rounded">Direct Line</span>
-            </a>
-
-            <!-- Language Selector Row -->
-            <div class="px-2.5 py-1.5 flex items-center justify-between text-xs rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors">
-                <div class="flex items-center gap-2.5 text-zinc-700 dark:text-zinc-300">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 shrink-0"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-                    <span class="text-xs font-medium">Language</span>
-                </div>
-                <select id="cora-header-language-select" class="cora-language-selector bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-[11px] font-medium rounded-lg px-2 py-1 outline-none border border-zinc-200/60 dark:border-zinc-700/60 cursor-pointer" onchange="if(window.coraSetLanguage) window.coraSetLanguage(this.value, true);">
-                    <?php foreach ( $cora_supported_languages as $l_code => $l_name ) : ?>
-                    <option value="<?php echo esc_attr( $l_code ); ?>" <?php selected( $cora_current_language, $l_code ); ?>><?php echo esc_html( $l_name ); ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
 
             <?php if ( cora_is_super_owner() ) : ?>
             <!-- Role Preview Row -->
@@ -5548,21 +5519,13 @@ body.cora-scroll-locked {
                     </div>
                 </div>
 
-                <!-- 2. Workspace Status & AI Model (Sleek Compact Monochromatic Row) -->
-                <?php
-                $cora_gemini_key_saved = ! empty( get_option( 'cora_workspace_ai_gemini_key', '' ) );
-                $cora_active_ai_model = get_option( 'cora_workspace_active_ai_model', 'cora-core-v2' );
-                ?>
+                <!-- 2. Workspace AI Status (Sleek Compact Monochromatic Row) -->
                 <div class="px-2.5 py-1.5 bg-zinc-50/80 dark:bg-zinc-800/40 border border-zinc-200/60 dark:border-zinc-700/60 rounded-xl flex items-center justify-between text-xs select-none">
                     <div class="flex items-center gap-1.5">
-                        <span class="w-1.5 h-1.5 rounded-full <?php echo $cora_gemini_key_saved ? 'bg-emerald-500 animate-pulse' : 'bg-zinc-400'; ?>"></span>
-                        <span class="text-[11px] font-medium text-zinc-700 dark:text-zinc-300"><?php echo $cora_gemini_key_saved ? 'Connected' : 'Active'; ?></span>
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span class="text-[11px] font-medium text-zinc-700 dark:text-zinc-300">Cora AI Agent</span>
                     </div>
-                    <select id="cora-ai-model-selector" class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-700/80 text-zinc-700 dark:text-zinc-300 text-[10.5px] font-medium rounded-md px-1.5 py-0.5 outline-none cursor-pointer transition-colors shadow-3xs">
-                        <option value="cora-core-v2" <?php selected( $cora_active_ai_model, 'cora-core-v2' ); ?>>Gemini 3.5 Flash</option>
-                        <option value="gemini" <?php selected( $cora_active_ai_model, 'gemini' ); ?>>Claude 3.5 Sonnet</option>
-                        <option value="gpt-4o" <?php selected( $cora_active_ai_model, 'gpt-4o' ); ?>>GPT-4o</option>
-                    </select>
+                    <span class="text-[10px] font-medium px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60">AI Connected</span>
                 </div>
 
                 <!-- 3. Streamlined Menu Items List -->
@@ -5590,35 +5553,6 @@ body.cora-scroll-locked {
                         </div>
                         <span class="text-[9px] font-semibold text-zinc-500 dark:text-zinc-400 px-1.5 py-0.2 bg-zinc-100 dark:bg-zinc-800 rounded">Guide</span>
                     </button>
-
-                    <button type="button" class="w-full text-left px-2.5 py-1.5 text-xs text-zinc-700 dark:text-zinc-300 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100 font-medium flex items-center justify-between cursor-pointer transition-colors" onclick="$('#cora-profile-popover').addClass('hidden'); window.coraOpenFeedbackDrawer();">
-                        <div class="flex items-center gap-2.5">
-                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400 shrink-0"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                            <span>Send Feedback</span>
-                        </div>
-                        <span class="text-zinc-300 dark:text-zinc-600 text-xs">&rsaquo;</span>
-                    </button>
-
-                    <a href="https://wa.me/919817059266?text=Hi%20Cora%20Founder%2C%20I%20have%20a%20question%20about%20my%20workspace." target="_blank" rel="noopener noreferrer" class="w-full text-left px-2.5 py-1.5 text-xs text-zinc-700 dark:text-zinc-300 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100 font-medium flex items-center justify-between cursor-pointer transition-colors no-underline" onclick="$('#cora-profile-popover').addClass('hidden');">
-                        <div class="flex items-center gap-2.5">
-                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400 shrink-0"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-                            <span>Direct Support</span>
-                        </div>
-                        <span class="text-[9px] font-medium text-zinc-500 dark:text-zinc-400 px-1.5 py-0.2 bg-zinc-100 dark:bg-zinc-800 rounded">Direct Line</span>
-                    </a>
-
-                    <!-- Language Row -->
-                    <div class="px-2.5 py-1.5 flex items-center justify-between text-xs rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition-colors">
-                        <div class="flex items-center gap-2.5 text-zinc-700 dark:text-zinc-300">
-                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400 shrink-0"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-                            <span class="text-xs font-medium">Language</span>
-                        </div>
-                        <select id="cora-language-selector" class="cora-language-selector bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-[10.5px] font-medium rounded-lg px-2 py-0.5 outline-none border border-zinc-200/60 dark:border-zinc-700/60 cursor-pointer" onchange="if(window.coraSetLanguage) window.coraSetLanguage(this.value, true);">
-                            <?php foreach ( $cora_supported_languages as $l_code => $l_name ) : ?>
-                            <option value="<?php echo esc_attr( $l_code ); ?>" <?php selected( $cora_current_language, $l_code ); ?>><?php echo esc_html( $l_name ); ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
 
                     <?php if ( cora_is_super_owner() ) : ?>
                     <!-- Role Preview Row -->
