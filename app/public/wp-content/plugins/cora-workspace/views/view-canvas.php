@@ -5470,6 +5470,8 @@ function cora_get_sparkline_points( $history, $type ) {
         switchTab('pages');
         syncStateToUrl();
     }
+    window.editTheme = editTheme;
+    window.switchTab = switchTab;
 
     // ── URL State Sync Helper ──────────────────────────────────
     function syncStateToUrl() {
@@ -11146,12 +11148,14 @@ function cora_get_sparkline_points( $history, $type ) {
             var pageId   = params.get('cv_page');
             var editorEngine = params.get('cv_editor');
 
-            if (cvAction === 'edit_live' || themeId === 'live') {
+            if (cvAction === 'edit_live' || themeId === 'live' || cvAction === 'customize') {
                 var liveTheme = (canvasState.themes && canvasState.themes.length > 0)
                     ? (canvasState.themes.find(function(t) { return t.status === 'live'; }) || canvasState.themes[0])
                     : null;
-                if (liveTheme) {
-                    editTheme(liveTheme.id, liveTheme.name, true);
+                var tId = liveTheme ? liveTheme.id : (canvasState.activeThemeId || 0);
+                var tName = liveTheme ? liveTheme.name : (canvasState.activeThemeName || 'Active Theme');
+                if (tId) {
+                    editTheme(tId, tName, true);
                     if (tabId) {
                         switchTab(tabId);
                     }

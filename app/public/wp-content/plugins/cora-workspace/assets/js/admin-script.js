@@ -1016,20 +1016,55 @@ jQuery(document).ready(function($) {
     window.coraNavigateTo = function(targetPageId) {
         if (!targetPageId) return;
 
+        var targetStr = String(targetPageId);
+        var query = '';
+        var hash = '';
+        var qIndex = targetStr.indexOf('?');
+        var hIndex = targetStr.indexOf('#');
+
+        if (qIndex !== -1) {
+            if (hIndex !== -1 && hIndex > qIndex) {
+                query = targetStr.substring(qIndex, hIndex);
+                hash = targetStr.substring(hIndex);
+            } else {
+                query = targetStr.substring(qIndex);
+            }
+            targetStr = targetStr.substring(0, qIndex);
+        } else if (hIndex !== -1) {
+            hash = targetStr.substring(hIndex);
+            targetStr = targetStr.substring(0, hIndex);
+        }
+
         // Immediately trigger realistic atomic skeleton preloader to eliminate perceived navigation lag
         if (typeof window.coraShowSkeleton === 'function') {
-            window.coraShowSkeleton(targetPageId);
+            window.coraShowSkeleton(targetStr);
+        }
+
+        if (targetStr.startsWith('http://') || targetStr.startsWith('https://')) {
+            window.location.href = targetStr + query + hash;
+            return;
+        }
+
+        if (targetStr.startsWith('/')) {
+            window.location.href = targetStr + query + hash;
+            return;
         }
 
         if (window.location.pathname.indexOf('admin.php') !== -1 || window.location.search.indexOf('page=cora-workspace') !== -1) {
-            window.location.href = window.location.pathname + '?page=cora-workspace&sub_page=' + encodeURIComponent(targetPageId);
+            window.location.href = window.location.pathname + '?page=cora-workspace&sub_page=' + encodeURIComponent(targetStr) + (query ? '&' + query.substring(1) : '') + hash;
+            return;
+        }
+
+        var navPrefix = (typeof coraREWPData !== 'undefined' && coraREWPData.navPrefix) ? coraREWPData.navPrefix : ((typeof coraREData !== 'undefined' && coraREData.navPrefix) ? coraREData.navPrefix : '');
+        if (navPrefix) {
+            window.location.href = navPrefix.replace(/\/+$/, '') + '/' + encodeURIComponent(targetStr) + query + hash;
             return;
         }
 
         // Canonical PWA & Workspace In-App Relative Navigation
         var isSingleTenant = (typeof coraREData !== 'undefined' && coraREData.isSingleTenant === true);
         if (isSingleTenant) {
-            window.location.href = '/workspace/' + encodeURIComponent(targetPageId);
+            window.location.href = '/workspace/' + encodeURIComponent(targetStr) + query + hash;
             return;
         }
 
@@ -1040,7 +1075,7 @@ jQuery(document).ready(function($) {
                 baseSlug = pathParts[0];
             }
         }
-        window.location.href = '/workspace/' + baseSlug + '/' + encodeURIComponent(targetPageId);
+        window.location.href = '/workspace/' + baseSlug + '/' + encodeURIComponent(targetStr) + query + hash;
     };
 
     // ─── PWA Standalone Mode In-App Navigation & Pull-To-Refresh Engine ───────

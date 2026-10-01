@@ -573,10 +573,30 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     <script src="<?php echo includes_url( 'js/jquery/jquery.min.js' ); ?>"></script>
     <script>
         window.$ = window.jQuery;
-        window.coraNavigateTo = window.coraNavigateTo || function(targetPageId) {
+        window.coraNavigateTo = function(targetPageId) {
             if (!targetPageId) return;
+            
+            var targetStr = String(targetPageId);
+            var query = '';
+            var hash = '';
+            var qIndex = targetStr.indexOf('?');
+            var hIndex = targetStr.indexOf('#');
+            
+            if (qIndex !== -1) {
+                if (hIndex !== -1 && hIndex > qIndex) {
+                    query = targetStr.substring(qIndex, hIndex);
+                    hash = targetStr.substring(hIndex);
+                } else {
+                    query = targetStr.substring(qIndex);
+                }
+                targetStr = targetStr.substring(0, qIndex);
+            } else if (hIndex !== -1) {
+                hash = targetStr.substring(hIndex);
+                targetStr = targetStr.substring(0, hIndex);
+            }
+
             try {
-                var cleanTarget = String(targetPageId).replace(/^\/workspace\//, '').split('?')[0].split('/')[0];
+                var cleanTarget = targetStr.replace(/^\/workspace\//, '').split('/')[0];
                 document.querySelectorAll('.cora-island-nav-link').forEach(function(el) {
                     var elTarget = el.getAttribute('data-island-target');
                     if (elTarget === cleanTarget || (cleanTarget === 'dashboard' && elTarget === 'home') || (cleanTarget === 'home' && elTarget === 'dashboard')) {
@@ -587,25 +607,32 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 });
             } catch(e) {}
 
-            var baseSlug = window.coraWorkspaceSlug || 'workspace';
-            if (!baseSlug || baseSlug === 'workspace') {
-                var pathParts = window.location.pathname.split('/').filter(Boolean);
-                if (pathParts[0] === 'workspace' && pathParts[1]) {
-                    baseSlug = pathParts[1];
-                } else if (pathParts.length > 0 && pathParts[0] !== 'wp-admin' && pathParts[0] !== 'wp-login.php' && pathParts[0] !== 'workspace') {
-                    baseSlug = pathParts[0];
-                }
+            if (targetStr.startsWith('http://') || targetStr.startsWith('https://') || targetStr.startsWith('/')) {
+                window.location.href = targetStr + query + hash;
+                return;
             }
-            window.location.href = '/workspace/' + encodeURIComponent(baseSlug) + '/' + encodeURIComponent(targetPageId);
+
+            var navPrefix = '<?php echo esc_js( $cora_nav_prefix ); ?>';
+            if (!navPrefix) {
+                navPrefix = '/workspace';
+            }
+            window.location.href = navPrefix.replace(/\/+$/, '') + '/' + encodeURIComponent(targetStr) + query + hash;
         };
 
         window.coraOpenLiveThemeEditor = function(e) {
             if (e && e.preventDefault) e.preventDefault();
             if (e && e.stopPropagation) e.stopPropagation();
-            if (typeof window.editTheme === 'function' && window.canvasState && window.canvasState.themes && window.canvasState.themes.length > 0) {
-                var liveTheme = window.canvasState.themes.find(function(t) { return t.status === 'live'; }) || window.canvasState.themes[0];
-                if (liveTheme) {
-                    window.editTheme(liveTheme.id, liveTheme.name, true);
+            if (typeof window.editTheme === 'function' && window.canvasState && (window.canvasState.themes || window.canvasState.activeThemeId)) {
+                var liveTheme = (window.canvasState.themes && window.canvasState.themes.length > 0)
+                    ? (window.canvasState.themes.find(function(t) { return t.status === 'live'; }) || window.canvasState.themes[0])
+                    : null;
+                var tId = liveTheme ? liveTheme.id : (window.canvasState.activeThemeId || 0);
+                var tName = liveTheme ? liveTheme.name : (window.canvasState.activeThemeName || 'Active Theme');
+                if (tId) {
+                    window.editTheme(tId, tName, true);
+                    try {
+                        history.pushState(null, '', window.location.pathname + '?cv_action=edit_live');
+                    } catch(err) {}
                     return;
                 }
             }
