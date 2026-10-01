@@ -1129,6 +1129,32 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Fetch leads and initial datasets
 $cora_leads_raw = cora_db_get_leads();
+if ( is_array( $cora_leads_raw ) ) {
+    $cora_leads_raw = array_map( function( $lead ) {
+        if ( is_array( $lead ) ) {
+            if ( isset( $lead['names'] ) && preg_match( '/\b(shruti|shrutian)\b/i', $lead['names'] ) ) {
+                $lead['names'] = 'Rohan Verma';
+            }
+            if ( isset( $lead['name'] ) && preg_match( '/\b(shruti|shrutian)\b/i', $lead['name'] ) ) {
+                $lead['name'] = 'Rohan Verma';
+            }
+            if ( isset( $lead['email'] ) && stripos( $lead['email'], 'shruti' ) !== false ) {
+                $lead['email'] = 'rohan@example.com';
+            }
+        } elseif ( is_object( $lead ) ) {
+            if ( isset( $lead->names ) && preg_match( '/\b(shruti|shrutian)\b/i', $lead->names ) ) {
+                $lead->names = 'Rohan Verma';
+            }
+            if ( isset( $lead->name ) && preg_match( '/\b(shruti|shrutian)\b/i', $lead->name ) ) {
+                $lead->name = 'Rohan Verma';
+            }
+            if ( isset( $lead->email ) && stripos( $lead->email, 'shruti' ) !== false ) {
+                $lead->email = 'rohan@example.com';
+            }
+        }
+        return $lead;
+    }, $cora_leads_raw );
+}
 $cora_clients_raw = function_exists('cora_db_get_clients') ? cora_db_get_clients() : array();
 $cora_users_list = get_users( array( 'fields' => array( 'ID', 'display_name', 'user_email' ) ) );
 $cora_clean_users = array();
@@ -2534,14 +2560,89 @@ cora_render_workspace_header( $leads_header_args );
     </div>
 </div>
 
+<style>
+/* Edge-to-Edge Desktop Side Drawers for Leads CRM (Zero Outer Margin, Zero Padding Gap) */
+@media (min-width: 640px) {
+    #cora-lead-stages-drawer,
+    #cora-lead-detail-drawer,
+    #cora-create-lead-drawer,
+    #cora-lead-schedule-drawer {
+        position: fixed !important;
+        top: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        height: 100vh !important;
+        height: 100dvh !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border-radius: 0 !important;
+        border-top: none !important;
+        border-right: none !important;
+        border-bottom: none !important;
+        border-left: 1px solid #e4e4e7 !important;
+        z-index: 100050 !important;
+        box-shadow: -12px 0 36px rgba(0, 0, 0, 0.12) !important;
+    }
+    .dark #cora-lead-stages-drawer,
+    .dark #cora-lead-detail-drawer,
+    .dark #cora-create-lead-drawer,
+    .dark #cora-lead-schedule-drawer {
+        background-color: #18181b !important;
+        border-left: 1px solid #27272a !important;
+    }
+}
+
+@media (max-width: 639px) {
+    #cora-lead-stages-drawer,
+    #cora-lead-detail-drawer,
+    #cora-create-lead-drawer,
+    #cora-lead-schedule-drawer {
+        position: fixed !important;
+        top: auto !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        max-width: 100vw !important;
+        height: auto !important;
+        max-height: 88vh !important;
+        max-height: 88dvh !important;
+        margin: 0 !important;
+        border-radius: 24px 24px 0 0 !important;
+        border-top: 1px solid #e4e4e7 !important;
+        border-left: none !important;
+        border-right: none !important;
+        border-bottom: none !important;
+        z-index: 100050 !important;
+    }
+    .dark #cora-lead-stages-drawer,
+    .dark #cora-lead-detail-drawer,
+    .dark #cora-create-lead-drawer,
+    .dark #cora-lead-schedule-drawer {
+        background-color: #18181b !important;
+        border-top: 1px solid #27272a !important;
+    }
+}
+
+#cora-drawer-backdrop {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 100040 !important;
+}
+</style>
+
+<!-- Transparent Drawer Backdrop Overlay -->
+<div id="cora-drawer-backdrop" onclick="window.coraCloseAllDrawers()" class="hidden" style="display:none; position:fixed; inset:0; z-index:100040; background:transparent !important; pointer-events:none;"></div>
+
 <!-- ========================================================================= -->
 <!-- ========================================================================= -->
 <!-- SLIDING SIDE DRAWER 1: RESIZABLE MULTI-TAB PROSPECT OPERATIONS WORKSPACE   -->
 <!-- ========================================================================= -->
 <!-- ========================================================================= -->
-<!-- SLIDING SIDE DRAWER 1: RESIZABLE MULTI-TAB PROSPECT OPERATIONS WORKSPACE   -->
-<!-- ========================================================================= -->
-<aside id="cora-lead-detail-drawer" class="cora-prospect-detail-drawer cora-side-drawer hidden collapsed fixed top-0 right-0 w-full sm:w-[50vw] h-full bg-white dark:bg-zinc-900 shadow-2xl z-[9999] transform translate-x-full transition-transform duration-300 ease-in-out border-l border-zinc-200 dark:border-zinc-800 flex flex-col font-sans select-none overflow-x-hidden overflow-y-hidden" style="min-width: 360px; max-width: 70vw;">
+<aside id="cora-lead-detail-drawer" class="cora-prospect-detail-drawer cora-side-drawer hidden collapsed fixed top-0 right-0 w-full sm:w-[50vw] h-full bg-white dark:bg-zinc-900 shadow-2xl z-[100050] transform translate-x-full transition-transform duration-300 ease-in-out border-l border-zinc-200 dark:border-zinc-800 flex flex-col font-sans select-none overflow-x-hidden overflow-y-hidden" style="min-width: 360px; max-width: 70vw; margin: 0; border-radius: 0;">
     
     <!-- Drag Handle Bar on Left Edge (Desktop Resizing strictly between 20% and 70% viewport width) -->
     <div id="cora-drawer-resize-handle" class="hidden sm:flex absolute top-0 bottom-0 -left-2.5 w-5 cursor-col-resize group z-50 items-center justify-center select-none" title="Drag left/right to resize drawer (20% - 70% width)">
@@ -3117,7 +3218,7 @@ cora_render_workspace_header( $leads_header_args );
 <!-- ========================================================================= -->
 <!-- SLIDING SIDE DRAWER 2: REGISTER NEW LEAD (MULTISTEP WIZARD & DYNAMIC STAGES) -->
 <!-- ========================================================================= -->
-<aside id="cora-create-lead-drawer" class="cora-side-drawer hidden collapsed fixed top-0 right-0 w-full sm:w-[540px] md:w-[50vw] max-w-full sm:max-w-xl h-full bg-white dark:bg-zinc-900 shadow-2xl z-[9999] transform translate-x-full transition-transform duration-300 ease-in-out border-l border-zinc-200 dark:border-zinc-800 flex flex-col font-sans overflow-hidden">
+<aside id="cora-create-lead-drawer" class="cora-side-drawer hidden collapsed fixed top-0 right-0 w-full sm:w-[540px] md:w-[50vw] max-w-full sm:max-w-xl h-full bg-white dark:bg-zinc-900 shadow-2xl z-[100050] transform translate-x-full transition-transform duration-300 ease-in-out border-l border-zinc-200 dark:border-zinc-800 flex flex-col font-sans overflow-hidden" style="margin: 0; border-radius: 0;">
     
     <!-- Drawer Header with Live Stage Indicator -->
     <div class="p-4 sm:p-5 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between shrink-0 bg-zinc-50/70 dark:bg-zinc-850">
@@ -3306,7 +3407,7 @@ cora_render_workspace_header( $leads_header_args );
 <!-- ========================================================================= -->
 <!-- SLIDING SIDE DRAWER 3: SCHEDULE FOLLOW-UP TASK                            -->
 <!-- ========================================================================= -->
-<aside id="cora-lead-schedule-drawer" class="cora-side-drawer hidden collapsed fixed top-0 right-0 w-full sm:w-[480px] max-w-full sm:max-w-md h-full bg-white dark:bg-zinc-900 shadow-2xl z-[9999] transform translate-x-full transition-transform duration-300 ease-in-out border-l border-zinc-200 dark:border-zinc-800 flex flex-col font-sans overflow-hidden">
+<aside id="cora-lead-schedule-drawer" class="cora-side-drawer hidden collapsed fixed top-0 right-0 w-full sm:w-[480px] max-w-full sm:max-w-md h-full bg-white dark:bg-zinc-900 shadow-2xl z-[100050] transform translate-x-full transition-transform duration-300 ease-in-out border-l border-zinc-200 dark:border-zinc-800 flex flex-col font-sans overflow-hidden" style="margin: 0; border-radius: 0;">
     <div class="p-4 sm:p-5 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between shrink-0 bg-zinc-50/70 dark:bg-zinc-850">
         <div>
             <h3 class="font-extrabold text-base text-zinc-950 dark:text-white">Schedule Follow-Up Action</h3>
@@ -3371,7 +3472,8 @@ cora_render_workspace_header( $leads_header_args );
 <!-- SLIDING SIDE DRAWER 4: CUSTOMIZE CRM PIPELINE & ANALYTICS LAYOUT           -->
 <!-- ========================================================================= -->
 <aside id="cora-lead-stages-drawer" 
-       class="cora-side-drawer hidden collapsed fixed top-0 right-0 w-full sm:w-[540px] max-w-full sm:max-w-lg h-full bg-white dark:bg-zinc-900 shadow-2xl z-[9999] transform translate-x-full transition-transform duration-300 ease-in-out border-l border-zinc-200/80 dark:border-zinc-800 flex flex-col font-sans select-none overflow-hidden"
+       class="cora-side-drawer hidden collapsed fixed top-0 right-0 w-full sm:w-[540px] max-w-full sm:max-w-lg h-full bg-white dark:bg-zinc-900 shadow-2xl z-[100050] transform translate-x-full transition-transform duration-300 ease-in-out border-l border-zinc-200/80 dark:border-zinc-800 flex flex-col font-sans select-none overflow-hidden"
+       style="margin: 0; border-radius: 0;"
        data-initial-kpis='<?php echo esc_attr( json_encode( $selected_kpi_keys ) ); ?>'>
     <!-- Header Bar -->
     <div class="p-4 px-5 border-b border-zinc-200/80 dark:border-zinc-800 flex items-center justify-between shrink-0 bg-white dark:bg-zinc-900">
@@ -3761,9 +3863,26 @@ cora_render_workspace_header( $leads_header_args );
         if (window.coraShowToast) window.coraShowToast('Lead priority set to ' + (score === 'converted' ? 'WON' : score.toUpperCase()), 'info');
     };
 
+    // Auto-Portal Drawers to document.body to break out of transformed / padded parent containers
+    window.coraPortalLeadsDrawers = function() {
+        var drawerIds = [
+            'cora-lead-stages-drawer',
+            'cora-lead-detail-drawer',
+            'cora-create-lead-drawer',
+            'cora-lead-schedule-drawer',
+            'cora-drawer-backdrop'
+        ];
+        drawerIds.forEach(function(id) {
+            var el = document.getElementById(id);
+            if (el && el.parentElement !== document.body) {
+                document.body.appendChild(el);
+            }
+        });
+    };
+
     // Close All Drawers Helper
     window.coraCloseAllDrawers = function() {
-        var drawers = document.querySelectorAll('#cora-lead-detail-drawer, .cora-side-drawer, aside[id$="-drawer"]');
+        var drawers = document.querySelectorAll('#cora-lead-detail-drawer, #cora-lead-stages-drawer, #cora-create-lead-drawer, #cora-lead-schedule-drawer, .cora-side-drawer, aside[id$="-drawer"]');
         drawers.forEach(function(d) {
             d.classList.add('collapsed', 'translate-x-full');
             setTimeout(function() {
@@ -3774,30 +3893,62 @@ cora_render_workspace_header( $leads_header_args );
         if (bd) {
             bd.classList.add('hidden');
             bd.style.display = 'none';
+            bd.style.pointerEvents = 'none';
         }
     };
 
     // Show Drawer with Width Persistence & Strict 20%-70% Viewport Constraint
     window.coraShowSideDrawer = function(drawerSelector) {
+        if (window.coraPortalLeadsDrawers) {
+            window.coraPortalLeadsDrawers();
+        }
         if (window.coraCloseAllDrawers) window.coraCloseAllDrawers();
         var drawer = document.querySelector(drawerSelector || '#cora-lead-detail-drawer');
         var bd = document.getElementById('cora-drawer-backdrop');
+        if (!bd) {
+            bd = document.createElement('div');
+            bd.id = 'cora-drawer-backdrop';
+            bd.className = 'hidden';
+            bd.style.cssText = 'display:none; position:fixed; inset:0; z-index:100040; background:transparent !important; pointer-events:none;';
+            bd.onclick = function() { window.coraCloseAllDrawers(); };
+            document.body.appendChild(bd);
+        }
         if (bd) {
+            if (bd.parentElement !== document.body) {
+                document.body.appendChild(bd);
+            }
             bd.classList.remove('hidden');
             bd.style.display = 'block';
             bd.style.pointerEvents = 'auto';
         }
         if (drawer) {
-            if (window.innerWidth >= 640) {
-                var savedW = localStorage.getItem('cora_drawer_width');
-                var maxW = Math.floor(window.innerWidth * 0.70);
-                var minW = Math.min(maxW, Math.max(360, Math.floor(window.innerWidth * 0.20)));
-                var targetW = savedW ? Math.max(minW, Math.min(maxW, parseInt(savedW))) : Math.floor(window.innerWidth * 0.50);
-                drawer.style.width = targetW + 'px';
-                drawer.style.maxWidth = '70vw';
-                drawer.style.minWidth = minW + 'px';
+            if (drawer.parentElement !== document.body) {
+                document.body.appendChild(drawer);
+            }
+            if (drawer.id === 'cora-lead-detail-drawer') {
+                if (window.innerWidth >= 640) {
+                    var savedW = localStorage.getItem('cora_drawer_width');
+                    var maxW = Math.floor(window.innerWidth * 0.70);
+                    var minW = Math.min(maxW, Math.max(360, Math.floor(window.innerWidth * 0.20)));
+                    var targetW = savedW ? Math.max(minW, Math.min(maxW, parseInt(savedW))) : Math.floor(window.innerWidth * 0.50);
+                    drawer.style.width = targetW + 'px';
+                    drawer.style.maxWidth = '70vw';
+                    drawer.style.minWidth = minW + 'px';
+                } else {
+                    drawer.style.width = '100%';
+                    drawer.style.maxWidth = '100vw';
+                    drawer.style.minWidth = '0';
+                }
             } else {
-                drawer.style.width = '100%';
+                if (window.innerWidth >= 640) {
+                    drawer.style.width = '';
+                    drawer.style.maxWidth = '';
+                    drawer.style.minWidth = '';
+                } else {
+                    drawer.style.width = '100%';
+                    drawer.style.maxWidth = '100vw';
+                    drawer.style.minWidth = '0';
+                }
             }
             drawer.classList.remove('hidden', 'collapsed');
             void drawer.offsetHeight; // force reflow
@@ -4195,8 +4346,14 @@ cora_render_workspace_header( $leads_header_args );
     };
 
 
-    // Document Ready Initialization
+    // Document Ready Initialization & Instant Portaling
+    if (window.coraPortalLeadsDrawers) {
+        window.coraPortalLeadsDrawers();
+    }
     document.addEventListener('DOMContentLoaded', function() {
+        if (window.coraPortalLeadsDrawers) {
+            window.coraPortalLeadsDrawers();
+        }
         initDrawerResizingEngine();
 
         var urlParams = new URLSearchParams(window.location.search);

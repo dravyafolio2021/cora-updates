@@ -17731,31 +17731,54 @@ jQuery(document).ready(function($) {
         });
     })();
 
-    // Helper to open side drawer with saved width
+    // Helper to open side drawer with saved width and edge-to-edge body portaling
     window.coraShowSideDrawer = function(drawerSelector) {
+        if (window.coraPortalLeadsDrawers) {
+            window.coraPortalLeadsDrawers();
+        }
         if (window.coraCloseAllDrawers) window.coraCloseAllDrawers();
         if (drawerSelector && (drawerSelector.includes('cora-prospect-detail-drawer') || drawerSelector.includes('cora-lead-detail-drawer'))) {
             drawerSelector = '#cora-lead-detail-drawer, .cora-prospect-detail-drawer, #cora-prospect-detail-drawer';
         }
         const drawer = $(drawerSelector);
-        const bd = $('#cora-drawer-backdrop');
+        let bd = $('#cora-drawer-backdrop');
+        if (!bd.length) {
+            bd = $('<div id="cora-drawer-backdrop" class="hidden" style="display:none; position:fixed; inset:0; z-index:100040; background:transparent !important; pointer-events:none;"></div>');
+            $('body').append(bd);
+            bd.on('click', function() { window.coraCloseAllDrawers(); });
+        }
         if (bd.length) {
+            if (bd.parent()[0] !== document.body) {
+                $('body').append(bd);
+            }
             bd.removeClass('hidden').css({'display': 'block', 'pointer-events': 'auto'});
         }
         if (drawer.length) {
-            // Restore saved width on desktop (clamped strictly between 20vw and 70vw, min 360px)
-            if (window.innerWidth >= 640) {
-                const savedW = localStorage.getItem('cora_drawer_width');
-                const maxW = Math.floor(window.innerWidth * 0.70);
-                const minW = Math.min(maxW, Math.max(360, Math.floor(window.innerWidth * 0.20)));
-                const targetW = savedW ? Math.max(minW, Math.min(maxW, parseInt(savedW))) : Math.floor(window.innerWidth * 0.50);
-                drawer.css({
-                    'width': targetW + 'px',
-                    'max-width': '70vw',
-                    'min-width': minW + 'px'
-                });
+            if (drawer.parent()[0] !== document.body) {
+                $('body').append(drawer);
+            }
+            const isLeadDetail = drawer.is('#cora-lead-detail-drawer, .cora-prospect-detail-drawer, #cora-prospect-detail-drawer');
+            if (isLeadDetail) {
+                // Restore saved width on desktop (clamped strictly between 20vw and 70vw, min 360px)
+                if (window.innerWidth >= 640) {
+                    const savedW = localStorage.getItem('cora_drawer_width');
+                    const maxW = Math.floor(window.innerWidth * 0.70);
+                    const minW = Math.min(maxW, Math.max(360, Math.floor(window.innerWidth * 0.20)));
+                    const targetW = savedW ? Math.max(minW, Math.min(maxW, parseInt(savedW))) : Math.floor(window.innerWidth * 0.50);
+                    drawer.css({
+                        'width': targetW + 'px',
+                        'max-width': '70vw',
+                        'min-width': minW + 'px'
+                    });
+                } else {
+                    drawer.css({'width': '100%', 'max-width': '100vw', 'min-width': '0'});
+                }
             } else {
-                drawer.css('width', '100%');
+                if (window.innerWidth < 640) {
+                    drawer.css({'width': '100%', 'max-width': '100vw', 'min-width': '0'});
+                } else {
+                    drawer.css({'max-width': '', 'min-width': ''});
+                }
             }
 
             drawer.removeClass('hidden collapsed');
