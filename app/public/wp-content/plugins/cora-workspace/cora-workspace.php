@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.274
+ * Version:           4.9.276
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.274' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.276' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -20393,8 +20393,10 @@ function cora_extract_and_execute_ai_actions( &$raw_reply ) {
         }
     }
 
-    // 3. Absolute safety sweep: Strip ANY remaining [ACTION:... from the reply
-    $raw_reply = preg_replace( '/\[ACTION:[a-zA-Z0-9_]+[\s\S]*/s', '', $raw_reply );
+    // 3. Absolute safety sweep: Strip unclosed action tags from reply without touching CTA pills
+    $raw_reply = preg_replace( '/\[ACTION:[a-zA-Z0-9_]+\]\{[\s\S]*?\}/s', '', $raw_reply );
+    $raw_reply = preg_replace( '/\[ACTION:[a-zA-Z0-9_]+:[^\]]*\]/i', '', $raw_reply );
+    $raw_reply = preg_replace( '/\[\/ACTION\]/i', '', $raw_reply );
     $raw_reply = cora_strip_all_emojis( trim( $raw_reply ) );
 
     return $action_results;
@@ -20500,6 +20502,14 @@ function cora_ajax_ai_chat() {
             'provider'              => 'cora-security-guardrail',
             'model'                 => 'cora-guard-v1',
         ) );
+        exit;
+    }
+
+    // Direct Autonomous Workspace Action & Navigation Interceptor
+    $lower_msg = strtolower( trim( $message ) );
+    if ( preg_match( '/\b(?:open|go to|take me to|launch|switch to|navigate to|show me)\s+(?:the\s+)?(canvas|settings|settings suite|crm|leads|tasks|deliverables|financials|invoices|ledger|forms|form builder|bookings|calendar|vault|contracts|blogs|content|media|team|users|super admin)\b/i', $lower_msg ) ||
+         in_array( $lower_msg, array( 'open canvas', 'canvas', 'open settings', 'settings', 'open leads', 'leads', 'open tasks', 'tasks', 'open forms', 'forms', 'open financials', 'financials', 'open vault', 'vault', 'open media', 'media', 'open blogs', 'blogs' ), true ) ) {
+        cora_ai_local_cofounder_handler( $message, $current_page, $history );
         exit;
     }
 
@@ -21429,6 +21439,73 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard',
         exit;
     }
 
+    // 0a. High-Priority Intent: Instant Workspace Module Navigation
+    if ( preg_match( '/\b(?:open|go to|take me to|launch|switch to|navigate to|show me)\s+(?:the\s+)?(canvas|settings|settings suite|crm|leads|tasks|deliverables|financials|invoices|ledger|forms|form builder|bookings|calendar|vault|contracts|blogs|content|media|team|users|super admin)\b/i', $lower_msg, $nav_m ) ||
+         in_array( $lower_msg, array( 'open canvas', 'canvas', 'open settings', 'settings', 'open leads', 'leads', 'open tasks', 'tasks', 'open forms', 'forms', 'open financials', 'financials', 'open vault', 'vault', 'open media', 'media', 'open blogs', 'blogs' ), true ) ) {
+        $nav_target = strtolower( trim( $nav_m[1] ?? str_replace( 'open ', '', $lower_msg ) ) );
+        $nav_labels = array(
+            'canvas'          => array( 'title' => 'Canvas Builder', 'url' => '/workspace/canvas', 'key' => 'canvas' ),
+            'settings'        => array( 'title' => 'Platform Settings', 'url' => '/workspace/settings-suite', 'key' => 'settings' ),
+            'settings suite'  => array( 'title' => 'Platform Settings', 'url' => '/workspace/settings-suite', 'key' => 'settings' ),
+            'crm'             => array( 'title' => 'CRM Leads Pipeline', 'url' => '/workspace/dashboard?sub_page=leads', 'key' => 'leads' ),
+            'leads'           => array( 'title' => 'CRM Leads Pipeline', 'url' => '/workspace/dashboard?sub_page=leads', 'key' => 'leads' ),
+            'tasks'           => array( 'title' => 'Deliverables & Tasks', 'url' => '/workspace/dashboard?sub_page=tasks', 'key' => 'tasks' ),
+            'deliverables'    => array( 'title' => 'Deliverables & Tasks', 'url' => '/workspace/dashboard?sub_page=tasks', 'key' => 'tasks' ),
+            'financials'      => array( 'title' => 'Financials & Invoicing', 'url' => '/workspace/dashboard?sub_page=financials', 'key' => 'financials' ),
+            'invoices'        => array( 'title' => 'Financials & Invoicing', 'url' => '/workspace/dashboard?sub_page=financials', 'key' => 'financials' ),
+            'ledger'          => array( 'title' => 'Financials & Invoicing', 'url' => '/workspace/dashboard?sub_page=financials', 'key' => 'financials' ),
+            'forms'           => array( 'title' => 'Forms Builder', 'url' => '/workspace/dashboard?sub_page=forms', 'key' => 'forms' ),
+            'form builder'    => array( 'title' => 'Forms Builder', 'url' => '/workspace/dashboard?sub_page=forms', 'key' => 'forms' ),
+            'bookings'        => array( 'title' => 'Calendar & Bookings', 'url' => '/workspace/dashboard?sub_page=bookings', 'key' => 'bookings' ),
+            'calendar'        => array( 'title' => 'Calendar & Bookings', 'url' => '/workspace/dashboard?sub_page=bookings', 'key' => 'bookings' ),
+            'vault'           => array( 'title' => 'Contracts Vault', 'url' => '/workspace/dashboard?sub_page=vault', 'key' => 'vault' ),
+            'contracts'       => array( 'title' => 'Contracts Vault', 'url' => '/workspace/dashboard?sub_page=vault', 'key' => 'vault' ),
+            'blogs'           => array( 'title' => 'Content Suite', 'url' => '/workspace/blogs', 'key' => 'blogs' ),
+            'content'         => array( 'title' => 'Content Suite', 'url' => '/workspace/blogs', 'key' => 'blogs' ),
+            'media'           => array( 'title' => 'Media Assets', 'url' => '/workspace/dashboard?sub_page=media', 'key' => 'media' ),
+            'team'            => array( 'title' => 'User Management', 'url' => '/workspace/dashboard?sub_page=users', 'key' => 'users' ),
+            'users'           => array( 'title' => 'User Management', 'url' => '/workspace/dashboard?sub_page=users', 'key' => 'users' ),
+            'super admin'     => array( 'title' => 'Platform Super Admin', 'url' => '/workspace/super-admin', 'key' => 'super-admin' ),
+        );
+        $matched = $nav_labels[ $nav_target ] ?? array( 'title' => ucfirst( $nav_target ), 'url' => "/workspace/{$nav_target}", 'key' => $nav_target );
+        $reply = "Opening **{$matched['title']}** for you.\n[CTA:Launch {$matched['title']}|{$matched['url']}]";
+
+        if ( function_exists( 'cora_workspace_record_ai_usage' ) ) {
+            cora_workspace_record_ai_usage();
+        }
+        $stat_obj = function_exists( 'cora_workspace_get_ai_usage_stats' ) ? cora_workspace_get_ai_usage_stats() : array();
+        wp_send_json_success( array(
+            'reply'             => $reply,
+            'answer'            => $reply,
+            'navigate'          => $matched['url'],
+            'action_results'    => array(
+                array(
+                    'success'  => true,
+                    'action'   => 'navigate',
+                    'navigate' => $matched['url'],
+                    'url'      => $matched['url'],
+                    'title'    => $matched['title'],
+                    'data'     => array(
+                        'navigate'   => $matched['url'],
+                        'target_key' => $matched['key'],
+                        'title'      => $matched['title'],
+                        'url'        => $matched['url'],
+                    ),
+                ),
+            ),
+            'ai_usage'          => $stat_obj,
+            'credits'           => $stat_obj['credits'] ?? array( 'used' => $stat_obj['primary_count'] ?? 1, 'total' => $stat_obj['primary_limit'] ?? 10000, 'remaining' => max( 0, ( $stat_obj['primary_limit'] ?? 10000 ) - ( $stat_obj['primary_count'] ?? 1 ) ), 'percent' => $stat_obj['primary_pct'] ?? 0 ),
+            'used_credits'      => $stat_obj['used_credits'] ?? ( $stat_obj['primary_count'] ?? 1 ),
+            'total_credits'     => $stat_obj['total_credits'] ?? ( $stat_obj['primary_limit'] ?? 10000 ),
+            'credits_remaining' => $stat_obj['credits_remaining'] ?? max( 0, ( $stat_obj['primary_limit'] ?? 10000 ) - ( $stat_obj['primary_count'] ?? 1 ) ),
+            'token_stats'       => array( 'monthly_tokens' => 12500, 'monthly_limit' => 100000, 'percent' => 12.5 ),
+            'total_tokens'      => 30,
+            'provider'          => 'local-cofounder',
+            'model'             => 'cora-core-v2',
+        ) );
+        exit;
+    }
+
     // 0. High-Priority Intent: Real-Time Date, Day, Time & Calendar
     if ( preg_match( '/\b(?:what is the date|what date is it|what\'s the date|today\'s date|current date|what day is it|what day is today|what time is it|what is the time|what\'s the time|current time|the date today|the time today)\b/i', $lower_msg ) ||
          ( preg_match( '/\b(?:date|day|time)\b/i', $lower_msg ) && preg_match( '/\b(?:today|now|current|what is|what\'s|tell me)\b/i', $lower_msg ) && strpos( $lower_msg, 'form' ) === false && strpos( $lower_msg, 'field' ) === false && strpos( $lower_msg, 'booking' ) === false ) ) {
@@ -22132,19 +22209,19 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard',
 
     // 1. Intent: Proactive Business Suggestions ("you suggest", "what do you suggest", "give me ideas", "help me decide")
     if ( preg_match( '/\b(?:you suggest|what do you suggest|suggest|your suggestion|your advice|give me ideas|recommend|what should (?:we|i) do|advise)\b/i', $lower ) || ( strpos( $lower, 'suggest' ) !== false ) ) {
-        $reply = "If we want to bring in new clients this week, I suggest setting up a **Client Intake Form** and linking it to our **CRM Leads pipeline**. That way, every new inquiry is captured automatically with deal values attached. Want me to build that form for you right now?";
+        $reply = "I suggest setting up a **Client Intake Form** and linking it to your **CRM Pipeline** to automatically capture incoming deals.\n[CTA:Create Intake Form|Create a client intake form] [CTA:Open CRM Leads|action:navigate:leads]";
     }
     // 2. Intent: Capability Testing ("I just want to test your capabilities", "test you", "testing", "prove it")
     elseif ( preg_match( '/\b(?:test your capabilities|test you|testing|just test|testing capabilities|prove it|test)\b/i', $lower ) || ( strpos( $lower, 'test' ) !== false && ( strpos( $lower, 'capabilit' ) !== false || strpos( $lower, 'just' ) !== false || strpos( $lower, 'want' ) !== false ) ) ) {
-        $reply = "I'm ready for the test! Try asking me: 'Change site name to Apex Studio', 'Generate an invoice of ₹50,000 for Acme Corp', or 'Add a lead for Priya Sharma'. Which one should we run?";
+        $reply = "I am ready. Choose any action below to test autonomous workspace execution:\n[CTA:Rename Site to Apex Studio|Change site name to Apex Studio] [CTA:Draft ₹50,000 Invoice|Generate an invoice of ₹50,000 for Acme Corp] [CTA:Add Lead Priya Sharma|Add a lead for Priya Sharma]";
     }
     // 3. Intent: Contextual Followup on CRM Leads ("CRM Leads as well>", "leads too", "what about leads", "crm leads")
     elseif ( preg_match( '/\b(?:crm lead|crm leads|leads as well|leads too|what about leads|manage leads|lead management)\b/i', $lower ) || ( strpos( $lower, 'lead' ) !== false && ( strpos( $lower, 'as well' ) !== false || strpos( $lower, 'too' ) !== false || strpos( $lower, 'also' ) !== false || strpos( $lower, 'what about' ) !== false || strpos( $lower, '>' ) !== false || strlen( $lower ) < 30 ) && ! preg_match( '/\b(?:create|add|new|insert)\b/i', $lower ) ) ) {
-        $reply = "Yes, absolutely! With CRM Leads, I can register qualified prospects, assign deal values, and organize your client pipeline. Give me a client name and deal amount, and I'll add them right to your pipeline.";
+        $reply = "With CRM Leads, I can register qualified prospects, track deal values, and manage follow-ups.\n[CTA:Add New Lead|action:open_lead_drawer] [CTA:Open Pipeline|action:navigate:leads]";
     }
     // 4. Intent: Contextual Followup on Forms ("Forms as well", "what about forms", "can you make forms")
     elseif ( preg_match( '/\b(?:forms as well|forms too|what about forms|form builder as well|can you make forms)\b/i', $lower ) || ( strpos( $lower, 'form' ) !== false && ( strpos( $lower, 'as well' ) !== false || strpos( $lower, 'too' ) !== false || strpos( $lower, 'also' ) !== false || strpos( $lower, 'what about' ) !== false ) && ! preg_match( '/\b(?:create|build|make|publish)\b/i', $lower ) ) ) {
-        $reply = "Definitely! I can build and publish custom client forms with live share links. What kind of form do you need—client intake, booking, or feedback?";
+        $reply = "I can build and publish high-converting multi-step forms with live URLs and WhatsApp validation.\n[CTA:Create Client Form|Create a client intake form] [CTA:Open Form Builder|action:navigate:forms]";
     }
     // 5. Intent: Financial CFO Mode & Ledger Intelligence (Autonomous CFO Agent)
     elseif ( $current_page === 'financials' || preg_match( '/\b(?:expense|expenses|gear|who owes|runway|cash flow|burn rate|afford|hire|simulate|margin|deal|gst|invoice|invoices|billing|tax invoice)\b/i', $lower ) ) {
@@ -22168,7 +22245,7 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard',
                 $cat = 'Gear & Tech';
                 if ( preg_match( '/\b(?:travel|cab|hotel|food|dinner|fuel)\b/i', $lower ) ) $cat = 'Food & Travel';
                 elseif ( preg_match( '/\b(?:software|app|saas|subscription)\b/i', $lower ) ) $cat = 'Software & Tools';
-                $reply = "I've structured a business expense for **₹" . number_format( $amt ) . "** under **{$cat}**.\n\n[ACTION:open_expense_drawer:{\"amount\":{$amt},\"category\":\"{$cat}\"}]";
+                $reply = "I've structured a business expense for **₹" . number_format( $amt ) . "** under **{$cat}**.\n[CTA:Review & Save Expense|action:open_expense_drawer:{\"amount\":{$amt},\"category\":\"{$cat}\"}] [CTA:Open Financials|action:navigate:financials]";
             }
             // 2. Invoicing
             elseif ( preg_match( '/\b(?:create|draft|generate|make|bill)\b.*?\b(?:invoice|bill)\b/i', $lower ) || preg_match( '/\binvoice\b.*?(?:₹|rs\.?|\d+)/i', $lower ) ) {
@@ -22176,52 +22253,45 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard',
                 if ( $amt <= 0 ) $amt = 45000;
                 $cl = 'Client';
                 if ( preg_match( '/(?:for|to|client)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/', $raw_msg, $cm ) ) $cl = trim( $cm[1] );
-                $reply = "I've drafted an 18% GST invoice for **{$cl}** of **₹" . number_format( $amt ) . "**.\n\n[ACTION:open_invoice_drawer:{\"amount\":{$amt},\"client_name\":\"{$cl}\"}]";
+                $reply = "I've drafted an 18% GST invoice for **{$cl}** of **₹" . number_format( $amt ) . "**.\n[APPROVE:Review & Save Invoice|action:open_invoice_drawer:{\"amount\":{$amt},\"client_name\":\"{$cl}\"}] [REVISE:Adjust Amount|Draft invoice of different amount]";
             }
             // 3. Who owes me
             elseif ( strpos( $lower, 'who owes' ) !== false || strpos( $lower, 'unpaid' ) !== false || strpos( $lower, 'overdue' ) !== false ) {
-                $overdue_list = array();
-                foreach ( $metrics['receivables'] as $r ) {
-                    if ( $r['status'] !== 'paid' ) {
-                        $overdue_list[] = "• **{$r['client_name']}**: ₹" . number_format( $r['due_balance'] ) . " (" . ( $r['is_overdue'] ? "{$r['days_overdue']} days overdue" : "due {$r['due_date']}" ) . ")";
-                    }
-                }
-                $reply = "You have **₹" . number_format( $metrics['expected_in'] ) . "** in total outstanding receivables (₹" . number_format( $metrics['overdue_total'] ) . " overdue):\n\n" . ( empty( $overdue_list ) ? "• *No overdue payments currently pending!*" : implode( "\n", $overdue_list ) );
+                $reply = "You have **₹" . number_format( $metrics['expected_in'] ) . "** in total outstanding receivables (₹" . number_format( $metrics['overdue_total'] ) . " overdue).\n[CTA:Open Financials|action:navigate:financials] [CTA:Draft GST Invoice|action:open_invoice_drawer]";
             }
             // 4. Runway / Cash
             elseif ( preg_match( '/\b(?:runway|cash|buffer|burn|balance|in bank)\b/i', $lower ) ) {
                 $runway = $metrics['monthly_recurring_total'] > 0 ? round( $metrics['available_cash'] / $metrics['monthly_recurring_total'], 1 ) . ' months' : '12+ months';
-                $reply = "### CFO Runway & Cash Audit\n\n• **Cleared Cash**: **₹" . number_format( $metrics['available_cash'] ) . "**\n• **Monthly Burn**: ₹" . number_format( $metrics['monthly_recurring_total'] ) . "/mo\n• **Operating Runway**: **{$runway}**\n• **Pending Receivables**: ₹" . number_format( $metrics['expected_in'] );
+                $reply = "You have **₹" . number_format( $metrics['available_cash'] ) . "** cleared in bank with **{$runway}** operating runway.\n[CTA:Log Expense|action:open_expense_drawer] [CTA:Draft Invoice|action:open_invoice_drawer] [CTA:Simulate Deal|action:open_simulator]";
             }
             // 5. Hire / Afford
             elseif ( strpos( $lower, 'hire' ) !== false || strpos( $lower, 'afford' ) !== false ) {
                 $sal = $parse_rupee( $raw_msg );
                 if ( $sal <= 0 ) $sal = 35000;
                 $cushion = $metrics['available_cash'] / max( 1, ( $metrics['monthly_recurring_total'] + $sal ) );
-                $reply = "### Hiring Feasibility Analysis for ₹" . number_format( $sal ) . "/month\n\n• **Current Available Cash**: ₹" . number_format( $metrics['available_cash'] ) . "\n• **New Monthly Burn**: ₹" . number_format( $metrics['monthly_recurring_total'] + $sal ) . "/mo\n• **Remaining Runway**: ~" . round( $cushion, 1 ) . " months\n\n**Verdict: Yes, you can afford this hire** without putting working capital at risk.";
+                $reply = "Yes, you can afford ₹" . number_format( $sal ) . "/month with ~" . round( $cushion, 1 ) . " months runway remaining.\n[CTA:Simulate Cost Impact|action:open_simulator:{\"revenue\":{$sal}}] [CTA:View Ledger|action:navigate:financials]";
             }
             // 6. Simulate Deal
             elseif ( preg_match( '/\b(?:deal|simulator|simulate|margin)\b/i', $lower ) ) {
                 $rev = $parse_rupee( $raw_msg );
                 if ( $rev <= 0 ) $rev = 150000;
-                $costs = round( $rev * 0.35 );
-                $reply = "### Project Deal Simulation (₹" . number_format( $rev ) . ")\n\n• **Gross Revenue**: ₹" . number_format( $rev ) . "\n• **Estimated Costs**: ~₹" . number_format( $costs ) . "\n• **Projected Net Margin**: ~**65.0%**\n\n[ACTION:open_simulator:{\"revenue\":{$rev}}]";
+                $reply = "Deal simulated at **₹" . number_format( $rev ) . "** with ~65% projected gross margin.\n[CTA:Open Deal Simulator|action:open_simulator:{\"revenue\":{$rev}}] [CTA:Draft GST Invoice|action:open_invoice_drawer:{\"amount\":{$rev}}]";
             }
             else {
-                $reply = "As your Chief Financial Officer (CFO), I can log expenses, draft GST invoices, evaluate deal margins, and audit your cash runway. What would you like to run?";
+                $reply = "As CFO, I can log expenses, draft GST invoices, and audit your cash runway.\n[CTA:Log Expense|action:open_expense_drawer] [CTA:Draft GST Invoice|action:open_invoice_drawer] [CTA:Runway Audit|What is my runway]";
             }
         } else {
-            $reply = "As your Chief Financial Officer (CFO), I can log expenses, draft GST invoices, evaluate deal margins, and audit your cash runway. What would you like to run?";
+            $reply = "As CFO, I can log expenses, draft GST invoices, and audit your cash runway.\n[CTA:Log Expense|action:open_expense_drawer] [CTA:Draft GST Invoice|action:open_invoice_drawer]";
         }
     }
     // 6. Intent: Contextual Followup on Settings / Site Name ("Site name as well", "settings too", "what about settings")
     elseif ( ( strpos( $lower, 'site name' ) !== false || strpos( $lower, 'setting' ) !== false || strpos( $lower, 'tagline' ) !== false ) && ( strpos( $lower, 'as well' ) !== false || strpos( $lower, 'too' ) !== false || strpos( $lower, 'also' ) !== false || strpos( $lower, 'what about' ) !== false ) ) {
         $cur_site_title = get_option( 'blogname', 'Cora' );
-        $reply = "Yes, I can handle that too! Your site is currently named **{$cur_site_title}**. Tell me what you'd like to rename it to and I'll apply it live.";
+        $reply = "Your site is currently named **{$cur_site_title}**. Tell me what to rename it to.\n[CTA:Open Settings Suite|action:navigate:settings]";
     }
     // 7. Intent: Casual Affirmations / Gratitude / Encouragement ("ok", "cool", "nice", "awesome", "great", "thanks", "sounds good")
     elseif ( preg_match( '/^(?:ok|okay|cool|nice|awesome|great|perfect|thanks|thank you|sounds good|got it|understood|sure|alright|yep|yeah)\b/i', $lower ) ) {
-        $reply = "You've got it! I'm right here whenever you need anything built, updated, or automated in your business. What's next on our agenda?";
+        $reply = "You got it! What should we build or automate next in your business?\n[CTA:Create Intake Form|Create a client intake form] [CTA:Review CRM Leads|action:navigate:leads] [CTA:Draft GST Invoice|action:open_invoice_drawer]";
     }
     // 8. Intent: Form Creation
     elseif ( preg_match( '/\b(?:form|intake|survey|questionnaire|lead form)\b/i', $lower ) && preg_match( '/\b(?:create|build|make|generate|new|setup|publish|draft)\b/i', $lower ) ) {
@@ -22254,9 +22324,9 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard',
 
         if ( ! empty( $exec_res['success'] ) ) {
             $action_results[] = $exec_res;
-            $reply = "I've created and published **{$title}** with " . count($fields) . " fields. The link is live below.";
+            $reply = "I've created and published **{$title}** with " . count($fields) . " fields.\n[CTA:Open Form Builder|action:navigate:forms] [CTA:View Live Form|" . ($exec_res['data']['public_url'] ?? '/forms') . "]";
         } else {
-            $reply = "I attempted to create the form but encountered an issue: " . ($exec_res['message'] ?? 'Database error.');
+            $reply = "I encountered an issue creating the form: " . ($exec_res['message'] ?? 'Database error.') . "\n[CTA:Try Again|Create a new client intake form]";
         }
     }
     // 9. Intent: CRM Lead Creation
@@ -22278,7 +22348,7 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard',
         }
 
         if ( ( $name === 'Prospective Client' || empty( $name ) ) && empty( $phone ) && $deal_value <= 0 ) {
-            $reply = "I can add that lead for you. What is their name, phone number, and estimated deal value?";
+            $reply = "Tell me the client's name, phone number, and estimated deal value to add them.\n[CTA:Open Lead Creator|action:open_lead_drawer]";
         } else {
             $exec_res = cora_execute_ai_action( 'create_lead', array(
                 'name'       => $name,
@@ -22291,7 +22361,7 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard',
             if ( ! empty( $exec_res['success'] ) ) {
                 $action_results[] = $exec_res;
                 $val_str = $deal_value > 0 ? " (₹" . number_format( $deal_value ) . ")" : "";
-                $reply = "Added **{$name}**{$val_str} to your CRM Pipeline.";
+                $reply = "Added **{$name}**{$val_str} to your CRM Pipeline.\n[CTA:View in CRM Leads|action:navigate:leads] [CTA:Add Another Lead|action:open_lead_drawer]";
             }
         }
     }
@@ -22314,7 +22384,7 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard',
         }
 
         if ( empty( $client_name ) || $amount <= 0 ) {
-            $reply = "I can generate that invoice. Who is the client and what is the amount?";
+            $reply = "Tell me the client name and total amount to generate their invoice.\n[CTA:Open Invoice Drawer|action:open_invoice_drawer]";
         } else {
             $exec_res = cora_execute_ai_action( 'create_invoice', array(
                 'client_name' => $client_name,
@@ -22324,7 +22394,7 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard',
 
             if ( ! empty( $exec_res['success'] ) ) {
                 $action_results[] = $exec_res;
-                $reply = "Generated **{$exec_res['data']['invoice_no']}** for **{$client_name}** totaling ₹" . number_format( $exec_res['data']['total_amount'] ) . ".";
+                $reply = "Generated **{$exec_res['data']['invoice_no']}** for **{$client_name}** totaling ₹" . number_format( $exec_res['data']['total_amount'] ) . ".\n[CTA:View in Financials|action:navigate:financials] [CTA:Open Vault|action:navigate:vault]";
             }
         }
     }
@@ -22349,7 +22419,7 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard',
 
         if ( ! empty( $exec_res['success'] ) ) {
             $action_results[] = $exec_res;
-            $reply = "Scheduled **{$title}** for **{$date}** at 10:00 AM.";
+            $reply = "Scheduled **{$title}** for **{$date}** at 10:00 AM.\n[CTA:Open Calendar|action:navigate:bookings]";
         }
     }
     // 12. Intent: Vault Document Drafting
@@ -22370,7 +22440,7 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard',
 
         if ( ! empty( $exec_res['success'] ) ) {
             $action_results[] = $exec_res;
-            $reply = "Drafted **{$title}** for **{$client_name}** with e-sign links ready.";
+            $reply = "Drafted **{$title}** for **{$client_name}** with e-sign ready.\n[CTA:Open Document Vault|action:navigate:vault]";
         }
     }
     // 13. Intent: Settings Modification
@@ -22417,52 +22487,52 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard',
 
             if ( ! empty( $exec_res['success'] ) ) {
                 $action_results[] = $exec_res;
-                $reply = "I've updated your workspace settings. You can review or undo the change below.";
+                $reply = "I've updated your workspace settings live.\n[CTA:Open Settings Suite|action:navigate:settings]";
             } else {
                 $reply = "I encountered an issue updating the settings: " . ($exec_res['message'] ?? 'Error.');
             }
         } else {
-            $reply = "I can update that setting for you. What would you like to set it to?";
+            $reply = "Tell me what you'd like to set this setting to.\n[CTA:Open Settings Suite|action:navigate:settings]";
         }
     }
     // 14. Intent: Settings Query / Inspection
     elseif ( preg_match( '/\b(?:what is|show me|check|display|tell me|get|view|current)\b/i', $lower ) && preg_match( '/\b(?:site name|site title|tagline|gst|gstin|tax|address|currency|settings|workspace name|config|configuration)\b/i', $lower ) ) {
         $cur_site_title = get_option( 'blogname', 'Cora' );
         $cur_tagline    = get_option( 'blogdescription', 'Not configured' );
-        $reply = "Your site is currently titled \"{$cur_site_title}\" with tagline \"{$cur_tagline}\". Would you like me to update either of these?";
+        $reply = "Your site is titled **\"{$cur_site_title}\"** with tagline **\"{$cur_tagline}\"**.\n[CTA:Open Settings Suite|action:navigate:settings]";
     }
     // 15. Intent: Capabilities & Scope Inquiries
     elseif ( preg_match( '/\b(?:can you|tell me what you can do|what can you do|capabilities|features|help|scope|abilities)\b/i', $lower ) || ( strpos( $lower, 'can you' ) !== false && ( strpos( $lower, 'update' ) !== false || strpos( $lower, 'change' ) !== false || strpos( $lower, 'name' ) !== false || strpos( $lower, 'site' ) !== false || strpos( $lower, 'manage' ) !== false ) ) ) {
         if ( strpos( $lower, 'site' ) !== false || strpos( $lower, 'name' ) !== false || strpos( $lower, 'setting' ) !== false || strpos( $lower, 'title' ) !== false ) {
             $cur_name = get_option( 'blogname', 'Cora' );
-            $reply = "Yes, absolutely! Your site is currently named **{$cur_name}**. Tell me what you'd like to rename it to and I'll update it right away.";
+            $reply = "Yes! Your site is named **{$cur_name}**. Tell me what to rename it to.\n[CTA:Open Settings Suite|action:navigate:settings]";
         } else {
-            $reply = "I can manage your settings (like site name, GST, and currency), build client forms, create CRM leads, and generate GST invoices. What would you like to work on?";
+            $reply = "I can build client forms, manage CRM leads, draft GST invoices, and configure workspace settings.\n[CTA:Create Intake Form|Create a client intake form] [CTA:Open CRM Leads|action:navigate:leads] [CTA:Draft GST Invoice|action:open_invoice_drawer]";
         }
     }
     // 16. Intent: Active Modules / Features List
     elseif ( preg_match( '/\b(?:module|modules|active modules|accessible modules|what modules|list modules|features active|enabled features|what is active)\b/i', $lower ) || ( strpos( $lower, 'module' ) !== false && ( strpos( $lower, 'list' ) !== false || strpos( $lower, 'active' ) !== false || strpos( $lower, 'show' ) !== false ) ) ) {
         $active_industry = function_exists( 'cora_get_active_industry' ) ? cora_get_active_industry() : 'custom';
-        $reply = "Your active modules in **" . strtoupper($active_industry) . "** mode include Dashboard, Forms, CRM Leads, Financials, Bookings, and Document Vault. Which one would you like to work in?";
+        $reply = "Your active modules in **" . strtoupper($active_industry) . "** include Forms, CRM Leads, Financials, Calendar, and Vault.\n[CTA:Open Forms|action:navigate:forms] [CTA:Open CRM Leads|action:navigate:leads] [CTA:Open Financials|action:navigate:financials]";
     }
     // 17. Intent: Casual Greetings & Quick Dialog
     elseif ( preg_match( '/^(?:hi|hello|hey|hey cora|yo|sup|greetings|good morning|good afternoon|good evening|gm|gn)\b/i', $lower ) || ( strlen( $lower ) <= 4 && in_array( $lower, array('hi', 'hey', 'yo', 'sup', 'gm', 'gn', 'hola') ) ) ) {
         if ( $current_page === 'blogs' || $current_page === 'content' ) {
-            $reply = "Hey! What are we working on in Content today? I can help you draft high-ranking blog posts, brainstorm viral topic ideas, or optimize SEO.";
+            $reply = "Hey! What are we creating in Content today? I can draft SEO posts or brainstorm high-converting angles.\n[CTA:Draft New Blog Post|Suggest 3 article ideas] [CTA:Scan Search Gaps|action:scan_opportunities]";
         } elseif ( $current_page === 'leads' ) {
-            $reply = "Hey! Ready to review your CRM leads or qualify new prospects? Let me know who or what you'd like to work on.";
+            $reply = "Hey! Ready to review your CRM leads or qualify new prospects?\n[CTA:Add New Lead|action:open_lead_drawer] [CTA:Review Pipeline|action:navigate:leads]";
         } elseif ( $current_page === 'financials' ) {
-            $reply = "Hey! I'm here to assist with your ledger, draft GST invoices, or log business expenses. What do you need?";
+            $reply = "Hey! I'm here to audit cash runway, draft GST invoices, or log expenses.\n[CTA:Log Expense|action:open_expense_drawer] [CTA:Draft Invoice|action:open_invoice_drawer]";
         } elseif ( $current_page === 'forms' ) {
-            $reply = "Hey! Ready to build or customize your client intake forms? Tell me what kind of form you'd like to create.";
+            $reply = "Hey! Ready to build or customize client intake forms?\n[CTA:Create Intake Form|Create a client intake form] [CTA:View All Forms|action:navigate:forms]";
         } elseif ( $current_page === 'tasks' ) {
-            $reply = "Hey! Let's check your deliverables and sprint tasks. What would you like to assign, update, or complete?";
+            $reply = "Hey! Let's check your deliverables and sprint milestones.\n[CTA:Create Task|action:open_task_drawer] [CTA:Review Tasks|action:navigate:tasks]";
         } elseif ( $current_page === 'bookings' ) {
-            $reply = "Hey! Ready to schedule a shoot session or check calendar appointments?";
+            $reply = "Hey! Ready to schedule a session or check calendar appointments?\n[CTA:Schedule Booking|action:navigate:bookings]";
         } elseif ( $current_page === 'vault' ) {
-            $reply = "Hey! I'm here to draft MSAs, NDAs, or client contracts. What document should we prepare?";
+            $reply = "Hey! I'm here to draft MSAs, NDAs, or client contracts.\n[CTA:Draft Agreement|Draft a client contract] [CTA:View Vault|action:navigate:vault]";
         } else {
-            $reply = "Hello! I'm here as your executive partner. What would you like to discuss, build, or execute today?";
+            $reply = "Hello! I am here as your executive co-founder. What should we build or automate today?\n[CTA:Create Intake Form|Create a client intake form] [CTA:Review CRM Leads|action:navigate:leads] [CTA:Draft GST Invoice|action:open_invoice_drawer]";
         }
     }
     // 18. Intent: Operational Briefing / Executive Activity Summary (Concise & Action-Oriented)
@@ -22484,7 +22554,7 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard',
         $tasks_count = count( (array)$tasks );
         $cur_date_str = current_datetime()->format( 'M j, Y' );
 
-        $reply = "Here is your operational snapshot for **{$cur_date_str}**. All systems are synchronized with **{$leads_count} active CRM leads**, **₹" . number_format($cash_num) . "** cleared in bank, and **" . max(1, $tasks_count) . " open tasks**.";
+        $reply = "Snapshot for **{$cur_date_str}**: **{$leads_count} active leads**, **₹" . number_format($cash_num) . "** cleared cash, and **" . max(1, $tasks_count) . " open tasks**.\n[CTA:Open CRM Pipeline|action:navigate:leads] [CTA:Open Financials|action:navigate:financials]";
 
         $briefing_payload = array(
             'date_str'    => $cur_date_str,
@@ -22539,41 +22609,24 @@ function cora_ai_local_cofounder_handler( $message, $current_page = 'dashboard',
         }
 
         if ( empty( $today_bookings ) && empty( $today_tasks ) ) {
-            $reply = "You have a clear schedule today with zero urgent tasks due. Would you like to review CRM leads or draft an invoice?";
+            $reply = "You have a clear schedule today with zero urgent deadlines.\n[CTA:Open CRM Leads|action:navigate:leads] [CTA:Draft GST Invoice|action:open_invoice_drawer]";
         } else {
             $b_str = ! empty( $today_bookings ) ? count( $today_bookings ) . " bookings (" . implode( ', ', array_slice( $today_bookings, 0, 2 ) ) . ")" : "no bookings";
             $t_str = ! empty( $today_tasks ) ? count( $today_tasks ) . " tasks" : "no pending tasks";
-            $reply = "For today, you have **{$b_str}** and **{$t_str}**. Let's keep operations running smoothly.";
+            $reply = "Today you have **{$b_str}** and **{$t_str}**.\n[CTA:Open Calendar|action:navigate:bookings] [CTA:View Deliverables|action:navigate:tasks]";
         }
     }
     // 19. Emotionally Intelligent Co-Founder Fallback (Context-Aware Dialogue)
     else {
         if ( $current_page === 'blogs' || $current_page === 'content' ) {
-            $fallbacks = array(
-                "I'm here to help you grow organic traffic and draft standout articles. Tell me what topic, keyword, or content strategy you'd like to explore.",
-                "Let's create something high-impact. Would you like to brainstorm blog topics, generate an outline, or write a full SEO draft?",
-                "I can research keywords, draft comprehensive blog posts, or optimize your existing articles. What should we tackle in Content?"
-            );
+            $reply = "I'm here to help you grow organic search traffic and draft standout articles.\n[CTA:Brainstorm 3 Topic Angles|Suggest 3 article ideas] [CTA:Scan Search Gaps|action:scan_opportunities]";
         } elseif ( $current_page === 'leads' ) {
-            $fallbacks = array(
-                "I can help you qualify prospects, calculate pipeline values, or organize client outreach. What's on your mind?",
-                "Ready to work on your sales pipeline? Tell me a client name and deal value, or let's review your active leads."
-            );
+            $reply = "I can help you qualify inbound prospects and organize client outreach.\n[CTA:Add New Lead|action:open_lead_drawer] [CTA:Open CRM Leads|action:navigate:leads]";
         } elseif ( $current_page === 'financials' ) {
-            $fallbacks = array(
-                "I can help you audit cash runway, draft GST invoices, or log expenses. How can I assist with your financials?",
-                "Let's keep your books in sync. Would you like to create an invoice, record an expense, or simulate deal margins?"
-            );
+            $reply = "I can audit cash runway, draft GST invoices, or log expenses.\n[CTA:Log Expense|action:open_expense_drawer] [CTA:Draft GST Invoice|action:open_invoice_drawer]";
         } else {
-            $fallbacks = array(
-                "I'm right by your side. We can build custom forms, add CRM leads, draft GST invoices, or update your workspace settings. What should we tackle together?",
-                "I'm here to help you run and grow your workspace smoothly. Tell me what's on your mind or what you'd like to work on next.",
-                "Let's make things easier for your business. Would you like to explore client leads, review tasks, or automate workflows?",
-                "I'm listening and ready to help. Just tell me what you'd like to configure or execute across your workspace."
-            );
+            $reply = "I'm here as your autonomous executive co-founder. What should we build or automate today?\n[CTA:Create Intake Form|Create a client intake form] [CTA:Open CRM Leads|action:navigate:leads] [CTA:Draft GST Invoice|action:open_invoice_drawer]";
         }
-        $f_idx = ( strlen( $raw_msg ) + intval( date( 'i' ) ) ) % count( $fallbacks );
-        $reply = $fallbacks[$f_idx];
     }
 
     // Strictly strip all emojis

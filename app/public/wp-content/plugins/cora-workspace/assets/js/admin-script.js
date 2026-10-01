@@ -3066,7 +3066,8 @@ jQuery(document).ready(function($) {
         }
 
         if (target.html) {
-            $('#cora-sidebar-chat').html(target.html);
+            const cleanHtml = target.html.replace(/\[\s*(CTA|APPROVE|REVISE|BUTTON)\s*:[^\]]+\]/gi, '').replace(/\[ACTION:[^\]]+\]/gi, '').replace(/\[\/ACTION\]/gi, '');
+            $('#cora-sidebar-chat').html(cleanHtml);
             $('#cora-sidebar-native-integration').hide();
         } else {
             window.coraStartNewConversation();
@@ -3113,7 +3114,8 @@ jQuery(document).ready(function($) {
             currentConversationId = targetChat.id;
             localStorage.setItem('cora_active_chat_id', targetChat.id);
             $('#cora-sidebar-active-chat-title').text(targetChat.title || 'Conversation');
-            $('#cora-sidebar-chat').html(targetChat.html);
+            const cleanTargetHtml = targetChat.html.replace(/\[\s*(CTA|APPROVE|REVISE|BUTTON)\s*:[^\]]+\]/gi, '').replace(/\[ACTION:[^\]]+\]/gi, '').replace(/\[\/ACTION\]/gi, '');
+            $('#cora-sidebar-chat').html(cleanTargetHtml);
             $('#cora-sidebar-native-integration').hide();
             if (typeof window.coraUpdateHistoryBadge === 'function') {
                 window.coraUpdateHistoryBadge();
@@ -4084,7 +4086,7 @@ jQuery(document).ready(function($) {
                     }
 
                     // Extract Interactive CTA, APPROVE, REVISE, and BUTTON Action Pills
-                    const ctaRegex = /\[(CTA|APPROVE|REVISE|BUTTON):([^\|\]]+)(?:\|([^\]]+))?\]/gi;
+                    const ctaRegex = /\[\s*(CTA|APPROVE|REVISE|BUTTON)\s*:\s*([^\|\]]+?)(?:\s*\|\s*([^\]]+?))?\s*\]/gi;
                     const ctaButtons = [];
                     let ctaMatch;
                     while ((ctaMatch = ctaRegex.exec(rawReply)) !== null) {
@@ -4130,11 +4132,12 @@ jQuery(document).ready(function($) {
                     }
 
                     // Cleanly strip all action tags and CTA tags from display text
-                    rawReply = rawReply.replace(/\[ACTION:[a-zA-Z0-9_]+\][\s\S]*?\[\/ACTION\]/g, '')
-                                       .replace(/\[ACTION:[a-zA-Z0-9_]+\]\{[\s\S]*?\}/g, '')
-                                       .replace(/\[ACTION:[a-zA-Z0-9_]+:[^\]]+\]/g, '')
-                                       .replace(/\[ACTION:[a-zA-Z0-9_]+[\s\S]*/g, '')
-                                       .replace(/\[(CTA|APPROVE|REVISE|BUTTON):[^\]]+\]/gi, '')
+                    rawReply = rawReply.replace(/\[ACTION:[a-zA-Z0-9_]+\][\s\S]*?\[\/ACTION\]/gi, '')
+                                       .replace(/\[ACTION:[a-zA-Z0-9_]+\]\{[\s\S]*?\}/gi, '')
+                                       .replace(/\[ACTION:[a-zA-Z0-9_]+:[^\]]+\]/gi, '')
+                                       .replace(/\[ACTION:[a-zA-Z0-9_]+[\s\S]*/gi, '')
+                                       .replace(/\[\s*(CTA|APPROVE|REVISE|BUTTON)\s*:[^\]]+\]/gi, '')
+                                       .replace(/\[\/ACTION\]/gi, '')
                                        .trim();
 
                     let replyHtml = rawReply;
@@ -4375,14 +4378,60 @@ jQuery(document).ready(function($) {
                         window.coraUpdateAIQuotaUI(response.data.ai_usage);
                     }
 
+                    // Automatic Real-Time Navigation Execution
+                    let autoNavUrl = response.data.navigate || '';
+                    if (!autoNavUrl && response.data.action_results) {
+                        if (typeof response.data.action_results === 'object' && !Array.isArray(response.data.action_results) && response.data.action_results.navigate) {
+                            autoNavUrl = response.data.action_results.navigate;
+                        } else if (Array.isArray(response.data.action_results)) {
+                            response.data.action_results.forEach(function(act) {
+                                if (act && (act.action === 'navigate' || act.navigate || (act.data && act.data.navigate))) {
+                                    autoNavUrl = act.navigate || (act.data && act.data.navigate) || act.url || (act.data && act.data.url);
+                                }
+                            });
+                        }
+                    }
+                    if (autoNavUrl) {
+                        setTimeout(function() {
+                            if (typeof window.coraNavigateTo === 'function') {
+                                window.coraNavigateTo(autoNavUrl);
+                            } else {
+                                window.location.href = autoNavUrl;
+                            }
+                        }, 400);
+                    }
+
                     // Render Rich Autonomous Action Result Cards
                     if (response.data.action_results && Array.isArray(response.data.action_results) && response.data.action_results.length > 0) {
                         response.data.action_results.forEach(function(act) {
-                            if (!act || !act.success || !act.data) return;
-                            const d = act.data;
+                            if (!act || !act.success) return;
+                            const d = act.data || act;
                             let cardHtml = '';
 
-                            if (act.action === 'create_article' || act.action === 'draft_article') {
+                            if (act.action === 'navigate') {
+                                cardHtml = `
+                                    <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 shadow-sm space-y-2.5 self-start max-w-[95%] w-full">
+                                        <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-2">
+                                            <div class="flex items-center gap-2">
+                                                <div class="w-6 h-6 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center font-bold text-[10px]">
+                                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                                                </div>
+                                                <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100">${d.title ? 'Opening ' + d.title : 'Navigating'}</span>
+                                            </div>
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/50">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                                Opening...
+                                            </span>
+                                        </div>
+                                        <div class="text-xs text-zinc-600 dark:text-zinc-400">
+                                            Switching view to <strong>${d.title || d.navigate || 'requested workspace module'}</strong>.
+                                        </div>
+                                        <a href="${d.url || d.navigate}" onclick="event.preventDefault(); if(typeof window.coraNavigateTo==='function'){ window.coraNavigateTo('${d.url || d.navigate}'); } else { window.location.href='${d.url || d.navigate}'; }" class="block py-1.5 text-center bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-colors">
+                                            Launch ${d.title || 'Module'} ↗
+                                        </a>
+                                    </div>
+                                `;
+                            } else if (act.action === 'create_article' || act.action === 'draft_article') {
                                 cardHtml = `
                                     <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 shadow-sm space-y-3 self-start max-w-[95%] w-full">
                                         <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-2.5">
@@ -4931,9 +4980,60 @@ jQuery(document).ready(function($) {
     window.coraHandleCtaAction = function(val, type) {
         if (!val) return;
         const trimmedVal = String(val).trim();
+        const lower = trimmedVal.toLowerCase();
 
-        // 1. Check if the value is a machine action command
-        if (trimmedVal.startsWith('action:') || ['create_article', 'create_lead', 'create_invoice', 'log_expense', 'create_form', 'create_booking', 'create_task', 'create_document', 'publish_articles', 'scan_opportunities', 'open_team_migration', 'open_permissions_matrix'].includes(trimmedVal)) {
+        // 1. Direct URL or Navigation check
+        const navTargets = {
+            'canvas': '/workspace/canvas',
+            'settings': '/workspace/settings-suite',
+            'settings-suite': '/workspace/settings-suite',
+            'settings suite': '/workspace/settings-suite',
+            'leads': '/workspace/dashboard?sub_page=leads',
+            'crm': '/workspace/dashboard?sub_page=leads',
+            'tasks': '/workspace/dashboard?sub_page=tasks',
+            'deliverables': '/workspace/dashboard?sub_page=tasks',
+            'financials': '/workspace/dashboard?sub_page=financials',
+            'invoices': '/workspace/dashboard?sub_page=financials',
+            'ledger': '/workspace/dashboard?sub_page=financials',
+            'forms': '/workspace/dashboard?sub_page=forms',
+            'form builder': '/workspace/dashboard?sub_page=forms',
+            'bookings': '/workspace/dashboard?sub_page=bookings',
+            'calendar': '/workspace/dashboard?sub_page=bookings',
+            'vault': '/workspace/dashboard?sub_page=vault',
+            'contracts': '/workspace/dashboard?sub_page=vault',
+            'blogs': '/workspace/blogs',
+            'content': '/workspace/blogs',
+            'media': '/workspace/dashboard?sub_page=media',
+            'users': '/workspace/dashboard?sub_page=users',
+            'team': '/workspace/dashboard?sub_page=users',
+            'super-admin': '/workspace/super-admin',
+            'super_admin': '/workspace/super-admin',
+            'super admin': '/workspace/super-admin',
+            'dashboard': '/workspace/dashboard'
+        };
+
+        if (trimmedVal.startsWith('/workspace/')) {
+            if (typeof window.coraNavigateTo === 'function') {
+                window.coraNavigateTo(trimmedVal);
+            } else {
+                window.location.href = trimmedVal;
+            }
+            return;
+        }
+
+        if (trimmedVal.startsWith('action:navigate:') || trimmedVal.startsWith('navigate:')) {
+            const destKey = trimmedVal.replace(/^(?:action:)?navigate:/i, '').trim().toLowerCase();
+            const targetUrl = navTargets[destKey] || `/workspace/${destKey}`;
+            if (typeof window.coraNavigateTo === 'function') {
+                window.coraNavigateTo(targetUrl);
+            } else {
+                window.location.href = targetUrl;
+            }
+            return;
+        }
+
+        // 2. Check if the value is a machine action command
+        if (trimmedVal.startsWith('action:') || ['create_article', 'draft_article', 'create_lead', 'create_invoice', 'log_expense', 'create_form', 'create_booking', 'create_task', 'create_document', 'publish_articles', 'scan_opportunities', 'open_team_migration', 'open_permissions_matrix', 'open_expense_drawer', 'open_invoice_drawer', 'open_income_drawer', 'open_simulator', 'open_lead_drawer', 'open_task_drawer', 'open_invite_drawer'].includes(trimmedVal)) {
             const actName = trimmedVal.replace(/^action:/, '');
             if (typeof window.coraExecuteCopilotAction === 'function') {
                 window.coraExecuteCopilotAction(actName, '{}');
@@ -4941,7 +5041,18 @@ jQuery(document).ready(function($) {
             }
         }
 
-        // 2. Otherwise execute the prompt directly in AI chat without requiring the user to type
+        // 3. Check for natural navigation triggers
+        const navCheck = lower.replace(/^open\s+|^go\s+to\s+|^launch\s+/i, '').trim();
+        if (navTargets[navCheck]) {
+            if (typeof window.coraNavigateTo === 'function') {
+                window.coraNavigateTo(navTargets[navCheck]);
+            } else {
+                window.location.href = navTargets[navCheck];
+            }
+            return;
+        }
+
+        // 4. Otherwise execute the prompt directly in AI chat without requiring the user to type
         if (typeof window.coraExecuteAIChat === 'function') {
             window.coraExecuteAIChat(trimmedVal);
         }
@@ -16177,7 +16288,7 @@ jQuery(document).ready(function($) {
                     .replace(/\n/g, '<br>');
 
                 // Extract interactive CTA, APPROVE, REVISE, and BUTTON pills
-                const ctaRegex = /\[(CTA|APPROVE|REVISE|BUTTON):([^\|\]]+)(?:\|([^\]]+))?\]/gi;
+                const ctaRegex = /\[\s*(CTA|APPROVE|REVISE|BUTTON)\s*:\s*([^\|\]]+?)(?:\s*\|\s*([^\]]+?))?\s*\]/gi;
                 const ctaButtons = [];
                 let ctaMatch;
                 while ((ctaMatch = ctaRegex.exec(formatted)) !== null) {
@@ -16204,8 +16315,9 @@ jQuery(document).ready(function($) {
                 }
 
                 // Cleanly strip all remaining bracketed tags from formatted display text
-                formatted = formatted.replace(/\[(CTA|APPROVE|REVISE|BUTTON):[^\]]+\]/gi, '')
+                formatted = formatted.replace(/\[\s*(CTA|APPROVE|REVISE|BUTTON)\s*:[^\]]+\]/gi, '')
                                      .replace(/\[ACTION:[^\]]+\]/gi, '')
+                                     .replace(/\[\/ACTION\]/gi, '')
                                      .trim();
 
                 // Extract action tag [ACTION:name:payload]
