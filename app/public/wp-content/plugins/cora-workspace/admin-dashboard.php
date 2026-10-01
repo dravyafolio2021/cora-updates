@@ -2086,6 +2086,9 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             opacity: 0;
             visibility: hidden;
             pointer-events: none;
+            display: inline-flex;
+            align-items: center;
+            height: 100%;
             transition: opacity 0.15s ease-in-out, visibility 0.15s ease-in-out;
         }
         .cora-nav-item:hover .cora-canvas-hover-actions,
@@ -5568,15 +5571,22 @@ body.cora-scroll-locked {
                 }
                 
                 foreach ( $nav_groups as $group ) :
+                    $visible_items = array();
+                    foreach ( $group['items'] as $target => $item ) {
+                        $super_pages = array( 'super-admin', 'super-users', 'super-finances', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-docs', 'super-ai-tokens', 'super-feature-flags', 'super-emergency', 'super-audit' );
+                        if ( ! in_array( $target, $super_pages ) && function_exists( 'cora_user_has_feature_access' ) && ! cora_user_has_feature_access( $target ) ) {
+                            continue;
+                        }
+                        $visible_items[$target] = $item;
+                    }
+                    if ( empty( $visible_items ) ) {
+                        continue;
+                    }
                 ?>
                 <div class="cora-nav-group select-none">
                     <div class="cora-nav-group-label px-3 text-[11px] font-bold text-zinc-500 uppercase select-none"><?php echo esc_html($group['label']); ?></div>
                     <ul class="cora-nav-list space-y-0.5 mt-1 select-none">
-                        <?php foreach ( $group['items'] as $target => $item ) : 
-                            $super_pages = array( 'super-admin', 'super-users', 'super-finances', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-docs', 'super-ai-tokens', 'super-feature-flags', 'super-emergency', 'super-audit' );
-                            if ( ! in_array( $target, $super_pages ) && function_exists( 'cora_user_has_feature_access' ) && ! cora_user_has_feature_access( $target ) ) {
-                                continue;
-                            }
+                        <?php foreach ( $visible_items as $target => $item ) : 
                             $nav_url = home_url( $cora_nav_prefix . '/' . $target );
                         ?>
                         <li class="list-none" data-target="<?php echo esc_attr($target); ?>">
@@ -5594,9 +5604,9 @@ body.cora-scroll-locked {
                                     <button type="button" onclick="event.preventDefault(); event.stopPropagation(); window.coraOpenLiveThemeEditor(event);" class="cora-canvas-hover-btn" title="Edit live theme" aria-label="Edit live theme">
                                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
                                     </button>
-                                    <a href="<?php echo esc_url($frontend_site_url); ?>" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation();" class="cora-canvas-hover-btn" title="View live site in new tab" aria-label="View live site in new tab">
+                                    <button type="button" onclick="event.preventDefault(); event.stopPropagation(); window.open('<?php echo esc_url($frontend_site_url); ?>', '_blank', 'noopener,noreferrer');" class="cora-canvas-hover-btn" title="View live site in new tab" aria-label="View live site in new tab">
                                         <svg viewBox="0 0 24 24" width="13.5" height="13.5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                                    </a>
+                                    </button>
                                 </div>
                                 <?php elseif ( ! empty( $item['soon'] ) ) : ?>
                                 <span class="cora-badge cora-badge-sidebar px-1.5 py-0.5 text-[9px] font-bold bg-zinc-100 text-zinc-500 rounded-full border border-zinc-200 select-none flex items-center gap-1">

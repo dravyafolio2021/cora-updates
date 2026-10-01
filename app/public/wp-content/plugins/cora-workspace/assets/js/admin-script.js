@@ -7107,10 +7107,13 @@ jQuery(document).ready(function($) {
         // Hide sidebar list items not allowed
         $('.cora-nav-item').each(function() {
             const target = $(this).data('target');
+            const $parentLi = $(this).closest('li');
             if (target && !allowed.includes(target) && !enterpriseNewModules.includes(target) && target !== 'feature-hub' && !$(this).hasClass('cora-nav-soon') && !$(this).hasClass('cora-nav-locked')) {
                 $(this).hide();
+                $parentLi.hide();
             } else {
                 $(this).show();
+                $parentLi.show();
             }
         });
 
