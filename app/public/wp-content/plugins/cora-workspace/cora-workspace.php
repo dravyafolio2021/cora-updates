@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.279
+ * Version:           4.9.280
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.279' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.280' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -62962,10 +62962,10 @@ function cora_schedule_task_notifications_cron( $force = false ) {
     );
 
     // ─────────────────────────────────────────────────────────────────────────
-    // 1. PRE-TASK UPCOMING REMINDERS (Next 15 to 30 Minutes)
+    // 1. PRE-TASK UPCOMING REMINDERS (Dynamic User Advance Windows & In-App Sync)
     // ─────────────────────────────────────────────────────────────────────────
-    $window_start = date( 'Y-m-d H:i:s', $now_ts );
-    $window_end   = date( 'Y-m-d H:i:s', $now_ts + ( 30 * MINUTE_IN_SECONDS ) );
+    $window_start = date( 'Y-m-d H:i:s', $now_ts - ( 15 * MINUTE_IN_SECONDS ) );
+    $window_end   = date( 'Y-m-d H:i:s', $now_ts + ( 75 * MINUTE_IN_SECONDS ) );
 
     $upcoming_tasks = $wpdb->get_results(
         $wpdb->prepare(
@@ -62973,11 +62973,13 @@ function cora_schedule_task_notifications_cron( $force = false ) {
              WHERE status != 'completed' 
                AND status != 'cancelled'
                AND reminder_sent = 0 
-               AND start_datetime IS NOT NULL 
-               AND start_datetime >= %s 
-               AND start_datetime <= %s",
+               AND (
+                   (start_datetime IS NOT NULL AND start_datetime >= %s AND start_datetime <= %s)
+                   OR (due_date IS NOT NULL AND start_time IS NOT NULL AND due_date = %s)
+               )",
             $window_start,
-            $window_end
+            $window_end,
+            $today_ymd
         ),
         ARRAY_A
     );
@@ -62988,31 +62990,62 @@ function cora_schedule_task_notifications_cron( $force = false ) {
             $prefs   = cora_get_user_task_preferences( $user_id );
             $in_dnd  = function_exists( 'cora_is_user_in_quiet_hours' ) ? cora_is_user_in_quiet_hours( $user_id, $prefs ) : false;
 
-            $start_ts   = strtotime( $t['start_datetime'] );
-            $mins_until = max( 1, round( ( $start_ts - $now_ts ) / 60 ) );
+            // Calculate start timestamp from start_datetime or due_date + start_time
+            $start_dt_str = ! empty( $t['start_datetime'] ) ? $t['start_datetime'] : ( ! empty( $t['due_date'] ) && ! empty( $t['start_time'] ) ? $t['due_date'] . ' ' . $t['start_time'] : '' );
+            if ( empty( $start_dt_str ) ) {
+                continue;
+            }
 
-            // A) PWA Web Push Notification
-            if ( ! empty( $prefs['push_enabled'] ) && ! $in_dnd ) {
+            $start_ts      = strtotime( $start_dt_str );
+            $mins_until    = round( ( $start_ts - $now_ts ) / 60 );
+            $advance_mins  = intval( $prefs['advance_mins'] ?? 30 );
+            if ( $advance_mins <= 0 ) {
+                $advance_mins = 30;
+            }
+
+            // Only fire if within user's configured advance alert window (or force mode)
+            if ( ! $force && ( $mins_until > $advance_mins || $mins_until < -15 ) ) {
+                continue;
+            }
+
+            $time_display = ! empty( $t['start_time'] ) ? $t['start_time'] : ( $start_ts ? date( 'H:i', $start_ts ) : 'upcoming' );
+            $time_label   = $mins_until <= 0 ? 'Starting now' : "Starts in {$mins_until}m ({$time_display})";
+            $task_title   = ! empty( $t['title'] ) ? $t['title'] : 'Task';
+            $task_cat     = ! empty( $t['category'] ) ? $t['category'] : 'General';
+            $task_prio    = strtoupper( $t['priority'] ?? 'medium' );
+            $task_url     = home_url( '/workspace/tasks' );
+
+            // A) PWA Web Push Notification (VAPID / Service Worker)
+            if ( ( ! empty( $prefs['push_enabled'] ) || $force ) && ! $in_dnd ) {
                 if ( function_exists( 'cora_pwa_send_push_notification' ) ) {
-                    $push_title = "Upcoming Task: " . ( $t['title'] ?? 'Task' );
-                    $push_body  = "Starts in {$mins_until}m ({$t['start_time']}) • Priority: " . strtoupper($t['priority'] ?? 'medium') . " • " . ($t['category'] ?? 'General');
-                    $push_url   = home_url( '/workspace/tasks' );
-                    $sent_push  = cora_pwa_send_push_notification( $user_id, $push_title, $push_body, $push_url );
+                    $push_title = "Task Reminder: {$task_title}";
+                    $push_body  = "{$time_label} • Priority: {$task_prio} • {$task_cat}";
+                    $sent_push  = cora_pwa_send_push_notification( $user_id, $push_title, $push_body, $task_url );
                     if ( $sent_push ) {
                         $dispatched['pre_task_push']++;
                     }
                 }
             }
 
-            // B) Monochromatic Email Reminder
-            if ( ! empty( $prefs['email_alerts'] ) && ! $in_dnd ) {
-                $user_obj = get_userdata( $user_id );
+            // B) Monochromatic In-App Bell Notification & Notification Drawer
+            if ( function_exists( 'cora_add_notification' ) ) {
+                cora_add_notification(
+                    $user_id,
+                    "Task Reminder: {$task_title}",
+                    "{$time_label} • Priority: {$task_prio} • {$task_cat}",
+                    $task_url
+                );
+            }
+
+            // C) Monochromatic HTML Email Reminder
+            if ( ( ! empty( $prefs['email_alerts'] ) || ! empty( $prefs['email_enabled'] ) || $force ) && ! $in_dnd ) {
+                $user_obj     = get_userdata( $user_id );
                 $target_email = ! empty( $prefs['custom_email'] ) ? $prefs['custom_email'] : ( $user_obj ? $user_obj->user_email : '' );
                 $display_name = $user_obj ? $user_obj->display_name : 'Workspace User';
 
                 if ( ! empty( $target_email ) && is_email( $target_email ) ) {
-                    $subject = "Reminder: " . ( $t['title'] ?? 'Upcoming Task' ) . " starts in {$mins_until}m";
-                    $html = cora_build_task_reminder_email_html( $display_name, $t, $mins_until );
+                    $subject = "Reminder: {$task_title} " . ( $mins_until <= 0 ? "starts now" : "starts in {$mins_until}m" );
+                    $html    = cora_build_task_reminder_email_html( $display_name, $t, max( 0, $mins_until ) );
                     $headers = array( 'Content-Type: text/html; charset=UTF-8' );
                     if ( @wp_mail( $target_email, $subject, $html, $headers ) ) {
                         $dispatched['pre_task_email']++;
@@ -63020,7 +63053,7 @@ function cora_schedule_task_notifications_cron( $force = false ) {
                 }
             }
 
-            // Mark reminder_sent in database table and workspace cache
+            // Mark reminder_sent in database table
             $wpdb->update( $table_name, array( 'reminder_sent' => 1, 'updated_at' => $now_mysql ), array( 'id' => $t['id'] ) );
         }
     }
@@ -63380,6 +63413,19 @@ function cora_ajax_trigger_task_cron() {
     $results = cora_schedule_task_notifications_cron( $force );
     wp_send_json_success( array(
         'message' => 'Task notifications cron executed.',
+        'stats'   => $results
+    ) );
+}
+}
+
+add_action( 'wp_ajax_cora_check_task_alerts', 'cora_ajax_check_task_alerts' );
+if ( ! function_exists( 'cora_ajax_check_task_alerts' ) ) {
+function cora_ajax_check_task_alerts() {
+    check_ajax_referer( 'cora_ajax_nonce', 'security' );
+    $force = ! empty( $_POST['force'] );
+    $results = cora_schedule_task_notifications_cron( $force );
+    wp_send_json_success( array(
+        'message' => 'Task alert check completed.',
         'stats'   => $results
     ) );
 }

@@ -19920,4 +19920,47 @@ jQuery(document).on('click', '#mobile-tabs-more-dropdown .cora-sub-tab, .mobile-
         window.coraUpdateStickyOffsets();
     }
 
+    // Real-Time Task Schedule Alert Heartbeat (Runs on load, tab visibility change, and 60-second intervals)
+    let lastAlertCheck = 0;
+    function coraHeartbeatTaskAlerts() {
+        const now = Date.now();
+        if (now - lastAlertCheck < 25000) return; // Debounce 25s
+        lastAlertCheck = now;
+        
+        if (typeof ajaxurl === 'undefined' && typeof cora_admin_vars === 'undefined') return;
+        const targetUrl = typeof ajaxurl !== 'undefined' ? ajaxurl : (cora_admin_vars && cora_admin_vars.ajax_url ? cora_admin_vars.ajax_url : '/wp-admin/admin-ajax.php');
+        const nonce = (typeof cora_admin_vars !== 'undefined' && cora_admin_vars.nonce) ? cora_admin_vars.nonce : ((typeof window.cora_nonce !== 'undefined') ? window.cora_nonce : '');
+
+        if (!nonce) return;
+
+        $.ajax({
+            url: targetUrl,
+            type: 'POST',
+            data: {
+                action: 'cora_check_task_alerts',
+                security: nonce
+            },
+            dataType: 'json',
+            success: function(res) {
+                if (res && res.success && res.data && res.data.stats && (res.data.stats.pre_task_push > 0 || res.data.stats.pre_task_email > 0)) {
+                    if (typeof window.coraFetchNotifications === 'function') {
+                        window.coraFetchNotifications();
+                    }
+                }
+            }
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => setTimeout(coraHeartbeatTaskAlerts, 2000));
+    } else {
+        setTimeout(coraHeartbeatTaskAlerts, 2000);
+    }
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+            coraHeartbeatTaskAlerts();
+        }
+    });
+    setInterval(coraHeartbeatTaskAlerts, 60000);
+
 })(jQuery);

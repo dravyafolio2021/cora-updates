@@ -1105,27 +1105,7 @@ function _cora_fmt_k( $n ) {
     });
 
     // ─── Keyboard Shortcuts ─────────────────────────────────────────
-    // Intercept Command Palette (⌘K / Ctrl+K) to open floating agent
-    var originalOpenCommandPalette = window.coraOpenCommandPalette;
-    Object.defineProperty(window, 'coraOpenCommandPalette', {
-        get: function() {
-            return function() {
-                var pill = document.getElementById('cora-agent-pill');
-                var board = document.getElementById('cora-agent-board');
-                if (pill || board) {
-                    window.coraExpandAgent();
-                    return;
-                }
-                if (typeof originalOpenCommandPalette === 'function') {
-                    originalOpenCommandPalette();
-                }
-            };
-        },
-        set: function(val) {
-            originalOpenCommandPalette = val;
-        },
-        configurable: true
-    });
+    // Escape to collapse
 
     // Escape to collapse
     document.addEventListener('keydown', function(e) {
