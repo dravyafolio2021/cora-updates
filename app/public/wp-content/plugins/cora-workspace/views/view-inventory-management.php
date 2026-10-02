@@ -1197,16 +1197,20 @@ body.cora-inventory-focus-mode .cora-sidebar-search {
 
         <!-- Allotted Van Stock (Cargo on Wheels) -->
         <div id="cora-vendor-van-stock-card" class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 shadow-2xs">
-            <div class="flex items-center justify-between mb-3">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
                 <div class="flex items-center gap-2">
                     <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
                     <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-300">Allotted Van Inventory</h3>
                 </div>
-                <div class="flex items-center gap-2">
-                    <span id="cora-vendor-van-stock-badge" class="px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300">0 SKUs</span>
-                    <button type="button" onclick="CoraInventory.printVanStock()" class="py-1 px-2.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-[11px] font-semibold flex items-center gap-1 transition-colors cursor-pointer" title="Print Current Van Inventory & Cargo Sheet">
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
-                        <span>Print Van Stock</span>
+                <div class="flex flex-wrap items-center gap-1.5">
+                    <span id="cora-vendor-van-stock-badge" class="px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 border border-zinc-200/60 dark:border-zinc-700/60">0 SKUs</span>
+                    <button type="button" onclick="CoraInventory.exportVanStockCSV()" class="inline-flex items-center gap-1.5 py-1 px-2.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white hover:bg-zinc-50 dark:bg-zinc-800 dark:hover:bg-zinc-700/80 text-zinc-700 dark:text-zinc-200 active:scale-98 text-[11px] font-semibold shadow-2xs transition-all cursor-pointer whitespace-nowrap" title="Export Inventory Details to CSV">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        <span>Export CSV</span>
+                    </button>
+                    <button type="button" onclick="CoraInventory.printVanStock()" class="inline-flex items-center gap-1.5 py-1 px-2.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white hover:bg-zinc-50 dark:bg-zinc-800 dark:hover:bg-zinc-700/80 text-zinc-700 dark:text-zinc-200 active:scale-98 text-[11px] font-semibold shadow-2xs transition-all cursor-pointer whitespace-nowrap" title="Print Current Van Inventory & Cargo Sheet">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                        <span>Print Report</span>
                     </button>
                 </div>
             </div>
@@ -1217,18 +1221,18 @@ body.cora-inventory-focus-mode .cora-sidebar-search {
 
         <!-- Today's Live Sales Ledger for Vendor -->
         <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 shadow-2xs">
-            <div class="flex items-center justify-between mb-3">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
                 <div class="flex items-center gap-2">
                     <span class="w-2 h-2 rounded-full bg-zinc-900 dark:bg-zinc-100"></span>
                     <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-300">Today's Spot Invoices</h3>
                 </div>
-                <div class="flex items-center gap-1.5">
-                    <button type="button" onclick="CoraInventory.exportSalesCSV('vendor')" class="py-1 px-2.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-[11px] font-semibold flex items-center gap-1 transition-colors cursor-pointer" title="Export Invoices as CSV Table">
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                <div class="flex flex-wrap items-center gap-1.5">
+                    <button type="button" onclick="CoraInventory.exportSalesCSV('vendor')" class="inline-flex items-center gap-1.5 py-1 px-2.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white hover:bg-zinc-50 dark:bg-zinc-800 dark:hover:bg-zinc-700/80 text-zinc-700 dark:text-zinc-200 active:scale-98 text-[11px] font-semibold shadow-2xs transition-all cursor-pointer whitespace-nowrap" title="Export Invoices as CSV Table">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                         <span>Export CSV</span>
                     </button>
-                    <button type="button" onclick="CoraInventory.printSalesRegister('today')" class="py-1 px-2.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-white text-[11px] font-semibold flex items-center gap-1 transition-colors cursor-pointer" title="Print Spot Invoices Table">
-                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                    <button type="button" onclick="CoraInventory.printSalesRegister('today')" class="inline-flex items-center gap-1.5 py-1 px-2.5 rounded-lg border border-zinc-900 dark:border-zinc-100 bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-white active:scale-98 text-[11px] font-semibold shadow-2xs transition-all cursor-pointer whitespace-nowrap" title="Print Spot Invoices Table">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
                         <span>Print Table</span>
                     </button>
                 </div>
@@ -6481,7 +6485,8 @@ window.CoraInventory = (function($) {
 
         const params = {
             action: 'cora_inventory_render_van_stock_sheet',
-            autoprint: 1
+            autoprint: 1,
+            security: window.cora_nonce || '<?php echo wp_create_nonce("cora_ajax_nonce"); ?>'
         };
         if (targetConsignmentId) {
             params.consignment_id = targetConsignmentId;
@@ -6493,6 +6498,16 @@ window.CoraInventory = (function($) {
             window.coraShowToast('Opening printable Van Stock & Cargo Manifest...', 'info');
         }
         window.open(url, '_blank', 'width=1100,height=960,scrollbars=yes,status=yes');
+    }
+
+    function exportVanStockCSV(consignmentId) {
+        const targetConsignmentId = consignmentId || activeConsignmentId || 0;
+        const nonce = window.cora_nonce || '<?php echo wp_create_nonce("cora_ajax_nonce"); ?>';
+        const url = (ajaxurl || '/wp-admin/admin-ajax.php') + '?action=cora_inventory_export_van_stock_csv&download=1&security=' + encodeURIComponent(nonce) + (targetConsignmentId ? '&consignment_id=' + encodeURIComponent(targetConsignmentId) : '');
+        if (window.coraShowToast) {
+            window.coraShowToast('Exporting Inventory Detail CSV...', 'info');
+        }
+        window.location.href = url;
     }
 
     function openEditSaleModal(saleId) {
@@ -7594,6 +7609,7 @@ window.CoraInventory = (function($) {
         loadVendorDashboard,
         printSaleInvoice,
         printVanStock,
+        exportVanStockCSV,
         openEditSaleModal,
         closeEditSaleModal,
         submitUpdateSale,

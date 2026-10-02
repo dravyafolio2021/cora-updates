@@ -50,6 +50,7 @@ class Cora_Inventory_Engine {
         add_action( 'wp_ajax_cora_inventory_export_sales_csv', array( __CLASS__, 'ajax_export_sales_csv' ) );
         add_action( 'wp_ajax_cora_inventory_render_sales_register_pdf', array( __CLASS__, 'ajax_render_sales_register_pdf' ) );
         add_action( 'wp_ajax_cora_inventory_render_van_stock_sheet', array( __CLASS__, 'ajax_render_van_stock_sheet' ) );
+        add_action( 'wp_ajax_cora_inventory_export_van_stock_csv', array( __CLASS__, 'ajax_export_van_stock_csv' ) );
         add_action( 'wp_ajax_cora_inventory_seed_demo_data', array( __CLASS__, 'ajax_seed_demo_data' ) );
 
         // Purge legacy demo seed data from existing installations
@@ -6121,16 +6122,20 @@ class Cora_Inventory_Engine {
             }
         }
 
-        // If the resolved consignment has 0 items, check if a consignment with loaded cargo exists
-        if ( $consignment && cora_table_exists( $table_c_items ) ) {
-            $has_items = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table_c_items} WHERE consignment_id = %d", $consignment_id ) );
+        // If the resolved consignment has 0 items or no consignment found, find the latest consignment with items
+        if ( cora_table_exists( $table_c_items ) ) {
+            $has_items = ( $consignment && $consignment_id > 0 ) ? (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table_c_items} WHERE consignment_id = %d", $consignment_id ) ) : 0;
             if ( ! $has_items ) {
                 $alt_csn_id = $wpdb->get_var(
                     $wpdb->prepare(
-                        "SELECT c.id FROM {$table_consignments} c INNER JOIN {$table_c_items} ci ON c.id = ci.consignment_id WHERE c.agency_id = %d ORDER BY c.id DESC LIMIT 1",
+                        "SELECT c.id FROM {$table_consignments} c INNER JOIN {$table_c_items} ci ON c.id = ci.consignment_id WHERE (c.agency_id = %d OR %d = 1) ORDER BY c.id DESC LIMIT 1",
+                        $agency_id,
                         $agency_id
                     )
                 );
+                if ( ! $alt_csn_id ) {
+                    $alt_csn_id = $wpdb->get_var( "SELECT c.id FROM {$table_consignments} c INNER JOIN {$table_c_items} ci ON c.id = ci.consignment_id ORDER BY c.id DESC LIMIT 1" );
+                }
                 if ( $alt_csn_id ) {
                     $consignment_id = intval( $alt_csn_id );
                     $consignment = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table_consignments} WHERE id = %d", $consignment_id ), ARRAY_A );
@@ -6173,7 +6178,6 @@ class Cora_Inventory_Engine {
                             p.category,
                             p.pricing_type as p_pricing_type,
                             p.wholesale_price,
-                            p.weight_rate as p_weight_rate,
                             p.unit_weight_grams as p_weight_g,
                             p.uom,
                             p.hsn_code
@@ -6307,26 +6311,26 @@ class Cora_Inventory_Engine {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>गाड़ी में उपलब्ध माल पत्रक - Cora Van Inventory &amp; Available Cargo Manifest (<?php echo esc_attr( $consignment_no ); ?>)</title>
+    <title>Detail - Van Inventory &amp; Available Cargo Manifest (<?php echo esc_attr( $consignment_no ); ?>)</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         @page {
-            size: A4 landscape;
-            margin: 8mm 10mm;
+            size: A4 portrait;
+            margin: 12mm 12mm;
         }
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: #f4f4f5;
             color: #09090b;
-            padding: 16px 20px;
+            padding: 20px;
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
         }
         .no-print-bar {
-            max-width: 1200px;
+            max-width: 900px;
             margin: 0 auto 16px auto;
             display: flex;
             align-items: center;
@@ -6363,11 +6367,11 @@ class Cora_Inventory_Engine {
         .btn-secondary:hover { background: #f4f4f5; }
 
         .sheet-container {
-            max-width: 1200px;
+            max-width: 900px;
             margin: 0 auto;
             background: #ffffff;
             border: 1px solid #e4e4e7;
-            border-radius: 12px;
+            border-radius: 14px;
             padding: 24px 28px;
             box-shadow: 0 4px 16px rgba(0,0,0,0.04);
         }
@@ -6383,234 +6387,162 @@ class Cora_Inventory_Engine {
             }
         }
 
-        /* Header Bar */
-        .sheet-header {
+        /* Detail Section Header */
+        .detail-top-bar {
             display: flex;
+            align-items: center;
             justify-content: space-between;
-            align-items: flex-start;
-            padding-bottom: 14px;
-            border-bottom: 2.5px solid #09090b;
-            margin-bottom: 14px;
+            padding-bottom: 12px;
+            margin-bottom: 2px;
         }
-        .company-brand {
-            font-size: 11px;
-            font-weight: 800;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            color: #71717a;
-        }
-        .sheet-main-title {
-            font-size: 20px;
-            font-weight: 900;
-            letter-spacing: -0.02em;
-            color: #09090b;
-            margin-top: 2px;
-        }
-        .sheet-hindi-title {
-            font-size: 13px;
-            font-weight: 700;
-            color: #3f3f46;
-            margin-top: 2px;
-        }
-        .sheet-header-meta {
-            text-align: right;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 11px;
-            color: #52525b;
-            line-height: 1.5;
-        }
-        .csn-pill {
-            display: inline-block;
-            background: #09090b;
-            color: #ffffff;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-weight: 800;
-            margin-bottom: 4px;
-            font-size: 11.5px;
-            letter-spacing: 0.02em;
-        }
-
-        /* KPI Cards Grid */
-        .kpi-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-        .kpi-card {
-            background: #fafafa;
-            border: 1px solid #e4e4e7;
-            border-radius: 8px;
-            padding: 10px 14px;
-        }
-        .kpi-label {
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            color: #71717a;
-            margin-bottom: 4px;
-        }
-        .kpi-val {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 16px;
+        .detail-title {
+            font-size: 18px;
             font-weight: 800;
             color: #09090b;
+            letter-spacing: -0.01em;
+        }
+        .detail-count {
+            font-size: 12px;
+            color: #71717a;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
         }
 
-        /* Solid Outline & Dotted Interior Grid */
+        /* Clean High-Contrast Table */
         .sheet-table-wrapper {
             width: 100%;
             overflow: hidden;
-            border: 2px solid #09090b;
+            border-radius: 6px;
             background: #ffffff;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
         }
-        table.sheet-table {
+        table.detail-table {
             width: 100%;
-            table-layout: fixed;
             border-collapse: collapse;
-            font-size: 11.5px;
+            font-size: 13px;
             text-align: left;
         }
-        table.sheet-table th {
-            background: #f4f4f5;
-            color: #09090b;
-            font-family: 'JetBrains Mono', monospace;
-            font-weight: 800;
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.03em;
-            padding: 8px 6px;
-            border-bottom: 2px solid #09090b;
-            border-right: 1px dotted #71717a;
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-        }
-        table.sheet-table th:last-child {
-            border-right: none;
-        }
-        table.sheet-table td {
-            padding: 7px 6px;
-            color: #09090b;
-            font-size: 11px;
-            border-bottom: 1px dotted #71717a;
-            border-right: 1px dotted #71717a;
-            vertical-align: top;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-        }
-        table.sheet-table td:last-child {
-            border-right: none;
-        }
-        table.sheet-table tbody tr:last-child td {
-            border-bottom: 2px solid #09090b;
-        }
-        table.sheet-table tfoot td {
-            background: #f4f4f5;
-            font-weight: 800;
-            font-family: 'JetBrains Mono', monospace;
-            padding: 8px 6px;
-            border-right: 1px dotted #71717a;
-            border-bottom: none;
-            color: #09090b;
-        }
-        table.sheet-table tfoot td:last-child {
-            border-right: none;
-        }
-
-        .text-right { text-align: right; }
-        .text-center { text-align: center; }
-        .font-mono { font-family: 'JetBrains Mono', monospace; }
-        .font-semibold { font-weight: 600; }
-        .font-bold { font-weight: 800; }
-
-        .type-badge {
-            display: inline-block;
-            font-size: 9.5px;
-            font-weight: 700;
-            padding: 1px 5px;
-            border-radius: 4px;
-            text-transform: uppercase;
-        }
-        .badge-weight {
-            background: #18181b;
+        table.detail-table thead tr {
+            background: #141416;
             color: #ffffff;
-            border: 1px solid #18181b;
         }
-        .badge-unit {
-            background: #f4f4f5;
-            color: #27272a;
-            border: 1px solid #d4d4d8;
-        }
-
-        .avail-highlight {
-            font-weight: 800;
-            color: #09090b;
-        }
-
-        /* Summary Footer */
-        .sheet-footer-grid {
-            display: grid;
-            grid-template-columns: 1.4fr 1fr;
-            gap: 20px;
-            margin-top: 10px;
-        }
-        .words-card {
-            border: 1px solid #e4e4e7;
-            background: #fafafa;
-            border-radius: 8px;
-            padding: 12px 16px;
-        }
-        .words-card h5 {
-            font-size: 10px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: #71717a;
-            margin-bottom: 4px;
-        }
-        .words-val {
-            font-size: 12.5px;
+        table.detail-table th {
+            color: #ffffff;
             font-weight: 700;
+            font-size: 13px;
+            padding: 12px 16px;
+            letter-spacing: 0.01em;
+            border: none;
+        }
+        table.detail-table th.col-num {
+            width: 50px;
+            text-align: center;
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+        table.detail-table th.col-qty-type {
+            width: 180px;
+            text-align: left;
+        }
+        table.detail-table th.col-qty {
+            width: 150px;
+            text-align: right;
+            padding-right: 20px;
+        }
+
+        table.detail-table tbody tr {
+            border-bottom: 1px solid #f4f4f5;
+            transition: background 0.1s;
+        }
+        table.detail-table tbody tr:last-child {
+            border-bottom: 1px solid #e4e4e7;
+        }
+        table.detail-table td {
+            padding: 14px 16px;
+            color: #09090b;
+            vertical-align: middle;
+        }
+        table.detail-table td.col-num {
+            text-align: center;
+            font-size: 13px;
+            color: #27272a;
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+        .item-name-title {
+            font-weight: 700;
+            color: #09090b;
+            font-size: 13.5px;
+            line-height: 1.35;
+        }
+        .item-sku-sub {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: #71717a;
+            margin-top: 3px;
+            letter-spacing: 0.02em;
+        }
+        .qty-type-text {
+            color: #71717a;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .qty-val-text {
+            text-align: right;
+            padding-right: 20px;
+            font-weight: 800;
+            font-size: 14px;
             color: #09090b;
             font-family: 'JetBrains Mono', monospace;
         }
 
-        .summary-card {
+        /* Manifest Meta Pill & Summary */
+        .meta-strip {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #fafafa;
             border: 1px solid #e4e4e7;
-            background: #ffffff;
             border-radius: 8px;
             padding: 10px 14px;
+            margin-bottom: 18px;
+            font-size: 12px;
+            color: #52525b;
         }
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            font-size: 11.5px;
-            padding: 3px 0;
-            font-family: 'JetBrains Mono', monospace;
+        .meta-strip strong {
+            color: #09090b;
         }
 
-        .signature-row {
+        .summary-box {
             display: flex;
             justify-content: space-between;
-            margin-top: 36px;
-            padding-top: 12px;
+            align-items: center;
+            padding: 12px 16px;
+            background: #fafafa;
+            border: 1px solid #e4e4e7;
+            border-radius: 8px;
+            margin-top: 14px;
+            font-size: 12.5px;
+        }
+
+        .sig-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 32px;
+            padding-top: 10px;
         }
         .sig-box {
             text-align: center;
-            width: 220px;
+            width: 180px;
         }
         .sig-line {
             border-top: 1.5px solid #09090b;
             margin-bottom: 5px;
         }
-        .sig-title {
-            font-size: 10.5px;
+        .sig-lbl {
+            font-size: 11px;
             font-weight: 700;
-            color: #3f3f46;
+            color: #52525b;
         }
     </style>
 </head>
@@ -6619,163 +6551,100 @@ class Cora_Inventory_Engine {
     <!-- Top Non-Print Toolbar -->
     <div class="no-print-bar">
         <div style="display:flex; align-items:center; gap:12px;">
-            <a href="javascript:window.history.back()" class="btn-action btn-secondary">&larr; Back to Inventory</a>
-            <span style="font-size:12px; color:#71717a; font-family:'JetBrains Mono', monospace;">Cora Van Inventory &amp; Available Cargo Manifest</span>
+            <a href="javascript:window.history.back()" class="btn-action btn-secondary">&larr; Back to Dashboard</a>
+            <span style="font-size:12px; color:#71717a; font-family:'JetBrains Mono', monospace;">Inventory Manifest (<?php echo esc_html( $consignment_no ); ?>)</span>
         </div>
         <div style="display:flex; align-items:center; gap:8px;">
-            <button type="button" class="btn-action btn-secondary" onclick="window.close()">
-                <span>Close</span>
-            </button>
+            <a href="<?php echo esc_url( admin_url( 'admin-ajax.php?action=cora_inventory_export_van_stock_csv&consignment_id=' . $consignment_id . '&download=1' ) ); ?>" class="btn-action btn-secondary">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                <span>Export CSV</span>
+            </a>
             <button type="button" class="btn-action btn-primary" onclick="window.print()">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
-                <span>Print Van Stock Manifest</span>
+                <span>Print Report</span>
             </button>
         </div>
     </div>
 
     <div class="sheet-container">
 
-        <!-- Header -->
-        <div class="sheet-header">
+        <!-- Consignment Info Strip -->
+        <div class="meta-strip">
             <div>
-                <div class="company-brand">CORA CENTRAL LOGISTICS &bull; STATIONERY MANUFACTURING</div>
-                <div class="sheet-main-title">Cora Van Inventory &amp; Available Cargo Manifest</div>
-                <div class="sheet-hindi-title">गाड़ी में उपलब्ध माल पत्रक (Live Dispatch &amp; On-Road Stock Ledger)</div>
+                <strong>Consignment:</strong> <?php echo esc_html( $consignment_no ); ?> &bull; 
+                <strong>Vehicle:</strong> <?php echo esc_html( $vehicle_no ); ?>
             </div>
-            <div class="sheet-header-meta">
-                <div class="csn-pill">Consignment #<?php echo esc_html( $consignment_no ); ?></div>
-                <div><strong>Vehicle No:</strong> <?php echo esc_html( $vehicle_no ); ?></div>
-                <div><strong>Route / Target:</strong> <?php echo esc_html( $route_name ); ?></div>
-                <div><strong>Driver / Field Rep:</strong> <?php echo esc_html( $driver_name ); ?><?php echo ! empty( $driver_phone ) ? ' (' . esc_html( $driver_phone ) . ')' : ''; ?></div>
-                <div><strong>Manifest Date:</strong> <?php echo esc_html( date( 'd M Y', strtotime( $dispatch_date ) ) ); ?></div>
+            <div>
+                <strong>Route:</strong> <?php echo esc_html( $route_name ); ?> &bull; 
+                <strong>Date:</strong> <?php echo esc_html( date( 'd M Y', strtotime( $dispatch_date ) ) ); ?>
             </div>
         </div>
 
-        <!-- 4 KPI Metrics Chips Grid -->
-        <div class="kpi-grid">
-            <div class="kpi-card">
-                <div class="kpi-label">Total Cargo on Wheels (₹)</div>
-                <div class="kpi-val">₹<?php echo number_format( $total_available_val, 2 ); ?></div>
-            </div>
-            <div class="kpi-card">
-                <div class="kpi-label">Available Weight (Kg)</div>
-                <div class="kpi-val"><?php echo number_format( $total_available_weight_kg, 2 ); ?> Kg</div>
-            </div>
-            <div class="kpi-card">
-                <div class="kpi-label">Available Units</div>
-                <div class="kpi-val"><?php echo number_format( $total_available_units ); ?> Pcs</div>
-            </div>
-            <div class="kpi-card">
-                <div class="kpi-label">Total SKUs</div>
-                <div class="kpi-val"><?php echo intval( $total_skus ); ?> Items</div>
-            </div>
+        <!-- Detail Header -->
+        <div class="detail-top-bar">
+            <div class="detail-title">Detail</div>
+            <div class="detail-count"><?php echo count( $items ); ?> line items</div>
         </div>
 
-        <!-- Solid Outline & Dotted Interior Table -->
+        <!-- Inventory Report Table (Matching Mockup) -->
         <div class="sheet-table-wrapper">
-            <table class="sheet-table">
+            <table class="detail-table">
                 <thead>
                     <tr>
-                        <th style="width: 32px;" class="text-center">#</th>
-                        <th style="width: 220px;">Product Name / Specification</th>
-                        <th style="width: 90px;" class="text-center">SKU</th>
-                        <th style="width: 85px;" class="text-center">Type</th>
-                        <th style="width: 95px;" class="text-right">Dispatched</th>
-                        <th style="width: 85px;" class="text-right">Sold</th>
-                        <th style="width: 135px;" class="text-right">Available on Van (गाड़ी में शेष)</th>
-                        <th style="width: 85px;" class="text-right">Rate (₹)</th>
-                        <th style="width: 110px;" class="text-right">Available Value (₹)</th>
+                        <th class="col-num">#</th>
+                        <th>Item Name</th>
+                        <th class="col-qty-type">Quantity Type</th>
+                        <th class="col-qty">Quantity</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if ( ! empty( $items ) ) : ?>
                         <?php foreach ( $items as $idx => $it ) : 
-                            $disp_str  = $it['is_weight'] ? ( number_format( $it['disp_wt'], 2 ) . ' kg' ) : ( number_format( $it['disp_qty'] ) . ' units' );
-                            $sold_str  = $it['is_weight'] ? ( number_format( $it['sold_wt'], 2 ) . ' kg' ) : ( number_format( $it['sold_qty'] ) . ' units' );
-                            $avail_str = $it['is_weight'] ? ( number_format( $it['avail_wt'], 2 ) . ' kg' ) : ( number_format( $it['avail_qty'] ) . ' units' );
+                            $qty_type_label = $it['is_weight'] ? 'Weight' : 'Unit';
+                            $qty_str = $it['is_weight'] 
+                                ? ( number_format( $it['disp_wt'] > 0 ? $it['disp_wt'] : $it['avail_wt'], 2 ) . ' kg' )
+                                : ( intval( $it['disp_qty'] > 0 ? $it['disp_qty'] : $it['avail_qty'] ) . ' Pcs' );
                         ?>
                             <tr>
-                                <td class="text-center font-mono"><?php echo intval( $idx + 1 ); ?></td>
+                                <td class="col-num"><?php echo intval( $idx + 1 ); ?></td>
                                 <td>
-                                    <div class="font-semibold"><?php echo esc_html( $it['name'] ); ?></div>
-                                    <?php if ( ! empty( $it['unit_wt_g'] ) && $it['unit_wt_g'] > 0 ) : ?>
-                                        <div style="font-size: 9.5px; color: #71717a; margin-top: 1px;">Spec: <?php echo esc_html( $it['unit_wt_g'] ); ?>g per notebook/unit</div>
-                                    <?php endif; ?>
+                                    <div class="item-name-title"><?php echo esc_html( $it['name'] ); ?></div>
+                                    <div class="item-sku-sub"><?php echo esc_html( $it['sku'] ); ?></div>
                                 </td>
-                                <td class="text-center font-mono" style="font-size: 10.5px; color: #52525b;"><?php echo esc_html( $it['sku'] ); ?></td>
-                                <td class="text-center">
-                                    <?php if ( $it['is_weight'] ) : ?>
-                                        <span class="type-badge badge-weight font-mono">⚖️ Weight</span>
-                                    <?php else : ?>
-                                        <span class="type-badge badge-unit font-mono">📦 Unit</span>
-                                    <?php endif; ?>
-                                </td>
-                                <td class="text-right font-mono"><?php echo esc_html( $disp_str ); ?></td>
-                                <td class="text-right font-mono" style="color: #52525b;"><?php echo esc_html( $sold_str ); ?></td>
-                                <td class="text-right font-mono avail-highlight"><?php echo esc_html( $avail_str ); ?></td>
-                                <td class="text-right font-mono"><?php echo esc_html( $it['rate_display'] ); ?></td>
-                                <td class="text-right font-mono font-bold">₹<?php echo number_format( $it['avail_val'], 2 ); ?></td>
+                                <td class="qty-type-text"><?php echo esc_html( $qty_type_label ); ?></td>
+                                <td class="qty-val-text"><?php echo esc_html( $qty_str ); ?></td>
                             </tr>
                         <?php endforeach; ?>
                     <?php else : ?>
                         <tr>
-                            <td colspan="9" class="text-center" style="padding: 24px; color: #71717a;">No items currently loaded or dispatched in this consignment.</td>
+                            <td colspan="4" style="padding: 28px; text-align: center; color: #71717a;">No items found in this inventory dispatch.</td>
                         </tr>
                     <?php endif; ?>
                 </tbody>
-                <tfoot>
-                    <tr>
-                        <td colspan="4" class="font-bold text-right" style="padding-right: 12px;">GRAND TOTALS (कुल उपलब्ध माल):</td>
-                        <td class="text-right font-mono font-bold"><?php echo number_format( $total_dispatched_weight_kg, 2 ); ?> kg</td>
-                        <td class="text-right font-mono font-bold" style="color: #52525b;"><?php echo number_format( $total_sold_weight_kg, 2 ); ?> kg</td>
-                        <td class="text-right font-mono font-bold">
-                            <?php echo number_format( $total_available_weight_kg, 2 ); ?> kg / <?php echo number_format( $total_available_units ); ?> pcs
-                        </td>
-                        <td class="text-center font-mono">—</td>
-                        <td class="text-right font-mono font-bold" style="font-size: 12.5px;">₹<?php echo number_format( $total_available_val, 2 ); ?></td>
-                    </tr>
-                </tfoot>
             </table>
         </div>
 
-        <!-- Footer Breakdown & Signatures -->
-        <div class="sheet-footer-grid">
-            <div class="words-card">
-                <h5>Total Available Cargo Value in Words</h5>
-                <div class="words-val"><?php echo esc_html( $amt_in_words ); ?></div>
-                <div style="font-size: 10px; color: #71717a; margin-top: 8px; line-height: 1.4;">
-                    Live Van Inventory &amp; Dispatch Cargo Manifest verified under Cora Multi-Tenant Manufacturing System. All items remaining in vehicle are subject to day-end physical reconciliation at central factory gates.
-                </div>
+        <!-- Summary Strip -->
+        <div class="summary-box">
+            <div>
+                <strong>Total Allocated Cargo:</strong> 
+                <?php echo number_format( $total_dispatched_weight_kg > 0 ? $total_dispatched_weight_kg : $total_available_weight_kg, 2 ); ?> kg &bull; 
+                <?php echo number_format( $total_dispatched_units > 0 ? $total_dispatched_units : $total_available_units ); ?> Pcs
             </div>
-            <div class="summary-card">
-                <div class="summary-row" style="border-bottom: 1px solid #f4f4f5; padding-bottom: 5px; font-weight: 700;">
-                    <span>Consignment Cargo Summary</span>
-                    <span>Value (₹)</span>
-                </div>
-                <div class="summary-row">
-                    <span style="color:#52525b;">Total Dispatched Value:</span>
-                    <span class="font-bold">₹<?php echo number_format( $total_dispatched_val, 2 ); ?></span>
-                </div>
-                <div class="summary-row">
-                    <span style="color:#52525b;">Realized Spot Sales:</span>
-                    <span class="font-bold">₹<?php echo number_format( $total_sold_val, 2 ); ?></span>
-                </div>
-                <div class="summary-row" style="border-top: 1px solid #e4e4e7; margin-top: 4px; padding-top: 4px;">
-                    <span style="color:#09090b; font-weight: 800;">Available on Wheels:</span>
-                    <span class="font-bold" style="color:#09090b;">₹<?php echo number_format( $total_available_val, 2 ); ?></span>
-                </div>
+            <div>
+                <strong>Total Line Items:</strong> <?php echo intval( $total_skus ); ?> SKUs
             </div>
         </div>
 
         <!-- Signatures -->
-        <div class="signature-row">
+        <div class="sig-row">
             <div class="sig-box">
                 <div class="sig-line"></div>
-                <div class="sig-title">Field Driver / Van Incharge</div>
+                <div class="sig-lbl">Field Representative</div>
             </div>
             <div class="sig-box">
                 <div class="sig-line"></div>
-                <div class="sig-title">Factory Dispatcher / Plant Supervisor</div>
+                <div class="sig-lbl">Authorized Dispatcher</div>
             </div>
         </div>
 
@@ -6793,6 +6662,171 @@ class Cora_Inventory_Engine {
 </html>
         <?php
         exit;
+    }
+
+    /**
+     * AJAX Endpoint: Export Van Stock Manifest to CSV matching the Detail table structure.
+     * Columns: Serial Number, Item Name, SKU, Quantity Type, Quantity
+     */
+    public static function ajax_export_van_stock_csv() {
+        global $wpdb;
+
+        $agency_id          = self::get_agency_id();
+        $consignment_id     = intval( $_REQUEST['consignment_id'] ?? 0 );
+        $user_id            = get_current_user_id();
+        $curr_user          = wp_get_current_user();
+
+        $table_consignments = $wpdb->prefix . 'cora_inventory_consignments';
+        $table_c_items      = $wpdb->prefix . 'cora_inventory_consignment_items';
+        $table_products     = $wpdb->prefix . 'cora_inventory_products';
+
+        $is_field_vendor = ( $curr_user && ! empty( $curr_user->roles ) && in_array( 'cora_field_vendor', $curr_user->roles, true ) );
+
+        $consignment = null;
+        if ( $consignment_id > 0 ) {
+            $consignment = $wpdb->get_row(
+                $wpdb->prepare( "SELECT * FROM {$table_consignments} WHERE id = %d AND (agency_id = %d OR %d = 1)", $consignment_id, $agency_id, $agency_id ),
+                ARRAY_A
+            );
+            if ( ! $consignment ) {
+                $consignment = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table_consignments} WHERE id = %d", $consignment_id ), ARRAY_A );
+            }
+        } else {
+            // Query active consignment for this agency / driver
+            if ( $is_field_vendor ) {
+                $consignment = $wpdb->get_row(
+                    $wpdb->prepare(
+                        "SELECT * FROM {$table_consignments} WHERE agency_id = %d AND (vendor_user_id = %d OR vendor_name = %s) AND status IN ('dispatched', 'active_selling') ORDER BY id DESC LIMIT 1",
+                        $agency_id,
+                        $user_id,
+                        $curr_user->display_name
+                    ),
+                    ARRAY_A
+                );
+            }
+            if ( ! $consignment ) {
+                $consignment = $wpdb->get_row(
+                    $wpdb->prepare(
+                        "SELECT * FROM {$table_consignments} WHERE agency_id = %d AND status IN ('dispatched', 'active_selling') ORDER BY id DESC LIMIT 1",
+                        $agency_id
+                    ),
+                    ARRAY_A
+                );
+            }
+            if ( ! $consignment ) {
+                $consignment = $wpdb->get_row(
+                    $wpdb->prepare(
+                        "SELECT * FROM {$table_consignments} WHERE agency_id = %d ORDER BY id DESC LIMIT 1",
+                        $agency_id
+                    ),
+                    ARRAY_A
+                );
+            }
+            if ( ! $consignment ) {
+                $consignment = $wpdb->get_row(
+                    "SELECT * FROM {$table_consignments} ORDER BY id DESC LIMIT 1",
+                    ARRAY_A
+                );
+            }
+            if ( $consignment ) {
+                $consignment_id = intval( $consignment['id'] );
+            }
+        }
+
+        // If the resolved consignment has 0 items or no consignment found, find latest consignment with items
+        if ( cora_table_exists( $table_c_items ) ) {
+            $has_items = ( $consignment && $consignment_id > 0 ) ? (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table_c_items} WHERE consignment_id = %d", $consignment_id ) ) : 0;
+            if ( ! $has_items ) {
+                $alt_csn_id = $wpdb->get_var(
+                    $wpdb->prepare(
+                        "SELECT c.id FROM {$table_consignments} c INNER JOIN {$table_c_items} ci ON c.id = ci.consignment_id WHERE (c.agency_id = %d OR %d = 1) ORDER BY c.id DESC LIMIT 1",
+                        $agency_id,
+                        $agency_id
+                    )
+                );
+                if ( ! $alt_csn_id ) {
+                    $alt_csn_id = $wpdb->get_var( "SELECT c.id FROM {$table_consignments} c INNER JOIN {$table_c_items} ci ON c.id = ci.consignment_id ORDER BY c.id DESC LIMIT 1" );
+                }
+                if ( $alt_csn_id ) {
+                    $consignment_id = intval( $alt_csn_id );
+                    $consignment = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table_consignments} WHERE id = %d", $consignment_id ), ARRAY_A );
+                }
+            }
+        }
+
+        $items_raw = array();
+        if ( $consignment_id > 0 && cora_table_exists( $table_c_items ) ) {
+            $items_raw = $wpdb->get_results(
+                $wpdb->prepare(
+                    "SELECT ci.*, 
+                            p.name as product_name_fallback,
+                            p.sku as p_sku,
+                            p.pricing_type as p_pricing_type,
+                            p.unit_weight_grams as p_weight_g
+                     FROM {$table_c_items} ci
+                     LEFT JOIN {$table_products} p ON ci.product_id = p.id
+                     WHERE ci.consignment_id = %d
+                     ORDER BY ci.id ASC",
+                    $consignment_id
+                ),
+                ARRAY_A
+            );
+        }
+
+        $csv_rows = array();
+        $csv_rows[] = '#,Item Name,SKU,Quantity Type,Quantity';
+
+        foreach ( $items_raw as $idx => $raw ) {
+            $sr_no     = $idx + 1;
+            $name      = ! empty( $raw['product_name'] ) ? $raw['product_name'] : ( ! empty( $raw['product_name_fallback'] ) ? $raw['product_name_fallback'] : 'Product' );
+            $sku       = ! empty( $raw['sku'] ) ? $raw['sku'] : ( ! empty( $raw['p_sku'] ) ? $raw['p_sku'] : '—' );
+            $is_weight = ( ( $raw['pricing_type'] ?? '' ) === 'weight_based' || floatval( $raw['dispatched_weight_kg'] ?? 0 ) > 0 || ( ( $raw['p_pricing_type'] ?? '' ) === 'weight_based' ) );
+            
+            $disp_qty  = intval( $raw['dispatched_qty'] ?? 0 );
+            $disp_wt   = floatval( $raw['dispatched_weight_kg'] ?? 0 );
+            $unit_wt_g = floatval( $raw['unit_weight_grams'] ?? ( $raw['p_weight_g'] ?? 0 ) );
+
+            if ( $is_weight && $disp_wt <= 0 && $unit_wt_g > 0 ) {
+                $disp_wt = round( ( $disp_qty * $unit_wt_g ) / 1000, 3 );
+            }
+            if ( $is_weight && $disp_wt <= 0 && $disp_qty > 0 ) {
+                $disp_wt = floatval( $disp_qty );
+            }
+
+            $qty_type = $is_weight ? 'Weight' : 'Unit';
+            $qty_str  = $is_weight ? ( number_format( $disp_wt, 2 ) . ' kg' ) : ( $disp_qty . ' Pcs' );
+
+            $row = array(
+                $sr_no,
+                $name,
+                $sku,
+                $qty_type,
+                $qty_str
+            );
+
+            $csv_rows[] = implode( ',', array_map( function( $val ) {
+                return '"' . str_replace( '"', '""', (string) $val ) . '"';
+            }, $row ) );
+        }
+
+        $csn_no_slug = ! empty( $consignment['consignment_no'] ) ? sanitize_file_name( $consignment['consignment_no'] ) : 'van_inventory';
+        $filename = 'cora_inventory_report_' . $csn_no_slug . '_' . date( 'Y-m-d' ) . '.csv';
+        $csv_content = "\xEF\xBB\xBF" . implode( "\r\n", $csv_rows );
+
+        if ( ! empty( $_REQUEST['download'] ) || strpos( $_SERVER['HTTP_ACCEPT'] ?? '', 'text/csv' ) !== false || ( isset( $_GET['action'] ) && $_GET['action'] === 'cora_inventory_export_van_stock_csv' && empty( $_POST ) ) ) {
+            header( 'Content-Type: text/csv; charset=utf-8' );
+            header( 'Content-Disposition: attachment; filename="' . $filename . '"' );
+            header( 'Pragma: no-cache' );
+            header( 'Expires: 0' );
+            echo $csv_content;
+            exit;
+        }
+
+        wp_send_json_success( array(
+            'csv_content' => $csv_content,
+            'filename'    => $filename,
+            'total_count' => count( $items_raw )
+        ) );
     }
 
     /**
