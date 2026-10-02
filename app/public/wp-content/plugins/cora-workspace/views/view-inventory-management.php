@@ -894,11 +894,11 @@ body.cora-inventory-focus-mode .cora-sidebar-search {
                         <thead>
                             <tr class="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50/90 dark:bg-zinc-800/60 text-[11px] font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider font-mono">
                                 <th class="py-3 px-3 w-14 text-center">1. Sr No (क्र०)</th>
-                                <th class="py-3 px-3.5 min-w-[150px]">2. Bill Number</th>
-                                <th class="py-3 px-3.5 min-w-[140px]">3. Date &amp; Time</th>
-                                <th class="py-3 px-4 min-w-[180px]">4. Customer / Firm Name</th>
+                                <th class="py-3 px-3.5 min-w-[110px] text-center">2. Bill Number</th>
+                                <th class="py-3 px-4 min-w-[180px]">3. Customer / Firm Name</th>
+                                <th class="py-3 px-3.5 min-w-[110px] text-center">4. Date</th>
                                 <th class="py-3 px-3.5 min-w-[130px]">5. City / Location</th>
-                                <th class="py-3 px-3.5 min-w-[130px]">6. Mobile Number</th>
+                                <th class="py-3 px-3.5 min-w-[130px] text-center">6. Mobile Number</th>
                                 <th class="py-3 px-4 min-w-[140px] text-right font-mono">7. Total Bill (₹)</th>
                                 <th class="py-3 px-4 min-w-[190px]">8. Item Details &amp; Weight</th>
                                 <th class="py-3 px-3 w-28 text-center">9. Actions</th>
@@ -918,19 +918,19 @@ body.cora-inventory-focus-mode .cora-sidebar-search {
                                 <td class="py-3 px-3 text-center text-zinc-500" id="cora-sr-ft-sr">
                                     Total
                                 </td>
-                                <td class="py-3 px-3.5 font-bold" id="cora-sr-ft-invoices">
+                                <td class="py-3 px-3.5 font-bold text-center" id="cora-sr-ft-invoices">
                                     0 Bills
-                                </td>
-                                <td class="py-3 px-3.5 text-zinc-400">
-                                    —
                                 </td>
                                 <td class="py-3 px-4 text-zinc-700 dark:text-zinc-300">
                                     Summary of Filtered Sales
                                 </td>
-                                <td class="py-3 px-3.5 text-zinc-400">
+                                <td class="py-3 px-3.5 text-zinc-400 text-center">
                                     —
                                 </td>
                                 <td class="py-3 px-3.5 text-zinc-400">
+                                    —
+                                </td>
+                                <td class="py-3 px-3.5 text-zinc-400 text-center">
                                     —
                                 </td>
                                 <td class="py-3 px-4 text-right font-mono font-bold text-zinc-950 dark:text-zinc-50 text-sm" id="cora-sr-ft-revenue">
@@ -6857,6 +6857,37 @@ window.CoraInventory = (function($) {
         });
     }
 
+    function format4DigitBillNo(s) {
+        if (!s) return '0001';
+        let inv = typeof s === 'object' ? (s.formatted_bill_no || s.invoice_no || '') : String(s);
+        let id = typeof s === 'object' ? parseInt(s.id || 0) : parseInt(inv.replace(/\D/g, '') || 0);
+        if (/^\d{4}$/.test(inv.trim())) {
+            return inv.trim();
+        }
+        if (id > 0) {
+            return String(id % 10000).padStart(4, '0');
+        }
+        let digits = inv.replace(/\D/g, '');
+        if (digits.length >= 4) {
+            return digits.slice(-4);
+        }
+        return String(id || 1).padStart(4, '0');
+    }
+
+    function formatDateOnly(dateStr) {
+        if (!dateStr) return '—';
+        try {
+            const d = new Date(dateStr.replace(/-/g, '/'));
+            if (!isNaN(d.getTime())) {
+                const dd = String(d.getDate()).padStart(2, '0');
+                const mm = String(d.getMonth() + 1).padStart(2, '0');
+                const yyyy = d.getFullYear();
+                return `${dd}-${mm}-${yyyy}`;
+            }
+        } catch (e) {}
+        return dateStr.split(' ')[0] || dateStr;
+    }
+
     function renderSalesRegisterTable(sales) {
         const tbody = $('#cora-sr-table-body');
         const mobileWrap = $('#cora-sr-mobile-cards-wrap');
@@ -6890,21 +6921,13 @@ window.CoraInventory = (function($) {
         sales.forEach((s, idx) => {
             const srNo = idx + 1;
             const saleId = parseInt(s.id);
-            const invNo = escapeHtml(s.invoice_no || ('INV-' + s.id));
+            const invNo = escapeHtml(format4DigitBillNo(s));
             const dateStr = s.created_at || s.sale_date || '';
-            let formattedDate = '—';
-            if (dateStr) {
-                try {
-                    const d = new Date(dateStr.replace(/-/g, '/'));
-                    formattedDate = d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) + ' ' + d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
-                } catch (e) {
-                    formattedDate = dateStr;
-                }
-            }
+            const formattedDate = formatDateOnly(dateStr);
 
-            const customerName = escapeHtml(s.customer_name || 'Walk-in Retailer');
-            const city = escapeHtml(s.city || 'Delhi NCR');
-            const phone = escapeHtml(s.phone || '—');
+            const customerName = escapeHtml(s.customer_name || s.resolved_customer || 'Walk-in Retailer');
+            const city = escapeHtml(s.city || s.city_location || 'Delhi NCR');
+            const phone = escapeHtml(s.phone || s.customer_mobile || '—');
             const grandTotal = parseFloat(s.grand_total || 0);
             const payMode = (s.payment_mode || 'cash').toUpperCase();
             const isPaid = (s.payment_status === 'paid');
@@ -6992,7 +7015,7 @@ window.CoraInventory = (function($) {
                 `;
             }
 
-            // Desktop Row
+            // Desktop Row (Columns: 1. Sr No, 2. Bill Number, 3. Customer / Firm Name, 4. Date, 5. City / Location, 6. Mobile Number, 7. Total Bill, 8. Item Details, 9. Actions)
             desktopHtml += `
                 <tr class="hover:bg-zinc-50/80 dark:hover:bg-zinc-800/40 transition-colors group">
                     <!-- 1. Sr No -->
@@ -7000,10 +7023,10 @@ window.CoraInventory = (function($) {
                         ${srNo}
                     </td>
 
-                    <!-- 2. Bill Number -->
-                    <td class="py-3 px-3.5 font-mono">
-                        <div class="flex items-center gap-1.5">
-                            <button type="button" onclick="CoraInventory.printSaleInvoice(${saleId})" class="font-bold text-zinc-950 dark:text-zinc-50 hover:underline hover:text-black dark:hover:text-white cursor-pointer inline-flex items-center gap-1" title="1-Click Print Invoice">
+                    <!-- 2. Bill Number (4-digit numeric) -->
+                    <td class="py-3 px-3.5 font-mono text-center">
+                        <div class="flex items-center justify-center gap-1.5">
+                            <button type="button" onclick="CoraInventory.printSaleInvoice(${saleId})" class="font-bold text-zinc-950 dark:text-zinc-50 hover:underline hover:text-black dark:hover:text-white cursor-pointer inline-flex items-center gap-1 font-mono text-sm" title="1-Click Print Invoice">
                                 <span>#${invNo}</span>
                                 <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 group-hover:text-zinc-700 dark:group-hover:text-zinc-200"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
                             </button>
@@ -7011,17 +7034,17 @@ window.CoraInventory = (function($) {
                         ${s.consignment_no ? `<div class="text-[10px] text-zinc-400 font-mono truncate">Van: ${escapeHtml(s.consignment_no)}</div>` : ''}
                     </td>
 
-                    <!-- 3. Date & Time -->
-                    <td class="py-3 px-3.5 font-mono text-[11px] text-zinc-600 dark:text-zinc-400 whitespace-nowrap">
-                        ${formattedDate}
-                    </td>
-
-                    <!-- 4. Customer / Firm Name -->
+                    <!-- 3. Customer / Firm Name (BEFORE DATE) -->
                     <td class="py-3 px-4">
                         <div class="font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
                             <span class="truncate max-w-[190px]">${customerName}</span>
                         </div>
                         ${s.gstin ? `<div class="text-[10px] font-mono text-zinc-400">GST: ${escapeHtml(s.gstin)}</div>` : ''}
+                    </td>
+
+                    <!-- 4. Date (DATE ONLY, NO TIME) -->
+                    <td class="py-3 px-3.5 font-mono text-center text-[11px] text-zinc-700 dark:text-zinc-300 whitespace-nowrap">
+                        ${formattedDate}
                     </td>
 
                     <!-- 5. City / Location -->
@@ -7033,9 +7056,9 @@ window.CoraInventory = (function($) {
                     </td>
 
                     <!-- 6. Mobile Number -->
-                    <td class="py-3 px-3.5 font-mono text-zinc-700 dark:text-zinc-300">
+                    <td class="py-3 px-3.5 font-mono text-center text-zinc-700 dark:text-zinc-300">
                         ${phone !== '—' ? `
-                            <a href="tel:${phone}" class="hover:underline flex items-center gap-1" title="Call Customer">
+                            <a href="tel:${phone}" class="hover:underline inline-flex items-center gap-1" title="Call Customer">
                                 <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
                                 <span>${phone}</span>
                             </a>
@@ -7199,19 +7222,19 @@ window.CoraInventory = (function($) {
             return;
         }
 
-        const headers = ['Serial Number', 'Bill number', 'Date', 'Customer/firm name', 'City/location', 'Mobile Number of Customer', 'total amount of bill'];
+        const headers = ['Serial Number', 'Bill number', 'Customer/firm name', 'Date', 'City/location', 'Mobile Number of Customer', 'total amount of bill'];
         const csvRows = [headers.join(',')];
 
         sales.forEach((s, idx) => {
             const srNo = idx + 1;
-            const invNo = '"' + (s.invoice_no || ('INV-' + s.id)).replace(/"/g, '""') + '"';
-            const dateStr = '"' + (s.sale_date || s.created_at || '').replace(/"/g, '""') + '"';
+            const invNo = '"' + format4DigitBillNo(s) + '"';
             const customer = '"' + (s.customer_name || s.resolved_customer || 'Walk-in Retailer').replace(/"/g, '""') + '"';
+            const dateStr = '"' + formatDateOnly(s.sale_date || s.created_at || '') + '"';
             const city = '"' + (s.city || s.city_location || 'Delhi NCR').replace(/"/g, '""') + '"';
             const phone = '"' + (s.phone || s.customer_mobile || '').replace(/"/g, '""') + '"';
             const amount = parseFloat(s.grand_total || 0).toFixed(2);
 
-            csvRows.push([srNo, invNo, dateStr, customer, city, phone, amount].join(','));
+            csvRows.push([srNo, invNo, customer, dateStr, city, phone, amount].join(','));
         });
 
         const filename = (source === 'vendor' ? 'Cora_Spot_Invoices_' : 'Cora_Sales_Register_') + new Date().toISOString().slice(0, 10) + '.csv';

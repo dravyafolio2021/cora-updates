@@ -14,15 +14,15 @@ echo "=== Cora Sales Register & CSV Export Verification ===\n";
 $csv_headers = array(
     'Serial Number',
     'Bill number',
-    'Date',
     'Customer/firm name',
+    'Date',
     'City/location',
     'Mobile Number of Customer',
     'total amount of bill'
 );
 
 echo "1. Checking CSV Column Sequence:\n";
-$expected_header_str = 'Serial Number,Bill number,Date,Customer/firm name,City/location,Mobile Number of Customer,total amount of bill';
+$expected_header_str = 'Serial Number,Bill number,Customer/firm name,Date,City/location,Mobile Number of Customer,total amount of bill';
 echo "   Expected: $expected_header_str\n";
 
 if ( class_exists( 'Cora_Inventory_Engine' ) ) {

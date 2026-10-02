@@ -5335,6 +5335,30 @@ class Cora_Inventory_Engine {
     }
 
     /**
+     * Helper: Format 4-digit numeric bill number.
+     */
+    public static function format_4digit_bill_no( $sale_or_id ) {
+        if ( is_array( $sale_or_id ) ) {
+            $inv = $sale_or_id['invoice_no'] ?? '';
+            $id  = intval( $sale_or_id['id'] ?? 0 );
+        } elseif ( is_numeric( $sale_or_id ) ) {
+            $inv = '';
+            $id  = intval( $sale_or_id );
+        } else {
+            $inv = (string) $sale_or_id;
+            $id  = intval( preg_replace( '/\D/', '', $inv ) );
+        }
+
+        if ( preg_match( '/^\d{4}$/', trim( $inv ) ) ) {
+            return trim( $inv );
+        }
+        if ( $id > 0 ) {
+            return sprintf( '%04d', $id % 10000 );
+        }
+        return sprintf( '%04d', wp_rand( 1000, 9999 ) );
+    }
+
+    /**
      * AJAX: Fetch Sales Register & Sold Items Ledger.
      */
     public static function ajax_get_sales_register() {
@@ -5348,7 +5372,7 @@ class Cora_Inventory_Engine {
 
     /**
      * AJAX: Export Sales Register to CSV.
-     * Column order: Serial Number, Bill number, Date, Customer/firm name, City/location, Mobile Number of Customer, total amount of bill
+     * Column order: Serial Number, Bill number, Customer/firm name, Date, City/location, Mobile Number of Customer, total amount of bill
      */
     public static function ajax_export_sales_csv() {
         if ( ! empty( $_REQUEST['security'] ) ) {
@@ -5358,12 +5382,12 @@ class Cora_Inventory_Engine {
         $sales = $data['sales'];
 
         $csv_rows = array();
-        $csv_rows[] = 'Serial Number,Bill number,Date,Customer/firm name,City/location,Mobile Number of Customer,total amount of bill';
+        $csv_rows[] = 'Serial Number,Bill number,Customer/firm name,Date,City/location,Mobile Number of Customer,total amount of bill';
 
         foreach ( $sales as $idx => $s ) {
             $sr_no = $idx + 1;
-            $bill_no = ! empty( $s['invoice_no'] ) ? $s['invoice_no'] : 'INV-' . str_pad( $s['id'], 5, '0', STR_PAD_LEFT );
-            $sale_date = ! empty( $s['sale_date'] ) ? date( 'd-m-Y H:i', strtotime( $s['sale_date'] ) ) : ( ! empty( $s['created_at'] ) ? date( 'd-m-Y H:i', strtotime( $s['created_at'] ) ) : '' );
+            $bill_no = self::format_4digit_bill_no( $s );
+            $sale_date = ! empty( $s['sale_date'] ) ? date( 'd-m-Y', strtotime( $s['sale_date'] ) ) : ( ! empty( $s['created_at'] ) ? date( 'd-m-Y', strtotime( $s['created_at'] ) ) : date( 'd-m-Y' ) );
             $customer_name = $s['resolved_customer'];
             $city_location = $s['city_location'];
             $mobile = $s['customer_mobile'];
@@ -5372,8 +5396,8 @@ class Cora_Inventory_Engine {
             $row = array(
                 $sr_no,
                 $bill_no,
-                $sale_date,
                 $customer_name,
+                $sale_date,
                 $city_location,
                 $mobile,
                 $grand_total
@@ -5820,11 +5844,11 @@ class Cora_Inventory_Engine {
                 <thead>
                     <tr>
                         <th style="width: 32px;" class="text-center">#</th>
-                        <th style="width: 105px;">Bill Number</th>
-                        <th style="width: 95px;">Date</th>
-                        <th style="width: 160px;">Customer / Firm Name</th>
+                        <th style="width: 85px;" class="text-center">Bill Number</th>
+                        <th style="width: 175px;">Customer / Firm Name</th>
+                        <th style="width: 90px;" class="text-center">Date</th>
                         <th style="width: 130px;">City / Location</th>
-                        <th style="width: 95px;">Mobile Number</th>
+                        <th style="width: 95px;" class="text-center">Mobile Number</th>
                         <th>Items Sold Summary (Weight @ ₹401.25/kg / Units)</th>
                         <th style="width: 100px;" class="text-right">Total Bill (₹)</th>
                     </tr>
@@ -5832,8 +5856,8 @@ class Cora_Inventory_Engine {
                 <tbody>
                     <?php if ( ! empty( $sales ) ) : ?>
                         <?php foreach ( $sales as $idx => $s ) : 
-                            $bill_no = ! empty( $s['invoice_no'] ) ? $s['invoice_no'] : 'INV-' . str_pad( $s['id'], 5, '0', STR_PAD_LEFT );
-                            $sale_date = ! empty( $s['sale_date'] ) ? date( 'd-m-Y H:i', strtotime( $s['sale_date'] ) ) : ( ! empty( $s['created_at'] ) ? date( 'd-m-Y H:i', strtotime( $s['created_at'] ) ) : '' );
+                            $bill_no = self::format_4digit_bill_no( $s );
+                            $sale_date = ! empty( $s['sale_date'] ) ? date( 'd-m-Y', strtotime( $s['sale_date'] ) ) : ( ! empty( $s['created_at'] ) ? date( 'd-m-Y', strtotime( $s['created_at'] ) ) : date( 'd-m-Y' ) );
                             $customer = $s['resolved_customer'];
                             $location = $s['city_location'];
                             $mobile = $s['customer_mobile'] ?: '—';
@@ -5842,15 +5866,15 @@ class Cora_Inventory_Engine {
                         ?>
                             <tr>
                                 <td class="text-center font-mono"><?php echo intval( $idx + 1 ); ?></td>
-                                <td class="font-mono font-semibold"><?php echo esc_html( $bill_no ); ?></td>
-                                <td class="font-mono"><?php echo esc_html( $sale_date ); ?></td>
+                                <td class="text-center font-mono font-bold"><?php echo esc_html( $bill_no ); ?></td>
                                 <td class="font-semibold"><?php echo esc_html( $customer ); ?></td>
+                                <td class="text-center font-mono"><?php echo esc_html( $sale_date ); ?></td>
                                 <td><?php echo esc_html( $location ); ?></td>
-                                <td class="font-mono"><?php echo esc_html( $mobile ); ?></td>
+                                <td class="text-center font-mono"><?php echo esc_html( $mobile ); ?></td>
                                 <td>
                                     <?php if ( ! empty( $items ) ) : ?>
                                         <?php foreach ( $items as $it ) : 
-                                            $is_wt = ( ( $it['pricing_type'] ?? '' ) === 'weight_based' || floatval( $it['weight_kg'] ?? 0 ) > 0 );
+                                             $is_wt = ( ( $it['pricing_type'] ?? '' ) === 'weight_based' || floatval( $it['weight_kg'] ?? 0 ) > 0 );
                                         ?>
                                             <?php if ( $is_wt ) : ?>
                                                 <span class="item-tag weight-badge font-mono">⚖️ <?php echo number_format( floatval( $it['weight_kg'] ?? 0 ), 2 ); ?> kg @ ₹<?php echo number_format( floatval( $it['weight_rate'] ?? 401.25 ), 2 ); ?>/kg</span>
