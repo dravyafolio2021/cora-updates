@@ -41,7 +41,7 @@ fi
 # Ensure single upload helper
 upload_payload() {
     echo "1. Uploading release zip to server ($REMOTE_TMP)..."
-    ssh "${SSH_OPTS[@]}" "$SSH_USER@$SSH_IP" "cat > $REMOTE_TMP" < "$LOCAL_ZIP"
+    rsync -avz -e "ssh -p $SSH_PORT -i $SSH_KEY -o StrictHostKeyChecking=no" "$LOCAL_ZIP" "$SSH_USER@$SSH_IP:$REMOTE_TMP"
     echo "✅ Release zip uploaded."
 }
 
