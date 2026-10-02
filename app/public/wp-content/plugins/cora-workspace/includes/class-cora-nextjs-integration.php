@@ -35,7 +35,8 @@ class Cora_NextJS_Integration {
             'cora_nextjs_scan_routes',
             'cora_nextjs_trigger_isr',
             'cora_nextjs_save_page_props',
-            'cora_nextjs_sync_repo'
+            'cora_nextjs_sync_repo',
+            'cora_nextjs_save_live_url'
         );
 
         foreach ( $actions as $action ) {
@@ -774,6 +775,74 @@ class Cora_NextJS_Integration {
 
         // Perform scan internally
         $this->cora_nextjs_scan_routes();
+    }
+
+    /**
+     * AJAX: Save Next.js Live Deployment / Local Dev URL
+     */
+    public function cora_nextjs_save_live_url() {
+        $nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( $_POST['nonce'] ) : ( isset( $_POST['_wpnonce'] ) ? sanitize_text_field( $_POST['_wpnonce'] ) : '' );
+        if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'wp_rest' ) && ! check_ajax_referer( 'cora_ajax_nonce', 'nonce', false ) ) {
+            wp_send_json_error( array( 'message' => 'Security check failed. Please refresh the page.' ) );
+        }
+
+        if ( ! current_user_can( 'edit_theme_options' ) && ! current_user_can( 'manage_options' ) && ! is_user_logged_in() ) {
+            wp_send_json_error( array( 'message' => 'Permission denied. Please log in.' ) );
+        }
+
+        $theme_id = intval( $_POST['theme_id'] ?? 0 );
+        $live_url = trim( wp_unslash( $_POST['live_url'] ?? '' ) );
+
+        if ( ! empty( $live_url ) ) {
+            if ( ! preg_match( '#^https?://#i', $live_url ) ) {
+                $live_url = 'http://' . $live_url;
+            }
+            $live_url = rtrim( $live_url, '/' );
+            if ( ! filter_var( $live_url, FILTER_VALIDATE_URL ) && strpos( $live_url, 'localhost' ) === false ) {
+                wp_send_json_error( array( 'message' => 'Invalid URL format. Please provide a valid HTTP or HTTPS URL.' ) );
+            }
+        }
+
+        global $wpdb;
+        if ( $theme_id <= 0 ) {
+            $live_theme = $wpdb->get_row( "SELECT id FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live' ORDER BY id DESC LIMIT 1", ARRAY_A );
+            if ( ! $live_theme ) {
+                $live_theme = $wpdb->get_row( "SELECT id FROM {$wpdb->prefix}cora_canvas_themes ORDER BY id DESC LIMIT 1", ARRAY_A );
+            }
+            $theme_id = $live_theme ? intval( $live_theme['id'] ) : 0;
+        }
+
+        if ( $theme_id <= 0 ) {
+            wp_send_json_error( array( 'message' => 'Theme ID is required.' ) );
+        }
+
+        $theme = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d", $theme_id ), ARRAY_A );
+
+        if ( ! $theme ) {
+            wp_send_json_error( array( 'message' => 'Theme not found.' ) );
+        }
+
+        $settings = json_decode( $theme['settings'] ?? '{}', true ) ?: array();
+        $settings['source']          = 'nextjs';
+        $settings['nextjs_live_url'] = $live_url;
+        $settings['live_url']        = $live_url;
+
+        $wpdb->update(
+            "{$wpdb->prefix}cora_canvas_themes",
+            array(
+                'settings'   => wp_json_encode( $settings ),
+                'updated_at' => current_time( 'mysql' )
+            ),
+            array( 'id' => $theme_id ),
+            array( '%s', '%s' ),
+            array( '%d' )
+        );
+
+        wp_send_json_success( array(
+            'message'  => 'Next.js live URL saved successfully.',
+            'live_url' => $live_url,
+            'theme_id' => $theme_id,
+        ) );
     }
 }
 

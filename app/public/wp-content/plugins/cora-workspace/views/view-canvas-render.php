@@ -29,6 +29,41 @@ if ( ! $active_theme ) {
 
 $theme_settings = $active_theme ? ( json_decode( $active_theme['settings'], true ) ?: array() ) : array();
 
+// Check if active or preview theme is Next.js
+$theme_source = isset( $theme_settings['source'] ) ? $theme_settings['source'] : ( isset( $active_theme['source'] ) ? $active_theme['source'] : '' );
+if ( 'nextjs' === $theme_source ) {
+    $nextjs_live_url = ! empty( $theme_settings['nextjs_live_url'] ) ? trim( $theme_settings['nextjs_live_url'] ) : ( ! empty( $theme_settings['live_url'] ) ? trim( $theme_settings['live_url'] ) : '' );
+    $nextjs_live_url = rtrim( $nextjs_live_url, '/' );
+
+    $page_id = isset( $GLOBALS['cora_canvas_render_page_id'] ) ? intval( $GLOBALS['cora_canvas_render_page_id'] ) : get_the_ID();
+    $target_route = '/';
+    if ( $page_id > 0 ) {
+        $canvas_page_row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE wp_post_id = %d OR id = %d LIMIT 1", $page_id, $page_id ), ARRAY_A );
+        if ( $canvas_page_row ) {
+            $target_route = ( ! empty( $canvas_page_row['is_homepage'] ) || ( isset( $canvas_page_row['slug'] ) && $canvas_page_row['slug'] === 'home' ) ) ? '/' : '/' . ltrim( $canvas_page_row['slug'], '/' );
+        } else {
+            $p_obj = get_post( $page_id );
+            if ( $p_obj && ! empty( $p_obj->post_name ) && $p_obj->post_name !== 'home' ) {
+                $target_route = '/' . ltrim( $p_obj->post_name, '/' );
+            }
+        }
+    }
+
+    $is_preview = isset( $GLOBALS['cora_preview_bar_script'] ) || ( function_exists( 'cora_get_preview_theme_id' ) && cora_get_preview_theme_id() > 0 );
+
+    if ( ! empty( $nextjs_live_url ) ) {
+        if ( function_exists( 'cora_render_nextjs_live_frame' ) ) {
+            cora_render_nextjs_live_frame( $nextjs_live_url, $target_route, $active_theme, $ws, $is_preview );
+            exit;
+        }
+    } else {
+        if ( function_exists( 'cora_render_nextjs_connector_screen' ) ) {
+            cora_render_nextjs_connector_screen( $active_theme, $ws, $target_route, $is_preview );
+            exit;
+        }
+    }
+}
+
 // Check if this is an HTML Canvas Page
 $page_id = isset( $GLOBALS['cora_canvas_render_page_id'] ) ? intval( $GLOBALS['cora_canvas_render_page_id'] ) : get_the_ID();
 $page_engine = get_post_meta( $page_id, '_cora_page_engine', true );

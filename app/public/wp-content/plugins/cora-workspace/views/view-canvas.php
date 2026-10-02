@@ -2358,13 +2358,13 @@ function cora_get_sparkline_points( $history, $type ) {
 
             <!-- Grid Layout: Connection Hub & API Credentials -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Card 1: Project Sync & ISR Webhook Status -->
-                <div class="bg-white border border-zinc-200 rounded-2xl p-5 shadow-xs flex flex-col justify-between">
+                <!-- Card 1: Project Sync & Live Deployment Connector -->
+                <div class="bg-white border border-zinc-200 rounded-2xl p-5 shadow-xs flex flex-col justify-between space-y-4">
                     <div>
                         <div class="flex items-center justify-between pb-3 border-b border-zinc-100 mb-4">
                             <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-900 flex items-center gap-2">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-                                Repository & Deployment
+                                Repository &amp; Deployment
                             </h3>
                             <span id="nextjs-status-badge" class="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-[10px] font-bold border border-emerald-200">Active</span>
                         </div>
@@ -2382,28 +2382,52 @@ function cora_get_sparkline_points( $history, $type ) {
                             <div class="grid grid-cols-2 gap-3">
                                 <div>
                                     <label class="block text-[10px] font-bold text-zinc-400 uppercase mb-1">Branch</label>
-                                    <div class="bg-zinc-50 px-3 py-2 rounded-lg border border-zinc-200 font-mono text-zinc-900 font-semibold truncate" id="nextjs-branch-label">main</div>
+                                    <div class="bg-zinc-50 px-3 py-2 rounded-lg border border-zinc-200 font-mono text-zinc-900 font-semibold truncate text-xs" id="nextjs-branch-label">main</div>
                                 </div>
                                 <div>
-                                    <label class="block text-[10px] font-bold text-zinc-400 uppercase mb-1">Live Frontend URL</label>
-                                    <div class="bg-zinc-50 px-3 py-2 rounded-lg border border-zinc-200 font-mono text-zinc-900 font-semibold truncate flex items-center justify-between">
-                                        <span id="nextjs-live-url-label">https://...</span>
-                                        <a id="nextjs-live-url-link" href="#" target="_blank" class="text-zinc-500 hover:text-zinc-900 text-[11px] font-bold">↗</a>
+                                    <label class="block text-[10px] font-bold text-zinc-400 uppercase mb-1">ISR Webhook Secret</label>
+                                    <div class="flex items-center gap-2 bg-zinc-50 px-2.5 py-1.5 rounded-lg border border-zinc-200">
+                                        <input type="password" id="nextjs-secret-display" class="bg-transparent border-0 text-[11px] font-mono text-zinc-900 font-semibold flex-1 outline-none min-w-0" readonly value="cora_sec_****************">
+                                        <button onclick="copyNextJSSecret()" class="text-zinc-500 hover:text-zinc-900 font-bold text-[10px] cursor-pointer shrink-0">Copy</button>
                                     </div>
                                 </div>
                             </div>
 
-                            <div>
-                                <label class="block text-[10px] font-bold text-zinc-400 uppercase mb-1">On-Demand ISR Webhook Secret</label>
-                                <div class="flex items-center gap-2 bg-zinc-50 px-3 py-2 rounded-lg border border-zinc-200">
-                                    <input type="password" id="nextjs-secret-display" class="bg-transparent border-0 text-xs font-mono text-zinc-900 font-semibold flex-1 outline-none" readonly value="cora_sec_****************">
-                                    <button onclick="copyNextJSSecret()" class="text-zinc-500 hover:text-zinc-900 font-bold text-[11px] cursor-pointer">Copy</button>
+                            <!-- Tactile Live Deployment & Local Dev URL Connector -->
+                            <div class="bg-zinc-50/80 p-3 rounded-xl border border-zinc-200 space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <label class="block text-[10px] font-bold text-zinc-600 uppercase tracking-wider">Live Deployment / Local Dev URL</label>
+                                    <a id="nextjs-live-url-link" href="#" target="_blank" class="text-zinc-500 hover:text-zinc-900 text-[11px] font-bold inline-flex items-center gap-1 hidden">
+                                        <span>Open</span>
+                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    </a>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <div class="relative flex-1">
+                                        <input type="url" id="nextjs-live-url-input"
+                                            placeholder="https://my-app.vercel.app or http://localhost:3000"
+                                            class="w-full pl-8 pr-3 py-2 bg-white rounded-lg border border-zinc-300 text-xs font-mono text-zinc-900 focus:outline-none focus:border-zinc-950">
+                                        <div class="absolute left-2.5 top-2.5 text-zinc-400 pointer-events-none">
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                                        </div>
+                                    </div>
+                                    <button onclick="window.saveNextJSLiveUrl()" id="btn-save-nextjs-live-url"
+                                        class="px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 shadow-xs border-none">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                                        <span>Save &amp; Connect</span>
+                                    </button>
+                                </div>
+                                <div class="flex items-center gap-1.5 flex-wrap pt-0.5">
+                                    <span class="text-[10px] text-zinc-400 font-medium mr-0.5">Presets:</span>
+                                    <button type="button" onclick="window.setNextJSPresetUrl('http://localhost:3000')" class="px-2 py-0.5 bg-white hover:bg-zinc-100 text-zinc-700 rounded border border-zinc-200 text-[10px] font-mono font-medium transition-colors cursor-pointer">http://localhost:3000</button>
+                                    <button type="button" onclick="window.setNextJSPresetUrl('http://localhost:3001')" class="px-2 py-0.5 bg-white hover:bg-zinc-100 text-zinc-700 rounded border border-zinc-200 text-[10px] font-mono font-medium transition-colors cursor-pointer">http://localhost:3001</button>
+                                    <button type="button" id="nextjs-preset-vercel" onclick="window.setNextJSPresetUrl(this.dataset.url || 'https://aigirl.vercel.app')" data-url="https://aigirl.vercel.app" class="px-2 py-0.5 bg-white hover:bg-zinc-100 text-zinc-700 rounded border border-zinc-200 text-[10px] font-mono font-medium transition-colors cursor-pointer truncate max-w-[180px]">https://aigirl.vercel.app</button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="pt-4 mt-4 border-t border-zinc-100 flex items-center justify-between gap-3">
+                    <div class="pt-3 border-t border-zinc-100 flex items-center justify-between gap-3">
                         <button onclick="syncNextJSRoutesFromGit()" id="btn-nextjs-sync-git" class="px-3.5 py-2 border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-900 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5">
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
                             <span>Sync Git Routes</span>
@@ -2432,7 +2456,7 @@ function cora_get_sparkline_points( $history, $type ) {
                                     <span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-emerald-100 text-emerald-800 font-mono mr-1.5">GET</span>
                                     <code class="text-[11px] font-mono text-zinc-900">/wp-json/cora-canvas/v1/nextjs/manifest</code>
                                 </div>
-                                <span class="text-[10px] text-zinc-400">All routes & tokens</span>
+                                <span class="text-[10px] text-zinc-400">All routes &amp; tokens</span>
                             </div>
 
                             <div class="bg-zinc-50 p-2.5 rounded-lg border border-zinc-200 flex items-center justify-between">
@@ -2440,7 +2464,7 @@ function cora_get_sparkline_points( $history, $type ) {
                                     <span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-emerald-100 text-emerald-800 font-mono mr-1.5">GET</span>
                                     <code class="text-[11px] font-mono text-zinc-900">/wp-json/cora-canvas/v1/nextjs/page?slug=about</code>
                                 </div>
-                                <span class="text-[10px] text-zinc-400">Page SEO & Props</span>
+                                <span class="text-[10px] text-zinc-400">Page SEO &amp; Props</span>
                             </div>
 
                             <div class="bg-zinc-50 p-2.5 rounded-lg border border-zinc-200 flex items-center justify-between">
@@ -2463,6 +2487,89 @@ function cora_get_sparkline_points( $history, $type ) {
 
                     <div class="pt-3 mt-3 border-t border-zinc-100">
                         <p class="text-[11px] text-zinc-500 leading-relaxed">Fetch data in Next.js Server Components with automatic caching: <code class="font-mono text-zinc-900 bg-zinc-100 px-1 py-0.5 rounded">fetch(url, { next: { tags: ['cora'] } })</code></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dedicated Interactive Next.js Visual Preview Card -->
+            <div class="bg-white border border-zinc-200 rounded-2xl shadow-xs overflow-hidden">
+                <!-- Top Toolbar -->
+                <div class="p-4 border-b border-zinc-200 flex flex-wrap items-center justify-between gap-3 bg-zinc-50/60">
+                    <div class="flex items-center gap-3 flex-wrap">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-900">Live Application Preview</h3>
+                        </div>
+                        <span class="text-zinc-300 hidden sm:inline">|</span>
+                        <!-- Route Selector Dropdown -->
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-[10px] font-bold text-zinc-400 uppercase">Route:</span>
+                            <select id="nextjs-preview-route-select" onchange="window.switchNextJSPreviewRoute(this.value)"
+                                class="bg-white border border-zinc-200 text-zinc-900 text-xs font-mono font-semibold rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-zinc-950 cursor-pointer">
+                                <option value="/">/ (Homepage)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <!-- Device Viewport Switcher -->
+                        <div class="inline-flex rounded-lg border border-zinc-200 bg-zinc-100 p-0.5">
+                            <button onclick="window.switchNextJSPreviewDevice('desktop')" id="btn-nextjs-device-desktop"
+                                class="px-2.5 py-1 rounded-md text-[11px] font-bold bg-zinc-950 text-white cursor-pointer transition-all flex items-center gap-1.5 shadow-2xs"
+                                title="Desktop View (100%)">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                                <span>Desktop</span>
+                            </button>
+                            <button onclick="window.switchNextJSPreviewDevice('tablet')" id="btn-nextjs-device-tablet"
+                                class="px-2.5 py-1 rounded-md text-[11px] font-bold text-zinc-600 hover:bg-white cursor-pointer transition-all flex items-center gap-1.5"
+                                title="Tablet View (768px)">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                                <span>768px</span>
+                            </button>
+                            <button onclick="window.switchNextJSPreviewDevice('mobile')" id="btn-nextjs-device-mobile"
+                                class="px-2.5 py-1 rounded-md text-[11px] font-bold text-zinc-600 hover:bg-white cursor-pointer transition-all flex items-center gap-1.5"
+                                title="Mobile View (375px)">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                                <span>375px</span>
+                            </button>
+                        </div>
+
+                        <!-- Actions: Reload and Open External -->
+                        <button onclick="window.reloadNextJSPreview()" id="btn-nextjs-preview-reload"
+                            class="p-1.5 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-100 text-zinc-700 cursor-pointer transition-all flex items-center justify-center"
+                            title="Reload Preview Frame">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                        </button>
+                        <a id="nextjs-preview-open-external" href="#" target="_blank"
+                            class="p-1.5 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-100 text-zinc-700 cursor-pointer transition-all flex items-center justify-center"
+                            title="Open Active Route in New Tab ↗">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Preview Frame Area -->
+                <div class="bg-zinc-100/80 p-4 sm:p-6 flex items-center justify-center min-h-[520px] relative overflow-hidden">
+                    <!-- Loading Spinner Overlay -->
+                    <div id="nextjs-preview-loading" class="hidden absolute inset-0 bg-white/70 backdrop-blur-xs flex items-center justify-center z-10 transition-opacity">
+                        <div class="flex flex-col items-center gap-2">
+                            <div class="w-6 h-6 border-2 border-zinc-900 border-t-transparent rounded-full animate-spin"></div>
+                            <span class="text-xs font-mono font-semibold text-zinc-700">Rendering route…</span>
+                        </div>
+                    </div>
+
+                    <!-- No URL State -->
+                    <div id="nextjs-preview-empty" class="hidden text-center max-w-md py-12 px-6 bg-white rounded-2xl border border-zinc-200 shadow-xs space-y-3">
+                        <div class="w-10 h-10 mx-auto rounded-full bg-zinc-100 flex items-center justify-center text-zinc-400">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                        </div>
+                        <h4 class="text-sm font-bold text-zinc-900">No Next.js Live URL Configured</h4>
+                        <p class="text-xs text-zinc-500 leading-relaxed">Enter your local development server (<code class="bg-zinc-100 px-1 py-0.5 rounded font-mono text-zinc-800">http://localhost:3000</code>) or production deployment URL above to enable real-time headless visual preview.</p>
+                    </div>
+
+                    <!-- Iframe Wrapper Container -->
+                    <div id="nextjs-preview-iframe-wrapper" class="w-full transition-all duration-300 mx-auto flex justify-center" style="max-width: 100%;">
+                        <iframe id="nextjs-preview-iframe" src="about:blank" class="w-full bg-white rounded-xl border border-zinc-200/90 shadow-sm" style="height: 680px;" onload="if(window.onNextJSPreviewIframeLoaded) window.onNextJSPreviewIframeLoaded();"></iframe>
                     </div>
                 </div>
             </div>
@@ -5880,6 +5987,7 @@ function cora_get_sparkline_points( $history, $type ) {
                 }
             }
         }
+        canvasState.activeThemeObj = themeObj;
         canvasState.activeThemeIsElementor = isElementor;
         canvasState.activeThemeIsNextJS = isNextJS;
 
@@ -5895,19 +6003,46 @@ function cora_get_sparkline_points( $history, $type ) {
             const settings = (themeObj && safeGetSettings(themeObj)) || {};
             const ghRepo = settings.github_repo || '';
             const ghBranch = settings.github_branch || 'main';
-            const liveUrl = settings.nextjs_live_url || '';
+            const liveUrl = settings.nextjs_live_url || settings.live_url || '';
             const isrSec = settings.nextjs_revalidate_secret || '';
+
+            canvasState.nextjs_live_url = liveUrl;
 
             jQuery('#nextjs-repo-label').text(ghRepo ? ghRepo.replace(/^https?:\/\/github\.com\//, '') : 'Not connected');
             jQuery('#nextjs-repo-link').attr('href', ghRepo ? (ghRepo.startsWith('http') ? ghRepo : 'https://github.com/' + ghRepo) : '#');
             jQuery('#nextjs-branch-label').text(ghBranch);
-            jQuery('#nextjs-live-url-label').text(liveUrl || 'No deployment URL');
-            jQuery('#nextjs-live-url-link').attr('href', liveUrl || '#');
+
+            // Populate Live URL Input and Link
+            jQuery('#nextjs-live-url-input').val(liveUrl);
+            if (liveUrl) {
+                jQuery('#nextjs-live-url-link').attr('href', liveUrl).removeClass('hidden').show();
+            } else {
+                jQuery('#nextjs-live-url-link').addClass('hidden').hide();
+            }
+
+            // Derive dynamic Vercel preset if repo is set
+            if (ghRepo) {
+                const repoName = ghRepo.replace(/^https?:\/\/github\.com\//, '').split('/').pop().replace(/\.git$/, '');
+                if (repoName) {
+                    const vercelUrl = `https://${repoName}.vercel.app`;
+                    jQuery('#nextjs-preset-vercel').attr('data-url', vercelUrl).text(vercelUrl);
+                }
+            }
+
             if (isrSec) {
                 jQuery('#nextjs-secret-display').val(isrSec);
             }
             if (window.switchNextJSSnippet) {
                 window.switchNextJSSnippet('lib');
+            }
+
+            // Populate preview routes & set initial route
+            if (window.populateNextJSRoutesDropdown && canvasState.pages) {
+                window.populateNextJSRoutesDropdown(canvasState.pages);
+            }
+            if (window.switchNextJSPreviewRoute) {
+                const currentRoute = jQuery('#nextjs-preview-route-select').val() || '/';
+                window.switchNextJSPreviewRoute(currentRoute);
             }
         } else if (isElementor) {
             jQuery('.lovable-route-col').hide();
@@ -6082,6 +6217,9 @@ function cora_get_sparkline_points( $history, $type ) {
                     }
                     filterPages();
                     populatePageMappingSelectors();
+                    if (window.populateNextJSRoutesDropdown) {
+                        window.populateNextJSRoutesDropdown(canvasState.pages);
+                    }
 
                     // Check for and execute pending Command Palette actions
                     setTimeout(() => {
@@ -6560,8 +6698,14 @@ function cora_get_sparkline_points( $history, $type ) {
                         <td class="px-3 py-2 whitespace-nowrap">${propsPill}</td>
                         <td class="px-3 py-2 whitespace-nowrap">${visibilityPill}</td>
                         <td class="px-3 py-2 text-[11px] text-zinc-400 whitespace-nowrap">${getRelativeTime(p.updated_at)}</td>
-                        <td class="px-3 py-2 w-32 whitespace-nowrap text-right">
+                        <td class="px-3 py-2 w-40 whitespace-nowrap text-right">
                             <div class="flex items-center gap-1 justify-end">
+                                <button onclick="window.previewNextJSRoute('${esc_js(routePath)}', event)"
+                                    class="px-2 py-1 bg-zinc-100 hover:bg-zinc-950 hover:text-white text-zinc-800 rounded-md text-[10px] font-bold cursor-pointer transition-all flex items-center gap-1"
+                                    title="Preview Route (${esc_js(routePath)})">
+                                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    <span>Preview</span>
+                                </button>
                                 <button onclick="openNextJSPagePropsDrawer(${p.id})"
                                     class="px-2 py-1 bg-zinc-100 hover:bg-zinc-950 hover:text-white text-zinc-800 rounded-md text-[10px] font-bold cursor-pointer transition-all flex items-center gap-1"
                                     title="Edit Props &amp; SEO">
@@ -6580,6 +6724,10 @@ function cora_get_sparkline_points( $history, $type ) {
                                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
                                     </button>
                                     <div id="page-menu-${p.id}" class="hidden absolute right-0 top-full mt-1 w-44 bg-white border border-zinc-200 rounded-xl shadow-lg py-1 z-20 text-left whitespace-normal">
+                                        <button onclick="window.previewNextJSRoute('${esc_js(routePath)}', event)" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer flex items-center gap-2">
+                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                            Preview Route
+                                        </button>
                                         <button onclick="openNextJSPagePropsDrawer(${p.id})" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer flex items-center gap-2">
                                             <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                                             Edit Props &amp; SEO
@@ -10598,6 +10746,212 @@ function cora_get_sparkline_points( $history, $type ) {
         if (navigator.clipboard && code) {
             navigator.clipboard.writeText(code);
             window.coraShowToast('Code snippet copied to clipboard!', 'success');
+        }
+    };
+
+    // --- Next.js Live Preview & URL Management Engine ---
+    window.setNextJSPresetUrl = function(url) {
+        if (!url) return;
+        jQuery('#nextjs-live-url-input').val(url);
+        window.saveNextJSLiveUrl();
+    };
+
+    window.saveNextJSLiveUrl = function(themeId, liveUrl) {
+        themeId = themeId || canvasState.activeThemeId;
+        if (typeof liveUrl === 'undefined' || liveUrl === null) {
+            liveUrl = jQuery('#nextjs-live-url-input').val().trim();
+        } else {
+            jQuery('#nextjs-live-url-input').val(liveUrl);
+        }
+
+        if (!themeId) {
+            window.coraShowToast('Please select an active theme workspace first.', 'error');
+            return;
+        }
+
+        const btn = jQuery('#btn-save-nextjs-live-url');
+        btn.prop('disabled', true).addClass('opacity-70');
+        window.coraShowToast('Connecting & saving Next.js Live URL…', 'info');
+
+        jQuery.ajax({
+            url: coraREData.ajaxUrl,
+            method: 'POST',
+            data: {
+                action: 'cora_nextjs_save_live_url',
+                theme_id: themeId,
+                live_url: liveUrl,
+                nonce: coraREData.ajaxNonce
+            },
+            success: function(res) {
+                btn.prop('disabled', false).removeClass('opacity-70');
+                if (res.success) {
+                    canvasState.nextjs_live_url = liveUrl;
+                    if (canvasState.activeThemeObj) {
+                        let settings = safeGetSettings(canvasState.activeThemeObj) || {};
+                        settings.nextjs_live_url = liveUrl;
+                        settings.live_url = liveUrl;
+                        canvasState.activeThemeObj.settings = JSON.stringify(settings);
+                    }
+                    if (Array.isArray(canvasState.themes)) {
+                        const t = canvasState.themes.find(th => th.id == themeId);
+                        if (t) {
+                            let s = safeGetSettings(t) || {};
+                            s.nextjs_live_url = liveUrl;
+                            s.live_url = liveUrl;
+                            t.settings = JSON.stringify(s);
+                        }
+                    }
+
+                    if (liveUrl) {
+                        jQuery('#nextjs-live-url-link').attr('href', liveUrl).removeClass('hidden').show();
+                        jQuery('#nextjs-preview-empty').addClass('hidden').hide();
+                        const currentRoute = jQuery('#nextjs-preview-route-select').val() || '/';
+                        window.switchNextJSPreviewRoute(currentRoute);
+                    } else {
+                        jQuery('#nextjs-live-url-link').addClass('hidden').hide();
+                        jQuery('#nextjs-preview-empty').removeClass('hidden').show();
+                        jQuery('#nextjs-preview-iframe').attr('src', 'about:blank');
+                    }
+
+                    window.coraShowToast(res.data.message || 'Next.js Live URL saved & connected.', 'success');
+                } else {
+                    window.coraShowToast(res.data.message || 'Failed to save Next.js live URL.', 'error');
+                }
+            },
+            error: function() {
+                btn.prop('disabled', false).removeClass('opacity-70');
+                window.coraShowToast('Network error while saving Next.js live URL.', 'error');
+            }
+        });
+    };
+
+    window.switchNextJSPreviewRoute = function(routePath) {
+        routePath = routePath || '/';
+        if (!routePath.startsWith('/')) {
+            routePath = '/' + routePath;
+        }
+
+        jQuery('#nextjs-preview-route-select').val(routePath);
+
+        const liveUrlInput = jQuery('#nextjs-live-url-input').val().trim();
+        const settings = (canvasState.activeThemeObj && safeGetSettings(canvasState.activeThemeObj)) || {};
+        const liveUrl = (liveUrlInput || canvasState.nextjs_live_url || settings.nextjs_live_url || settings.live_url || '').replace(/\/+$/, '');
+
+        if (!liveUrl) {
+            jQuery('#nextjs-preview-empty').removeClass('hidden').show();
+            jQuery('#nextjs-preview-loading').addClass('hidden').hide();
+            jQuery('#nextjs-preview-iframe').attr('src', 'about:blank');
+            jQuery('#nextjs-preview-open-external').attr('href', '#');
+            return;
+        }
+
+        jQuery('#nextjs-preview-empty').addClass('hidden').hide();
+        
+        const targetUrl = liveUrl + (routePath === '/' ? '' : routePath);
+        jQuery('#nextjs-preview-open-external').attr('href', targetUrl);
+
+        const iframe = jQuery('#nextjs-preview-iframe');
+        const currentSrc = iframe.attr('src');
+        if (currentSrc !== targetUrl) {
+            jQuery('#nextjs-preview-loading').removeClass('hidden').show();
+            iframe.attr('src', targetUrl);
+        }
+    };
+
+    window.switchNextJSPreviewDevice = function(device) {
+        const wrapper = jQuery('#nextjs-preview-iframe-wrapper');
+        ['desktop', 'tablet', 'mobile'].forEach(d => {
+            const btn = jQuery('#btn-nextjs-device-' + d);
+            if (d === device) {
+                btn.removeClass('text-zinc-600 hover:bg-white').addClass('bg-zinc-950 text-white shadow-2xs');
+            } else {
+                btn.removeClass('bg-zinc-950 text-white shadow-2xs').addClass('text-zinc-600 hover:bg-white');
+            }
+        });
+
+        if (device === 'mobile') {
+            wrapper.css('max-width', '375px');
+        } else if (device === 'tablet') {
+            wrapper.css('max-width', '768px');
+        } else {
+            wrapper.css('max-width', '100%');
+        }
+    };
+
+    window.reloadNextJSPreview = function() {
+        const iframe = document.getElementById('nextjs-preview-iframe');
+        if (iframe && iframe.src && iframe.src !== 'about:blank') {
+            jQuery('#nextjs-preview-loading').removeClass('hidden').show();
+            iframe.src = iframe.src;
+        }
+    };
+
+    window.onNextJSPreviewIframeLoaded = function() {
+        jQuery('#nextjs-preview-loading').addClass('hidden').hide();
+    };
+
+    window.previewNextJSRoute = function(routePath, event) {
+        if (event) {
+            event.stopPropagation();
+            event.preventDefault();
+        }
+        routePath = routePath || '/';
+        const settings = (canvasState.activeThemeObj && safeGetSettings(canvasState.activeThemeObj)) || {};
+        const liveUrlInput = jQuery('#nextjs-live-url-input').val().trim();
+        const liveUrl = (liveUrlInput || canvasState.nextjs_live_url || settings.nextjs_live_url || settings.live_url || '').replace(/\/+$/, '');
+
+        if (event && (event.metaKey || event.ctrlKey)) {
+            if (liveUrl) {
+                window.open(liveUrl + (routePath === '/' ? '' : (routePath.startsWith('/') ? routePath : '/' + routePath)), '_blank');
+            } else {
+                window.coraShowToast('No Next.js Live URL configured yet.', 'warning');
+            }
+            return;
+        }
+
+        // Switch to Next.js SDK tab, update preview route and scroll to preview
+        if (typeof switchTab === 'function') {
+            switchTab('nextjs-sdk');
+        }
+        window.switchNextJSPreviewRoute(routePath);
+        
+        // Smooth scroll to preview frame
+        const previewEl = document.getElementById('nextjs-preview-iframe-wrapper');
+        if (previewEl) {
+            previewEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    };
+
+    window.populateNextJSRoutesDropdown = function(pages) {
+        const select = jQuery('#nextjs-preview-route-select');
+        if (!select.length) return;
+
+        const currentVal = select.val() || '/';
+        select.empty();
+
+        const routesMap = new Map();
+        routesMap.set('/', '/ (Homepage)');
+
+        if (Array.isArray(pages)) {
+            pages.forEach(p => {
+                if (p.is_homepage == 1) {
+                    routesMap.set('/', `/${p.title ? ' (' + p.title + ' - Home)' : ' (Homepage)'}`);
+                } else if (p.slug) {
+                    const cleanSlug = '/' + p.slug.replace(/^\/+/, '');
+                    const label = `${cleanSlug}${p.title ? ' (' + p.title + ')' : ''}`;
+                    routesMap.set(cleanSlug, label);
+                }
+            });
+        }
+
+        routesMap.forEach((label, val) => {
+            select.append(`<option value="${esc_html(val)}">${esc_html(label)}</option>`);
+        });
+
+        if (routesMap.has(currentVal)) {
+            select.val(currentVal);
+        } else {
+            select.val('/');
         }
     };
 

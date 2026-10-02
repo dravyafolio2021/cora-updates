@@ -8966,6 +8966,562 @@ function cora_provision_default_canvas_theme_for_agency( $agency_id ) {
 }
 
 /**
+ * Render Next.js Live Frame Bridge & Embedded Headless View
+ */
+if ( ! function_exists( 'cora_render_nextjs_live_frame' ) ) {
+function cora_render_nextjs_live_frame( $live_url, $route_path = '/', $active_theme = array(), $target_ws = array(), $is_preview = false ) {
+    while ( ob_get_level() > 0 ) {
+        ob_end_clean();
+    }
+    status_header( 200 );
+    nocache_headers();
+
+    $live_url = rtrim( trim( $live_url ), '/' );
+    $clean_route = ( empty( $route_path ) || $route_path === 'home' || $route_path === '/' ) ? '/' : '/' . ltrim( $route_path, '/' );
+    $iframe_src = $live_url . $clean_route;
+
+    $ws_name = ! empty( $target_ws['name'] ) ? $target_ws['name'] : get_bloginfo( 'name' );
+    $ws_slug = ! empty( $target_ws['slug'] ) ? $target_ws['slug'] : ( ! empty( $GLOBALS['cora_active_workspace_site_slug'] ) ? $GLOBALS['cora_active_workspace_site_slug'] : 'workspace' );
+    $theme_id = ! empty( $active_theme['id'] ) ? intval( $active_theme['id'] ) : ( function_exists( 'cora_get_preview_theme_id' ) ? intval( cora_get_preview_theme_id() ) : 0 );
+    
+    $api_url = rest_url( 'cora-canvas/v1/' );
+    $public_api_url = home_url( '/api/v1/public/' );
+    $rest_nonce = wp_create_nonce( 'wp_rest' );
+    $ajax_nonce = wp_create_nonce( 'cora_ajax_nonce' );
+
+    $preview_bar_html = '';
+    if ( $is_preview && function_exists( 'cora_canvas_preview_bar_js' ) ) {
+        $rest_url = esc_url( cora_get_origin_relative_url( rest_url( 'cora/v1/preview-bar-data' ) ) );
+        $site_url = esc_url( home_url() );
+        $preview_bar_html = '<script id="cora-preview-bar-injector">' . "\n"
+            . 'var REST_BASE = ' . json_encode( $rest_url ) . ";\n"
+            . 'var SITE_URL = ' . json_encode( $site_url ) . ";\n"
+            . cora_canvas_preview_bar_js()
+            . '</script>' . "\n";
+    }
+
+    $title = esc_html( $ws_name ) . ' — Next.js Live Preview';
+    
+    header( 'Content-Type: text/html; charset=UTF-8' );
+    ?>
+<!DOCTYPE html>
+<html lang="en" style="height: 100%; width: 100%; overflow: hidden; background: #09090b;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title><?php echo $title; ?></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { width: 100%; height: 100%; overflow: hidden; background: #09090b; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+        #cora-nextjs-frame-wrapper { position: fixed; top: 0; left: 0; right: 0; bottom: 0; width: 100%; height: 100%; z-index: 10; display: flex; flex-direction: column; }
+        #cora-nextjs-iframe { width: 100%; height: 100%; flex: 1; border: none; background: #ffffff; }
+        #cora-frame-loader { position: fixed; top: 0; left: 0; width: 100%; height: 3px; z-index: 99999; background: rgba(24, 24, 27, 0.4); overflow: hidden; }
+        #cora-frame-progress { width: 0%; height: 100%; background: #ffffff; transition: width 0.3s ease; }
+        #cora-error-overlay { display: none; position: fixed; inset: 0; z-index: 50; background: rgba(9,9,11,0.88); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); align-items: center; justify-content: center; padding: 24px; }
+        #cora-error-overlay.active { display: flex; }
+    </style>
+    <script>
+        window.CORA_API_URL = <?php echo json_encode( $api_url ); ?>;
+        window.CORA_PUBLIC_API_URL = <?php echo json_encode( $public_api_url ); ?>;
+        window.CORA_NONCE = <?php echo json_encode( $rest_nonce ); ?>;
+        window.CORA_AJAX_NONCE = <?php echo json_encode( $ajax_nonce ); ?>;
+        window.CORA_THEME_ID = <?php echo json_encode( $theme_id ); ?>;
+        window.CORA_WORKSPACE_SLUG = <?php echo json_encode( $ws_slug ); ?>;
+        window.CORA_IS_PREVIEW = <?php echo $is_preview ? 'true' : 'false'; ?>;
+        window.CORA_TARGET_ROUTE = <?php echo json_encode( $clean_route ); ?>;
+        window.CORA_NEXTJS_LIVE_URL = <?php echo json_encode( $live_url ); ?>;
+    </script>
+</head>
+<body style="background: #09090b; color: #f4f4f5; -webkit-font-smoothing: antialiased;">
+    <div id="cora-frame-loader"><div id="cora-frame-progress"></div></div>
+
+    <div id="cora-nextjs-frame-wrapper">
+        <iframe
+            id="cora-nextjs-iframe"
+            src="<?php echo esc_url( $iframe_src ); ?>"
+            allow="geolocation; microphone; camera; midi; vr; accelerometer; gyroscope; payment; ambient-light-sensor; encrypted-media; usb"
+            sandbox="allow-forms allow-modals allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts allow-downloads"
+            title="<?php echo esc_attr( $ws_name ); ?> Next.js Preview"
+        ></iframe>
+    </div>
+
+    <!-- Error / Server Not Running Fallback Overlay -->
+    <div id="cora-error-overlay">
+        <div style="max-width: 460px; width: 100%; background: #18181b; border: 1px solid #27272a; border-radius: 16px; padding: 28px 24px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.6); text-align: center;">
+            <div style="width: 44px; height: 44px; border-radius: 12px; background: #27272a; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px; border: 1px solid #3f3f46;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f4f4f5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            </div>
+            <h3 style="font-size: 16px; font-weight: 600; color: #f4f4f5; margin-bottom: 8px; letter-spacing: -0.01em;">Waiting for Next.js Dev Server</h3>
+            <p style="font-size: 13px; color: #a1a1aa; line-height: 1.5; margin-bottom: 16px;">
+                Unable to connect to <code style="background: #27272a; color: #f4f4f5; padding: 2px 6px; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 12px;"><?php echo esc_html( $live_url ); ?></code>.
+                Please ensure your local dev server is running.
+            </p>
+            <div style="background: #09090b; border: 1px solid #27272a; border-radius: 8px; padding: 10px 14px; text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #d4d4d8; margin-bottom: 20px;">
+                <span style="color: #71717a;">$</span> npm run dev
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button onclick="window.location.reload()" style="background: #ffffff; color: #09090b; border: none; font-weight: 600; font-size: 13px; padding: 8px 18px; border-radius: 8px; cursor: pointer; transition: opacity 0.15s ease;">
+                    Retry Connection
+                </button>
+                <button onclick="window.location.href=window.location.pathname+'?cv_edit_url=1'" style="background: #27272a; color: #f4f4f5; border: 1px solid #3f3f46; font-weight: 500; font-size: 13px; padding: 8px 16px; border-radius: 8px; cursor: pointer;">
+                    Change URL
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    (function() {
+        var iframe = document.getElementById('cora-nextjs-iframe');
+        var progress = document.getElementById('cora-frame-progress');
+        var loader = document.getElementById('cora-frame-loader');
+        var overlay = document.getElementById('cora-error-overlay');
+        var isPreview = <?php echo $is_preview ? 'true' : 'false'; ?>;
+        var themeId = <?php echo json_encode( $theme_id ); ?>;
+        var wsSlug = <?php echo json_encode( $ws_slug ); ?>;
+
+        if (progress) progress.style.width = '60%';
+
+        var loadTimeout = setTimeout(function() {
+            try {
+                if (iframe && !iframe.contentWindow) {
+                    overlay.classList.add('active');
+                }
+            } catch(e) {}
+        }, 10000);
+
+        iframe.addEventListener('load', function() {
+            clearTimeout(loadTimeout);
+            if (progress) progress.style.width = '100%';
+            setTimeout(function() {
+                if (loader) loader.style.display = 'none';
+            }, 300);
+
+            try {
+                iframe.contentWindow.postMessage({
+                    type: 'CORA_INIT',
+                    apiUrl: window.CORA_API_URL,
+                    publicApiUrl: window.CORA_PUBLIC_API_URL,
+                    nonce: window.CORA_NONCE,
+                    themeId: window.CORA_THEME_ID,
+                    workspaceSlug: window.CORA_WORKSPACE_SLUG,
+                    route: window.CORA_TARGET_ROUTE
+                }, '*');
+            } catch(e) {}
+        });
+
+        // Listen for route sync from child Next.js frame
+        window.addEventListener('message', function(event) {
+            if (!event.data || typeof event.data !== 'object') return;
+
+            if (event.data.type === 'CORA_ROUTE_CHANGE' && event.data.path) {
+                var newPath = event.data.path;
+                var currentUrl = new URL(window.location.href);
+                var pathPrefix = currentUrl.pathname.startsWith('/site/' + wsSlug) ? ('/site/' + wsSlug) : (currentUrl.pathname.startsWith('/site') ? '/site' : (currentUrl.pathname.startsWith('/' + wsSlug) ? ('/' + wsSlug) : ''));
+                
+                var cleanNew = (newPath === '/' || newPath === '/home') ? '' : ('/' + newPath.replace(/^\/+/, ''));
+                var formatted = (pathPrefix ? pathPrefix : '') + (cleanNew ? cleanNew : '/');
+                if (formatted !== currentUrl.pathname) {
+                    currentUrl.pathname = formatted;
+                    try {
+                        window.history.replaceState(null, '', currentUrl.toString());
+                    } catch(e) {}
+                }
+            }
+
+            if (event.data.type === 'CORA_GET_CONFIG') {
+                try {
+                    iframe.contentWindow.postMessage({
+                        type: 'CORA_CONFIG_RESPONSE',
+                        apiUrl: window.CORA_API_URL,
+                        nonce: window.CORA_NONCE,
+                        themeId: window.CORA_THEME_ID,
+                        workspaceSlug: window.CORA_WORKSPACE_SLUG
+                    }, '*');
+                } catch(e) {}
+            }
+        });
+    })();
+    </script>
+
+    <?php echo $preview_bar_html; ?>
+</body>
+</html>
+    <?php
+    exit;
+}
+}
+
+/**
+ * Render Monochromatic Next.js Native Connector Screen
+ */
+if ( ! function_exists( 'cora_render_nextjs_connector_screen' ) ) {
+function cora_render_nextjs_connector_screen( $active_theme = array(), $target_ws = array(), $target_page_slug = '', $is_preview = false ) {
+    while ( ob_get_level() > 0 ) {
+        ob_end_clean();
+    }
+    status_header( 200 );
+    nocache_headers();
+
+    global $wpdb;
+    $theme_id = ! empty( $active_theme['id'] ) ? intval( $active_theme['id'] ) : 0;
+    $theme_settings = $active_theme ? ( json_decode( $active_theme['settings'] ?? '{}', true ) ?: array() ) : array();
+
+    $ws_name = ! empty( $target_ws['name'] ) ? $target_ws['name'] : get_bloginfo( 'name' );
+    $ws_slug = ! empty( $target_ws['slug'] ) ? $target_ws['slug'] : ( ! empty( $GLOBALS['cora_active_workspace_site_slug'] ) ? $GLOBALS['cora_active_workspace_site_slug'] : 'workspace' );
+
+    $repo = $theme_settings['github_repo'] ?? '';
+    $branch = $theme_settings['github_branch'] ?? 'main';
+    $current_live_url = $theme_settings['nextjs_live_url'] ?? ( $theme_settings['live_url'] ?? '' );
+    $ajax_nonce = wp_create_nonce( 'cora_ajax_nonce' );
+
+    // Fetch scanned routes for this theme
+    $routes = array();
+    if ( $theme_id > 0 ) {
+        $routes = $wpdb->get_results( $wpdb->prepare(
+            "SELECT id, title, slug, is_homepage, status FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d AND status != 'trash' ORDER BY is_homepage DESC, id ASC",
+            $theme_id
+        ), ARRAY_A );
+    }
+
+    if ( empty( $routes ) ) {
+        $routes = array(
+            array( 'title' => 'Home', 'slug' => 'home', 'is_homepage' => 1 ),
+            array( 'title' => 'About', 'slug' => 'about', 'is_homepage' => 0 ),
+            array( 'title' => 'Services', 'slug' => 'services', 'is_homepage' => 0 ),
+            array( 'title' => 'Contact', 'slug' => 'contact', 'is_homepage' => 0 ),
+        );
+    }
+
+    $preview_bar_html = '';
+    if ( $is_preview && function_exists( 'cora_canvas_preview_bar_js' ) ) {
+        $rest_url = esc_url( cora_get_origin_relative_url( rest_url( 'cora/v1/preview-bar-data' ) ) );
+        $site_url = esc_url( home_url() );
+        $preview_bar_html = '<script id="cora-preview-bar-injector">' . "\n"
+            . 'var REST_BASE = ' . json_encode( $rest_url ) . ";\n"
+            . 'var SITE_URL = ' . json_encode( $site_url ) . ";\n"
+            . cora_canvas_preview_bar_js()
+            . '</script>' . "\n";
+    }
+
+    $manifest_api_url = rest_url( 'cora-canvas/v1/nextjs/manifest' . ( $theme_id ? '?theme_id=' . $theme_id : '' ) );
+
+    header( 'Content-Type: text/html; charset=UTF-8' );
+    ?>
+<!DOCTYPE html>
+<html lang="en" style="background: #09090b; color: #f4f4f5; min-height: 100%;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?php echo esc_html( $ws_name ); ?> — Next.js Native Connector</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: #09090b; color: #f4f4f5; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px 16px; -webkit-font-smoothing: antialiased; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        .toast-enter { transform: translateY(0); opacity: 1; transition: all 0.25s ease-out; }
+        .toast-exit { transform: translateY(-10px); opacity: 0; transition: all 0.2s ease-in; }
+        .btn-hover:hover { background: #ffffff !important; }
+        .btn-hover:active { transform: scale(0.98); }
+        .preset-chip { background: #18181b; color: #a1a1aa; border: 1px solid #27272a; padding: 3px 8px; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 11px; cursor: pointer; transition: all 0.15s ease; }
+        .preset-chip:hover { background: #27272a; color: #f4f4f5; border-color: #3f3f46; }
+    </style>
+</head>
+<body>
+    <!-- Monochromatic Toast Notification Container -->
+    <div id="cora-toast-container" style="position: fixed; top: 20px; right: 20px; z-index: 999999; display: flex; flex-direction: column; gap: 8px; pointer-events: none;"></div>
+
+    <main style="width: 100%; max-width: 620px; background: #18181b; border: 1px solid #27272a; border-radius: 20px; padding: 32px 28px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.6); margin: auto;">
+        <!-- Header -->
+        <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #27272a; padding-bottom: 20px; margin-bottom: 24px;">
+            <div style="display: flex; align-items: center; gap: 14px;">
+                <div style="width: 42px; height: 42px; border-radius: 12px; background: #27272a; border: 1px solid #3f3f46; display: flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #ffffff; font-size: 18px;">
+                    N
+                </div>
+                <div>
+                    <h1 style="font-size: 16px; font-weight: 600; color: #f4f4f5; display: flex; align-items: center; gap: 8px; letter-spacing: -0.01em;">
+                        <?php echo esc_html( $ws_name ); ?>
+                        <span style="font-size: 11px; font-family: 'JetBrains Mono', monospace; font-weight: 500; background: #27272a; color: #d4d4d8; border: 1px solid #3f3f46; padding: 2px 7px; border-radius: 6px;">Next.js Engine</span>
+                    </h1>
+                    <p style="font-size: 12px; color: #71717a; margin-top: 2px;">Headless React Bridge & Workspace Connector</p>
+                </div>
+            </div>
+            <div>
+                <span style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 500; background: #27272a; color: #d4d4d8; border: 1px solid #3f3f46;">
+                    <span style="width: 6px; height: 6px; border-radius: 9999px; background: #10b981;"></span>
+                    Ready to Connect
+                </span>
+            </div>
+        </div>
+
+        <!-- Connection Form Card -->
+        <div style="background: #09090b; border: 1px solid #27272a; border-radius: 14px; padding: 20px; margin-bottom: 20px;">
+            <label style="display: block; font-size: 11px; font-weight: 600; color: #a1a1aa; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px;">
+                Live Deployment or Localhost URL
+            </label>
+            <form id="cora-nextjs-connect-form" onsubmit="coraConnectNextjs(event)">
+                <div style="display: flex; gap: 8px; flex-direction: row; flex-wrap: wrap;">
+                    <div style="position: relative; flex: 1; min-width: 220px;">
+                        <input
+                            type="text"
+                            id="cora-live-url-input"
+                            value="<?php echo esc_attr( $current_live_url ?: 'http://localhost:3000' ); ?>"
+                            placeholder="http://localhost:3000"
+                            style="width: 100%; padding: 10px 14px; background: #18181b; border: 1px solid #3f3f46; border-radius: 8px; font-size: 13px; color: #f4f4f5; font-family: 'JetBrains Mono', monospace; outline: none; transition: border-color 0.15s ease;"
+                            required
+                        >
+                    </div>
+                    <button
+                        type="submit"
+                        id="cora-connect-btn"
+                        class="btn-hover"
+                        style="padding: 10px 20px; background: #f4f4f5; color: #09090b; font-weight: 600; font-size: 13px; border-radius: 8px; border: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: all 0.15s ease; white-space: nowrap;"
+                    >
+                        <span id="cora-btn-text">Connect & Launch</span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                    </button>
+                </div>
+
+                <!-- Quick Presets -->
+                <div style="display: flex; align-items: center; gap: 6px; margin-top: 10px; font-size: 11px; color: #71717a; flex-wrap: wrap;">
+                    <span>Presets:</span>
+                    <button type="button" onclick="coraSetPresetUrl('http://localhost:3000')" class="preset-chip">localhost:3000</button>
+                    <button type="button" onclick="coraSetPresetUrl('http://127.0.0.1:3000')" class="preset-chip">127.0.0.1:3000</button>
+                    <button type="button" onclick="coraSetPresetUrl('http://localhost:3001')" class="preset-chip">localhost:3001</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Scanned Routes & Git Repository Summary -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px;">
+            <div style="background: #09090b; border: 1px solid #27272a; border-radius: 12px; padding: 16px;">
+                <div style="font-size: 11px; color: #71717a; text-transform: uppercase; font-weight: 600; letter-spacing: 0.04em; margin-bottom: 8px;">Connected Repository</div>
+                <?php if ( ! empty( $repo ) ) : ?>
+                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #f4f4f5; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 4px;" title="<?php echo esc_attr( $repo ); ?>">
+                        <?php echo esc_html( $repo ); ?>
+                    </div>
+                    <div style="font-size: 11px; color: #a1a1aa; font-family: 'JetBrains Mono', monospace;">
+                        branch: <?php echo esc_html( $branch ); ?>
+                    </div>
+                <?php else : ?>
+                    <div style="font-size: 12px; color: #a1a1aa;">Headless local mode</div>
+                <?php endif; ?>
+            </div>
+
+            <div style="background: #09090b; border: 1px solid #27272a; border-radius: 12px; padding: 16px;">
+                <div style="font-size: 11px; color: #71717a; text-transform: uppercase; font-weight: 600; letter-spacing: 0.04em; margin-bottom: 8px;">Scanned Routes (<?php echo count( $routes ); ?>)</div>
+                <div style="display: flex; flex-wrap: wrap; gap: 6px; max-height: 60px; overflow-y: auto;">
+                    <?php foreach ( $routes as $r ) : ?>
+                        <?php $r_path = ( ! empty( $r['is_homepage'] ) || ( isset( $r['slug'] ) && $r['slug'] === 'home' ) ) ? '/' : '/' . ltrim( $r['slug'], '/' ); ?>
+                        <span style="display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 6px; background: #18181b; color: #d4d4d8; font-family: 'JetBrains Mono', monospace; font-size: 11px; border: 1px solid #27272a;">
+                            <?php echo esc_html( $r_path ); ?>
+                        </span>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        </div>
+
+        <!-- Terminal Guide & API Endpoint -->
+        <div style="background: #09090b; border: 1px solid #27272a; border-radius: 12px; padding: 16px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                <span style="font-size: 11px; color: #71717a; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;">Start Local Next.js Server</span>
+                <span style="font-size: 11px; color: #71717a; font-family: 'JetBrains Mono', monospace;">Terminal</span>
+            </div>
+            <div style="background: #18181b; border: 1px solid #27272a; border-radius: 8px; padding: 10px 14px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #e4e4e7; display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                <code>npm run dev</code>
+                <button type="button" onclick="coraCopySnippet('npm run dev')" style="background: none; border: none; color: #a1a1aa; font-size: 11px; cursor: pointer; padding: 2px 6px;">Copy</button>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: #71717a; border-top: 1px solid #18181b; padding-top: 10px;">
+                <span>Headless Manifest API:</span>
+                <a href="<?php echo esc_url( $manifest_api_url ); ?>" target="_blank" rel="noopener" style="color: #f4f4f5; text-decoration: none; font-family: 'JetBrains Mono', monospace;">
+                    /wp-json/cora-canvas/v1/nextjs/manifest
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <script>
+    var CORA_THEME_ID = <?php echo json_encode( $theme_id ); ?>;
+    var CORA_AJAX_NONCE = <?php echo json_encode( $ajax_nonce ); ?>;
+    var CORA_AJAX_URL = <?php echo json_encode( admin_url( 'admin-ajax.php' ) ); ?>;
+
+    function coraShowToast(message, type) {
+        type = type || 'info';
+        var container = document.getElementById('cora-toast-container');
+        if (!container) return;
+        var toast = document.createElement('div');
+        toast.style.cssText = 'pointer-events: auto; background: #18181b; border: 1px solid #3f3f46; color: #f4f4f5; font-size: 12px; padding: 10px 16px; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 8px; font-weight: 500;';
+        toast.className = 'toast-enter';
+        
+        var icon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a1a1aa" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>';
+        if (type === 'success') {
+            icon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.2"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+        } else if (type === 'error') {
+            icon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>';
+        }
+
+        toast.innerHTML = icon + '<span>' + message + '</span>';
+        container.appendChild(toast);
+
+        setTimeout(function() {
+            toast.className = toast.className.replace('toast-enter', 'toast-exit');
+            setTimeout(function() { toast.remove(); }, 250);
+        }, 3500);
+    }
+
+    function coraSetPresetUrl(url) {
+        var input = document.getElementById('cora-live-url-input');
+        if (input) input.value = url;
+    }
+
+    function coraCopySnippet(text) {
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(text).then(function() {
+                coraShowToast('Command copied to clipboard.', 'success');
+            });
+        }
+    }
+
+    function coraConnectNextjs(e) {
+        e.preventDefault();
+        var input = document.getElementById('cora-live-url-input');
+        var btn = document.getElementById('cora-connect-btn');
+        var btnText = document.getElementById('cora-btn-text');
+        var liveUrl = input ? input.value.trim() : '';
+
+        if (!liveUrl) {
+            coraShowToast('Please enter a valid deployment or localhost URL.', 'error');
+            return;
+        }
+
+        if (btn) btn.disabled = true;
+        if (btnText) btnText.textContent = 'Connecting...';
+
+        var formData = new FormData();
+        formData.append('action', 'cora_nextjs_save_live_url');
+        formData.append('theme_id', CORA_THEME_ID);
+        formData.append('live_url', liveUrl);
+        formData.append('nonce', CORA_AJAX_NONCE);
+
+        fetch(CORA_AJAX_URL, {
+            method: 'POST',
+            body: formData,
+            credentials: 'same-origin'
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            if (data && data.success) {
+                coraShowToast('Connected! Launching live preview...', 'success');
+                setTimeout(function() {
+                    window.location.reload();
+                }, 600);
+            } else {
+                var msg = (data && data.data && data.data.message) ? data.data.message : 'Failed to save live URL.';
+                coraShowToast(msg, 'error');
+                if (btn) btn.disabled = false;
+                if (btnText) btnText.textContent = 'Connect & Launch';
+            }
+        })
+        .catch(function(err) {
+            coraShowToast('Network error: ' + err.message, 'error');
+            if (btn) btn.disabled = false;
+            if (btnText) btnText.textContent = 'Connect & Launch';
+        });
+    }
+    </script>
+
+    <?php echo $preview_bar_html; ?>
+</body>
+</html>
+    <?php
+    exit;
+}
+}
+
+/**
+ * AJAX: Save Next.js Live Deployment / Local Dev URL
+ */
+if ( ! function_exists( 'cora_ajax_nextjs_save_live_url' ) ) {
+function cora_ajax_nextjs_save_live_url() {
+    $nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( $_POST['nonce'] ) : ( isset( $_POST['security'] ) ? sanitize_text_field( $_POST['security'] ) : ( isset( $_POST['_wpnonce'] ) ? sanitize_text_field( $_POST['_wpnonce'] ) : '' ) );
+    $authorized = false;
+    if ( ! empty( $nonce ) ) {
+        if ( wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) || wp_verify_nonce( $nonce, 'cora_re_nonce' ) || wp_verify_nonce( $nonce, 'wp_rest' ) || wp_verify_nonce( $nonce, 'cora_canvas_nonce' ) ) {
+            $authorized = true;
+        }
+    }
+    if ( ! $authorized && function_exists( 'check_ajax_referer' ) ) {
+        if ( check_ajax_referer( 'cora_ajax_nonce', 'nonce', false ) || check_ajax_referer( 'cora_re_nonce', 'nonce', false ) || check_ajax_referer( 'cora_ajax_nonce', 'security', false ) ) {
+            $authorized = true;
+        }
+    }
+    if ( ! $authorized && is_user_logged_in() && ( current_user_can( 'edit_posts' ) || current_user_can( 'manage_options' ) ) ) {
+        $authorized = true;
+    }
+    if ( ! $authorized ) {
+        wp_send_json_error( array( 'message' => 'Security check failed. Please refresh the page.' ) );
+    }
+
+    global $wpdb;
+    $theme_id = isset( $_POST['theme_id'] ) ? intval( $_POST['theme_id'] ) : 0;
+    $live_url = isset( $_POST['live_url'] ) ? trim( wp_unslash( $_POST['live_url'] ) ) : '';
+
+    if ( ! empty( $live_url ) ) {
+        if ( ! preg_match( '#^https?://#i', $live_url ) ) {
+            $live_url = 'http://' . $live_url;
+        }
+        $live_url = rtrim( $live_url, '/' );
+        if ( ! filter_var( $live_url, FILTER_VALIDATE_URL ) && strpos( $live_url, 'localhost' ) === false ) {
+            wp_send_json_error( array( 'message' => 'Invalid URL format. Please provide a valid HTTP or HTTPS URL.' ) );
+        }
+    }
+
+    if ( $theme_id <= 0 ) {
+        $live_theme = $wpdb->get_row( "SELECT id FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live' ORDER BY id DESC LIMIT 1", ARRAY_A );
+        if ( ! $live_theme ) {
+            $live_theme = $wpdb->get_row( "SELECT id FROM {$wpdb->prefix}cora_canvas_themes ORDER BY id DESC LIMIT 1", ARRAY_A );
+        }
+        $theme_id = $live_theme ? intval( $live_theme['id'] ) : 0;
+    }
+
+    if ( $theme_id <= 0 ) {
+        wp_send_json_error( array( 'message' => 'Theme ID is required.' ) );
+    }
+
+    $theme = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d", $theme_id ), ARRAY_A );
+    if ( ! $theme ) {
+        wp_send_json_error( array( 'message' => 'Theme workspace record not found.' ) );
+    }
+
+    $settings = json_decode( $theme['settings'] ?? '{}', true ) ?: array();
+    $settings['source']          = 'nextjs';
+    $settings['nextjs_live_url'] = $live_url;
+    $settings['live_url']        = $live_url;
+
+    $wpdb->update(
+        $wpdb->prefix . 'cora_canvas_themes',
+        array(
+            'settings'   => wp_json_encode( $settings ),
+            'updated_at' => current_time( 'mysql' )
+        ),
+        array( 'id' => $theme_id )
+    );
+
+    wp_send_json_success( array(
+        'message'  => 'Next.js live URL saved successfully.',
+        'theme_id' => $theme_id,
+        'live_url' => $live_url
+    ) );
+}
+}
+add_action( 'wp_ajax_cora_nextjs_save_live_url', 'cora_ajax_nextjs_save_live_url' );
+
+/**
  * Serve Canvas Themes dynamic frontend routing
  */
 if ( ! function_exists( 'cora_canvas_theme_frontend_router' ) ) {
@@ -9287,6 +9843,29 @@ function cora_canvas_theme_frontend_router() {
             if ( ! $canvas_page ) {
                 $canvas_page = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d ORDER BY id ASC LIMIT 1", $active_theme_id ), ARRAY_A );
             }
+        }
+    }
+
+    $source = isset( $theme_settings['source'] ) ? $theme_settings['source'] : ( isset( $active_theme['source'] ) ? $active_theme['source'] : '' );
+
+    // If active/preview theme source is Next.js, render live frame bridge or native connector screen
+    if ( 'nextjs' === $source || ( ! empty( $active_theme['source'] ) && 'nextjs' === $active_theme['source'] ) ) {
+        $nextjs_live_url = ! empty( $theme_settings['nextjs_live_url'] ) ? trim( $theme_settings['nextjs_live_url'] ) : ( ! empty( $theme_settings['live_url'] ) ? trim( $theme_settings['live_url'] ) : '' );
+        $nextjs_live_url = rtrim( $nextjs_live_url, '/' );
+
+        $target_route = '/';
+        if ( $canvas_page ) {
+            $target_route = ( ! empty( $canvas_page['is_homepage'] ) || ( isset( $canvas_page['slug'] ) && $canvas_page['slug'] === 'home' ) ) ? '/' : '/' . ltrim( $canvas_page['slug'], '/' );
+        } elseif ( ! empty( $target_page_slug ) && $target_page_slug !== 'home' ) {
+            $target_route = '/' . ltrim( $target_page_slug, '/' );
+        }
+
+        if ( ! empty( $nextjs_live_url ) ) {
+            cora_render_nextjs_live_frame( $nextjs_live_url, $target_route, $active_theme, $target_ws, $is_preview );
+            exit;
+        } else {
+            cora_render_nextjs_connector_screen( $active_theme, $target_ws, $target_route, $is_preview );
+            exit;
         }
     }
 
