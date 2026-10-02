@@ -1196,7 +1196,13 @@ body.cora-inventory-focus-mode .cora-sidebar-search {
                     <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
                     <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-300">Allotted Van Inventory</h3>
                 </div>
-                <span id="cora-vendor-van-stock-badge" class="px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300">0 SKUs</span>
+                <div class="flex items-center gap-2">
+                    <span id="cora-vendor-van-stock-badge" class="px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300">0 SKUs</span>
+                    <button type="button" onclick="CoraInventory.printVanStock()" class="py-1 px-2.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-[11px] font-semibold flex items-center gap-1 transition-colors cursor-pointer" title="Print Current Van Inventory & Cargo Sheet">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                        <span>Print Van Stock</span>
+                    </button>
+                </div>
             </div>
             <div id="cora-vendor-van-stock-list" class="space-y-2">
                 <!-- Populated via AJAX -->
@@ -3732,6 +3738,9 @@ window.CoraInventory = (function($) {
                             <div class="text-[11px] text-zinc-500">${escapeHtml(c.vendor_name)} • ${escapeHtml(c.vehicle_no)}${c.driver_email ? ' • <span class="font-mono text-[10px]">' + escapeHtml(c.driver_email) + '</span>' : ''}</div>
                         </div>
                         <div class="flex items-center gap-1.5 shrink-0">
+                            <button type="button" onclick="CoraInventory.printVanStock(${c.id})" class="p-1.5 rounded-lg bg-zinc-50 dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 transition-colors cursor-pointer" title="Print Van Stock & Cargo Manifest">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                            </button>
                             <button type="button" onclick="CoraInventory.openEditConsignmentModal(${c.id})" class="p-1.5 rounded-lg bg-zinc-50 dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 transition-colors cursor-pointer" title="Edit Consignment">
                                 <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                             </button>
@@ -6455,6 +6464,31 @@ window.CoraInventory = (function($) {
         window.open(url, '_blank', 'width=920,height=960,scrollbars=yes,status=yes');
     }
 
+    function printVanStock(consignmentId) {
+        const targetConsignmentId = consignmentId || activeConsignmentId || 0;
+        if (!targetConsignmentId && (!activeConsignmentItems || !activeConsignmentItems.length)) {
+            if (window.coraShowToast) {
+                window.coraShowToast('No active van consignment or cargo items found to print.', 'info');
+            }
+            return;
+        }
+
+        const params = {
+            action: 'cora_inventory_render_van_stock_sheet',
+            autoprint: 1
+        };
+        if (targetConsignmentId) {
+            params.consignment_id = targetConsignmentId;
+        }
+
+        const queryStr = $.param(params);
+        const url = (ajaxurl || '/wp-admin/admin-ajax.php') + '?' + queryStr;
+        if (window.coraShowToast) {
+            window.coraShowToast('Opening printable Van Stock & Cargo Manifest...', 'info');
+        }
+        window.open(url, '_blank', 'width=1100,height=960,scrollbars=yes,status=yes');
+    }
+
     function openEditSaleModal(saleId) {
         const s = (salesLedgerCache || []).find(x => parseInt(x.id) === parseInt(saleId));
         if (!s) return;
@@ -7452,6 +7486,7 @@ window.CoraInventory = (function($) {
         renderVendorVanStock,
         loadVendorDashboard,
         printSaleInvoice,
+        printVanStock,
         openEditSaleModal,
         closeEditSaleModal,
         submitUpdateSale,
