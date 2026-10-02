@@ -443,6 +443,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="dns-prefetch" href="https://fonts.googleapis.com">
     <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
     <link rel="preload" href="<?php echo CORA_WORKSPACE_URL . 'assets/css/tailwind-built.css?v=' . CORA_WORKSPACE_VERSION; ?>" as="style">
     <link rel="preload" href="<?php echo CORA_WORKSPACE_URL . 'assets/css/admin-style.css?v=' . CORA_WORKSPACE_VERSION; ?>" as="style">
     <link rel="preload" href="<?php echo CORA_WORKSPACE_URL . 'assets/js/admin-script.js?v=' . CORA_WORKSPACE_VERSION; ?>" as="script">
@@ -4428,6 +4429,39 @@ body.cora-scroll-locked {
     overscroll-behavior: contain !important;
     overscroll-behavior-y: contain !important;
     -webkit-overflow-scrolling: touch !important;
+}
+
+/* High-Performance Rendering Engine: GPU Compositing & Content Visibility */
+.cora-portal-drawer,
+.cora-mobile-portal-drawer,
+.cora-drawer,
+.cora-sheet,
+[id$="-drawer"],
+[id$="-sheet"] {
+    will-change: transform;
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+
+button,
+a,
+input,
+select,
+textarea,
+[role="button"],
+.cora-btn,
+.cora-tab-btn,
+.cora-clickable {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.cora-table-body tr:nth-child(n+12),
+.cora-kanban-card:nth-child(n+8),
+.cora-card-grid > *:nth-child(n+10) {
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 64px;
 }
 </style>
 

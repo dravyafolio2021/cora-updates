@@ -3892,6 +3892,11 @@ function cora_get_custom_enabled_features() {
  */
 if ( ! function_exists( 'cora_get_all_roles' ) ) {
 function cora_get_all_roles() {
+    static $cached_roles = null;
+    if ( $cached_roles !== null ) {
+        return $cached_roles;
+    }
+
     $active_industry = function_exists( 'cora_get_active_industry' ) ? cora_get_active_industry() : 'photography_studio';
     $module = class_exists( 'Cora_Module_Registry' ) ? Cora_Module_Registry::get_module( $active_industry ) : null;
     
@@ -3925,6 +3930,7 @@ function cora_get_all_roles() {
         }
     }
     
+    $cached_roles = $roles;
     return $roles;
 }
 }
@@ -7812,7 +7818,13 @@ function cora_get_team_members_rest() {
 
 if ( ! function_exists( 'cora_get_workspace_team_members' ) ) {
     function cora_get_workspace_team_members() {
+        static $cached_team = array();
         $agency_id = cora_get_current_user_agency_id();
+        $cache_key = (string) $agency_id;
+        if ( isset( $cached_team[ $cache_key ] ) ) {
+            return $cached_team[ $cache_key ];
+        }
+
         $args = array();
         if ( ! empty( $agency_id ) && $agency_id !== 'super' ) {
             $args['meta_query'] = array(
@@ -7860,6 +7872,7 @@ if ( ! function_exists( 'cora_get_workspace_team_members' ) ) {
             );
         }
 
+        $cached_team[ $cache_key ] = $team;
         return $team;
     }
 }

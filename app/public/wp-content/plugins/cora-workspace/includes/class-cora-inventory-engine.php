@@ -42,6 +42,7 @@ class Cora_Inventory_Engine {
         add_action( 'wp_ajax_cora_inventory_export_daily_pdf', array( __CLASS__, 'ajax_export_daily_pdf' ) );
         add_action( 'wp_ajax_cora_inventory_render_pdf_view', array( __CLASS__, 'ajax_render_pdf_view' ) );
         add_action( 'wp_ajax_cora_inventory_render_catalog_pdf', array( __CLASS__, 'ajax_render_catalog_pdf' ) );
+        add_action( 'wp_ajax_cora_inventory_render_sale_invoice', array( __CLASS__, 'ajax_render_sale_invoice' ) );
         add_action( 'wp_ajax_cora_inventory_resend_consignment_email', array( __CLASS__, 'ajax_resend_consignment_email' ) );
         add_action( 'wp_ajax_cora_track_dispatch_email_open', array( __CLASS__, 'ajax_track_dispatch_email_open' ) );
         add_action( 'wp_ajax_nopriv_cora_track_dispatch_email_open', array( __CLASS__, 'ajax_track_dispatch_email_open' ) );
@@ -703,6 +704,47 @@ class Cora_Inventory_Engine {
                 }
                 if ( ! in_array( 'email_open_count', $cols, true ) ) {
                     $wpdb->query( "ALTER TABLE {$table_c} ADD COLUMN email_open_count int(11) NOT NULL DEFAULT 0 AFTER email_opened_at" );
+                }
+            }
+        }
+
+        $table_ci = $wpdb->prefix . 'cora_inventory_consignment_items';
+        if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $table_ci ) ) {
+            $cols = $wpdb->get_col( "SHOW COLUMNS FROM {$table_ci}" );
+            if ( ! empty( $cols ) ) {
+                if ( ! in_array( 'pricing_type', $cols, true ) ) {
+                    $wpdb->query( "ALTER TABLE {$table_ci} ADD COLUMN pricing_type varchar(30) NOT NULL DEFAULT 'unit_based' AFTER product_name" );
+                }
+                if ( ! in_array( 'unit_weight_grams', $cols, true ) ) {
+                    $wpdb->query( "ALTER TABLE {$table_ci} ADD COLUMN unit_weight_grams decimal(10,2) DEFAULT NULL AFTER pricing_type" );
+                }
+                if ( ! in_array( 'dispatched_weight_kg', $cols, true ) ) {
+                    $wpdb->query( "ALTER TABLE {$table_ci} ADD COLUMN dispatched_weight_kg decimal(10,3) NOT NULL DEFAULT 0.000 AFTER dispatched_qty" );
+                }
+                if ( ! in_array( 'sold_weight_kg', $cols, true ) ) {
+                    $wpdb->query( "ALTER TABLE {$table_ci} ADD COLUMN sold_weight_kg decimal(10,3) NOT NULL DEFAULT 0.000 AFTER sold_qty" );
+                }
+                if ( ! in_array( 'weight_rate', $cols, true ) ) {
+                    $wpdb->query( "ALTER TABLE {$table_ci} ADD COLUMN weight_rate decimal(10,2) NOT NULL DEFAULT 401.25 AFTER unit_rate" );
+                }
+            }
+        }
+
+        $table_si = $wpdb->prefix . 'cora_inventory_sales_items';
+        if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $table_si ) ) {
+            $cols = $wpdb->get_col( "SHOW COLUMNS FROM {$table_si}" );
+            if ( ! empty( $cols ) ) {
+                if ( ! in_array( 'pricing_type', $cols, true ) ) {
+                    $wpdb->query( "ALTER TABLE {$table_si} ADD COLUMN pricing_type varchar(30) NOT NULL DEFAULT 'unit_based' AFTER product_name" );
+                }
+                if ( ! in_array( 'unit_weight_grams', $cols, true ) ) {
+                    $wpdb->query( "ALTER TABLE {$table_si} ADD COLUMN unit_weight_grams decimal(10,2) DEFAULT NULL AFTER pricing_type" );
+                }
+                if ( ! in_array( 'weight_kg', $cols, true ) ) {
+                    $wpdb->query( "ALTER TABLE {$table_si} ADD COLUMN weight_kg decimal(10,3) NOT NULL DEFAULT 0.000 AFTER quantity" );
+                }
+                if ( ! in_array( 'weight_rate', $cols, true ) ) {
+                    $wpdb->query( "ALTER TABLE {$table_si} ADD COLUMN weight_rate decimal(10,2) NOT NULL DEFAULT 401.25 AFTER unit_price" );
                 }
             }
         }
@@ -2476,11 +2518,10 @@ class Cora_Inventory_Engine {
         $total_dispatched_val = 0.00;
         $validated_items = array();
 
-        // Validate stock quantities & calculate value (strictly >= 1 unit)
+        // Validate stock quantities & calculate value (supporting weight-based @ ₹401.25/kg & unit-based)
         foreach ( $items_raw as $item ) {
             $product_id = intval( $item['product_id'] ?? 0 );
-            $qty = intval( $item['quantity'] ?? 0 );
-            if ( ! $product_id || $qty <= 0 ) {
+            if ( ! $product_id ) {
                 continue;
             }
 
@@ -2489,27 +2530,76 @@ class Cora_Inventory_Engine {
                 continue;
             }
 
-            if ( $product['stock_quantity'] < $qty ) {
-                wp_send_json_error( sprintf( 'Insufficient plant stock for "%s". Available: %d, Requested: %d', $product['name'], $product['stock_quantity'], $qty ) );
+            $is_weight_based = ( ( $product['pricing_type'] ?? '' ) === 'weight_based' || ( $product['pricing_type'] ?? '' ) === 'weight' )
+                || ( ! empty( $product['unit_weight_grams'] ) && floatval( $product['unit_weight_grams'] ) > 0 )
+                || ( ! empty( $product['uom'] ) && strpos( $product['uom'], 'g)' ) !== false )
+                || ( ! empty( $product['sku'] ) && ( strpos( $product['sku'], 'KGZ-WGT' ) !== false || strpos( $product['sku'], 'STN-WGT' ) !== false ) )
+                || ( ! empty( $product['description'] ) && strpos( $product['description'], '/Kg' ) !== false );
+
+            if ( $is_weight_based ) {
+                $weight_kg = ! empty( $item['weight_kg'] ) ? floatval( $item['weight_kg'] ) : ( ! empty( $item['quantity'] ) ? floatval( $item['quantity'] ) : 0.0 );
+                if ( $weight_kg <= 0 ) {
+                    continue;
+                }
+
+                $weight_rate = 401.25;
+                $line_total = round( $weight_kg * $weight_rate, 2 );
+                $unit_weight_grams = floatval( $product['unit_weight_grams'] ?? 0 ) > 0 ? floatval( $product['unit_weight_grams'] ) : 1000.0;
+                $units_to_deduct = max( 1, (int) ceil( ( $weight_kg * 1000.0 ) / $unit_weight_grams ) );
+
+                if ( $product['stock_quantity'] < $units_to_deduct ) {
+                    wp_send_json_error( sprintf( 'Insufficient plant stock for "%s". Available: %d units (%s kg equivalent), Requested: %.2f kg (%d units)', $product['name'], $product['stock_quantity'], number_format( ( $product['stock_quantity'] * $unit_weight_grams ) / 1000.0, 2 ), $weight_kg, $units_to_deduct ) );
+                }
+
+                $total_dispatched_val += $line_total;
+
+                $validated_items[] = array(
+                    'product_id'           => $product_id,
+                    'product_name'         => $product['name'],
+                    'sku'                  => $product['sku'],
+                    'pricing_type'         => 'weight_based',
+                    'unit_weight_grams'    => $unit_weight_grams,
+                    'quantity'             => $units_to_deduct,
+                    'dispatched_weight_kg' => $weight_kg,
+                    'unit_rate'            => 0.00,
+                    'weight_rate'          => $weight_rate,
+                    'line_total'           => $line_total,
+                    'prev_stock'           => $product['stock_quantity'],
+                    'units_deduct'         => $units_to_deduct,
+                );
+            } else {
+                $qty = intval( $item['quantity'] ?? 0 );
+                if ( $qty <= 0 ) {
+                    continue;
+                }
+
+                if ( $product['stock_quantity'] < $qty ) {
+                    wp_send_json_error( sprintf( 'Insufficient plant stock for "%s". Available: %d, Requested: %d', $product['name'], $product['stock_quantity'], $qty ) );
+                }
+
+                $unit_rate = floatval( $product['wholesale_price'] );
+                $line_total = round( $unit_rate * $qty, 2 );
+                $total_dispatched_val += $line_total;
+
+                $validated_items[] = array(
+                    'product_id'           => $product_id,
+                    'product_name'         => $product['name'],
+                    'sku'                  => $product['sku'],
+                    'pricing_type'         => 'unit_based',
+                    'unit_weight_grams'    => null,
+                    'quantity'             => $qty,
+                    'dispatched_weight_kg' => 0.000,
+                    'unit_rate'            => $unit_rate,
+                    'weight_rate'          => 401.25,
+                    'line_total'           => $line_total,
+                    'prev_stock'           => $product['stock_quantity'],
+                    'units_deduct'         => $qty,
+                );
             }
-
-            $unit_rate = floatval( $product['wholesale_price'] );
-            $line_total = $unit_rate * $qty;
-            $total_dispatched_val += $line_total;
-
-            $validated_items[] = array(
-                'product_id'   => $product_id,
-                'product_name' => $product['name'],
-                'sku'          => $product['sku'],
-                'quantity'     => $qty,
-                'unit_rate'    => $unit_rate,
-                'line_total'   => $line_total,
-                'prev_stock'   => $product['stock_quantity'],
-            );
         }
 
         if ( empty( $validated_items ) ) {
-            wp_send_json_error( 'Please allocate at least one product with 1 or more units. Zero unit dispatches are not permitted.' );
+            wp_send_json_error( 'Please allocate at least one product with valid weight (kg) or units. Zero unit dispatches are not permitted.' );
         }
 
         // Package route meta & cities in notes
@@ -2565,18 +2655,23 @@ class Cora_Inventory_Engine {
                     'product_id'           => $v_item['product_id'],
                     'product_name'         => $v_item['product_name'],
                     'sku'                  => $v_item['sku'],
+                    'pricing_type'         => $v_item['pricing_type'],
+                    'unit_weight_grams'    => $v_item['unit_weight_grams'],
                     'dispatched_qty'       => $v_item['quantity'],
+                    'dispatched_weight_kg' => $v_item['dispatched_weight_kg'],
                     'sold_qty'             => 0,
+                    'sold_weight_kg'       => 0.000,
                     'returned_good_qty'    => 0,
                     'returned_damaged_qty' => 0,
                     'unit_rate'            => $v_item['unit_rate'],
+                    'weight_rate'          => $v_item['weight_rate'],
                     'line_total'           => $v_item['line_total'],
                     'created_at'           => $now,
                 )
             );
 
             // Deduct plant stock
-            $new_stock = max( 0, $v_item['prev_stock'] - $v_item['quantity'] );
+            $new_stock = max( 0, $v_item['prev_stock'] - $v_item['units_deduct'] );
             $wpdb->update(
                 $table_products,
                 array( 'stock_quantity' => $new_stock, 'updated_at' => $now ),
@@ -3140,28 +3235,73 @@ class Cora_Inventory_Engine {
             $product_id = intval( $it['product_id'] ?? 0 );
             $product_name = sanitize_text_field( $it['product_name'] ?? 'Stationery Item' );
             $sku = sanitize_text_field( $it['sku'] ?? '' );
-            $qty = intval( $it['quantity'] ?? 1 );
-            $unit_price = floatval( $it['unit_price'] ?? 0.00 );
+            $pricing_type = sanitize_text_field( $it['pricing_type'] ?? 'unit_based' );
             $gst_rate = floatval( $it['gst_rate'] ?? 12.00 );
+            $unit_weight_grams = ! empty( $it['unit_weight_grams'] ) ? floatval( $it['unit_weight_grams'] ) : 0.0;
 
-            if ( $qty <= 0 || $unit_price <= 0 ) {
-                continue;
+            if ( $product_id ) {
+                $p_row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_inventory_products WHERE id = %d", $product_id ), ARRAY_A );
+                if ( $p_row ) {
+                    if ( ( $p_row['pricing_type'] ?? '' ) === 'weight_based' || floatval( $p_row['unit_weight_grams'] ?? 0 ) > 0 || strpos( $p_row['sku'] ?? '', 'KGZ-WGT' ) !== false ) {
+                        $pricing_type = 'weight_based';
+                        $unit_weight_grams = floatval( $p_row['unit_weight_grams'] ?? 0 ) > 0 ? floatval( $p_row['unit_weight_grams'] ) : 1000.0;
+                    }
+                }
             }
 
-            $line_total = $qty * $unit_price;
-            $tax = ( $line_total * $gst_rate ) / 100.00;
-            $subtotal += $line_total;
-            $total_tax += $tax;
+            if ( $pricing_type === 'weight_based' || ! empty( $it['weight_kg'] ) ) {
+                $weight_kg = floatval( $it['weight_kg'] ?? 0.0 );
+                if ( $weight_kg <= 0 ) {
+                    continue;
+                }
+                $weight_rate = 401.25;
+                $line_total = round( $weight_kg * $weight_rate, 2 );
+                $tax = ( $line_total * $gst_rate ) / 100.00;
+                $subtotal += $line_total;
+                $total_tax += $tax;
 
-            $validated_items[] = array(
-                'product_id'   => $product_id,
-                'product_name' => $product_name,
-                'sku'          => $sku,
-                'quantity'     => $qty,
-                'unit_price'   => $unit_price,
-                'gst_rate'     => $gst_rate,
-                'line_total'   => $line_total,
-            );
+                $sold_units = max( 1, (int) ceil( ( $weight_kg * 1000.0 ) / ( $unit_weight_grams > 0 ? $unit_weight_grams : 1000.0 ) ) );
+
+                $validated_items[] = array(
+                    'product_id'        => $product_id,
+                    'product_name'      => $product_name,
+                    'sku'               => $sku,
+                    'pricing_type'      => 'weight_based',
+                    'unit_weight_grams' => $unit_weight_grams,
+                    'weight_kg'         => $weight_kg,
+                    'quantity'          => $sold_units,
+                    'unit_price'        => 0.00,
+                    'weight_rate'       => $weight_rate,
+                    'gst_rate'          => $gst_rate,
+                    'line_total'        => $line_total,
+                );
+            } else {
+                $qty = intval( $it['quantity'] ?? 0 );
+                $unit_price = floatval( $it['unit_price'] ?? 0.00 );
+
+                if ( $qty <= 0 || $unit_price <= 0 ) {
+                    continue;
+                }
+
+                $line_total = round( $qty * $unit_price, 2 );
+                $tax = ( $line_total * $gst_rate ) / 100.00;
+                $subtotal += $line_total;
+                $total_tax += $tax;
+
+                $validated_items[] = array(
+                    'product_id'        => $product_id,
+                    'product_name'      => $product_name,
+                    'sku'               => $sku,
+                    'pricing_type'      => 'unit_based',
+                    'unit_weight_grams' => null,
+                    'weight_kg'         => 0.000,
+                    'quantity'          => $qty,
+                    'unit_price'        => $unit_price,
+                    'weight_rate'       => 401.25,
+                    'gst_rate'          => $gst_rate,
+                    'line_total'        => $line_total,
+                );
+            }
         }
 
         $grand_total = $subtotal + $total_tax;
@@ -3200,26 +3340,40 @@ class Cora_Inventory_Engine {
             $wpdb->insert(
                 $table_s_items,
                 array(
-                    'sale_id'      => $sale_id,
-                    'product_id'   => $v_it['product_id'],
-                    'product_name' => $v_it['product_name'],
-                    'sku'          => $v_it['sku'],
-                    'quantity'     => $v_it['quantity'],
-                    'unit_price'   => $v_it['unit_price'],
-                    'gst_rate'     => $v_it['gst_rate'],
-                    'line_total'   => $v_it['line_total'],
-                    'created_at'   => $now,
+                    'sale_id'           => $sale_id,
+                    'product_id'        => $v_it['product_id'],
+                    'product_name'      => $v_it['product_name'],
+                    'sku'               => $v_it['sku'],
+                    'pricing_type'      => $v_it['pricing_type'],
+                    'unit_weight_grams' => $v_it['unit_weight_grams'],
+                    'weight_kg'         => $v_it['weight_kg'],
+                    'quantity'          => $v_it['quantity'],
+                    'unit_price'        => $v_it['unit_price'],
+                    'weight_rate'       => $v_it['weight_rate'],
+                    'gst_rate'          => $v_it['gst_rate'],
+                    'line_total'        => $v_it['line_total'],
+                    'created_at'        => $now,
                 )
             );
 
-            // Update sold_qty in consignment items if product matches
+            // Update sold_qty and sold_weight_kg in consignment items if product matches
             if ( $consignment_id && $v_it['product_id'] ) {
-                $wpdb->query( $wpdb->prepare(
-                    "UPDATE {$table_c_items} SET sold_qty = sold_qty + %d WHERE consignment_id = %d AND product_id = %d",
-                    $v_it['quantity'],
-                    $consignment_id,
-                    $v_it['product_id']
-                ) );
+                if ( $v_it['pricing_type'] === 'weight_based' ) {
+                    $wpdb->query( $wpdb->prepare(
+                        "UPDATE {$table_c_items} SET sold_qty = sold_qty + %d, sold_weight_kg = sold_weight_kg + %f WHERE consignment_id = %d AND product_id = %d",
+                        $v_it['quantity'],
+                        $v_it['weight_kg'],
+                        $consignment_id,
+                        $v_it['product_id']
+                    ) );
+                } else {
+                    $wpdb->query( $wpdb->prepare(
+                        "UPDATE {$table_c_items} SET sold_qty = sold_qty + %d WHERE consignment_id = %d AND product_id = %d",
+                        $v_it['quantity'],
+                        $consignment_id,
+                        $v_it['product_id']
+                    ) );
+                }
             }
         }
 
@@ -4446,6 +4600,484 @@ class Cora_Inventory_Engine {
         </div>
 
     </div>
+
+</body>
+</html>
+        <?php
+        exit;
+    }
+
+    /**
+     * AJAX: Render Clean Professional GST Tax Invoice for Printing.
+     */
+    public static function ajax_render_sale_invoice() {
+        global $wpdb;
+        $agency_id = self::get_agency_id();
+        $sale_id   = intval( $_GET['sale_id'] ?? ( $_POST['sale_id'] ?? 0 ) );
+        $autoprint = ! empty( $_GET['autoprint'] ) || ! empty( $_POST['autoprint'] );
+
+        if ( ! $sale_id ) {
+            wp_die( '<h1>Error</h1><p>Invalid or missing Sale Invoice ID.</p>', 'Invoice Error', array( 'response' => 400 ) );
+        }
+
+        $table_sales   = $wpdb->prefix . 'cora_inventory_sales';
+        $table_s_items = $wpdb->prefix . 'cora_inventory_sales_items';
+        $table_c       = $wpdb->prefix . 'cora_inventory_consignments';
+        $table_p       = $wpdb->prefix . 'cora_inventory_products';
+
+        $sale = $wpdb->get_row(
+            $wpdb->prepare( "SELECT s.*, c.consignment_no, c.vehicle_no, c.vendor_name, c.driver_phone FROM {$table_sales} s LEFT JOIN {$table_c} c ON s.consignment_id = c.id WHERE s.id = %d AND s.agency_id = %d", $sale_id, $agency_id ),
+            ARRAY_A
+        );
+
+        if ( ! $sale ) {
+            // Fallback lookup without agency_id constraint for cross-agency driver previews
+            $sale = $wpdb->get_row(
+                $wpdb->prepare( "SELECT s.*, c.consignment_no, c.vehicle_no, c.vendor_name, c.driver_phone FROM {$table_sales} s LEFT JOIN {$table_c} c ON s.consignment_id = c.id WHERE s.id = %d", $sale_id ),
+                ARRAY_A
+            );
+        }
+
+        if ( ! $sale ) {
+            wp_die( '<h1>Invoice Not Found</h1><p>The requested invoice could not be located.</p>', 'Not Found', array( 'response' => 404 ) );
+        }
+
+        $items = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT si.*, p.hsn_code, p.uom, p.unit_weight_grams as p_weight_g, p.gst_rate as p_gst_rate 
+                 FROM {$table_s_items} si 
+                 LEFT JOIN {$table_p} p ON si.product_id = p.id 
+                 WHERE si.sale_id = %d 
+                 ORDER BY si.id ASC",
+                $sale_id
+            ),
+            ARRAY_A
+        );
+
+        // Tax calculation breakdown (assuming standard 18% GST: 9% CGST + 9% SGST)
+        $total_amount = floatval( $sale['grand_total'] ?? ( $sale['total_amount'] ?? 0.0 ) );
+        $taxable_val  = floatval( $sale['subtotal'] ?? round( $total_amount / 1.18, 2 ) );
+        $total_gst    = floatval( $sale['tax_amount'] ?? round( $total_amount - $taxable_val, 2 ) );
+        $cgst_val     = round( $total_gst / 2.0, 2 );
+        $sgst_val     = round( $total_gst - $cgst_val, 2 );
+        $inv_number   = ! empty( $sale['invoice_no'] ) ? $sale['invoice_no'] : ( ! empty( $sale['invoice_number'] ) ? $sale['invoice_number'] : 'INV-' . str_pad( $sale['id'], 5, '0', STR_PAD_LEFT ) );
+        $retailer_name = ! empty( $sale['customer_name'] ) ? $sale['customer_name'] : ( ! empty( $sale['retailer_name'] ) ? $sale['retailer_name'] : 'Cash / Spot Customer' );
+        $retailer_phone = ! empty( $sale['phone'] ) ? $sale['phone'] : ( ! empty( $sale['retailer_phone'] ) ? $sale['retailer_phone'] : '' );
+
+        // Helper to convert number to words (Indian numbering system)
+        $number_to_words = function( $number ) use ( &$number_to_words ) {
+            $no = (int) floor( $number );
+            $point = (int) round( ( $number - $no ) * 100 );
+            $words = array(
+                0 => '', 1 => 'One', 2 => 'Two', 3 => 'Three', 4 => 'Four', 5 => 'Five',
+                6 => 'Six', 7 => 'Seven', 8 => 'Eight', 9 => 'Nine', 10 => 'Ten',
+                11 => 'Eleven', 12 => 'Twelve', 13 => 'Thirteen', 14 => 'Fourteen', 15 => 'Fifteen',
+                16 => 'Sixteen', 17 => 'Seventeen', 18 => 'Eighteen', 19 => 'Nineteen', 20 => 'Twenty',
+                30 => 'Thirty', 40 => 'Forty', 50 => 'Fifty', 60 => 'Sixty', 70 => 'Seventy',
+                80 => 'Eighty', 90 => 'Ninety'
+            );
+            $digits = array('', 'Hundred', 'Thousand', 'Lakh', 'Crore');
+            $str = array();
+            $i = 0;
+            while ( $i < count( $digits ) && $no > 0 ) {
+                $divider = ( $i == 2 ) ? 10 : 100;
+                if ( $i == 1 ) { $divider = 100; }
+                $number_part = $no % $divider;
+                $no = (int) ( $no / $divider );
+                $i += ( $divider == 10 ) ? 1 : 2;
+                if ( $number_part ) {
+                    $plural = ( ( count( $str ) && $number_part > 9 ) ? 's' : '' );
+                    $hundred = ( count( $str ) == 1 && $str[0] ) ? ' and ' : '';
+                    if ( $number_part < 21 ) {
+                        $str[] = $words[ $number_part ] . ' ' . $digits[ count( $str ) ];
+                    } else {
+                        $str[] = $words[ (int) ( $number_part / 10 ) * 10 ] . ' ' . $words[ $number_part % 10 ] . ' ' . $digits[ count( $str ) ];
+                    }
+                } else {
+                    $str[] = '';
+                }
+            }
+            $result = implode( ' ', array_reverse( array_filter( $str ) ) );
+            $points = ( $point ) ? ' and ' . $words[ (int) ( $point / 10 ) * 10 ] . ' ' . $words[ $point % 10 ] . ' Paise' : '';
+            return trim( ( $result ? $result : 'Zero' ) . ' Rupees' . $points . ' Only' );
+        };
+
+        $amt_in_words = $number_to_words( $total_amount );
+        ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tax Invoice - <?php echo esc_html( $inv_number ); ?></title>
+    <style>
+        @page {
+            size: A4;
+            margin: 12mm 15mm;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-size: 12px;
+            color: #18181b;
+            background: #f4f4f5;
+            padding: 24px;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        .invoice-wrapper {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 1px solid #e4e4e7;
+            border-radius: 12px;
+            padding: 32px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+        }
+        @media print {
+            body { background: #ffffff; padding: 0; }
+            .invoice-wrapper { border: none; box-shadow: none; padding: 0; max-width: 100%; }
+            .no-print { display: none !important; }
+        }
+        .header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #18181b;
+        }
+        .company-title {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: #09090b;
+        }
+        .company-sub {
+            font-size: 11px;
+            color: #52525b;
+            margin-top: 3px;
+            line-height: 1.4;
+        }
+        .invoice-badge {
+            text-align: right;
+        }
+        .tax-invoice-label {
+            font-size: 16px;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: #09090b;
+        }
+        .inv-number {
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 13px;
+            font-weight: 700;
+            color: #27272a;
+            margin-top: 4px;
+        }
+        .inv-meta-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 16px 0;
+            border-bottom: 1px solid #e4e4e7;
+        }
+        .meta-card h4 {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #71717a;
+            margin-bottom: 6px;
+        }
+        .meta-card p {
+            font-size: 12px;
+            line-height: 1.5;
+            color: #27272a;
+        }
+        .meta-card p strong {
+            color: #09090b;
+        }
+        table.items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 11.5px;
+        }
+        table.items-table th {
+            background: #f4f4f5;
+            color: #27272a;
+            font-weight: 700;
+            text-align: left;
+            padding: 8px 10px;
+            border-top: 1px solid #d4d4d8;
+            border-bottom: 1px solid #d4d4d8;
+            font-size: 10.5px;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        table.items-table td {
+            padding: 9px 10px;
+            border-bottom: 1px solid #f4f4f5;
+            vertical-align: top;
+        }
+        table.items-table tr:last-child td {
+            border-bottom: 1px solid #d4d4d8;
+        }
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
+        .font-mono { font-family: "SFMono-Regular", Consolas, monospace; }
+        .item-name { font-weight: 600; color: #09090b; }
+        .item-sku { font-size: 10px; color: #71717a; font-family: monospace; }
+        .weight-pill {
+            display: inline-block;
+            font-size: 9.5px;
+            font-weight: 600;
+            padding: 1px 5px;
+            border-radius: 4px;
+            background: #f4f4f5;
+            color: #27272a;
+            border: 1px solid #e4e4e7;
+            margin-top: 2px;
+        }
+        .summary-section {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            gap: 20px;
+        }
+        .words-col {
+            flex: 1;
+            padding-right: 16px;
+        }
+        .words-col h5 {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: #71717a;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .words-text {
+            font-size: 11.5px;
+            font-style: italic;
+            color: #27272a;
+            line-height: 1.4;
+        }
+        .totals-table {
+            width: 280px;
+            border-collapse: collapse;
+            font-size: 11.5px;
+        }
+        .totals-table td {
+            padding: 4px 8px;
+        }
+        .totals-table tr.grand-total td {
+            padding-top: 8px;
+            padding-bottom: 8px;
+            border-top: 2px solid #18181b;
+            border-bottom: 2px solid #18181b;
+            font-size: 13px;
+            font-weight: 800;
+            color: #09090b;
+        }
+        .footer-signatures {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e4e4e7;
+        }
+        .sig-block {
+            text-align: center;
+            width: 180px;
+        }
+        .sig-line {
+            height: 40px;
+            border-bottom: 1px dashed #a1a1aa;
+            margin-bottom: 6px;
+        }
+        .sig-label {
+            font-size: 10.5px;
+            color: #52525b;
+            font-weight: 600;
+        }
+        .print-btn-bar {
+            margin-bottom: 16px;
+            max-width: 800px;
+            margin: 0 auto 16px auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn-print {
+            background: #18181b;
+            color: #ffffff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-print:hover { background: #27272a; }
+    </style>
+</head>
+<body>
+
+    <div class="no-print print-btn-bar">
+        <a href="javascript:window.history.back()" style="color:#52525b; text-decoration:none; font-size:12px;">&larr; Back to Inventory</a>
+        <button type="button" class="btn-print" onclick="window.print()">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+            <span>Print Invoice</span>
+        </button>
+    </div>
+
+    <div class="invoice-wrapper">
+
+        <!-- Header -->
+        <div class="header-bar">
+            <div>
+                <div class="company-title">CORA PLANT &amp; LOGISTICS</div>
+                <div class="company-sub">
+                    Central Paper &amp; Stationery Manufacturing Facility<br>
+                    <strong>GSTIN:</strong> 07AAAAA0000A1Z5 &bull; <strong>State Code:</strong> 07 (Delhi)<br>
+                    support@cora.local &bull; +91 11 4500 8900
+                </div>
+            </div>
+            <div class="invoice-badge">
+                <div class="tax-invoice-label">TAX INVOICE</div>
+                <div class="inv-number"><?php echo esc_html( $inv_number ); ?></div>
+                <div style="font-size:11px; color:#52525b; margin-top:2px;">Date: <?php echo esc_html( date( 'd-m-Y', strtotime( $sale['sale_date'] ?: $sale['created_at'] ) ) ); ?></div>
+            </div>
+        </div>
+
+        <!-- Meta Grid -->
+        <div class="inv-meta-grid">
+            <div class="meta-card">
+                <h4>Billed To (Customer / Retailer)</h4>
+                <p>
+                    <strong><?php echo esc_html( $retailer_name ); ?></strong><br>
+                    <?php if ( ! empty( $retailer_phone ) ) : ?>
+                        Phone: <?php echo esc_html( $retailer_phone ); ?><br>
+                    <?php endif; ?>
+                    <?php if ( ! empty( $sale['notes'] ) ) : ?>
+                        Notes: <?php echo esc_html( $sale['notes'] ); ?><br>
+                    <?php endif; ?>
+                    Place of Supply: State Code 07
+                </p>
+            </div>
+            <div class="meta-card">
+                <h4>Dispatch &amp; Van Logistics</h4>
+                <p>
+                    <strong>Consignment No:</strong> <?php echo esc_html( $sale['consignment_no'] ?: 'Direct Dispatch' ); ?><br>
+                    <strong>Vehicle No:</strong> <?php echo esc_html( $sale['vehicle_no'] ?: 'DL-1V-5501' ); ?><br>
+                    <strong>Field Driver:</strong> <?php echo esc_html( $sale['vendor_name'] ?: 'Assigned Rep' ); ?><br>
+                    <strong>Payment Mode:</strong> <span style="text-transform:uppercase; font-weight:700;"><?php echo esc_html( $sale['payment_mode'] ?: 'Cash' ); ?></span>
+                </p>
+            </div>
+        </div>
+
+        <!-- Items Table -->
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th style="width: 32px;" class="text-center">#</th>
+                    <th>Item Description</th>
+                    <th style="width: 70px;" class="text-center">HSN</th>
+                    <th style="width: 80px;" class="text-right">Qty / Wt</th>
+                    <th style="width: 80px;" class="text-right">Rate (₹)</th>
+                    <th style="width: 85px;" class="text-right">Amount (₹)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if ( ! empty( $items ) ) : ?>
+                    <?php foreach ( $items as $idx => $item ) : 
+                        $is_weight = ( ( $item['pricing_type'] ?? '' ) === 'weight_based' || floatval( $item['weight_kg'] ?? 0 ) > 0 || ( ! empty( $item['unit_weight_grams'] ) && floatval( $item['unit_weight_grams'] ) > 0 ) );
+                        $qty_display = $is_weight ? number_format( floatval( $item['weight_kg'] ?? 0 ), 2 ) . ' kg' : intval( $item['quantity'] ) . ' units';
+                        $rate_display = $is_weight ? number_format( floatval( $item['weight_rate'] ?? 401.25 ), 2 ) . '/kg' : number_format( floatval( $item['unit_price'] ), 2 );
+                    ?>
+                        <tr>
+                            <td class="text-center font-mono"><?php echo intval( $idx + 1 ); ?></td>
+                            <td>
+                                <div class="item-name"><?php echo esc_html( $item['product_name'] ); ?></div>
+                                <div class="item-sku">SKU: <?php echo esc_html( $item['sku'] ); ?></div>
+                                <?php if ( $is_weight ) : ?>
+                                    <div class="weight-pill">⚖️ Weight Item @ ₹401.25/kg</div>
+                                <?php endif; ?>
+                            </td>
+                            <td class="text-center font-mono"><?php echo esc_html( $item['hsn_code'] ?: '4820' ); ?></td>
+                            <td class="text-right font-mono font-semibold"><?php echo esc_html( $qty_display ); ?></td>
+                            <td class="text-right font-mono"><?php echo esc_html( $rate_display ); ?></td>
+                            <td class="text-right font-mono font-semibold"><?php echo number_format( floatval( $item['line_total'] ), 2 ); ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php else : ?>
+                    <tr>
+                        <td colspan="6" class="text-center" style="padding: 24px; color:#71717a;">No item breakdown available for this invoice.</td>
+                    </tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
+
+        <!-- Summary & Totals -->
+        <div class="summary-section">
+            <div class="words-col">
+                <h5>Invoice Amount in Words</h5>
+                <div class="words-text"><?php echo esc_html( $amt_in_words ); ?></div>
+                
+                <div style="margin-top: 16px; font-size: 10px; color: #71717a; line-height: 1.4;">
+                    <strong>Terms &amp; Conditions:</strong><br>
+                    1. Goods once sold will not be taken back without valid batch verification.<br>
+                    2. Subject to Delhi jurisdiction only.
+                </div>
+            </div>
+            <div>
+                <table class="totals-table">
+                    <tr>
+                        <td style="color:#71717a;">Taxable Subtotal</td>
+                        <td class="text-right font-mono">₹<?php echo number_format( $taxable_val, 2 ); ?></td>
+                    </tr>
+                    <tr>
+                        <td style="color:#71717a;">CGST (9%)</td>
+                        <td class="text-right font-mono">₹<?php echo number_format( $cgst_val, 2 ); ?></td>
+                    </tr>
+                    <tr>
+                        <td style="color:#71717a;">SGST (9%)</td>
+                        <td class="text-right font-mono">₹<?php echo number_format( $sgst_val, 2 ); ?></td>
+                    </tr>
+                    <tr class="grand-total">
+                        <td>Grand Total</td>
+                        <td class="text-right font-mono">₹<?php echo number_format( $total_amount, 2 ); ?></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Signatures -->
+        <div class="footer-signatures">
+            <div class="sig-block">
+                <div class="sig-line"></div>
+                <div class="sig-label">Receiver's Signature &amp; Stamp</div>
+            </div>
+            <div class="sig-block">
+                <div class="sig-line"></div>
+                <div class="sig-label">For Cora Plant &amp; Logistics</div>
+            </div>
+        </div>
+
+    </div>
+
+    <?php if ( $autoprint ) : ?>
+        <script>
+            window.onload = function() {
+                window.print();
+            };
+        </script>
+    <?php endif; ?>
 
 </body>
 </html>

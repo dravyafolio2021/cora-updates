@@ -57,6 +57,19 @@ if (typeof window.ajaxurl === 'undefined') {
     window.ajaxurl = (window.coraREData && window.coraREData.ajaxUrl) ? window.coraREData.ajaxUrl : '/wp-admin/admin-ajax.php';
 }
 
+if (typeof window.coraDebounce !== 'function') {
+    window.coraDebounce = function(func, wait) {
+        var timeout;
+        return function() {
+            var context = this, args = arguments;
+            clearTimeout(timeout);
+            timeout = setTimeout(function() {
+                func.apply(context, args);
+            }, wait || 180);
+        };
+    };
+}
+
 // =============================================================================
 // UNIVERSAL MOBILE & DESKTOP BODY SCROLL LOCK ENGINE
 // Prevents background scroll bleed & rubber-band chaining when any drawer, 
@@ -1603,9 +1616,9 @@ jQuery(document).ready(function($) {
         coraApplyCRMFilters();
     });
 
-    $('#cora-crm-search-input').on('input', function() {
+    $('#cora-crm-search-input').on('input', window.coraDebounce(function() {
         coraApplyCRMFilters();
-    });
+    }, 180));
 
     // 4. Update Booking Status (Action callback)
     window.coraUpdateBookingStatus = function(button, nextStatus) {
@@ -10842,7 +10855,7 @@ jQuery(document).ready(function($) {
         coraUpdateTxCategories('Inflow');
         coraRenderFinancials();
         
-        $('#cora-financial-search').on('input', coraRenderFinancials);
+        $('#cora-financial-search').on('input', window.coraDebounce(coraRenderFinancials, 180));
 
         $('#cora-financial-filters').on('click', '.cora-filter-btn', function() {
             $('#cora-financial-filters .cora-filter-btn').removeClass('bg-zinc-950 text-white').addClass('border border-zinc-200 text-zinc-655 bg-white hover:bg-zinc-50');
@@ -15328,9 +15341,9 @@ jQuery(document).ready(function($) {
         });
 
         // Search
-        $searchInput.off('input').on('input', function() {
+        $searchInput.off('input').on('input', window.coraDebounce(function() {
             updateFilteredDisplay();
-        });
+        }, 150));
 
         // Select
         $optionsList.off('click', '.cora-repo-option-item').on('click', '.cora-repo-option-item', function(e) {
@@ -15479,9 +15492,9 @@ jQuery(document).ready(function($) {
         });
 
         // Search
-        $searchInput.off('input').on('input', function() {
+        $searchInput.off('input').on('input', window.coraDebounce(function() {
             updateFilteredBranchDisplay();
-        });
+        }, 150));
 
         // Select
         $optionsList.off('click', '.cora-branch-option-item').on('click', '.cora-branch-option-item', function(e) {

@@ -2089,6 +2089,61 @@ textarea,
     pointer-events: none !important;
 }
 
+/* =============================================================================
+   15. WORKSPACE HIGH-PERFORMANCE RENDERING ENGINE (Core Web Vitals & LCP Boost)
+   ============================================================================= */
+.cora-table-body tr:nth-child(n+12),
+.cora-kanban-card:nth-child(n+8),
+.cora-card-grid > *:nth-child(n+10) {
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 64px;
+}
+
+/* GPU Accelerated Compositing Layers for Silky 60/120fps Drawers & Modals */
+.cora-portal-drawer,
+.cora-mobile-portal-drawer,
+.cora-drawer,
+.cora-sheet,
+[id$="-drawer"],
+[id$="-sheet"] {
+    will-change: transform;
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+
+/* Zero Mobile Tap Delay & Manipulation Optimization */
+button,
+a,
+input,
+select,
+textarea,
+[role="button"],
+.cora-btn,
+.cora-tab-btn,
+.cora-nav-item,
+.cora-clickable {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Font Smoothing & Subpixel Geometry Optimization */
+body,
+.cora-workspace-root {
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Smooth Virtual Scroll Containment */
+.cora-scroll-container,
+[data-cora-scrollable],
+.cora-drawer-scrollable {
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+
 
 
 

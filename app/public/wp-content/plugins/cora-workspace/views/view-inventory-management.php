@@ -1788,199 +1788,272 @@ body.cora-inventory-focus-mode .cora-sidebar-search {
             </div>
         </div>
 
-        <!-- Scrollable Content Form Body -->
+        <!-- Scrollable Content Form Body with 3-Step Wizard -->
         <form id="cora-inv-csn-form" onsubmit="CoraInventory.dispatchConsignment(event)" class="flex-1 overflow-hidden max-w-5xl mx-auto w-full flex flex-col justify-between" style="min-height: 0; flex: 1 1 auto;">
             
             <div class="flex-1 overflow-y-auto px-4 sm:px-6 md:px-12 py-4 space-y-4 -webkit-overflow-scrolling-touch pb-24">
                 
-                <!-- CARD 1: Driver & Vehicle Assignment -->
-                <div class="p-3.5 sm:p-4 rounded-2xl bg-zinc-50/70 dark:bg-zinc-800/40 border border-zinc-200/80 dark:border-zinc-700/80 space-y-3">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-zinc-200/60 dark:border-zinc-700/60">
-                        <div>
-                            <span class="text-xs font-bold text-zinc-950 dark:text-zinc-50 block">1. Field Sales Driver &amp; Vehicle</span>
-                            <span class="text-[10.5px] text-zinc-500 dark:text-zinc-400">Select team member or invite new driver</span>
-                        </div>
-                        
-                        <!-- Driver Mode Switcher -->
-                        <div class="inline-flex items-center p-0.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 self-start sm:self-auto shadow-2xs">
-                            <button type="button" id="cora-csn-btn-mode-existing" onclick="CoraInventory.switchDriverMode('existing')" class="px-2.5 py-1 text-[10.5px] font-bold rounded-md bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 transition-all cursor-pointer">
-                                Existing Member
-                            </button>
-                            <button type="button" id="cora-csn-btn-mode-new" onclick="CoraInventory.switchDriverMode('new')" class="px-2.5 py-1 text-[10.5px] font-semibold text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 rounded-md transition-all cursor-pointer">
-                                + Invite New
-                            </button>
-                        </div>
-                    </div>
+                <!-- 3-STEP WIZARD PROGRESS STEPPER BAR -->
+                <div class="flex items-center justify-between p-1.5 rounded-2xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700/80 select-none">
+                    <button type="button" onclick="CoraInventory.goToConsignmentStep(1)" id="cora-csn-tab-1" class="flex-1 py-2 px-2.5 sm:px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 sm:gap-2 bg-white dark:bg-zinc-900 text-zinc-950 dark:text-zinc-50 shadow-2xs cursor-pointer">
+                        <span class="w-5 h-5 rounded-full bg-zinc-950 text-white dark:bg-zinc-100 dark:text-zinc-950 flex items-center justify-center text-[10px] font-mono font-bold" id="cora-csn-tab-num-1">1</span>
+                        <span class="truncate">Driver Details</span>
+                    </button>
+                    <button type="button" onclick="CoraInventory.goToConsignmentStep(2)" id="cora-csn-tab-2" class="flex-1 py-2 px-2.5 sm:px-3 rounded-xl text-xs font-semibold text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-all flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer">
+                        <span class="w-5 h-5 rounded-full bg-zinc-200 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 flex items-center justify-center text-[10px] font-mono font-bold" id="cora-csn-tab-num-2">2</span>
+                        <span class="truncate">Location &amp; Route</span>
+                    </button>
+                    <button type="button" onclick="CoraInventory.goToConsignmentStep(3)" id="cora-csn-tab-3" class="flex-1 py-2 px-2.5 sm:px-3 rounded-xl text-xs font-semibold text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-all flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer">
+                        <span class="w-5 h-5 rounded-full bg-zinc-200 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 flex items-center justify-center text-[10px] font-mono font-bold" id="cora-csn-tab-num-3">3</span>
+                        <span class="truncate">Select Inventory</span>
+                    </button>
+                </div>
 
-                    <input type="hidden" id="cora-csn-driver-mode" value="existing">
-
-                    <!-- Existing Driver Selection -->
-                    <div id="cora-csn-pane-existing" class="space-y-2.5">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+                <!-- STEP 1 PANE: Driver & Vehicle Details -->
+                <div id="cora-csn-step-pane-1" class="space-y-4">
+                    <div class="p-4 sm:p-5 rounded-2xl bg-zinc-50/70 dark:bg-zinc-800/40 border border-zinc-200/80 dark:border-zinc-700/80 space-y-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-zinc-200/60 dark:border-zinc-700/60">
                             <div>
-                                <label class="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1">Driver / Sales Agent *</label>
-                                <select id="cora-csn-user-select" onchange="CoraInventory.onDriverSelectChange()" class="w-full px-3 py-2 text-xs rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 outline-none cursor-pointer focus:border-zinc-400 shadow-2xs">
-                                    <?php if ( ! empty( $workspace_members ) ) : ?>
-                                        <?php foreach ( $workspace_members as $m ) : ?>
-                                            <option value="<?php echo esc_attr( $m['id'] ); ?>" data-name="<?php echo esc_attr( $m['display_name'] ); ?>" data-email="<?php echo esc_attr( $m['email'] ); ?>" data-role="<?php echo esc_attr( $m['role_label'] ); ?>">
-                                                <?php echo esc_html( $m['display_name'] . ' (' . $m['role_label'] . ')' ); ?>
+                                <span class="text-xs font-bold text-zinc-950 dark:text-zinc-50 block">Step 1: Field Sales Driver &amp; Assigned Vehicle</span>
+                                <span class="text-[10.5px] text-zinc-500 dark:text-zinc-400">Select an active team member or invite a new driver to this route</span>
+                            </div>
+                            
+                            <!-- Driver Mode Switcher -->
+                            <div class="inline-flex items-center p-0.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 self-start sm:self-auto shadow-2xs">
+                                <button type="button" id="cora-csn-btn-mode-existing" onclick="CoraInventory.switchDriverMode('existing')" class="px-2.5 py-1 text-[10.5px] font-bold rounded-md bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 transition-all cursor-pointer">
+                                    Existing Member
+                                </button>
+                                <button type="button" id="cora-csn-btn-mode-new" onclick="CoraInventory.switchDriverMode('new')" class="px-2.5 py-1 text-[10.5px] font-semibold text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 rounded-md transition-all cursor-pointer">
+                                    + Invite New
+                                </button>
+                            </div>
+                        </div>
+
+                        <input type="hidden" id="cora-csn-driver-mode" value="existing">
+
+                        <!-- Existing Driver Selection -->
+                        <div id="cora-csn-pane-existing" class="space-y-3">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1">Driver / Sales Agent *</label>
+                                    <select id="cora-csn-user-select" onchange="CoraInventory.onDriverSelectChange()" class="w-full px-3 py-2.5 text-xs rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 outline-none cursor-pointer focus:border-zinc-400 shadow-2xs">
+                                        <?php if ( ! empty( $workspace_members ) ) : ?>
+                                            <?php foreach ( $workspace_members as $m ) : ?>
+                                                <option value="<?php echo esc_attr( $m['id'] ); ?>" data-name="<?php echo esc_attr( $m['display_name'] ); ?>" data-email="<?php echo esc_attr( $m['email'] ); ?>" data-role="<?php echo esc_attr( $m['role_label'] ); ?>">
+                                                    <?php echo esc_html( $m['display_name'] . ' (' . $m['role_label'] . ')' ); ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        <?php else : ?>
+                                            <option value="1" data-name="Rohan Verma" data-email="driver.van02@cora.local" data-role="Field Sales / Mobile Vendor">
+                                                Rohan Verma (Field Sales / Mobile Vendor)
                                             </option>
-                                        <?php endforeach; ?>
-                                    <?php else : ?>
-                                        <option value="1" data-name="Rohan Verma" data-email="driver.van02@cora.local" data-role="Field Sales / Mobile Vendor">
-                                            Rohan Verma (Field Sales / Mobile Vendor)
-                                        </option>
-                                    <?php endif; ?>
-                                </select>
-                            </div>
+                                        <?php endif; ?>
+                                    </select>
+                                </div>
 
-                            <div>
-                                <label class="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1">Vehicle Registration No *</label>
-                                <input type="text" id="cora-csn-vehicle" required value="DL-1V-5501" placeholder="e.g. DL-1V-5501" class="w-full px-3 py-2 text-xs rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 outline-none focus:border-zinc-400 shadow-2xs">
-                            </div>
-                        </div>
-
-                        <!-- Selected User Badge Preview -->
-                        <div id="cora-csn-selected-preview" class="flex items-center justify-between p-2 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/70 dark:border-zinc-700 text-xs">
-                            <div class="flex items-center gap-2">
-                                <div class="w-6 h-6 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center font-bold text-[9.5px] text-zinc-800 dark:text-zinc-200 shrink-0" id="cora-csn-preview-avatar">RV</div>
-                                <div class="truncate">
-                                    <span class="font-bold text-zinc-900 dark:text-zinc-100" id="cora-csn-preview-name">Rohan Verma</span>
-                                    <span class="text-[10px] text-zinc-400 ml-1.5 truncate" id="cora-csn-preview-email">driver.van02@cora.local</span>
+                                <div>
+                                    <label class="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1">Vehicle Registration No *</label>
+                                    <input type="text" id="cora-csn-vehicle" required value="DL-1V-5501" placeholder="e.g. DL-1V-5501" class="w-full px-3 py-2.5 text-xs rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 outline-none focus:border-zinc-400 shadow-2xs">
                                 </div>
                             </div>
-                            <span class="px-2 py-0.5 rounded-full text-[9.5px] font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 shrink-0" id="cora-csn-preview-role">Field Sales</span>
-                        </div>
-                    </div>
 
-                    <!-- Invite New Driver -->
-                    <div id="cora-csn-pane-new" class="space-y-2.5 hidden">
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                            <div>
-                                <label class="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1">Driver Full Name *</label>
-                                <input type="text" id="cora-csn-new-name" placeholder="e.g. Aarav Mehta" class="w-full px-3 py-2 text-xs rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 outline-none focus:border-zinc-400 shadow-2xs">
-                            </div>
-                            <div>
-                                <label class="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1">Driver Email Address *</label>
-                                <input type="email" id="cora-csn-new-email" placeholder="aarav.driver@domain.com" class="w-full px-3 py-2 text-xs rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 outline-none focus:border-zinc-400 shadow-2xs">
-                            </div>
-                            <div>
-                                <label class="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1">Mobile Phone No *</label>
-                                <input type="tel" id="cora-csn-new-phone" placeholder="+91 98765 43210" class="w-full px-3 py-2 text-xs rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 outline-none focus:border-zinc-400 shadow-2xs">
+                            <!-- Selected User Badge Preview -->
+                            <div id="cora-csn-selected-preview" class="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/70 dark:border-zinc-700 text-xs">
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center font-bold text-[10px] text-zinc-800 dark:text-zinc-200 shrink-0" id="cora-csn-preview-avatar">RV</div>
+                                    <div class="truncate">
+                                        <span class="font-bold text-zinc-900 dark:text-zinc-100" id="cora-csn-preview-name">Rohan Verma</span>
+                                        <span class="text-[10.5px] text-zinc-400 ml-1.5 truncate" id="cora-csn-preview-email">driver.van02@cora.local</span>
+                                    </div>
+                                </div>
+                                <span class="px-2 py-0.5 rounded-full text-[9.5px] font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 shrink-0" id="cora-csn-preview-role">Field Sales</span>
                             </div>
                         </div>
-                        <div class="p-2.5 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-200/60 dark:border-emerald-800/40 text-[10.5px] text-emerald-800 dark:text-emerald-300 flex items-start gap-1.5">
-                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                            <span>Driver will receive an invitation to access the Field Van Sales POS terminal for this route.</span>
+
+                        <!-- Invite New Driver -->
+                        <div id="cora-csn-pane-new" class="space-y-3 hidden">
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                                <div>
+                                    <label class="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1">Driver Full Name *</label>
+                                    <input type="text" id="cora-csn-new-name" placeholder="e.g. Aarav Mehta" class="w-full px-3 py-2 text-xs rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 outline-none focus:border-zinc-400 shadow-2xs">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1">Driver Email Address *</label>
+                                    <input type="email" id="cora-csn-new-email" placeholder="aarav.driver@domain.com" class="w-full px-3 py-2 text-xs rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 outline-none focus:border-zinc-400 shadow-2xs">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1">Mobile Phone No *</label>
+                                    <input type="tel" id="cora-csn-new-phone" placeholder="+91 98765 43210" class="w-full px-3 py-2 text-xs rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 outline-none focus:border-zinc-400 shadow-2xs">
+                                </div>
+                            </div>
+                            <div class="p-2.5 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-200/60 dark:border-emerald-800/40 text-[10.5px] text-emerald-800 dark:text-emerald-300 flex items-start gap-1.5">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                                <span>Driver will receive an invitation to access the Field Van Sales POS terminal for this route.</span>
+                            </div>
+                        </div>
+
+                        <!-- Step 1 Action Bar -->
+                        <div class="pt-4 mt-2 border-t border-zinc-200/60 dark:border-zinc-700/60 flex items-center justify-between">
+                            <div class="text-[11.5px] font-medium text-zinc-500 dark:text-zinc-400">
+                                Step 1 of 3: Field Driver &amp; Vehicle
+                            </div>
+                            <button type="button" onclick="CoraInventory.nextConsignmentStep()" class="py-2.5 px-5 sm:px-6 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-950 font-bold text-xs shadow-sm transition-all cursor-pointer flex items-center gap-2">
+                                <span>Next: Location &amp; Route</span>
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                            </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- CARD 2: Territory Route & Coverage Cities -->
-                <div class="p-3.5 sm:p-4 rounded-2xl bg-zinc-50/70 dark:bg-zinc-800/40 border border-zinc-200/80 dark:border-zinc-700/80 space-y-3">
-                    <div>
-                        <span class="text-xs font-bold text-zinc-950 dark:text-zinc-50 block">2. Assigned Route &amp; Target Territory</span>
-                        <span class="text-[10.5px] text-zinc-500 dark:text-zinc-400">Specify territory route and coverage zones</span>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
-                        <div>
-                            <label class="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1">Route / Territory Name *</label>
-                            <input type="text" id="cora-csn-route" value="Central Stationery Market &amp; University Belts" required placeholder="e.g. North Zone Retail Hub" class="w-full px-3 py-2 text-xs rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 outline-none focus:border-zinc-400 shadow-2xs">
+                <!-- STEP 2 PANE: Location & Route Details -->
+                <div id="cora-csn-step-pane-2" class="space-y-4 hidden">
+                    <div class="p-4 sm:p-5 rounded-2xl bg-zinc-50/70 dark:bg-zinc-800/40 border border-zinc-200/80 dark:border-zinc-700/80 space-y-3.5">
+                        <div class="pb-2.5 border-b border-zinc-200/60 dark:border-zinc-700/60">
+                            <span class="text-xs font-bold text-zinc-950 dark:text-zinc-50 block">Step 2: Assigned Route &amp; Target Territory</span>
+                            <span class="text-[10.5px] text-zinc-500 dark:text-zinc-400">Specify territory route, coverage zones, and optional route mapping</span>
                         </div>
-                        <div>
-                            <label class="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1">Google Maps Route URL (Optional)</label>
-                            <div class="relative">
-                                <input type="url" id="cora-csn-gmaps-url" placeholder="https://maps.app.goo.gl/..." class="w-full pl-8 pr-3 py-2 text-xs rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 outline-none focus:border-zinc-400 shadow-2xs">
-                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1">Route / Territory Name *</label>
+                                <input type="text" id="cora-csn-route" value="Central Stationery Market &amp; University Belts" required placeholder="e.g. North Zone Retail Hub" class="w-full px-3 py-2 text-xs rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 outline-none focus:border-zinc-400 shadow-2xs">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1">Google Maps Route URL (Optional)</label>
+                                <div class="relative">
+                                    <input type="url" id="cora-csn-gmaps-url" placeholder="https://maps.app.goo.gl/..." class="w-full pl-8 pr-3 py-2 text-xs rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 outline-none focus:border-zinc-400 shadow-2xs">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div>
-                        <div class="flex items-center justify-between mb-1">
-                            <label class="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300">Target Cities &amp; Coverage Zones *</label>
-                            <span class="text-[9.5px] text-zinc-400">Tap chips to add</span>
+                        <div>
+                            <div class="flex items-center justify-between mb-1">
+                                <label class="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300">Target Cities &amp; Coverage Zones *</label>
+                                <span class="text-[9.5px] text-zinc-400">Tap chips to add</span>
+                            </div>
+                            <input type="text" id="cora-csn-target-cities" value="Delhi NCR, Noida, Greater Noida, Ghaziabad" required placeholder="e.g. Delhi NCR, Noida, Gurgaon" class="w-full px-3 py-2 text-xs rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 outline-none focus:border-zinc-400 shadow-2xs mb-2">
+                            
+                            <!-- 1-Tap Quick City Preset Chips -->
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <span class="text-[9.5px] font-semibold text-zinc-400 mr-0.5">Quick Add:</span>
+                                <button type="button" onclick="CoraInventory.appendCityTag('Delhi NCR')" class="px-2 py-0.5 rounded-lg bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[10px] font-medium border border-zinc-200 dark:border-zinc-700 transition-colors cursor-pointer shadow-3xs">+ Delhi NCR</button>
+                                <button type="button" onclick="CoraInventory.appendCityTag('Noida')" class="px-2 py-0.5 rounded-lg bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[10px] font-medium border border-zinc-200 dark:border-zinc-700 transition-colors cursor-pointer shadow-3xs">+ Noida</button>
+                                <button type="button" onclick="CoraInventory.appendCityTag('Gurgaon')" class="px-2 py-0.5 rounded-lg bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[10px] font-medium border border-zinc-200 dark:border-zinc-700 transition-colors cursor-pointer shadow-3xs">+ Gurgaon</button>
+                                <button type="button" onclick="CoraInventory.appendCityTag('Ghaziabad')" class="px-2 py-0.5 rounded-lg bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[10px] font-medium border border-zinc-200 dark:border-zinc-700 transition-colors cursor-pointer shadow-3xs">+ Ghaziabad</button>
+                                <button type="button" onclick="CoraInventory.appendCityTag('Mumbai')" class="px-2 py-0.5 rounded-lg bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[10px] font-medium border border-zinc-200 dark:border-zinc-700 transition-colors cursor-pointer shadow-3xs">+ Mumbai</button>
+                                <button type="button" onclick="CoraInventory.appendCityTag('Bangalore')" class="px-2 py-0.5 rounded-lg bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[10px] font-medium border border-zinc-200 dark:border-zinc-700 transition-colors cursor-pointer shadow-3xs">+ Bangalore</button>
+                            </div>
                         </div>
-                        <input type="text" id="cora-csn-target-cities" value="Delhi NCR, Noida, Greater Noida, Ghaziabad" required placeholder="e.g. Delhi NCR, Noida, Gurgaon" class="w-full px-3 py-2 text-xs rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 outline-none focus:border-zinc-400 shadow-2xs mb-2">
+
+                        <div>
+                            <label class="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1">Custom Route Dispatch Notes</label>
+                            <textarea id="cora-csn-notes" rows="2" placeholder="Optional delivery instructions or customer visit checkpoints..." class="w-full px-3 py-2 text-xs rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 outline-none focus:border-zinc-400 shadow-2xs"></textarea>
+                        </div>
+
+                        <!-- Step 2 Action Bar -->
+                        <div class="pt-4 mt-2 border-t border-zinc-200/60 dark:border-zinc-700/60 flex items-center justify-between">
+                            <button type="button" onclick="CoraInventory.prevConsignmentStep()" class="py-2.5 px-4 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 font-semibold text-xs transition-colors cursor-pointer flex items-center gap-1.5">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                                <span>Back to Driver</span>
+                            </button>
+                            <button type="button" onclick="CoraInventory.nextConsignmentStep()" class="py-2.5 px-5 sm:px-6 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-950 font-bold text-xs shadow-sm transition-all cursor-pointer flex items-center gap-2">
+                                <span>Next: Select Inventory</span>
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 3 PANE: Inventory Allocation Suite (Unit-Based vs Weight-Based Items) -->
+                <div id="cora-csn-step-pane-3" class="space-y-4 hidden">
+                    <div class="rounded-2xl border border-zinc-200/80 dark:border-zinc-800 overflow-hidden bg-white dark:bg-zinc-900 shadow-2xs">
                         
-                        <!-- 1-Tap Quick City Preset Chips -->
-                        <div class="flex items-center gap-1.5 flex-wrap">
-                            <span class="text-[9.5px] font-semibold text-zinc-400 mr-0.5">Quick Add:</span>
-                            <button type="button" onclick="CoraInventory.appendCityTag('Delhi NCR')" class="px-2 py-0.5 rounded-lg bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[10px] font-medium border border-zinc-200 dark:border-zinc-700 transition-colors cursor-pointer shadow-3xs">+ Delhi NCR</button>
-                            <button type="button" onclick="CoraInventory.appendCityTag('Noida')" class="px-2 py-0.5 rounded-lg bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[10px] font-medium border border-zinc-200 dark:border-zinc-700 transition-colors cursor-pointer shadow-3xs">+ Noida</button>
-                            <button type="button" onclick="CoraInventory.appendCityTag('Gurgaon')" class="px-2 py-0.5 rounded-lg bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[10px] font-medium border border-zinc-200 dark:border-zinc-700 transition-colors cursor-pointer shadow-3xs">+ Gurgaon</button>
-                            <button type="button" onclick="CoraInventory.appendCityTag('Ghaziabad')" class="px-2 py-0.5 rounded-lg bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[10px] font-medium border border-zinc-200 dark:border-zinc-700 transition-colors cursor-pointer shadow-3xs">+ Ghaziabad</button>
-                            <button type="button" onclick="CoraInventory.appendCityTag('Mumbai')" class="px-2 py-0.5 rounded-lg bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[10px] font-medium border border-zinc-200 dark:border-zinc-700 transition-colors cursor-pointer shadow-3xs">+ Mumbai</button>
-                            <button type="button" onclick="CoraInventory.appendCityTag('Bangalore')" class="px-2 py-0.5 rounded-lg bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[10px] font-medium border border-zinc-200 dark:border-zinc-700 transition-colors cursor-pointer shadow-3xs">+ Bangalore</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- CARD 3: Product Allocation Suite (Top 5 Suggestions + Multi-Select + Fast Search) -->
-                <div class="rounded-2xl border border-zinc-200/80 dark:border-zinc-800 overflow-hidden bg-white dark:bg-zinc-900 shadow-2xs">
-                    
-                    <!-- Allocation Header & Metrics Summary -->
-                    <div class="p-3.5 bg-zinc-50 dark:bg-zinc-800/60 border-b border-zinc-200/80 dark:border-zinc-800 flex items-center justify-between gap-2 flex-wrap">
-                        <div class="flex items-center gap-2">
-                            <span class="font-bold text-xs text-zinc-900 dark:text-zinc-100">3. Allocated Van Stock</span>
-                            <span id="cora-csn-item-count-badge" class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-zinc-200/80 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-200">5 SKUs</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span id="cora-csn-calc-units" class="text-[11px] font-mono text-zinc-500 dark:text-zinc-400 hidden sm:inline">5 units</span>
-                            <div id="cora-csn-calc-val" class="font-mono text-xs font-bold text-emerald-700 dark:text-emerald-400 px-2.5 py-1 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-700 shadow-3xs">
-                                Total: ₹0.00
+                        <!-- Allocation Header & Metrics Summary -->
+                        <div class="p-3.5 bg-zinc-50 dark:bg-zinc-800/60 border-b border-zinc-200/80 dark:border-zinc-800 flex items-center justify-between gap-2 flex-wrap">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <span class="font-bold text-xs text-zinc-950 dark:text-zinc-50">Step 3: Allocated Van Stock</span>
+                                <span id="cora-csn-sku-count-badge" class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-zinc-200/80 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-200">0 SKUs</span>
+                                <span id="cora-csn-weight-count-badge" class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700">0.00 kg total</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span id="cora-csn-calc-units" class="text-[11px] font-mono text-zinc-500 dark:text-zinc-400 hidden sm:inline">0 units</span>
+                                <div id="cora-csn-calc-val" class="font-mono text-xs font-bold text-emerald-700 dark:text-emerald-400 px-2.5 py-1 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-700 shadow-3xs">
+                                    Total: ₹0.00
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Smart Suggestions & Multi-Product Toolbar -->
-                    <div class="p-2.5 bg-zinc-50/50 dark:bg-zinc-900/60 border-b border-zinc-100 dark:border-zinc-800/60 flex items-center justify-between gap-2 flex-wrap">
-                        <div class="flex items-center gap-1.5 flex-wrap">
-                            <button type="button" onclick="CoraInventory.suggestTop5Products()" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-900 text-[11px] font-bold shadow-3xs transition-all cursor-pointer">
-                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                                <span>✦ Suggest Top 5 Fast-Selling</span>
+                        <!-- Smart Suggestions & Multi-Product Toolbar -->
+                        <div class="p-2.5 bg-zinc-50/50 dark:bg-zinc-900/60 border-b border-zinc-100 dark:border-zinc-800/60 flex items-center justify-between gap-2 flex-wrap">
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <button type="button" onclick="CoraInventory.suggestTop5Products()" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-900 text-[11px] font-bold shadow-3xs transition-all cursor-pointer">
+                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                                    <span>✦ Suggest Top 5 Fast-Selling</span>
+                                </button>
+                                <button type="button" onclick="CoraInventory.openMultiProductPicker()" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 text-[11px] font-semibold transition-all cursor-pointer shadow-3xs">
+                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                    <span>Browse &amp; Multi-Select Products</span>
+                                </button>
+                            </div>
+                            <button type="button" onclick="CoraInventory.clearAllAllocations()" class="text-[10px] text-zinc-400 hover:text-rose-600 transition-colors cursor-pointer px-1 py-0.5">
+                                Clear All
                             </button>
-                            <button type="button" onclick="CoraInventory.openMultiProductPicker()" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 text-[11px] font-semibold transition-all cursor-pointer shadow-3xs">
-                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                                <span>Browse &amp; Multi-Select Products</span>
+                        </div>
+
+                        <!-- Instant Search Input -->
+                        <div class="p-3 border-b border-zinc-200/60 dark:border-zinc-700/60 bg-white dark:bg-zinc-900 relative">
+                            <div class="relative">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                                <input type="text" id="cora-csn-sku-search" oninput="CoraInventory.searchSKUsToAllocate(this.value)" placeholder="Search catalog SKUs by name, barcode, or SKU..." class="w-full pl-8 pr-3 py-2 text-xs rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 outline-none focus:border-zinc-400 transition-colors">
+                            </div>
+
+                            <!-- Live Search Results Dropdown -->
+                            <div id="cora-csn-search-results" class="absolute left-3 right-3 top-full mt-1.5 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-700 shadow-xl z-30 max-h-60 overflow-y-auto divide-y divide-zinc-100 dark:divide-zinc-800 hidden">
+                                <!-- Populated dynamically via JS -->
+                            </div>
+                        </div>
+
+                        <!-- Allocated Items List with Dual Stock Category Cards -->
+                        <div id="cora-csn-alloc-list" class="p-3 space-y-2.5 max-h-[420px] overflow-y-auto divide-y divide-zinc-100 dark:divide-zinc-800/60">
+                            <!-- Populated dynamically with Unit-based vs Weight-based stock cards -->
+                        </div>
+
+                        <!-- Step 3 Action Bar -->
+                        <div class="p-3.5 bg-zinc-50 dark:bg-zinc-800/60 border-t border-zinc-200/80 dark:border-zinc-800 flex items-center justify-between">
+                            <button type="button" onclick="CoraInventory.prevConsignmentStep()" class="py-2.5 px-4 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 font-semibold text-xs transition-colors cursor-pointer flex items-center gap-1.5">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                                <span>Back to Location</span>
+                            </button>
+                            <button type="button" onclick="$('#cora-inv-csn-form').submit()" class="py-2.5 px-5 sm:px-6 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-950 font-bold text-xs shadow-sm transition-all cursor-pointer flex items-center gap-2">
+                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+                                <span>Confirm Van Dispatch &amp; Lock Stock</span>
                             </button>
                         </div>
-                        <button type="button" onclick="CoraInventory.clearAllAllocations()" class="text-[10px] text-zinc-400 hover:text-rose-600 transition-colors cursor-pointer px-1 py-0.5">
-                            Clear All
-                        </button>
-                    </div>
-
-                    <!-- Instant Search Input -->
-                    <div class="p-3 border-b border-zinc-200/60 dark:border-zinc-700/60 bg-white dark:bg-zinc-900 relative">
-                        <div class="relative">
-                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                            <input type="text" id="cora-csn-sku-search" oninput="CoraInventory.searchSKUsToAllocate(this.value)" placeholder="Search catalog SKUs by name, barcode, or SKU..." class="w-full pl-8 pr-3 py-2 text-xs rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 outline-none focus:border-zinc-400 transition-colors">
-                        </div>
-
-                        <!-- Live Search Results Dropdown -->
-                        <div id="cora-csn-search-results" class="absolute left-3 right-3 top-full mt-1.5 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-700 shadow-xl z-30 max-h-60 overflow-y-auto divide-y divide-zinc-100 dark:divide-zinc-800 hidden">
-                            <!-- Populated dynamically via JS -->
-                        </div>
-                    </div>
-
-                    <!-- Allocated Items List -->
-                    <div id="cora-csn-alloc-list" class="p-3 space-y-2 max-h-96 overflow-y-auto divide-y divide-zinc-100 dark:divide-zinc-800/60">
-                        <!-- Populated dynamically with top 5 pre-selected items + searched items -->
                     </div>
                 </div>
 
             </div>
 
-            <!-- Sticky Bottom Navigation Footer (Elevated Above Screen Bottom / Floating Nav) -->
+            <!-- Sticky Bottom Navigation Footer with Dynamic Wizard Step Controls -->
             <div class="sticky bottom-0 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md px-4 sm:px-6 md:px-12 py-3 sm:py-3.5 border-t border-zinc-200/80 dark:border-zinc-800 flex items-center justify-between gap-3 shrink-0 z-30 shadow-[0_-4px_20px_rgba(0,0,0,0.06)]" style="padding-bottom: max(14px, env(safe-area-inset-bottom, 14px));">
-                <button type="button" onclick="CoraInventory.closeConsignmentModal()" class="py-2.5 px-4 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 font-semibold text-xs transition-colors cursor-pointer">
-                    Cancel
+                
+                <!-- Left Nav Button -->
+                <button type="button" id="cora-csn-btn-back" onclick="CoraInventory.prevConsignmentStep()" class="py-2.5 px-4 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 font-semibold text-xs transition-colors cursor-pointer flex items-center gap-1.5">
+                    <span>Cancel</span>
                 </button>
-                <button type="submit" class="py-2.5 px-5 sm:px-6 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-950 font-bold text-xs shadow-sm transition-colors cursor-pointer flex items-center gap-2">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
-                    <span>Confirm Van Dispatch &amp; Lock Stock</span>
-                </button>
+
+                <!-- Right Nav Button -->
+                <div class="flex items-center gap-2">
+                    <button type="button" id="cora-csn-btn-next" onclick="CoraInventory.nextConsignmentStep()" class="py-2.5 px-5 sm:px-6 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-950 font-bold text-xs shadow-sm transition-colors cursor-pointer flex items-center gap-1.5">
+                        <span>Next: Location Details</span>
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                    </button>
+                    <button type="submit" id="cora-csn-btn-submit" class="py-2.5 px-5 sm:px-6 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-950 font-bold text-xs shadow-sm transition-colors cursor-pointer hidden items-center gap-2">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+                        <span>Confirm Van Dispatch &amp; Lock Stock</span>
+                    </button>
+                </div>
             </div>
         </form>
 
@@ -2206,10 +2279,16 @@ body.cora-inventory-focus-mode .cora-sidebar-search {
                 <button type="button" onclick="CoraInventory.closeEditSaleModal()" class="py-2.5 px-4 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 font-semibold text-xs transition-colors cursor-pointer">
                     Cancel
                 </button>
-                <button type="submit" id="cora-edit-sale-save-btn" class="py-2.5 px-6 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-950 font-bold text-xs shadow-sm transition-colors cursor-pointer flex items-center gap-2">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    <span>Save Invoice</span>
-                </button>
+                <div class="flex items-center gap-2">
+                    <button type="button" id="cora-edit-sale-print-btn" class="py-2.5 px-4 rounded-xl bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-700 font-bold text-xs shadow-3xs transition-colors cursor-pointer flex items-center gap-1.5">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                        <span>Print Invoice</span>
+                    </button>
+                    <button type="submit" id="cora-edit-sale-save-btn" class="py-2.5 px-6 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-950 font-bold text-xs shadow-sm transition-colors cursor-pointer flex items-center gap-2">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <span>Save Invoice</span>
+                    </button>
+                </div>
             </div>
         </form>
     </div>
@@ -4787,8 +4866,27 @@ window.CoraInventory = (function($) {
 
     let consignmentAllocations = [];
     let multiPickerSelections = {};
+    let currentConsignmentStep = 1;
+
+    function isWeightBasedProduct(p) {
+        if (!p) return false;
+        if (p.pricing_type === 'weight_based' || p.pricing_type === 'weight') return true;
+        if (parseFloat(p.unit_weight_grams || 0) > 0) return true;
+        if (p.uom && p.uom.indexOf('g)') !== -1) return true;
+        if (p.sku && (p.sku.indexOf('KGZ-WGT') !== -1 || p.sku.indexOf('STN-WGT') !== -1)) return true;
+        if (p.description && p.description.indexOf('/Kg') !== -1) return true;
+        return false;
+    }
+
+    function getProductUnitWeightGrams(p) {
+        if (!p) return 1000.0;
+        const g = parseFloat(p.unit_weight_grams || 0);
+        return g > 0 ? g : 1000.0;
+    }
 
     function openConsignmentModal() {
+        currentConsignmentStep = 1;
+        goToConsignmentStep(1);
         if (!consignmentAllocations || !consignmentAllocations.length) {
             initTop5ConsignmentAllocations();
         } else {
@@ -4803,6 +4901,80 @@ window.CoraInventory = (function($) {
         closeStudioDrawer('#cora-inv-consignment-sheet', '#cora-inv-consignment-backdrop', '#cora-inv-consignment-drawer');
     }
 
+    function goToConsignmentStep(step) {
+        currentConsignmentStep = parseInt(step) || 1;
+        $('#cora-csn-step-pane-1').addClass('hidden');
+        $('#cora-csn-step-pane-2').addClass('hidden');
+        $('#cora-csn-step-pane-3').addClass('hidden');
+
+        $(`#cora-csn-step-pane-${currentConsignmentStep}`).removeClass('hidden');
+
+        [1, 2, 3].forEach(s => {
+            const tab = $(`#cora-csn-tab-${s}`);
+            const num = $(`#cora-csn-tab-num-${s}`);
+            if (s === currentConsignmentStep) {
+                tab.addClass('bg-white dark:bg-zinc-900 text-zinc-950 dark:text-zinc-50 shadow-2xs font-bold')
+                   .removeClass('text-zinc-500 font-semibold');
+                num.addClass('bg-zinc-950 text-white dark:bg-zinc-100 dark:text-zinc-950')
+                   .removeClass('bg-zinc-200 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300');
+            } else {
+                tab.removeClass('bg-white dark:bg-zinc-900 text-zinc-950 dark:text-zinc-50 shadow-2xs font-bold')
+                   .addClass('text-zinc-500 font-semibold');
+                num.removeClass('bg-zinc-950 text-white dark:bg-zinc-100 dark:text-zinc-950')
+                   .addClass('bg-zinc-200 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300');
+            }
+        });
+
+        if (currentConsignmentStep === 1) {
+            $('#cora-csn-btn-back').html('<span>Cancel</span>').attr('onclick', 'CoraInventory.closeConsignmentModal()');
+            $('#cora-csn-btn-next').removeClass('hidden').html('<span>Next: Location Details</span> <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>');
+            $('#cora-csn-btn-submit').addClass('hidden').removeClass('flex');
+        } else if (currentConsignmentStep === 2) {
+            $('#cora-csn-btn-back').html('<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> <span>Back to Driver</span>').attr('onclick', 'CoraInventory.prevConsignmentStep()');
+            $('#cora-csn-btn-next').removeClass('hidden').html('<span>Next: Select Inventory</span> <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>');
+            $('#cora-csn-btn-submit').addClass('hidden').removeClass('flex');
+        } else if (currentConsignmentStep === 3) {
+            $('#cora-csn-btn-back').html('<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> <span>Back to Location</span>').attr('onclick', 'CoraInventory.prevConsignmentStep()');
+            $('#cora-csn-btn-next').addClass('hidden');
+            $('#cora-csn-btn-submit').removeClass('hidden').addClass('flex');
+        }
+    }
+
+    function nextConsignmentStep() {
+        if (currentConsignmentStep === 1) {
+            const mode = $('#cora-csn-driver-mode').val();
+            if (mode === 'new') {
+                if (!$('#cora-csn-new-name').val().trim() || !$('#cora-csn-new-email').val().trim() || !$('#cora-csn-new-phone').val().trim()) {
+                    window.coraShowToast('Please provide new driver name, email, and phone number.', 'error');
+                    return;
+                }
+            }
+            if (!$('#cora-csn-vehicle').val().trim()) {
+                window.coraShowToast('Please enter vehicle registration number.', 'error');
+                return;
+            }
+            goToConsignmentStep(2);
+        } else if (currentConsignmentStep === 2) {
+            if (!$('#cora-csn-route').val().trim()) {
+                window.coraShowToast('Please enter route/territory name.', 'error');
+                return;
+            }
+            if (!$('#cora-csn-target-cities').val().trim()) {
+                window.coraShowToast('Please specify target cities or coverage zones.', 'error');
+                return;
+            }
+            goToConsignmentStep(3);
+        }
+    }
+
+    function prevConsignmentStep() {
+        if (currentConsignmentStep > 1) {
+            goToConsignmentStep(currentConsignmentStep - 1);
+        } else {
+            closeConsignmentModal();
+        }
+    }
+
     function initTop5ConsignmentAllocations() {
         consignmentAllocations = [];
         if (catalogCache && catalogCache.length) {
@@ -4813,14 +4985,21 @@ window.CoraInventory = (function($) {
                 candidates = candidates.slice(0, 5);
             }
             candidates.forEach(p => {
+                const isWeight = isWeightBasedProduct(p);
+                const unitWeightGrams = getProductUnitWeightGrams(p);
+                const defaultWeightKg = isWeight ? parseFloat(((1 * unitWeightGrams) / 1000.0).toFixed(2)) : 0;
                 consignmentAllocations.push({
                     product_id: parseInt(p.id),
                     name: p.name || 'Stationery Item',
                     sku: p.sku || 'SKU',
+                    pricing_type: isWeight ? 'weight_based' : 'unit_based',
+                    unit_weight_grams: unitWeightGrams,
                     wholesale_price: parseFloat(p.wholesale_price || p.wholesale_rate || 0),
+                    weight_rate: 401.25,
                     stock_quantity: parseInt(p.stock_quantity || 0),
                     image_url: p.image_url || '',
-                    quantity: 1
+                    quantity: 1,
+                    weight_kg: defaultWeightKg > 0 ? defaultWeightKg : 1.0
                 });
             });
         }
@@ -4834,9 +5013,8 @@ window.CoraInventory = (function($) {
 
     function openMultiProductPicker() {
         multiPickerSelections = {};
-        // Pre-populate with current allocations
         consignmentAllocations.forEach(item => {
-            multiPickerSelections[item.product_id] = item.quantity;
+            multiPickerSelections[item.product_id] = item.pricing_type === 'weight_based' ? (item.weight_kg || 1) : item.quantity;
         });
 
         $('#cora-multi-search-input').val('');
@@ -4877,12 +5055,18 @@ window.CoraInventory = (function($) {
         items.forEach(p => {
             const pid = parseInt(p.id);
             const isSelected = !!multiPickerSelections[pid];
-            const qty = multiPickerSelections[pid] || 1;
+            const isWeight = isWeightBasedProduct(p);
+            const unitWeightG = getProductUnitWeightGrams(p);
             const stock = parseInt(p.stock_quantity || 0);
-            const price = parseFloat(p.wholesale_price || p.wholesale_rate || 0);
+            const availableKg = ((stock * unitWeightG) / 1000.0).toFixed(2);
+            const defaultVal = isWeight ? (multiPickerSelections[pid] || 1.0) : (multiPickerSelections[pid] || 1);
             const thumbHtml = p.image_url 
                 ? `<img src="${escapeHtml(p.image_url)}" class="w-9 h-9 rounded-lg object-cover border border-zinc-200 dark:border-zinc-700 shrink-0">`
                 : `<div class="w-9 h-9 rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center font-bold text-[10px] text-zinc-700 dark:text-zinc-300 shrink-0">${(p.name || 'P').substring(0, 2).toUpperCase()}</div>`;
+
+            let metaText = isWeight
+                ? `<span class="font-mono text-zinc-500 dark:text-zinc-400">${escapeHtml(p.sku)} &bull; Stock: <span class="font-semibold text-emerald-600 dark:text-emerald-400">${stock} units (${availableKg} kg)</span> &bull; <span class="text-amber-700 dark:text-amber-300 font-bold">₹401.25/kg</span></span>`
+                : `<span class="font-mono text-zinc-500 dark:text-zinc-400">${escapeHtml(p.sku)} &bull; Stock: <span class="font-semibold ${stock > 0 ? 'text-zinc-800 dark:text-zinc-200' : 'text-rose-500'}">${stock} units</span> &bull; ₹${parseFloat(p.wholesale_price || 0).toFixed(2)}/unit</span>`;
 
             html += `
                 <div class="flex items-center justify-between p-3 rounded-xl border transition-all ${isSelected ? 'bg-zinc-50 dark:bg-zinc-800/60 border-zinc-900 dark:border-zinc-100 shadow-2xs' : 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700'}">
@@ -4891,12 +5075,12 @@ window.CoraInventory = (function($) {
                         ${thumbHtml}
                         <div class="min-w-0 flex-1">
                             <div class="font-bold text-xs text-zinc-900 dark:text-zinc-100 leading-tight truncate">${escapeHtml(p.name)}</div>
-                            <div class="text-[11px] font-mono text-zinc-400 mt-0.5 truncate">${escapeHtml(p.sku)} • Stock: <span class="font-semibold ${stock > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500'}">${stock}</span> • ₹${price.toFixed(2)}/unit</div>
+                            <div class="text-[11px] mt-0.5 truncate">${metaText}</div>
                         </div>
                     </label>
                     <div class="flex items-center gap-1.5 shrink-0 ml-3">
-                        <span class="text-[10px] font-semibold text-zinc-400 uppercase">Qty</span>
-                        <input type="number" min="1" max="${stock > 0 ? stock : 9999}" value="${qty}" ${!isSelected ? 'disabled' : ''} onchange="CoraInventory.onMultiQtyChange(${pid}, this.value)" oninput="CoraInventory.onMultiQtyChange(${pid}, this.value)" class="w-16 px-2 py-1 rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-right font-mono text-xs font-bold text-zinc-900 dark:text-zinc-100 outline-none focus:border-zinc-400 disabled:opacity-30">
+                        <span class="text-[10px] font-semibold text-zinc-400 uppercase">${isWeight ? 'Weight (kg)' : 'Qty'}</span>
+                        <input type="${isWeight ? 'number' : 'number'}" ${isWeight ? 'step="0.1"' : 'min="1"'} value="${defaultVal}" ${!isSelected ? 'disabled' : ''} onchange="CoraInventory.onMultiQtyChange(${pid}, this.value)" oninput="CoraInventory.onMultiQtyChange(${pid}, this.value)" class="w-18 px-2 py-1 rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-right font-mono text-xs font-bold text-zinc-900 dark:text-zinc-100 outline-none focus:border-zinc-400 disabled:opacity-30">
                     </div>
                 </div>
             `;
@@ -4912,8 +5096,9 @@ window.CoraInventory = (function($) {
         if (select) {
             (catalogCache || []).forEach(p => {
                 const pid = parseInt(p.id);
+                const isWeight = isWeightBasedProduct(p);
                 if (!multiPickerSelections[pid]) {
-                    multiPickerSelections[pid] = 1;
+                    multiPickerSelections[pid] = isWeight ? 1.0 : 1;
                 }
             });
         } else {
@@ -4924,8 +5109,10 @@ window.CoraInventory = (function($) {
 
     function onMultiPickerCheckboxToggle(productId, isChecked) {
         const pid = parseInt(productId);
+        const p = (catalogCache || []).find(x => parseInt(x.id) === pid);
+        const isWeight = isWeightBasedProduct(p);
         if (isChecked) {
-            multiPickerSelections[pid] = multiPickerSelections[pid] || 1;
+            multiPickerSelections[pid] = multiPickerSelections[pid] || (isWeight ? 1.0 : 1);
         } else {
             delete multiPickerSelections[pid];
         }
@@ -4935,8 +5122,10 @@ window.CoraInventory = (function($) {
 
     function onMultiQtyChange(productId, qty) {
         const pid = parseInt(productId);
-        let parsed = parseInt(qty);
-        if (isNaN(parsed) || parsed < 1) parsed = 1;
+        const p = (catalogCache || []).find(x => parseInt(x.id) === pid);
+        const isWeight = isWeightBasedProduct(p);
+        let parsed = isWeight ? parseFloat(qty) : parseInt(qty);
+        if (isNaN(parsed) || parsed <= 0) parsed = isWeight ? 0.5 : 1;
         if (multiPickerSelections[pid]) {
             multiPickerSelections[pid] = parsed;
         }
@@ -4954,14 +5143,20 @@ window.CoraInventory = (function($) {
         selectedPids.forEach(pid => {
             const p = (catalogCache || []).find(x => parseInt(x.id) === pid);
             if (p) {
+                const isWeight = isWeightBasedProduct(p);
+                const unitWeightG = getProductUnitWeightGrams(p);
                 newAllocations.push({
                     product_id: pid,
                     name: p.name || 'Product',
                     sku: p.sku || 'SKU',
+                    pricing_type: isWeight ? 'weight_based' : 'unit_based',
+                    unit_weight_grams: unitWeightG,
                     wholesale_price: parseFloat(p.wholesale_price || p.wholesale_rate || 0),
+                    weight_rate: 401.25,
                     stock_quantity: parseInt(p.stock_quantity || 0),
                     image_url: p.image_url || '',
-                    quantity: multiPickerSelections[pid] || 1
+                    quantity: !isWeight ? (parseInt(multiPickerSelections[pid]) || 1) : 1,
+                    weight_kg: isWeight ? (parseFloat(multiPickerSelections[pid]) || 1.0) : 0
                 });
             }
         });
@@ -4981,6 +5176,33 @@ window.CoraInventory = (function($) {
         renderConsignmentAllocList();
     }
 
+    function stepAllocWeight(productId, delta) {
+        const pid = parseInt(productId);
+        const item = consignmentAllocations.find(it => it.product_id === pid);
+        if (!item) return;
+        const current = parseFloat(item.weight_kg || 1);
+        const newWeight = Math.max(0.05, Math.round((current + delta) * 100) / 100);
+        onAllocWeightChange(pid, newWeight);
+        renderConsignmentAllocList();
+    }
+
+    function onAllocWeightChange(productId, val) {
+        const pid = parseInt(productId);
+        const item = consignmentAllocations.find(it => it.product_id === pid);
+        if (!item) return;
+
+        let parsed = parseFloat(val);
+        if (isNaN(parsed) || parsed <= 0) parsed = 0.5;
+        item.weight_kg = parsed;
+
+        const subtotalEl = $(`#cora-csn-subtotal-${pid}`);
+        if (subtotalEl.length) {
+            const lineTotal = (item.weight_kg * (item.weight_rate || 401.25));
+            subtotalEl.text('₹' + lineTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+        }
+        recalcConsignmentVal();
+    }
+
     function clearAllAllocations() {
         if (!consignmentAllocations.length) return;
         consignmentAllocations = [];
@@ -4992,12 +5214,12 @@ window.CoraInventory = (function($) {
         const container = $('#cora-csn-alloc-list');
         if (!consignmentAllocations.length) {
             container.html(`
-                <div class="text-zinc-400 dark:text-zinc-500 py-8 text-center text-xs">
+                <div class="text-zinc-400 dark:text-zinc-500 py-10 text-center text-xs">
                     <div class="w-10 h-10 mx-auto mb-2 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-400">
                         <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 8"></polygon></svg>
                     </div>
                     <div class="font-bold text-zinc-700 dark:text-zinc-300">No items currently allocated</div>
-                    <div class="text-[11px] text-zinc-400 mt-0.5">Use Top 5 Suggestion or Browse Catalog to add products.</div>
+                    <div class="text-[11px] text-zinc-400 mt-0.5">Use Top 5 Fast-Selling or Browse Catalog to add products.</div>
                 </div>
             `);
             recalcConsignmentVal();
@@ -5006,30 +5228,76 @@ window.CoraInventory = (function($) {
 
         let html = '';
         consignmentAllocations.forEach((item) => {
-            const lineTotal = (item.quantity * item.wholesale_price);
+            const isWeight = item.pricing_type === 'weight_based';
+            const unitWeightG = item.unit_weight_grams || 1000.0;
+            const availableKg = ((item.stock_quantity * unitWeightG) / 1000.0).toFixed(2);
+            const lineTotal = isWeight 
+                ? (parseFloat(item.weight_kg || 0) * (item.weight_rate || 401.25))
+                : (parseInt(item.quantity || 0) * item.wholesale_price);
+
             const thumbHtml = item.image_url 
                 ? `<img src="${escapeHtml(item.image_url)}" class="w-10 h-10 rounded-xl object-cover border border-zinc-200 dark:border-zinc-700 shrink-0 shadow-2xs">`
                 : `<div class="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center font-bold text-xs text-zinc-700 dark:text-zinc-300 shrink-0 shadow-2xs">${(item.name || 'P').substring(0, 2).toUpperCase()}</div>`;
 
-            html += `
-                <div class="flex items-center justify-between p-3 rounded-xl bg-zinc-50/70 dark:bg-zinc-800/40 border border-zinc-200/80 dark:border-zinc-700/80 text-xs hover:border-zinc-300 dark:hover:border-zinc-600 transition-colors gap-3">
-                    <div class="flex items-center gap-3 min-w-0 flex-1">
-                        ${thumbHtml}
-                        <div class="min-w-0 flex-1">
-                            <div class="font-bold text-zinc-900 dark:text-zinc-100 leading-tight truncate">${escapeHtml(item.name)}</div>
-                            <div class="text-[11px] font-mono text-zinc-400 mt-0.5 truncate">${escapeHtml(item.sku)} • Stock: <span class="font-semibold text-zinc-700 dark:text-zinc-300">${item.stock_quantity}</span> • ₹${item.wholesale_price.toFixed(2)}/unit</div>
+            let badgeHtml = isWeight
+                ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9.5px] font-semibold bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800/60">⚖️ Weight Item • ₹401.25/kg</span>`
+                : `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9.5px] font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700">📦 Unit Item • ₹${item.wholesale_price.toFixed(2)}/unit</span>`;
+
+            let stockText = isWeight
+                ? `Stock: <span class="font-semibold text-zinc-800 dark:text-zinc-200">${item.stock_quantity} units</span> (<span class="font-semibold text-emerald-600 dark:text-emerald-400 font-mono">${availableKg} kg available</span>)`
+                : `Stock: <span class="font-semibold text-zinc-800 dark:text-zinc-200">${item.stock_quantity} units available</span>`;
+
+            let controlsHtml = '';
+            if (isWeight) {
+                controlsHtml = `
+                    <div class="flex items-center gap-2">
+                        <div class="flex items-center rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 overflow-hidden shadow-2xs">
+                            <button type="button" onclick="CoraInventory.stepAllocWeight(${item.product_id}, -0.5)" class="px-2 py-1.5 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer font-bold text-xs" title="-0.5 kg">－</button>
+                            <div class="flex items-center px-1">
+                                <input type="number" step="0.05" min="0.05" max="${availableKg > 0 ? availableKg : 9999}" value="${parseFloat(item.weight_kg || 1).toFixed(2)}" onchange="CoraInventory.onAllocWeightChange(${item.product_id}, this.value)" oninput="CoraInventory.onAllocWeightChange(${item.product_id}, this.value)" class="w-16 py-1 text-center font-mono text-xs font-bold text-zinc-900 dark:text-zinc-100 outline-none bg-transparent">
+                                <span class="text-[10.5px] font-bold text-zinc-500 pr-1">kg</span>
+                            </div>
+                            <button type="button" onclick="CoraInventory.stepAllocWeight(${item.product_id}, 0.5)" class="px-2 py-1.5 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer font-bold text-xs" title="+0.5 kg">＋</button>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <button type="button" onclick="CoraInventory.stepAllocWeight(${item.product_id}, 1.0)" class="px-1.5 py-1 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-[10px] font-bold text-zinc-700 dark:text-zinc-300 transition-colors cursor-pointer" title="Add 1 kg">+1kg</button>
+                            <button type="button" onclick="CoraInventory.stepAllocWeight(${item.product_id}, 5.0)" class="px-1.5 py-1 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-[10px] font-bold text-zinc-700 dark:text-zinc-300 transition-colors cursor-pointer" title="Add 5 kg">+5kg</button>
                         </div>
                     </div>
-                    <div class="flex items-center gap-2 shrink-0">
-                        <div class="text-right hidden sm:block mr-1">
+                `;
+            } else {
+                controlsHtml = `
+                    <div class="flex items-center rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 overflow-hidden shadow-2xs">
+                        <button type="button" onclick="CoraInventory.stepAllocQty(${item.product_id}, -1)" class="px-2.5 py-1.5 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer font-bold text-xs">－</button>
+                        <div class="flex items-center px-1">
+                            <input type="number" min="1" max="${item.stock_quantity > 0 ? item.stock_quantity : 9999}" value="${item.quantity}" onchange="CoraInventory.onAllocQtyChange(${item.product_id}, this.value)" oninput="CoraInventory.onAllocQtyChange(${item.product_id}, this.value)" class="w-12 py-1 text-center font-mono text-xs font-bold text-zinc-900 dark:text-zinc-100 outline-none bg-transparent">
+                            <span class="text-[10px] font-bold text-zinc-400 pr-1">units</span>
+                        </div>
+                        <button type="button" onclick="CoraInventory.stepAllocQty(${item.product_id}, 1)" class="px-2.5 py-1.5 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer font-bold text-xs">＋</button>
+                    </div>
+                `;
+            }
+
+            html += `
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 rounded-2xl bg-zinc-50/80 dark:bg-zinc-800/40 border border-zinc-200/80 dark:border-zinc-700/80 text-xs hover:border-zinc-300 dark:hover:border-zinc-600 transition-all gap-3">
+                    <div class="flex items-start gap-3 min-w-0 flex-1">
+                        ${thumbHtml}
+                        <div class="min-w-0 flex-1 space-y-1">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <span class="font-bold text-zinc-950 dark:text-zinc-50 text-xs leading-tight">${escapeHtml(item.name)}</span>
+                                ${badgeHtml}
+                            </div>
+                            <div class="text-[11px] font-mono text-zinc-500 dark:text-zinc-400">
+                                ${escapeHtml(item.sku)} &bull; ${stockText}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between sm:justify-end gap-3 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-zinc-200/50 dark:border-zinc-700/50">
+                        <div class="text-right mr-1">
                             <div class="text-[10px] text-zinc-400 uppercase font-semibold">Subtotal</div>
                             <div class="font-mono font-bold text-zinc-900 dark:text-zinc-100 text-xs" id="cora-csn-subtotal-${item.product_id}">₹${lineTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                         </div>
-                        <div class="flex items-center rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 overflow-hidden shadow-2xs">
-                            <button type="button" onclick="CoraInventory.stepAllocQty(${item.product_id}, -1)" class="px-2 py-1.5 text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer font-bold text-xs">－</button>
-                            <input type="number" min="1" value="${item.quantity}" onchange="CoraInventory.onAllocQtyChange(${item.product_id}, this.value)" oninput="CoraInventory.onAllocQtyChange(${item.product_id}, this.value)" class="w-12 py-1.5 text-center font-mono text-xs font-bold text-zinc-900 dark:text-zinc-100 outline-none bg-transparent">
-                            <button type="button" onclick="CoraInventory.stepAllocQty(${item.product_id}, 1)" class="px-2 py-1.5 text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer font-bold text-xs">＋</button>
-                        </div>
+                        ${controlsHtml}
                         <button type="button" onclick="CoraInventory.removeAllocItem(${item.product_id})" class="p-1.5 rounded-lg text-zinc-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer" title="Remove from Van">
                             <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                         </button>
@@ -5068,12 +5336,19 @@ window.CoraInventory = (function($) {
 
         let html = '';
         matches.forEach(p => {
+            const isWeight = isWeightBasedProduct(p);
+            const unitWeightG = getProductUnitWeightGrams(p);
             const price = parseFloat(p.wholesale_price || p.wholesale_rate || 0);
             const stock = parseInt(p.stock_quantity || 0);
+            const availableKg = ((stock * unitWeightG) / 1000.0).toFixed(2);
             const isAlreadyAllocated = consignmentAllocations.some(it => it.product_id === parseInt(p.id));
             const thumbHtml = p.image_url 
                 ? `<img src="${escapeHtml(p.image_url)}" class="w-8 h-8 rounded-lg object-cover border border-zinc-200 dark:border-zinc-700 shrink-0">`
                 : `<div class="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center font-bold text-[10px] text-zinc-700 dark:text-zinc-300 shrink-0">${(p.name || 'P').substring(0, 2).toUpperCase()}</div>`;
+
+            let metaLine = isWeight
+                ? `${escapeHtml(p.sku)} &bull; Stock: <span class="font-semibold text-emerald-600 dark:text-emerald-400">${stock} units (${availableKg} kg)</span> &bull; <strong class="text-amber-700 dark:text-amber-300 font-mono">₹401.25/kg</strong>`
+                : `${escapeHtml(p.sku)} &bull; Stock: <span class="font-semibold text-zinc-700 dark:text-zinc-300">${stock} units</span> &bull; <strong class="font-mono">₹${price.toFixed(2)}/unit</strong>`;
 
             html += `
                 <div class="flex items-center justify-between p-2.5 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 transition-colors text-xs gap-2">
@@ -5081,7 +5356,7 @@ window.CoraInventory = (function($) {
                         ${thumbHtml}
                         <div class="min-w-0 flex-1">
                             <div class="font-bold text-zinc-900 dark:text-zinc-100 leading-tight truncate">${escapeHtml(p.name)}</div>
-                            <div class="text-[11px] font-mono text-zinc-400 truncate">${escapeHtml(p.sku)} • Stock: <span class="font-semibold text-zinc-700 dark:text-zinc-300">${stock}</span> • ₹${price.toFixed(2)}</div>
+                            <div class="text-[11px] font-mono text-zinc-400 truncate">${metaLine}</div>
                         </div>
                     </div>
                     <button type="button" onclick="CoraInventory.addSKUToConsignment(${p.id})" class="px-2.5 py-1 rounded-lg ${isAlreadyAllocated ? 'bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200' : 'bg-zinc-950 text-white dark:bg-zinc-100 dark:text-zinc-950'} text-[11px] font-bold shadow-2xs hover:opacity-90 transition-all shrink-0 cursor-pointer flex items-center gap-1">
@@ -5098,19 +5373,31 @@ window.CoraInventory = (function($) {
         const pid = parseInt(productId);
         const existing = consignmentAllocations.find(it => it.product_id === pid);
         if (existing) {
-            existing.quantity += 1;
-            window.coraShowToast(`Increased quantity for ${existing.name} (Qty: ${existing.quantity})`, 'info');
+            if (existing.pricing_type === 'weight_based') {
+                existing.weight_kg = Math.round(((existing.weight_kg || 1) + 0.5) * 100) / 100;
+                window.coraShowToast(`Increased weight for ${existing.name} (${existing.weight_kg} kg)`, 'info');
+            } else {
+                existing.quantity += 1;
+                window.coraShowToast(`Increased quantity for ${existing.name} (Qty: ${existing.quantity})`, 'info');
+            }
         } else {
             const p = (catalogCache || []).find(x => parseInt(x.id) === pid);
             if (p) {
+                const isWeight = isWeightBasedProduct(p);
+                const unitWeightG = getProductUnitWeightGrams(p);
+                const defaultWeightKg = isWeight ? parseFloat(((1 * unitWeightG) / 1000.0).toFixed(2)) : 0;
                 consignmentAllocations.unshift({
                     product_id: pid,
                     name: p.name || 'Product',
                     sku: p.sku || 'SKU',
+                    pricing_type: isWeight ? 'weight_based' : 'unit_based',
+                    unit_weight_grams: unitWeightG,
                     wholesale_price: parseFloat(p.wholesale_price || p.wholesale_rate || 0),
+                    weight_rate: 401.25,
                     stock_quantity: parseInt(p.stock_quantity || 0),
                     image_url: p.image_url || '',
-                    quantity: 1
+                    quantity: 1,
+                    weight_kg: defaultWeightKg > 0 ? defaultWeightKg : 1.0
                 });
                 window.coraShowToast(`Added ${p.name} to van allocation.`, 'success');
             }
@@ -5147,15 +5434,33 @@ window.CoraInventory = (function($) {
 
     function recalcConsignmentVal() {
         let total = 0;
-        let units = 0;
+        let unitsCount = 0;
+        let weightCountKg = 0;
+        let unitItemsCount = 0;
+        let weightItemsCount = 0;
+
         consignmentAllocations.forEach(it => {
-            const qty = parseInt(it.quantity || 0);
-            total += (qty * it.wholesale_price);
-            units += qty;
+            if (it.pricing_type === 'weight_based') {
+                const w = parseFloat(it.weight_kg || 0);
+                total += (w * (it.weight_rate || 401.25));
+                weightCountKg += w;
+                weightItemsCount++;
+            } else {
+                const q = parseInt(it.quantity || 0);
+                total += (q * it.wholesale_price);
+                unitsCount += q;
+                unitItemsCount++;
+            }
         });
+
         $('#cora-csn-calc-val').text('Total: ₹' + total.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
         $('#cora-csn-sku-count-badge').text(`${consignmentAllocations.length} SKUs`);
-        $('#cora-csn-units-count-badge').text(`${units} units`);
+        $('#cora-csn-weight-count-badge').text(`${weightCountKg.toFixed(2)} kg total`);
+        
+        let breakdownParts = [];
+        if (unitItemsCount > 0) breakdownParts.push(`${unitsCount} units`);
+        if (weightItemsCount > 0) breakdownParts.push(`${weightCountKg.toFixed(2)} kg`);
+        $('#cora-csn-calc-units').text(breakdownParts.join(' • ') || '0 units');
     }
 
     function appendCityTag(cityName) {
@@ -5221,15 +5526,24 @@ window.CoraInventory = (function($) {
             return;
         }
 
-        const invalidItem = consignmentAllocations.find(it => !it.quantity || it.quantity < 1);
+        const invalidItem = consignmentAllocations.find(it => {
+            if (it.pricing_type === 'weight_based') {
+                return !it.weight_kg || it.weight_kg <= 0;
+            }
+            return !it.quantity || it.quantity < 1;
+        });
         if (invalidItem) {
-            window.coraShowToast('All allocated items must have a quantity of 1 or more units.', 'error');
+            window.coraShowToast('All allocated items must have a valid quantity / weight.', 'error');
             return;
         }
 
         const items = consignmentAllocations.map(it => ({
             product_id: it.product_id,
-            quantity: it.quantity
+            pricing_type: it.pricing_type || 'unit_based',
+            quantity: it.quantity || 1,
+            weight_kg: it.weight_kg || 0,
+            unit_rate: it.wholesale_price || 0,
+            unit_weight_grams: it.unit_weight_grams || null
         }));
 
         const driverMode = $('#cora-csn-driver-mode').val() || 'existing';
@@ -5341,6 +5655,19 @@ window.CoraInventory = (function($) {
         }
     }
 
+    function validateSpotWeight(input) {
+        const val = parseFloat($(input).val()) || 0.0;
+        const max = parseFloat($(input).attr('data-max')) || 0.0;
+        if (val < 0) {
+            $(input).val(0);
+        } else if (val > max) {
+            $(input).val(max.toFixed(2));
+            if (window.coraShowToast) {
+                window.coraShowToast('Weight adjusted to available van stock (' + max.toFixed(2) + ' kg available).', 'warning');
+            }
+        }
+    }
+
     function renderSpotSaleItems() {
         let html = '';
         const itemsToRender = (activeConsignmentItems && activeConsignmentItems.length) ? activeConsignmentItems : [];
@@ -5363,46 +5690,98 @@ window.CoraInventory = (function($) {
             const pid = parseInt(it.product_id || it.id);
             const name = it.product_name || it.name || 'Stationery Item';
             const sku = it.sku || '';
-            const rate = parseFloat(it.unit_rate || it.wholesale_price || 0);
+            const isWeight = (it.pricing_type === 'weight_based' || parseFloat(it.dispatched_weight_kg || 0) > 0 || parseFloat(it.unit_weight_grams || 0) > 0 || (it.sku && it.sku.indexOf('KGZ-WGT') !== -1));
+            const rate = isWeight ? 401.25 : parseFloat(it.unit_rate || it.wholesale_price || 0);
             const gst = parseFloat(it.gst_rate || 12);
-            const dispatchedQty = parseInt(it.dispatched_qty || 0);
-            const soldQty = parseInt(it.sold_qty || 0);
-            const remainingQty = Math.max(0, parseInt(it.remaining_qty !== undefined ? it.remaining_qty : (dispatchedQty - soldQty)));
-            const unit = it.unit || 'units';
-            const isOutOfStock = remainingQty <= 0;
+            const unitWeightG = parseFloat(it.unit_weight_grams || 1000.0);
+            
+            let stockAvailableText = '';
+            let inputControls = '';
+            let isOutOfStock = false;
+
+            if (isWeight) {
+                const dispatchedWeight = parseFloat(it.dispatched_weight_kg || 0);
+                const soldWeight = parseFloat(it.sold_weight_kg || 0);
+                const remainingWeight = Math.max(0, dispatchedWeight - soldWeight);
+                isOutOfStock = remainingWeight <= 0;
+                stockAvailableText = remainingWeight > 0 
+                    ? `In Van: <strong class="text-emerald-600 dark:text-emerald-400 font-mono">${remainingWeight.toFixed(2)} kg</strong> available &bull; <span class="font-bold text-amber-700 dark:text-amber-300">₹401.25/kg</span>`
+                    : `<span class="text-rose-500 font-semibold">Sold Out on Route</span>`;
+
+                inputControls = `
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <label class="text-[11px] font-semibold text-zinc-500 hidden sm:inline-block">Weight Sold:</label>
+                        <div class="flex items-center px-2 py-1 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 shadow-2xs">
+                            <input type="number" 
+                                step="0.05"
+                                data-pid="${pid}" 
+                                data-name="${escapeHtml(name)}" 
+                                data-sku="${escapeHtml(sku)}" 
+                                data-pricing="weight_based"
+                                data-unitweight="${unitWeightG}"
+                                data-rate="401.25" 
+                                data-gst="${gst}" 
+                                data-max="${remainingWeight.toFixed(2)}" 
+                                min="0" 
+                                max="${remainingWeight.toFixed(2)}" 
+                                value="0" 
+                                ${isOutOfStock ? 'disabled' : ''} 
+                                oninput="CoraInventory.validateSpotWeight(this); CoraInventory.recalcSpotTotal();" 
+                                class="cora-spot-qty-input w-16 text-right font-mono text-xs font-bold text-zinc-900 dark:text-zinc-100 outline-none bg-transparent">
+                            <span class="text-[10.5px] font-bold text-zinc-500 ml-1">kg</span>
+                        </div>
+                    </div>
+                `;
+            } else {
+                const dispatchedQty = parseInt(it.dispatched_qty || 0);
+                const soldQty = parseInt(it.sold_qty || 0);
+                const remainingQty = Math.max(0, parseInt(it.remaining_qty !== undefined ? it.remaining_qty : (dispatchedQty - soldQty)));
+                isOutOfStock = remainingQty <= 0;
+                stockAvailableText = remainingQty > 0 
+                    ? `In Van: <strong class="text-zinc-800 dark:text-zinc-200 font-mono">${remainingQty} units</strong> available &bull; ₹${rate.toFixed(2)}/unit`
+                    : `<span class="text-rose-500 font-semibold">Sold Out on Route</span>`;
+
+                inputControls = `
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <label class="text-[11px] font-semibold text-zinc-500 hidden sm:inline-block">Units Sold:</label>
+                        <div class="flex items-center px-2 py-1 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 shadow-2xs">
+                            <input type="number" 
+                                data-pid="${pid}" 
+                                data-name="${escapeHtml(name)}" 
+                                data-sku="${escapeHtml(sku)}" 
+                                data-pricing="unit_based"
+                                data-rate="${rate}" 
+                                data-gst="${gst}" 
+                                data-max="${remainingQty}" 
+                                min="0" 
+                                max="${remainingQty}" 
+                                value="0" 
+                                ${isOutOfStock ? 'disabled' : ''} 
+                                oninput="CoraInventory.validateSpotQty(this); CoraInventory.recalcSpotTotal();" 
+                                class="cora-spot-qty-input w-14 text-right font-mono text-xs font-bold text-zinc-900 dark:text-zinc-100 outline-none bg-transparent">
+                            <span class="text-[10px] font-bold text-zinc-400 ml-1">units</span>
+                        </div>
+                    </div>
+                `;
+            }
 
             html += `
-                <div class="flex items-center justify-between p-3 rounded-xl bg-zinc-50/70 dark:bg-zinc-800/40 border border-zinc-200/80 dark:border-zinc-700/80 text-xs hover:border-zinc-300 dark:hover:border-zinc-600 transition-colors ${isOutOfStock ? 'opacity-60 bg-zinc-100/40 dark:bg-zinc-900/40' : ''}">
+                <div class="flex items-center justify-between p-3.5 rounded-2xl bg-zinc-50/70 dark:bg-zinc-800/40 border border-zinc-200/80 dark:border-zinc-700/80 text-xs hover:border-zinc-300 dark:hover:border-zinc-600 transition-all ${isOutOfStock ? 'opacity-60 bg-zinc-100/40 dark:bg-zinc-900/40' : ''}">
                     <div class="flex items-center gap-3 min-w-0 flex-1 pr-2">
-                        <div class="w-8 h-8 rounded-lg bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center font-bold text-[10px] text-zinc-600 dark:text-zinc-300 shrink-0 shadow-2xs">
+                        <div class="w-8 h-8 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center font-bold text-[10px] text-zinc-600 dark:text-zinc-300 shrink-0 shadow-2xs">
                             ${escapeHtml(name.substring(0, 2).toUpperCase())}
                         </div>
-                        <div class="min-w-0">
-                            <div class="font-bold text-zinc-900 dark:text-zinc-100 leading-tight truncate">${escapeHtml(name)}</div>
-                            <div class="text-[11px] font-mono text-zinc-400 mt-0.5 flex items-center gap-2 flex-wrap">
-                                <span>${escapeHtml(sku)} • Rate: ₹${rate.toFixed(2)}</span>
-                                <span class="px-1.5 py-0.2 rounded text-[10px] ${remainingQty > 0 ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60 font-semibold' : 'bg-zinc-200/80 dark:bg-zinc-800 text-zinc-500 font-medium'}">
-                                    ${remainingQty > 0 ? 'In Van: ' + remainingQty + ' ' + escapeHtml(unit) : 'Sold Out on Route'}
-                                </span>
+                        <div class="min-w-0 space-y-0.5">
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <span class="font-bold text-zinc-900 dark:text-zinc-100 text-xs truncate">${escapeHtml(name)}</span>
+                                ${isWeight ? '<span class="px-1.5 py-0.2 rounded text-[9px] font-semibold bg-amber-50 text-amber-800 dark:bg-amber-950/50 dark:text-amber-300 border border-amber-200/60">⚖️ Weight</span>' : ''}
+                            </div>
+                            <div class="text-[11px] font-mono text-zinc-500 dark:text-zinc-400">
+                                ${escapeHtml(sku)} &bull; ${stockAvailableText}
                             </div>
                         </div>
                     </div>
-                    <div class="flex items-center gap-2 shrink-0">
-                        <label class="text-[11px] font-semibold text-zinc-500 hidden sm:inline-block">Billed Qty:</label>
-                        <input type="number" 
-                            data-pid="${pid}" 
-                            data-name="${escapeHtml(name)}" 
-                            data-sku="${escapeHtml(sku)}" 
-                            data-rate="${rate}" 
-                            data-gst="${gst}" 
-                            data-max="${remainingQty}" 
-                            min="0" 
-                            max="${remainingQty}" 
-                            value="0" 
-                            ${isOutOfStock ? 'disabled' : ''} 
-                            oninput="CoraInventory.validateSpotQty(this); CoraInventory.recalcSpotTotal();" 
-                            class="cora-spot-qty-input w-20 px-2.5 py-1.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-right font-mono text-xs font-bold text-zinc-900 dark:text-zinc-100 outline-none focus:border-zinc-400 disabled:opacity-40 disabled:cursor-not-allowed">
-                    </div>
+                    ${inputControls}
                 </div>
             `;
         });
@@ -5412,13 +5791,33 @@ window.CoraInventory = (function($) {
 
     function recalcSpotTotal() {
         let subtotal = 0;
+        let unitsTotal = 0;
+        let weightTotalKg = 0;
+
         $('.cora-spot-qty-input').each(function() {
-            const qty = parseInt($(this).val()) || 0;
-            const rate = parseFloat($(this).data('rate')) || 0;
-            subtotal += (qty * rate);
+            const pricing = $(this).data('pricing');
+            if (pricing === 'weight_based') {
+                const w = parseFloat($(this).val()) || 0.0;
+                subtotal += (w * 401.25);
+                weightTotalKg += w;
+            } else {
+                const q = parseInt($(this).val()) || 0;
+                const rate = parseFloat($(this).data('rate')) || 0.0;
+                subtotal += (q * rate);
+                unitsTotal += q;
+            }
         });
+
         const totalWithTax = subtotal * 1.12;
-        $('#cora-spot-total-display').text('Total: ₹' + totalWithTax.toLocaleString('en-IN', { minimumFractionDigits: 2 }));
+        let breakdownStr = '';
+        if (weightTotalKg > 0 && unitsTotal > 0) {
+            breakdownStr = ` (${unitsTotal} units • ${weightTotalKg.toFixed(2)} kg)`;
+        } else if (weightTotalKg > 0) {
+            breakdownStr = ` (${weightTotalKg.toFixed(2)} kg)`;
+        } else if (unitsTotal > 0) {
+            breakdownStr = ` (${unitsTotal} units)`;
+        }
+        $('#cora-spot-total-display').text('Total: ₹' + totalWithTax.toLocaleString('en-IN', { minimumFractionDigits: 2 }) + breakdownStr);
     }
 
     function submitSpotSale(e) {
@@ -5428,28 +5827,52 @@ window.CoraInventory = (function($) {
         let exceedMsg = '';
 
         $('.cora-spot-qty-input').each(function() {
-            const qty = parseInt($(this).val()) || 0;
-            const max = parseInt($(this).attr('data-max')) || 0;
+            const pricing = $(this).data('pricing');
+            const max = parseFloat($(this).attr('data-max')) || 0;
             const pid = parseInt($(this).data('pid')) || 0;
             const name = $(this).data('name') || '';
             const sku = $(this).data('sku') || '';
             const rate = parseFloat($(this).data('rate')) || 0;
             const gst = parseFloat($(this).data('gst')) || 12;
+            const unitWeightG = parseFloat($(this).data('unitweight')) || 1000.0;
 
-            if (qty > max) {
-                hasExceeded = true;
-                exceedMsg = `Requested quantity ${qty} for "${name}" exceeds available van stock (${max}).`;
-            }
-
-            if (qty > 0 && pid > 0) {
-                items.push({
-                    product_id: pid,
-                    product_name: name,
-                    sku: sku,
-                    quantity: qty,
-                    unit_price: rate,
-                    gst_rate: gst
-                });
+            if (pricing === 'weight_based') {
+                const w = parseFloat($(this).val()) || 0.0;
+                if (w > max) {
+                    hasExceeded = true;
+                    exceedMsg = `Requested weight ${w.toFixed(2)} kg for "${name}" exceeds available van stock (${max.toFixed(2)} kg).`;
+                }
+                if (w > 0 && pid > 0) {
+                    items.push({
+                        product_id: pid,
+                        product_name: name,
+                        sku: sku,
+                        pricing_type: 'weight_based',
+                        weight_kg: w,
+                        unit_weight_grams: unitWeightG,
+                        unit_price: 0,
+                        weight_rate: 401.25,
+                        gst_rate: gst
+                    });
+                }
+            } else {
+                const qty = parseInt($(this).val()) || 0;
+                if (qty > max) {
+                    hasExceeded = true;
+                    exceedMsg = `Requested quantity ${qty} for "${name}" exceeds available van stock (${max}).`;
+                }
+                if (qty > 0 && pid > 0) {
+                    items.push({
+                        product_id: pid,
+                        product_name: name,
+                        sku: sku,
+                        pricing_type: 'unit_based',
+                        quantity: qty,
+                        unit_price: rate,
+                        weight_rate: 401.25,
+                        gst_rate: gst
+                    });
+                }
             }
         });
 
@@ -5459,11 +5882,11 @@ window.CoraInventory = (function($) {
         }
 
         if (!items.length) {
-            window.coraShowToast('Specify at least 1 unit sold from active van stock.', 'error');
+            window.coraShowToast('Specify at least 1 unit or weight sold from active van stock.', 'error');
             return;
         }
 
-        window.coraShowToast('Recording field invoice...', 'info');
+        window.coraShowToast('Recording field bill & preparing invoice...', 'info');
         $.ajax({
             url: ajaxurl || '/wp-admin/admin-ajax.php',
             type: 'POST',
@@ -5478,11 +5901,16 @@ window.CoraInventory = (function($) {
             },
             success: function(res) {
                 if (res.success) {
-                    window.coraShowToast('Spot bill created successfully!', 'success');
+                    window.coraShowToast('Spot bill created successfully! Generating Tax Invoice...', 'success');
                     closeSpotSaleSheet();
                     loadCatalog();
                     loadConsignments();
                     loadVendorDashboard();
+                    if (res.data && res.data.sale_id) {
+                        setTimeout(function() {
+                            CoraInventory.printSaleInvoice(res.data.sale_id);
+                        }, 400);
+                    }
                 } else {
                     window.coraShowToast(res.data || 'Failed to record spot sale.', 'error');
                 }
@@ -5514,25 +5942,50 @@ window.CoraInventory = (function($) {
         items.forEach(it => {
             const name = it.product_name || it.name || 'Stationery Item';
             const sku = it.sku || '';
-            const rate = parseFloat(it.unit_rate || it.wholesale_price || 0);
-            const dispatchedQty = parseInt(it.dispatched_qty || 0);
-            const soldQty = parseInt(it.sold_qty || 0);
-            const remainingQty = Math.max(0, parseInt(it.remaining_qty !== undefined ? it.remaining_qty : (dispatchedQty - soldQty)));
-            const unit = it.unit || 'units';
-            const valOnWheels = remainingQty * rate;
+            const isWeight = (it.pricing_type === 'weight_based' || parseFloat(it.dispatched_weight_kg || 0) > 0 || (it.sku && it.sku.indexOf('KGZ-WGT') !== -1));
+            const rate = isWeight ? 401.25 : parseFloat(it.unit_rate || it.wholesale_price || 0);
+            
+            if (isWeight) {
+                const dispatchedWeight = parseFloat(it.dispatched_weight_kg || 0);
+                const soldWeight = parseFloat(it.sold_weight_kg || 0);
+                const remainingWeight = Math.max(0, dispatchedWeight - soldWeight);
+                const valOnWheels = remainingWeight * rate;
 
-            html += `
-                <div class="flex items-center justify-between p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 text-xs border border-zinc-200/60 dark:border-zinc-700/60 gap-3">
-                    <div class="min-w-0 flex-1">
-                        <div class="font-bold text-zinc-900 dark:text-zinc-100 truncate">${escapeHtml(name)}</div>
-                        <div class="text-[11px] text-zinc-400 font-mono mt-0.5 truncate">${escapeHtml(sku)} • Rate: ₹${rate.toFixed(2)}</div>
+                html += `
+                    <div class="flex items-center justify-between p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-800/40 text-xs border border-zinc-200/60 dark:border-zinc-700/60 gap-3">
+                        <div class="min-w-0 flex-1 space-y-0.5">
+                            <div class="flex items-center gap-1.5">
+                                <span class="font-bold text-zinc-900 dark:text-zinc-100 truncate">${escapeHtml(name)}</span>
+                                <span class="px-1.5 py-0.2 rounded text-[9px] font-semibold bg-amber-50 text-amber-800 dark:bg-amber-950/50 dark:text-amber-300 border border-amber-200/60">⚖️ Weight</span>
+                            </div>
+                            <div class="text-[11px] text-zinc-400 font-mono truncate">${escapeHtml(sku)} &bull; Rate: ₹401.25/kg</div>
+                        </div>
+                        <div class="text-right font-mono shrink-0">
+                            <div class="font-bold text-zinc-900 dark:text-zinc-100">${remainingWeight.toFixed(2)} kg <span class="font-sans font-normal text-[10px] text-zinc-400">/ ${dispatchedWeight.toFixed(2)} kg</span></div>
+                            <div class="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">₹${Number(valOnWheels.toFixed(2)).toLocaleString('en-IN')} on wheels</div>
+                        </div>
                     </div>
-                    <div class="text-right font-mono shrink-0">
-                        <div class="font-bold text-zinc-900 dark:text-zinc-100">${remainingQty} <span class="font-sans font-normal text-[10px] text-zinc-400">/ ${dispatchedQty} ${escapeHtml(unit)}</span></div>
-                        <div class="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">₹${Number(valOnWheels.toFixed(2)).toLocaleString('en-IN')} on wheels</div>
+                `;
+            } else {
+                const dispatchedQty = parseInt(it.dispatched_qty || 0);
+                const soldQty = parseInt(it.sold_qty || 0);
+                const remainingQty = Math.max(0, parseInt(it.remaining_qty !== undefined ? it.remaining_qty : (dispatchedQty - soldQty)));
+                const unit = it.unit || 'units';
+                const valOnWheels = remainingQty * rate;
+
+                html += `
+                    <div class="flex items-center justify-between p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-800/40 text-xs border border-zinc-200/60 dark:border-zinc-700/60 gap-3">
+                        <div class="min-w-0 flex-1">
+                            <div class="font-bold text-zinc-900 dark:text-zinc-100 truncate">${escapeHtml(name)}</div>
+                            <div class="text-[11px] text-zinc-400 font-mono mt-0.5 truncate">${escapeHtml(sku)} &bull; Rate: ₹${rate.toFixed(2)}/unit</div>
+                        </div>
+                        <div class="text-right font-mono shrink-0">
+                            <div class="font-bold text-zinc-900 dark:text-zinc-100">${remainingQty} <span class="font-sans font-normal text-[10px] text-zinc-400">/ ${dispatchedQty} ${escapeHtml(unit)}</span></div>
+                            <div class="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">₹${Number(valOnWheels.toFixed(2)).toLocaleString('en-IN')} on wheels</div>
+                        </div>
                     </div>
-                </div>
-            `;
+                `;
+            }
         });
         container.html(html);
     }
@@ -5660,7 +6113,11 @@ window.CoraInventory = (function($) {
                                     <div class="font-bold text-zinc-900 dark:text-zinc-100">₹${Number(s.grand_total || 0).toLocaleString('en-IN')}</div>
                                     <div class="text-[10px] text-zinc-400">${badgeText}</div>
                                 </div>
-                                <div class="flex items-center gap-1 shrink-0 ml-1">
+                                <div class="flex items-center gap-1.5 shrink-0 ml-1">
+                                    <button type="button" onclick="CoraInventory.printSaleInvoice(${s.id})" class="p-1.5 rounded-lg bg-zinc-950 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-950 transition-colors cursor-pointer shadow-3xs flex items-center gap-1" title="Print Official GST Tax Invoice">
+                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                                        <span class="text-[10px] font-bold hidden sm:inline">Print</span>
+                                    </button>
                                     <button type="button" onclick="CoraInventory.openEditSaleModal(${s.id})" class="p-1.5 rounded-lg bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 transition-colors cursor-pointer" title="Edit Invoice">
                                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                                     </button>
@@ -5677,6 +6134,16 @@ window.CoraInventory = (function($) {
         });
     }
 
+    function printSaleInvoice(saleId, autoPrint = true) {
+        if (!saleId) {
+            window.coraShowToast('Invalid invoice ID selected for printing.', 'error');
+            return;
+        }
+        const url = (ajaxurl || '/wp-admin/admin-ajax.php') + '?action=cora_inventory_render_sale_invoice&sale_id=' + encodeURIComponent(saleId) + (autoPrint ? '&autoprint=1' : '');
+        if (window.coraShowToast) window.coraShowToast('Opening printable GST Tax Invoice...', 'info');
+        window.open(url, '_blank', 'width=920,height=960,scrollbars=yes,status=yes');
+    }
+
     function openEditSaleModal(saleId) {
         const s = (salesLedgerCache || []).find(x => parseInt(x.id) === parseInt(saleId));
         if (!s) return;
@@ -5690,6 +6157,7 @@ window.CoraInventory = (function($) {
         $('#cora-edit-sale-paystatus').val((s.payment_status || 'paid').toLowerCase());
         $('#cora-edit-sale-grandtotal').val(parseFloat(s.grand_total || 0).toFixed(2));
         $('#cora-edit-sale-paidamount').val(parseFloat(s.paid_amount || s.grand_total || 0).toFixed(2));
+        $('#cora-edit-sale-print-btn').attr('onclick', `CoraInventory.printSaleInvoice(${s.id})`);
 
         openStudioDrawer('#cora-inv-edit-sale-sheet', '#cora-inv-edit-sale-backdrop', '#cora-inv-edit-sale-drawer');
     }
@@ -6057,15 +6525,21 @@ window.CoraInventory = (function($) {
         },
         openConsignmentModal,
         closeConsignmentModal,
+        goToConsignmentStep,
+        nextConsignmentStep,
+        prevConsignmentStep,
         suggestTop5Products,
         openMultiProductPicker,
         closeMultiProductPicker,
+        renderMultiPickerList,
         filterMultiPicker,
         toggleMultiPickerSelectAll,
         onMultiPickerCheckboxToggle,
         onMultiQtyChange,
         applyMultiProductSelection,
         stepAllocQty,
+        stepAllocWeight,
+        onAllocWeightChange,
         clearAllAllocations,
         renderConsignmentAllocList,
         searchSKUsToAllocate,
@@ -6093,7 +6567,10 @@ window.CoraInventory = (function($) {
         submitSpotSale,
         recalcSpotTotal,
         validateSpotQty,
+        validateSpotWeight,
         renderVendorVanStock,
+        loadVendorDashboard,
+        printSaleInvoice,
         openEditSaleModal,
         closeEditSaleModal,
         submitUpdateSale,
@@ -6160,6 +6637,7 @@ window.CoraInventory = (function($) {
         setExportScope,
         triggerExportCSV,
         triggerExportPDF,
+        printSaleInvoice,
         toggleFocusMode,
         setFocusMode,
         toggleAnalyticsCards,
