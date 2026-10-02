@@ -5373,7 +5373,7 @@ class Cora_Inventory_Engine {
 
     /**
      * AJAX: Export Sales Register to CSV.
-     * Column order: Serial Number, Bill number, Customer/firm name, Date, City/location, Mobile Number of Customer, total amount of bill
+     * Includes sold item descriptions, weights, units, and rates per bill, with support for itemized breakdown.
      */
     public static function ajax_export_sales_csv() {
         if ( ! empty( $_REQUEST['security'] ) ) {
@@ -5381,35 +5381,119 @@ class Cora_Inventory_Engine {
         }
         $data = self::get_filtered_sales_data( $_REQUEST );
         $sales = $data['sales'];
+        $export_mode = sanitize_text_field( $_REQUEST['export_mode'] ?? ( $_REQUEST['mode'] ?? 'summary' ) );
 
         $csv_rows = array();
-        $csv_rows[] = 'Serial Number,Bill number,Customer/firm name,Date,City/location,Mobile Number of Customer,total amount of bill';
 
-        foreach ( $sales as $idx => $s ) {
-            $sr_no = $idx + 1;
-            $bill_no = self::format_4digit_bill_no( $s );
-            $sale_date = ! empty( $s['sale_date'] ) ? date( 'd-m-Y', strtotime( $s['sale_date'] ) ) : ( ! empty( $s['created_at'] ) ? date( 'd-m-Y', strtotime( $s['created_at'] ) ) : date( 'd-m-Y' ) );
-            $customer_name = $s['resolved_customer'];
-            $city_location = $s['city_location'];
-            $mobile = $s['customer_mobile'];
-            $grand_total = number_format( floatval( $s['grand_total'] ), 2, '.', '' );
+        if ( $export_mode === 'itemized' || $export_mode === 'items' ) {
+            // Itemized line-by-line CSV export
+            $csv_rows[] = 'Serial Number,Bill number,Customer/firm name,Date,City/location,Mobile Number of Customer,Product Name,SKU,Pricing Type,Quantity,Weight (Kg),Rate (Rs),GST (%),Line Total (Rs),Total Bill Amount (Rs)';
 
-            $row = array(
-                $sr_no,
-                $bill_no,
-                $customer_name,
-                $sale_date,
-                $city_location,
-                $mobile,
-                $grand_total
-            );
+            $row_idx = 1;
+            foreach ( $sales as $s ) {
+                $bill_no       = self::format_4digit_bill_no( $s );
+                $sale_date     = ! empty( $s['sale_date'] ) ? date( 'd-m-Y', strtotime( $s['sale_date'] ) ) : ( ! empty( $s['created_at'] ) ? date( 'd-m-Y', strtotime( $s['created_at'] ) ) : date( 'd-m-Y' ) );
+                $customer_name = $s['resolved_customer'];
+                $city_location = $s['city_location'];
+                $mobile        = $s['customer_mobile'];
+                $grand_total   = number_format( floatval( $s['grand_total'] ), 2, '.', '' );
+                $items         = $s['items'] ?? array();
 
-            $csv_rows[] = implode( ',', array_map( function( $val ) {
-                return '"' . str_replace( '"', '""', (string) $val ) . '"';
-            }, $row ) );
+                if ( ! empty( $items ) ) {
+                    foreach ( $items as $it ) {
+                        $is_wt = ( ( $it['pricing_type'] ?? '' ) === 'weight_based' || floatval( $it['weight_kg'] ?? 0 ) > 0 );
+                        $p_name = $it['product_name'] ?? 'Product';
+                        $sku = $it['sku'] ?? '—';
+                        $p_type = $is_wt ? 'Weight-Based' : 'Unit-Based';
+                        $qty = intval( $it['quantity'] ?? 1 );
+                        $wt = number_format( floatval( $it['weight_kg'] ?? 0 ), 2, '.', '' );
+                        $rate = number_format( floatval( $is_wt ? ( $it['weight_rate'] ?? 401.25 ) : ( $it['unit_price'] ?? 0 ) ), 2, '.', '' );
+                        $gst = number_format( floatval( $it['gst_rate'] ?? 12 ), 0, '.', '' );
+                        $line_total = number_format( floatval( $it['line_total'] ?? 0 ), 2, '.', '' );
+
+                        $row = array(
+                            $row_idx++,
+                            $bill_no,
+                            $customer_name,
+                            $sale_date,
+                            $city_location,
+                            $mobile,
+                            $p_name,
+                            $sku,
+                            $p_type,
+                            $qty,
+                            $wt,
+                            $rate,
+                            $gst . '%',
+                            $line_total,
+                            $grand_total
+                        );
+
+                        $csv_rows[] = implode( ',', array_map( function( $val ) {
+                            return '"' . str_replace( '"', '""', (string) $val ) . '"';
+                        }, $row ) );
+                    }
+                } else {
+                    $row = array(
+                        $row_idx++,
+                        $bill_no,
+                        $customer_name,
+                        $sale_date,
+                        $city_location,
+                        $mobile,
+                        'Spot Billing Sale',
+                        '—',
+                        'General',
+                        1,
+                        '0.00',
+                        $grand_total,
+                        '0%',
+                        $grand_total,
+                        $grand_total
+                    );
+
+                    $csv_rows[] = implode( ',', array_map( function( $val ) {
+                        return '"' . str_replace( '"', '""', (string) $val ) . '"';
+                    }, $row ) );
+                }
+            }
+            $filename = 'cora_itemized_sales_ledger_' . date( 'Y-m-d' ) . '.csv';
+        } else {
+            // Summary with sold items details column
+            $csv_rows[] = 'Serial Number,Bill number,Customer/firm name,Date,City/location,Mobile Number of Customer,Items Sold (Product / Weight / Qty @ Rate),Total Weight (Kg),Total Units,total amount of bill';
+
+            foreach ( $sales as $idx => $s ) {
+                $sr_no         = $idx + 1;
+                $bill_no       = self::format_4digit_bill_no( $s );
+                $sale_date     = ! empty( $s['sale_date'] ) ? date( 'd-m-Y', strtotime( $s['sale_date'] ) ) : ( ! empty( $s['created_at'] ) ? date( 'd-m-Y', strtotime( $s['created_at'] ) ) : date( 'd-m-Y' ) );
+                $customer_name = $s['resolved_customer'];
+                $city_location = $s['city_location'];
+                $mobile        = $s['customer_mobile'];
+                $items_summary = ! empty( $s['items_summary'] ) ? $s['items_summary'] : 'Spot Billing Sale';
+                $weight_kg     = number_format( floatval( $s['sale_weight_kg'] ?? ( $s['total_weight_kg'] ?? 0 ) ), 2, '.', '' );
+                $units         = intval( $s['sale_units'] ?? ( $s['total_units'] ?? 0 ) );
+                $grand_total   = number_format( floatval( $s['grand_total'] ), 2, '.', '' );
+
+                $row = array(
+                    $sr_no,
+                    $bill_no,
+                    $customer_name,
+                    $sale_date,
+                    $city_location,
+                    $mobile,
+                    $items_summary,
+                    $weight_kg,
+                    $units,
+                    $grand_total
+                );
+
+                $csv_rows[] = implode( ',', array_map( function( $val ) {
+                    return '"' . str_replace( '"', '""', (string) $val ) . '"';
+                }, $row ) );
+            }
+            $filename = 'cora_sales_register_' . date( 'Y-m-d' ) . '.csv';
         }
 
-        $filename = 'cora_sales_register_' . date( 'Y-m-d' ) . '.csv';
         $csv_content = "\xEF\xBB\xBF" . implode( "\r\n", $csv_rows );
 
         if ( ! empty( $_REQUEST['download'] ) || strpos( $_SERVER['HTTP_ACCEPT'] ?? '', 'text/csv' ) !== false || ( isset( $_GET['action'] ) && $_GET['action'] === 'cora_inventory_export_sales_csv' && empty( $_POST ) ) ) {
@@ -6034,6 +6118,23 @@ class Cora_Inventory_Engine {
             }
             if ( $consignment ) {
                 $consignment_id = intval( $consignment['id'] );
+            }
+        }
+
+        // If the resolved consignment has 0 items, check if a consignment with loaded cargo exists
+        if ( $consignment && cora_table_exists( $table_c_items ) ) {
+            $has_items = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table_c_items} WHERE consignment_id = %d", $consignment_id ) );
+            if ( ! $has_items ) {
+                $alt_csn_id = $wpdb->get_var(
+                    $wpdb->prepare(
+                        "SELECT c.id FROM {$table_consignments} c INNER JOIN {$table_c_items} ci ON c.id = ci.consignment_id WHERE c.agency_id = %d ORDER BY c.id DESC LIMIT 1",
+                        $agency_id
+                    )
+                );
+                if ( $alt_csn_id ) {
+                    $consignment_id = intval( $alt_csn_id );
+                    $consignment = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table_consignments} WHERE id = %d", $consignment_id ), ARRAY_A );
+                }
             }
         }
 

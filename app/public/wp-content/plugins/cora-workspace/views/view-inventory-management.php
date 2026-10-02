@@ -750,10 +750,16 @@ body.cora-inventory-focus-mode .cora-sidebar-search {
                         <span>Print Sales Sheet</span>
                     </button>
 
-                    <!-- Action: Export CSV -->
-                    <button type="button" onclick="CoraInventory.exportSalesCSV()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 text-xs font-semibold shadow-2xs transition-colors whitespace-nowrap cursor-pointer" title="Download CSV ledger">
+                    <!-- Action: Export Invoices CSV (With Items Summary) -->
+                    <button type="button" onclick="CoraInventory.exportSalesCSV('all', 'summary')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 text-xs font-semibold shadow-2xs transition-colors whitespace-nowrap cursor-pointer" title="Download Invoices & Items CSV ledger">
                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                         <span>Export CSV</span>
+                    </button>
+
+                    <!-- Action: Export Itemized CSV (Row-by-Row Line Items) -->
+                    <button type="button" onclick="CoraInventory.exportSalesCSV('all', 'itemized')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 text-xs font-semibold shadow-2xs transition-colors whitespace-nowrap cursor-pointer" title="Download detailed line-by-line itemized sales ledger CSV">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                        <span>Itemized CSV</span>
                     </button>
 
                     <!-- Action: Refresh -->
@@ -6865,18 +6871,18 @@ window.CoraInventory = (function($) {
                 if (res.success) {
                     const data = res.data || {};
                     salesRegisterCache = Array.isArray(data.sales) ? data.sales : [];
-                    const kpis = data.kpis || {};
+                    const kpis = data.summary || data.kpis || {};
 
                     // Update Metric Chips / KPI Cards
                     $('#cora-sr-kpi-revenue').text('₹' + Number(kpis.total_revenue || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
                     $('#cora-sr-kpi-invoices').text((kpis.total_invoices || 0) + ' Bills');
-                    $('#cora-sr-kpi-weight').text(Number(kpis.total_weight_kg || 0).toFixed(2) + ' Kg');
+                    $('#cora-sr-kpi-weight').text(Number(kpis.total_weight_kg_sold || kpis.total_weight_kg || 0).toFixed(2) + ' Kg');
                     $('#cora-sr-kpi-units').text(Number(kpis.total_units_sold || 0).toLocaleString('en-IN') + ' Units');
 
                     // Update Table Footer Summary
                     $('#cora-sr-ft-invoices').text((kpis.total_invoices || 0) + ' Bills');
                     $('#cora-sr-ft-revenue').text('₹' + Number(kpis.total_revenue || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
-                    $('#cora-sr-ft-weight').text(Number(kpis.total_weight_kg || 0).toFixed(2) + ' Kg • ' + Number(kpis.total_units_sold || 0).toLocaleString('en-IN') + ' Units');
+                    $('#cora-sr-ft-weight').text(Number(kpis.total_weight_kg_sold || kpis.total_weight_kg || 0).toFixed(2) + ' Kg • ' + Number(kpis.total_units_sold || 0).toLocaleString('en-IN') + ' Units');
 
                     renderSalesRegisterTable(salesRegisterCache);
                 } else {
@@ -6979,8 +6985,8 @@ window.CoraInventory = (function($) {
 
             const items = Array.isArray(s.items) ? s.items : [];
             const itemCount = items.length;
-            const totalWeight = parseFloat(s.total_weight_kg || 0);
-            const totalUnits = parseInt(s.total_units || 0);
+            const totalWeight = parseFloat(s.sale_weight_kg || s.total_weight_kg || 0);
+            const totalUnits = parseInt(s.sale_units || s.total_units || 0);
             const isExpanded = !!expandedSalesRows[saleId];
 
             // Build line items nested table
@@ -7243,7 +7249,7 @@ window.CoraInventory = (function($) {
         setDatePreset('all');
     }
 
-    function exportSalesCSV(source) {
+    function exportSalesCSV(source, mode) {
         let sales = [];
         if (source === 'vendor') {
             sales = (salesLedgerCache && salesLedgerCache.length > 0) ? salesLedgerCache : (salesRegisterCache || []);
@@ -7256,22 +7262,123 @@ window.CoraInventory = (function($) {
             return;
         }
 
-        const headers = ['Serial Number', 'Bill number', 'Customer/firm name', 'Date', 'City/location', 'Mobile Number of Customer', 'total amount of bill'];
-        const csvRows = [headers.join(',')];
+        const isItemized = (mode === 'itemized' || mode === 'items');
+        let csvRows = [];
 
-        sales.forEach((s, idx) => {
-            const srNo = idx + 1;
-            const invNo = '"' + format4DigitBillNo(s) + '"';
-            const customer = '"' + (s.customer_name || s.resolved_customer || 'Walk-in Retailer').replace(/"/g, '""') + '"';
-            const dateStr = '"' + formatDateOnly(s.sale_date || s.created_at || '') + '"';
-            const city = '"' + (s.city || s.city_location || 'Delhi NCR').replace(/"/g, '""') + '"';
-            const phone = '"' + (s.phone || s.customer_mobile || '').replace(/"/g, '""') + '"';
-            const amount = parseFloat(s.grand_total || 0).toFixed(2);
+        if (isItemized) {
+            // Detailed Line-Item CSV Export
+            const headers = ['Serial Number', 'Bill number', 'Customer/firm name', 'Date', 'City/location', 'Mobile Number of Customer', 'Product Name', 'SKU', 'Pricing Type', 'Quantity', 'Weight (Kg)', 'Rate (Rs)', 'GST (%)', 'Line Total (Rs)', 'Total Bill Amount (Rs)'];
+            csvRows.push(headers.join(','));
 
-            csvRows.push([srNo, invNo, customer, dateStr, city, phone, amount].join(','));
-        });
+            let rowIdx = 1;
+            sales.forEach(s => {
+                const billNo = '"' + format4DigitBillNo(s) + '"';
+                const customer = '"' + (s.customer_name || s.resolved_customer || 'Walk-in Retailer').replace(/"/g, '""') + '"';
+                const dateStr = '"' + formatDateOnly(s.sale_date || s.created_at || '') + '"';
+                const city = '"' + (s.city || s.city_location || 'Delhi NCR').replace(/"/g, '""') + '"';
+                const phone = '"' + (s.phone || s.customer_mobile || '').replace(/"/g, '""') + '"';
+                const grandTotal = parseFloat(s.grand_total || 0).toFixed(2);
+                const items = Array.isArray(s.items) ? s.items : [];
 
-        const filename = (source === 'vendor' ? 'Cora_Spot_Invoices_' : 'Cora_Sales_Register_') + new Date().toISOString().slice(0, 10) + '.csv';
+                if (items.length > 0) {
+                    items.forEach(it => {
+                        const itWeight = parseFloat(it.weight_kg || 0);
+                        const isWeightBased = (it.pricing_type === 'weight_based' || itWeight > 0);
+                        const pName = '"' + (it.product_name || 'Product').replace(/"/g, '""') + '"';
+                        const sku = '"' + (it.sku || '—').replace(/"/g, '""') + '"';
+                        const pType = isWeightBased ? '"Weight-Based"' : '"Unit-Based"';
+                        const qty = parseInt(it.quantity || 1);
+                        const wt = itWeight > 0 ? itWeight.toFixed(2) : '0.00';
+                        const rate = isWeightBased ? parseFloat(it.weight_rate || 401.25).toFixed(2) : parseFloat(it.unit_price || 0).toFixed(2);
+                        const gst = parseFloat(it.gst_rate || 12).toFixed(0) + '%';
+                        const lineTotal = parseFloat(it.line_total || 0).toFixed(2);
+
+                        csvRows.push([
+                            rowIdx++,
+                            billNo,
+                            customer,
+                            dateStr,
+                            city,
+                            phone,
+                            pName,
+                            sku,
+                            pType,
+                            qty,
+                            wt,
+                            rate,
+                            '"' + gst + '"',
+                            lineTotal,
+                            grandTotal
+                        ].join(','));
+                    });
+                } else {
+                    csvRows.push([
+                        rowIdx++,
+                        billNo,
+                        customer,
+                        dateStr,
+                        city,
+                        phone,
+                        '"Spot Billing Sale"',
+                        '"—"',
+                        '"General"',
+                        1,
+                        '0.00',
+                        grandTotal,
+                        '"0%"',
+                        grandTotal,
+                        grandTotal
+                    ].join(','));
+                }
+            });
+        } else {
+            // Summary CSV Export (With complete items summary, weight kg, and units)
+            const headers = ['Serial Number', 'Bill number', 'Customer/firm name', 'Date', 'City/location', 'Mobile Number of Customer', 'Items Sold (Product / Weight / Qty @ Rate)', 'Total Weight (Kg)', 'Total Units', 'total amount of bill'];
+            csvRows.push(headers.join(','));
+
+            sales.forEach((s, idx) => {
+                const srNo = idx + 1;
+                const invNo = '"' + format4DigitBillNo(s) + '"';
+                const customer = '"' + (s.customer_name || s.resolved_customer || 'Walk-in Retailer').replace(/"/g, '""') + '"';
+                const dateStr = '"' + formatDateOnly(s.sale_date || s.created_at || '') + '"';
+                const city = '"' + (s.city || s.city_location || 'Delhi NCR').replace(/"/g, '""') + '"';
+                const phone = '"' + (s.phone || s.customer_mobile || '').replace(/"/g, '""') + '"';
+                
+                // Build items summary if not present
+                let itemsSummary = s.items_summary || '';
+                let totalWeight = parseFloat(s.sale_weight_kg || s.total_weight_kg || 0);
+                let totalUnits = parseInt(s.sale_units || s.total_units || 0);
+
+                if (!itemsSummary && Array.isArray(s.items) && s.items.length > 0) {
+                    const lines = [];
+                    s.items.forEach(it => {
+                        const wt = parseFloat(it.weight_kg || 0);
+                        const isWt = (it.pricing_type === 'weight_based' || wt > 0);
+                        if (isWt) {
+                            const r = parseFloat(it.weight_rate || 401.25).toFixed(2);
+                            lines.push(`${wt.toFixed(2)} kg @ ₹${r}/kg (${it.product_name || 'Item'})`);
+                            if (!totalWeight) totalWeight += wt;
+                        } else {
+                            const q = parseInt(it.quantity || 1);
+                            const r = parseFloat(it.unit_price || 0).toFixed(2);
+                            lines.push(`${q} units @ ₹${r}/unit (${it.product_name || 'Item'})`);
+                            if (!totalUnits) totalUnits += q;
+                        }
+                    });
+                    itemsSummary = lines.join('; ');
+                }
+                if (!itemsSummary) itemsSummary = 'Spot Billing Sale';
+
+                const itemsSummaryCol = '"' + itemsSummary.replace(/"/g, '""') + '"';
+                const weightCol = totalWeight.toFixed(2);
+                const unitsCol = totalUnits;
+                const amount = parseFloat(s.grand_total || 0).toFixed(2);
+
+                csvRows.push([srNo, invNo, customer, dateStr, city, phone, itemsSummaryCol, weightCol, unitsCol, amount].join(','));
+            });
+        }
+
+        const filename = (isItemized ? 'Cora_Itemized_Sales_Ledger_' : (source === 'vendor' ? 'Cora_Spot_Invoices_' : 'Cora_Sales_Register_')) + new Date().toISOString().slice(0, 10) + '.csv';
         const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + encodeURIComponent(csvRows.join('\r\n'));
         const link = document.createElement('a');
         link.setAttribute('href', csvContent);
@@ -7279,7 +7386,7 @@ window.CoraInventory = (function($) {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        window.coraShowToast((source === 'vendor' ? 'Spot Invoices' : 'Sales Register') + ' exported to CSV successfully.', 'success');
+        window.coraShowToast((isItemized ? 'Itemized Sales Ledger' : (source === 'vendor' ? 'Spot Invoices' : 'Sales Register')) + ' exported to CSV successfully.', 'success');
     }
 
     function printSalesRegister(preset) {
