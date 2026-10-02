@@ -6175,10 +6175,12 @@ class Cora_Inventory_Engine {
                     "SELECT ci.*, 
                             p.name as product_name_fallback,
                             p.sku as p_sku,
+                            p.description as p_description,
                             p.category,
                             p.pricing_type as p_pricing_type,
                             p.wholesale_price,
                             p.unit_weight_grams as p_weight_g,
+                            p.pages_count as p_pages_count,
                             p.uom,
                             p.hsn_code
                      FROM {$table_c_items} ci
@@ -6267,28 +6269,52 @@ class Cora_Inventory_Engine {
                 }
             }
 
+            $name = ! empty( $raw['product_name'] ) ? $raw['product_name'] : ( ! empty( $raw['product_name_fallback'] ) ? $raw['product_name_fallback'] : 'Stationery Item' );
+            $sku  = ! empty( $raw['sku'] ) ? $raw['sku'] : ( ! empty( $raw['p_sku'] ) ? $raw['p_sku'] : 'SKU-' . $raw['product_id'] );
+
+            // Detect Pages / Bhan per unit
+            $pages_per_unit = '—';
+            $search_text = $name . ' ' . ( $raw['p_description'] ?? '' ) . ' ' . ( $raw['description'] ?? '' ) . ' ' . ( $raw['uom'] ?? '' ) . ' ' . $sku;
+            if ( preg_match( '/(\d+\s*(?:भान|पृष्ठ|Pgs|Pages|शीट|पन्ने|pages?|pgs?))/iu', $search_text, $pm ) ) {
+                $pages_per_unit = trim( $pm[1] );
+            } elseif ( ! empty( $raw['p_pages_count'] ) && intval( $raw['p_pages_count'] ) > 0 ) {
+                $pages_per_unit = intval( $raw['p_pages_count'] ) . ' पृष्ठ';
+            } elseif ( ! empty( $raw['pages_count'] ) && intval( $raw['pages_count'] ) > 0 ) {
+                $pages_per_unit = intval( $raw['pages_count'] ) . ' पृष्ठ';
+            }
+
+            // Weight string
+            $weight_str = '—';
+            if ( $is_weight && $disp_wt > 0 ) {
+                $weight_str = number_format( $disp_wt, 2 ) . ' kg';
+            } elseif ( $is_weight ) {
+                $weight_str = '0.00 kg';
+            }
+
             $total_skus++;
             $total_dispatched_val += $item_disp_val;
             $total_sold_val       += $item_sold_val;
             $total_available_val  += $item_avail_val;
 
             $items[] = array(
-                'raw'           => $raw,
-                'name'          => ! empty( $raw['product_name'] ) ? $raw['product_name'] : ( ! empty( $raw['product_name_fallback'] ) ? $raw['product_name_fallback'] : 'Stationery Item' ),
-                'sku'           => ! empty( $raw['sku'] ) ? $raw['sku'] : ( ! empty( $raw['p_sku'] ) ? $raw['p_sku'] : 'SKU-' . $raw['product_id'] ),
-                'is_weight'     => $is_weight,
-                'unit_wt_g'     => $unit_wt_g,
-                'disp_qty'      => $disp_qty,
-                'sold_qty'      => $sold_qty,
-                'avail_qty'     => $avail_qty,
-                'disp_wt'       => $disp_wt,
-                'sold_wt'       => $sold_wt,
-                'avail_wt'      => $avail_wt,
-                'rate'          => $rate,
-                'rate_display'  => $rate_display,
-                'disp_val'      => $item_disp_val,
-                'sold_val'      => $item_sold_val,
-                'avail_val'     => $item_avail_val,
+                'raw'            => $raw,
+                'name'           => $name,
+                'sku'            => $sku,
+                'is_weight'      => $is_weight,
+                'pages_per_unit' => $pages_per_unit,
+                'weight_str'     => $weight_str,
+                'unit_wt_g'      => $unit_wt_g,
+                'disp_qty'       => $disp_qty,
+                'sold_qty'       => $sold_qty,
+                'avail_qty'      => $avail_qty,
+                'disp_wt'        => $disp_wt,
+                'sold_wt'        => $sold_wt,
+                'avail_wt'       => $avail_wt,
+                'rate'           => $rate,
+                'rate_display'   => $rate_display,
+                'disp_val'       => $item_disp_val,
+                'sold_val'       => $item_sold_val,
+                'avail_val'      => $item_avail_val,
             );
         }
 
@@ -6434,18 +6460,24 @@ class Cora_Inventory_Engine {
             letter-spacing: 0.01em;
             border: none;
         }
-        table.detail-table th.col-num {
-            width: 50px;
-            text-align: center;
-            padding-left: 12px;
-            padding-right: 12px;
+        table.detail-table th.col-qty {
+            width: 120px;
+            text-align: left;
+            padding-left: 16px;
         }
-        table.detail-table th.col-qty-type {
-            width: 180px;
+        table.detail-table th.col-name {
             text-align: left;
         }
-        table.detail-table th.col-qty {
+        table.detail-table th.col-pages {
+            width: 120px;
+            text-align: left;
+        }
+        table.detail-table th.col-weight {
             width: 150px;
+            text-align: right;
+        }
+        table.detail-table th.col-price {
+            width: 130px;
             text-align: right;
             padding-right: 20px;
         }
@@ -6462,12 +6494,35 @@ class Cora_Inventory_Engine {
             color: #09090b;
             vertical-align: middle;
         }
-        table.detail-table td.col-num {
-            text-align: center;
+        table.detail-table td.col-qty-val {
+            text-align: left;
+            padding-left: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
             font-size: 13px;
-            color: #27272a;
-            padding-left: 12px;
-            padding-right: 12px;
+            color: #09090b;
+        }
+        table.detail-table td.col-name-cell {
+            text-align: left;
+        }
+        table.detail-table td.col-pages-val {
+            text-align: left;
+            font-size: 13px;
+            color: #52525b;
+        }
+        table.detail-table td.col-weight-val {
+            text-align: right;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: #52525b;
+        }
+        table.detail-table td.col-price-val {
+            text-align: right;
+            padding-right: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 13.5px;
+            color: #09090b;
         }
         .item-name-title {
             font-weight: 700;
@@ -6482,18 +6537,19 @@ class Cora_Inventory_Engine {
             margin-top: 3px;
             letter-spacing: 0.02em;
         }
-        .qty-type-text {
-            color: #71717a;
-            font-size: 13px;
-            font-weight: 500;
-        }
-        .qty-val-text {
-            text-align: right;
-            padding-right: 20px;
+
+        /* Grand Total Row */
+        .grand-total-row {
+            background: #fafafa;
+            border-top: 2px solid #18181b;
             font-weight: 800;
-            font-size: 14px;
+        }
+        .grand-total-row td {
+            padding: 14px 16px;
             color: #09090b;
-            font-family: 'JetBrains Mono', monospace;
+        }
+        .font-bold {
+            font-weight: 800 !important;
         }
 
         /* Manifest Meta Pill & Summary */
@@ -6586,41 +6642,52 @@ class Cora_Inventory_Engine {
             <div class="detail-count"><?php echo count( $items ); ?> line items</div>
         </div>
 
-        <!-- Inventory Report Table (Matching Mockup) -->
+        <!-- Inventory Report Table (5-Column Layout) -->
         <div class="sheet-table-wrapper">
             <table class="detail-table">
                 <thead>
                     <tr>
-                        <th class="col-num">#</th>
-                        <th>Item Name</th>
-                        <th class="col-qty-type">Quantity Type</th>
-                        <th class="col-qty">Quantity</th>
+                        <th class="col-qty">Total Quantity</th>
+                        <th class="col-name">Name of item</th>
+                        <th class="col-pages">Pages per unit</th>
+                        <th class="col-weight">Total weight of all units</th>
+                        <th class="col-price">Total price</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if ( ! empty( $items ) ) : ?>
-                        <?php foreach ( $items as $idx => $it ) : 
-                            $qty_type_label = $it['is_weight'] ? 'Weight' : 'Unit';
-                            $qty_str = $it['is_weight'] 
-                                ? ( number_format( $it['disp_wt'] > 0 ? $it['disp_wt'] : $it['avail_wt'], 2 ) . ' kg' )
-                                : ( intval( $it['disp_qty'] > 0 ? $it['disp_qty'] : $it['avail_qty'] ) . ' Pcs' );
+                        <?php foreach ( $items as $it ) : 
+                            $qty_str = ( $it['disp_qty'] > 0 ? intval( $it['disp_qty'] ) : 1 ) . ' Pcs';
                         ?>
                             <tr>
-                                <td class="col-num"><?php echo intval( $idx + 1 ); ?></td>
-                                <td>
+                                <td class="col-qty-val"><?php echo esc_html( $qty_str ); ?></td>
+                                <td class="col-name-cell">
                                     <div class="item-name-title"><?php echo esc_html( $it['name'] ); ?></div>
                                     <div class="item-sku-sub"><?php echo esc_html( $it['sku'] ); ?></div>
                                 </td>
-                                <td class="qty-type-text"><?php echo esc_html( $qty_type_label ); ?></td>
-                                <td class="qty-val-text"><?php echo esc_html( $qty_str ); ?></td>
+                                <td class="col-pages-val"><?php echo esc_html( $it['pages_per_unit'] ); ?></td>
+                                <td class="col-weight-val"><?php echo esc_html( $it['weight_str'] ); ?></td>
+                                <td class="col-price-val">₹<?php echo number_format( $it['disp_val'], 2 ); ?></td>
                             </tr>
                         <?php endforeach; ?>
                     <?php else : ?>
                         <tr>
-                            <td colspan="4" style="padding: 28px; text-align: center; color: #71717a;">No items found in this inventory dispatch.</td>
+                            <td colspan="5" style="padding: 28px; text-align: center; color: #71717a;">No items found in this inventory dispatch.</td>
                         </tr>
                     <?php endif; ?>
                 </tbody>
+                <tfoot>
+                    <tr class="grand-total-row">
+                        <td class="col-qty-val font-bold"><?php echo intval( $total_dispatched_units ); ?> Pcs</td>
+                        <td class="col-name-cell font-bold">
+                            <div class="item-name-title" style="font-size: 13.5px;">Grand Total</div>
+                            <div class="item-sku-sub"><?php echo intval( $total_skus ); ?> Dispatched Items</div>
+                        </td>
+                        <td class="col-pages-val">—</td>
+                        <td class="col-weight-val font-bold"><?php echo $total_dispatched_weight_kg > 0 ? ( number_format( $total_dispatched_weight_kg, 2 ) . ' kg' ) : '—'; ?></td>
+                        <td class="col-price-val font-bold">₹<?php echo number_format( $total_dispatched_val, 2 ); ?></td>
+                    </tr>
+                </tfoot>
             </table>
         </div>
 
@@ -6632,7 +6699,8 @@ class Cora_Inventory_Engine {
                 <?php echo number_format( $total_dispatched_units > 0 ? $total_dispatched_units : $total_available_units ); ?> Pcs
             </div>
             <div>
-                <strong>Total Line Items:</strong> <?php echo intval( $total_skus ); ?> SKUs
+                <strong>Total Dispatch Value:</strong> 
+                <strong style="font-family:'JetBrains Mono', monospace;">₹<?php echo number_format( $total_dispatched_val, 2 ); ?></strong> (<?php echo intval( $total_skus ); ?> SKUs)
             </div>
         </div>
 
@@ -6666,7 +6734,7 @@ class Cora_Inventory_Engine {
 
     /**
      * AJAX Endpoint: Export Van Stock Manifest to CSV matching the Detail table structure.
-     * Columns: Serial Number, Item Name, SKU, Quantity Type, Quantity
+     * Columns: Total Quantity (Items in the dispatch), Name of item, Pages per unit, Total weight of all units(if weighted item), total price
      */
     public static function ajax_export_van_stock_csv() {
         global $wpdb;
@@ -6761,8 +6829,12 @@ class Cora_Inventory_Engine {
                     "SELECT ci.*, 
                             p.name as product_name_fallback,
                             p.sku as p_sku,
+                            p.description as p_description,
                             p.pricing_type as p_pricing_type,
-                            p.unit_weight_grams as p_weight_g
+                            p.wholesale_price,
+                            p.unit_weight_grams as p_weight_g,
+                            p.pages_count as p_pages_count,
+                            p.uom
                      FROM {$table_c_items} ci
                      LEFT JOIN {$table_products} p ON ci.product_id = p.id
                      WHERE ci.consignment_id = %d
@@ -6774,12 +6846,11 @@ class Cora_Inventory_Engine {
         }
 
         $csv_rows = array();
-        $csv_rows[] = '#,Item Name,SKU,Quantity Type,Quantity';
+        $csv_rows[] = 'Total Quantity (Items in the dispatch),Name of item,Pages per unit,Total weight of all units(if weighted item),total price';
 
-        foreach ( $items_raw as $idx => $raw ) {
-            $sr_no     = $idx + 1;
+        foreach ( $items_raw as $raw ) {
             $name      = ! empty( $raw['product_name'] ) ? $raw['product_name'] : ( ! empty( $raw['product_name_fallback'] ) ? $raw['product_name_fallback'] : 'Product' );
-            $sku       = ! empty( $raw['sku'] ) ? $raw['sku'] : ( ! empty( $raw['p_sku'] ) ? $raw['p_sku'] : '—' );
+            $sku       = ! empty( $raw['sku'] ) ? $raw['sku'] : ( ! empty( $raw['p_sku'] ) ? $raw['p_sku'] : '' );
             $is_weight = ( ( $raw['pricing_type'] ?? '' ) === 'weight_based' || floatval( $raw['dispatched_weight_kg'] ?? 0 ) > 0 || ( ( $raw['p_pricing_type'] ?? '' ) === 'weight_based' ) );
             
             $disp_qty  = intval( $raw['dispatched_qty'] ?? 0 );
@@ -6793,15 +6864,52 @@ class Cora_Inventory_Engine {
                 $disp_wt = floatval( $disp_qty );
             }
 
-            $qty_type = $is_weight ? 'Weight' : 'Unit';
-            $qty_str  = $is_weight ? ( number_format( $disp_wt, 2 ) . ' kg' ) : ( $disp_qty . ' Pcs' );
+            // Pages per unit extraction
+            $pages_per_unit = '—';
+            $search_text = $name . ' ' . ( $raw['p_description'] ?? '' ) . ' ' . ( $raw['description'] ?? '' ) . ' ' . ( $raw['uom'] ?? '' ) . ' ' . $sku;
+            if ( preg_match( '/(\d+\s*(?:भान|पृष्ठ|Pgs|Pages|शीट|पन्ने|pages?|pgs?))/iu', $search_text, $pm ) ) {
+                $pages_per_unit = trim( $pm[1] );
+            } elseif ( ! empty( $raw['p_pages_count'] ) && intval( $raw['p_pages_count'] ) > 0 ) {
+                $pages_per_unit = intval( $raw['p_pages_count'] ) . ' पृष्ठ';
+            } elseif ( ! empty( $raw['pages_count'] ) && intval( $raw['pages_count'] ) > 0 ) {
+                $pages_per_unit = intval( $raw['pages_count'] ) . ' पृष्ठ';
+            }
+
+            // Total weight of all units (if weighted item)
+            $weight_str = '—';
+            if ( $is_weight && $disp_wt > 0 ) {
+                $weight_str = number_format( $disp_wt, 2 ) . ' kg';
+            } elseif ( $is_weight ) {
+                $weight_str = '0.00 kg';
+            }
+
+            // Total price
+            if ( $is_weight ) {
+                $rate = floatval( $raw['weight_rate'] ?? 0 );
+                if ( $rate <= 0 && ! empty( $raw['p_weight_rate'] ) ) {
+                    $rate = floatval( $raw['p_weight_rate'] );
+                }
+                if ( $rate <= 0 ) {
+                    $rate = 401.25;
+                }
+                $line_price = round( $disp_wt * $rate, 2 );
+            } else {
+                $rate = floatval( $raw['unit_rate'] ?? 0 );
+                if ( $rate <= 0 && ! empty( $raw['wholesale_price'] ) ) {
+                    $rate = floatval( $raw['wholesale_price'] );
+                }
+                $line_price = round( $disp_qty * $rate, 2 );
+            }
+            $price_str = '₹' . number_format( $line_price, 2 );
+
+            $qty_str = ( $disp_qty > 0 ? $disp_qty : 1 ) . ' Pcs';
 
             $row = array(
-                $sr_no,
+                $qty_str,
                 $name,
-                $sku,
-                $qty_type,
-                $qty_str
+                $pages_per_unit,
+                $weight_str,
+                $price_str
             );
 
             $csv_rows[] = implode( ',', array_map( function( $val ) {
