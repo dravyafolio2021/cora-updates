@@ -1205,7 +1205,22 @@ body.cora-inventory-focus-mode .cora-sidebar-search {
 
         <!-- Today's Live Sales Ledger for Vendor -->
         <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 shadow-2xs">
-            <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-3">Today's Spot Invoices</h3>
+            <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-zinc-900 dark:bg-zinc-100"></span>
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-300">Today's Spot Invoices</h3>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <button type="button" onclick="CoraInventory.exportSalesCSV('vendor')" class="py-1 px-2.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-[11px] font-semibold flex items-center gap-1 transition-colors cursor-pointer" title="Export Invoices as CSV Table">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        <span>Export CSV</span>
+                    </button>
+                    <button type="button" onclick="CoraInventory.printSalesRegister('today')" class="py-1 px-2.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-white text-[11px] font-semibold flex items-center gap-1 transition-colors cursor-pointer" title="Print Spot Invoices Table">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                        <span>Print Table</span>
+                    </button>
+                </div>
+            </div>
             <div id="cora-vendor-sales-list" class="space-y-2">
                 <!-- Populated via AJAX -->
             </div>
@@ -7171,38 +7186,46 @@ window.CoraInventory = (function($) {
         setDatePreset('all');
     }
 
-    function exportSalesCSV() {
-        if (!salesRegisterCache || salesRegisterCache.length === 0) {
-            window.coraShowToast('No sales records to export for active filter.', 'error');
+    function exportSalesCSV(source) {
+        let sales = [];
+        if (source === 'vendor') {
+            sales = (salesLedgerCache && salesLedgerCache.length > 0) ? salesLedgerCache : (salesRegisterCache || []);
+        } else {
+            sales = (salesRegisterCache && salesRegisterCache.length > 0) ? salesRegisterCache : (salesLedgerCache || []);
+        }
+
+        if (!sales || sales.length === 0) {
+            window.coraShowToast(source === 'vendor' ? 'No spot invoices logged today to export.' : 'No sales records to export for active filter.', 'error');
             return;
         }
 
         const headers = ['Serial Number', 'Bill number', 'Date', 'Customer/firm name', 'City/location', 'Mobile Number of Customer', 'total amount of bill'];
         const csvRows = [headers.join(',')];
 
-        salesRegisterCache.forEach((s, idx) => {
+        sales.forEach((s, idx) => {
             const srNo = idx + 1;
             const invNo = '"' + (s.invoice_no || ('INV-' + s.id)).replace(/"/g, '""') + '"';
-            const dateStr = '"' + (s.created_at || s.sale_date || '').replace(/"/g, '""') + '"';
-            const customer = '"' + (s.customer_name || 'Walk-in Retailer').replace(/"/g, '""') + '"';
-            const city = '"' + (s.city || 'Delhi NCR').replace(/"/g, '""') + '"';
-            const phone = '"' + (s.phone || '').replace(/"/g, '""') + '"';
+            const dateStr = '"' + (s.sale_date || s.created_at || '').replace(/"/g, '""') + '"';
+            const customer = '"' + (s.customer_name || s.resolved_customer || 'Walk-in Retailer').replace(/"/g, '""') + '"';
+            const city = '"' + (s.city || s.city_location || 'Delhi NCR').replace(/"/g, '""') + '"';
+            const phone = '"' + (s.phone || s.customer_mobile || '').replace(/"/g, '""') + '"';
             const amount = parseFloat(s.grand_total || 0).toFixed(2);
 
             csvRows.push([srNo, invNo, dateStr, customer, city, phone, amount].join(','));
         });
 
+        const filename = (source === 'vendor' ? 'Cora_Spot_Invoices_' : 'Cora_Sales_Register_') + new Date().toISOString().slice(0, 10) + '.csv';
         const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + encodeURIComponent(csvRows.join('\r\n'));
         const link = document.createElement('a');
         link.setAttribute('href', csvContent);
-        link.setAttribute('download', 'Cora_Sales_Register_' + new Date().toISOString().slice(0, 10) + '.csv');
+        link.setAttribute('download', filename);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        window.coraShowToast('Sales Register exported to CSV successfully.', 'success');
+        window.coraShowToast((source === 'vendor' ? 'Spot Invoices' : 'Sales Register') + ' exported to CSV successfully.', 'success');
     }
 
-    function printSalesRegister() {
+    function printSalesRegister(preset) {
         const search = ($('#cora-sr-search').val() || '').trim();
         const startDate = $('#cora-sr-start-date').val() || '';
         const endDate = $('#cora-sr-end-date').val() || '';
@@ -7212,10 +7235,14 @@ window.CoraInventory = (function($) {
             autoprint: 1,
             security: window.cora_nonce || '<?php echo wp_create_nonce("cora_ajax_nonce"); ?>'
         };
-        if (search) params.search = search;
-        if (startDate) params.start_date = startDate;
-        if (endDate) params.end_date = endDate;
-        if (currentDatePreset && currentDatePreset !== 'all') params.date_preset = currentDatePreset;
+        if (typeof preset === 'string' && preset !== '') {
+            params.date_preset = preset;
+        } else {
+            if (search) params.search = search;
+            if (startDate) params.start_date = startDate;
+            if (endDate) params.end_date = endDate;
+            if (currentDatePreset && currentDatePreset !== 'all') params.date_preset = currentDatePreset;
+        }
 
         const queryStr = $.param(params);
         const url = (ajaxurl || '/wp-admin/admin-ajax.php') + '?' + queryStr;
