@@ -156,7 +156,7 @@ body.cora-inventory-focus-mode #cora-sidebar-focus-banner {
     display: flex !important;
 }
 
-/* When sidebar is collapsed in collapsed mode, format banner cleanly as a compact icon pill */
+/* When sidebar is collapsed, hide focus banner cleanly to keep dock icon grid minimal and uncluttered */
 .cora-sidebar.collapsed-sidebar #cora-sidebar-focus-banner,
 .collapsed-sidebar #cora-sidebar-focus-banner,
 body.collapsed-sidebar #cora-sidebar-focus-banner,
@@ -164,49 +164,7 @@ body.sidebar-collapsed #cora-sidebar-focus-banner,
 aside.cora-sidebar.w-16 #cora-sidebar-focus-banner,
 aside.cora-sidebar[style*="width: 64px"] #cora-sidebar-focus-banner,
 aside.cora-sidebar[style*="width: 4rem"] #cora-sidebar-focus-banner {
-    padding: 0 !important;
-    margin: 6px auto !important;
-    width: 36px !important;
-    height: 36px !important;
-    min-width: 36px !important;
-    min-height: 36px !important;
-    border-radius: 10px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    cursor: pointer !important;
-    box-sizing: border-box !important;
-}
-
-.cora-sidebar.collapsed-sidebar #cora-sidebar-focus-banner p,
-.cora-sidebar.collapsed-sidebar #cora-sidebar-focus-banner button,
-.cora-sidebar.collapsed-sidebar #cora-sidebar-focus-banner > div > span:not(.animate-pulse),
-.cora-sidebar.collapsed-sidebar #cora-sidebar-focus-banner > div > div > span:not(.animate-pulse),
-.cora-sidebar.collapsed-sidebar #cora-sidebar-focus-banner > span,
-.collapsed-sidebar #cora-sidebar-focus-banner p,
-.collapsed-sidebar #cora-sidebar-focus-banner button,
-.collapsed-sidebar #cora-sidebar-focus-banner span:not(.animate-pulse),
-body.collapsed-sidebar #cora-sidebar-focus-banner p,
-body.collapsed-sidebar #cora-sidebar-focus-banner button,
-body.collapsed-sidebar #cora-sidebar-focus-banner span:not(.animate-pulse),
-aside.cora-sidebar.w-16 #cora-sidebar-focus-banner p,
-aside.cora-sidebar.w-16 #cora-sidebar-focus-banner button,
-aside.cora-sidebar.w-16 #cora-sidebar-focus-banner span:not(.animate-pulse),
-aside.cora-sidebar[style*="width: 64px"] #cora-sidebar-focus-banner p,
-aside.cora-sidebar[style*="width: 64px"] #cora-sidebar-focus-banner button,
-aside.cora-sidebar[style*="width: 64px"] #cora-sidebar-focus-banner span:not(.animate-pulse) {
     display: none !important;
-}
-
-.cora-sidebar.collapsed-sidebar #cora-sidebar-focus-banner .animate-pulse,
-.collapsed-sidebar #cora-sidebar-focus-banner .animate-pulse,
-body.collapsed-sidebar #cora-sidebar-focus-banner .animate-pulse,
-aside.cora-sidebar.w-16 #cora-sidebar-focus-banner .animate-pulse,
-aside.cora-sidebar[style*="width: 64px"] #cora-sidebar-focus-banner .animate-pulse {
-    display: block !important;
-    width: 8px !important;
-    height: 8px !important;
-    margin: 0 auto !important;
 }
 
 body.cora-inventory-focus-mode .cora-sidebar-nav .cora-nav-group {

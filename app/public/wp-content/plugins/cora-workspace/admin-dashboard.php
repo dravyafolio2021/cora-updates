@@ -3965,15 +3965,15 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         }
         /* Bulletproof Collapsed Sidebar Overrides */
         .cora-sidebar.collapsed-sidebar {
-            width: 4.5rem !important;
-            min-width: 4.5rem !important;
-            max-width: 4.5rem !important;
+            width: 4rem !important;
+            min-width: 4rem !important;
+            max-width: 4rem !important;
         }
 
         .cora-sidebar.collapsed-sidebar .cora-sidebar-top-container {
             flex-direction: column !important;
-            gap: 0.5rem !important;
-            padding: 0.75rem 0.25rem 0.5rem 0.25rem !important;
+            gap: 0.35rem !important;
+            padding: 0.6rem 0.25rem 0.4rem 0.25rem !important;
             align-items: center !important;
             justify-content: center !important;
         }
@@ -3981,14 +3981,16 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         .cora-sidebar.collapsed-sidebar .cora-sidebar-header-actions {
             flex-direction: column !important;
             align-items: center !important;
-            gap: 0.5rem !important;
+            gap: 0.35rem !important;
             width: 100% !important;
         }
 
         .cora-sidebar.collapsed-sidebar #cora-sidebar-search-btn,
         .cora-sidebar.collapsed-sidebar #cora-sidebar-toggle {
             display: flex !important;
-            padding: 0.4rem !important;
+            width: 32px !important;
+            height: 32px !important;
+            padding: 0 !important;
             border-radius: 8px !important;
             margin: 0 auto !important;
             align-items: center !important;
@@ -4005,6 +4007,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         .cora-sidebar.collapsed-sidebar .cora-studio-info,
         .cora-sidebar.collapsed-sidebar .cora-user-info,
         .cora-sidebar.collapsed-sidebar .cora-switcher-arrow,
+        .cora-sidebar.collapsed-sidebar #cora-sidebar-focus-banner,
         .cora-sidebar.collapsed-sidebar div.px-3.pb-1 {
             display: none !important;
         }
@@ -4013,47 +4016,103 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             justify-content: center !important;
             border-color: transparent !important;
             background-color: transparent !important;
-            padding: 0.25rem !important;
+            padding: 0 !important;
             margin: 0 auto !important;
             box-shadow: none !important;
         }
 
-        /* macOS Dock Magnification Effect (Cora UI/UX) */
+        .cora-sidebar.collapsed-sidebar .cora-sidebar-nav {
+            padding: 0.25rem 0 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+        }
+
+        .cora-sidebar.collapsed-sidebar .cora-nav-list {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            width: 100% !important;
+            gap: 2px !important;
+        }
+
+        /* Clean Monochromatic Collapsed Navigation Icons */
         .cora-sidebar.collapsed-sidebar .cora-nav-item {
             justify-content: center !important;
-            padding: 0.6rem 0 !important;
-            margin: 4px 8px !important;
-            border-radius: 12px !important;
+            width: 36px !important;
+            height: 36px !important;
+            min-width: 36px !important;
+            min-height: 36px !important;
+            margin: 2px auto !important;
+            padding: 0 !important;
+            border-radius: 10px !important;
             position: relative !important;
-            transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.15s ease !important;
-            transform-origin: left center !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease !important;
+            color: #71717a !important;
         }
 
-        .cora-sidebar.collapsed-sidebar .cora-nav-item.dock-hover-active {
-            transform: scale(1.35) translateX(4px) !important;
-            z-index: 50 !important;
+        .cora-sidebar.collapsed-sidebar .cora-nav-item .cora-nav-icon {
+            margin: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
         }
 
-        .cora-sidebar.collapsed-sidebar .cora-nav-item.dock-hover-neighbor {
-            transform: scale(1.16) translateX(2px) !important;
-            z-index: 40 !important;
+        .cora-sidebar.collapsed-sidebar .cora-nav-item svg {
+            width: 17px !important;
+            height: 17px !important;
+            stroke-width: 1.8 !important;
         }
 
         .cora-sidebar.collapsed-sidebar .cora-nav-item.cora-active {
-            background-color: #eaeaea !important;
-            border-radius: 12px !important;
+            background-color: #f4f4f5 !important;
+            color: #09090b !important;
+            border-radius: 10px !important;
+            font-weight: 700 !important;
+        }
+        html.dark .cora-sidebar.collapsed-sidebar .cora-nav-item.cora-active {
+            background-color: #27272a !important;
+            color: #f4f4f5 !important;
+        }
+
+        .cora-sidebar.collapsed-sidebar .cora-nav-item:hover:not(.cora-active) {
+            background-color: #f4f4f5 !important;
+            color: #18181b !important;
+        }
+        html.dark .cora-sidebar.collapsed-sidebar .cora-nav-item:hover:not(.cora-active) {
+            background-color: #18181b !important;
+            color: #f4f4f5 !important;
         }
 
         .cora-sidebar.collapsed-sidebar .cora-user-footer {
             flex-direction: column !important;
-            gap: 0.75rem !important;
-            padding: 1rem 0.5rem !important;
+            gap: 0.4rem !important;
+            padding: 0.5rem 0.25rem 0.6rem 0.25rem !important;
             justify-content: center !important;
             align-items: center !important;
         }
 
+        .cora-sidebar.collapsed-sidebar .cora-user-footer .relative.w-8.h-8,
+        .cora-sidebar.collapsed-sidebar .cora-user-footer .w-8.h-8 {
+            width: 30px !important;
+            height: 30px !important;
+            margin: 0 auto !important;
+        }
+
         .cora-sidebar.collapsed-sidebar .cora-user-inbox {
             margin: 0 !important;
+            width: 28px !important;
+            height: 28px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            padding: 0 !important;
+            border-radius: 8px !important;
         }
 
         /* Sidebar popover positioning across expanded & collapsed states */
