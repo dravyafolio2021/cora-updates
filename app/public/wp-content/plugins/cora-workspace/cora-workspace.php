@@ -9780,9 +9780,25 @@ function cora_canvas_theme_frontend_router() {
     if ( $active_theme_id ) {
         $active_theme = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d", $active_theme_id ), ARRAY_A );
         $theme_settings = $active_theme ? (json_decode( $active_theme['settings'], true ) ?: array()) : array();
-        $source = isset( $theme_settings['source'] ) ? $theme_settings['source'] : '';
+        $source = isset( $theme_settings['source'] ) ? $theme_settings['source'] : ( isset( $active_theme['source'] ) ? $active_theme['source'] : '' );
         if ( 'lovable' === $source ) {
             return; // Delegate routing to cora_git_sync_serve_frontend running at priority 4
+        }
+
+        // If active/preview theme source is Next.js, render live frame bridge or native connector screen immediately
+        if ( 'nextjs' === $source || ( ! empty( $active_theme['source'] ) && 'nextjs' === $active_theme['source'] ) ) {
+            $nextjs_live_url = ! empty( $theme_settings['nextjs_live_url'] ) ? trim( $theme_settings['nextjs_live_url'] ) : ( ! empty( $theme_settings['live_url'] ) ? trim( $theme_settings['live_url'] ) : '' );
+            $nextjs_live_url = rtrim( $nextjs_live_url, '/' );
+
+            $target_route = ( empty( $target_page_slug ) || $target_page_slug === 'home' ) ? '/' : '/' . ltrim( $target_page_slug, '/' );
+
+            if ( ! empty( $nextjs_live_url ) ) {
+                cora_render_nextjs_live_frame( $nextjs_live_url, $target_route, $active_theme, $target_ws, $is_preview );
+                exit;
+            } else {
+                cora_render_nextjs_connector_screen( $active_theme, $target_ws, $target_route, $is_preview );
+                exit;
+            }
         }
     }
 
@@ -9869,8 +9885,8 @@ function cora_canvas_theme_frontend_router() {
                 }
             }
 
-            // 5. Match by slug across any theme belonging to this agency / workspace
-            if ( ! $canvas_page ) {
+            // 5. Match by slug across any theme belonging to this agency / workspace only if no active theme was resolved
+            if ( ! $canvas_page && ! $active_theme_id ) {
                 $canvas_page = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE slug = %s ORDER BY id DESC LIMIT 1", $target_page_slug ), ARRAY_A );
                 if ( ! $canvas_page ) {
                     $target_clean = sanitize_title( $target_page_slug );
@@ -11053,18 +11069,14 @@ function cora_get_preview_theme_id() {
         $raw_theme_id = intval( $_GET['preview_theme_id'] );
     } elseif ( isset( $_GET['cv_preview_theme'] ) ) {
         $raw_theme_id = intval( $_GET['cv_preview_theme'] );
-    } elseif ( isset( $_COOKIE['cora_preview_theme_id'] ) ) {
-        $raw_theme_id = intval( $_COOKIE['cora_preview_theme_id'] );
     } elseif ( isset( $_GET['elementor-preview'] ) ) {
         $post_id = intval( $_GET['elementor-preview'] );
         $raw_theme_id = intval( $wpdb->get_var( $wpdb->prepare( "SELECT theme_id FROM {$wpdb->prefix}cora_canvas_pages WHERE wp_post_id = %d LIMIT 1", $post_id ) ) );
     } elseif ( isset( $_GET['preview_id'] ) ) {
         $post_id = intval( $_GET['preview_id'] );
         $raw_theme_id = intval( $wpdb->get_var( $wpdb->prepare( "SELECT theme_id FROM {$wpdb->prefix}cora_canvas_pages WHERE wp_post_id = %d LIMIT 1", $post_id ) ) );
-    }
-
-    // Support extracting candidate preview theme ID from Referer header for assets/static files
-    if ( ! $raw_theme_id && ! empty( $_SERVER['HTTP_REFERER'] ) ) {
+    } elseif ( ! empty( $_SERVER['HTTP_REFERER'] ) ) {
+        // Support extracting candidate preview theme ID from Referer header for assets/static files
         $referer_query = parse_url( $_SERVER['HTTP_REFERER'], PHP_URL_QUERY );
         if ( ! empty( $referer_query ) ) {
             parse_str( $referer_query, $ref_params );
@@ -11072,6 +11084,33 @@ function cora_get_preview_theme_id() {
                 $raw_theme_id = intval( $ref_params['cv_preview_theme'] );
             } elseif ( isset( $ref_params['preview_theme_id'] ) ) {
                 $raw_theme_id = intval( $ref_params['preview_theme_id'] );
+            }
+        }
+    } elseif ( isset( $_COOKIE['cora_preview_theme_id'] ) ) {
+        $cookie_theme_id = intval( $_COOKIE['cora_preview_theme_id'] );
+        if ( $cookie_theme_id > 0 ) {
+            // Check if current agency has a live theme
+            $has_live_theme = false;
+            if ( $target_agency_id > 0 ) {
+                $live_cnt = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_canvas_themes WHERE agency_id = %d AND status = 'live'", $target_agency_id ) );
+                $has_live_theme = ( intval( $live_cnt ) > 0 );
+            } else {
+                $live_cnt = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live'" );
+                $has_live_theme = ( intval( $live_cnt ) > 0 );
+            }
+
+            $has_preview_query = ( isset( $_GET['preview'] ) && ( $_GET['preview'] === '1' || $_GET['preview'] === 'true' ) );
+
+            // b) If only in $_COOKIE, it must ONLY apply if the current agency does NOT have a live theme, OR if the request explicitly has preview=1.
+            // If visiting /site/ without preview parameters, clear the cookie and return 0 so the active LIVE theme renders!
+            if ( $has_preview_query || ! $has_live_theme ) {
+                $raw_theme_id = $cookie_theme_id;
+            } else {
+                if ( ! headers_sent() ) {
+                    setcookie( 'cora_preview_theme_id', '', time() - 3600, '/' );
+                }
+                unset( $_COOKIE['cora_preview_theme_id'] );
+                $raw_theme_id = 0;
             }
         }
     }
@@ -11084,8 +11123,8 @@ function cora_get_preview_theme_id() {
         }
     }
 
-    // 3. Fallback to current queried page context
-    if ( is_page() ) {
+    // 3. Fallback to current queried page context (only if explicitly previewing)
+    if ( is_page() && ( isset( $_GET['preview'] ) || isset( $_GET['elementor-preview'] ) || isset( $_GET['preview_id'] ) ) ) {
         $post_id = get_queried_object_id();
         if ( $post_id ) {
             $canvas_page = $wpdb->get_row( $wpdb->prepare( "SELECT theme_id FROM {$wpdb->prefix}cora_canvas_pages WHERE wp_post_id = %d LIMIT 1", $post_id ), ARRAY_A );
@@ -39571,37 +39610,89 @@ function cora_ajax_canvas_activate_theme() {
     global $wpdb;
     $theme_id = intval( $_POST['theme_id'] );
     
-    // Find the old live theme
-    $old_live_theme = $wpdb->get_row( "SELECT id FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live' LIMIT 1", ARRAY_A );
+    // Clear preview cookie immediately
+    if ( ! headers_sent() ) {
+        setcookie( 'cora_preview_theme_id', '', time() - 3600, '/' );
+    }
+    if ( isset( $_COOKIE['cora_preview_theme_id'] ) ) {
+        unset( $_COOKIE['cora_preview_theme_id'] );
+    }
 
-    // Update themes statuses
+    $target_theme = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d", $theme_id ), ARRAY_A );
+    if ( ! $target_theme ) {
+        wp_send_json_error( array( 'message' => 'Theme not found.' ) );
+        return;
+    }
+
+    // Resolve agency context for current workspace / user
+    $agency_id = 0;
+    if ( function_exists( 'cora_get_current_workspace_context' ) ) {
+        $ws = cora_get_current_workspace_context();
+        if ( $ws ) {
+            $agency_id = ! empty( $ws['agency_id'] ) ? intval( $ws['agency_id'] ) : ( ! empty( $ws['id'] ) ? intval( $ws['id'] ) : 0 );
+        }
+    }
+    if ( ! $agency_id && ! empty( $target_theme['agency_id'] ) ) {
+        $agency_id = intval( $target_theme['agency_id'] );
+    }
+    if ( ! $agency_id ) {
+        $agency_id = function_exists( 'cora_get_request_agency_id' ) ? cora_get_request_agency_id() : 0;
+    }
+    if ( ! $agency_id ) {
+        $current_user_id = get_current_user_id();
+        if ( $current_user_id ) {
+            $agency_id = intval( $wpdb->get_var( $wpdb->prepare( "SELECT agency_id FROM {$wpdb->prefix}cora_users WHERE wp_user_id = %d LIMIT 1", $current_user_id ) ) );
+            if ( ! $agency_id ) {
+                $agency_id = intval( $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$wpdb->prefix}cora_agencies WHERE owner_user_id = %d LIMIT 1", $current_user_id ) ) );
+            }
+        }
+    }
+    if ( ! $agency_id ) {
+        $agency_id = 1;
+    }
+
+    // Find old live themes for this agency
+    $old_live_themes = $wpdb->get_results( $wpdb->prepare( "SELECT id FROM {$wpdb->prefix}cora_canvas_themes WHERE agency_id = %d AND status = 'live'", $agency_id ), ARRAY_A );
+
+    // Set all other themes for this agency to draft
     $wpdb->update(
         $wpdb->prefix . 'cora_canvas_themes',
         array( 'status' => 'draft', 'updated_at' => current_time('mysql') ),
-        array( 'status' => 'live' )
+        array( 'agency_id' => $agency_id )
     );
     
+    // Set target theme status to live for current agency
     $wpdb->update(
         $wpdb->prefix . 'cora_canvas_themes',
-        array( 'status' => 'live', 'activated_at' => current_time('mysql'), 'updated_at' => current_time('mysql') ),
+        array( 
+            'status'       => 'live', 
+            'agency_id'    => $agency_id,
+            'activated_at' => current_time('mysql'), 
+            'updated_at'   => current_time('mysql') 
+        ),
         array( 'id' => $theme_id )
     );
 
     // Set old live theme's pages to draft in both WP and database
-    if ( $old_live_theme ) {
-        $old_pages = $wpdb->get_results( $wpdb->prepare( "SELECT wp_post_id FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d", intval( $old_live_theme['id'] ) ), ARRAY_A );
-        foreach ( $old_pages as $p ) {
-            $wp_post_id = intval( $p['wp_post_id'] );
-            if ( $wp_post_id ) {
-                wp_update_post( array(
-                    'ID'          => $wp_post_id,
-                    'post_status' => 'draft',
-                ) );
-                $wpdb->update(
-                    $wpdb->prefix . 'cora_canvas_pages',
-                    array( 'status' => 'draft', 'updated_at' => current_time('mysql') ),
-                    array( 'wp_post_id' => $wp_post_id )
-                );
+    if ( ! empty( $old_live_themes ) ) {
+        foreach ( $old_live_themes as $olt ) {
+            $olt_id = intval( $olt['id'] );
+            if ( $olt_id && $olt_id !== $theme_id ) {
+                $old_pages = $wpdb->get_results( $wpdb->prepare( "SELECT wp_post_id FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d", $olt_id ), ARRAY_A );
+                foreach ( $old_pages as $p ) {
+                    $wp_post_id = intval( $p['wp_post_id'] );
+                    if ( $wp_post_id ) {
+                        wp_update_post( array(
+                            'ID'          => $wp_post_id,
+                            'post_status' => 'draft',
+                        ) );
+                        $wpdb->update(
+                            $wpdb->prefix . 'cora_canvas_pages',
+                            array( 'status' => 'draft', 'updated_at' => current_time('mysql') ),
+                            array( 'wp_post_id' => $wp_post_id )
+                        );
+                    }
+                }
             }
         }
     }
@@ -39624,10 +39715,16 @@ function cora_ajax_canvas_activate_theme() {
     }
 
     // Sync homepage selection to WordPress native Reading settings
-    cora_canvas_sync_homepage_options();
+    cora_canvas_sync_homepage_options( $agency_id );
 
-    cora_log_activity( 'Canvas', "Activated theme id {$theme_id}. Published pages, drafted old pages." );
+    cora_log_activity( 'Canvas', "Activated theme id {$theme_id} for agency {$agency_id}. Published pages, drafted old pages." );
     wp_send_json_success();
+}
+}
+
+if ( ! function_exists( 'cora_ajax_activate_theme' ) ) {
+function cora_ajax_activate_theme() {
+    cora_ajax_canvas_activate_theme();
 }
 }
 
@@ -39635,9 +39732,16 @@ function cora_ajax_canvas_activate_theme() {
  * Synchronizes the live Canvas theme's designated homepage with native WordPress show_on_front and page_on_front options.
  */
 if ( ! function_exists( 'cora_canvas_sync_homepage_options' ) ) {
-function cora_canvas_sync_homepage_options() {
+function cora_canvas_sync_homepage_options( $target_agency_id = 0 ) {
     global $wpdb;
-    $live_theme = $wpdb->get_row( "SELECT id FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live' LIMIT 1", ARRAY_A );
+    if ( ! $target_agency_id ) {
+        $target_agency_id = function_exists( 'cora_get_request_agency_id' ) ? cora_get_request_agency_id() : 0;
+    }
+    if ( $target_agency_id > 0 ) {
+        $live_theme = $wpdb->get_row( $wpdb->prepare( "SELECT id FROM {$wpdb->prefix}cora_canvas_themes WHERE agency_id = %d AND status = 'live' ORDER BY id DESC LIMIT 1", $target_agency_id ), ARRAY_A );
+    } else {
+        $live_theme = $wpdb->get_row( "SELECT id FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live' ORDER BY id DESC LIMIT 1", ARRAY_A );
+    }
     if ( $live_theme ) {
         $theme_id = intval( $live_theme['id'] );
         $homepage = $wpdb->get_row( $wpdb->prepare( "SELECT wp_post_id FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d AND is_homepage = 1 LIMIT 1", $theme_id ), ARRAY_A );
