@@ -9020,7 +9020,7 @@ function cora_render_nextjs_live_frame( $live_url, $route_path = '/', $active_th
         #cora-nextjs-iframe { width: 100%; height: 100%; flex: 1; border: none; background: #ffffff; }
         #cora-frame-loader { position: fixed; top: 0; left: 0; width: 100%; height: 3px; z-index: 99999; background: rgba(24, 24, 27, 0.4); overflow: hidden; }
         #cora-frame-progress { width: 0%; height: 100%; background: #ffffff; transition: width 0.3s ease; }
-        #cora-error-overlay { display: none; position: fixed; inset: 0; z-index: 50; background: rgba(9,9,11,0.88); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); align-items: center; justify-content: center; padding: 24px; }
+        #cora-error-overlay { display: none; position: fixed; inset: 0; z-index: 50; background: rgba(9,9,11,0.92); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); align-items: center; justify-content: center; padding: 24px; }
         #cora-error-overlay.active { display: flex; }
     </style>
     <script>
@@ -9048,27 +9048,41 @@ function cora_render_nextjs_live_frame( $live_url, $route_path = '/', $active_th
         ></iframe>
     </div>
 
-    <!-- Error / Server Not Running Fallback Overlay -->
+    <!-- Error / Local Dev Server Offline Card Overlay -->
     <div id="cora-error-overlay">
-        <div style="max-width: 460px; width: 100%; background: #18181b; border: 1px solid #27272a; border-radius: 16px; padding: 28px 24px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.6); text-align: center;">
-            <div style="width: 44px; height: 44px; border-radius: 12px; background: #27272a; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px; border: 1px solid #3f3f46;">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f4f4f5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+        <div style="max-width: 480px; width: 100%; background: #18181b; border: 1px solid #27272a; border-radius: 16px; padding: 30px 26px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7); text-align: center;">
+            <div style="width: 48px; height: 48px; border-radius: 14px; background: #27272a; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px; border: 1px solid #3f3f46;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f4f4f5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
             </div>
-            <h3 style="font-size: 16px; font-weight: 600; color: #f4f4f5; margin-bottom: 8px; letter-spacing: -0.01em;">Waiting for Next.js Dev Server</h3>
-            <p style="font-size: 13px; color: #a1a1aa; line-height: 1.5; margin-bottom: 16px;">
-                Unable to connect to <code style="background: #27272a; color: #f4f4f5; padding: 2px 6px; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 12px;"><?php echo esc_html( $live_url ); ?></code>.
-                Please ensure your local dev server is running.
+            <h3 style="font-size: 17px; font-weight: 700; color: #ffffff; margin-bottom: 8px; letter-spacing: -0.01em;">Local Dev Server Offline</h3>
+            <p style="font-size: 13px; color: #a1a1aa; line-height: 1.55; margin-bottom: 18px;">
+                Unable to connect to <code style="background: #27272a; color: #f4f4f5; padding: 2px 7px; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 12px; border: 1px solid #3f3f46;"><?php echo esc_html( $live_url ); ?></code>.<br>
+                Please ensure your local Next.js development server is active in terminal.
             </p>
-            <div style="background: #09090b; border: 1px solid #27272a; border-radius: 8px; padding: 10px 14px; text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #d4d4d8; margin-bottom: 20px;">
-                <span style="color: #71717a;">$</span> npm run dev
+            
+            <!-- Terminal Instruction Card -->
+            <div style="background: #09090b; border: 1px solid #27272a; border-radius: 10px; padding: 12px 14px; text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #d4d4d8; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
+                    <span style="color: #71717a; font-weight: 600;">$</span>
+                    <span style="color: #ffffff; font-weight: 500;">npm run dev</span>
+                </div>
+                <button type="button" onclick="navigator.clipboard.writeText('npm run dev'); var el=this; el.innerText='Copied!'; setTimeout(function(){ el.innerText='Copy'; }, 2000);" style="background: #27272a; color: #a1a1aa; border: 1px solid #3f3f46; border-radius: 6px; padding: 3px 9px; font-size: 10px; font-weight: 600; cursor: pointer; transition: all 0.15s ease;">Copy</button>
             </div>
-            <div style="display: flex; gap: 10px; justify-content: center;">
-                <button onclick="window.location.reload()" style="background: #ffffff; color: #09090b; border: none; font-weight: 600; font-size: 13px; padding: 8px 18px; border-radius: 8px; cursor: pointer; transition: opacity 0.15s ease;">
+
+            <!-- Action Buttons Grid -->
+            <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+                <button onclick="window.location.reload()" style="background: #ffffff; color: #09090b; border: none; font-weight: 700; font-size: 12.5px; padding: 9px 18px; border-radius: 8px; cursor: pointer; transition: opacity 0.15s ease; display: inline-flex; align-items: center; gap: 6px;">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
                     Retry Connection
                 </button>
-                <button onclick="window.location.href=window.location.pathname+'?cv_edit_url=1'" style="background: #27272a; color: #f4f4f5; border: 1px solid #3f3f46; font-weight: 500; font-size: 13px; padding: 8px 16px; border-radius: 8px; cursor: pointer;">
+                <button onclick="window.location.href=window.location.pathname+'?cv_edit_url=1'" style="background: #27272a; color: #f4f4f5; border: 1px solid #3f3f46; font-weight: 600; font-size: 12.5px; padding: 9px 15px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                     Change URL
                 </button>
+                <a href="<?php echo esc_url( $live_url ); ?>" target="_blank" rel="noopener noreferrer" style="background: #27272a; color: #f4f4f5; border: 1px solid #3f3f46; font-weight: 600; font-size: 12.5px; padding: 9px 15px; border-radius: 8px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                    Open <?php echo esc_html( preg_replace( '#^https?://#', '', $live_url ) ); ?> ↗
+                </a>
             </div>
         </div>
     </div>
@@ -9082,42 +9096,68 @@ function cora_render_nextjs_live_frame( $live_url, $route_path = '/', $active_th
         var isPreview = <?php echo $is_preview ? 'true' : 'false'; ?>;
         var themeId = <?php echo json_encode( $theme_id ); ?>;
         var wsSlug = <?php echo json_encode( $ws_slug ); ?>;
+        var isLoaded = false;
 
         if (progress) progress.style.width = '60%';
 
+        function showOffline() {
+            if (isLoaded) return;
+            if (overlay) overlay.classList.add('active');
+            if (loader) loader.style.display = 'none';
+        }
+
+        // Fast probe check via fetch (immediately detects offline localhost)
+        if (window.fetch && window.CORA_NEXTJS_LIVE_URL) {
+            fetch(window.CORA_NEXTJS_LIVE_URL, { mode: 'no-cors', cache: 'no-store' })
+                .then(function() {
+                    // Server reachable
+                })
+                .catch(function(err) {
+                    showOffline();
+                });
+        }
+
         var loadTimeout = setTimeout(function() {
-            try {
-                if (iframe && !iframe.contentWindow) {
-                    overlay.classList.add('active');
-                }
-            } catch(e) {}
-        }, 10000);
+            if (!isLoaded) {
+                showOffline();
+            }
+        }, 5000);
 
-        iframe.addEventListener('load', function() {
-            clearTimeout(loadTimeout);
-            if (progress) progress.style.width = '100%';
-            setTimeout(function() {
-                if (loader) loader.style.display = 'none';
-            }, 300);
+        if (iframe) {
+            iframe.addEventListener('error', function() {
+                clearTimeout(loadTimeout);
+                showOffline();
+            });
 
-            try {
-                iframe.contentWindow.postMessage({
-                    type: 'CORA_INIT',
-                    apiUrl: window.CORA_API_URL,
-                    publicApiUrl: window.CORA_PUBLIC_API_URL,
-                    nonce: window.CORA_NONCE,
-                    themeId: window.CORA_THEME_ID,
-                    workspaceSlug: window.CORA_WORKSPACE_SLUG,
-                    route: window.CORA_TARGET_ROUTE
-                }, '*');
-            } catch(e) {}
-        });
+            iframe.addEventListener('load', function() {
+                isLoaded = true;
+                clearTimeout(loadTimeout);
+                if (progress) progress.style.width = '100%';
+                setTimeout(function() {
+                    if (loader) loader.style.display = 'none';
+                }, 300);
+
+                try {
+                    iframe.contentWindow.postMessage({
+                        type: 'CORA_INIT',
+                        apiUrl: window.CORA_API_URL,
+                        publicApiUrl: window.CORA_PUBLIC_API_URL,
+                        nonce: window.CORA_NONCE,
+                        themeId: window.CORA_THEME_ID,
+                        workspaceSlug: window.CORA_WORKSPACE_SLUG,
+                        route: window.CORA_TARGET_ROUTE
+                    }, '*');
+                } catch(e) {}
+            });
+        }
 
         // Listen for route sync from child Next.js frame
         window.addEventListener('message', function(event) {
             if (!event.data || typeof event.data !== 'object') return;
 
             if (event.data.type === 'CORA_ROUTE_CHANGE' && event.data.path) {
+                isLoaded = true;
+                if (overlay) overlay.classList.remove('active');
                 var newPath = event.data.path;
                 var currentUrl = new URL(window.location.href);
                 var pathPrefix = currentUrl.pathname.startsWith('/site/' + wsSlug) ? ('/site/' + wsSlug) : (currentUrl.pathname.startsWith('/site') ? '/site' : (currentUrl.pathname.startsWith('/' + wsSlug) ? ('/' + wsSlug) : ''));
@@ -9133,14 +9173,18 @@ function cora_render_nextjs_live_frame( $live_url, $route_path = '/', $active_th
             }
 
             if (event.data.type === 'CORA_GET_CONFIG') {
+                isLoaded = true;
+                if (overlay) overlay.classList.remove('active');
                 try {
-                    iframe.contentWindow.postMessage({
-                        type: 'CORA_CONFIG_RESPONSE',
-                        apiUrl: window.CORA_API_URL,
-                        nonce: window.CORA_NONCE,
-                        themeId: window.CORA_THEME_ID,
-                        workspaceSlug: window.CORA_WORKSPACE_SLUG
-                    }, '*');
+                    if (iframe && iframe.contentWindow) {
+                        iframe.contentWindow.postMessage({
+                            type: 'CORA_CONFIG_RESPONSE',
+                            apiUrl: window.CORA_API_URL,
+                            nonce: window.CORA_NONCE,
+                            themeId: window.CORA_THEME_ID,
+                            workspaceSlug: window.CORA_WORKSPACE_SLUG
+                        }, '*');
+                    }
                 } catch(e) {}
             }
         });
@@ -9860,7 +9904,7 @@ function cora_canvas_theme_frontend_router() {
             $target_route = '/' . ltrim( $target_page_slug, '/' );
         }
 
-        if ( ! empty( $nextjs_live_url ) ) {
+        if ( ! empty( $nextjs_live_url ) && empty( $_GET['cv_edit_url'] ) ) {
             cora_render_nextjs_live_frame( $nextjs_live_url, $target_route, $active_theme, $target_ws, $is_preview );
             exit;
         } else {
