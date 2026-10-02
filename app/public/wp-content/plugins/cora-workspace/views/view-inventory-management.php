@@ -502,6 +502,11 @@ body.cora-inventory-focus-mode .cora-sidebar-search {
                 <span>Van Consignments</span>
             </button>
 
+            <button type="button" onclick="CoraInventory.switchSubtab('sales_register')" id="cora-tab-btn-sales_register" class="px-3.5 py-2 text-xs font-medium border-b-2 border-transparent text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors whitespace-nowrap flex items-center gap-1.5">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                <span>Sales Register</span>
+            </button>
+
             <button type="button" onclick="CoraInventory.switchSubtab('map')" id="cora-tab-btn-map" class="px-3.5 py-2 text-xs font-medium border-b-2 border-transparent text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors whitespace-nowrap flex items-center gap-1.5">
                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
                 <span>Route GPS Map</span>
@@ -721,6 +726,236 @@ body.cora-inventory-focus-mode .cora-sidebar-search {
             <div id="cora-consignments-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <!-- Populated via AJAX -->
             </div>
+        </div>
+
+        <!-- SUBTAB: Sales Register & Billing Ledger -->
+        <div id="cora-subtab-sales_register" class="space-y-4 hidden">
+            
+            <!-- Top Header & Action Row -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1">
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold uppercase bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-950">
+                            Sales Ledger (बिक्री रजिस्टर)
+                        </span>
+                        <h2 class="text-sm font-bold text-zinc-950 dark:text-zinc-50">Stationery Sales &amp; Invoicing Register</h2>
+                    </div>
+                    <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Comprehensive chronological ledger of retail shop spot sales, mobile van field dispatches, weight-based stationery billing, and GST invoices.</p>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2 shrink-0">
+                    <!-- Action: Print Sales Sheet -->
+                    <button type="button" onclick="CoraInventory.printSalesRegister()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 text-xs font-semibold shadow-2xs transition-colors whitespace-nowrap cursor-pointer" title="Print-ready ledger with printable table view">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M6 9V2h12v7"></path><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                        <span>Print Sales Sheet</span>
+                    </button>
+
+                    <!-- Action: Export CSV -->
+                    <button type="button" onclick="CoraInventory.exportSalesCSV()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 text-xs font-semibold shadow-2xs transition-colors whitespace-nowrap cursor-pointer" title="Download CSV ledger">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        <span>Export CSV</span>
+                    </button>
+
+                    <!-- Action: Refresh -->
+                    <button type="button" onclick="CoraInventory.loadSalesRegister()" class="p-1.5 rounded-xl text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer" title="Refresh Sales Register">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 4 Summary Metric Chips / KPI Cards -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
+                <!-- KPI 1: Total Revenue -->
+                <div class="p-3.5 rounded-xl bg-white dark:bg-zinc-900/90 border border-zinc-200/80 dark:border-zinc-800 shadow-2xs flex flex-col justify-between hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors">
+                    <div class="flex items-center justify-between text-[11px] font-medium text-zinc-500 dark:text-zinc-400 mb-1">
+                        <span class="truncate">Total Revenue</span>
+                        <span class="w-6 h-6 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 flex items-center justify-center shrink-0">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                        </span>
+                    </div>
+                    <div class="text-base sm:text-xl font-bold font-mono tracking-tight text-zinc-950 dark:text-zinc-50" id="cora-sr-kpi-revenue">
+                        ₹0.00
+                    </div>
+                    <div class="text-[10.5px] text-zinc-400 dark:text-zinc-500 mt-1 truncate">
+                        Realized across active filter
+                    </div>
+                </div>
+
+                <!-- KPI 2: Total Invoices -->
+                <div class="p-3.5 rounded-xl bg-white dark:bg-zinc-900/90 border border-zinc-200/80 dark:border-zinc-800 shadow-2xs flex flex-col justify-between hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors">
+                    <div class="flex items-center justify-between text-[11px] font-medium text-zinc-500 dark:text-zinc-400 mb-1">
+                        <span class="truncate">Total Invoices</span>
+                        <span class="w-6 h-6 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 flex items-center justify-center shrink-0">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                        </span>
+                    </div>
+                    <div class="text-base sm:text-xl font-bold font-mono tracking-tight text-zinc-950 dark:text-zinc-50" id="cora-sr-kpi-invoices">
+                        0 Bills
+                    </div>
+                    <div class="text-[10.5px] text-zinc-400 dark:text-zinc-500 mt-1 truncate">
+                        Spot &amp; field route sales
+                    </div>
+                </div>
+
+                <!-- KPI 3: Total Weight Sold (Kg) -->
+                <div class="p-3.5 rounded-xl bg-white dark:bg-zinc-900/90 border border-zinc-200/80 dark:border-zinc-800 shadow-2xs flex flex-col justify-between hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors">
+                    <div class="flex items-center justify-between text-[11px] font-medium text-zinc-500 dark:text-zinc-400 mb-1">
+                        <span class="truncate">Weight Sold (Kg)</span>
+                        <span class="w-6 h-6 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 flex items-center justify-center shrink-0">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg>
+                        </span>
+                    </div>
+                    <div class="text-base sm:text-xl font-bold font-mono tracking-tight text-zinc-950 dark:text-zinc-50" id="cora-sr-kpi-weight">
+                        0.00 Kg
+                    </div>
+                    <div class="text-[10.5px] text-zinc-400 dark:text-zinc-500 mt-1 truncate">
+                        @ ₹401.25/Kg standard rate
+                    </div>
+                </div>
+
+                <!-- KPI 4: Total Units Sold -->
+                <div class="p-3.5 rounded-xl bg-white dark:bg-zinc-900/90 border border-zinc-200/80 dark:border-zinc-800 shadow-2xs flex flex-col justify-between hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors">
+                    <div class="flex items-center justify-between text-[11px] font-medium text-zinc-500 dark:text-zinc-400 mb-1">
+                        <span class="truncate">Total Units Sold</span>
+                        <span class="w-6 h-6 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 flex items-center justify-center shrink-0">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+                        </span>
+                    </div>
+                    <div class="text-base sm:text-xl font-bold font-mono tracking-tight text-zinc-950 dark:text-zinc-50" id="cora-sr-kpi-units">
+                        0 Units
+                    </div>
+                    <div class="text-[10.5px] text-zinc-400 dark:text-zinc-500 mt-1 truncate">
+                        Notebooks, reams, stationery
+                    </div>
+                </div>
+            </div>
+
+            <!-- Unified Filter & Search Bar -->
+            <div class="p-2.5 rounded-xl bg-white dark:bg-zinc-900/90 border border-zinc-200/80 dark:border-zinc-800 shadow-2xs flex flex-col lg:flex-row lg:items-center justify-between gap-2.5">
+                
+                <!-- Left: Date Preset Pills + Custom Date Range -->
+                <div class="flex flex-wrap items-center gap-1.5">
+                    <!-- Date Presets Group -->
+                    <div class="flex items-center p-0.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/60 dark:border-zinc-700/60">
+                        <button type="button" onclick="CoraInventory.setDatePreset('all')" id="cora-sr-preset-all" class="cora-sr-preset-btn px-2.5 py-1 rounded-md text-xs font-bold transition-all bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-2xs cursor-pointer">
+                            All Time
+                        </button>
+                        <button type="button" onclick="CoraInventory.setDatePreset('today')" id="cora-sr-preset-today" class="cora-sr-preset-btn px-2.5 py-1 rounded-md text-xs font-medium transition-all text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 cursor-pointer">
+                            Today
+                        </button>
+                        <button type="button" onclick="CoraInventory.setDatePreset('yesterday')" id="cora-sr-preset-yesterday" class="cora-sr-preset-btn px-2.5 py-1 rounded-md text-xs font-medium transition-all text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 cursor-pointer">
+                            Yesterday
+                        </button>
+                        <button type="button" onclick="CoraInventory.setDatePreset('this_week')" id="cora-sr-preset-this_week" class="cora-sr-preset-btn px-2.5 py-1 rounded-md text-xs font-medium transition-all text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 cursor-pointer">
+                            This Week
+                        </button>
+                        <button type="button" onclick="CoraInventory.setDatePreset('this_month')" id="cora-sr-preset-this_month" class="cora-sr-preset-btn px-2.5 py-1 rounded-md text-xs font-medium transition-all text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 cursor-pointer">
+                            This Month
+                        </button>
+                    </div>
+
+                    <!-- Custom Date Pickers -->
+                    <div class="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400">
+                        <span class="text-[11px] font-mono">From:</span>
+                        <input type="date" id="cora-sr-start-date" onchange="CoraInventory.onDateRangeChange()" class="px-2 py-1 text-xs rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 outline-none font-mono text-zinc-800 dark:text-zinc-200">
+                        <span class="text-[11px] font-mono">To:</span>
+                        <input type="date" id="cora-sr-end-date" onchange="CoraInventory.onDateRangeChange()" class="px-2 py-1 text-xs rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 outline-none font-mono text-zinc-800 dark:text-zinc-200">
+                    </div>
+                </div>
+
+                <!-- Right: Search Input + Payment Mode Filter -->
+                <div class="flex flex-wrap items-center gap-1.5 justify-end">
+                    
+                    <!-- Search Input -->
+                    <div class="relative min-w-[170px] sm:min-w-[220px]">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <input type="text" id="cora-sr-search" oninput="CoraInventory.debouncedSalesSearch()" placeholder="Search Bill #, Customer, Phone, City..." class="w-full pl-7 pr-2.5 py-1 text-xs rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 outline-none focus:border-zinc-400 transition-colors">
+                    </div>
+
+                    <!-- Payment Status Filter -->
+                    <select id="cora-sr-payment-filter" onchange="CoraInventory.loadSalesRegister()" class="px-2.5 py-1 text-xs font-medium rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 outline-none cursor-pointer text-zinc-800 dark:text-zinc-200">
+                        <option value="all" selected>All Payment Modes</option>
+                        <option value="paid">Paid (Cash &amp; UPI)</option>
+                        <option value="credit">Credit / Unpaid</option>
+                        <option value="cash">Cash Only</option>
+                        <option value="upi">UPI Only</option>
+                    </select>
+
+                    <button type="button" onclick="CoraInventory.clearSalesFilters()" class="p-1.5 rounded-lg text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer" title="Reset Filters">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- DESKTOP INTERACTIVE SALES REGISTER TABLE (Notion Style) -->
+            <div class="hidden md:block rounded-2xl bg-white dark:bg-zinc-900/90 border border-zinc-200/80 dark:border-zinc-800 shadow-2xs overflow-hidden" id="cora-sr-table-wrap">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50/90 dark:bg-zinc-800/60 text-[11px] font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider font-mono">
+                                <th class="py-3 px-3 w-14 text-center">1. Sr No (क्र०)</th>
+                                <th class="py-3 px-3.5 min-w-[150px]">2. Bill Number</th>
+                                <th class="py-3 px-3.5 min-w-[140px]">3. Date &amp; Time</th>
+                                <th class="py-3 px-4 min-w-[180px]">4. Customer / Firm Name</th>
+                                <th class="py-3 px-3.5 min-w-[130px]">5. City / Location</th>
+                                <th class="py-3 px-3.5 min-w-[130px]">6. Mobile Number</th>
+                                <th class="py-3 px-4 min-w-[140px] text-right font-mono">7. Total Bill (₹)</th>
+                                <th class="py-3 px-4 min-w-[190px]">8. Item Details &amp; Weight</th>
+                                <th class="py-3 px-3 w-28 text-center">9. Actions</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="cora-sr-table-body" class="divide-y divide-zinc-200/60 dark:divide-zinc-800/60 font-sans">
+                            <!-- Populated via AJAX -->
+                            <tr>
+                                <td colspan="9" class="py-12 text-center text-zinc-400">Loading sales register entries...</td>
+                            </tr>
+                        </tbody>
+
+                        <!-- Summary Totals Footer Strip -->
+                        <tfoot id="cora-sr-table-footer" class="border-t-2 border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/60 text-xs font-mono font-bold text-zinc-900 dark:text-zinc-100">
+                            <tr>
+                                <td class="py-3 px-3 text-center text-zinc-500" id="cora-sr-ft-sr">
+                                    Total
+                                </td>
+                                <td class="py-3 px-3.5 font-bold" id="cora-sr-ft-invoices">
+                                    0 Bills
+                                </td>
+                                <td class="py-3 px-3.5 text-zinc-400">
+                                    —
+                                </td>
+                                <td class="py-3 px-4 text-zinc-700 dark:text-zinc-300">
+                                    Summary of Filtered Sales
+                                </td>
+                                <td class="py-3 px-3.5 text-zinc-400">
+                                    —
+                                </td>
+                                <td class="py-3 px-3.5 text-zinc-400">
+                                    —
+                                </td>
+                                <td class="py-3 px-4 text-right font-mono font-bold text-zinc-950 dark:text-zinc-50 text-sm" id="cora-sr-ft-revenue">
+                                    ₹0.00
+                                </td>
+                                <td class="py-3 px-4 font-mono text-zinc-800 dark:text-zinc-200" id="cora-sr-ft-weight">
+                                    0.00 Kg • 0 Units
+                                </td>
+                                <td class="py-3 px-3 text-center text-[10px] text-zinc-400">
+                                    Ledger
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <!-- MOBILE RESPONSIVE CARDS VIEW -->
+            <div class="block md:hidden">
+                <div id="cora-sr-mobile-cards-wrap" class="space-y-3">
+                    <!-- Populated via AJAX -->
+                    <div class="py-8 text-center text-zinc-400 text-xs">Loading sales...</div>
+                </div>
+            </div>
+
         </div>
 
         <!-- SUBTAB 3: Live Route & GPS Map -->
@@ -2280,6 +2515,107 @@ body.cora-inventory-focus-mode .cora-sidebar-search {
     </div>
 </div>
 
+<!-- 5B. SALES REGISTER INVOICE DETAILS STUDIO DRAWER -->
+<div id="cora-inv-sale-details-sheet" class="fixed inset-x-0 bottom-0 z-[99999] pointer-events-none transition-all duration-300 hidden" style="display:none; top: 48px; height: calc(100vh - 48px);">
+    <div id="cora-inv-sale-details-backdrop" onclick="CoraInventory.closeSaleDetailsModal()" class="absolute inset-0 bg-white dark:bg-zinc-950 opacity-0 transition-opacity duration-300"></div>
+    <div id="cora-inv-sale-details-drawer" class="absolute inset-0 w-full h-full bg-white dark:bg-zinc-900 border-t border-zinc-200/80 dark:border-zinc-800 shadow-2xl transform translate-y-full transition-transform duration-300 ease-out pointer-events-auto flex flex-col overflow-hidden z-10" style="top: 0; bottom: 0; height: 100% !important; min-height: 100% !important; max-height: 100% !important;">
+        
+        <!-- Sheet Header Bar -->
+        <div class="px-6 md:px-12 lg:px-16 py-3.5 border-b border-zinc-200/80 dark:border-zinc-800 flex items-center justify-between shrink-0 bg-white dark:bg-zinc-900">
+            <div class="flex items-center gap-3">
+                <span class="w-9 h-9 rounded-xl bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 flex items-center justify-center shadow-xs shrink-0">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                </span>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h3 class="text-sm md:text-base font-bold text-zinc-950 dark:text-zinc-50 leading-tight">Sale Invoice Details &amp; Ledger Breakdown</h3>
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700" id="cora-sd-inv-no-badge">
+                            #INV-2026
+                        </span>
+                    </div>
+                    <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5" id="cora-sd-date-text">Stationery spot sales transaction &amp; dispatch ledger record.</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <button type="button" id="cora-sd-print-btn" onclick="CoraInventory.printSaleInvoice(0)" class="py-1.5 px-3 rounded-xl bg-zinc-900 hover:bg-black text-white dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-950 transition-colors text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-2xs">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M6 9V2h12v7"></path><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                    <span>Print Invoice</span>
+                </button>
+                <button type="button" onclick="CoraInventory.closeSaleDetailsModal()" class="py-1.5 px-3 rounded-xl border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors text-xs font-semibold flex items-center gap-1.5 cursor-pointer" title="Exit Details">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    <span class="hidden sm:inline">Close</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Scrollable Content Body -->
+        <div class="flex-1 overflow-y-auto px-6 md:px-12 lg:px-16 py-6 space-y-6">
+            
+            <!-- Cards Grid: Customer Info & Payment Breakdown -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Customer Details -->
+                <div class="p-4 rounded-2xl bg-zinc-50/80 dark:bg-zinc-800/50 border border-zinc-200/80 dark:border-zinc-700/80 space-y-2">
+                    <div class="text-[10px] uppercase font-mono font-bold text-zinc-500">Retailer / Customer Details</div>
+                    <div class="text-sm font-bold text-zinc-950 dark:text-zinc-50" id="cora-sd-customer-name">—</div>
+                    <div class="text-xs text-zinc-600 dark:text-zinc-400 font-mono" id="cora-sd-phone">—</div>
+                    <div class="text-xs text-zinc-600 dark:text-zinc-400" id="cora-sd-city">—</div>
+                    <div class="text-[11px] text-zinc-500 font-mono" id="cora-sd-gstin">GSTIN: —</div>
+                </div>
+
+                <!-- Van Consignment Dispatch Info -->
+                <div class="p-4 rounded-2xl bg-zinc-50/80 dark:bg-zinc-800/50 border border-zinc-200/80 dark:border-zinc-700/80 space-y-2">
+                    <div class="text-[10px] uppercase font-mono font-bold text-zinc-500">Dispatch Route &amp; Van</div>
+                    <div class="text-sm font-bold text-zinc-950 dark:text-zinc-50 font-mono" id="cora-sd-consignment-no">—</div>
+                    <div class="text-xs text-zinc-600 dark:text-zinc-400" id="cora-sd-driver-name">Driver: —</div>
+                    <div class="text-xs text-zinc-600 dark:text-zinc-400 font-mono" id="cora-sd-vehicle-no">Vehicle: —</div>
+                    <div class="text-xs text-zinc-500 truncate" id="cora-sd-route-name">Route: —</div>
+                </div>
+
+                <!-- Financial Totals -->
+                <div class="p-4 rounded-2xl bg-zinc-50/80 dark:bg-zinc-800/50 border border-zinc-200/80 dark:border-zinc-700/80 space-y-2">
+                    <div class="text-[10px] uppercase font-mono font-bold text-zinc-500">Invoice Total &amp; Status</div>
+                    <div class="text-xl font-bold text-zinc-950 dark:text-zinc-50 font-mono" id="cora-sd-grand-total">₹0.00</div>
+                    <div class="flex items-center gap-2 text-xs">
+                        <span class="text-zinc-500">Mode:</span>
+                        <span class="font-mono font-bold text-zinc-800 dark:text-zinc-200 uppercase" id="cora-sd-pay-mode">CASH</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-xs">
+                        <span class="text-zinc-500">Status:</span>
+                        <span class="px-2 py-0.2 rounded text-[10px] font-mono font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200/80" id="cora-sd-pay-status">Paid</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Line Items Table -->
+            <div class="rounded-2xl border border-zinc-200/80 dark:border-zinc-800 overflow-hidden">
+                <div class="px-4 py-3 bg-zinc-100/80 dark:bg-zinc-800/60 border-b border-zinc-200/80 dark:border-zinc-700/80 flex items-center justify-between">
+                    <span class="text-xs font-bold uppercase font-mono text-zinc-700 dark:text-zinc-300">Sold Stationery Items &amp; Weight Breakdown</span>
+                    <span class="text-xs font-mono font-semibold text-zinc-600 dark:text-zinc-400" id="cora-sd-items-summary">0 items • 0.00 Kg</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/40 text-[11px] font-bold text-zinc-500 uppercase font-mono">
+                                <th class="py-2.5 px-3">Item / SKU</th>
+                                <th class="py-2.5 px-3 text-center">Type</th>
+                                <th class="py-2.5 px-3 text-center font-mono">Weight (Kg)</th>
+                                <th class="py-2.5 px-3 text-center font-mono">Quantity</th>
+                                <th class="py-2.5 px-3 text-right font-mono">Rate</th>
+                                <th class="py-2.5 px-3 text-center font-mono">GST</th>
+                                <th class="py-2.5 px-3 text-right font-mono">Total (₹)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cora-sd-items-tbody" class="divide-y divide-zinc-200/60 dark:divide-zinc-800/60">
+                            <!-- Populated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
 <!-- 6. EDIT CONSIGNMENT STUDIO DRAWER -->
 <div id="cora-inv-edit-csn-sheet" class="fixed inset-x-0 bottom-0 z-[99999] pointer-events-none transition-all duration-300 hidden" style="display:none; top: 48px; height: calc(100vh - 48px);">
     <div id="cora-inv-edit-csn-backdrop" onclick="CoraInventory.closeEditConsignmentModal()" class="absolute inset-0 bg-white dark:bg-zinc-950 opacity-0 transition-opacity duration-300"></div>
@@ -2638,6 +2974,8 @@ window.CoraInventory = (function($) {
 
         if (tab === 'map') {
             setTimeout(initLeafletMap, 150);
+        } else if (tab === 'sales_register') {
+            loadSalesRegister();
         }
     }
 
@@ -6434,6 +6772,541 @@ window.CoraInventory = (function($) {
         window.coraShowToast('Switched to Field Van Sales Driver Terminal.', 'info');
     }
 
+    // =========================================================================
+    // SALES REGISTER LEDGER CONTROLLER & NOTION TABLE ENGINE
+    // =========================================================================
+    let salesRegisterCache = [];
+    let activeSalesPreset = 'all';
+    let expandedSalesRows = {};
+
+    function loadSalesRegister() {
+        const tbody = $('#cora-sr-table-body');
+        const mobileWrap = $('#cora-sr-mobile-cards-wrap');
+        
+        tbody.html(`
+            <tr>
+                <td colspan="9" class="py-12 text-center text-zinc-400">
+                    <div class="inline-flex items-center gap-2">
+                        <svg class="animate-spin" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle><path d="M12 2a10 10 0 0 1 10 10" stroke-opacity="0.75"></path></svg>
+                        <span>Loading sales ledger...</span>
+                    </div>
+                </td>
+            </tr>
+        `);
+        mobileWrap.html('<div class="py-8 text-center text-zinc-400 text-xs">Loading sales...</div>');
+
+        const startDate = $('#cora-sr-start-date').val();
+        const endDate = $('#cora-sr-end-date').val();
+        const search = $('#cora-sr-search').val();
+        const paymentFilter = $('#cora-sr-payment-filter').val();
+
+        $.ajax({
+            url: ajaxurl || '/wp-admin/admin-ajax.php',
+            type: 'POST',
+            data: {
+                action: 'cora_inventory_get_sales_register',
+                security: window.cora_nonce || '<?php echo wp_create_nonce("cora_ajax_nonce"); ?>',
+                date_preset: activeSalesPreset,
+                start_date: startDate,
+                end_date: endDate,
+                search: search,
+                payment_status: paymentFilter
+            },
+            success: function(res) {
+                if (res.success) {
+                    const data = res.data || {};
+                    salesRegisterCache = Array.isArray(data.sales) ? data.sales : [];
+                    const kpis = data.kpis || {};
+
+                    // Update Metric Chips / KPI Cards
+                    $('#cora-sr-kpi-revenue').text('₹' + Number(kpis.total_revenue || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+                    $('#cora-sr-kpi-invoices').text((kpis.total_invoices || 0) + ' Bills');
+                    $('#cora-sr-kpi-weight').text(Number(kpis.total_weight_kg || 0).toFixed(2) + ' Kg');
+                    $('#cora-sr-kpi-units').text(Number(kpis.total_units_sold || 0).toLocaleString('en-IN') + ' Units');
+
+                    // Update Table Footer Summary
+                    $('#cora-sr-ft-invoices').text((kpis.total_invoices || 0) + ' Bills');
+                    $('#cora-sr-ft-revenue').text('₹' + Number(kpis.total_revenue || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+                    $('#cora-sr-ft-weight').text(Number(kpis.total_weight_kg || 0).toFixed(2) + ' Kg • ' + Number(kpis.total_units_sold || 0).toLocaleString('en-IN') + ' Units');
+
+                    renderSalesRegisterTable(salesRegisterCache);
+                } else {
+                    tbody.html('<tr><td colspan="9" class="py-8 text-center text-red-500 text-xs">Failed to load sales register.</td></tr>');
+                    mobileWrap.html('<div class="py-8 text-center text-red-500 text-xs">Failed to load sales register.</div>');
+                }
+            },
+            error: function() {
+                tbody.html('<tr><td colspan="9" class="py-8 text-center text-red-500 text-xs">Network error while fetching sales.</td></tr>');
+                mobileWrap.html('<div class="py-8 text-center text-red-500 text-xs">Network error while fetching sales.</div>');
+            }
+        });
+    }
+
+    function renderSalesRegisterTable(sales) {
+        const tbody = $('#cora-sr-table-body');
+        const mobileWrap = $('#cora-sr-mobile-cards-wrap');
+
+        if (!sales || sales.length === 0) {
+            const emptyHtml = `
+                <tr>
+                    <td colspan="9" class="py-16 text-center text-zinc-400">
+                        <div class="flex flex-col items-center justify-center gap-2">
+                            <div class="w-10 h-10 rounded-2xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-400">
+                                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                            </div>
+                            <span class="text-xs font-semibold text-zinc-600 dark:text-zinc-400">No sales invoices found matching active filter.</span>
+                            <span class="text-[11px] text-zinc-400">Try adjusting date presets or clearing search terms.</span>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            tbody.html(emptyHtml);
+            mobileWrap.html(`
+                <div class="p-8 text-center bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 text-zinc-400 text-xs">
+                    No sales invoices found matching active filter.
+                </div>
+            `);
+            return;
+        }
+
+        let desktopHtml = '';
+        let mobileHtml = '';
+
+        sales.forEach((s, idx) => {
+            const srNo = idx + 1;
+            const saleId = parseInt(s.id);
+            const invNo = escapeHtml(s.invoice_no || ('INV-' + s.id));
+            const dateStr = s.created_at || s.sale_date || '';
+            let formattedDate = '—';
+            if (dateStr) {
+                try {
+                    const d = new Date(dateStr.replace(/-/g, '/'));
+                    formattedDate = d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) + ' ' + d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+                } catch (e) {
+                    formattedDate = dateStr;
+                }
+            }
+
+            const customerName = escapeHtml(s.customer_name || 'Walk-in Retailer');
+            const city = escapeHtml(s.city || 'Delhi NCR');
+            const phone = escapeHtml(s.phone || '—');
+            const grandTotal = parseFloat(s.grand_total || 0);
+            const payMode = (s.payment_mode || 'cash').toUpperCase();
+            const isPaid = (s.payment_status === 'paid');
+            const isCredit = !isPaid || (s.payment_mode === 'credit') || (s.payment_status === 'unpaid');
+
+            // Payment badge
+            let payBadgeClass = 'bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200 border-zinc-200/80 dark:border-zinc-700/80';
+            if (isCredit) {
+                payBadgeClass = 'bg-amber-50 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300 border-amber-200/80 dark:border-amber-800/60';
+            } else if (payMode === 'UPI') {
+                payBadgeClass = 'bg-indigo-50 text-indigo-800 dark:bg-indigo-950/40 dark:text-indigo-300 border-indigo-200/80 dark:border-indigo-800/60';
+            } else {
+                payBadgeClass = 'bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300 border-emerald-200/80 dark:border-emerald-800/60';
+            }
+
+            const items = Array.isArray(s.items) ? s.items : [];
+            const itemCount = items.length;
+            const totalWeight = parseFloat(s.total_weight_kg || 0);
+            const totalUnits = parseInt(s.total_units || 0);
+            const isExpanded = !!expandedSalesRows[saleId];
+
+            // Build line items nested table
+            let itemsTableHtml = '';
+            if (itemCount > 0) {
+                itemsTableHtml = `
+                    <div class="p-3 bg-zinc-50/80 dark:bg-zinc-800/40 rounded-xl border border-zinc-200/60 dark:border-zinc-800/80 my-2">
+                        <div class="flex items-center justify-between pb-2 mb-2 border-b border-zinc-200/60 dark:border-zinc-700/60">
+                            <span class="text-[11px] font-bold uppercase font-mono text-zinc-600 dark:text-zinc-400">Sold Items &amp; Weight Calculation (@ ₹401.25/Kg)</span>
+                            <span class="text-[11px] font-mono font-semibold text-zinc-700 dark:text-zinc-300">${itemCount} items • ${totalWeight.toFixed(2)} Kg • ${totalUnits} units</span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-[11px] border-collapse font-sans">
+                                <thead>
+                                    <tr class="text-zinc-500 dark:text-zinc-400 border-b border-zinc-200/60 dark:border-zinc-700/60">
+                                        <th class="py-1 px-2 font-semibold">Item / SKU</th>
+                                        <th class="py-1 px-2 font-semibold text-center">Pricing</th>
+                                        <th class="py-1 px-2 font-semibold text-center font-mono">Weight (Kg)</th>
+                                        <th class="py-1 px-2 font-semibold text-center font-mono">Qty</th>
+                                        <th class="py-1 px-2 font-semibold text-right font-mono">Rate</th>
+                                        <th class="py-1 px-2 font-semibold text-center font-mono">GST</th>
+                                        <th class="py-1 px-2 font-semibold text-right font-mono">Line Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-zinc-200/40 dark:divide-zinc-800/40">
+                                    ${items.map(it => {
+                                        const itWeight = parseFloat(it.weight_kg || 0);
+                                        const itQty = parseInt(it.quantity || 1);
+                                        const isWeightBased = (it.pricing_type === 'weight_based' || itWeight > 0);
+                                        const itRate = isWeightBased ? '₹401.25 / Kg' : ('₹' + parseFloat(it.unit_price || 0).toFixed(2));
+                                        const itGst = parseFloat(it.gst_rate || 12).toFixed(0) + '%';
+                                        const itLineTotal = '₹' + parseFloat(it.line_total || 0).toFixed(2);
+                                        return `
+                                            <tr class="hover:bg-zinc-100/60 dark:hover:bg-zinc-800/60 transition-colors">
+                                                <td class="py-1.5 px-2">
+                                                    <div class="font-semibold text-zinc-900 dark:text-zinc-100">${escapeHtml(it.product_name)}</div>
+                                                    <div class="text-[10px] font-mono text-zinc-400">${escapeHtml(it.sku || '—')}</div>
+                                                </td>
+                                                <td class="py-1.5 px-2 text-center">
+                                                    <span class="px-1.5 py-0.5 rounded text-[9.5px] font-mono ${isWeightBased ? 'bg-zinc-200/70 text-zinc-800 dark:bg-zinc-700 dark:text-zinc-200 font-semibold' : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400'}">
+                                                        ${isWeightBased ? 'Weight-Based' : 'Unit-Based'}
+                                                    </span>
+                                                </td>
+                                                <td class="py-1.5 px-2 text-center font-mono text-zinc-800 dark:text-zinc-200 ${itWeight > 0 ? 'font-bold' : 'text-zinc-400'}">
+                                                    ${itWeight > 0 ? (itWeight.toFixed(3) + ' Kg') : '—'}
+                                                </td>
+                                                <td class="py-1.5 px-2 text-center font-mono font-semibold text-zinc-800 dark:text-zinc-200">
+                                                    ${itQty}
+                                                </td>
+                                                <td class="py-1.5 px-2 text-right font-mono text-zinc-700 dark:text-zinc-300">
+                                                    ${itRate}
+                                                </td>
+                                                <td class="py-1.5 px-2 text-center font-mono text-zinc-500">
+                                                    ${itGst}
+                                                </td>
+                                                <td class="py-1.5 px-2 text-right font-mono font-bold text-zinc-950 dark:text-zinc-50">
+                                                    ${itLineTotal}
+                                                </td>
+                                            </tr>
+                                        `;
+                                    }).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Desktop Row
+            desktopHtml += `
+                <tr class="hover:bg-zinc-50/80 dark:hover:bg-zinc-800/40 transition-colors group">
+                    <!-- 1. Sr No -->
+                    <td class="py-3 px-3 text-center font-mono font-bold text-zinc-500 dark:text-zinc-400 select-none">
+                        ${srNo}
+                    </td>
+
+                    <!-- 2. Bill Number -->
+                    <td class="py-3 px-3.5 font-mono">
+                        <div class="flex items-center gap-1.5">
+                            <button type="button" onclick="CoraInventory.printSaleInvoice(${saleId})" class="font-bold text-zinc-950 dark:text-zinc-50 hover:underline hover:text-black dark:hover:text-white cursor-pointer inline-flex items-center gap-1" title="1-Click Print Invoice">
+                                <span>#${invNo}</span>
+                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 group-hover:text-zinc-700 dark:group-hover:text-zinc-200"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                            </button>
+                        </div>
+                        ${s.consignment_no ? `<div class="text-[10px] text-zinc-400 font-mono truncate">Van: ${escapeHtml(s.consignment_no)}</div>` : ''}
+                    </td>
+
+                    <!-- 3. Date & Time -->
+                    <td class="py-3 px-3.5 font-mono text-[11px] text-zinc-600 dark:text-zinc-400 whitespace-nowrap">
+                        ${formattedDate}
+                    </td>
+
+                    <!-- 4. Customer / Firm Name -->
+                    <td class="py-3 px-4">
+                        <div class="font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
+                            <span class="truncate max-w-[190px]">${customerName}</span>
+                        </div>
+                        ${s.gstin ? `<div class="text-[10px] font-mono text-zinc-400">GST: ${escapeHtml(s.gstin)}</div>` : ''}
+                    </td>
+
+                    <!-- 5. City / Location -->
+                    <td class="py-3 px-3.5 text-zinc-700 dark:text-zinc-300">
+                        <div class="flex items-center gap-1 text-xs">
+                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400 shrink-0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                            <span class="truncate max-w-[120px] font-medium">${city}</span>
+                        </div>
+                    </td>
+
+                    <!-- 6. Mobile Number -->
+                    <td class="py-3 px-3.5 font-mono text-zinc-700 dark:text-zinc-300">
+                        ${phone !== '—' ? `
+                            <a href="tel:${phone}" class="hover:underline flex items-center gap-1" title="Call Customer">
+                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                                <span>${phone}</span>
+                            </a>
+                        ` : '<span class="text-zinc-400">—</span>'}
+                    </td>
+
+                    <!-- 7. Total Bill Amount (₹) -->
+                    <td class="py-3 px-4 text-right font-mono">
+                        <div class="font-bold text-zinc-950 dark:text-zinc-50 text-sm">
+                            ₹${grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </div>
+                        <div class="flex items-center justify-end gap-1 mt-0.5">
+                            <span class="px-1.5 py-0.2 rounded text-[9.5px] font-mono font-semibold border ${payBadgeClass}">
+                                ${isCredit ? 'Credit' : payMode}
+                            </span>
+                        </div>
+                    </td>
+
+                    <!-- 8. Item Details (Accordion Button) -->
+                    <td class="py-3 px-4">
+                        <button type="button" onclick="CoraInventory.toggleSaleItemAccordion(${saleId})" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-800 dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:text-zinc-200 text-[11px] font-medium transition-colors cursor-pointer border border-zinc-200/80 dark:border-zinc-700/80" title="Expand item breakdown">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                            <span>${itemCount} ${itemCount === 1 ? 'item' : 'items'}</span>
+                            ${totalWeight > 0 ? `<span class="text-zinc-500 font-mono">• ${totalWeight.toFixed(2)} Kg</span>` : ''}
+                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="transform transition-transform ${isExpanded ? 'rotate-180' : ''}"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </button>
+                    </td>
+
+                    <!-- 9. Actions -->
+                    <td class="py-3 px-3 text-center">
+                        <div class="flex items-center justify-center gap-1">
+                            <button type="button" onclick="CoraInventory.printSaleInvoice(${saleId})" class="p-1.5 rounded-lg text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer" title="Print Tax Invoice">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M6 9V2h12v7"></path><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                            </button>
+                            <button type="button" onclick="CoraInventory.openSaleDetailsModal(${saleId})" class="p-1.5 rounded-lg text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer" title="View Full Details">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                            </button>
+                            <button type="button" onclick="CoraInventory.openDeleteSaleModal(${saleId}, '${invNo}')" class="p-1.5 rounded-lg text-zinc-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors cursor-pointer" title="Delete Invoice">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                <!-- Accordion Detail Row -->
+                <tr id="cora-sr-acc-row-${saleId}" class="${isExpanded ? '' : 'hidden'} bg-zinc-50/50 dark:bg-zinc-900/40">
+                    <td colspan="9" class="p-3">
+                        ${itemsTableHtml}
+                    </td>
+                </tr>
+            `;
+
+            // Mobile Card
+            mobileHtml += `
+                <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 shadow-2xs space-y-2.5">
+                    <div class="flex items-center justify-between pb-2 border-b border-zinc-100 dark:border-zinc-800">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-mono font-bold text-zinc-500">#${srNo}</span>
+                            <span class="font-mono font-bold text-sm text-zinc-950 dark:text-zinc-50">#${invNo}</span>
+                        </div>
+                        <span class="px-2 py-0.5 rounded text-[10px] font-mono font-semibold border ${payBadgeClass}">
+                            ${isCredit ? 'Credit' : payMode}
+                        </span>
+                    </div>
+
+                    <div class="flex items-center justify-between text-xs">
+                        <div class="font-bold text-zinc-900 dark:text-zinc-100">${customerName}</div>
+                        <div class="text-zinc-500 dark:text-zinc-400 font-mono text-[11px]">${formattedDate}</div>
+                    </div>
+
+                    <div class="flex items-center justify-between text-xs text-zinc-600 dark:text-zinc-400">
+                        <div class="flex items-center gap-1">
+                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                            <span>${city}</span>
+                        </div>
+                        <div class="font-mono">${phone}</div>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-2 border-t border-zinc-100 dark:border-zinc-800">
+                        <div>
+                            <span class="text-[10px] text-zinc-400">Total Amount</span>
+                            <div class="font-mono font-bold text-base text-zinc-950 dark:text-zinc-50">₹${grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <button type="button" onclick="CoraInventory.toggleSaleItemAccordion(${saleId})" class="px-2.5 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs font-medium cursor-pointer">
+                                <span>${itemCount} Items</span>
+                            </button>
+                            <button type="button" onclick="CoraInventory.printSaleInvoice(${saleId})" class="p-2 rounded-xl bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 cursor-pointer" title="Print Invoice">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M6 9V2h12v7"></path><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="cora-sr-acc-mobile-${saleId}" class="${isExpanded ? '' : 'hidden'} pt-2">
+                        ${itemsTableHtml}
+                    </div>
+                </div>
+            `;
+        });
+
+        tbody.html(desktopHtml);
+        mobileWrap.html(mobileHtml);
+    }
+
+    function toggleSaleItemAccordion(saleId) {
+        saleId = parseInt(saleId);
+        expandedSalesRows[saleId] = !expandedSalesRows[saleId];
+        
+        const desktopAcc = $(`#cora-sr-acc-row-${saleId}`);
+        const mobileAcc = $(`#cora-sr-acc-mobile-${saleId}`);
+
+        if (expandedSalesRows[saleId]) {
+            desktopAcc.removeClass('hidden');
+            mobileAcc.removeClass('hidden');
+        } else {
+            desktopAcc.addClass('hidden');
+            mobileAcc.addClass('hidden');
+        }
+    }
+
+    function setDatePreset(preset) {
+        activeSalesPreset = preset || 'all';
+        $('.cora-sr-preset-btn').removeClass('bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 font-bold shadow-2xs')
+            .addClass('text-zinc-500 font-medium');
+        $('#cora-sr-preset-' + activeSalesPreset).addClass('bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 font-bold shadow-2xs')
+            .removeClass('text-zinc-500 font-medium');
+
+        $('#cora-sr-start-date').val('');
+        $('#cora-sr-end-date').val('');
+
+        loadSalesRegister();
+    }
+
+    function onDateRangeChange() {
+        const s = $('#cora-sr-start-date').val();
+        const e = $('#cora-sr-end-date').val();
+        if (s && e) {
+            $('.cora-sr-preset-btn').removeClass('bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 font-bold shadow-2xs')
+                .addClass('text-zinc-500 font-medium');
+            loadSalesRegister();
+        }
+    }
+
+    function clearSalesFilters() {
+        $('#cora-sr-search').val('');
+        $('#cora-sr-start-date').val('');
+        $('#cora-sr-end-date').val('');
+        $('#cora-sr-payment-filter').val('all');
+        setDatePreset('all');
+    }
+
+    function exportSalesCSV() {
+        if (!salesRegisterCache || salesRegisterCache.length === 0) {
+            window.coraShowToast('No sales records to export for active filter.', 'error');
+            return;
+        }
+
+        const headers = ['Serial Number', 'Bill number', 'Date', 'Customer/firm name', 'City/location', 'Mobile Number of Customer', 'total amount of bill'];
+        const csvRows = [headers.join(',')];
+
+        salesRegisterCache.forEach((s, idx) => {
+            const srNo = idx + 1;
+            const invNo = '"' + (s.invoice_no || ('INV-' + s.id)).replace(/"/g, '""') + '"';
+            const dateStr = '"' + (s.created_at || s.sale_date || '').replace(/"/g, '""') + '"';
+            const customer = '"' + (s.customer_name || 'Walk-in Retailer').replace(/"/g, '""') + '"';
+            const city = '"' + (s.city || 'Delhi NCR').replace(/"/g, '""') + '"';
+            const phone = '"' + (s.phone || '').replace(/"/g, '""') + '"';
+            const amount = parseFloat(s.grand_total || 0).toFixed(2);
+
+            csvRows.push([srNo, invNo, dateStr, customer, city, phone, amount].join(','));
+        });
+
+        const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + encodeURIComponent(csvRows.join('\r\n'));
+        const link = document.createElement('a');
+        link.setAttribute('href', csvContent);
+        link.setAttribute('download', 'Cora_Sales_Register_' + new Date().toISOString().slice(0, 10) + '.csv');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.coraShowToast('Sales Register exported to CSV successfully.', 'success');
+    }
+
+    function printSalesRegister() {
+        const search = ($('#cora-sr-search').val() || '').trim();
+        const startDate = $('#cora-sr-start-date').val() || '';
+        const endDate = $('#cora-sr-end-date').val() || '';
+
+        const params = {
+            action: 'cora_inventory_render_sales_register_pdf',
+            autoprint: 1,
+            security: window.cora_nonce || '<?php echo wp_create_nonce("cora_ajax_nonce"); ?>'
+        };
+        if (search) params.search = search;
+        if (startDate) params.start_date = startDate;
+        if (endDate) params.end_date = endDate;
+        if (currentDatePreset && currentDatePreset !== 'all') params.date_preset = currentDatePreset;
+
+        const queryStr = $.param(params);
+        const url = (ajaxurl || '/wp-admin/admin-ajax.php') + '?' + queryStr;
+        window.open(url, '_blank');
+        if (window.coraShowToast) window.coraShowToast('Opening printable Sales Register & Sold Items Ledger...', 'info');
+    }
+
+    function openSaleDetailsModal(saleId) {
+        let s = (salesRegisterCache || []).find(x => parseInt(x.id) === parseInt(saleId));
+        if (!s) {
+            s = (salesLedgerCache || []).find(x => parseInt(x.id) === parseInt(saleId));
+        }
+        if (!s) return;
+
+        const invNo = s.invoice_no || ('INV-' + s.id);
+        $('#cora-sd-inv-no-badge').text('#' + invNo);
+        $('#cora-sd-date-text').text('Transaction on ' + (s.created_at || s.sale_date || '—'));
+        $('#cora-sd-print-btn').attr('onclick', `CoraInventory.printSaleInvoice(${s.id})`);
+
+        $('#cora-sd-customer-name').text(s.customer_name || 'Walk-in Retailer');
+        $('#cora-sd-phone').text(s.phone ? ('📞 ' + s.phone) : 'No phone specified');
+        $('#cora-sd-city').text('📍 ' + (s.city || 'Delhi NCR'));
+        $('#cora-sd-gstin').text(s.gstin ? ('GSTIN: ' + s.gstin) : 'GSTIN: Unregistered');
+
+        $('#cora-sd-consignment-no').text(s.consignment_no ? ('Consignment #' + s.consignment_no) : 'Direct Plant Sale');
+        $('#cora-sd-driver-name').text('Driver: ' + (s.driver_name || s.vendor_name || 'Plant Admin'));
+        $('#cora-sd-vehicle-no').text('Vehicle: ' + (s.vehicle_no || 'Plant HQ'));
+        $('#cora-sd-route-name').text('Route: ' + (s.route_name || 'Direct Order'));
+
+        const grandTotal = parseFloat(s.grand_total || 0);
+        $('#cora-sd-grand-total').text('₹' + grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+        $('#cora-sd-pay-mode').text((s.payment_mode || 'cash').toUpperCase());
+        const isPaid = (s.payment_status === 'paid');
+        $('#cora-sd-pay-status').text(isPaid ? 'Paid' : 'Outstanding / Credit')
+            .attr('class', isPaid ? 'px-2 py-0.2 rounded text-[10px] font-mono font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200/80 dark:bg-emerald-950/40 dark:text-emerald-300' : 'px-2 py-0.2 rounded text-[10px] font-mono font-semibold bg-amber-50 text-amber-800 border border-amber-200/80 dark:bg-amber-950/40 dark:text-amber-300');
+
+        const items = Array.isArray(s.items) ? s.items : [];
+        const totalWeight = parseFloat(s.total_weight_kg || 0);
+        $('#cora-sd-items-summary').text(items.length + ' items • ' + totalWeight.toFixed(2) + ' Kg total');
+
+        const tbody = $('#cora-sd-items-tbody');
+        if (items.length === 0) {
+            tbody.html('<tr><td colspan="7" class="py-4 text-center text-zinc-400">No line items recorded for this invoice.</td></tr>');
+        } else {
+            const html = items.map(it => {
+                const isW = (it.pricing_type === 'weight_based' || parseFloat(it.weight_kg || 0) > 0);
+                const w = parseFloat(it.weight_kg || 0);
+                const q = parseInt(it.quantity || 1);
+                const r = isW ? '₹401.25 / Kg' : ('₹' + parseFloat(it.unit_price || 0).toFixed(2));
+                const gst = parseFloat(it.gst_rate || 12).toFixed(0) + '%';
+                const lt = '₹' + parseFloat(it.line_total || 0).toFixed(2);
+
+                return `
+                    <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/40 font-sans">
+                        <td class="py-2 px-3">
+                            <div class="font-semibold text-zinc-900 dark:text-zinc-100">${escapeHtml(it.product_name)}</div>
+                            <div class="text-[10px] font-mono text-zinc-400">${escapeHtml(it.sku || '—')}</div>
+                        </td>
+                        <td class="py-2 px-3 text-center">
+                            <span class="px-1.5 py-0.5 rounded text-[9.5px] font-mono ${isW ? 'bg-zinc-200 dark:bg-zinc-700 font-bold' : 'bg-zinc-100 dark:bg-zinc-800'}">
+                                ${isW ? 'Weight' : 'Unit'}
+                            </span>
+                        </td>
+                        <td class="py-2 px-3 text-center font-mono font-bold text-zinc-800 dark:text-zinc-200">
+                            ${w > 0 ? (w.toFixed(3) + ' Kg') : '—'}
+                        </td>
+                        <td class="py-2 px-3 text-center font-mono font-semibold text-zinc-800 dark:text-zinc-200">
+                            ${q}
+                        </td>
+                        <td class="py-2 px-3 text-right font-mono text-zinc-700 dark:text-zinc-300">
+                            ${r}
+                        </td>
+                        <td class="py-2 px-3 text-center font-mono text-zinc-500">
+                            ${gst}
+                        </td>
+                        <td class="py-2 px-3 text-right font-mono font-bold text-zinc-950 dark:text-zinc-50">
+                            ${lt}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            tbody.html(html);
+        }
+
+        openStudioDrawer('#cora-inv-sale-details-sheet', '#cora-inv-sale-details-backdrop', '#cora-inv-sale-details-drawer');
+    }
+
+    function closeSaleDetailsModal() {
+        closeStudioDrawer('#cora-inv-sale-details-sheet', '#cora-inv-sale-details-backdrop', '#cora-inv-sale-details-drawer');
+    }
+
     function escapeHtml(str) {
         return (str || '').toString().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
@@ -6535,6 +7408,23 @@ window.CoraInventory = (function($) {
         openDeleteSaleModal,
         closeDeleteSaleModal,
         confirmDeleteSale,
+        loadSalesRegister,
+        filterSalesRegister: () => {
+            clearTimeout(window._coraSalesSearchTimer);
+            window._coraSalesSearchTimer = setTimeout(loadSalesRegister, 250);
+        },
+        debouncedSalesSearch: () => {
+            clearTimeout(window._coraSalesSearchTimer);
+            window._coraSalesSearchTimer = setTimeout(loadSalesRegister, 250);
+        },
+        setDatePreset,
+        onDateRangeChange,
+        clearSalesFilters,
+        toggleSaleItemAccordion,
+        exportSalesCSV,
+        printSalesRegister,
+        openSaleDetailsModal,
+        closeSaleDetailsModal,
         openOCRSheet: () => {
             if (<?php echo $is_driver_only ? 'true' : 'false'; ?>) {
                 openSpotSaleSheet();

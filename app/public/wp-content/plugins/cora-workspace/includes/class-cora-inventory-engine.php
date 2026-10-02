@@ -46,6 +46,9 @@ class Cora_Inventory_Engine {
         add_action( 'wp_ajax_cora_inventory_resend_consignment_email', array( __CLASS__, 'ajax_resend_consignment_email' ) );
         add_action( 'wp_ajax_cora_track_dispatch_email_open', array( __CLASS__, 'ajax_track_dispatch_email_open' ) );
         add_action( 'wp_ajax_nopriv_cora_track_dispatch_email_open', array( __CLASS__, 'ajax_track_dispatch_email_open' ) );
+        add_action( 'wp_ajax_cora_inventory_get_sales_register', array( __CLASS__, 'ajax_get_sales_register' ) );
+        add_action( 'wp_ajax_cora_inventory_export_sales_csv', array( __CLASS__, 'ajax_export_sales_csv' ) );
+        add_action( 'wp_ajax_cora_inventory_render_sales_register_pdf', array( __CLASS__, 'ajax_render_sales_register_pdf' ) );
         add_action( 'wp_ajax_cora_inventory_seed_demo_data', array( __CLASS__, 'ajax_seed_demo_data' ) );
 
         // Purge legacy demo seed data from existing installations
@@ -3106,6 +3109,7 @@ class Cora_Inventory_Engine {
         ) );
     }
 
+
     /**
      * AJAX: Get Shop Visits for Live Route Map & Timeline.
      */
@@ -4664,45 +4668,7 @@ class Cora_Inventory_Engine {
         $retailer_name = ! empty( $sale['customer_name'] ) ? $sale['customer_name'] : ( ! empty( $sale['retailer_name'] ) ? $sale['retailer_name'] : 'Cash / Spot Customer' );
         $retailer_phone = ! empty( $sale['phone'] ) ? $sale['phone'] : ( ! empty( $sale['retailer_phone'] ) ? $sale['retailer_phone'] : '' );
 
-        // Helper to convert number to words (Indian numbering system)
-        $number_to_words = function( $number ) use ( &$number_to_words ) {
-            $no = (int) floor( $number );
-            $point = (int) round( ( $number - $no ) * 100 );
-            $words = array(
-                0 => '', 1 => 'One', 2 => 'Two', 3 => 'Three', 4 => 'Four', 5 => 'Five',
-                6 => 'Six', 7 => 'Seven', 8 => 'Eight', 9 => 'Nine', 10 => 'Ten',
-                11 => 'Eleven', 12 => 'Twelve', 13 => 'Thirteen', 14 => 'Fourteen', 15 => 'Fifteen',
-                16 => 'Sixteen', 17 => 'Seventeen', 18 => 'Eighteen', 19 => 'Nineteen', 20 => 'Twenty',
-                30 => 'Thirty', 40 => 'Forty', 50 => 'Fifty', 60 => 'Sixty', 70 => 'Seventy',
-                80 => 'Eighty', 90 => 'Ninety'
-            );
-            $digits = array('', 'Hundred', 'Thousand', 'Lakh', 'Crore');
-            $str = array();
-            $i = 0;
-            while ( $i < count( $digits ) && $no > 0 ) {
-                $divider = ( $i == 2 ) ? 10 : 100;
-                if ( $i == 1 ) { $divider = 100; }
-                $number_part = $no % $divider;
-                $no = (int) ( $no / $divider );
-                $i += ( $divider == 10 ) ? 1 : 2;
-                if ( $number_part ) {
-                    $plural = ( ( count( $str ) && $number_part > 9 ) ? 's' : '' );
-                    $hundred = ( count( $str ) == 1 && $str[0] ) ? ' and ' : '';
-                    if ( $number_part < 21 ) {
-                        $str[] = $words[ $number_part ] . ' ' . $digits[ count( $str ) ];
-                    } else {
-                        $str[] = $words[ (int) ( $number_part / 10 ) * 10 ] . ' ' . $words[ $number_part % 10 ] . ' ' . $digits[ count( $str ) ];
-                    }
-                } else {
-                    $str[] = '';
-                }
-            }
-            $result = implode( ' ', array_reverse( array_filter( $str ) ) );
-            $points = ( $point ) ? ' and ' . $words[ (int) ( $point / 10 ) * 10 ] . ' ' . $words[ $point % 10 ] . ' Paise' : '';
-            return trim( ( $result ? $result : 'Zero' ) . ' Rupees' . $points . ' Only' );
-        };
-
-        $amt_in_words = $number_to_words( $total_amount );
+        $amt_in_words = self::convert_number_to_indian_words( $total_amount );
         ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -5066,6 +5032,897 @@ class Cora_Inventory_Engine {
             <div class="sig-block">
                 <div class="sig-line"></div>
                 <div class="sig-label">For Cora Plant &amp; Logistics</div>
+            </div>
+        </div>
+
+    </div>
+
+    <?php if ( $autoprint ) : ?>
+        <script>
+            window.onload = function() {
+                window.print();
+            };
+        </script>
+    <?php endif; ?>
+
+</body>
+</html>
+        <?php
+        exit;
+    }
+
+    /**
+     * Convert numeric amount to words in Indian numbering system (Crores, Lakhs, Thousands, Hundreds, Paise).
+     */
+    public static function convert_number_to_indian_words( $number ) {
+        $no = (int) floor( $number );
+        $point = (int) round( ( $number - $no ) * 100 );
+        $words = array(
+            0 => '', 1 => 'One', 2 => 'Two', 3 => 'Three', 4 => 'Four', 5 => 'Five',
+            6 => 'Six', 7 => 'Seven', 8 => 'Eight', 9 => 'Nine', 10 => 'Ten',
+            11 => 'Eleven', 12 => 'Twelve', 13 => 'Thirteen', 14 => 'Fourteen', 15 => 'Fifteen',
+            16 => 'Sixteen', 17 => 'Seventeen', 18 => 'Eighteen', 19 => 'Nineteen', 20 => 'Twenty',
+            30 => 'Thirty', 40 => 'Forty', 50 => 'Fifty', 60 => 'Sixty', 70 => 'Seventy',
+            80 => 'Eighty', 90 => 'Ninety'
+        );
+
+        $get_two_digits = function( $n ) use ( $words ) {
+            if ( $n == 0 ) return '';
+            if ( $n < 20 ) return $words[ $n ];
+            $ten = (int) ( $n / 10 ) * 10;
+            $unit = $n % 10;
+            return trim( $words[ $ten ] . ( $unit ? ' ' . $words[ $unit ] : '' ) );
+        };
+
+        $get_three_digits = function( $n ) use ( $words, $get_two_digits ) {
+            $str = '';
+            $hundreds = (int) ( $n / 100 );
+            $rem = $n % 100;
+            if ( $hundreds > 0 ) {
+                $str .= $words[ $hundreds ] . ' Hundred';
+                if ( $rem > 0 ) $str .= ' and ';
+            }
+            if ( $rem > 0 ) {
+                $str .= $get_two_digits( $rem );
+            }
+            return trim( $str );
+        };
+
+        if ( $no == 0 ) {
+            $result = 'Zero';
+        } else {
+            $parts = array();
+            // Crores (e.g. 1,00,00,000)
+            $crores = (int) ( $no / 10000000 );
+            $no %= 10000000;
+            if ( $crores > 0 ) {
+                $parts[] = $get_three_digits( $crores ) . ' Crore';
+            }
+            // Lakhs (e.g. 1,00,000)
+            $lakhs = (int) ( $no / 100000 );
+            $no %= 100000;
+            if ( $lakhs > 0 ) {
+                $parts[] = $get_two_digits( $lakhs ) . ' Lakh';
+            }
+            // Thousands (e.g. 1,000)
+            $thousands = (int) ( $no / 1000 );
+            $no %= 1000;
+            if ( $thousands > 0 ) {
+                $parts[] = $get_two_digits( $thousands ) . ' Thousand';
+            }
+            // Remaining 3 digits (Hundreds + Tens + Units)
+            if ( $no > 0 ) {
+                $parts[] = $get_three_digits( $no );
+            }
+            $result = implode( ' ', $parts );
+        }
+
+        $points = ( $point > 0 ) ? ' and ' . $get_two_digits( $point ) . ' Paise' : '';
+        return trim( $result . ' Rupees' . $points . ' Only' );
+    }
+
+    /**
+     * Retrieve filtered sales, item breakdowns, location metadata, and summary KPI totals.
+     */
+    public static function get_filtered_sales_data( $request ) {
+        global $wpdb;
+        $agency_id = self::get_agency_id();
+
+        $table_sales        = $wpdb->prefix . 'cora_inventory_sales';
+        $table_consignments = $wpdb->prefix . 'cora_inventory_consignments';
+        $table_visits       = $wpdb->prefix . 'cora_inventory_shop_visits';
+        $table_s_items      = $wpdb->prefix . 'cora_inventory_sales_items';
+
+        $start_date     = sanitize_text_field( $request['start_date'] ?? '' );
+        $end_date       = sanitize_text_field( $request['end_date'] ?? '' );
+        $date_preset    = sanitize_text_field( $request['date_preset'] ?? ( $request['preset'] ?? '' ) );
+        $consignment_id = intval( $request['consignment_id'] ?? 0 );
+        $vendor_user_id = intval( $request['vendor_user_id'] ?? ( $request['driver_id'] ?? 0 ) );
+        $search         = sanitize_text_field( $request['search'] ?? '' );
+
+        // Handle date presets if start_date/end_date not explicitly provided
+        if ( ! empty( $date_preset ) && ( empty( $start_date ) || empty( $end_date ) ) ) {
+            $today = current_time( 'Y-m-d' );
+            if ( $date_preset === 'today' ) {
+                $start_date = $today;
+                $end_date   = $today;
+            } elseif ( $date_preset === 'this_week' ) {
+                $start_date = date( 'Y-m-d', strtotime( 'monday this week', strtotime( $today ) ) );
+                $end_date   = date( 'Y-m-d', strtotime( 'sunday this week', strtotime( $today ) ) );
+            } elseif ( $date_preset === 'this_month' ) {
+                $start_date = date( 'Y-m-01', strtotime( $today ) );
+                $end_date   = date( 'Y-m-t', strtotime( $today ) );
+            }
+        }
+
+        $where = "WHERE s.agency_id = %d";
+        $params = array( $agency_id );
+
+        if ( ! empty( $start_date ) ) {
+            $where .= " AND DATE(COALESCE(s.sale_date, s.created_at)) >= %s";
+            $params[] = $start_date;
+        }
+
+        if ( ! empty( $end_date ) ) {
+            $where .= " AND DATE(COALESCE(s.sale_date, s.created_at)) <= %s";
+            $params[] = $end_date;
+        }
+
+        if ( $consignment_id > 0 ) {
+            $where .= " AND s.consignment_id = %d";
+            $params[] = $consignment_id;
+        }
+
+        if ( $vendor_user_id > 0 ) {
+            $where .= " AND (s.vendor_user_id = %d OR c.vendor_user_id = %d)";
+            $params[] = $vendor_user_id;
+            $params[] = $vendor_user_id;
+        }
+
+        if ( ! empty( $search ) ) {
+            $s_term = '%' . $wpdb->esc_like( $search ) . '%';
+            $where .= " AND (s.invoice_no LIKE %s OR s.customer_name LIKE %s OR s.phone LIKE %s OR s.gstin LIKE %s OR c.consignment_no LIKE %s OR c.route_name LIKE %s OR v.shop_name LIKE %s OR v.address LIKE %s)";
+            for ( $i = 0; $i < 8; $i++ ) {
+                $params[] = $s_term;
+            }
+        }
+
+        $query = $wpdb->prepare(
+            "SELECT 
+                s.*,
+                c.consignment_no,
+                c.vehicle_no,
+                c.vendor_name as consignment_vendor_name,
+                c.route_name,
+                c.notes as consignment_notes,
+                v.shop_name as visit_shop_name,
+                v.owner_name as visit_owner_name,
+                v.phone as visit_phone,
+                v.address as visit_address,
+                v.notes as visit_notes
+            FROM {$table_sales} s
+            LEFT JOIN {$table_consignments} c ON s.consignment_id = c.id
+            LEFT JOIN {$table_visits} v ON s.visit_id = v.id
+            {$where}
+            ORDER BY COALESCE(s.sale_date, s.created_at) DESC, s.id DESC",
+            $params
+        );
+
+        $sales_rows = $wpdb->get_results( $query, ARRAY_A ) ?: array();
+
+        // Get all sale IDs to batch fetch line items
+        $sale_ids = array();
+        foreach ( $sales_rows as $row ) {
+            $sale_ids[] = intval( $row['id'] );
+        }
+
+        $items_by_sale = array();
+        if ( ! empty( $sale_ids ) && cora_table_exists( $table_s_items ) ) {
+            $ids_placeholder = implode( ',', array_fill( 0, count( $sale_ids ), '%d' ) );
+            $items_query = $wpdb->prepare(
+                "SELECT * FROM {$table_s_items} WHERE sale_id IN ({$ids_placeholder}) ORDER BY id ASC",
+                $sale_ids
+            );
+            $raw_items = $wpdb->get_results( $items_query, ARRAY_A ) ?: array();
+            foreach ( $raw_items as $item ) {
+                $sid = intval( $item['sale_id'] );
+                if ( ! isset( $items_by_sale[ $sid ] ) ) {
+                    $items_by_sale[ $sid ] = array();
+                }
+                $items_by_sale[ $sid ][] = $item;
+            }
+        }
+
+        $processed_sales      = array();
+        $total_revenue        = 0.00;
+        $total_weight_kg_sold = 0.000;
+        $total_units_sold     = 0;
+        $total_cash           = 0.00;
+        $total_upi            = 0.00;
+        $total_credit         = 0.00;
+
+        foreach ( $sales_rows as $s ) {
+            $sid = intval( $s['id'] );
+            $items = $items_by_sale[ $sid ] ?? array();
+
+            // Extract location / city metadata
+            $city_location = '';
+            if ( ! empty( $s['consignment_notes'] ) ) {
+                $c_notes = json_decode( $s['consignment_notes'], true );
+                if ( is_array( $c_notes ) && ! empty( $c_notes['target_cities'] ) ) {
+                    $city_location = $c_notes['target_cities'];
+                }
+            }
+            if ( empty( $city_location ) && ! empty( $s['visit_address'] ) ) {
+                $city_location = $s['visit_address'];
+            }
+            if ( empty( $city_location ) && ! empty( $s['route_name'] ) ) {
+                $city_location = $s['route_name'];
+            }
+            if ( empty( $city_location ) ) {
+                $city_location = 'Local Market';
+            }
+
+            $customer_mobile = ! empty( $s['phone'] ) ? $s['phone'] : ( ! empty( $s['visit_phone'] ) ? $s['visit_phone'] : '' );
+            $customer_name   = ! empty( $s['customer_name'] ) ? $s['customer_name'] : ( ! empty( $s['visit_shop_name'] ) ? $s['visit_shop_name'] : 'Spot Customer' );
+
+            $grand_total = floatval( $s['grand_total'] );
+            $paid_amount = floatval( $s['paid_amount'] );
+            $pay_mode    = strtolower( $s['payment_mode'] ?? 'cash' );
+            $pay_status  = strtolower( $s['payment_status'] ?? 'paid' );
+
+            $total_revenue += $grand_total;
+
+            if ( $pay_mode === 'cash' ) {
+                $total_cash += $paid_amount;
+            } elseif ( $pay_mode === 'upi' ) {
+                $total_upi += $paid_amount;
+            }
+
+            if ( $pay_status !== 'paid' ) {
+                $total_credit += max( 0, $grand_total - $paid_amount );
+            }
+
+            // Summarize items for display & ledger breakdown
+            $sale_weight_kg = 0.000;
+            $sale_units = 0;
+            $item_summary_lines = array();
+
+            foreach ( $items as $it ) {
+                $is_wt = ( ( $it['pricing_type'] ?? '' ) === 'weight_based' || floatval( $it['weight_kg'] ?? 0 ) > 0 );
+                if ( $is_wt ) {
+                    $wt = floatval( $it['weight_kg'] ?? 0 );
+                    $rate = floatval( $it['weight_rate'] ?? 401.25 );
+                    $sale_weight_kg += $wt;
+                    $item_summary_lines[] = sprintf( '%s kg @ ₹%s/kg (%s)', number_format( $wt, 2 ), number_format( $rate, 2 ), $it['product_name'] );
+                } else {
+                    $qty = intval( $it['quantity'] ?? 0 );
+                    $rate = floatval( $it['unit_price'] ?? 0 );
+                    $sale_units += $qty;
+                    $item_summary_lines[] = sprintf( '%d units @ ₹%s/unit (%s)', $qty, number_format( $rate, 2 ), $it['product_name'] );
+                }
+            }
+
+            $total_weight_kg_sold += $sale_weight_kg;
+            $total_units_sold     += $sale_units;
+
+            $s['city_location']       = $city_location;
+            $s['customer_mobile']     = $customer_mobile;
+            $s['resolved_customer']   = $customer_name;
+            $s['items']               = $items;
+            $s['items_summary']       = implode( '; ', $item_summary_lines );
+            $s['sale_weight_kg']      = round( $sale_weight_kg, 2 );
+            $s['sale_units']          = $sale_units;
+
+            $processed_sales[] = $s;
+        }
+
+        return array(
+            'sales' => $processed_sales,
+            'summary' => array(
+                'total_revenue'        => round( $total_revenue, 2 ),
+                'total_invoices'       => count( $processed_sales ),
+                'total_weight_kg_sold' => round( $total_weight_kg_sold, 2 ),
+                'total_units_sold'     => $total_units_sold,
+                'total_cash'           => round( $total_cash, 2 ),
+                'total_upi'            => round( $total_upi, 2 ),
+                'total_credit'         => round( $total_credit, 2 ),
+                'start_date'           => $start_date,
+                'end_date'             => $end_date,
+                'date_preset'          => $date_preset,
+            )
+        );
+    }
+
+    /**
+     * AJAX: Fetch Sales Register & Sold Items Ledger.
+     */
+    public static function ajax_get_sales_register() {
+        check_ajax_referer( 'cora_ajax_nonce', 'security' );
+        $data = self::get_filtered_sales_data( $_POST );
+        wp_send_json_success( array(
+            'sales'   => $data['sales'],
+            'summary' => $data['summary'],
+        ) );
+    }
+
+    /**
+     * AJAX: Export Sales Register to CSV.
+     * Column order: Serial Number, Bill number, Date, Customer/firm name, City/location, Mobile Number of Customer, total amount of bill
+     */
+    public static function ajax_export_sales_csv() {
+        if ( ! empty( $_REQUEST['security'] ) ) {
+            check_ajax_referer( 'cora_ajax_nonce', 'security' );
+        }
+        $data = self::get_filtered_sales_data( $_REQUEST );
+        $sales = $data['sales'];
+
+        $csv_rows = array();
+        $csv_rows[] = 'Serial Number,Bill number,Date,Customer/firm name,City/location,Mobile Number of Customer,total amount of bill';
+
+        foreach ( $sales as $idx => $s ) {
+            $sr_no = $idx + 1;
+            $bill_no = ! empty( $s['invoice_no'] ) ? $s['invoice_no'] : 'INV-' . str_pad( $s['id'], 5, '0', STR_PAD_LEFT );
+            $sale_date = ! empty( $s['sale_date'] ) ? date( 'd-m-Y H:i', strtotime( $s['sale_date'] ) ) : ( ! empty( $s['created_at'] ) ? date( 'd-m-Y H:i', strtotime( $s['created_at'] ) ) : '' );
+            $customer_name = $s['resolved_customer'];
+            $city_location = $s['city_location'];
+            $mobile = $s['customer_mobile'];
+            $grand_total = number_format( floatval( $s['grand_total'] ), 2, '.', '' );
+
+            $row = array(
+                $sr_no,
+                $bill_no,
+                $sale_date,
+                $customer_name,
+                $city_location,
+                $mobile,
+                $grand_total
+            );
+
+            $csv_rows[] = implode( ',', array_map( function( $val ) {
+                return '"' . str_replace( '"', '""', (string) $val ) . '"';
+            }, $row ) );
+        }
+
+        $filename = 'cora_sales_register_' . date( 'Y-m-d' ) . '.csv';
+        $csv_content = "\xEF\xBB\xBF" . implode( "\r\n", $csv_rows );
+
+        if ( ! empty( $_REQUEST['download'] ) || strpos( $_SERVER['HTTP_ACCEPT'] ?? '', 'text/csv' ) !== false || ( isset( $_GET['action'] ) && $_GET['action'] === 'cora_inventory_export_sales_csv' && empty( $_POST ) ) ) {
+            header( 'Content-Type: text/csv; charset=utf-8' );
+            header( 'Content-Disposition: attachment; filename="' . $filename . '"' );
+            header( 'Pragma: no-cache' );
+            header( 'Expires: 0' );
+            echo $csv_content;
+            exit;
+        }
+
+        wp_send_json_success( array(
+            'csv_content' => $csv_content,
+            'filename'    => $filename,
+            'total_count' => count( $sales )
+        ) );
+    }
+
+    /**
+     * AJAX / Direct View: Render Printable Sales Register & Sold Items Ledger Sheet.
+     */
+    public static function ajax_render_sales_register_pdf() {
+        if ( ! empty( $_REQUEST['security'] ) && ! wp_verify_nonce( $_REQUEST['security'], 'cora_ajax_nonce' ) ) {
+            wp_die( '<h1>Security Check Failed</h1><p>Invalid security token.</p>', 'Security Error', array( 'response' => 403 ) );
+        }
+
+        $data    = self::get_filtered_sales_data( $_REQUEST );
+        $sales   = $data['sales'];
+        $summary = $data['summary'];
+
+        $autoprint = ! empty( $_GET['autoprint'] ) || ! empty( $_POST['autoprint'] );
+        $date_range_label = 'All Recorded Sales';
+        if ( ! empty( $summary['start_date'] ) && ! empty( $summary['end_date'] ) ) {
+            if ( $summary['start_date'] === $summary['end_date'] ) {
+                $date_range_label = 'Date: ' . date( 'd M Y', strtotime( $summary['start_date'] ) );
+            } else {
+                $date_range_label = 'Period: ' . date( 'd M Y', strtotime( $summary['start_date'] ) ) . ' to ' . date( 'd M Y', strtotime( $summary['end_date'] ) );
+            }
+        } elseif ( ! empty( $summary['start_date'] ) ) {
+            $date_range_label = 'From: ' . date( 'd M Y', strtotime( $summary['start_date'] ) );
+        } elseif ( ! empty( $summary['end_date'] ) ) {
+            $date_range_label = 'Up to: ' . date( 'd M Y', strtotime( $summary['end_date'] ) );
+        }
+
+        $amount_in_words = self::convert_number_to_indian_words( $summary['total_revenue'] );
+        $csv_export_url = admin_url( 'admin-ajax.php?action=cora_inventory_export_sales_csv&download=1&security=' . wp_create_nonce( 'cora_ajax_nonce' ) );
+        if ( ! empty( $summary['start_date'] ) ) {
+            $csv_export_url .= '&start_date=' . urlencode( $summary['start_date'] );
+        }
+        if ( ! empty( $summary['end_date'] ) ) {
+            $csv_export_url .= '&end_date=' . urlencode( $summary['end_date'] );
+        }
+        if ( ! empty( $_REQUEST['search'] ) ) {
+            $csv_export_url .= '&search=' . urlencode( sanitize_text_field( $_REQUEST['search'] ) );
+        }
+
+        header( 'Content-Type: text/html; charset=utf-8' );
+        ?>
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>बिक्री एवं बिल पंजी - Cora Sales Register &amp; Sold Items Ledger (<?php echo esc_attr( date( 'd M Y' ) ); ?>)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        @page {
+            size: A4 landscape;
+            margin: 8mm 10mm;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #f4f4f5;
+            color: #09090b;
+            padding: 16px 20px;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        .no-print-bar {
+            max-width: 1200px;
+            margin: 0 auto 16px auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #ffffff;
+            border: 1px solid #e4e4e7;
+            padding: 10px 16px;
+            border-radius: 12px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+        }
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.15s;
+        }
+        .btn-primary {
+            background: #09090b;
+            color: #ffffff;
+            border: 1px solid #09090b;
+        }
+        .btn-primary:hover { background: #27272a; }
+        .btn-secondary {
+            background: #ffffff;
+            color: #27272a;
+            border: 1px solid #d4d4d8;
+        }
+        .btn-secondary:hover { background: #f4f4f5; }
+
+        .sheet-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 1px solid #e4e4e7;
+            border-radius: 12px;
+            padding: 24px 28px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+        }
+
+        @media print {
+            body { background: #ffffff; padding: 0; }
+            .no-print-bar { display: none !important; }
+            .sheet-container {
+                border: none;
+                box-shadow: none;
+                padding: 0;
+                max-width: 100%;
+            }
+        }
+
+        /* Header Bar */
+        .sheet-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding-bottom: 14px;
+            border-bottom: 2.5px solid #09090b;
+            margin-bottom: 14px;
+        }
+        .company-brand {
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #71717a;
+        }
+        .sheet-main-title {
+            font-size: 20px;
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            color: #09090b;
+            margin-top: 2px;
+        }
+        .sheet-hindi-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #3f3f46;
+            margin-top: 2px;
+        }
+        .sheet-header-meta {
+            text-align: right;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: #52525b;
+            line-height: 1.5;
+        }
+        .date-pill {
+            display: inline-block;
+            background: #f4f4f5;
+            color: #18181b;
+            border: 1px solid #e4e4e7;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        /* KPI Cards Grid */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .kpi-card {
+            background: #fafafa;
+            border: 1px solid #e4e4e7;
+            border-radius: 8px;
+            padding: 8px 10px;
+        }
+        .kpi-label {
+            font-size: 9.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #71717a;
+            margin-bottom: 3px;
+        }
+        .kpi-val {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            font-weight: 800;
+            color: #09090b;
+        }
+
+        /* Solid Outline & Dotted Interior Grid */
+        .sheet-table-wrapper {
+            width: 100%;
+            overflow: hidden;
+            border: 2px solid #09090b; /* Crisp solid outline */
+            background: #ffffff;
+            margin-bottom: 16px;
+        }
+        table.sheet-table {
+            width: 100%;
+            table-layout: fixed;
+            border-collapse: collapse;
+            font-size: 11.5px;
+            text-align: left;
+        }
+        table.sheet-table th {
+            background: #f4f4f5;
+            color: #09090b;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 800;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            padding: 8px 6px;
+            border-bottom: 2px solid #09090b;
+            border-right: 1px dotted #71717a;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        table.sheet-table th:last-child {
+            border-right: none;
+        }
+        table.sheet-table td {
+            padding: 7px 6px;
+            color: #09090b;
+            font-size: 11px;
+            border-bottom: 1px dotted #71717a; /* Dotted interior rows */
+            border-right: 1px dotted #71717a;  /* Dotted interior columns */
+            vertical-align: top;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        table.sheet-table td:last-child {
+            border-right: none;
+        }
+        table.sheet-table tbody tr:last-child td {
+            border-bottom: 2px solid #09090b;
+        }
+        table.sheet-table tfoot td {
+            background: #f4f4f5;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+            padding: 8px 6px;
+            border-right: 1px dotted #71717a;
+            border-bottom: none;
+            color: #09090b;
+        }
+        table.sheet-table tfoot td:last-child {
+            border-right: none;
+        }
+
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        .font-semibold { font-weight: 600; }
+        .font-bold { font-weight: 800; }
+
+        .item-tag {
+            display: inline-block;
+            font-size: 9.5px;
+            background: #f4f4f5;
+            border: 1px solid #e4e4e7;
+            padding: 1px 4px;
+            border-radius: 4px;
+            margin: 1px 2px 1px 0;
+            white-space: normal;
+        }
+        .weight-badge {
+            background: #18181b;
+            color: #ffffff;
+            border: 1px solid #18181b;
+        }
+
+        /* Summary Footer */
+        .sheet-footer-grid {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: 20px;
+            margin-top: 10px;
+        }
+        .words-card {
+            border: 1px solid #e4e4e7;
+            background: #fafafa;
+            border-radius: 8px;
+            padding: 12px 16px;
+        }
+        .words-card h5 {
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #71717a;
+            margin-bottom: 4px;
+        }
+        .words-val {
+            font-size: 12.5px;
+            font-weight: 700;
+            color: #09090b;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .settlement-card {
+            border: 1px solid #e4e4e7;
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 10px 14px;
+        }
+        .settlement-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11.5px;
+            padding: 3px 0;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .signature-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 36px;
+            padding-top: 12px;
+        }
+        .sig-box {
+            text-align: center;
+            width: 200px;
+        }
+        .sig-line {
+            border-top: 1.5px solid #09090b;
+            margin-bottom: 5px;
+        }
+        .sig-title {
+            font-size: 10.5px;
+            font-weight: 700;
+            color: #3f3f46;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Non-Print Toolbar -->
+    <div class="no-print-bar">
+        <div style="display:flex; align-items:center; gap:12px;">
+            <a href="javascript:window.history.back()" class="btn-action btn-secondary">&larr; Back to Dashboard</a>
+            <span style="font-size:12px; color:#71717a; font-family:'JetBrains Mono', monospace;">Cora Sales Register &amp; Ledger</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+            <a href="<?php echo esc_url( $csv_export_url ); ?>" class="btn-action btn-secondary">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                <span>Export CSV</span>
+            </a>
+            <button type="button" class="btn-action btn-primary" onclick="window.print()">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                <span>Print / Save as PDF</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="sheet-container">
+
+        <!-- Header -->
+        <div class="sheet-header">
+            <div>
+                <div class="company-brand">CORA CENTRAL LOGISTICS &bull; STATIONERY MANUFACTURING</div>
+                <div class="sheet-main-title">Sales Register &amp; Sold Items Ledger</div>
+                <div class="sheet-hindi-title">बिक्री एवं बिल पंजी (Invoices, Consignments &amp; Spot Collections)</div>
+            </div>
+            <div class="sheet-header-meta">
+                <div class="date-pill"><?php echo esc_html( $date_range_label ); ?></div>
+                <div>Generated: <?php echo esc_html( date( 'd-m-Y H:i:s' ) ); ?></div>
+                <div>Place of Supply: State Code 07 (Delhi NCR)</div>
+            </div>
+        </div>
+
+        <!-- KPI Metrics Grid -->
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-label">Total Revenue</div>
+                <div class="kpi-val">₹<?php echo number_format( $summary['total_revenue'], 2 ); ?></div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Total Invoices</div>
+                <div class="kpi-val"><?php echo intval( $summary['total_invoices'] ); ?> Bills</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Weight Sold</div>
+                <div class="kpi-val"><?php echo number_format( $summary['total_weight_kg_sold'], 2 ); ?> Kg</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Units Sold</div>
+                <div class="kpi-val"><?php echo intval( $summary['total_units_sold'] ); ?> Pcs</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Cash Collected</div>
+                <div class="kpi-val">₹<?php echo number_format( $summary['total_cash'], 2 ); ?></div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">UPI Instant</div>
+                <div class="kpi-val">₹<?php echo number_format( $summary['total_upi'], 2 ); ?></div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Pending Credit</div>
+                <div class="kpi-val">₹<?php echo number_format( $summary['total_credit'], 2 ); ?></div>
+            </div>
+        </div>
+
+        <!-- Solid Outline & Dotted Interior Table -->
+        <div class="sheet-table-wrapper">
+            <table class="sheet-table">
+                <thead>
+                    <tr>
+                        <th style="width: 32px;" class="text-center">#</th>
+                        <th style="width: 105px;">Bill Number</th>
+                        <th style="width: 95px;">Date</th>
+                        <th style="width: 160px;">Customer / Firm Name</th>
+                        <th style="width: 130px;">City / Location</th>
+                        <th style="width: 95px;">Mobile Number</th>
+                        <th>Items Sold Summary (Weight @ ₹401.25/kg / Units)</th>
+                        <th style="width: 100px;" class="text-right">Total Bill (₹)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if ( ! empty( $sales ) ) : ?>
+                        <?php foreach ( $sales as $idx => $s ) : 
+                            $bill_no = ! empty( $s['invoice_no'] ) ? $s['invoice_no'] : 'INV-' . str_pad( $s['id'], 5, '0', STR_PAD_LEFT );
+                            $sale_date = ! empty( $s['sale_date'] ) ? date( 'd-m-Y H:i', strtotime( $s['sale_date'] ) ) : ( ! empty( $s['created_at'] ) ? date( 'd-m-Y H:i', strtotime( $s['created_at'] ) ) : '' );
+                            $customer = $s['resolved_customer'];
+                            $location = $s['city_location'];
+                            $mobile = $s['customer_mobile'] ?: '—';
+                            $items = $s['items'] ?? array();
+                            $bill_amt = floatval( $s['grand_total'] );
+                        ?>
+                            <tr>
+                                <td class="text-center font-mono"><?php echo intval( $idx + 1 ); ?></td>
+                                <td class="font-mono font-semibold"><?php echo esc_html( $bill_no ); ?></td>
+                                <td class="font-mono"><?php echo esc_html( $sale_date ); ?></td>
+                                <td class="font-semibold"><?php echo esc_html( $customer ); ?></td>
+                                <td><?php echo esc_html( $location ); ?></td>
+                                <td class="font-mono"><?php echo esc_html( $mobile ); ?></td>
+                                <td>
+                                    <?php if ( ! empty( $items ) ) : ?>
+                                        <?php foreach ( $items as $it ) : 
+                                            $is_wt = ( ( $it['pricing_type'] ?? '' ) === 'weight_based' || floatval( $it['weight_kg'] ?? 0 ) > 0 );
+                                        ?>
+                                            <?php if ( $is_wt ) : ?>
+                                                <span class="item-tag weight-badge font-mono">⚖️ <?php echo number_format( floatval( $it['weight_kg'] ?? 0 ), 2 ); ?> kg @ ₹<?php echo number_format( floatval( $it['weight_rate'] ?? 401.25 ), 2 ); ?>/kg</span>
+                                                <span class="item-tag"><?php echo esc_html( $it['product_name'] ); ?></span>
+                                            <?php else : ?>
+                                                <span class="item-tag font-mono">📦 <?php echo intval( $it['quantity'] ); ?> units @ ₹<?php echo number_format( floatval( $it['unit_price'] ), 2 ); ?></span>
+                                                <span class="item-tag"><?php echo esc_html( $it['product_name'] ); ?></span>
+                                            <?php endif; ?>
+                                        <?php endforeach; ?>
+                                    <?php else : ?>
+                                        <span style="color:#71717a; font-style:italic;">Direct spot bill sale</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td class="text-right font-mono font-bold">₹<?php echo number_format( $bill_amt, 2 ); ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else : ?>
+                        <tr>
+                            <td colspan="8" class="text-center" style="padding: 24px; color: #71717a;">No sales or spot billing records found for the selected criteria.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="6" class="font-bold text-right" style="padding-right: 12px;">GRAND TOTALS:</td>
+                        <td class="font-mono font-bold">
+                            Total Wt: <?php echo number_format( $summary['total_weight_kg_sold'], 2 ); ?> kg &bull; Total Units: <?php echo intval( $summary['total_units_sold'] ); ?>
+                        </td>
+                        <td class="text-right font-mono font-bold" style="font-size: 13px;">₹<?php echo number_format( $summary['total_revenue'], 2 ); ?></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <!-- Footer Breakdown & Signatures -->
+        <div class="sheet-footer-grid">
+            <div class="words-card">
+                <h5>Total Invoiced Amount in Words</h5>
+                <div class="words-val"><?php echo esc_html( $amount_in_words ); ?></div>
+                <div style="font-size: 10px; color: #71717a; margin-top: 8px; line-height: 1.4;">
+                    Official financial audit trail registered under Cora Multi-Tenant Manufacturing System. All tax &amp; payment splits are subject to central plant ledger reconciliation.
+                </div>
+            </div>
+            <div class="settlement-card">
+                <div class="settlement-row" style="border-bottom: 1px solid #f4f4f5; padding-bottom: 5px; font-weight: 700;">
+                    <span>Collections Settlement</span>
+                    <span>Amount (₹)</span>
+                </div>
+                <div class="settlement-row">
+                    <span style="color:#52525b;">Cash Collections:</span>
+                    <span class="font-bold">₹<?php echo number_format( $summary['total_cash'], 2 ); ?></span>
+                </div>
+                <div class="settlement-row">
+                    <span style="color:#52525b;">UPI Direct QR:</span>
+                    <span class="font-bold">₹<?php echo number_format( $summary['total_upi'], 2 ); ?></span>
+                </div>
+                <div class="settlement-row">
+                    <span style="color:#52525b;">Credit / Receivables:</span>
+                    <span class="font-bold">₹<?php echo number_format( $summary['total_credit'], 2 ); ?></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Signatures -->
+        <div class="signature-row">
+            <div class="sig-box">
+                <div class="sig-line"></div>
+                <div class="sig-title">Field Sales &amp; Van Incharge</div>
+            </div>
+            <div class="sig-box">
+                <div class="sig-line"></div>
+                <div class="sig-title">Factory Accounts Manager</div>
             </div>
         </div>
 
