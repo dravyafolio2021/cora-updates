@@ -1959,6 +1959,52 @@ textarea,
     z-index: 9999 !important;
 }
 
+/* Bulletproof High-Contrast Popover Typography */
+#cora-profile-popover,
+#cora-header-profile-popover {
+    background-color: #ffffff !important;
+    border-color: #e4e4e7 !important;
+    color: #18181b !important;
+}
+html.dark #cora-profile-popover,
+html.dark #cora-header-profile-popover {
+    background-color: #18181b !important;
+    border-color: #27272a !important;
+    color: #f4f4f5 !important;
+}
+#cora-profile-popover .text-zinc-900,
+#cora-header-profile-popover .text-zinc-900 {
+    color: #09090b !important;
+}
+#cora-profile-popover .text-zinc-700,
+#cora-header-profile-popover .text-zinc-700 {
+    color: #27272a !important;
+}
+#cora-profile-popover .text-zinc-500,
+#cora-profile-popover .text-zinc-400,
+#cora-header-profile-popover .text-zinc-500,
+#cora-header-profile-popover .text-zinc-400 {
+    color: #71717a !important;
+}
+html.dark #cora-profile-popover .text-zinc-900,
+html.dark #cora-header-profile-popover .text-zinc-900,
+html.dark #cora-profile-popover .text-zinc-100,
+html.dark #cora-header-profile-popover .text-zinc-100 {
+    color: #f4f4f5 !important;
+}
+html.dark #cora-profile-popover .text-zinc-700,
+html.dark #cora-header-profile-popover .text-zinc-700,
+html.dark #cora-profile-popover .text-zinc-300,
+html.dark #cora-header-profile-popover .text-zinc-300 {
+    color: #d4d4d8 !important;
+}
+html.dark #cora-profile-popover .text-zinc-500,
+html.dark #cora-profile-popover .text-zinc-400,
+html.dark #cora-header-profile-popover .text-zinc-500,
+html.dark #cora-header-profile-popover .text-zinc-400 {
+    color: #a1a1aa !important;
+}
+
 /* Smooth momentum scrolling across all scrollable regions */
 [data-cora-scrollable],
 .overflow-y-auto,

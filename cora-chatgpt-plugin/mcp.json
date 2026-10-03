@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json.schemastore.org/mcp.json",
+  "name": "cora-workspace-mcp",
+  "version": "1.0.0",
+  "description": "Cora Workspace Universal Remote MCP Gateway for ChatGPT and AI Agents",
+  "mcpServers": {
+    "cora": {
+      "type": "remote",
+      "protocol": "2026-07-28",
+      "transport": "http",
+      "url": "https://stagging.heycora.in/wp-json/cora/v1/mcp",
+      "auth": {
+        "type": "bearer",
+        "header": "Authorization",
+        "description": "Your Cora Workspace MCP Access Token or OAuth 2.1 Bearer Token"
+      },
+      "capabilities": {
+        "tools": true,
+        "resources": true,
+        "prompts": true,
+        "logging": true
+      }
+    }
+  }
+}

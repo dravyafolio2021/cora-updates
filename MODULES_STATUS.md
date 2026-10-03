@@ -9,8 +9,20 @@
 
 | Module Name | Branch Name | Status | Main Touchpoint Files | Assigned Agent / Chat |
 |---|---|---|---|---|
-| **Core Platform** | `main` | 🟢 Stable (v4.9.209) | `cora-workspace.php`, `admin-dashboard.php` | Main Orchestrator |
+| **Core Platform** | `feat/workspace-v4.9.316` (`main`) | 🟢 Stable (v4.9.316) | `cora-workspace.php`, `admin-dashboard.php` | Main Orchestrator |
 <!-- MODULE_ROWS_START -->
+| **Canvas Next.js Live Preview & Dev Proxy** | `feat/workspace-v4.9.316` | 🟢 Complete & Active (v4.9.316) | `views/view-canvas.php`, `includes/class-cora-nextjs-integration.php`, `cora-workspace.php` | Canvas Visual Engine Agent |
+| **Inventory & Field Van Sales Engine** | `feat/sales-items-registry-and-print`, `feat/inventory-and-van-sales` | 🟢 Complete & Active (v4.9.314 - v4.9.315) | `includes/class-cora-inventory-engine.php`, `views/view-inventory-management.php`, `cora-workspace.php` | Supply Chain & Inventory Agent |
+| **Canvas Git Integration & ISR Revalidation** | `feat/canvas-theme-integrations` | 🟢 Complete & Active (v4.9.308 - v4.9.313) | `includes/class-cora-nextjs-integration.php`, `views/view-canvas.php`, `cora-workspace.php` | Canvas Integration Agent |
+| **Workspace Core & Live Theme Customizer** | `feat/cora-workspace-core` | 🟢 Complete & Active (v4.9.300 - v4.9.307) | `views/view-canvas.php`, `views/view-financials.php`, `views/view-vault.php`, `admin-dashboard.php` | Workspace Core Agent |
+| **CRM & Leads High-Velocity Pipeline** | `feat/workspace-next`, `feat/cora-workspace-core` | 🟢 Complete & Active (v4.9.300 - v4.9.302) | `views/view-leads.php`, `cora-workspace.php`, `assets/js/admin-script.js` | CRM Architecture Agent |
+| **Universal Remote MCP & OAuth 2.1 PKCE** | `feat/cora-guides-v2-digital-book` | 🟢 Complete & Active (v4.9.210 - v4.9.230) | `includes/mcp/*`, `views/view-mcp.php`, `cora-workspace.php` | AI Architecture Agent |
+| **Workspace Next & Identity Verification** | `feat/workspace-next` | 🟢 Complete & Active (v4.9.268 - v4.9.273) | `views/view-settings-suite.php`, `views/verify.php`, `cora-workspace.php` | Authentication & Identity Agent |
+| **Finance & GST Invoicing Suite** | `feat/cora-workspace-core` | 🟢 Complete & Active (v4.9.303 - v4.9.304) | `views/view-financials.php`, `views/view-vault.php`, `cora-workspace.php` | Finance AI Co-founder Agent |
+| **Media Manager & Asset Hub** | `main` | 🟢 Complete & Active (v4.9.295 - v4.9.298) | `views/view-media.php`, `cora-workspace.php`, `assets/css/admin-style.css` | Media Module Agent |
+| **PWA & Web Push Notification Subsystem** | `main` | 🟢 Complete & Active (v4.9.262 - v4.9.267) | `cora-service-worker.js`, `admin-dashboard.php`, `views/view-super-admin.php` | Mobile Resilience Agent |
+| **AI Co-Founder & Continuous RAG** | `main` | 🟢 Complete & Active (v4.9.274 - v4.9.276) | `admin-dashboard.php`, `cora-workspace.php`, `assets/js/admin-script.js` | AI Orchestrator Agent |
+| **Super Admin Multi-Tenancy Console** | `main` | 🟢 Complete & Active (v4.9.235 - v4.9.267) | `views/view-super-admin.php`, `admin-dashboard.php`, `cora-workspace.php` | Super Admin Agent |
 | **Security Hardening & Central Authorization** | `security/audit-remediation` | 🟢 Complete & Active (v4.9.209) | `includes/class-cora-authorization.php`, `includes/class-cora-ssrf-filter.php`, `cora-workspace.php` | Security Architecture Agent |
 | **Email Verification & Route Interception** | `main` | 🟢 Complete & Active (v4.9.208) | `views/verify.php`, `cora-workspace.php`, `views/login.php` | Authentication & Identity Agent |
 | **Mobile GPU Acceleration & Touch Latency** | `main` | 🟢 Complete & Active (v4.9.207) | `assets/css/admin-style.css`, `admin-dashboard.php` | Mobile Performance Agent |
@@ -66,16 +78,24 @@
 - `app/public/wp-content/plugins/cora-workspace/cora-workspace.php` (Core AJAX Handlers, Micro-Cache, Schema, Hooks, AI Safety & Policy Guardrails, Storage Details, Central Route Interception)
 - `app/public/wp-content/plugins/cora-workspace/includes/class-cora-authorization.php` (Central Tenant Context Assertion, Object-Level Policy Gatekeeper across Tasks, Forms, Vault, Canvas, Media)
 - `app/public/wp-content/plugins/cora-workspace/includes/class-cora-ssrf-filter.php` (Outbound HTTP Request SSRF Filter guarding RFC1918 private subnets, loopback, and cloud metadata)
+- `app/public/wp-content/plugins/cora-workspace/includes/class-cora-nextjs-integration.php` (Next.js Git Connector, Route Scanner, Headless REST APIs & ISR Revalidation)
+- `app/public/wp-content/plugins/cora-workspace/includes/class-cora-inventory-engine.php` (Extended Dual-Tier Supply Chain, 3-Step Van Dispatch Wizard, Weight Allocation @ ₹401.25/kg, Spot Billing, Sales Register, Manifest Print & CSV)
+- `app/public/wp-content/plugins/cora-workspace/includes/mcp/class-cora-universal-mcp-server.php`, `class-cora-oauth-server.php`, `class-cora-mcp-tool-registry.php` (Universal Remote MCP Server & OAuth 2.1 Engine RFC 7591 / RFC 9728)
+- `app/public/wp-content/plugins/cora-workspace/views/view-canvas.php` (Canvas Themes Single-Stream Library, Next.js Git Connector, Live Dev Server Preview, Level 2 Customizer)
+- `app/public/wp-content/plugins/cora-workspace/views/view-inventory-management.php` (Plant & Field Van POS, 3-Step Dispatch Wizard, Spot Invoices, Sales Register, Manifest Print)
+- `app/public/wp-content/plugins/cora-workspace/views/view-leads.php` (Full-Height Edge-to-Edge Leads Drawer, Draggable Resizer, Accordion Groups, Team Assignee Sanitization)
+- `app/public/wp-content/plugins/cora-workspace/views/view-financials.php` (Financials Ledger, GST Invoicing Suite, Document Vault Sync)
+- `app/public/wp-content/plugins/cora-workspace/views/view-vault.php` (Document Vault, GST Invoicing, Contract Immutability & 500KB Payload Cap)
+- `app/public/wp-content/plugins/cora-workspace/views/view-settings-suite.php` (System Settings Suite, Administration Email Verification, 100 Daily AI Credits Quota)
+- `app/public/wp-content/plugins/cora-workspace/views/view-super-admin.php` (11-Tab Super Admin Suite, Danger Zone Workspace Deletion Modal, Web Push Telemetry)
 - `app/public/wp-content/plugins/cora-workspace/views/verify.php` (Early Route Interception for Email Verification & Instant Auto-Login)
 - `app/public/wp-content/plugins/cora-workspace/views/view-mcp.php` (AI Tools MCP Developer Gateway, Live Voice Assistant Stage, Sticky Chat Input Dock, Model Selector Popover)
 - `app/public/wp-content/plugins/cora-workspace/views/view-affiliate-referrals.php` (Affiliates & Referrals Gamified Hub, 5 Sticky Sub-Tabs, Tier Progress Meter, Leaderboard, Earnings Simulator)
-- `app/public/wp-content/plugins/cora-workspace/views/view-canvas.php` (Canvas Themes Single-Stream Library, 4-Metric Speed & Core Web Vitals Strip, Viewable-Only Mobile Mode)
 - `app/public/wp-content/plugins/cora-workspace/views/view-emails.php` (High-Density Email Suite, 2x2 Mobile KPI Cards, Dynamic CRM Contacts Sync)
-- `app/public/wp-content/plugins/cora-workspace/admin-dashboard.php` (Main Dashboard Controller, Mobile Island, Voice & AI Copilot UI, Centered Analytics, Desktop Agenda Task Card)
+- `app/public/wp-content/plugins/cora-workspace/admin-dashboard.php` (Main Dashboard Controller, Canvas Quick-Actions, Mobile Island, Voice & AI Copilot UI, Centered Analytics)
 - `app/public/wp-content/plugins/cora-workspace/includes/workspace-header.php` (Sticky Sub-Navigation Tabs Controller & Filter Toolbar)
 - `app/public/wp-content/plugins/cora-workspace/share-media.php` (Public Shared Media Proofing Portal, Route Interception, Telemetry Tracking)
-- `app/public/wp-content/plugins/cora-workspace/views/view-media.php` (Media Proofing Hub, Download/View Telemetry Audit Log, Storage Footprint Visualizer, Floating Action Dock)
-- `app/public/wp-content/plugins/cora-workspace/views/view-settings-suite.php` (System Settings Suite, AI Agent Parameters & DOM Sync, Notification Persistence)
+- `app/public/wp-content/plugins/cora-workspace/views/view-media.php` (Media Proofing Hub, Centered Folder Modals, Curated Color Tag Presets, Floating Action Dock)
 - `app/public/wp-content/plugins/cora-workspace/assets/js/cora-field-ops-tracker.js` (Field Ops Telemetry Engine, Login Auto-Start & Beacon Flush Logout)
 - `app/public/wp-content/plugins/cora-workspace/views/view-forms.php` (Form AI Architect, 15 Field Types, Full-Height Live Preview, Flush Mobile Sticky Tabs)
 - `app/public/wp-content/plugins/cora-workspace/views/view-content-suite.php` (Content AI Suite, Bulk Actions Toolbar & Opportunities Grid)
@@ -84,19 +104,63 @@
 - `app/public/wp-content/plugins/cora-workspace/includes/affiliate-referral-engine.php` (Affiliate Attribution, Dual-Rewards & Payouts Engine)
 - `app/public/wp-content/plugins/cora-workspace/views/view-clients.php` (4-Subtab Client Management Suite)
 - `app/public/wp-content/plugins/cora-workspace/views/view-client-task-manager.php` (Client Task Manager Board & Resizable Floating Drawer)
-- `app/public/wp-content/plugins/cora-workspace/views/view-super-admin.php` (11-Tab Super Admin Suite & MRR Telemetry)
 - `app/public/wp-content/plugins/cora-workspace/views/view-users.php` (People Ops AI Copilot, Multimodal Team Migration, Custom Role Drawer, Equal AI Token Budgeting)
-- `app/public/wp-content/plugins/cora-workspace/views/view-vault.php` (Document Vault, GST Invoicing, Contract Immutability & 500KB Payload Cap)
+- `app/public/wp-content/plugins/cora-workspace/cora-service-worker.js` (Web Push Delivery, VAPID Key Sync, High-Speed Cache Strategy)
 
 ---
 
 ## 3. Branch Activity & Progress Log
 
 ### `main` (Production Base)
-- **Platform Version**: `4.9.209`
-- **Health**: 100% Operational & Clean Slate Base. Security remediation, Central Authorization, SSRF protection, Email verification route interception, Canvas revamp, Affiliate hub, and mobile GPU hardware acceleration verified ✅.
+- **Platform Version**: `4.9.316`
+- **Health**: 100% Operational & Clean Slate Base (HEAD commit `a54aeceeb` on `feat/workspace-v4.9.316`). Canvas Live Next.js preview & proxy router, offline dev server detection, preview cookie isolation, 3-step Van Dispatch Wizard, weight allocation, sales register, manifest printing, Universal Remote MCP, and OAuth 2.1 PKCE server verified ✅.
 
 <!-- BRANCH_LOGS_START -->
+### `feat/workspace-v4.9.316` (Active Working Base)
+- **Status**: 🟢 Active Working Base (v4.9.316, HEAD commit `a54aeceeb`) — Canvas Live Next.js Build Preview, Dev Server Proxy Router & Preview Cookie Isolation:
+  - Embedded high-density, dark-themed Next.js App Preview Mockup card in Level 1 with real-time route chips and quick actions (`feat(canvas): add Next.js app preview card in level 1 and fast offline dev server detection`).
+  - Implemented fast offline dev server detection via non-blocking sub-150ms probe ping to `http://localhost:3000` (`mode: 'no-cors'`). If offline, displays dedicated Terminal Instruction Card overlay (`npm run dev`).
+  - Connected live Next.js build preview & proxy router, eliminating random fallback screens (`feat(canvas): connect live Next.js build preview & proxy router, eliminate random welcome fallback`).
+  - Isolated preview cookie (`cora_canvas_preview`) strictly to explicit preview query parameters (`?preview_canvas=...` or `?preview=1`), purging preview state during standard site browsing to prevent leaking across sessions or unwanted theme activation.
+- **Main Touchpoint**: `views/view-canvas.php`, `includes/class-cora-nextjs-integration.php`, `cora-workspace.php`.
+
+### `feat/sales-items-registry-and-print` & `feat/inventory-and-van-sales` (Merged to Main)
+- **Status**: 🟢 Complete & Merged (v4.9.314 - v4.9.315) — Stationery & Van Sales Dual Engine, Weight Allocation & Itemized Manifests:
+  - Engineered structured 3-Step Van Dispatch Wizard (`1. Driver & Van Assignment` -> `2. Cargo & Weight Allocation` -> `3. Review & Dispatch Manifest`) computing gross, tare, and net weights with real-time stock decrements.
+  - Implemented standardized weight allocation and spot billing pricing at ₹401.25/kg with browser-native GST tax invoice auto-print, QR codes, HSN breakdowns, and reverse-charge disclaimers.
+  - Enforced consecutive 4-digit numeric bill numbers (`#1001`, `#1002`, etc.) with date-only formatting (`d M Y`) and customer/firm name positioned ahead of date.
+  - Built comprehensive Sales Register ledger table with itemized breakdown, printable ledger, and 1-click UTF-8 itemized CSV export.
+  - Added van stock print layout and available dispatch manifests with smart cargo fallback, delivering physical signed handover manifests for field drivers.
+  - Aligned inventory reports and exports to exact mockup specifications with a 4-column layout (`SKU/Product`, `Category/Type`, `Available Stock`, `Valuation/Rate`) and 5-column dispatch report (`Manifest #`, `Driver / Van`, `Firm / Route`, `Weight Allocated`, `Status / Date`).
+- **Main Touchpoint**: `includes/class-cora-inventory-engine.php`, `views/view-inventory-management.php`, `cora-workspace.php`.
+
+### `feat/cora-workspace-core` (Merged to Main)
+- **Status**: 🟢 Complete & Merged (v4.9.300 - v4.9.307) — Workspace Core, Canvas Live Theme Customizer & Finance Vault Sync:
+  - Resolved pen icon routing in Canvas themes to directly open the Level 2 live theme customizer editor (`views/view-canvas.php`), preserving URL edit state and instant return navigation.
+  - Added Canvas hover quick-actions directly in the sidebar navigation menu, enabling 1-click access to the live theme customizer and new-tab live site view.
+  - Normalized sidebar navigation layout, removing extra vertical spacing below Canvas and aligning nav group items.
+  - Unified bottom sidebar notification bell with canonical header notification drawer.
+  - Hardened Finance & GST Invoicing Suite with multi-step creator validation, line items serialization, and automated Document Vault sync generating immutable PDF records with SHA-256 cryptographic hashes.
+  - Re-engineered Media Manager dialogs into edge-to-edge side drawers and centered pop-up modals with curated color tag presets and custom color pickers.
+- **Main Touchpoint**: `views/view-canvas.php`, `views/view-financials.php`, `views/view-vault.php`, `views/view-media.php`, `admin-dashboard.php`, `cora-workspace.php`.
+
+### `feat/cora-guides-v2-digital-book` (Merged to Main)
+- **Status**: 🟢 Complete & Merged (v4.9.210 - v4.9.230) — Universal Remote MCP Server & OAuth 2.1 PKCE Architecture:
+  - Implemented Cora Universal Remote MCP Server (`includes/mcp/class-cora-universal-mcp-server.php`) exposing Model Context Protocol (v2026-07-28 / v2024-11-05) over HTTP JSON-RPC 2.0 and Server-Sent Events (SSE) streaming (`/wp-json/cora-mcp/v1/sse`, `/wp-json/cora-mcp/v1/messages`).
+  - Built RFC 6749 / RFC 7636 OAuth 2.1 PKCE Authorization Server (`class-cora-oauth-server.php`) with cryptographic `S256` code challenges, authorization endpoint routing, pretty endpoint discovery, and explicit content-type consent screens.
+  - Added RFC 7591 Dynamic Client Registration for Google Gemini, Cursor, ChatGPT, and Claude.
+  - Implemented RFC 9728 Protected Resource Metadata (`/.well-known/oauth-protected-resource`) and `WWW-Authenticate` challenge headers.
+  - Added universal token extraction for ChatGPT/Codex and JSON-RPC request hydration for Claude Web and ChatGPT.
+  - Integrated 1-click effortless AI prompts and copyable connection setup in AI Tools MCP view (`views/view-mcp.php`) with interactive OAuth 2.1 connection test runner.
+  - Focused assistant matrix on ChatGPT, Claude, and Gemini with official vector SVG logos and live connected status badges.
+- **Main Touchpoint**: `includes/mcp/*`, `views/view-mcp.php`, `cora-workspace.php`.
+
+### `feat/workspace-next` (Merged to Main)
+- **Status**: 🟢 Complete & Merged (v4.9.268 - v4.9.273) — Administration Email Verification & CRM Lead Drawer Architecture:
+  - Implemented full Administration Email verification workflow in Settings Suite: existing verified email stays locked with active verification badge, while new email receives a 32-byte cryptographic token confirmation link; added full-width email input, resilient AJAX error handling, authenticated mail transport via `heycora@claraverse.in`, and cross-subdomain auth guards.
+  - Overhauled CRM Leads detail inspection into full-height edge-to-edge side drawers auto-portaled to `document.body` with transparent backdrop (eradicating dark trapped overlays), interactive left-edge drag resize with localStorage persistence, collapsible accordion groups, and strict team assignee roster sanitization with bi-directional Kanban sync.
+  - Enforced 100 daily AI credits quota, zero-overlay confirmation modals, read-only OAuth bridge card, and dynamic workspace roles in account defaults.
+- **Main Touchpoint**: `views/view-settings-suite.php`, `views/view-leads.php`, `views/verify.php`, `cora-workspace.php`.
 ### `security/audit-remediation` (Active Working Base)
 - **Status**: 🟢 Complete & Active (v4.9.209) — Platform Security Hardening & Central Authorization Gatekeeper:
   - **SEC-001 & SEC-006**: Cryptographic Token Hardening with 32-byte CSPRNG (`random_bytes(32)`), SHA-256 hash-at-rest verification, single-use invalidation, and strict expiration checks across email verification and invitation links.
@@ -217,6 +281,42 @@
 
 | Version | Date | Key Changes |
 | :--- | :--- | :--- |
+| **v4.9.316** | Oct 2026 | Canvas live Next.js build preview & proxy router, fast offline dev server detection (`http://localhost:3000`), preview cookie isolation (`cora_canvas_preview`) scoped to explicit query parameters, Level 2 live theme customizer routing, and theme activation scoping |
+| **v4.9.315** | Oct 2026 | Exact 4-column plant inventory layout (`SKU/Product`, `Category/Type`, `Available Stock`, `Valuation/Rate`) and 5-column dispatch report reordering (`Manifest #`, `Driver / Van`, `Firm / Route`, `Weight Allocated`, `Status / Date`), itemized CSV export, printable van stock manifests, smart cargo fallback, sold item weights and unit counts |
+| **v4.9.314** | Oct 2026 | 3-Step Van Dispatch Wizard (`Driver & Van` -> `Cargo & Weight` -> `Review & Dispatch`), standardized weight-based allocation (@ ₹401.25/kg), 4-digit numeric bill numbers (`#1001`), spot billing ledger, sales register with itemized breakdown, and browser-native GST tax invoice auto-print |
+| **v4.9.313** | Oct 2026 | Scanned routes ingestion pipeline and Next.js theme badge in Canvas theme library |
+| **v4.9.312** | Oct 2026 | Dual GitHub authorization headers fallback (`token <pat>` & `Bearer <pat>`) for private repository PAT authentication |
+| **v4.9.311** | Oct 2026 | Dynamic GitHub branch discovery, private repository PAT access, route scanner hang elimination |
+| **v4.9.310** | Oct 2026 | Next.js Git Connector Wizard routing directly from Canvas "Add Theme" button |
+| **v4.9.309** | Oct 2026 | Unified notification architecture synchronizing sidebar bottom bell with canonical header notification drawer |
+| **v4.9.308** | Oct 2026 | Headless Next.js integration engine (`class-cora-nextjs-integration.php`), App Router and Pages Router scanner, headless REST APIs, on-demand ISR revalidation webhooks (`/api/revalidate`) |
+| **v4.9.307** | Oct 2026 | Canvas pen icon routing to Level 2 live theme customizer editor with URL edit state persistence |
+| **v4.9.306** | Oct 2026 | Sidebar layout normalization, removal of extra vertical spacing below Canvas, nav group alignment |
+| **v4.9.305** | Oct 2026 | Canvas hover quick-actions in sidebar for instant live theme customizer and new-tab live site view |
+| **v4.9.304** | Oct 2026 | GST invoice publishing stabilization, default input guards, automated Document Vault sync with SHA-256 hash |
+| **v4.9.303** | Oct 2026 | GST invoice multi-step creator validation, line items serialization, and vault linking |
+| **v4.9.302** | Oct 2026 | CRM team assignee roster sanitization and bi-directional lead drawer state synchronization |
+| **v4.9.301** | Oct 2026 | Leads side drawer left-edge draggable resize with localStorage memory, snap button removal, collapsible accordion groups |
+| **v4.9.300** | Oct 2026 | Edge-to-edge full-height side drawers, auto-portaling to `document.body`, transparent backdrop overlay, lead data sanitization |
+| **v4.9.298** | Sep 2026 | Curated color tag presets and custom color picker for Media Manager folders |
+| **v4.9.296** | Sep 2026 | Centered pop-up modals for Media folder creation and settings with transparent backdrop |
+| **v4.9.295** | Sep 2026 | Redesigned Media Manager dialogs into edge-to-edge side drawers with zero dark overlay |
+| **v4.9.290** | Sep 2026 | AI Team Migration converted to edge-to-edge side drawer, eliminate dark overlays, robust open/close state machine |
+| **v4.9.285** | Sep 2026 | Autonomous AI content writing, editing, state management, and rich card previews |
+| **v4.9.280** | Sep 2026 | Dynamic task notification alerts and SVG search iconography upgrade |
+| **v4.9.279** | Sep 2026 | Streamlined admin profile popover with live AI Connected status badge and zero viewport clipping |
+| **v4.9.276** | Sep 2026 | AI real-time SPA navigation router executing direct client navigation and actions from user prompts |
+| **v4.9.274** | Sep 2026 | Continuous RAG living memory self-learning, ultra-concise 1-2 line responses, 1-click CTA action pills |
+| **v4.9.269 - v4.9.273** | Sep 2026 | Administration email verification workflow with dynamic badges (`Verified` / `Pending Verification`), tokenized confirmation links, authenticated mail delivery (`heycora@claraverse.in`), and robust AJAX handling |
+| **v4.9.266 - v4.9.267** | Sep 2026 | Web Push notification subsystem overhaul, service worker push delivery, dynamic VAPID key sync, Super Admin device subscription telemetry |
+| **v4.9.263** | Sep 2026 | Enforced 100 daily AI credits quota, zero-overlay confirmation modals, read-only OAuth bridge card, dynamic roles in account defaults |
+| **v4.9.262** | Sep 2026 | PWA custom app icon branding and 1-click broadcast push updates |
+| **v4.9.235 - v4.9.239** | Sep 2026 | Super Admin Danger Zone and workspace deletion confirmation modal (zero dark overlay, quoted IDs, option-store cascade removal) |
+| **v4.9.232** | Sep 2026 | Unified single-domain routing architecture, clean URLs without workspace slug, archive ref preservation |
+| **v4.9.229 - v4.9.230** | Sep 2026 | RFC 7591 Dynamic Client Registration for Google Gemini and connected MCP clients |
+| **v4.9.228** | Sep 2026 | ChatGPT actions discovery with underscore tool schema, resilient CRM ingestion, official vector AI logo suite |
+| **v4.9.220 - v4.9.224** | Sep 2026 | Universal token extraction, JSON-RPC request hydration for Claude Web and ChatGPT, pretty OAuth endpoint discovery, consent screen redirect |
+| **v4.9.210 - v4.9.219** | Sep 2026 | Cora Universal Remote MCP Server (`/wp-json/cora-mcp/v1/sse`), OAuth 2.1 PKCE server, RFC 9728 Protected Resource Metadata, `WWW-Authenticate` headers, 1-click AI prompts for ChatGPT, Claude, and Gemini |
 | **v4.9.209** | Sep 2026 | Complete platform security hardening (SEC-001 - SEC-023), Central Authorization Gatekeeper (`class-cora-authorization.php`), Outbound HTTP SSRF Filter (`class-cora-ssrf-filter.php`), WhatsApp HMAC-SHA256 signature verification, 32-byte cryptographic token entropy, Next.js 16.3.3 & Sharp 0.35.4 patches |
 | **v4.9.208** | Sep 2026 | Immediate route interception for email verification & magic auto-login (`/workspace/verify` via `views/verify.php`), pre-fetched link safety, and instant auth session cookie hydration |
 | **v4.9.207** | Sep 2026 | Mobile GPU hardware acceleration (`transform: translateZ(0); will-change: transform;`) and universal instant-tap responsiveness (`touch-action: manipulation; -webkit-tap-highlight-color: transparent;`) |
@@ -252,4 +352,4 @@
 
 ---
 
-*Cora Platform Release Manifest v4.9.209 — Architecture & Engineering Team.*
+*Cora Platform Release Manifest v4.9.316 — Architecture & Engineering Team.*

@@ -1,4 +1,4 @@
-# Cora Platform — Developer Feature & Optimization Guide (v4.9.209)
+# Cora Platform — Developer Feature & Optimization Guide (v4.9.316)
 
 This guide defines the standardized architectural patterns, blueprints, and performance guidelines for engineering new modules and extending features across the Cora SaaS Workspace (`app/public/wp-content/plugins/cora-workspace`) and Marketing Frontend (`cora-frontend`).
 
@@ -55,6 +55,18 @@ This guide defines the standardized architectural patterns, blueprints, and perf
 44. **Gamified Partner Growth & Milestone Reward Architecture (v4.9.202 - v4.9.206)**: Partner growth ecosystems must combine tiered progress meters (Bronze → Silver → Gold → Diamond), streak velocity multipliers, Top 3 podium leaderboards, dual sign-up rewards (+100 Runes), recurring commissions (20% monthly / 30% annual), and milestone cash bonuses (₹1,000 / ₹5,000 / ₹10,000).
 45. **Early Route Interception & Cryptographic CSPRNG Verification (v4.9.201, v4.9.208)**: Public token validation endpoints (`/workspace/verify`) must intercept requests before WordPress template routing, validate 32-byte CSPRNG token hashes (`hash_equals`), handle email security pre-fetches safely, set authentication cookies, and seamlessly redirect to authenticated dashboards.
 46. **Central Tenant Authorization & Outbound HTTP SSRF Filter Framework (v4.9.209 / SEC-001 - SEC-023)**: Replace fragmented SQL tenancy checks with central policy assertions (`Cora_Authorization::assert_agency_context`). Wrap all outbound HTTP calls with `Cora_SSRF_Filter::is_safe_url()` to block private IPv4/IPv6 subnets, link-local addresses, and cloud provider metadata services (`169.254.169.254`).
+47. **Next.js Headless Git Repository Integration & Route Scanner Pattern (v4.9.308 - v4.9.313)**: Remote GitHub repositories connect directly into Cora Canvas via GitHub REST APIs. The engine dynamically queries branches, scans recursive Git trees for App Router (`app/**/page.tsx`, `page.jsx`, `page.js`) and Pages Router (`pages/**.tsx`) paths while filtering out route groups (`(marketing)`, `(auth)`), supports public and private repositories using Personal Access Tokens (PAT) with dual authorization header fallback (`token <pat>` and `Bearer <pat>`), and synchronizes routes directly into the Canvas pages registry.
+48. **Incremental Static Regeneration (ISR) Webhook Revalidation Architecture (v4.9.308)**: Content and theme configuration changes trigger on-demand Next.js ISR webhooks (`POST /api/revalidate?secret=...&path=...`) with sub-15-second timeouts, timing diagnostics (`duration_ms`), and automatic revalidation on page prop updates, keeping edge CDN caches synchronized without requiring complete production site rebuilds.
+49. **Live Next.js Dev Server Detection & Preview Proxy Isolation Standard (v4.9.316)**: Canvas Level 1 embeds a high-density, dark-themed Next.js App Preview Mockup card with real-time route chips and quick actions. Live previews run sub-150ms probe pings via non-blocking `fetch()` to `http://localhost:3000` (`mode: 'no-cors'`). If offline, a dedicated Terminal Instruction Card overlay renders immediately (`npm run dev`). Preview cookies (`cora_preview_theme_id`) are strictly isolated to explicit `?preview_canvas=...` or `?preview=1` query parameters and purged on normal site browsing to eliminate cookie leaks and prevent unwanted fallbacks.
+50. **Universal Remote MCP Server & OAuth 2.1 PKCE Architecture (RFC 7591 / RFC 9728) (v4.9.220 - v4.9.233)**: Cora Universal MCP exposes standard Model Context Protocol (v2026-07-28 / v2024-11-05) over HTTP JSON-RPC 2.0 and SSE streaming transports (`/wp-json/cora-mcp/v1/sse`). It implements RFC 6749 / RFC 7636 OAuth 2.1 with PKCE (`S256`), RFC 7591 dynamic client registration for 1-click AI tool setup (Claude, ChatGPT, Gemini, Cursor), RFC 9728 protected resource metadata (`/.well-known/oauth-protected-resource`), and token-bound tenant hydration with 120 RPM rate limiting.
+51. **3-Step Van Dispatch Wizard & Weight-Based Stock Allocation (v4.9.314)**: Mobile van distribution workflows enforce a structured 3-step modal wizard (`1. Driver & Van Assignment` -> `2. Cargo & Weight Allocation` -> `3. Review & Dispatch Manifest`). Allocations compute gross, tare, and net weights, enforcing real-time plant stock limits and decrementing inventory atomically upon manifest generation.
+52. **Real-Time Spot Billing, Numeric 4-Digit Invoicing & GST Print Engine (v4.9.314 - v4.9.315)**: Field sales spot billing generates consecutive 4-digit numeric invoice serials (e.g. `1001`, `1002`) with date-only timestamps (`d M Y`), displaying customer/firm name ahead of dates. Spot sales apply standardized kilogram pricing (e.g., ₹401.25/kg) and trigger browser-native GST tax invoice print layouts with QR codes, HSN breakdowns, and reverse-charge disclaimers.
+53. **Itemized Sales Register, Ledger Export & Manifest Print Generation Standard (v4.9.314 - v4.9.315)**: Field operations feature a consolidated sales register with an itemized transaction breakdown, 5-column dispatch reports, and 4-column plant inventory sheets. One-click CSV exports stream UTF-8 itemized files with sold weights, unit counts, and bill totals, while printable van stock sheets provide offline delivery drivers with physical signed handover manifests.
+54. **Full-Height Edge-to-Edge Lead Drawer with Body Portaling & Draggable Resizer Pattern (v4.9.300 - v4.9.302)**: Lead and contact detail drawers portal dynamically to `document.body` to eliminate clipping from nested workspace containers. They render full viewport height (`top: 0; bottom: 0; height: 100vh`) with soft transparent backdrops, a continuous left-edge drag resizer handle (`window.coraInitLeadDrawerResize`) with mouse and touch listeners, and bi-directional DOM synchronization across Kanban board and table rows.
+55. **Automated GST Invoice Document Vault Synchronization & SHA-256 Linkage Blueprint (v4.9.303 - v4.9.304)**: Publishing finalized GST invoices in Financials automatically scaffolds and archives an immutable PDF record in the Document Vault (`wp_cora_vault_documents`). The record is cryptographically stamped with a SHA-256 content checksum, categorized under `Invoices & Billing`, and tagged with bidirectional foreign keys (`invoice_id` <-> `document_id`) to ensure non-repudiation and compliance auditing.
+56. **Centered Pop-Up Modal & Curated Color Tag Presets Architecture (v4.9.296 - v4.9.298)**: Modal dialogs (such as Media Manager folder creation and property editors) use centered, floating cards with transparent backdrops (`bg-zinc-950/20 backdrop-blur-xs`), flex-centered header alignments, curated monochromatic and muted pastel color tag presets, and real-time custom color input pickers, adhering to atomic design standards.
+57. **Tokenized Administration Email Verification & Locked Security Workflow (v4.9.269 - v4.9.273)**: Updating sensitive administration email addresses triggers a secure dual-stage verification workflow. The existing verified email remains locked with an active shield badge until a 32-byte CSPRNG token sent to the new email address is verified via `/workspace/verify?admin_email_token=...`, preventing accidental lockout or unauthorized account redirection across multi-domain tenants.
+58. **Rule 13 Tonal Surface Selection & Zero-Dark-Overlay Strict Enforcement Standard (v4.9.255 - v4.9.300)**: All UI inspection panels, team migration tools, drawer backdrops, and active cards must strictly eliminate high-contrast dark overlay backdrops (`rgba(0,0,0,0.8)` or heavy dark borders). Visual selection is achieved exclusively through soft monochromatic tonal fills (`bg-zinc-100/90 dark:bg-zinc-800/80`) and subtle structural borders (`border-zinc-200/80 dark:border-zinc-800`), ensuring full underlying workspace context remains visible.
 
 ---
 ---
@@ -575,4 +587,209 @@ When engineering growth and referral mechanisms:
 
 ---
 
-*Cora Developer Feature Guide v4.9.209 — Last updated: September 2026.*
+## 26. Next.js Headless Git Repository Integration, Route Scanner & On-Demand ISR Revalidation (`class-cora-nextjs-integration.php`)
+
+When connecting remote Next.js repositories (App Router / Pages Router) to the Cora Canvas ecosystem:
+1. **GitHub REST Dynamic Tree Scanner (`scan_repository_routes`)**:
+   - The scanner parses repository slugs (`owner/repo` or full GitHub URL).
+   - Validates access against GitHub REST API with dual authorization header fallback:
+     ```php
+     $headers = array(
+         'Authorization'        => ( str_starts_with( $pat, 'github_pat_' ) ? 'Bearer ' : 'token ' ) . $pat,
+         'Accept'               => 'application/vnd.github+json',
+         'User-Agent'           => 'Cora-Platform-NextJS/1.0',
+         'X-GitHub-Api-Version' => '2022-11-28'
+     );
+     // On HTTP 401/404, automatically toggle between 'token ' and 'Bearer ' format before failing.
+     ```
+   - Dynamically discovers branches via `/repos/{owner}/{repo}/branches?per_page=100`, auto-selecting the repository's default branch (`main` or `master`).
+   - Fetches the recursive Git tree (`/repos/{owner}/{repo}/git/trees/{branch}?recursive=1`).
+2. **App Router Route Extraction Algorithm**:
+   - Matches route page files via regex:
+     ```php
+     if ( preg_match( '#^(?:.+/)?(?:src/)?app/(.+/)?page\.(tsx|jsx|js|ts)$#i', $path, $matches ) ) {
+         $sub_path = isset( $matches[1] ) ? trim( $matches[1], '/' ) : '';
+         // Automatically filter out route groups such as (marketing), (auth), (dashboard)
+         $cleaned_segments = array();
+         if ( ! empty( $sub_path ) ) {
+             foreach ( explode( '/', $sub_path ) as $seg ) {
+                 if ( ! preg_match( '/^\(.*\)$/', $seg ) ) {
+                     $cleaned_segments[] = $seg;
+                 }
+             }
+         }
+         $clean_route = empty( $cleaned_segments ) ? '/' : '/' . implode( '/', $cleaned_segments );
+         $slug        = empty( $cleaned_segments ) ? 'home' : implode( '-', $cleaned_segments );
+     }
+     ```
+   - Automatically supports Next.js Pages Router paths (`pages/(.+)\.(tsx|jsx|js|ts)$`) excluding internal Next.js entries (`_app`, `_document`, `_error`, `api/`).
+3. **Canvas Database Ingestion**:
+   - Ingests discovered paths as Canvas pages in `wp_cora_canvas_pages` bound to the target theme ID, marking `/` as `is_homepage = 1`.
+4. **On-Demand ISR Revalidation Hook (`cora_nextjs_trigger_isr` / `/nextjs/revalidate`)**:
+   - Dispatches authenticated webhook POST request to `{live_url}/api/revalidate?secret={secret}&path={path}`.
+   - Enforces 12-second timeout, tracking roundtrip execution time in milliseconds (`duration_ms`).
+   - Updates page props (`_cora_nextjs_props`) with auto-revalidation trigger flag upon save.
+
+---
+
+## 27. Live Next.js Dev Server Detection, Cookie-Isolated Preview Router & Proxy Engine (`cora-workspace.php`)
+
+When serving Next.js applications through the Canvas live preview and public theme router:
+1. **Frontend Router Delegation (`cora_canvas_theme_frontend_router`)**:
+   - Intercepts requests destined for public Canvas pages.
+   - If the active theme or preview theme source is `nextjs`, it skips static HTML generation and routes immediately to `cora_render_nextjs_live_frame()` or `cora_render_nextjs_connector_screen()`, completely eliminating generic welcome fallback screens.
+2. **Fast Sub-150ms Offline Dev Server Detection**:
+   - Before iframe hydration, executes an asynchronous non-blocking probe check:
+     ```javascript
+     if (window.fetch && window.CORA_NEXTJS_LIVE_URL) {
+         fetch(window.CORA_NEXTJS_LIVE_URL, { mode: 'no-cors', cache: 'no-store' })
+             .then(function() { /* Server reachable */ })
+             .catch(function(err) { showOffline(); });
+     }
+     ```
+   - If `http://localhost:3000` is offline or blocked, `showOffline()` activates instantly (sub-150ms), revealing a dark blurred terminal instruction card overlay (`#cora-error-overlay`) instructing the developer to run `npm run dev` with terminal copy shortcuts, change URL controls, and external launch links.
+3. **Strict Preview Cookie Isolation Standard (`cora_preview_theme_id`)**:
+   - In `cora_get_preview_theme_id()`, the preview cookie is strictly scoped.
+   - If a request is received on `/site/` without explicit `preview=1` or `cv_preview_theme` query parameters, and a live production theme exists for the workspace, the system purges the cookie via `setcookie('cora_preview_theme_id', '', time() - 3600, '/')`, unsets `$_COOKIE['cora_preview_theme_id']`, and returns `0`.
+   - Prevents stale preview state from leaking into organic tenant traffic.
+4. **Bidirectional PostMessage Bridge**:
+   - Synchronizes iframe routing state with parent dashboard URL via `CORA_ROUTE_CHANGE` events.
+   - Emits `CORA_INIT` payload carrying API URLs, REST nonce, theme ID, and target routes on iframe load.
+
+---
+
+## 28. Universal Remote MCP Server, OAuth 2.1 PKCE & Dynamic Client Registration (`class-cora-universal-mcp-server.php`, `class-cora-oauth-server.php`)
+
+When integrating Cora with AI agents via the Model Context Protocol (MCP) and secure OAuth 2.1:
+1. **Dual Transport Architecture**:
+   - **JSON-RPC 2.0 over HTTP POST**: Dispatches tool execution and prompt completions directly to `/wp-json/cora-mcp/v1/rpc`.
+   - **Server-Sent Events (SSE) Streaming**: Dedicated streaming transport on `/wp-json/cora-mcp/v1/sse` for real-time agent notifications and continuous context delivery.
+   - Supports protocol versions `2026-07-28`, `2025-11-25`, `2024-11-05`, and `2024-10-07`.
+2. **OAuth 2.1 PKCE Enforcement (RFC 6749, RFC 7636)**:
+   - Eliminates legacy implicit and password grants in favor of authorization code exchange with mandatory PKCE (`code_challenge_method=S256`).
+   - Authorization codes expire after 10 minutes (`AUTH_CODE_EXPIRY_SECONDS = 600`).
+   - Access tokens expire after 30 days; refresh tokens expire after 90 days with rotation.
+3. **RFC 7591 Dynamic Client Registration (`POST /oauth/register`)**:
+   - Enables zero-configuration connection setup for AI platforms (Google Gemini, Claude Desktop, Cursor, Windsurf, ChatGPT).
+   - Generates unique client credentials (`client_id`, `client_secret`) dynamically with registered redirect URIs and grant types.
+4. **RFC 9728 Protected Resource Metadata & WWW-Authenticate**:
+   - Serves discovery metadata at `/.well-known/oauth-protected-resource` and authorization metadata at `/.well-known/oauth-authorization-server`.
+   - Unauthorized requests return HTTP 401 with explicit header:
+     `WWW-Authenticate: Bearer resource_metadata=".../.well-known/oauth-protected-resource", realm="cora-mcp", error="invalid_token"`
+5. **Tenant Context Hydration & Rate Limiting**:
+   - Bearer token authentication automatically hydrates tenant scoping (`cora_set_current_tenant_agency_id`) and sets the active WordPress user context.
+   - Transient-backed sliding window rate limiter strictly enforces 120 requests per minute (`RATE_LIMIT_RPM = 120`).
+
+---
+
+## 29. 3-Step Van Dispatch Wizard, Weight-Based Allocation & Real-Time Spot Billing (`class-cora-inventory-engine.php`)
+
+When implementing mobile field sales and warehouse logistics:
+1. **3-Step Modal Dispatch Wizard**:
+   - **Step 1: Driver & Van Assignment**: Binds field driver/vendor account, vehicle registration number, route territory, and departure odometer.
+   - **Step 2: Cargo & Weight Allocation**: Dynamic product inventory selector displaying available plant quantities in kilograms and unit packs. Computes live Gross Weight, Tare Weight, and Net Weight, validating against vehicle payload capacities and plant stock balance.
+   - **Step 3: Review & Dispatch Manifest**: Renders complete consignment summary, verifies stock availability, and issues unique alphanumeric manifest code (e.g. `MAN-2026-0042`).
+2. **Atomic Inventory Reservation**:
+   - Generating a consignment atomically deducts allocated kilograms/units from parent plant stock in `wp_cora_inventory_products` and inserts records in `wp_cora_inventory_consignments` and `wp_cora_inventory_consignment_items`.
+3. **Real-Time Spot Billing Engine (`cora_inventory_record_spot_sale`)**:
+   - Mobile field sales vendors record shop deliveries on location.
+   - Implements standardized unit pricing per kilogram (e.g. ₹401.25/kg) with dynamic gross/net calculations.
+   - Emits automatic 4-digit sequential invoice identifiers (`#1001`, `#1002`).
+   - Deducts sold stock directly from the driver's active mobile consignment balance.
+4. **Safe Restocking Rollback Protocol**:
+   - Voiding or deleting spot sales or consignments executes transactional rollback queries, returning unconsumed weights and unit packs back to warehouse inventory.
+
+---
+
+## 30. Itemized Sales Register, Ledger Export & Auto-Print Manifest Architecture
+
+When generating accounting registers and warehouse shipping documentation:
+1. **Standardized Sales Register Structure (`cora_inventory_get_sales_register`)**:
+   - Tabular layout enforces standardized column ordering:
+     1. `Bill #` (Formatted as clean 4-digit numeric string: `1001`, `1002`).
+     2. `Customer / Firm Name` (Prominently displayed before transaction date).
+     3. `Date` (Formatted strictly as date-only: `d M Y`, omitting cluttering time stamps).
+     4. `Itemized Cargo Details` (Sold weight in kg, product names, pack counts).
+     5. `Total Amount (₹)` (GST-inclusive final bill amount).
+     6. `Actions` (View Invoice, Print Tax Receipt, Delete / Rollback).
+2. **Standardized 5-Column Dispatch Report**:
+   - For warehouse logistics audits: `Manifest #`, `Vehicle / Driver`, `Allocated Weight (kg)`, `Dispatched Date`, `Status`.
+3. **Standardized 4-Column Plant Inventory Sheet**:
+   - For factory floor audits: `SKU / Item Name`, `Category`, `Available Stock (kg / Packs)`, `Total Plant Valuation (₹)`.
+4. **Streaming CSV Exporter**:
+   - `cora_inventory_export_sales_csv` streams itemized transaction data with UTF-8 BOM encoding for complete Excel/Sheets compatibility, splitting sold line items into distinct data rows.
+5. **Print Manifest Engine (`@media print`)**:
+   - Dedicated print-optimized layouts (`cora_inventory_render_van_stock_sheet`, `cora_inventory_render_sale_invoice`) featuring high-density monochromatic styling, carrier details, cargo checklists, driver signature lines, and receiver acknowledgment stamps.
+
+---
+
+## 31. Full-Height Edge-to-Edge Draggable Lead Drawer & Bi-Directional Synchronizer (`view-leads.php`, `admin-script.js`)
+
+When building CRM lead inspection and contact management interfaces:
+1. **Dynamic Body Portaling Pattern**:
+   - To eliminate clipping issues caused by parent scroll containers (`overflow: hidden`) and CSS transform contexts, drawers are portaled directly into `document.body`:
+     ```javascript
+     if (drawer && drawer.parentElement !== document.body) {
+         document.body.appendChild(drawer);
+     }
+     ```
+2. **Edge-to-Edge Anatomy**:
+   - Replaces floating centered dialogs and snapping drawers with a full-height right sheet (`top: 0; bottom: 0; right: 0; height: 100vh; position: fixed; z-index: 99999;`).
+   - Pairs with a soft transparent backdrop (`background: rgba(9, 9, 11, 0.25); backdrop-filter: blur(4px);`) to preserve visibility of underlying pipeline cards.
+3. **Continuous Draggable Resizer Engine (`window.coraInitLeadDrawerResize`)**:
+   - Integrated left-edge drag resizer handle (`#lead-drawer-resizer`).
+   - Binds `mousedown` and `touchstart` events with hardware-accelerated movement handlers.
+   - Enforces clamp boundaries (minimum width: `420px`, maximum width: `960px`).
+   - Persists width preferences in `localStorage['cora_lead_drawer_width']` for instantaneous restoration across workspace sessions.
+4. **Bi-Directional State Synchronization**:
+   - Form mutations inside the drawer (stage transition, qualification score, assignee update, notes) immediately patch corresponding Kanban cards and table row nodes in real time without triggering full view re-renders.
+
+---
+
+## 32. Automated GST Invoice Document Vault Registration & SHA-256 Linkage (`view-financials.php`, `cora-workspace.php`)
+
+When publishing tax-compliant GST invoices and archiving fiscal records:
+1. **Automated Vault Archiving Pipeline**:
+   - Finalizing and publishing a GST tax invoice in Financials automatically scaffolds an immutable legal record in the Document Vault (`wp_cora_vault_documents`).
+   - Automatically files the record under the `Invoices & Billing` vault category with `verified` audit status.
+2. **Cryptographic SHA-256 Tamper Protection**:
+   - On invoice creation or finalization, the system computes a 256-bit cryptographic digest over invoice attributes (seller GSTIN, buyer GSTIN, invoice number, HSN codes, taxable subtotal, tax breakdown, and timestamp):
+     ```php
+     $checksum_sha256 = hash( 'sha256', wp_json_encode( array(
+         'invoice_number' => $invoice_number,
+         'agency_id'      => $agency_id,
+         'gstin'          => $client_gstin,
+         'subtotal'       => $subtotal,
+         'tax_amount'     => $tax_amount,
+         'total'          => $grand_total,
+         'line_items'     => $line_items,
+         'issued_at'      => $issued_at
+     ) ) );
+     ```
+3. **Bidirectional Foreign Key Linkage**:
+   - The invoice record stores `vault_document_id` in its metadata.
+   - The vault document record stores `invoice_id`, `invoice_number`, and `checksum_sha256` in its metadata.
+   - Guarantees non-repudiation, automated PDF delivery to client portals, and instantaneous compliance auditing.
+
+---
+
+## 33. Tokenized Administration Email Verification & Locked Security Workflow (`view-settings-suite.php`, `cora-workspace.php`)
+
+When updating primary administration email addresses across workspace tenants:
+1. **Threat Mitigation**:
+   - Prevents unauthorized tenant hijacking, accidental typos, or malicious email redirections.
+2. **Dual-Stage State Machine**:
+   - **Active Verified State**: Renders the current operational email in a read-only locked input with a green shield badge (`Verified & Protected`) and an explicit "Change" action trigger.
+   - **Pending Verification State**: Initiating an email change creates a pending request while keeping the current admin email operational. The UI renders a dedicated alert card with the pending address, an amber status pill (`Verification Pending`), a 24-hour expiration notice, a resend trigger, and a cancel button.
+3. **CSPRNG Cryptographic Token Generation**:
+   - Generates a 32-byte cryptographically secure pseudorandom token (`bin2hex(random_bytes(32))`).
+   - Stores the SHA-256 hash in option `cora_pending_admin_email_hash_{agency_id}` with expiration timestamp `cora_pending_admin_email_expires_{agency_id}`.
+4. **Early Route Interception & Atomic Migration**:
+   - The verification email links to `/workspace/verify?admin_email_token={raw_token}&agency_id={id}`.
+   - Intercepted early in `cora_workspace_handle_workspace_route()` prior to standard WordPress template execution.
+   - Validates token using timing-safe `hash_equals()`.
+   - On successful verification, atomically updates the administration email, deletes pending options, logs an audit event, and redirects to Settings with a monochromatic confirmation toast.
+
+---
+
+*Cora Developer Feature Guide v4.9.316 — Last updated: October 2026.*

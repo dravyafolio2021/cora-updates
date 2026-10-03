@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.315
+ * Version:           4.9.337
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.315' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.337' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -1567,6 +1567,22 @@ function cora_workspace_handle_workspace_route() {
     }
     if ( in_array( 'wp-json', $path_parts, true ) || in_array( 'wp-admin', $path_parts, true ) || in_array( 'admin-ajax.php', $path_parts, true ) ) {
         return;
+    }
+
+    // Intercept Next.js / Static Assets early on init (/ _next/*, /_expo/*, /brand/*, or static extensions)
+    $path_ext = strtolower( pathinfo( $path, PATHINFO_EXTENSION ) );
+    $first_part_check = $path_parts[0] ?? '';
+    $is_static_asset_req = ( $first_part_check === '_next' || $first_part_check === '_expo' || $first_part_check === 'brand' || in_array( $path_ext, array( 'css', 'js', 'png', 'svg', 'jpg', 'jpeg', 'webp', 'ico', 'woff', 'woff2', 'ttf', 'json', 'map' ), true ) );
+    if ( $is_static_asset_req && ! in_array( $first_part_check, array( 'wp-content', 'wp-includes', 'assets', 'core', 'wp-admin' ), true ) ) {
+        global $wpdb;
+        $static_theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE settings LIKE '%is_static_built%' ORDER BY status = 'live' DESC, updated_at DESC, id DESC LIMIT 1", ARRAY_A );
+        if ( $static_theme ) {
+            $st_settings = json_decode( $static_theme['settings'] ?? '{}', true ) ?: array();
+            if ( ! empty( $st_settings['static_build_path'] ) && is_dir( $st_settings['static_build_path'] ) ) {
+                cora_render_nextjs_static_build( $st_settings['static_build_path'], $path, $static_theme, null, false );
+                exit;
+            }
+        }
     }
 
     // Bypass standalone router for Universal MCP, OAuth 2.1, and Well-Known Discovery
@@ -8878,6 +8894,67 @@ function cora_render_default_workspace_welcome_site( $ws_name = 'Cora Workspace'
 }
 
 /**
+ * Ensures Canvas database tables exist in the database across all environments.
+ */
+if ( ! function_exists( 'cora_ensure_canvas_tables_exist' ) ) {
+function cora_ensure_canvas_tables_exist() {
+    global $wpdb;
+    static $checked = false;
+    if ( $checked ) return;
+    $checked = true;
+
+    $themes_tbl = $wpdb->prefix . 'cora_canvas_themes';
+    $pages_tbl  = $wpdb->prefix . 'cora_canvas_pages';
+
+    $table_exists = $wpdb->get_var( "SHOW TABLES LIKE '{$themes_tbl}'" );
+    if ( empty( $table_exists ) ) {
+        $charset_collate = $wpdb->get_charset_collate();
+        $sql_themes = "CREATE TABLE IF NOT EXISTS {$themes_tbl} (
+            id bigint unsigned NOT NULL AUTO_INCREMENT,
+            agency_id bigint unsigned NOT NULL DEFAULT 1,
+            name varchar(255) NOT NULL,
+            status varchar(20) NOT NULL DEFAULT 'draft',
+            settings longtext,
+            activated_at datetime DEFAULT NULL,
+            created_by bigint unsigned NOT NULL DEFAULT 1,
+            created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+            updated_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+            PRIMARY KEY (id),
+            KEY agency_id (agency_id),
+            KEY status (status)
+        ) {$charset_collate};";
+
+        $sql_pages = "CREATE TABLE IF NOT EXISTS {$pages_tbl} (
+            id bigint unsigned NOT NULL AUTO_INCREMENT,
+            agency_id bigint unsigned NOT NULL DEFAULT 1,
+            theme_id bigint unsigned NOT NULL,
+            wp_post_id bigint unsigned NOT NULL DEFAULT 0,
+            title varchar(255) NOT NULL,
+            slug varchar(255) NOT NULL,
+            status varchar(20) NOT NULL DEFAULT 'draft',
+            is_homepage tinyint(1) NOT NULL DEFAULT 0,
+            template varchar(100) DEFAULT NULL,
+            seo_title varchar(255) DEFAULT NULL,
+            seo_description text,
+            seo_og_image varchar(500) DEFAULT NULL,
+            scheduled_at datetime DEFAULT NULL,
+            created_by bigint unsigned NOT NULL DEFAULT 1,
+            created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+            updated_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+            PRIMARY KEY (id),
+            KEY agency_id (agency_id),
+            KEY theme_id (theme_id),
+            KEY wp_post_id (wp_post_id)
+        ) {$charset_collate};";
+
+        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+        dbDelta( $sql_themes );
+        dbDelta( $sql_pages );
+    }
+}
+}
+
+/**
  * Automatically provisions a default Canvas theme and associated pages for a tenant agency workspace if one does not exist.
  */
 if ( ! function_exists( 'cora_provision_default_canvas_theme_for_agency' ) ) {
@@ -8966,10 +9043,1003 @@ function cora_provision_default_canvas_theme_for_agency( $agency_id ) {
 }
 
 /**
+ * Render Next.js / React Static Build Output & Asset Proxy
+ */
+if ( ! function_exists( 'cora_render_nextjs_static_build' ) ) {
+function cora_render_nextjs_static_build( $static_dir, $route_path = '/', $active_theme = array(), $target_ws = array(), $is_preview = false ) {
+    $static_dir = rtrim( $static_dir, '/' );
+    $real_static_dir = realpath( $static_dir );
+    if ( ! $real_static_dir || ! is_dir( $real_static_dir ) ) {
+        return false;
+    }
+
+    $request_uri = $_SERVER['REQUEST_URI'] ?? '';
+    $parsed_url  = parse_url( $request_uri );
+    $uri_path    = trim( $parsed_url['path'] ?? '', '/' );
+
+    // Normalize path to strip workspace prefix if needed
+    $home_path = trim( parse_url( home_url(), PHP_URL_PATH ) ?? '', '/' );
+    if ( ! empty( $home_path ) && strpos( $uri_path, $home_path ) === 0 ) {
+        $uri_path = trim( substr( $uri_path, strlen( $home_path ) ), '/' );
+    }
+
+    $clean_route = ( empty( $route_path ) || $route_path === 'home' || $route_path === '/' ) ? '' : trim( $route_path, '/' );
+
+    // 1. Check if requesting a static asset file (css, js, png, svg, json, font, etc.)
+    $asset_extensions = array( 'js', 'css', 'png', 'jpg', 'jpeg', 'gif', 'svg', 'webp', 'ico', 'json', 'woff', 'woff2', 'ttf', 'eot', 'map', 'wasm' );
+    $path_info = pathinfo( $uri_path );
+    $ext = strtolower( $path_info['extension'] ?? '' );
+
+    if ( in_array( $ext, $asset_extensions, true ) ) {
+        // Try finding asset inside static_dir
+        $candidate_asset_paths = array(
+            $real_static_dir . '/' . $uri_path,
+            $real_static_dir . '/' . preg_replace( '#^(site/[^/]+/|site/|[^/]+/site/|[^/]+/)#', '', $uri_path ),
+            $real_static_dir . '/' . basename( $uri_path )
+        );
+
+        foreach ( $candidate_asset_paths as $cap ) {
+            $real_cap = realpath( $cap );
+            // Path traversal defense: file must reside strictly inside $real_static_dir
+            if ( $real_cap && strpos( $real_cap, $real_static_dir ) === 0 && file_exists( $real_cap ) && ! is_dir( $real_cap ) ) {
+                while ( ob_get_level() > 0 ) {
+                    ob_end_clean();
+                }
+
+                // Fast 304 Not Modified check
+                $filemtime = filemtime( $real_cap );
+                $etag = '"' . md5( $real_cap . $filemtime ) . '"';
+                if ( isset( $_SERVER['HTTP_IF_NONE_MATCH'] ) && trim( $_SERVER['HTTP_IF_NONE_MATCH'] ) === $etag ) {
+                    status_header( 304 );
+                    exit;
+                }
+
+                status_header( 200 );
+                
+                $mime_types = array(
+                    'js'    => 'application/javascript; charset=UTF-8',
+                    'css'   => 'text/css; charset=UTF-8',
+                    'json'  => 'application/json; charset=UTF-8',
+                    'png'   => 'image/png',
+                    'jpg'   => 'image/jpeg',
+                    'jpeg'  => 'image/jpeg',
+                    'gif'   => 'image/gif',
+                    'svg'   => 'image/svg+xml',
+                    'webp'  => 'image/webp',
+                    'ico'   => 'image/x-icon',
+                    'woff'  => 'font/woff',
+                    'woff2' => 'font/woff2',
+                    'ttf'   => 'font/ttf',
+                    'eot'   => 'application/vnd.ms-fontobject',
+                    'map'   => 'application/json',
+                    'wasm'  => 'application/wasm'
+                );
+
+                $content_type = $mime_types[ $ext ] ?? 'application/octet-stream';
+                header( 'Content-Type: ' . $content_type );
+                header( 'Cache-Control: public, max-age=31536000, immutable' );
+                header( 'ETag: ' . $etag );
+                header( 'Access-Control-Allow-Origin: *' );
+                readfile( $real_cap );
+                exit;
+            }
+        }
+    }
+
+    // 2. Serve HTML Route
+    $html_file = '';
+    if ( empty( $clean_route ) || $clean_route === 'home' ) {
+        if ( file_exists( $real_static_dir . '/index.html' ) ) {
+            $html_file = $real_static_dir . '/index.html';
+        }
+    } else {
+        if ( file_exists( $real_static_dir . '/' . $clean_route . '.html' ) ) {
+            $html_file = $real_static_dir . '/' . $clean_route . '.html';
+        } elseif ( file_exists( $real_static_dir . '/' . $clean_route . '/index.html' ) ) {
+            $html_file = $real_static_dir . '/' . $clean_route . '/index.html';
+        } elseif ( file_exists( $real_static_dir . '/index.html' ) ) {
+            // SPA fallback
+            $html_file = $real_static_dir . '/index.html';
+        }
+    }
+
+    if ( ! $html_file || ! file_exists( $html_file ) ) {
+        if ( file_exists( $real_static_dir . '/404.html' ) ) {
+            $html_file = $real_static_dir . '/404.html';
+        } elseif ( file_exists( $real_static_dir . '/index.html' ) ) {
+            $html_file = $real_static_dir . '/index.html';
+        } else {
+            return false;
+        }
+    }
+
+    $real_html = realpath( $html_file );
+    if ( ! $real_html || strpos( $real_html, $real_static_dir ) !== 0 ) {
+        return false;
+    }
+
+    $html = file_get_contents( $real_html );
+
+    while ( ob_get_level() > 0 ) {
+        ob_end_clean();
+    }
+    status_header( 200 );
+    nocache_headers();
+    header( 'Content-Type: text/html; charset=UTF-8' );
+
+    $ws_name = ! empty( $target_ws['name'] ) ? $target_ws['name'] : get_bloginfo( 'name' );
+    $ws_slug = ! empty( $target_ws['slug'] ) ? $target_ws['slug'] : 'workspace';
+    $theme_id = ! empty( $active_theme['id'] ) ? intval( $active_theme['id'] ) : 0;
+
+    $api_url = rest_url( 'cora-canvas/v1/' );
+    $public_api_url = home_url( '/api/v1/public/' );
+    $form_embed_url = plugins_url( 'assets/js/cora-form-embed.js', __FILE__ );
+    $rest_nonce = wp_create_nonce( 'wp_rest' );
+    $ajax_nonce = wp_create_nonce( 'cora_ajax_nonce' );
+
+    $injection = "\n<script id=\"cora-context-bridge\">\n"
+        . "window.CORA_API_URL = " . json_encode( $api_url ) . ";\n"
+        . "window.CORA_PUBLIC_API_URL = " . json_encode( $public_api_url ) . ";\n"
+        . "window.CORA_FORM_EMBED_URL = " . json_encode( $form_embed_url ) . ";\n"
+        . "window.CORA_NONCE = " . json_encode( $rest_nonce ) . ";\n"
+        . "window.CORA_AJAX_NONCE = " . json_encode( $ajax_nonce ) . ";\n"
+        . "window.CORA_THEME_ID = " . json_encode( $theme_id ) . ";\n"
+        . "window.CORA_WORKSPACE_SLUG = " . json_encode( $ws_slug ) . ";\n"
+        . "window.CORA_IS_STATIC_BUILD = true;\n"
+        . "\n"
+        . "/* Cora Universal Lead Form Bridge */\n"
+        . "window.submitCoraLead = async function(formData) {\n"
+        . "    try {\n"
+        . "        var payload = {};\n"
+        . "        if (formData instanceof HTMLFormElement) {\n"
+        . "            var fd = new FormData(formData);\n"
+        . "            fd.forEach(function(v, k) { payload[k] = v; });\n"
+        . "        } else if (typeof formData === 'object' && formData !== null) {\n"
+        . "            payload = formData;\n"
+        . "        }\n"
+        . "        if (!payload.source) payload.source = 'Website Form';\n"
+        . "        if (window.CORA_THEME_ID) payload.theme_id = window.CORA_THEME_ID;\n"
+        . "        var endpoint = (window.CORA_API_URL ? window.CORA_API_URL + 'nextjs/forms/submit' : '/wp-json/cora-canvas/v1/nextjs/forms/submit');\n"
+        . "        var res = await fetch(endpoint, {\n"
+        . "            method: 'POST',\n"
+        . "            headers: {\n"
+        . "                'Content-Type': 'application/json',\n"
+        . "                'X-WP-Nonce': window.CORA_NONCE || ''\n"
+        . "            },\n"
+        . "            body: JSON.stringify(payload)\n"
+        . "        });\n"
+        . "        return await res.json();\n"
+        . "    } catch(err) {\n"
+        . "        console.error('Cora lead submission error:', err);\n"
+        . "        return { success: false, message: err.message };\n"
+        . "    }\n"
+        . "};\n"
+        . "\n"
+        . "/* Automatic Form Interception & Modal Embed Support */\n"
+        . "document.addEventListener('DOMContentLoaded', function() {\n"
+        . "    if (document.querySelector('.cora-form-embed, [data-cora-open-form]')) {\n"
+        . "        if (!document.querySelector('script[src*=\"cora-form-embed.js\"]')) {\n"
+        . "            var s = document.createElement('script');\n"
+        . "            s.src = window.CORA_FORM_EMBED_URL || '/wp-content/plugins/cora-workspace/assets/js/cora-form-embed.js';\n"
+        . "            s.defer = true;\n"
+        . "            document.head.appendChild(s);\n"
+        . "        }\n"
+        . "    }\n"
+        . "});\n"
+        . "\n"
+        . "document.addEventListener('submit', async function(e) {\n"
+        . "    var form = e.target;\n"
+        . "    if (!form || form.tagName !== 'FORM') return;\n"
+        . "    if (form.getAttribute('data-cora-ignore') === 'true') return;\n"
+        . "    var action = (form.getAttribute('action') || '').trim();\n"
+        . "    var isCoraEndpoint = action.indexOf('/wp-json/cora-canvas/v1/nextjs/forms/submit') !== -1 ||\n"
+        . "                         action.indexOf('/wp-json/cora/v1/forms/submit') !== -1 ||\n"
+        . "                         action.indexOf('cora-canvas/v1/nextjs/forms/submit') !== -1 ||\n"
+        . "                         action.indexOf('cora/v1/forms/submit') !== -1;\n"
+        . "    var isBlankAction = !action || action === '#' || action === '' || action.startsWith('javascript:');\n"
+        . "    var hasLeadFields = !!form.querySelector('[name=\"name\"], [name=\"email\"], [name=\"full_name\"], [name=\"first_name\"], [name=\"contact_name\"], [name=\"your-name\"], [name=\"your-email\"], input[type=\"email\"]');\n"
+        . "\n"
+        . "    if (isCoraEndpoint || isBlankAction || hasLeadFields) {\n"
+        . "        e.preventDefault();\n"
+        . "        var submitBtn = form.querySelector('button[type=\"submit\"], input[type=\"submit\"], button:not([type])');\n"
+        . "        var originalText = submitBtn ? submitBtn.innerHTML : '';\n"
+        . "        if (submitBtn) {\n"
+        . "            submitBtn.disabled = true;\n"
+        . "            submitBtn.innerHTML = 'Submitting…';\n"
+        . "        }\n"
+        . "        var result = await window.submitCoraLead(form);\n"
+        . "        if (submitBtn) {\n"
+        . "            submitBtn.disabled = false;\n"
+        . "            submitBtn.innerHTML = originalText;\n"
+        . "        }\n"
+        . "        var alertBox = form.querySelector('.cora-form-feedback');\n"
+        . "        if (!alertBox) {\n"
+        . "            alertBox = document.createElement('div');\n"
+        . "            alertBox.className = 'cora-form-feedback';\n"
+        . "            if (submitBtn && submitBtn.parentNode === form) {\n"
+        . "                form.insertBefore(alertBox, submitBtn);\n"
+        . "            } else {\n"
+        . "                form.appendChild(alertBox);\n"
+        . "            }\n"
+        . "        }\n"
+        . "        if (result && result.success) {\n"
+        . "            alertBox.style.cssText = 'margin-top:14px;margin-bottom:14px;padding:14px 18px;background:#09090b;color:#f4f4f5;border:1px solid #27272a;border-radius:10px;font-size:13px;font-weight:500;text-align:center;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 4px 12px rgba(0,0,0,0.3);';\n"
+        . "            alertBox.innerHTML = '<svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#10b981\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M22 11.08V12a10 10 0 1 1-5.93-9.14\"></path><polyline points=\"22 4 12 14.01 9 11.01\"></polyline></svg> <span>' + (result.message || 'Thank you! Your message has been received.') + '</span>';\n"
+        . "            form.reset();\n"
+        . "            setTimeout(function() { if (alertBox && alertBox.parentNode) alertBox.remove(); }, 8000);\n"
+        . "        } else {\n"
+        . "            alertBox.style.cssText = 'margin-top:14px;margin-bottom:14px;padding:14px 18px;background:#09090b;color:#f43f5e;border:1px solid #27272a;border-radius:10px;font-size:13px;font-weight:500;text-align:center;display:flex;align-items:center;justify-content:center;gap:10px;';\n"
+        . "            alertBox.innerHTML = '<svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#f43f5e\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle><line x1=\"12\" y1=\"8\" x2=\"12\" y2=\"12\"></line><line x1=\"12\" y1=\"16\" x2=\"12.01\" y2=\"16\"></line></svg> <span>' + (result && result.message ? result.message : 'Submission failed. Please check required fields.') + '</span>';\n"
+        . "        }\n"
+        . "    }\n"
+        . "});\n"
+        . "</script>\n";
+
+    if ( strpos( $html, 'cora-form-embed' ) !== false || strpos( $html, 'data-cora-open-form' ) !== false ) {
+        $injection .= '<script src="' . esc_url( $form_embed_url ) . '" defer></script>' . "\n";
+    }
+
+    if ( $is_preview && function_exists( 'cora_canvas_preview_bar_js' ) ) {
+        $rest_url = esc_url( cora_get_origin_relative_url( rest_url( 'cora/v1/preview-bar-data' ) ) );
+        $site_url = esc_url( home_url() );
+        $injection .= '<script id="cora-preview-bar-injector">' . "\n"
+            . 'var REST_BASE = ' . json_encode( $rest_url ) . ";\n"
+            . 'var SITE_URL = ' . json_encode( $site_url ) . ";\n"
+            . cora_canvas_preview_bar_js()
+            . '</script>' . "\n";
+    }
+
+    if ( stripos( $html, '</head>' ) !== false ) {
+        $html = str_ireplace( '</head>', $injection . '</head>', $html );
+    } else {
+        $html = $injection . $html;
+    }
+
+    echo $html;
+    exit;
+}
+}
+
+/**
+ * Render Next.js Live Frame Bridge & Embedded Headless View
+ */
+if ( ! function_exists( 'cora_render_nextjs_live_frame' ) ) {
+function cora_render_nextjs_live_frame( $live_url, $route_path = '/', $active_theme = array(), $target_ws = array(), $is_preview = false ) {
+    while ( ob_get_level() > 0 ) {
+        ob_end_clean();
+    }
+    status_header( 200 );
+    nocache_headers();
+
+    $live_url = rtrim( trim( $live_url ), '/' );
+    $clean_route = ( empty( $route_path ) || $route_path === 'home' || $route_path === '/' ) ? '/' : '/' . ltrim( $route_path, '/' );
+    $iframe_src = $live_url . $clean_route;
+
+    $ws_name = ! empty( $target_ws['name'] ) ? $target_ws['name'] : get_bloginfo( 'name' );
+    $ws_slug = ! empty( $target_ws['slug'] ) ? $target_ws['slug'] : ( ! empty( $GLOBALS['cora_active_workspace_site_slug'] ) ? $GLOBALS['cora_active_workspace_site_slug'] : 'workspace' );
+    $theme_id = ! empty( $active_theme['id'] ) ? intval( $active_theme['id'] ) : ( function_exists( 'cora_get_preview_theme_id' ) ? intval( cora_get_preview_theme_id() ) : 0 );
+    
+    $api_url = rest_url( 'cora-canvas/v1/' );
+    $public_api_url = home_url( '/api/v1/public/' );
+    $rest_nonce = wp_create_nonce( 'wp_rest' );
+    $ajax_nonce = wp_create_nonce( 'cora_ajax_nonce' );
+
+    $preview_bar_html = '';
+    if ( $is_preview && function_exists( 'cora_canvas_preview_bar_js' ) ) {
+        $rest_url = esc_url( cora_get_origin_relative_url( rest_url( 'cora/v1/preview-bar-data' ) ) );
+        $site_url = esc_url( home_url() );
+        $preview_bar_html = '<script id="cora-preview-bar-injector">' . "\n"
+            . 'var REST_BASE = ' . json_encode( $rest_url ) . ";\n"
+            . 'var SITE_URL = ' . json_encode( $site_url ) . ";\n"
+            . cora_canvas_preview_bar_js()
+            . '</script>' . "\n";
+    }
+
+    $title = esc_html( $ws_name ) . ' — Next.js Live Preview';
+    
+    header( 'Content-Type: text/html; charset=UTF-8' );
+    ?>
+<!DOCTYPE html>
+<html lang="en" style="height: 100%; width: 100%; overflow: hidden; background: #09090b;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title><?php echo $title; ?></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { width: 100%; height: 100%; overflow: hidden; background: #09090b; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+        #cora-nextjs-frame-wrapper { position: fixed; top: 0; left: 0; right: 0; bottom: 0; width: 100%; height: 100%; z-index: 10; display: flex; flex-direction: column; }
+        #cora-nextjs-iframe { width: 100%; height: 100%; flex: 1; border: none; background: #ffffff; }
+        #cora-frame-loader { position: fixed; top: 0; left: 0; width: 100%; height: 3px; z-index: 99999; background: rgba(24, 24, 27, 0.4); overflow: hidden; }
+        #cora-frame-progress { width: 0%; height: 100%; background: #ffffff; transition: width 0.3s ease; }
+        #cora-error-overlay { display: none; position: fixed; inset: 0; z-index: 50; background: rgba(9,9,11,0.92); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); align-items: center; justify-content: center; padding: 24px; }
+        #cora-error-overlay.active { display: flex; }
+    </style>
+    <script>
+        window.CORA_API_URL = <?php echo json_encode( $api_url ); ?>;
+        window.CORA_PUBLIC_API_URL = <?php echo json_encode( $public_api_url ); ?>;
+        window.CORA_NONCE = <?php echo json_encode( $rest_nonce ); ?>;
+        window.CORA_AJAX_NONCE = <?php echo json_encode( $ajax_nonce ); ?>;
+        window.CORA_THEME_ID = <?php echo json_encode( $theme_id ); ?>;
+        window.CORA_WORKSPACE_SLUG = <?php echo json_encode( $ws_slug ); ?>;
+        window.CORA_IS_PREVIEW = <?php echo $is_preview ? 'true' : 'false'; ?>;
+        window.CORA_TARGET_ROUTE = <?php echo json_encode( $clean_route ); ?>;
+        window.CORA_NEXTJS_LIVE_URL = <?php echo json_encode( $live_url ); ?>;
+    </script>
+</head>
+<body style="background: #09090b; color: #f4f4f5; -webkit-font-smoothing: antialiased;">
+    <div id="cora-frame-loader"><div id="cora-frame-progress"></div></div>
+
+    <div id="cora-nextjs-frame-wrapper">
+        <iframe
+            id="cora-nextjs-iframe"
+            src="<?php echo esc_url( $iframe_src ); ?>"
+            allow="geolocation; microphone; camera; midi; vr; accelerometer; gyroscope; payment; ambient-light-sensor; encrypted-media; usb"
+            sandbox="allow-forms allow-modals allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts allow-downloads"
+            title="<?php echo esc_attr( $ws_name ); ?> Next.js Preview"
+        ></iframe>
+    </div>
+
+    <!-- Error / Local Dev Server Offline Card Overlay -->
+    <div id="cora-error-overlay">
+        <div style="max-width: 500px; width: 100%; background: #18181b; border: 1px solid #27272a; border-radius: 16px; padding: 30px 26px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7); text-align: center;">
+            <div style="width: 48px; height: 48px; border-radius: 14px; background: #27272a; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px; border: 1px solid #3f3f46;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f4f4f5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            </div>
+            <h3 style="font-size: 17px; font-weight: 700; color: #ffffff; margin-bottom: 8px; letter-spacing: -0.01em;">Local Dev Server Offline</h3>
+            <p style="font-size: 13px; color: #a1a1aa; line-height: 1.55; margin-bottom: 18px;">
+                Unable to connect to <code style="background: #27272a; color: #f4f4f5; padding: 2px 7px; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 12px; border: 1px solid #3f3f46;"><?php echo esc_html( $live_url ); ?></code>.<br>
+                Build the static site from your GitHub repo or start your local dev server.
+            </p>
+
+            <!-- 1-Click Primary Action: Build Static Site from GitHub -->
+            <button id="btn-inline-build" onclick="runInlineStaticBuild()" style="background: #ffffff; color: #09090b; border: none; font-weight: 700; font-size: 13px; padding: 11px 20px; border-radius: 8px; cursor: pointer; transition: all 0.15s ease; display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-bottom: 14px; box-shadow: 0 4px 14px rgba(255,255,255,0.12);">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                <span id="btn-inline-build-label">Build Static Site from GitHub</span>
+            </button>
+            
+            <!-- Terminal Instruction Card -->
+            <div style="background: #09090b; border: 1px solid #27272a; border-radius: 10px; padding: 12px 14px; text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #d4d4d8; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
+                    <span style="color: #71717a; font-weight: 600;">$</span>
+                    <span style="color: #ffffff; font-weight: 500;">npm run dev</span>
+                </div>
+                <button type="button" onclick="navigator.clipboard.writeText('npm run dev'); var el=this; el.innerText='Copied!'; setTimeout(function(){ el.innerText='Copy'; }, 2000);" style="background: #27272a; color: #a1a1aa; border: 1px solid #3f3f46; border-radius: 6px; padding: 3px 9px; font-size: 10px; font-weight: 600; cursor: pointer; transition: all 0.15s ease;">Copy</button>
+            </div>
+
+            <!-- Action Buttons Grid -->
+            <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+                <button onclick="window.location.reload()" style="background: #27272a; color: #f4f4f5; border: 1px solid #3f3f46; font-weight: 600; font-size: 12.5px; padding: 9px 16px; border-radius: 8px; cursor: pointer; transition: opacity 0.15s ease; display: inline-flex; align-items: center; gap: 6px;">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                    Retry Connection
+                </button>
+                <button onclick="window.location.href=window.location.pathname+'?cv_edit_url=1'" style="background: #27272a; color: #f4f4f5; border: 1px solid #3f3f46; font-weight: 600; font-size: 12.5px; padding: 9px 15px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                    Change URL
+                </button>
+                <a href="<?php echo esc_url( $live_url ); ?>" target="_blank" rel="noopener noreferrer" style="background: #27272a; color: #f4f4f5; border: 1px solid #3f3f46; font-weight: 600; font-size: 12.5px; padding: 9px 15px; border-radius: 8px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                    Open <?php echo esc_html( preg_replace( '#^https?://#', '', $live_url ) ); ?> ↗
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    (function() {
+        var iframe = document.getElementById('cora-nextjs-iframe');
+        var progress = document.getElementById('cora-frame-progress');
+        var loader = document.getElementById('cora-frame-loader');
+        var overlay = document.getElementById('cora-error-overlay');
+        var isPreview = <?php echo $is_preview ? 'true' : 'false'; ?>;
+        var themeId = <?php echo json_encode( $theme_id ); ?>;
+        var wsSlug = <?php echo json_encode( $ws_slug ); ?>;
+        var isLoaded = false;
+
+        if (progress) progress.style.width = '60%';
+
+        function showOffline() {
+            if (isLoaded) return;
+            if (overlay) overlay.classList.add('active');
+            if (loader) loader.style.display = 'none';
+        }
+
+        window.runInlineStaticBuild = function() {
+            var btn = document.getElementById('btn-inline-build');
+            var label = document.getElementById('btn-inline-build-label');
+            if (btn) btn.disabled = true;
+            if (label) label.innerText = 'Cloning & Building from GitHub…';
+
+            var fd = new FormData();
+            fd.append('action', 'cora_nextjs_build_repo');
+            fd.append('theme_id', themeId);
+            fd.append('nonce', window.CORA_AJAX_NONCE || '');
+
+            fetch('/wp-admin/admin-ajax.php', {
+                method: 'POST',
+                body: fd
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(res) {
+                if (res && res.success) {
+                    if (label) label.innerText = 'Build Complete! Loading…';
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 600);
+                } else {
+                    if (btn) btn.disabled = false;
+                    if (label) label.innerText = 'Build Static Site from GitHub';
+                    var errMsg = (res && res.data && res.data.message) ? res.data.message : 'Build failed.';
+                    alert(errMsg);
+                    if (res && res.data && res.data.logs) {
+                        console.error('Build logs:', res.data.logs);
+                    }
+                }
+            })
+            .catch(function(err) {
+                if (btn) btn.disabled = false;
+                if (label) label.innerText = 'Build Static Site from GitHub';
+                alert('Network error while building repository.');
+            });
+        };
+
+        // Fast probe check via fetch (immediately detects offline localhost)
+        if (window.fetch && window.CORA_NEXTJS_LIVE_URL) {
+            fetch(window.CORA_NEXTJS_LIVE_URL, { mode: 'no-cors', cache: 'no-store' })
+                .then(function() {
+                    // Server reachable
+                })
+                .catch(function(err) {
+                    showOffline();
+                });
+        }
+
+        var loadTimeout = setTimeout(function() {
+            if (!isLoaded) {
+                showOffline();
+            }
+        }, 5000);
+
+        if (iframe) {
+            iframe.addEventListener('error', function() {
+                clearTimeout(loadTimeout);
+                showOffline();
+            });
+
+            iframe.addEventListener('load', function() {
+                isLoaded = true;
+                clearTimeout(loadTimeout);
+                if (progress) progress.style.width = '100%';
+                setTimeout(function() {
+                    if (loader) loader.style.display = 'none';
+                }, 300);
+
+                try {
+                    iframe.contentWindow.postMessage({
+                        type: 'CORA_INIT',
+                        apiUrl: window.CORA_API_URL,
+                        publicApiUrl: window.CORA_PUBLIC_API_URL,
+                        nonce: window.CORA_NONCE,
+                        themeId: window.CORA_THEME_ID,
+                        workspaceSlug: window.CORA_WORKSPACE_SLUG,
+                        route: window.CORA_TARGET_ROUTE
+                    }, '*');
+                } catch(e) {}
+            });
+        }
+
+        // Listen for route sync from child Next.js frame
+        window.addEventListener('message', function(event) {
+            if (!event.data || typeof event.data !== 'object') return;
+
+            if (event.data.type === 'CORA_ROUTE_CHANGE' && event.data.path) {
+                isLoaded = true;
+                if (overlay) overlay.classList.remove('active');
+                var newPath = event.data.path;
+                var currentUrl = new URL(window.location.href);
+                var pathPrefix = currentUrl.pathname.startsWith('/site/' + wsSlug) ? ('/site/' + wsSlug) : (currentUrl.pathname.startsWith('/site') ? '/site' : (currentUrl.pathname.startsWith('/' + wsSlug) ? ('/' + wsSlug) : ''));
+                
+                var cleanNew = (newPath === '/' || newPath === '/home') ? '' : ('/' + newPath.replace(/^\/+/, ''));
+                var formatted = (pathPrefix ? pathPrefix : '') + (cleanNew ? cleanNew : '/');
+                if (formatted !== currentUrl.pathname) {
+                    currentUrl.pathname = formatted;
+                    try {
+                        window.history.replaceState(null, '', currentUrl.toString());
+                    } catch(e) {}
+                }
+            }
+
+            if (event.data.type === 'CORA_GET_CONFIG') {
+                isLoaded = true;
+                if (overlay) overlay.classList.remove('active');
+                try {
+                    if (iframe && iframe.contentWindow) {
+                        iframe.contentWindow.postMessage({
+                            type: 'CORA_CONFIG_RESPONSE',
+                            apiUrl: window.CORA_API_URL,
+                            nonce: window.CORA_NONCE,
+                            themeId: window.CORA_THEME_ID,
+                            workspaceSlug: window.CORA_WORKSPACE_SLUG
+                        }, '*');
+                    }
+                } catch(e) {}
+            }
+        });
+    })();
+    </script>
+
+    <?php echo $preview_bar_html; ?>
+</body>
+</html>
+    <?php
+    exit;
+}
+}
+
+/**
+ * Render Monochromatic Next.js Native Static Deployment Hub Screen
+ */
+if ( ! function_exists( 'cora_render_nextjs_connector_screen' ) ) {
+function cora_render_nextjs_connector_screen( $active_theme = array(), $target_ws = array(), $target_page_slug = '', $is_preview = false ) {
+    while ( ob_get_level() > 0 ) {
+        ob_end_clean();
+    }
+    status_header( 200 );
+    nocache_headers();
+
+    global $wpdb;
+    $theme_id = ! empty( $active_theme['id'] ) ? intval( $active_theme['id'] ) : 0;
+    $theme_settings = $active_theme ? ( json_decode( $active_theme['settings'] ?? '{}', true ) ?: array() ) : array();
+
+    $ws_name = ! empty( $target_ws['name'] ) ? $target_ws['name'] : get_bloginfo( 'name' );
+    $ws_slug = ! empty( $target_ws['slug'] ) ? $target_ws['slug'] : ( ! empty( $GLOBALS['cora_active_workspace_site_slug'] ) ? $GLOBALS['cora_active_workspace_site_slug'] : 'workspace' );
+
+    $repo = $theme_settings['github_repo'] ?? '';
+    $branch = $theme_settings['github_branch'] ?? 'main';
+    $current_live_url = $theme_settings['nextjs_live_url'] ?? ( $theme_settings['live_url'] ?? '' );
+    $framework = $theme_settings['framework'] ?? 'Next.js';
+    $ajax_nonce = wp_create_nonce( 'cora_ajax_nonce' );
+
+    // Fetch scanned routes for this theme
+    $routes = array();
+    if ( $theme_id > 0 ) {
+        $routes = $wpdb->get_results( $wpdb->prepare(
+            "SELECT id, title, slug, is_homepage, status FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d AND status != 'trash' ORDER BY is_homepage DESC, id ASC",
+            $theme_id
+        ), ARRAY_A );
+    }
+
+    if ( empty( $routes ) ) {
+        $routes = array(
+            array( 'title' => 'Home', 'slug' => 'home', 'is_homepage' => 1 ),
+            array( 'title' => 'Insights', 'slug' => 'insights', 'is_homepage' => 0 ),
+            array( 'title' => 'Services', 'slug' => 'services', 'is_homepage' => 0 ),
+            array( 'title' => 'Contact', 'slug' => 'contact', 'is_homepage' => 0 ),
+        );
+    }
+
+    $preview_bar_html = '';
+    if ( $is_preview && function_exists( 'cora_canvas_preview_bar_js' ) ) {
+        $rest_url = esc_url( cora_get_origin_relative_url( rest_url( 'cora/v1/preview-bar-data' ) ) );
+        $site_url = esc_url( home_url() );
+        $preview_bar_html = '<script id="cora-preview-bar-injector">' . "\n"
+            . 'var REST_BASE = ' . json_encode( $rest_url ) . ";\n"
+            . 'var SITE_URL = ' . json_encode( $site_url ) . ";\n"
+            . cora_canvas_preview_bar_js()
+            . '</script>' . "\n";
+    }
+
+    $webhook_url = home_url( '/wp-json/cora-canvas/v1/nextjs/github-webhook?theme_id=' . $theme_id );
+    $manifest_api_url = rest_url( 'cora-canvas/v1/nextjs/manifest' . ( $theme_id ? '?theme_id=' . $theme_id : '' ) );
+
+    header( 'Content-Type: text/html; charset=UTF-8' );
+    ?>
+<!DOCTYPE html>
+<html lang="en" style="background: #09090b; color: #f4f4f5; min-height: 100%;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?php echo esc_html( $ws_name ); ?> — Static Site Deployment Center</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: #09090b; color: #f4f4f5; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 16px; -webkit-font-smoothing: antialiased; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        .toast-enter { transform: translateY(0); opacity: 1; transition: all 0.25s ease-out; }
+        .toast-exit { transform: translateY(-10px); opacity: 0; transition: all 0.2s ease-in; }
+        .btn-primary { background: #ffffff; color: #09090b; font-weight: 600; font-size: 14px; padding: 12px 24px; border-radius: 10px; border: none; cursor: pointer; transition: all 0.15s ease; display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; box-shadow: 0 4px 14px rgba(255,255,255,0.15); }
+        .btn-primary:hover { background: #f4f4f5; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(255,255,255,0.25); }
+        .btn-primary:active { transform: scale(0.99); }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .preset-chip { background: #18181b; color: #a1a1aa; border: 1px solid #27272a; padding: 3px 8px; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 11px; cursor: pointer; transition: all 0.15s ease; }
+        .preset-chip:hover { background: #27272a; color: #f4f4f5; border-color: #3f3f46; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .spinning { animation: spin 1s linear infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .pulsing { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+    </style>
+</head>
+<body>
+    <!-- Monochromatic Toast Container -->
+    <div id="cora-toast-container" style="position: fixed; top: 20px; right: 20px; z-index: 999999; display: flex; flex-direction: column; gap: 8px; pointer-events: none;"></div>
+
+    <main style="width: 100%; max-width: 640px; background: #18181b; border: 1px solid #27272a; border-radius: 20px; padding: 32px 28px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7); margin: auto;">
+        <!-- Top Header -->
+        <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #27272a; padding-bottom: 20px; margin-bottom: 24px;">
+            <div style="display: flex; align-items: center; gap: 14px;">
+                <div style="width: 44px; height: 44px; border-radius: 12px; background: #27272a; border: 1px solid #3f3f46; display: flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #ffffff; font-size: 18px;">
+                    ▲
+                </div>
+                <div>
+                    <h1 style="font-size: 16px; font-weight: 600; color: #f4f4f5; display: flex; align-items: center; gap: 8px; letter-spacing: -0.01em;">
+                        <?php echo esc_html( $ws_name ); ?>
+                        <span style="font-size: 11px; font-family: 'JetBrains Mono', monospace; font-weight: 500; background: #27272a; color: #d4d4d8; border: 1px solid #3f3f46; padding: 2px 7px; border-radius: 6px;"><?php echo esc_html( $framework ); ?></span>
+                    </h1>
+                    <p style="font-size: 12px; color: #71717a; margin-top: 2px;">Automated Static Site Deployment & Hosting Engine</p>
+                </div>
+            </div>
+            <div>
+                <span id="cora-status-pill" style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 500; background: #27272a; color: #d4d4d8; border: 1px solid #3f3f46;">
+                    <span style="width: 6px; height: 6px; border-radius: 9999px; background: #eab308;"></span>
+                    Build Required
+                </span>
+            </div>
+        </div>
+
+        <!-- Hero Build & Deploy Card -->
+        <div style="background: #09090b; border: 1px solid #27272a; border-radius: 16px; padding: 24px; margin-bottom: 20px;">
+            <div style="margin-bottom: 18px;">
+                <div style="font-size: 14px; font-weight: 600; color: #f4f4f5; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+                    <span>⚡ Deploy & Host Static Site</span>
+                </div>
+                <p style="font-size: 12px; color: #a1a1aa; line-height: 1.5;">
+                    Compile and host your Next.js / React application directly on this domain as an ultra-fast static site. No separate external hosting, Vercel, or local dev server is required.
+                </p>
+            </div>
+
+            <button type="button" id="cora-static-build-btn" onclick="coraTriggerStaticBuild()" class="btn-primary">
+                <svg id="cora-btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                <span id="cora-static-build-btn-text">⚡ Build & Deploy Static Site from GitHub</span>
+            </button>
+
+            <!-- Real-Time Build Progress Logs Window -->
+            <div id="cora-build-progress-box" style="display: none; margin-top: 16px; background: #18181b; border: 1px solid #27272a; border-radius: 10px; padding: 14px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #d4d4d8;">
+                <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #27272a; padding-bottom: 8px; margin-bottom: 10px; color: #71717a; font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em;">
+                    <span id="cora-build-step-title">Building project…</span>
+                    <span id="cora-build-spinner" class="spinning" style="display: inline-block;">⚙️</span>
+                </div>
+                <div id="cora-build-steps" style="display: flex; flex-direction: column; gap: 6px;">
+                    <div id="step-1" style="color: #71717a;">[ ] 1. Cloning & fetching latest commit from GitHub...</div>
+                    <div id="step-2" style="color: #71717a;">[ ] 2. Preparing environment & resolving dependencies...</div>
+                    <div id="step-3" style="color: #71717a;">[ ] 3. Compiling Next.js App Router / React components...</div>
+                    <div id="step-4" style="color: #71717a;">[ ] 4. Prerendering static HTML for all scanned routes...</div>
+                    <div id="step-5" style="color: #71717a;">[ ] 5. Deploying static assets to web server...</div>
+                </div>
+                <div id="cora-build-error-log" style="display: none; margin-top: 10px; padding: 8px; background: #27272a; border-radius: 6px; color: #f43f5e; white-space: pre-wrap; font-size: 10px; max-height: 140px; overflow-y: auto;"></div>
+            </div>
+        </div>
+
+        <!-- Connected Repository & Routes Grid -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px;">
+            <div style="background: #09090b; border: 1px solid #27272a; border-radius: 12px; padding: 16px;">
+                <div style="font-size: 11px; color: #71717a; text-transform: uppercase; font-weight: 600; letter-spacing: 0.04em; margin-bottom: 8px;">Connected Repository</div>
+                <?php if ( ! empty( $repo ) ) : ?>
+                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #f4f4f5; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 4px;" title="<?php echo esc_attr( $repo ); ?>">
+                        <?php echo esc_html( $repo ); ?>
+                    </div>
+                    <div style="font-size: 11px; color: #a1a1aa; font-family: 'JetBrains Mono', monospace;">
+                        branch: <?php echo esc_html( $branch ); ?>
+                    </div>
+                <?php else : ?>
+                    <div style="font-size: 12px; color: #a1a1aa;">Headless static mode</div>
+                <?php endif; ?>
+            </div>
+
+            <div style="background: #09090b; border: 1px solid #27272a; border-radius: 12px; padding: 16px;">
+                <div style="font-size: 11px; color: #71717a; text-transform: uppercase; font-weight: 600; letter-spacing: 0.04em; margin-bottom: 8px;">Scanned Routes (<?php echo count( $routes ); ?>)</div>
+                <div style="display: flex; flex-wrap: wrap; gap: 6px; max-height: 60px; overflow-y: auto;">
+                    <?php foreach ( $routes as $r ) : ?>
+                        <?php $r_path = ( ! empty( $r['is_homepage'] ) || ( isset( $r['slug'] ) && $r['slug'] === 'home' ) ) ? '/' : '/' . ltrim( $r['slug'], '/' ); ?>
+                        <span style="display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 6px; background: #18181b; color: #d4d4d8; font-family: 'JetBrains Mono', monospace; font-size: 11px; border: 1px solid #27272a;">
+                            <?php echo esc_html( $r_path ); ?>
+                        </span>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        </div>
+
+        <!-- Continuous GitHub Webhook Card -->
+        <div style="background: #09090b; border: 1px solid #27272a; border-radius: 12px; padding: 16px; margin-bottom: 20px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                <span style="font-size: 11px; color: #71717a; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;">Continuous GitHub Auto-Deploy (Webhook)</span>
+                <span style="font-size: 11px; color: #10b981; font-family: 'JetBrains Mono', monospace; font-weight: 500;">git push &rarr; auto-build</span>
+            </div>
+            <div style="background: #18181b; border: 1px solid #27272a; border-radius: 8px; padding: 8px 12px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #e4e4e7; display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px;">
+                <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><?php echo esc_html( $webhook_url ); ?></span>
+                <button type="button" onclick="coraCopySnippet('<?php echo esc_js( $webhook_url ); ?>')" class="preset-chip" style="white-space: nowrap;">Copy Webhook</button>
+            </div>
+            <p style="font-size: 11px; color: #71717a; line-height: 1.4;">
+                Add this URL as a Webhook in your GitHub repo settings to trigger automated zero-downtime builds whenever code is pushed.
+            </p>
+        </div>
+
+        <!-- Collapsible Developer Proxy URL Option -->
+        <details style="background: #09090b; border: 1px solid #27272a; border-radius: 12px; padding: 14px 16px;">
+            <summary style="font-size: 12px; font-weight: 500; color: #a1a1aa; cursor: pointer; user-select: none;">
+                Advanced: Connect External Live Dev Server (Optional)
+            </summary>
+            <div style="margin-top: 14px; border-top: 1px solid #18181b; padding-top: 14px;">
+                <form id="cora-nextjs-connect-form" onsubmit="coraConnectNextjs(event)">
+                    <div style="display: flex; gap: 8px; flex-direction: row; flex-wrap: wrap;">
+                        <input
+                            type="text"
+                            id="cora-live-url-input"
+                            value="<?php echo esc_attr( $current_live_url ?: '' ); ?>"
+                            placeholder="http://localhost:3000"
+                            style="flex: 1; min-width: 200px; padding: 8px 12px; background: #18181b; border: 1px solid #3f3f46; border-radius: 6px; font-size: 12px; color: #f4f4f5; font-family: 'JetBrains Mono', monospace; outline: none;"
+                        >
+                        <button type="submit" class="preset-chip" style="padding: 8px 14px; font-size: 12px;">Save & Proxy</button>
+                    </div>
+                </form>
+            </div>
+        </details>
+    </main>
+
+    <script>
+    var CORA_THEME_ID = <?php echo json_encode( $theme_id ); ?>;
+    var CORA_AJAX_NONCE = <?php echo json_encode( $ajax_nonce ); ?>;
+    var CORA_AJAX_URL = <?php echo json_encode( admin_url( 'admin-ajax.php' ) ); ?>;
+
+    function coraShowToast(message, type) {
+        type = type || 'info';
+        var container = document.getElementById('cora-toast-container');
+        if (!container) return;
+        var toast = document.createElement('div');
+        toast.style.cssText = 'pointer-events: auto; background: #18181b; border: 1px solid #3f3f46; color: #f4f4f5; font-size: 12px; padding: 10px 16px; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 8px; font-weight: 500;';
+        toast.className = 'toast-enter';
+        
+        var icon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a1a1aa" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>';
+        if (type === 'success') {
+            icon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.2"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+        } else if (type === 'error') {
+            icon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>';
+        }
+
+        toast.innerHTML = icon + '<span>' + message + '</span>';
+        container.appendChild(toast);
+
+        setTimeout(function() {
+            toast.className = toast.className.replace('toast-enter', 'toast-exit');
+            setTimeout(function() { toast.remove(); }, 250);
+        }, 4000);
+    }
+
+    function coraCopySnippet(text) {
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(text).then(function() {
+                coraShowToast('Webhook URL copied to clipboard.', 'success');
+            });
+        }
+    }
+
+    function coraTriggerStaticBuild() {
+        var btn = document.getElementById('cora-static-build-btn');
+        var btnText = document.getElementById('cora-static-build-btn-text');
+        var progressBox = document.getElementById('cora-build-progress-box');
+        var stepTitle = document.getElementById('cora-build-step-title');
+        var errBox = document.getElementById('cora-build-error-log');
+
+        if (btn) btn.disabled = true;
+        if (btnText) btnText.textContent = 'Building Static Site…';
+        if (progressBox) progressBox.style.display = 'block';
+        if (errBox) errBox.style.display = 'none';
+
+        // Step simulation updates while request runs
+        var s1 = document.getElementById('step-1');
+        var s2 = document.getElementById('step-2');
+        var s3 = document.getElementById('step-3');
+        var s4 = document.getElementById('step-4');
+        var s5 = document.getElementById('step-5');
+
+        if (s1) { s1.style.color = '#f4f4f5'; s1.textContent = '⏳ [1/5] Cloning & fetching latest commit from GitHub...'; }
+
+        setTimeout(function() {
+            if (s1) { s1.style.color = '#10b981'; s1.textContent = '✓ [1/5] GitHub repository cloned successfully.'; }
+            if (s2) { s2.style.color = '#f4f4f5'; s2.textContent = '⏳ [2/5] Preparing environment & resolving dependencies...'; }
+        }, 1500);
+
+        setTimeout(function() {
+            if (s2) { s2.style.color = '#10b981'; s2.textContent = '✓ [2/5] Packages & framework dependencies resolved.'; }
+            if (s3) { s3.style.color = '#f4f4f5'; s3.textContent = '⏳ [3/5] Compiling Next.js App Router / React components...'; }
+        }, 4000);
+
+        setTimeout(function() {
+            if (s3) { s3.style.color = '#10b981'; s3.textContent = '✓ [3/5] Next.js components compiled.'; }
+            if (s4) { s4.style.color = '#f4f4f5'; s4.textContent = '⏳ [4/5] Prerendering static HTML for all scanned routes...'; }
+        }, 8000);
+
+        var formData = new FormData();
+        formData.append('action', 'cora_nextjs_build_repo');
+        formData.append('theme_id', CORA_THEME_ID);
+        formData.append('nonce', CORA_AJAX_NONCE);
+
+        fetch(CORA_AJAX_URL, {
+            method: 'POST',
+            body: formData,
+            credentials: 'same-origin'
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            if (data && data.success) {
+                if (s4) { s4.style.color = '#10b981'; s4.textContent = '✓ [4/5] Static HTML prerendered.'; }
+                if (s5) { s5.style.color = '#10b981'; s5.textContent = '✓ [5/5] Static site deployed & live on Cora!'; }
+                if (stepTitle) stepTitle.textContent = 'Build Complete!';
+                var pill = document.getElementById('cora-status-pill');
+                if (pill) {
+                    pill.innerHTML = '<span style="width: 6px; height: 6px; border-radius: 9999px; background: #10b981;"></span> Live Static Site';
+                }
+                coraShowToast('Static site built successfully! Launching...', 'success');
+                setTimeout(function() {
+                    window.location.reload();
+                }, 1000);
+            } else {
+                var msg = (data && data.data && data.data.message) ? data.data.message : 'Build failed.';
+                var logs = (data && data.data && data.data.logs) ? data.data.logs : '';
+                coraShowToast(msg, 'error');
+                if (btn) btn.disabled = false;
+                if (btnText) btnText.textContent = '⚡ Retry Build';
+                if (errBox && logs) {
+                    errBox.style.display = 'block';
+                    errBox.textContent = logs;
+                }
+            }
+        })
+        .catch(function(err) {
+            coraShowToast('Build error: ' + err.message, 'error');
+            if (btn) btn.disabled = false;
+            if (btnText) btnText.textContent = '⚡ Retry Build';
+        });
+    }
+
+    function coraConnectNextjs(e) {
+        e.preventDefault();
+        var input = document.getElementById('cora-live-url-input');
+        var liveUrl = input ? input.value.trim() : '';
+
+        var formData = new FormData();
+        formData.append('action', 'cora_nextjs_save_live_url');
+        formData.append('theme_id', CORA_THEME_ID);
+        formData.append('live_url', liveUrl);
+        formData.append('nonce', CORA_AJAX_NONCE);
+
+        fetch(CORA_AJAX_URL, {
+            method: 'POST',
+            body: formData,
+            credentials: 'same-origin'
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            if (data && data.success) {
+                coraShowToast('Saved! Reloading...', 'success');
+                setTimeout(function() { window.location.reload(); }, 600);
+            } else {
+                coraShowToast('Failed to save URL.', 'error');
+            }
+        })
+        .catch(function(err) {
+            coraShowToast(err.message, 'error');
+        });
+    }
+
+    // Automatically trigger static build on first load
+    document.addEventListener('DOMContentLoaded', function() {
+        var repo = <?php echo json_encode( $repo ); ?>;
+        if (repo) {
+            setTimeout(function() {
+                coraTriggerStaticBuild();
+            }, 300);
+        }
+    });
+    </script>
+
+    <?php echo $preview_bar_html; ?>
+</body>
+</html>
+    <?php
+    exit;
+}
+}
+
+/**
+ * AJAX: Save Next.js Live Deployment / Local Dev URL
+ */
+if ( ! function_exists( 'cora_ajax_nextjs_save_live_url' ) ) {
+function cora_ajax_nextjs_save_live_url() {
+    $nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( $_POST['nonce'] ) : ( isset( $_POST['security'] ) ? sanitize_text_field( $_POST['security'] ) : ( isset( $_POST['_wpnonce'] ) ? sanitize_text_field( $_POST['_wpnonce'] ) : '' ) );
+    $authorized = false;
+    if ( ! empty( $nonce ) ) {
+        if ( wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) || wp_verify_nonce( $nonce, 'cora_re_nonce' ) || wp_verify_nonce( $nonce, 'wp_rest' ) || wp_verify_nonce( $nonce, 'cora_canvas_nonce' ) ) {
+            $authorized = true;
+        }
+    }
+    if ( ! $authorized && function_exists( 'check_ajax_referer' ) ) {
+        if ( check_ajax_referer( 'cora_ajax_nonce', 'nonce', false ) || check_ajax_referer( 'cora_re_nonce', 'nonce', false ) || check_ajax_referer( 'cora_ajax_nonce', 'security', false ) ) {
+            $authorized = true;
+        }
+    }
+    if ( ! $authorized && is_user_logged_in() && ( current_user_can( 'edit_posts' ) || current_user_can( 'manage_options' ) ) ) {
+        $authorized = true;
+    }
+    if ( ! $authorized ) {
+        wp_send_json_error( array( 'message' => 'Security check failed. Please refresh the page.' ) );
+    }
+
+    global $wpdb;
+    $theme_id = isset( $_POST['theme_id'] ) ? intval( $_POST['theme_id'] ) : 0;
+    $live_url = isset( $_POST['live_url'] ) ? trim( wp_unslash( $_POST['live_url'] ) ) : '';
+
+    if ( ! empty( $live_url ) ) {
+        if ( ! preg_match( '#^https?://#i', $live_url ) ) {
+            $live_url = 'http://' . $live_url;
+        }
+        $live_url = rtrim( $live_url, '/' );
+        if ( ! filter_var( $live_url, FILTER_VALIDATE_URL ) && strpos( $live_url, 'localhost' ) === false ) {
+            wp_send_json_error( array( 'message' => 'Invalid URL format. Please provide a valid HTTP or HTTPS URL.' ) );
+        }
+    }
+
+    if ( $theme_id <= 0 ) {
+        $live_theme = $wpdb->get_row( "SELECT id FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live' ORDER BY id DESC LIMIT 1", ARRAY_A );
+        if ( ! $live_theme ) {
+            $live_theme = $wpdb->get_row( "SELECT id FROM {$wpdb->prefix}cora_canvas_themes ORDER BY id DESC LIMIT 1", ARRAY_A );
+        }
+        $theme_id = $live_theme ? intval( $live_theme['id'] ) : 0;
+    }
+
+    if ( $theme_id <= 0 ) {
+        wp_send_json_error( array( 'message' => 'Theme ID is required.' ) );
+    }
+
+    $theme = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d", $theme_id ), ARRAY_A );
+    if ( ! $theme ) {
+        wp_send_json_error( array( 'message' => 'Theme workspace record not found.' ) );
+    }
+
+    $settings = json_decode( $theme['settings'] ?? '{}', true ) ?: array();
+    $settings['source']          = 'nextjs';
+    $settings['nextjs_live_url'] = $live_url;
+    $settings['live_url']        = $live_url;
+
+    $wpdb->update(
+        $wpdb->prefix . 'cora_canvas_themes',
+        array(
+            'settings'   => wp_json_encode( $settings ),
+            'updated_at' => current_time( 'mysql' )
+        ),
+        array( 'id' => $theme_id )
+    );
+
+    wp_send_json_success( array(
+        'message'  => 'Next.js live URL saved successfully.',
+        'theme_id' => $theme_id,
+        'live_url' => $live_url
+    ) );
+}
+}
+add_action( 'wp_ajax_cora_nextjs_save_live_url', 'cora_ajax_nextjs_save_live_url' );
+
+/**
  * Serve Canvas Themes dynamic frontend routing
  */
 if ( ! function_exists( 'cora_canvas_theme_frontend_router' ) ) {
 function cora_canvas_theme_frontend_router() {
+    cora_ensure_canvas_tables_exist();
+
     // Prevent intercepting REST API requests
     if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
         return;
@@ -9045,6 +10115,21 @@ function cora_canvas_theme_frontend_router() {
     $reserved_paths = array( 'api', 'workspace', 'shared-doc', 'shared-portfolio', 'shared-media', 'shared-preview', 'shared-form', 'portal', 'client-portal', 'cora-service-worker.js', 'cora-manifest.json', 'cora-offline.html', 'wp-admin', 'wp-login.php', 'wp-json', 'wp-includes', 'wp-content', 'assets', 'core', 'oauth', 'mcp', '.well-known' );
     if ( in_array( $first_part, $reserved_paths, true ) ) {
         return;
+    }
+
+    // Direct static asset fast-path: /_next/*, /_expo/*, /brand/*, /favicon.svg, /og.png, /earth-atmos.jpg, etc.
+    $path_ext = strtolower( pathinfo( $path, PATHINFO_EXTENSION ) );
+    $is_static_asset_req = ( $first_part === '_next' || $first_part === '_expo' || $first_part === 'brand' || in_array( $path_ext, array( 'css', 'js', 'png', 'svg', 'jpg', 'jpeg', 'webp', 'ico', 'woff', 'woff2', 'ttf', 'json', 'map' ), true ) );
+    if ( $is_static_asset_req && ! in_array( $first_part, array( 'wp-content', 'wp-includes', 'assets', 'core', 'wp-admin' ), true ) ) {
+        global $wpdb;
+        $static_theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE settings LIKE '%is_static_built%' ORDER BY status = 'live' DESC, updated_at DESC, id DESC LIMIT 1", ARRAY_A );
+        if ( $static_theme ) {
+            $st_settings = json_decode( $static_theme['settings'] ?? '{}', true ) ?: array();
+            if ( ! empty( $st_settings['static_build_path'] ) && is_dir( $st_settings['static_build_path'] ) ) {
+                cora_render_nextjs_static_build( $st_settings['static_build_path'], $path, $static_theme, null, false );
+                exit;
+            }
+        }
     }
 
     // List of known admin dashboard subpages and public auth pages
@@ -9167,12 +10252,34 @@ function cora_canvas_theme_frontend_router() {
 
         if ( ! empty( $cand_agency_ids ) ) {
             $in_sql = implode( ',', array_map( 'intval', $cand_agency_ids ) );
-            $live_theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE agency_id IN ($in_sql) AND status = 'live' ORDER BY id DESC LIMIT 1", ARRAY_A );
-            if ( ! $live_theme ) {
-                $live_theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE agency_id IN ($in_sql) ORDER BY id DESC LIMIT 1", ARRAY_A );
-            }
+            $live_theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE agency_id IN ($in_sql) AND status = 'live' ORDER BY updated_at DESC, id DESC LIMIT 1", ARRAY_A );
             if ( $live_theme ) {
                 $active_theme_id = intval( $live_theme['id'] );
+            }
+        }
+
+        // Global fallback 1: If no live theme found for candidate agency IDs, fetch any live theme globally
+        if ( ! $active_theme_id ) {
+            $live_theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live' ORDER BY updated_at DESC, id DESC LIMIT 1", ARRAY_A );
+            if ( $live_theme ) {
+                $active_theme_id = intval( $live_theme['id'] );
+            }
+        }
+
+        // Fallback 2: If no live theme exists anywhere, fallback to agency draft theme
+        if ( ! $active_theme_id && ! empty( $cand_agency_ids ) ) {
+            $in_sql = implode( ',', array_map( 'intval', $cand_agency_ids ) );
+            $draft_theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE agency_id IN ($in_sql) ORDER BY updated_at DESC, id DESC LIMIT 1", ARRAY_A );
+            if ( $draft_theme ) {
+                $active_theme_id = intval( $draft_theme['id'] );
+            }
+        }
+
+        // Fallback 3: Global latest theme
+        if ( ! $active_theme_id ) {
+            $draft_theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes ORDER BY updated_at DESC, id DESC LIMIT 1", ARRAY_A );
+            if ( $draft_theme ) {
+                $active_theme_id = intval( $draft_theme['id'] );
             }
         }
     }
@@ -9180,9 +10287,33 @@ function cora_canvas_theme_frontend_router() {
     if ( $active_theme_id ) {
         $active_theme = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d", $active_theme_id ), ARRAY_A );
         $theme_settings = $active_theme ? (json_decode( $active_theme['settings'], true ) ?: array()) : array();
-        $source = isset( $theme_settings['source'] ) ? $theme_settings['source'] : '';
+        $source = isset( $theme_settings['source'] ) ? $theme_settings['source'] : ( isset( $active_theme['source'] ) ? $active_theme['source'] : '' );
         if ( 'lovable' === $source ) {
             return; // Delegate routing to cora_git_sync_serve_frontend running at priority 4
+        }
+
+        $is_nextjs = ( 'nextjs' === $source || ( ! empty( $active_theme['source'] ) && 'nextjs' === $active_theme['source'] ) || ! empty( $theme_settings['github_repo'] ) || ! empty( $theme_settings['is_static_built'] ) );
+
+        // If active/preview theme source is Next.js, render static build, live frame bridge, or native connector screen immediately
+        if ( $is_nextjs ) {
+            $nextjs_live_url = ! empty( $theme_settings['nextjs_live_url'] ) ? trim( $theme_settings['nextjs_live_url'] ) : ( ! empty( $theme_settings['live_url'] ) ? trim( $theme_settings['live_url'] ) : '' );
+            $nextjs_live_url = rtrim( $nextjs_live_url, '/' );
+
+            $target_route = ( empty( $target_page_slug ) || $target_page_slug === 'home' ) ? '/' : '/' . ltrim( $target_page_slug, '/' );
+
+            // Prioritize static build if compiled from GitHub
+            if ( ! empty( $theme_settings['is_static_built'] ) && ! empty( $theme_settings['static_build_path'] ) && is_dir( $theme_settings['static_build_path'] ) && empty( $_GET['cv_edit_url'] ) ) {
+                cora_render_nextjs_static_build( $theme_settings['static_build_path'], $target_route, $active_theme, $target_ws, $is_preview );
+                exit;
+            }
+
+            if ( ! empty( $nextjs_live_url ) && empty( $_GET['cv_edit_url'] ) ) {
+                cora_render_nextjs_live_frame( $nextjs_live_url, $target_route, $active_theme, $target_ws, $is_preview );
+                exit;
+            } else {
+                cora_render_nextjs_connector_screen( $active_theme, $target_ws, $target_route, $is_preview );
+                exit;
+            }
         }
     }
 
@@ -9269,8 +10400,8 @@ function cora_canvas_theme_frontend_router() {
                 }
             }
 
-            // 5. Match by slug across any theme belonging to this agency / workspace
-            if ( ! $canvas_page ) {
+            // 5. Match by slug across any theme belonging to this agency / workspace only if no active theme was resolved
+            if ( ! $canvas_page && ! $active_theme_id ) {
                 $canvas_page = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE slug = %s ORDER BY id DESC LIMIT 1", $target_page_slug ), ARRAY_A );
                 if ( ! $canvas_page ) {
                     $target_clean = sanitize_title( $target_page_slug );
@@ -9287,6 +10418,35 @@ function cora_canvas_theme_frontend_router() {
             if ( ! $canvas_page ) {
                 $canvas_page = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d ORDER BY id ASC LIMIT 1", $active_theme_id ), ARRAY_A );
             }
+        }
+    }
+
+    $source = isset( $theme_settings['source'] ) ? $theme_settings['source'] : ( isset( $active_theme['source'] ) ? $active_theme['source'] : '' );
+
+    // If active/preview theme source is Next.js, render static build, live frame bridge, or native connector screen
+    if ( 'nextjs' === $source || ( ! empty( $active_theme['source'] ) && 'nextjs' === $active_theme['source'] ) ) {
+        $nextjs_live_url = ! empty( $theme_settings['nextjs_live_url'] ) ? trim( $theme_settings['nextjs_live_url'] ) : ( ! empty( $theme_settings['live_url'] ) ? trim( $theme_settings['live_url'] ) : '' );
+        $nextjs_live_url = rtrim( $nextjs_live_url, '/' );
+
+        $target_route = '/';
+        if ( $canvas_page ) {
+            $target_route = ( ! empty( $canvas_page['is_homepage'] ) || ( isset( $canvas_page['slug'] ) && $canvas_page['slug'] === 'home' ) ) ? '/' : '/' . ltrim( $canvas_page['slug'], '/' );
+        } elseif ( ! empty( $target_page_slug ) && $target_page_slug !== 'home' ) {
+            $target_route = '/' . ltrim( $target_page_slug, '/' );
+        }
+
+        // Prioritize static build if compiled
+        if ( ! empty( $theme_settings['is_static_built'] ) && ! empty( $theme_settings['static_build_path'] ) && is_dir( $theme_settings['static_build_path'] ) && empty( $_GET['cv_edit_url'] ) ) {
+            cora_render_nextjs_static_build( $theme_settings['static_build_path'], $target_route, $active_theme, $target_ws, $is_preview );
+            exit;
+        }
+
+        if ( ! empty( $nextjs_live_url ) && empty( $_GET['cv_edit_url'] ) ) {
+            cora_render_nextjs_live_frame( $nextjs_live_url, $target_route, $active_theme, $target_ws, $is_preview );
+            exit;
+        } else {
+            cora_render_nextjs_connector_screen( $active_theme, $target_ws, $target_route, $is_preview );
+            exit;
         }
     }
 
@@ -10430,18 +11590,14 @@ function cora_get_preview_theme_id() {
         $raw_theme_id = intval( $_GET['preview_theme_id'] );
     } elseif ( isset( $_GET['cv_preview_theme'] ) ) {
         $raw_theme_id = intval( $_GET['cv_preview_theme'] );
-    } elseif ( isset( $_COOKIE['cora_preview_theme_id'] ) ) {
-        $raw_theme_id = intval( $_COOKIE['cora_preview_theme_id'] );
     } elseif ( isset( $_GET['elementor-preview'] ) ) {
         $post_id = intval( $_GET['elementor-preview'] );
         $raw_theme_id = intval( $wpdb->get_var( $wpdb->prepare( "SELECT theme_id FROM {$wpdb->prefix}cora_canvas_pages WHERE wp_post_id = %d LIMIT 1", $post_id ) ) );
     } elseif ( isset( $_GET['preview_id'] ) ) {
         $post_id = intval( $_GET['preview_id'] );
         $raw_theme_id = intval( $wpdb->get_var( $wpdb->prepare( "SELECT theme_id FROM {$wpdb->prefix}cora_canvas_pages WHERE wp_post_id = %d LIMIT 1", $post_id ) ) );
-    }
-
-    // Support extracting candidate preview theme ID from Referer header for assets/static files
-    if ( ! $raw_theme_id && ! empty( $_SERVER['HTTP_REFERER'] ) ) {
+    } elseif ( ! empty( $_SERVER['HTTP_REFERER'] ) ) {
+        // Support extracting candidate preview theme ID from Referer header for assets/static files
         $referer_query = parse_url( $_SERVER['HTTP_REFERER'], PHP_URL_QUERY );
         if ( ! empty( $referer_query ) ) {
             parse_str( $referer_query, $ref_params );
@@ -10449,6 +11605,33 @@ function cora_get_preview_theme_id() {
                 $raw_theme_id = intval( $ref_params['cv_preview_theme'] );
             } elseif ( isset( $ref_params['preview_theme_id'] ) ) {
                 $raw_theme_id = intval( $ref_params['preview_theme_id'] );
+            }
+        }
+    } elseif ( isset( $_COOKIE['cora_preview_theme_id'] ) ) {
+        $cookie_theme_id = intval( $_COOKIE['cora_preview_theme_id'] );
+        if ( $cookie_theme_id > 0 ) {
+            // Check if current agency has a live theme
+            $has_live_theme = false;
+            if ( $target_agency_id > 0 ) {
+                $live_cnt = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_canvas_themes WHERE agency_id = %d AND status = 'live'", $target_agency_id ) );
+                $has_live_theme = ( intval( $live_cnt ) > 0 );
+            } else {
+                $live_cnt = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live'" );
+                $has_live_theme = ( intval( $live_cnt ) > 0 );
+            }
+
+            $has_preview_query = ( isset( $_GET['preview'] ) && ( $_GET['preview'] === '1' || $_GET['preview'] === 'true' ) );
+
+            // b) If only in $_COOKIE, it must ONLY apply if the current agency does NOT have a live theme, OR if the request explicitly has preview=1.
+            // If visiting /site/ without preview parameters, clear the cookie and return 0 so the active LIVE theme renders!
+            if ( $has_preview_query || ! $has_live_theme ) {
+                $raw_theme_id = $cookie_theme_id;
+            } else {
+                if ( ! headers_sent() ) {
+                    setcookie( 'cora_preview_theme_id', '', time() - 3600, '/' );
+                }
+                unset( $_COOKIE['cora_preview_theme_id'] );
+                $raw_theme_id = 0;
             }
         }
     }
@@ -10461,8 +11644,8 @@ function cora_get_preview_theme_id() {
         }
     }
 
-    // 3. Fallback to current queried page context
-    if ( is_page() ) {
+    // 3. Fallback to current queried page context (only if explicitly previewing)
+    if ( is_page() && ( isset( $_GET['preview'] ) || isset( $_GET['elementor-preview'] ) || isset( $_GET['preview_id'] ) ) ) {
         $post_id = get_queried_object_id();
         if ( $post_id ) {
             $canvas_page = $wpdb->get_row( $wpdb->prepare( "SELECT theme_id FROM {$wpdb->prefix}cora_canvas_pages WHERE wp_post_id = %d LIMIT 1", $post_id ), ARRAY_A );
@@ -38472,6 +39655,252 @@ function cora_duplicate_wp_post( $post_id, $new_title = '' ) {
 }
 }
 
+if ( ! function_exists( 'cora_canvas_get_default_starter_html' ) ) {
+/**
+ * Generates a clean, modern, Tailwind CSS + Inter landing page starter based on template key.
+ */
+function cora_canvas_get_default_starter_html( $template_key = 'agency', $theme_name = 'My Studio' ) {
+    $title = esc_html( ! empty( $theme_name ) ? $theme_name : 'Modern Studio' );
+    
+    switch ( $template_key ) {
+        case 'saas':
+            $hero_badge = '● v2.4 Platform Live · Intelligent Autonomous Agent Engine';
+            $hero_title = 'The Autonomous AI Workspace for Modern Teams';
+            $hero_sub = 'Streamline operations, automate client workflows, and sync digital assets in real time with high-performance infrastructure.';
+            $cta_primary = 'Start Free 14-Day Trial';
+            $cta_sec = 'Explore Live Demo';
+            break;
+            
+        case 'consulting':
+            $hero_badge = 'Strategic Enterprise Advisory & Valuation Practice';
+            $hero_title = 'Capital Strategy & Advisory for High-Growth Enterprises';
+            $hero_sub = 'Navigating market expansion, operational restructuring, and private capital transactions with data-driven institutional rigour.';
+            $cta_primary = 'Schedule Executive Audit';
+            $cta_sec = 'View Case Studies';
+            break;
+            
+        case 'photography':
+            $hero_badge = 'Premium Commercial & Editorial Photography';
+            $hero_title = 'Visual Storytelling for Brands & Global Campaigns';
+            $hero_sub = 'Capturing cinematic depth, brand identity, and editorial architecture with signature lighting and meticulous post-production.';
+            $cta_primary = 'Book Studio Session';
+            $cta_sec = 'View Portfolio Reel';
+            break;
+            
+        case 'custom':
+            $hero_badge = 'Tailored Digital Experience Platform';
+            $hero_title = 'Built for Performance, Conversion & Brand Authority';
+            $hero_sub = 'Delivering tailored digital experiences, responsive design, and seamless customer capture engineered for rapid growth.';
+            $cta_primary = 'Get Started Today';
+            $cta_sec = 'Learn More';
+            break;
+            
+        case 'agency':
+        default:
+            $hero_badge = 'Creative Agency of the Year 2026';
+            $hero_title = 'We Craft Iconic Brands & Cinematic Digital Experiences';
+            $hero_sub = 'Award-winning creative direction, high-converting web architecture, and video production engineered to scale modern enterprises.';
+            $cta_primary = 'Book Consultation';
+            $cta_sec = 'Explore Showcase';
+            break;
+    }
+
+    return '<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>' . $title . ' · High-Performance Web Presence</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: [\'Inter\', \'-apple-system\', \'BlinkMacSystemFont\', \'sans-serif\'],
+                        mono: [\'JetBrains Mono\', \'monospace\']
+                    },
+                    colors: {
+                        brand: {
+                            50: \'#fafafa\',
+                            100: \'#f4f4f5\',
+                            800: \'#27272a\',
+                            900: \'#18181b\',
+                            950: \'#09090b\'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-[#09090b] text-zinc-100 font-sans antialiased selection:bg-zinc-800 selection:text-white">
+
+    <!-- Top Announcement Bar -->
+    <div class="bg-zinc-900 border-b border-zinc-800/80 py-2 px-4 text-center text-xs text-zinc-400 font-medium">
+        <span>' . $hero_badge . '</span>
+    </div>
+
+    <!-- Navigation Bar -->
+    <header class="sticky top-0 z-50 bg-[#09090b]/90 backdrop-blur-md border-b border-zinc-800/80">
+        <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-zinc-950 font-black text-sm">
+                    ▲
+                </div>
+                <span class="font-extrabold text-base tracking-tight text-white">' . $title . '</span>
+            </div>
+            <nav class="hidden md:flex items-center gap-8 text-xs font-semibold text-zinc-400">
+                <a href="#services" class="hover:text-white transition-colors">Services</a>
+                <a href="#showcase" class="hover:text-white transition-colors">Showcase</a>
+                <a href="#metrics" class="hover:text-white transition-colors">Performance</a>
+                <a href="#contact" class="hover:text-white transition-colors">Contact</a>
+            </nav>
+            <div class="flex items-center gap-3">
+                <a href="#contact" class="px-4 py-2 bg-white hover:bg-zinc-200 text-zinc-950 text-xs font-bold rounded-lg transition-all shadow-xs">
+                    ' . $cta_primary . '
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="relative pt-24 pb-20 px-6 border-b border-zinc-800/60 overflow-hidden">
+        <div class="max-w-4xl mx-auto text-center">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-[11px] font-semibold text-zinc-300 mb-6">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>' . $hero_badge . '</span>
+            </div>
+            <h1 class="text-4xl sm:text-6xl font-black tracking-tight text-white leading-[1.08] mb-6">
+                ' . $hero_title . '
+            </h1>
+            <p class="text-base sm:text-lg text-zinc-400 max-w-2xl mx-auto leading-relaxed mb-10 font-normal">
+                ' . $hero_sub . '
+            </p>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a href="#contact" class="w-full sm:w-auto px-6 py-3.5 bg-white hover:bg-zinc-200 text-zinc-950 text-xs font-extrabold rounded-xl transition-all shadow-lg">
+                    ' . $cta_primary . ' →
+                </a>
+                <a href="#services" class="w-full sm:w-auto px-6 py-3.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 text-xs font-bold rounded-xl border border-zinc-800 transition-all">
+                    ' . $cta_sec . '
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Key Metrics Ticker -->
+    <section id="metrics" class="py-12 px-6 border-b border-zinc-800/60 bg-zinc-950/50">
+        <div class="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            <div class="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800/60">
+                <div class="text-3xl font-black text-white font-mono mb-1">99.9%</div>
+                <div class="text-xs text-zinc-400 font-medium">Uptime & Reliability</div>
+            </div>
+            <div class="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800/60">
+                <div class="text-3xl font-black text-white font-mono mb-1">&lt;50ms</div>
+                <div class="text-xs text-zinc-400 font-medium">Global Edge Latency</div>
+            </div>
+            <div class="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800/60">
+                <div class="text-3xl font-black text-white font-mono mb-1">500+</div>
+                <div class="text-xs text-zinc-400 font-medium">Projects Delivered</div>
+            </div>
+            <div class="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800/60">
+                <div class="text-3xl font-black text-white font-mono mb-1">4.9/5</div>
+                <div class="text-xs text-zinc-400 font-medium">Client Satisfaction</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Core Services Grid -->
+    <section id="services" class="py-20 px-6 border-b border-zinc-800/60">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center max-w-xl mx-auto mb-16">
+                <h2 class="text-xs font-bold tracking-widest text-zinc-500 uppercase mb-3 font-mono">Our Capabilities</h2>
+                <h3 class="text-3xl font-black text-white tracking-tight">Engineered for Exponential Results</h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="p-8 rounded-2xl bg-zinc-900/50 border border-zinc-800/80 hover:border-zinc-700 transition-all">
+                    <div class="w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-white mb-6">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    </div>
+                    <h4 class="text-lg font-bold text-white mb-2">Strategy & Brand Identity</h4>
+                    <p class="text-xs text-zinc-400 leading-relaxed">Comprehensive positioning, visual systems, and narrative architecture that elevate market value.</p>
+                </div>
+                <div class="p-8 rounded-2xl bg-zinc-900/50 border border-zinc-800/80 hover:border-zinc-700 transition-all">
+                    <div class="w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-white mb-6">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+                    </div>
+                    <h4 class="text-lg font-bold text-white mb-2">Next-Gen Web Architecture</h4>
+                    <p class="text-xs text-zinc-400 leading-relaxed">Zero-lag, mobile-first responsive interfaces optimized for Core Web Vitals and peak search conversion.</p>
+                </div>
+                <div class="p-8 rounded-2xl bg-zinc-900/50 border border-zinc-800/80 hover:border-zinc-700 transition-all">
+                    <div class="w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-white mb-6">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                    </div>
+                    <h4 class="text-lg font-bold text-white mb-2">Automated Growth & CRM</h4>
+                    <p class="text-xs text-zinc-400 leading-relaxed">Built-in lead capture directly synchronized with client pipelines and instant notification funnels.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Native Lead Consultation Form -->
+    <section id="contact" class="py-20 px-6 bg-[#0c0c0e]">
+        <div class="max-w-xl mx-auto">
+            <div class="text-center mb-10">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-[11px] font-semibold text-zinc-300 mb-3">
+                    <span>⚡ Instant CRM Sync</span>
+                </div>
+                <h3 class="text-3xl font-black text-white tracking-tight mb-2">Request a Consultation</h3>
+                <p class="text-xs text-zinc-400">Fill in your requirements below and our team will get in touch within 24 hours.</p>
+            </div>
+            
+            <form method="POST" class="p-8 rounded-2xl bg-zinc-900 border border-zinc-800 shadow-2xl flex flex-col gap-4">
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[11px] font-bold text-zinc-300 uppercase tracking-wider">Full Name *</label>
+                    <input type="text" name="name" required placeholder="Aarav Mehta" class="w-full px-3.5 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500 transition-all">
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[11px] font-bold text-zinc-300 uppercase tracking-wider">Email Address *</label>
+                        <input type="email" name="email" required placeholder="aarav@company.com" class="w-full px-3.5 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500 transition-all">
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[11px] font-bold text-zinc-300 uppercase tracking-wider">Phone Number</label>
+                        <input type="tel" name="phone" placeholder="+91 98765 43210" class="w-full px-3.5 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500 transition-all">
+                    </div>
+                </div>
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[11px] font-bold text-zinc-300 uppercase tracking-wider">Project Details / Message</label>
+                    <textarea name="message" rows="4" placeholder="Briefly describe your goals, budget, or timeline..." class="w-full px-3.5 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500 transition-all resize-none"></textarea>
+                </div>
+                <button type="submit" class="w-full py-3.5 bg-white hover:bg-zinc-200 text-zinc-950 text-xs font-extrabold rounded-xl transition-all shadow-md mt-2 cursor-pointer">
+                    Submit Inquiry →
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-10 px-6 border-t border-zinc-800/80 text-center text-xs text-zinc-500">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+                <span class="font-bold text-zinc-300">' . $title . '</span>
+                <span>· High-Performance Website</span>
+            </div>
+            <div>
+                <span>© ' . date('Y') . ' ' . $title . '. All rights reserved. Powered by Cora Canvas.</span>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>';
+}
+}
+
 if ( ! function_exists( 'cora_canvas_get_draft_theme_limit' ) ) {
 /**
  * Dynamic draft theme quota limit:
@@ -38577,6 +40006,14 @@ function cora_ajax_canvas_create_theme() {
             } else {
                 $settings['github_branch'] = 'main';
             }
+        } elseif ( $_POST['builder'] === 'html_ai' || ( isset( $_POST['start_from'] ) && $_POST['start_from'] === 'html_ai' ) ) {
+            $settings['source'] = 'nextjs';
+            $settings['framework'] = 'html_tailwind';
+            $settings['template_key'] = sanitize_text_field( $_POST['template_key'] ?? 'agency' );
+            if ( ! empty( $_POST['github_repo'] ) ) {
+                $settings['github_repo'] = esc_url_raw( $_POST['github_repo'] );
+                $settings['github_branch'] = sanitize_text_field( ! empty( $_POST['github_branch'] ) ? $_POST['github_branch'] : 'main' );
+            }
         } elseif ( $_POST['builder'] === 'nextjs' ) {
             $settings['source'] = 'nextjs';
             $settings['nextjs_live_url'] = esc_url_raw( ! empty( $_POST['live_url'] ) ? $_POST['live_url'] : ( ! empty( $_POST['nextjs_live_url'] ) ? $_POST['nextjs_live_url'] : '' ) );
@@ -38613,10 +40050,12 @@ function cora_ajax_canvas_create_theme() {
         }
     }
 
+    $agency_id = function_exists( 'cora_db_get_agency_id' ) ? cora_db_get_agency_id() : 1;
+
     $wpdb->insert(
         $wpdb->prefix . 'cora_canvas_themes',
         array(
-            'agency_id' => 1,
+            'agency_id' => $agency_id,
             'name' => $name,
             'status' => 'draft',
             'settings' => json_encode($settings),
@@ -38627,6 +40066,129 @@ function cora_ajax_canvas_create_theme() {
     );
     
     $new_id = $wpdb->insert_id;
+
+    $is_html_ai = ( ( isset( $_POST['builder'] ) && $_POST['builder'] === 'html_ai' ) || ( isset( $_POST['start_from'] ) && $_POST['start_from'] === 'html_ai' ) || ! empty( $_POST['raw_html'] ) || ! empty( $_POST['html_code'] ) );
+
+    if ( $is_html_ai ) {
+        $raw_html = wp_unslash( ! empty( $_POST['raw_html'] ) ? $_POST['raw_html'] : ( ! empty( $_POST['html_code'] ) ? $_POST['html_code'] : '' ) );
+        $template_key = sanitize_text_field( $_POST['template_key'] ?? 'agency' );
+        if ( empty( trim( $raw_html ) ) && function_exists( 'cora_canvas_get_default_starter_html' ) ) {
+            $raw_html = cora_canvas_get_default_starter_html( $template_key, $name );
+        }
+
+        $upload_dir = wp_get_upload_dir();
+        $theme_build_dir = $upload_dir['basedir'] . '/cora-nextjs-builds/theme_' . $new_id;
+        $out_dir = $theme_build_dir . '/out';
+        wp_mkdir_p( $out_dir );
+
+        if ( ! empty( $raw_html ) ) {
+            file_put_contents( $theme_build_dir . '/index.html', $raw_html );
+            file_put_contents( $out_dir . '/index.html', $raw_html );
+        }
+
+        $settings['is_static_built']   = true;
+        $settings['static_build_path'] = $out_dir;
+        $settings['static_built_at']   = current_time( 'mysql' );
+        $settings['static_file_count'] = 1;
+        $settings['source']            = 'nextjs';
+        $settings['framework']         = 'html_tailwind';
+        $settings['template_key']      = $template_key;
+
+        $wpdb->update(
+            $wpdb->prefix . 'cora_canvas_themes',
+            array(
+                'settings'   => json_encode( $settings ),
+                'updated_at' => current_time( 'mysql' ),
+            ),
+            array( 'id' => $new_id ),
+            array( '%s', '%s' ),
+            array( '%d' )
+        );
+
+        $is_live = false;
+        if ( ( isset( $_POST['activate_live'] ) && ( $_POST['activate_live'] === '1' || $_POST['activate_live'] === 1 || $_POST['activate_live'] === 'true' || $_POST['activate_live'] === true ) ) || ( isset( $_POST['builder'] ) && $_POST['builder'] === 'html_ai' ) || ( isset( $_POST['start_from'] ) && $_POST['start_from'] === 'html_ai' ) ) {
+            $is_live = true;
+            // Set all other themes for this agency to draft
+            $wpdb->update(
+                $wpdb->prefix . 'cora_canvas_themes',
+                array( 'status' => 'draft', 'updated_at' => current_time( 'mysql' ) ),
+                array( 'agency_id' => $agency_id, 'status' => 'live' ),
+                array( '%s', '%s' ),
+                array( '%d', '%s' )
+            );
+
+            // Set this new theme to live
+            $wpdb->update(
+                $wpdb->prefix . 'cora_canvas_themes',
+                array( 'status' => 'live', 'activated_at' => current_time( 'mysql' ), 'updated_at' => current_time( 'mysql' ) ),
+                array( 'id' => $new_id ),
+                array( '%s', '%s', '%s' ),
+                array( '%d' )
+            );
+
+            // Clear the cora_preview_theme_id cookie
+            if ( ! headers_sent() ) {
+                setcookie( 'cora_preview_theme_id', '', time() - 3600, '/' );
+            }
+            if ( function_exists( 'cora_canvas_sync_homepage_options' ) ) {
+                cora_canvas_sync_homepage_options( $agency_id );
+            }
+        }
+
+        // Ensure a Canvas Page record (is_homepage = 1, slug = 'home', title = 'Home', status = 'publish') is created in wp_cora_canvas_pages for $new_id
+        $existing_page = $wpdb->get_row( $wpdb->prepare( "SELECT id FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d AND (slug = 'home' OR is_homepage = 1) LIMIT 1", $new_id ), ARRAY_A );
+        if ( ! $existing_page ) {
+            $wp_post_id = wp_insert_post( array(
+                'post_title'    => 'Home',
+                'post_name'     => 'home',
+                'post_type'     => 'page',
+                'post_status'   => 'publish',
+                'post_content'  => ! empty( $raw_html ) ? $raw_html : '<!-- HTML AI Static Page -->',
+                'page_template' => 'cora_canvas_standalone'
+            ) );
+
+            if ( ! is_wp_error( $wp_post_id ) ) {
+                update_post_meta( $wp_post_id, '_cora_page_engine', 'html_canvas' );
+                update_post_meta( $wp_post_id, '_wp_page_template', 'cora_canvas_standalone' );
+                update_post_meta( $wp_post_id, '_cora_canvas_theme_id', $new_id );
+                if ( ! empty( $raw_html ) ) {
+                    update_post_meta( $wp_post_id, '_cora_canvas_html_compiled', wp_slash( $raw_html ) );
+                }
+
+                $wpdb->insert(
+                    $wpdb->prefix . 'cora_canvas_pages',
+                    array(
+                        'agency_id'       => $agency_id,
+                        'theme_id'        => $new_id,
+                        'wp_post_id'      => $wp_post_id,
+                        'title'           => 'Home',
+                        'slug'            => 'home',
+                        'status'          => 'publish',
+                        'is_homepage'     => 1,
+                        'template'        => 'cora_canvas_standalone',
+                        'seo_title'       => $name . ' · Home',
+                        'seo_description' => $settings['site_tagline'] ?? 'Modern high-converting web presence built with Cora Canvas AI.',
+                        'seo_og_image'    => $settings['site_logo'] ?? '',
+                        'created_by'      => get_current_user_id(),
+                        'created_at'      => current_time( 'mysql' ),
+                        'updated_at'      => current_time( 'mysql' )
+                    ),
+                    array( '%d', '%d', '%d', '%s', '%s', '%s', '%d', '%s', '%s', '%s', '%s', '%d', '%s', '%s' )
+                );
+            }
+        }
+
+        cora_log_activity( 'Canvas', "Created HTML AI theme workspace '{$name}'." );
+
+        wp_send_json_success( array(
+            'theme_id'        => $new_id,
+            'name'            => $name,
+            'builder'         => 'html_ai',
+            'is_static_built' => true,
+            'is_live'         => $is_live,
+            'preview_url'     => home_url( '/site/' )
+        ) );
+    }
 
     if ( isset( $_POST['builder'] ) && $_POST['builder'] === 'nextjs' ) {
         // Register Next.js routes into pages table
@@ -38669,7 +40231,7 @@ function cora_ajax_canvas_create_theme() {
                 $wpdb->insert(
                     $wpdb->prefix . 'cora_canvas_pages',
                     array(
-                        'agency_id'       => 1,
+                        'agency_id'       => $agency_id,
                         'theme_id'        => $new_id,
                         'wp_post_id'      => $wp_post_id,
                         'title'           => $title,
@@ -38698,6 +40260,26 @@ function cora_ajax_canvas_create_theme() {
                     )
                 );
                 update_post_meta( $page_id, '_cora_nextjs_props', $initial_props );
+            }
+        }
+
+        // Automatically trigger static build immediately upon connecting repository
+        $repo_url = isset( $settings['github_repo'] ) ? $settings['github_repo'] : '';
+        $build_res_payload = array();
+        if ( ! empty( $repo_url ) && class_exists( 'Cora_NextJS_Integration' ) ) {
+            $build_res = Cora_NextJS_Integration::execute_static_build( $new_id );
+            if ( is_wp_error( $build_res ) ) {
+                $build_res_payload = array(
+                    'build_success' => false,
+                    'build_message' => $build_res->get_error_message(),
+                    'build_logs'    => $build_res->get_error_data(),
+                );
+            } else {
+                $build_res_payload = array(
+                    'build_success' => true,
+                    'build_message' => $build_res['message'] ?? 'Static site built successfully.',
+                    'build_logs'    => $build_res['build_logs'] ?? '',
+                );
             }
         }
     }
@@ -38821,7 +40403,12 @@ function cora_ajax_canvas_create_theme() {
     }
 
     cora_log_activity( 'Canvas', "Created draft theme workspace '{$name}'." );
-    wp_send_json_success();
+    $response_data = array_merge( array(
+        'theme_id' => $new_id,
+        'name'     => $name,
+        'builder'  => $settings['source'] ?? 'elementor',
+    ), isset( $build_res_payload ) ? $build_res_payload : array() );
+    wp_send_json_success( $response_data );
 }
 }
 add_action( 'wp_ajax_cora_ajax_create_theme', 'cora_ajax_canvas_create_theme' );
@@ -38948,37 +40535,89 @@ function cora_ajax_canvas_activate_theme() {
     global $wpdb;
     $theme_id = intval( $_POST['theme_id'] );
     
-    // Find the old live theme
-    $old_live_theme = $wpdb->get_row( "SELECT id FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live' LIMIT 1", ARRAY_A );
+    // Clear preview cookie immediately
+    if ( ! headers_sent() ) {
+        setcookie( 'cora_preview_theme_id', '', time() - 3600, '/' );
+    }
+    if ( isset( $_COOKIE['cora_preview_theme_id'] ) ) {
+        unset( $_COOKIE['cora_preview_theme_id'] );
+    }
 
-    // Update themes statuses
+    $target_theme = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d", $theme_id ), ARRAY_A );
+    if ( ! $target_theme ) {
+        wp_send_json_error( array( 'message' => 'Theme not found.' ) );
+        return;
+    }
+
+    // Resolve agency context for current workspace / user
+    $agency_id = 0;
+    if ( function_exists( 'cora_get_current_workspace_context' ) ) {
+        $ws = cora_get_current_workspace_context();
+        if ( $ws ) {
+            $agency_id = ! empty( $ws['agency_id'] ) ? intval( $ws['agency_id'] ) : ( ! empty( $ws['id'] ) ? intval( $ws['id'] ) : 0 );
+        }
+    }
+    if ( ! $agency_id && ! empty( $target_theme['agency_id'] ) ) {
+        $agency_id = intval( $target_theme['agency_id'] );
+    }
+    if ( ! $agency_id ) {
+        $agency_id = function_exists( 'cora_get_request_agency_id' ) ? cora_get_request_agency_id() : 0;
+    }
+    if ( ! $agency_id ) {
+        $current_user_id = get_current_user_id();
+        if ( $current_user_id ) {
+            $agency_id = intval( $wpdb->get_var( $wpdb->prepare( "SELECT agency_id FROM {$wpdb->prefix}cora_users WHERE wp_user_id = %d LIMIT 1", $current_user_id ) ) );
+            if ( ! $agency_id ) {
+                $agency_id = intval( $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$wpdb->prefix}cora_agencies WHERE owner_user_id = %d LIMIT 1", $current_user_id ) ) );
+            }
+        }
+    }
+    if ( ! $agency_id ) {
+        $agency_id = 1;
+    }
+
+    // Find old live themes for this agency
+    $old_live_themes = $wpdb->get_results( $wpdb->prepare( "SELECT id FROM {$wpdb->prefix}cora_canvas_themes WHERE agency_id = %d AND status = 'live'", $agency_id ), ARRAY_A );
+
+    // Set all other themes for this agency to draft
     $wpdb->update(
         $wpdb->prefix . 'cora_canvas_themes',
         array( 'status' => 'draft', 'updated_at' => current_time('mysql') ),
-        array( 'status' => 'live' )
+        array( 'agency_id' => $agency_id )
     );
     
+    // Set target theme status to live for current agency
     $wpdb->update(
         $wpdb->prefix . 'cora_canvas_themes',
-        array( 'status' => 'live', 'activated_at' => current_time('mysql'), 'updated_at' => current_time('mysql') ),
+        array( 
+            'status'       => 'live', 
+            'agency_id'    => $agency_id,
+            'activated_at' => current_time('mysql'), 
+            'updated_at'   => current_time('mysql') 
+        ),
         array( 'id' => $theme_id )
     );
 
     // Set old live theme's pages to draft in both WP and database
-    if ( $old_live_theme ) {
-        $old_pages = $wpdb->get_results( $wpdb->prepare( "SELECT wp_post_id FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d", intval( $old_live_theme['id'] ) ), ARRAY_A );
-        foreach ( $old_pages as $p ) {
-            $wp_post_id = intval( $p['wp_post_id'] );
-            if ( $wp_post_id ) {
-                wp_update_post( array(
-                    'ID'          => $wp_post_id,
-                    'post_status' => 'draft',
-                ) );
-                $wpdb->update(
-                    $wpdb->prefix . 'cora_canvas_pages',
-                    array( 'status' => 'draft', 'updated_at' => current_time('mysql') ),
-                    array( 'wp_post_id' => $wp_post_id )
-                );
+    if ( ! empty( $old_live_themes ) ) {
+        foreach ( $old_live_themes as $olt ) {
+            $olt_id = intval( $olt['id'] );
+            if ( $olt_id && $olt_id !== $theme_id ) {
+                $old_pages = $wpdb->get_results( $wpdb->prepare( "SELECT wp_post_id FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d", $olt_id ), ARRAY_A );
+                foreach ( $old_pages as $p ) {
+                    $wp_post_id = intval( $p['wp_post_id'] );
+                    if ( $wp_post_id ) {
+                        wp_update_post( array(
+                            'ID'          => $wp_post_id,
+                            'post_status' => 'draft',
+                        ) );
+                        $wpdb->update(
+                            $wpdb->prefix . 'cora_canvas_pages',
+                            array( 'status' => 'draft', 'updated_at' => current_time('mysql') ),
+                            array( 'wp_post_id' => $wp_post_id )
+                        );
+                    }
+                }
             }
         }
     }
@@ -39001,10 +40640,16 @@ function cora_ajax_canvas_activate_theme() {
     }
 
     // Sync homepage selection to WordPress native Reading settings
-    cora_canvas_sync_homepage_options();
+    cora_canvas_sync_homepage_options( $agency_id );
 
-    cora_log_activity( 'Canvas', "Activated theme id {$theme_id}. Published pages, drafted old pages." );
+    cora_log_activity( 'Canvas', "Activated theme id {$theme_id} for agency {$agency_id}. Published pages, drafted old pages." );
     wp_send_json_success();
+}
+}
+
+if ( ! function_exists( 'cora_ajax_activate_theme' ) ) {
+function cora_ajax_activate_theme() {
+    cora_ajax_canvas_activate_theme();
 }
 }
 
@@ -39012,9 +40657,16 @@ function cora_ajax_canvas_activate_theme() {
  * Synchronizes the live Canvas theme's designated homepage with native WordPress show_on_front and page_on_front options.
  */
 if ( ! function_exists( 'cora_canvas_sync_homepage_options' ) ) {
-function cora_canvas_sync_homepage_options() {
+function cora_canvas_sync_homepage_options( $target_agency_id = 0 ) {
     global $wpdb;
-    $live_theme = $wpdb->get_row( "SELECT id FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live' LIMIT 1", ARRAY_A );
+    if ( ! $target_agency_id ) {
+        $target_agency_id = function_exists( 'cora_get_request_agency_id' ) ? cora_get_request_agency_id() : 0;
+    }
+    if ( $target_agency_id > 0 ) {
+        $live_theme = $wpdb->get_row( $wpdb->prepare( "SELECT id FROM {$wpdb->prefix}cora_canvas_themes WHERE agency_id = %d AND status = 'live' ORDER BY id DESC LIMIT 1", $target_agency_id ), ARRAY_A );
+    } else {
+        $live_theme = $wpdb->get_row( "SELECT id FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live' ORDER BY id DESC LIMIT 1", ARRAY_A );
+    }
     if ( $live_theme ) {
         $theme_id = intval( $live_theme['id'] );
         $homepage = $wpdb->get_row( $wpdb->prepare( "SELECT wp_post_id FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d AND is_homepage = 1 LIMIT 1", $theme_id ), ARRAY_A );
@@ -40128,14 +41780,31 @@ function cora_ajax_canvas_create_html_page() {
         if ( in_array( $file_ext, array( 'html', 'htm', 'txt' ), true ) ) {
             $raw_html = file_get_contents( $_FILES['html_file']['tmp_name'] );
         } elseif ( $file_ext === 'zip' ) {
-            // Unpack ZIP archive to extract index.html and assets
+            // Unpack ZIP archive to extract index.html and assets safely
             if ( class_exists( 'ZipArchive' ) ) {
                 $zip = new ZipArchive();
                 if ( $zip->open( $_FILES['html_file']['tmp_name'] ) === true ) {
                     $upload_dir = wp_upload_dir();
-                    $target_dir = $upload_dir['basedir'] . '/cora-canvas/' . $theme_id . '/' . time();
+                    $target_dir = $upload_dir['basedir'] . '/cora-canvas/' . intval( $theme_id ) . '/' . time();
                     wp_mkdir_p( $target_dir );
-                    $zip->extractTo( $target_dir );
+                    $real_target_dir = realpath( $target_dir );
+
+                    if ( $real_target_dir ) {
+                        for ( $i = 0; $i < $zip->numFiles; $i++ ) {
+                            $filename = $zip->getNameIndex( $i );
+                            // Skip dangerous/traversal entries
+                            if ( strpos( $filename, '../' ) !== false || strpos( $filename, '..\\' ) !== false ) {
+                                continue;
+                            }
+                            $destination = $real_target_dir . '/' . ltrim( $filename, '/' );
+                            if ( substr( $filename, -1 ) === '/' ) {
+                                wp_mkdir_p( $destination );
+                            } else {
+                                wp_mkdir_p( dirname( $destination ) );
+                                copy( "zip://" . $_FILES['html_file']['tmp_name'] . "#" . $filename, $destination );
+                            }
+                        }
+                    }
                     $zip->close();
 
                     // Find primary HTML file
@@ -40143,7 +41812,7 @@ function cora_ajax_canvas_create_html_page() {
                     if ( empty( $files ) ) {
                         $files = glob( $target_dir . '/**/*.html' );
                     }
-                    if ( ! empty( $files[0] ) ) {
+                    if ( ! empty( $files[0] ) && file_exists( $files[0] ) ) {
                         $raw_html = file_get_contents( $files[0] );
                     }
                 }

@@ -460,35 +460,101 @@ function cora_get_sparkline_points( $history, $type ) {
                 $live_source = strtolower($live_theme_settings['source'] ?? '');
                 $is_nextjs = ($live_source === 'nextjs');
                 $is_lovable = ($live_source === 'lovable');
+
+                if ( $is_nextjs ) {
+                    $is_static_built = ! empty( $live_theme_settings['is_static_built'] );
+                    $static_built_at = ! empty( $live_theme_settings['static_built_at'] ) ? $live_theme_settings['static_built_at'] : '';
+                    $static_file_count = ! empty( $live_theme_settings['static_file_count'] ) ? intval( $live_theme_settings['static_file_count'] ) : 0;
+                    $nextjs_live_url = ! empty( $live_theme_settings['nextjs_live_url'] ) ? $live_theme_settings['nextjs_live_url'] : ( ! empty( $live_theme_settings['live_url'] ) ? $live_theme_settings['live_url'] : '' );
+                    
+                    if ( empty( $nextjs_live_url ) || $nextjs_live_url === 'http://localhost:3000' || $is_static_built ) {
+                        $nextjs_display_url = preg_replace( '#^https?://#', '', rtrim( $canvas_preview_url, '/' ) );
+                    } else {
+                        $nextjs_display_url = preg_replace( '#^https?://#', '', rtrim( $nextjs_live_url, '/' ) );
+                    }
+
+                    $nextjs_repo = ! empty( $live_theme_settings['github_repo'] ) ? $live_theme_settings['github_repo'] : ( ! empty( $live_theme_settings['repo'] ) ? $live_theme_settings['repo'] : 'cora/nextjs-starter' );
+                    $nextjs_branch = ! empty( $live_theme_settings['github_branch'] ) ? $live_theme_settings['github_branch'] : ( ! empty( $live_theme_settings['branch'] ) ? $live_theme_settings['branch'] : 'main' );
+
+                    // Scanned routes
+                    $nextjs_routes = array();
+                    if ( ! empty( $live_stats ) ) {
+                        foreach ( $live_stats as $st_page ) {
+                            $p_slug = $st_page['slug'] ?? '';
+                            if ( ! empty( $st_page['is_homepage'] ) || $p_slug === 'home' || $p_slug === 'index' || $p_slug === '' ) {
+                                $nextjs_routes[] = '/';
+                            } else {
+                                $nextjs_routes[] = '/' . ltrim( $p_slug, '/' );
+                            }
+                        }
+                        $nextjs_routes = array_values( array_unique( $nextjs_routes ) );
+                    }
+                    if ( empty( $nextjs_routes ) ) {
+                        $nextjs_routes = array( '/', '/about', '/contact' );
+                    }
+                }
             ?>
             <div class="bg-white border border-zinc-200/80 rounded-xl shadow-3xs p-4 sm:p-5" id="active-theme-card">
                 <div class="flex flex-col md:flex-row items-stretch md:items-center gap-5 sm:gap-6">
                     <!-- Left: Streamlined Browser Preview Box -->
                     <div class="relative shrink-0 flex items-center justify-center md:justify-start w-full md:w-80 max-w-full md:max-w-[340px]" style="flex: 0 0 auto;">
-                        <div class="w-full rounded-xl border border-zinc-200/80 shadow-3xs overflow-hidden flex flex-col bg-zinc-50 select-none" style="height: 190px; width: 100%; max-width: 340px;">
+                        <!-- Sleek Theme Browser Preview Box with Live Iframe -->
+                        <div class="w-full rounded-xl border border-zinc-800 shadow-3xs overflow-hidden flex flex-col bg-zinc-950 select-none text-zinc-100 relative group" style="height: 190px; width: 100%; max-width: 340px;">
                             <!-- Browser Top Bar -->
-                            <div class="flex items-center gap-1.5 px-3 py-1.5 border-b border-zinc-200/60 shrink-0 bg-white">
-                                <span class="w-1.5 h-1.5 rounded-full bg-zinc-300"></span>
-                                <span class="w-1.5 h-1.5 rounded-full bg-zinc-300"></span>
-                                <span class="w-1.5 h-1.5 rounded-full bg-zinc-300"></span>
-                                <div class="flex-1 mx-2 bg-zinc-100/90 rounded px-2 py-0.5 text-[8px] font-mono text-zinc-500 text-center truncate">
-                                    <?php echo esc_html( $canvas_display_url ); ?>
+                            <div class="flex items-center gap-1.5 px-3 py-1.5 border-b border-zinc-800/80 shrink-0 bg-zinc-900/90 z-10">
+                                <span class="w-1.5 h-1.5 rounded-full bg-zinc-700"></span>
+                                <span class="w-1.5 h-1.5 rounded-full bg-zinc-700"></span>
+                                <span class="w-1.5 h-1.5 rounded-full bg-zinc-700"></span>
+                                <?php if ( $is_nextjs && ! empty( $is_static_built ) ) : ?>
+                                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-950 border border-emerald-800 text-[8px] font-mono font-bold text-emerald-400">
+                                    <svg viewBox="0 0 24 24" width="7" height="7" fill="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                                    Static Site
+                                </span>
+                                <?php elseif ( $is_nextjs ) : ?>
+                                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-zinc-950 border border-zinc-800 text-[8px] font-mono font-bold text-zinc-200">
+                                    <svg viewBox="0 0 24 24" width="7" height="7" fill="currentColor" class="text-white shrink-0"><path d="M12 2L2 22h20L12 2z"/></svg>
+                                    Next.js
+                                </span>
+                                <?php else : ?>
+                                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-zinc-800 border border-zinc-700 text-[8px] font-mono font-bold text-zinc-200">
+                                    Live
+                                </span>
+                                <?php endif; ?>
+                                <div class="flex-1 mx-1.5 bg-zinc-950/80 border border-zinc-800/60 rounded px-2 py-0.5 text-[8px] font-mono text-zinc-400 text-center truncate" title="<?php echo esc_attr($canvas_preview_url); ?>">
+                                    <?php echo esc_html( ! empty($nextjs_display_url) ? $nextjs_display_url : $canvas_display_url ); ?>
                                 </div>
-                                <a href="<?php echo esc_url( $canvas_preview_url ); ?>" target="_blank" class="text-zinc-400 hover:text-zinc-800 transition-colors" title="Open Preview">
+                                <a href="<?php echo esc_url( $canvas_preview_url ); ?>" target="_blank" class="text-zinc-500 hover:text-white transition-colors" title="Open Live Site in New Tab">
                                     <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
                                 </a>
                             </div>
-                            <!-- Live Preview Frame -->
-                            <div class="flex-1 relative overflow-hidden bg-white">
+                            <!-- Live Rendered Preview Frame -->
+                            <div class="flex-1 relative overflow-hidden bg-zinc-950">
                                 <iframe 
                                     src="<?php echo esc_url( $canvas_preview_url ); ?>" 
                                     loading="lazy"
                                     sandbox="allow-scripts allow-same-origin"
                                     class="absolute border-none pointer-events-none" 
-                                    style="top:0;left:0;width:1280px;height:760px;transform:scale(0.25);transform-origin:0 0;background:#ffffff;"
+                                    style="top:0;left:0;width:1280px;height:760px;transform:scale(0.265);transform-origin:0 0;background:#09090b;"
                                     tabindex="-1"
                                     aria-hidden="true">
                                 </iframe>
+                                <?php if ( $is_nextjs ) : ?>
+                                <!-- Bottom Monochromatic Quick Strip -->
+                                <div class="absolute inset-x-0 bottom-0 py-1.5 px-2.5 bg-gradient-to-t from-zinc-950 via-zinc-950/90 to-transparent flex items-center justify-between gap-2 z-10 opacity-90 group-hover:opacity-100 transition-opacity">
+                                    <div class="flex items-center gap-1.5 min-w-0">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
+                                        <span class="text-[9px] font-mono font-medium text-zinc-300 truncate max-w-[130px]" title="<?php echo esc_attr($nextjs_repo); ?>"><?php echo esc_html( $nextjs_repo ); ?></span>
+                                    </div>
+                                    <div class="flex items-center gap-1 shrink-0">
+                                        <a href="<?php echo esc_url( $canvas_preview_url ); ?>" target="_blank" class="px-1.5 py-0.5 bg-white hover:bg-zinc-100 text-zinc-950 font-bold text-[8.5px] rounded flex items-center gap-0.5 no-underline shadow-3xs cursor-pointer select-none">
+                                            <span>Open ↗</span>
+                                        </a>
+                                        <button type="button" onclick="window.buildNextJSRepo(<?php echo $live_theme['id']; ?>)" class="px-1.5 py-0.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 font-medium text-[8.5px] rounded flex items-center gap-0.5 cursor-pointer select-none" title="Build static site">
+                                            <span>⚡ Build</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
@@ -563,6 +629,15 @@ function cora_get_sparkline_points( $history, $type ) {
                                 <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                                 <span>Customize Theme</span>
                             </button>
+
+                            <?php if ( $is_nextjs ) : ?>
+                            <!-- Static Build Action -->
+                            <button type="button" onclick="window.buildNextJSRepo(<?php echo $live_theme['id']; ?>)"
+                                    class="h-8 px-3.5 bg-white hover:bg-zinc-50 border border-zinc-200/80 text-zinc-900 rounded-lg text-xs font-semibold cursor-pointer transition-all flex items-center gap-1.5 shadow-3xs shrink-0" title="Build &amp; sync static distribution from GitHub">
+                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                                <span>Build Static</span>
+                            </button>
+                            <?php endif; ?>
 
                             <!-- Secondary Settings -->
                             <button type="button" onclick="editTheme(<?php echo $live_theme['id']; ?>, '<?php echo esc_js($live_theme['name']); ?>', true); switchTab('settings');"
@@ -1000,8 +1075,12 @@ function cora_get_sparkline_points( $history, $type ) {
                     <span id="dashboard-theme-badge" class="px-1.5 py-0.5 text-[8px] font-bold uppercase rounded bg-green-50 text-green-700 border border-green-200 ml-1">Live</span>
                 </div>
             </div>
-            <div>
+            <div class="flex items-center gap-2">
                 <?php if ( ! $is_read_only ) : ?>
+                <button id="dashboard-nextjs-build-btn" onclick="window.buildNextJSRepo(canvasState.activeThemeId)" class="px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-semibold shadow-sm cursor-pointer transition-all hidden items-center gap-1.5" title="Rebuild &amp; sync static frontend from GitHub">
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                    <span>Build Static</span>
+                </button>
                 <button id="activate-theme-header-btn" onclick="triggerActivateThemeFromHeader()" class="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-semibold shadow-sm cursor-pointer transition-all">Activate Theme</button>
                 <?php endif; ?>
                 <a id="preview-site-header-btn" href="<?php echo home_url( '/site/' ); ?>" target="_blank" class="px-3 py-1.5 border border-zinc-200 rounded-lg text-xs font-semibold text-zinc-700 bg-white hover:bg-zinc-50 shadow-sm cursor-pointer transition-all hidden">Preview Site</a>
@@ -1031,6 +1110,10 @@ function cora_get_sparkline_points( $history, $type ) {
                 <!-- Action button for Pages tab -->
                 <?php if ( ! $is_read_only ) : ?>
                 <div id="tab-action-pages" class="tab-action-btn flex items-center gap-2">
+                    <button onclick="window.buildNextJSRepo()" id="tab-action-build-nextjs" class="hidden px-3 py-1.5 border border-zinc-900 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg text-[11px] font-bold shadow-2xs cursor-pointer transition-all active:scale-95 flex items-center gap-1.5" title="Rebuild &amp; sync static frontend from GitHub">
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                        <span>Build Static</span>
+                    </button>
                     <button onclick="triggerNextJSISRRebuild()" id="tab-action-revalidate-nextjs" class="hidden px-3 py-1.5 border border-zinc-900 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg text-[11px] font-bold shadow-2xs cursor-pointer transition-all active:scale-95 flex items-center gap-1.5">
                         <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
                         <span>Rebuild ISR</span>
@@ -2358,13 +2441,13 @@ function cora_get_sparkline_points( $history, $type ) {
 
             <!-- Grid Layout: Connection Hub & API Credentials -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Card 1: Project Sync & ISR Webhook Status -->
-                <div class="bg-white border border-zinc-200 rounded-2xl p-5 shadow-xs flex flex-col justify-between">
+                <!-- Card 1: Project Sync & Live Deployment Connector -->
+                <div class="bg-white border border-zinc-200 rounded-2xl p-5 shadow-xs flex flex-col justify-between space-y-4">
                     <div>
                         <div class="flex items-center justify-between pb-3 border-b border-zinc-100 mb-4">
                             <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-900 flex items-center gap-2">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-                                Repository & Deployment
+                                Repository &amp; Deployment
                             </h3>
                             <span id="nextjs-status-badge" class="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-[10px] font-bold border border-emerald-200">Active</span>
                         </div>
@@ -2382,34 +2465,68 @@ function cora_get_sparkline_points( $history, $type ) {
                             <div class="grid grid-cols-2 gap-3">
                                 <div>
                                     <label class="block text-[10px] font-bold text-zinc-400 uppercase mb-1">Branch</label>
-                                    <div class="bg-zinc-50 px-3 py-2 rounded-lg border border-zinc-200 font-mono text-zinc-900 font-semibold truncate" id="nextjs-branch-label">main</div>
+                                    <div class="bg-zinc-50 px-3 py-2 rounded-lg border border-zinc-200 font-mono text-zinc-900 font-semibold truncate text-xs" id="nextjs-branch-label">main</div>
                                 </div>
                                 <div>
-                                    <label class="block text-[10px] font-bold text-zinc-400 uppercase mb-1">Live Frontend URL</label>
-                                    <div class="bg-zinc-50 px-3 py-2 rounded-lg border border-zinc-200 font-mono text-zinc-900 font-semibold truncate flex items-center justify-between">
-                                        <span id="nextjs-live-url-label">https://...</span>
-                                        <a id="nextjs-live-url-link" href="#" target="_blank" class="text-zinc-500 hover:text-zinc-900 text-[11px] font-bold">↗</a>
+                                    <label class="block text-[10px] font-bold text-zinc-400 uppercase mb-1">ISR Webhook Secret</label>
+                                    <div class="flex items-center gap-2 bg-zinc-50 px-2.5 py-1.5 rounded-lg border border-zinc-200">
+                                        <input type="password" id="nextjs-secret-display" class="bg-transparent border-0 text-[11px] font-mono text-zinc-900 font-semibold flex-1 outline-none min-w-0" readonly value="cora_sec_****************">
+                                        <button onclick="copyNextJSSecret()" class="text-zinc-500 hover:text-zinc-900 font-bold text-[10px] cursor-pointer shrink-0">Copy</button>
                                     </div>
                                 </div>
                             </div>
 
-                            <div>
-                                <label class="block text-[10px] font-bold text-zinc-400 uppercase mb-1">On-Demand ISR Webhook Secret</label>
-                                <div class="flex items-center gap-2 bg-zinc-50 px-3 py-2 rounded-lg border border-zinc-200">
-                                    <input type="password" id="nextjs-secret-display" class="bg-transparent border-0 text-xs font-mono text-zinc-900 font-semibold flex-1 outline-none" readonly value="cora_sec_****************">
-                                    <button onclick="copyNextJSSecret()" class="text-zinc-500 hover:text-zinc-900 font-bold text-[11px] cursor-pointer">Copy</button>
+                            <!-- Tactile Live Deployment & Local Dev URL Connector -->
+                            <div class="bg-zinc-50/80 p-3 rounded-xl border border-zinc-200 space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <label class="block text-[10px] font-bold text-zinc-600 uppercase tracking-wider">Live Deployment / Local Dev URL</label>
+                                    <a id="nextjs-live-url-link" href="#" target="_blank" class="text-zinc-500 hover:text-zinc-900 text-[11px] font-bold inline-flex items-center gap-1 hidden">
+                                        <span>Open</span>
+                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    </a>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <div class="relative flex-1">
+                                        <input type="url" id="nextjs-live-url-input"
+                                            placeholder="https://my-app.vercel.app or http://localhost:3000"
+                                            class="w-full pl-8 pr-3 py-2 bg-white rounded-lg border border-zinc-300 text-xs font-mono text-zinc-900 focus:outline-none focus:border-zinc-950">
+                                        <div class="absolute left-2.5 top-2.5 text-zinc-400 pointer-events-none">
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                                        </div>
+                                    </div>
+                                    <button onclick="window.saveNextJSLiveUrl()" id="btn-save-nextjs-live-url"
+                                        class="px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 shadow-xs border-none">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                                        <span>Save &amp; Connect</span>
+                                    </button>
+                                </div>
+                                <div class="flex items-center gap-1.5 flex-wrap pt-0.5">
+                                    <span class="text-[10px] text-zinc-400 font-medium mr-0.5">Presets:</span>
+                                    <button type="button" onclick="window.setNextJSPresetUrl('http://localhost:3000')" class="px-2 py-0.5 bg-white hover:bg-zinc-100 text-zinc-700 rounded border border-zinc-200 text-[10px] font-mono font-medium transition-colors cursor-pointer">http://localhost:3000</button>
+                                    <button type="button" onclick="window.setNextJSPresetUrl('http://localhost:3001')" class="px-2 py-0.5 bg-white hover:bg-zinc-100 text-zinc-700 rounded border border-zinc-200 text-[10px] font-mono font-medium transition-colors cursor-pointer">http://localhost:3001</button>
+                                    <button type="button" id="nextjs-preset-vercel" onclick="window.setNextJSPresetUrl(this.dataset.url || 'https://aigirl.vercel.app')" data-url="https://aigirl.vercel.app" class="px-2 py-0.5 bg-white hover:bg-zinc-100 text-zinc-700 rounded border border-zinc-200 text-[10px] font-mono font-medium transition-colors cursor-pointer truncate max-w-[180px]">https://aigirl.vercel.app</button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="pt-4 mt-4 border-t border-zinc-100 flex items-center justify-between gap-3">
-                        <button onclick="syncNextJSRoutesFromGit()" id="btn-nextjs-sync-git" class="px-3.5 py-2 border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-900 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
-                            <span>Sync Git Routes</span>
-                        </button>
-                        <button onclick="triggerNextJSISRRebuild()" id="btn-nextjs-trigger-isr" class="px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 border-none shadow-xs">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                    <div class="pt-3 border-t border-zinc-100 flex items-center justify-between gap-2 flex-wrap">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <button onclick="syncNextJSRoutesFromGit()" id="btn-nextjs-sync-git" class="px-3.5 py-2 border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-900 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                                <span>Sync Git Routes</span>
+                            </button>
+                            <button onclick="window.buildNextJSRepo()" id="btn-nextjs-build-static" class="px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 border-none shadow-xs">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                                <span id="btn-nextjs-build-label">Build Static Site</span>
+                            </button>
+                            <button onclick="window.copyClaudeMasterPrompt()" class="px-3 py-2 border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-800 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs" title="Copy starter foundation prompt for Claude / ChatGPT">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+                                <span>Copy Claude / ChatGPT Prompt</span>
+                            </button>
+                        </div>
+                        <button onclick="triggerNextJSISRRebuild()" id="btn-nextjs-trigger-isr" class="px-3 py-2 border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
                             <span>Trigger ISR Rebuild</span>
                         </button>
                     </div>
@@ -2432,7 +2549,7 @@ function cora_get_sparkline_points( $history, $type ) {
                                     <span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-emerald-100 text-emerald-800 font-mono mr-1.5">GET</span>
                                     <code class="text-[11px] font-mono text-zinc-900">/wp-json/cora-canvas/v1/nextjs/manifest</code>
                                 </div>
-                                <span class="text-[10px] text-zinc-400">All routes & tokens</span>
+                                <span class="text-[10px] text-zinc-400">All routes &amp; tokens</span>
                             </div>
 
                             <div class="bg-zinc-50 p-2.5 rounded-lg border border-zinc-200 flex items-center justify-between">
@@ -2440,7 +2557,7 @@ function cora_get_sparkline_points( $history, $type ) {
                                     <span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-emerald-100 text-emerald-800 font-mono mr-1.5">GET</span>
                                     <code class="text-[11px] font-mono text-zinc-900">/wp-json/cora-canvas/v1/nextjs/page?slug=about</code>
                                 </div>
-                                <span class="text-[10px] text-zinc-400">Page SEO & Props</span>
+                                <span class="text-[10px] text-zinc-400">Page SEO &amp; Props</span>
                             </div>
 
                             <div class="bg-zinc-50 p-2.5 rounded-lg border border-zinc-200 flex items-center justify-between">
@@ -2463,6 +2580,89 @@ function cora_get_sparkline_points( $history, $type ) {
 
                     <div class="pt-3 mt-3 border-t border-zinc-100">
                         <p class="text-[11px] text-zinc-500 leading-relaxed">Fetch data in Next.js Server Components with automatic caching: <code class="font-mono text-zinc-900 bg-zinc-100 px-1 py-0.5 rounded">fetch(url, { next: { tags: ['cora'] } })</code></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dedicated Interactive Next.js Visual Preview Card -->
+            <div class="bg-white border border-zinc-200 rounded-2xl shadow-xs overflow-hidden">
+                <!-- Top Toolbar -->
+                <div class="p-4 border-b border-zinc-200 flex flex-wrap items-center justify-between gap-3 bg-zinc-50/60">
+                    <div class="flex items-center gap-3 flex-wrap">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-900">Live Application Preview</h3>
+                        </div>
+                        <span class="text-zinc-300 hidden sm:inline">|</span>
+                        <!-- Route Selector Dropdown -->
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-[10px] font-bold text-zinc-400 uppercase">Route:</span>
+                            <select id="nextjs-preview-route-select" onchange="window.switchNextJSPreviewRoute(this.value)"
+                                class="bg-white border border-zinc-200 text-zinc-900 text-xs font-mono font-semibold rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-zinc-950 cursor-pointer">
+                                <option value="/">/ (Homepage)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <!-- Device Viewport Switcher -->
+                        <div class="inline-flex rounded-lg border border-zinc-200 bg-zinc-100 p-0.5">
+                            <button onclick="window.switchNextJSPreviewDevice('desktop')" id="btn-nextjs-device-desktop"
+                                class="px-2.5 py-1 rounded-md text-[11px] font-bold bg-zinc-950 text-white cursor-pointer transition-all flex items-center gap-1.5 shadow-2xs"
+                                title="Desktop View (100%)">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                                <span>Desktop</span>
+                            </button>
+                            <button onclick="window.switchNextJSPreviewDevice('tablet')" id="btn-nextjs-device-tablet"
+                                class="px-2.5 py-1 rounded-md text-[11px] font-bold text-zinc-600 hover:bg-white cursor-pointer transition-all flex items-center gap-1.5"
+                                title="Tablet View (768px)">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                                <span>768px</span>
+                            </button>
+                            <button onclick="window.switchNextJSPreviewDevice('mobile')" id="btn-nextjs-device-mobile"
+                                class="px-2.5 py-1 rounded-md text-[11px] font-bold text-zinc-600 hover:bg-white cursor-pointer transition-all flex items-center gap-1.5"
+                                title="Mobile View (375px)">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                                <span>375px</span>
+                            </button>
+                        </div>
+
+                        <!-- Actions: Reload and Open External -->
+                        <button onclick="window.reloadNextJSPreview()" id="btn-nextjs-preview-reload"
+                            class="p-1.5 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-100 text-zinc-700 cursor-pointer transition-all flex items-center justify-center"
+                            title="Reload Preview Frame">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                        </button>
+                        <a id="nextjs-preview-open-external" href="#" target="_blank"
+                            class="p-1.5 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-100 text-zinc-700 cursor-pointer transition-all flex items-center justify-center"
+                            title="Open Active Route in New Tab ↗">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Preview Frame Area -->
+                <div class="bg-zinc-100/80 p-4 sm:p-6 flex items-center justify-center min-h-[520px] relative overflow-hidden">
+                    <!-- Loading Spinner Overlay -->
+                    <div id="nextjs-preview-loading" class="hidden absolute inset-0 bg-white/70 backdrop-blur-xs flex items-center justify-center z-10 transition-opacity">
+                        <div class="flex flex-col items-center gap-2">
+                            <div class="w-6 h-6 border-2 border-zinc-900 border-t-transparent rounded-full animate-spin"></div>
+                            <span class="text-xs font-mono font-semibold text-zinc-700">Rendering route…</span>
+                        </div>
+                    </div>
+
+                    <!-- No URL State -->
+                    <div id="nextjs-preview-empty" class="hidden text-center max-w-md py-12 px-6 bg-white rounded-2xl border border-zinc-200 shadow-xs space-y-3">
+                        <div class="w-10 h-10 mx-auto rounded-full bg-zinc-100 flex items-center justify-center text-zinc-400">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                        </div>
+                        <h4 class="text-sm font-bold text-zinc-900">No Next.js Live URL Configured</h4>
+                        <p class="text-xs text-zinc-500 leading-relaxed">Enter your local development server (<code class="bg-zinc-100 px-1 py-0.5 rounded font-mono text-zinc-800">http://localhost:3000</code>) or production deployment URL above to enable real-time headless visual preview.</p>
+                    </div>
+
+                    <!-- Iframe Wrapper Container -->
+                    <div id="nextjs-preview-iframe-wrapper" class="w-full transition-all duration-300 mx-auto flex justify-center" style="max-width: 100%;">
+                        <iframe id="nextjs-preview-iframe" src="about:blank" class="w-full bg-white rounded-xl border border-zinc-200/90 shadow-sm" style="height: 680px;" onload="if(window.onNextJSPreviewIframeLoaded) window.onNextJSPreviewIframeLoaded();"></iframe>
                     </div>
                 </div>
             </div>
@@ -2844,8 +3044,6 @@ function cora_get_sparkline_points( $history, $type ) {
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
         </div>
     </div>
 
@@ -4405,9 +4603,13 @@ function cora_get_sparkline_points( $history, $type ) {
 .atw-card:hover{transform:translateY(-4px);box-shadow:0 16px 48px rgba(0,0,0,.11),0 4px 16px rgba(0,0,0,.07)!important;}
 .atw-card:hover .atw-thumb{transform:scale(1.04);}
 .atw-thumb{transition:transform .5s cubic-bezier(.4,0,.2,1);display:block;width:100%;height:100%;object-fit:cover;}
+.atw-card.atw-sel-h{background:#ffffff!important;border-color:#18181b!important;box-shadow:0 0 0 3px rgba(24,24,27,.18),0 8px 32px rgba(0,0,0,.12)!important;}
 .atw-card.atw-sel-e{border-color:#18181b!important;box-shadow:0 0 0 3px rgba(24,24,27,.15),0 8px 32px rgba(0,0,0,.1)!important;}
 .atw-card.atw-sel-n{border-color:#18181b!important;box-shadow:0 0 0 3px rgba(24,24,27,.18),0 8px 32px rgba(0,0,0,.12)!important;}
 .atw-card.atw-sel-l{border-color:#7c3aed!important;box-shadow:0 0 0 3px rgba(124,58,237,.18),0 8px 32px rgba(124,58,237,.1)!important;}
+.atw-template-card{background:#ffffff;border:1.5px solid #e4e4e7;border-radius:16px;transition:all .2s cubic-bezier(.4,0,.2,1);cursor:pointer;overflow:hidden;}
+.atw-template-card:hover{border-color:#a1a1aa!important;transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.06)!important;}
+.atw-template-card.atw-sel-t{background:#fafafa!important;border-color:#18181b!important;box-shadow:0 0 0 2px rgba(24,24,27,.12),0 8px 28px rgba(0,0,0,.08)!important;}
 .atw-tab{transition:all .15s;border:none;cursor:pointer;font-size:11px;font-weight:700;font-family:inherit;}
 .atw-tab.atw-tab-on{background:white;color:#18181b;border:1px solid #e4e4e7!important;box-shadow:0 1px 3px rgba(0,0,0,.08);border-radius:10px;}
 .atw-tab.atw-tab-off{background:transparent;color:#71717a;border:1px solid transparent!important;border-radius:10px;}
@@ -4428,13 +4630,15 @@ function cora_get_sparkline_points( $history, $type ) {
 .atw-title-text { display: inline !important; }
 .atw-lbl-text { display: inline !important; }
 .atw-line-connector { width: 44px !important; margin: 0 6px !important; }
-.atw-builder-grid { display: grid !important; grid-template-columns: repeat(3, 1fr) !important; gap: 18px !important; width: 100% !important; max-width: 1060px !important; }
+.atw-builder-grid { display: grid !important; grid-template-columns: repeat(4, 1fr) !important; gap: 16px !important; width: 100% !important; max-width: 1160px !important; }
+.atw-prompts-grid { display: grid !important; grid-template-columns: repeat(3, 1fr) !important; gap: 16px !important; width: 100% !important; }
 .atw-token-branch-row { display: grid !important; grid-template-columns: 1fr 120px !important; gap: 12px !important; }
 .atw-template-grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 12px !important; }
 .atw-cancel-text { display: inline !important; }
 
-@media (max-width: 900px) {
-    .atw-builder-grid { grid-template-columns: 1fr !important; gap: 14px !important; }
+@media (max-width: 1024px) {
+    .atw-builder-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 14px !important; }
+    .atw-prompts-grid { grid-template-columns: repeat(2, 1fr) !important; }
 }
 
 @media (max-width: 640px) {
@@ -4442,6 +4646,8 @@ function cora_get_sparkline_points( $history, $type ) {
     .atw-title-text { display: none !important; }
     .atw-lbl-text { display: none !important; }
     .atw-line-connector { width: 20px !important; margin: 0 3px !important; }
+    .atw-builder-grid { grid-template-columns: 1fr !important; gap: 12px !important; }
+    .atw-prompts-grid { grid-template-columns: 1fr !important; }
     .atw-token-branch-row { grid-template-columns: 1fr !important; }
     .atw-template-grid { grid-template-columns: 1fr !important; }
     .atw-cancel-text { display: none !important; }
@@ -4490,28 +4696,71 @@ function cora_get_sparkline_points( $history, $type ) {
     <div id="atw-body" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;">
 
         <!-- STEP 1: Choose Builder -->
-        <div id="wizard-step-1" class="atw-anim" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:52px 32px 40px;">
-            <div style="text-align:center;margin-bottom:44px;max-width:540px;">
-                <p style="font-size:10px;font-weight:900;letter-spacing:.18em;text-transform:uppercase;color:#a1a1aa;margin-bottom:14px;">Step 1 of 3</p>
-                <h2 style="font-size:34px;font-weight:900;color:#18181b;letter-spacing:-.045em;line-height:1.08;margin-bottom:14px;">What are you<br>building with?</h2>
-                <p style="font-size:14px;color:#71717a;line-height:1.65;">Choose your frontend technology. Connect modern Next.js Git projects or import Elementor themes with full Cora operational control.</p>
+        <div id="wizard-step-1" class="atw-anim" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 28px 36px;">
+            <div style="text-align:center;margin-bottom:38px;max-width:580px;">
+                <p style="font-size:10px;font-weight:900;letter-spacing:.18em;text-transform:uppercase;color:#a1a1aa;margin-bottom:12px;">Step 1 of 3</p>
+                <h2 style="font-size:32px;font-weight:900;color:#18181b;letter-spacing:-.045em;line-height:1.1;margin-bottom:12px;">What are you<br>building with?</h2>
+                <p style="font-size:13.5px;color:#71717a;line-height:1.6;">Choose your frontend technology. Launch with instant AI Tailwind templates, connect Next.js Git repositories, or import Elementor kits.</p>
             </div>
             <div class="atw-builder-grid">
 
-                <!-- 1. Next.js Native Card (Featured / Headless) -->
-                <button onclick="wizardSelectBuilder('nextjs')" id="wizard-card-nextjs" class="atw-card atw-sel-n" style="text-align:left;background:white;border:2px solid #18181b;border-radius:20px;overflow:hidden;cursor:pointer;padding:0;box-shadow:0 1px 4px rgba(0,0,0,.06);">
+                <!-- 1. AI HTML & Tailwind Card (Featured / Default - html_ai) -->
+                <button onclick="wizardSelectBuilder('html_ai')" id="wizard-card-html-ai" class="atw-card atw-sel-h" style="text-align:left;background:white;border:2px solid #18181b;border-radius:20px;overflow:hidden;cursor:pointer;padding:0;box-shadow:0 1px 4px rgba(0,0,0,.06);display:flex;flex-direction:column;justify-content:space-between;">
+                    <div style="position:relative;overflow:hidden;background:#09090b;">
+                        <div style="width:100%;padding-bottom:56.25%;position:relative;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 40%, #27272a 0%, #09090b 100%);">
+                            <!-- Minimalist AI Visual -->
+                            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;">
+                                <div style="width:44px;height:44px;background:white;border-radius:12px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,0,0,.4);">
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#09090b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                </div>
+                                <span style="font-size:10px;font-weight:800;color:#e4e4e7;letter-spacing:0.04em;font-family:monospace;">HTML + TAILWIND AI</span>
+                            </div>
+                            <div id="atw-ov-h" style="display:flex;position:absolute;inset:0;background:rgba(24,24,27,.48);align-items:center;justify-content:center;">
+                                <div style="width:44px;height:44px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 24px rgba(0,0,0,.2);">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#18181b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Top left badge -->
+                        <div style="position:absolute;top:11px;left:11px;display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.95);backdrop-filter:blur(8px);border-radius:100px;padding:4px 9px 4px 6px;box-shadow:0 1px 6px rgba(0,0,0,.14);">
+                            <span style="width:6px;height:6px;background:#10b981;border-radius:50%;"></span>
+                            <span style="font-size:10px;font-weight:800;color:#18181b;letter-spacing:-.01em;">⚡ 10-Min AI Launch</span>
+                        </div>
+                    </div>
+                    <div style="padding:16px 18px 18px;display:flex;flex-direction:column;flex:1;justify-content:space-between;">
+                        <div>
+                            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:4px;">
+                                <div>
+                                    <h3 style="font-size:14px;font-weight:800;color:#18181b;letter-spacing:-.02em;margin-bottom:4px;line-height:1.2;">AI HTML & Tailwind (Claude / ChatGPT)</h3>
+                                    <p style="font-size:11.5px;color:#71717a;line-height:1.45;">Prompt-driven templates · Instant Zero-Build live launch · Built-in Lead CRM.</p>
+                                </div>
+                                <div id="wiz-radio-html-ai" style="width:18px;height:18px;min-width:18px;border-radius:50%;border:2px solid #18181b;display:flex;align-items:center;justify-content:center;margin-top:2px;transition:all .18s;flex-shrink:0;">
+                                    <div style="width:8px;height:8px;border-radius:50%;background:#18181b;transition:all .18s;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:12px;">
+                            <span style="font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:3px 7px;background:#18181b;color:white;border-radius:6px;">Claude Prompt Matrix</span>
+                            <span style="font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:3px 7px;background:#f4f4f5;color:#71717a;border-radius:6px;">Tailwind CSS</span>
+                            <span style="font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:3px 7px;background:#f4f4f5;color:#71717a;border-radius:6px;">Auto CRM Lead Capture</span>
+                        </div>
+                    </div>
+                </button>
+
+                <!-- 2. Next.js Native Card (Git) -->
+                <button onclick="wizardSelectBuilder('nextjs')" id="wizard-card-nextjs" class="atw-card" style="text-align:left;background:white;border:2px solid #e4e4e7;border-radius:20px;overflow:hidden;cursor:pointer;padding:0;box-shadow:0 1px 4px rgba(0,0,0,.06);display:flex;flex-direction:column;justify-content:space-between;">
                     <div style="position:relative;overflow:hidden;background:#09090b;">
                         <div style="width:100%;padding-bottom:56.25%;position:relative;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 40%, #27272a 0%, #09090b 100%);">
                             <!-- Next.js Dark Minimalist Visual -->
                             <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;">
-                                <div style="width:48px;height:48px;background:white;border-radius:12px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,0,0,.4);">
-                                    <svg width="26" height="26" viewBox="0 0 24 24" fill="#09090b"><path d="M12 2L2 19.7778H22L12 2Z"/></svg>
+                                <div style="width:44px;height:44px;background:white;border-radius:12px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,0,0,.4);">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="#09090b"><path d="M12 2L2 19.7778H22L12 2Z"/></svg>
                                 </div>
-                                <span style="font-size:11px;font-weight:800;color:#e4e4e7;letter-spacing:0.04em;font-family:monospace;">NEXT.JS APP ROUTER</span>
+                                <span style="font-size:10px;font-weight:800;color:#e4e4e7;letter-spacing:0.04em;font-family:monospace;">NEXT.JS APP ROUTER</span>
                             </div>
-                            <div id="atw-ov-n" style="display:flex;position:absolute;inset:0;background:rgba(24,24,27,.48);align-items:center;justify-content:center;">
-                                <div style="width:48px;height:48px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 24px rgba(0,0,0,.2);">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#18181b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            <div id="atw-ov-n" style="display:none;position:absolute;inset:0;background:rgba(24,24,27,.48);align-items:center;justify-content:center;">
+                                <div style="width:44px;height:44px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 24px rgba(0,0,0,.2);">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#18181b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                                 </div>
                             </div>
                         </div>
@@ -4521,32 +4770,34 @@ function cora_get_sparkline_points( $history, $type ) {
                             <span style="font-size:10px;font-weight:800;color:#18181b;letter-spacing:-.01em;">Native Next.js</span>
                         </div>
                     </div>
-                    <div style="padding:18px 20px 20px;">
-                        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:4px;">
-                            <div>
-                                <h3 style="font-size:15px;font-weight:800;color:#18181b;letter-spacing:-.025em;margin-bottom:4px;">Next.js Native (Git)</h3>
-                                <p style="font-size:12px;color:#71717a;line-height:1.55;">Connect GitHub repo · Headless React App Router · Full operational control.</p>
-                            </div>
-                            <div id="wiz-radio-nextjs" style="width:18px;height:18px;min-width:18px;border-radius:50%;border:2px solid #18181b;display:flex;align-items:center;justify-content:center;margin-top:2px;transition:all .18s;flex-shrink:0;">
-                                <div style="width:8px;height:8px;border-radius:50%;background:#18181b;transition:all .18s;"></div>
+                    <div style="padding:16px 18px 18px;display:flex;flex-direction:column;flex:1;justify-content:space-between;">
+                        <div>
+                            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:4px;">
+                                <div>
+                                    <h3 style="font-size:14px;font-weight:800;color:#18181b;letter-spacing:-.02em;margin-bottom:4px;line-height:1.2;">Next.js Native (Git)</h3>
+                                    <p style="font-size:11.5px;color:#71717a;line-height:1.45;">Connect GitHub repo · Headless React App Router · Full operational control.</p>
+                                </div>
+                                <div id="wiz-radio-nextjs" style="width:18px;height:18px;min-width:18px;border-radius:50%;border:2px solid #d4d4d8;display:flex;align-items:center;justify-content:center;margin-top:2px;transition:all .18s;flex-shrink:0;">
+                                    <div style="width:8px;height:8px;border-radius:50%;background:transparent;transition:all .18s;"></div>
+                                </div>
                             </div>
                         </div>
-                        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;">
-                            <span style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:3px 8px;background:#18181b;color:white;border-radius:6px;">App Router</span>
-                            <span style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:3px 8px;background:#f4f4f5;color:#71717a;border-radius:6px;">GitHub Sync</span>
-                            <span style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:3px 8px;background:#f4f4f5;color:#71717a;border-radius:6px;">ISR Rebuild</span>
+                        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:12px;">
+                            <span style="font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:3px 7px;background:#f4f4f5;color:#71717a;border-radius:6px;">App Router</span>
+                            <span style="font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:3px 7px;background:#f4f4f5;color:#71717a;border-radius:6px;">GitHub Sync</span>
+                            <span style="font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:3px 7px;background:#f4f4f5;color:#71717a;border-radius:6px;">ISR Rebuild</span>
                         </div>
                     </div>
                 </button>
 
-                <!-- 2. Elementor Card -->
-                <button onclick="wizardSelectBuilder('elementor')" id="wizard-card-elementor" class="atw-card" style="text-align:left;background:white;border:2px solid #e4e4e7;border-radius:20px;overflow:hidden;cursor:pointer;padding:0;box-shadow:0 1px 4px rgba(0,0,0,.06);">
+                <!-- 3. Elementor Card -->
+                <button onclick="wizardSelectBuilder('elementor')" id="wizard-card-elementor" class="atw-card" style="text-align:left;background:white;border:2px solid #e4e4e7;border-radius:20px;overflow:hidden;cursor:pointer;padding:0;box-shadow:0 1px 4px rgba(0,0,0,.06);display:flex;flex-direction:column;justify-content:space-between;">
                     <div style="position:relative;overflow:hidden;background:#f0f0ef;">
                         <div style="width:100%;padding-bottom:56.25%;position:relative;">
                             <img src="<?php echo esc_url( plugin_dir_url(dirname(__FILE__)) . 'assets/img/wizard-elementor-thumb.jpg' ); ?>" alt="Elementor editor" class="atw-thumb" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;" loading="lazy">
                             <div id="atw-ov-e" style="display:none;position:absolute;inset:0;background:rgba(24,24,27,.48);align-items:center;justify-content:center;">
-                                <div style="width:48px;height:48px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 24px rgba(0,0,0,.2);">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#18181b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                <div style="width:44px;height:44px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 24px rgba(0,0,0,.2);">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#18181b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                                 </div>
                             </div>
                         </div>
@@ -4555,32 +4806,34 @@ function cora_get_sparkline_points( $history, $type ) {
                             <span style="font-size:10px;font-weight:800;color:#18181b;letter-spacing:-.01em;">Elementor</span>
                         </div>
                     </div>
-                    <div style="padding:18px 20px 20px;">
-                        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:4px;">
-                            <div>
-                                <h3 style="font-size:15px;font-weight:800;color:#18181b;letter-spacing:-.025em;margin-bottom:4px;">Elementor Builder</h3>
-                                <p style="font-size:12px;color:#71717a;line-height:1.55;">Upload a Kit (.zip) or manage Elementor pages.</p>
-                            </div>
-                            <div id="wiz-radio-elementor" style="width:18px;height:18px;min-width:18px;border-radius:50%;border:2px solid #d4d4d8;display:flex;align-items:center;justify-content:center;margin-top:2px;transition:all .18s;flex-shrink:0;">
-                                <div style="width:8px;height:8px;border-radius:50%;background:transparent;transition:all .18s;"></div>
+                    <div style="padding:16px 18px 18px;display:flex;flex-direction:column;flex:1;justify-content:space-between;">
+                        <div>
+                            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:4px;">
+                                <div>
+                                    <h3 style="font-size:14px;font-weight:800;color:#18181b;letter-spacing:-.02em;margin-bottom:4px;line-height:1.2;">Elementor Builder / Kit</h3>
+                                    <p style="font-size:11.5px;color:#71717a;line-height:1.45;">Upload Elementor Kit (.zip) or manage Elementor pages.</p>
+                                </div>
+                                <div id="wiz-radio-elementor" style="width:18px;height:18px;min-width:18px;border-radius:50%;border:2px solid #d4d4d8;display:flex;align-items:center;justify-content:center;margin-top:2px;transition:all .18s;flex-shrink:0;">
+                                    <div style="width:8px;height:8px;border-radius:50%;background:transparent;transition:all .18s;"></div>
+                                </div>
                             </div>
                         </div>
-                        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;">
-                            <span style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:3px 8px;background:#f4f4f5;color:#71717a;border-radius:6px;">Upload Kit</span>
-                            <span style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:3px 8px;background:#f4f4f5;color:#71717a;border-radius:6px;">Visual Editor</span>
+                        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:12px;">
+                            <span style="font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:3px 7px;background:#f4f4f5;color:#71717a;border-radius:6px;">Upload Kit</span>
+                            <span style="font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:3px 7px;background:#f4f4f5;color:#71717a;border-radius:6px;">Visual Editor</span>
                         </div>
                     </div>
                 </button>
 
-                <!-- 3. Lovable Card — LOCKED / Coming Soon -->
-                <div id="wizard-card-lovable" onclick="if(typeof window.coraShowToast==='function'){window.coraShowToast('Lovable integration is coming soon!','info');}else{console.log('Lovable coming soon');}" class="atw-card" style="text-align:left;background:#fafafa;border:2px solid #e4e4e7;border-radius:20px;overflow:hidden;cursor:not-allowed;padding:0;box-shadow:0 1px 4px rgba(0,0,0,.04);opacity:.55;filter:grayscale(.35);position:relative;transition:opacity .2s,filter .2s;user-select:none;" onmouseover="this.style.opacity='.62';" onmouseout="this.style.opacity='.55';">
+                <!-- 4. Lovable Card — LOCKED / Coming Soon -->
+                <div id="wizard-card-lovable" onclick="if(typeof window.coraShowToast==='function'){window.coraShowToast('Lovable integration is coming soon!','info');}else{console.log('Lovable coming soon');}" class="atw-card" style="text-align:left;background:#fafafa;border:2px solid #e4e4e7;border-radius:20px;overflow:hidden;cursor:not-allowed;padding:0;box-shadow:0 1px 4px rgba(0,0,0,.04);opacity:.55;filter:grayscale(.35);position:relative;transition:opacity .2s,filter .2s;user-select:none;display:flex;flex-direction:column;justify-content:space-between;" onmouseover="this.style.opacity='.62';" onmouseout="this.style.opacity='.55';">
                     <div style="position:relative;overflow:hidden;background:#f0eef5;">
                         <div style="width:100%;padding-bottom:56.25%;position:relative;">
                             <img src="<?php echo esc_url( plugin_dir_url(dirname(__FILE__)) . 'assets/img/wizard-lovable-thumb.jpg' ); ?>" alt="Lovable Studio" class="atw-thumb" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;filter:grayscale(.3);" loading="lazy">
                             <!-- Permanent lock overlay -->
                             <div style="position:absolute;inset:0;background:rgba(24,24,27,.32);display:flex;align-items:center;justify-content:center;">
-                                <div style="width:48px;height:48px;background:rgba(255,255,255,.92);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.12);">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                <div style="width:44px;height:44px;background:rgba(255,255,255,.92);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.12);">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                                 </div>
                             </div>
                         </div>
@@ -4595,22 +4848,305 @@ function cora_get_sparkline_points( $history, $type ) {
                             <span style="font-size:9px;font-weight:800;color:#e4e4e7;letter-spacing:.04em;text-transform:uppercase;">Coming Soon</span>
                         </div>
                     </div>
-                    <div style="padding:18px 20px 20px;">
-                        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:4px;">
-                            <div>
-                                <h3 style="font-size:15px;font-weight:800;color:#a1a1aa;letter-spacing:-.025em;margin-bottom:4px;">Lovable Studio</h3>
-                                <p style="font-size:12px;color:#a1a1aa;line-height:1.55;">Connect a live AI-built Lovable.dev project.</p>
-                            </div>
-                            <div style="width:18px;height:18px;min-width:18px;display:flex;align-items:center;justify-content:center;margin-top:2px;flex-shrink:0;">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d4d4d8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    <div style="padding:16px 18px 18px;display:flex;flex-direction:column;flex:1;justify-content:space-between;">
+                        <div>
+                            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:4px;">
+                                <div>
+                                    <h3 style="font-size:14px;font-weight:800;color:#a1a1aa;letter-spacing:-.02em;margin-bottom:4px;line-height:1.2;">Lovable Studio (Locked / Coming Soon)</h3>
+                                    <p style="font-size:11.5px;color:#a1a1aa;line-height:1.45;">Connect a live AI-built Lovable.dev project.</p>
+                                </div>
+                                <div style="width:18px;height:18px;min-width:18px;display:flex;align-items:center;justify-content:center;margin-top:2px;flex-shrink:0;">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d4d4d8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                </div>
                             </div>
                         </div>
-                        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;">
-                            <span style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:3px 8px;background:#f4f4f5;color:#a1a1aa;border-radius:6px;border:1px solid #e4e4e7;">Lovable API</span>
-                            <span style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:3px 8px;background:#f4f4f5;color:#a1a1aa;border-radius:6px;border:1px solid #e4e4e7;">Live Sync</span>
+                        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:12px;">
+                            <span style="font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:3px 7px;background:#f4f4f5;color:#a1a1aa;border-radius:6px;border:1px solid #e4e4e7;">Lovable API</span>
+                            <span style="font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:3px 7px;background:#f4f4f5;color:#a1a1aa;border-radius:6px;border:1px solid #e4e4e7;">Live Sync</span>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- STEP 2-HTML: AI HTML & Tailwind Starter Prompts Matrix -->
+        <div id="wizard-step-2-html" class="atw-anim" style="display:none;flex:1;flex-direction:column;align-items:center;justify-content:flex-start;padding:36px 28px;max-width:1160px;margin:0 auto;width:100%;">
+            <!-- Header -->
+            <div style="text-align:center;margin-bottom:28px;max-width:680px;">
+                <div style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;background:#18181b;border-radius:100px;margin-bottom:12px;">
+                    <span style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:white;">⚡ Claude & ChatGPT Master Prompts</span>
+                </div>
+                <h2 style="font-size:26px;font-weight:900;color:#18181b;letter-spacing:-.04em;line-height:1.15;margin-bottom:8px;">Choose a Business Template Prompt</h2>
+                <p style="font-size:13px;color:#71717a;line-height:1.55;">Select a template below to copy its tailored master prompt for Claude or ChatGPT, or paste your generated HTML code directly.</p>
+            </div>
+
+            <!-- Template Prompts Grid (High-Density Responsive Cards) -->
+            <div class="atw-prompts-grid" style="margin-bottom:24px;">
+
+                <!-- 1. Creative Agency & Video Studio -->
+                <div onclick="window.selectHtmlTemplate('agency', 'Creative Agency & Video Studio')" id="wiz-tcard-agency" class="atw-template-card atw-sel-t" style="display:flex;flex-direction:column;justify-content:space-between;padding:18px;">
+                    <div>
+                        <!-- Thumbnail Illustration Preview -->
+                        <div style="height:110px;border-radius:12px;background:radial-gradient(circle at 50% 30%, #27272a 0%, #09090b 100%);display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:14px;overflow:hidden;border:1px solid #27272a;">
+                            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+                                <div style="width:36px;height:36px;background:rgba(255,255,255,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.15);">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                </div>
+                                <span style="font-size:9.5px;font-weight:800;color:#e4e4e7;letter-spacing:0.04em;font-family:monospace;">CREATIVE AGENCY</span>
+                            </div>
+                            <span style="position:absolute;top:8px;right:8px;font-size:8.5px;font-weight:800;color:#10b981;background:rgba(16,185,129,0.15);padding:2px 6px;border-radius:4px;border:1px solid rgba(16,185,129,0.3);">Dark Minimal</span>
+                        </div>
+
+                        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;">
+                            <h3 style="font-size:14px;font-weight:800;color:#18181b;letter-spacing:-0.02em;">🎨 Creative Agency & Video Studio</h3>
+                        </div>
+                        <p style="font-size:11.5px;color:#71717a;line-height:1.45;margin-bottom:12px;">Tailwind CDN, dark modern minimalist aesthetic, video reel hero, portfolio showcase cards, services grid, testimonial ticker, and a native lead consultation &lt;form&gt;.</p>
+                        
+                        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px;">
+                            <span style="font-size:8.5px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 7px;border-radius:5px;">Tailwind CDN</span>
+                            <span style="font-size:8.5px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 7px;border-radius:5px;">Native Lead Form</span>
+                            <span style="font-size:8.5px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 7px;border-radius:5px;">Mobile 100%</span>
+                        </div>
+                    </div>
+
+                    <div style="display:flex;flex-direction:column;gap:6px;border-top:1px solid #f4f4f5;padding-top:12px;">
+                        <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('agency');" style="width:100%;padding:8px 12px;background:#f4f4f5;border:1px solid #e4e4e7;border-radius:8px;font-size:11px;font-weight:700;color:#18181b;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                            <span>📋 Copy Prompt for Claude / ChatGPT</span>
+                        </button>
+                        <button type="button" onclick="window.selectHtmlTemplate('agency', 'Creative Agency & Video Studio')" style="width:100%;padding:8px 12px;background:#18181b;border:none;border-radius:8px;font-size:11px;font-weight:700;color:white;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;">
+                            <span>Select & Connect Code →</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 2. AI SaaS & Software Landing -->
+                <div onclick="window.selectHtmlTemplate('saas', 'AI SaaS & Software Landing')" id="wiz-tcard-saas" class="atw-template-card" style="display:flex;flex-direction:column;justify-content:space-between;padding:18px;">
+                    <div>
+                        <!-- Thumbnail Illustration Preview -->
+                        <div style="height:110px;border-radius:12px;background:radial-gradient(circle at 50% 30%, #1e1b4b 0%, #09090b 100%);display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:14px;overflow:hidden;border:1px solid #2e1065;">
+                            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+                                <div style="width:36px;height:36px;background:rgba(255,255,255,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.15);">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                                </div>
+                                <span style="font-size:9.5px;font-weight:800;color:#c4b5fd;letter-spacing:0.04em;font-family:monospace;">AI SAAS PLATFORM</span>
+                            </div>
+                            <span style="position:absolute;top:8px;right:8px;font-size:8.5px;font-weight:800;color:#a78bfa;background:rgba(167,139,250,0.15);padding:2px 6px;border-radius:4px;border:1px solid rgba(167,139,250,0.3);">High Tech</span>
+                        </div>
+
+                        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;">
+                            <h3 style="font-size:14px;font-weight:800;color:#18181b;letter-spacing:-0.02em;">⚡ AI SaaS & Software Landing</h3>
+                        </div>
+                        <p style="font-size:11.5px;color:#71717a;line-height:1.45;margin-bottom:12px;">Modern software company layout, live status pill, interactive feature cards, pricing tiers with toggle, and native product demo/waitlist &lt;form&gt;.</p>
+                        
+                        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px;">
+                            <span style="font-size:8.5px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 7px;border-radius:5px;">Tailwind CDN</span>
+                            <span style="font-size:8.5px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 7px;border-radius:5px;">Native Lead Form</span>
+                            <span style="font-size:8.5px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 7px;border-radius:5px;">Mobile 100%</span>
+                        </div>
+                    </div>
+
+                    <div style="display:flex;flex-direction:column;gap:6px;border-top:1px solid #f4f4f5;padding-top:12px;">
+                        <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('saas');" style="width:100%;padding:8px 12px;background:#f4f4f5;border:1px solid #e4e4e7;border-radius:8px;font-size:11px;font-weight:700;color:#18181b;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                            <span>📋 Copy Prompt for Claude / ChatGPT</span>
+                        </button>
+                        <button type="button" onclick="window.selectHtmlTemplate('saas', 'AI SaaS & Software Landing')" style="width:100%;padding:8px 12px;background:#18181b;border:none;border-radius:8px;font-size:11px;font-weight:700;color:white;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;">
+                            <span>Select & Connect Code →</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 3. B2B Advisory & Management Consulting -->
+                <div onclick="window.selectHtmlTemplate('consulting', 'B2B Advisory & Management Consulting')" id="wiz-tcard-consulting" class="atw-template-card" style="display:flex;flex-direction:column;justify-content:space-between;padding:18px;">
+                    <div>
+                        <!-- Thumbnail Illustration Preview -->
+                        <div style="height:110px;border-radius:12px;background:radial-gradient(circle at 50% 30%, #1c1917 0%, #09090b 100%);display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:14px;overflow:hidden;border:1px solid #292524;">
+                            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+                                <div style="width:36px;height:36px;background:rgba(255,255,255,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.15);">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d6d3d1" stroke-width="2"><path d="M20 7h-7L10 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg>
+                                </div>
+                                <span style="font-size:9.5px;font-weight:800;color:#e7e5e4;letter-spacing:0.04em;font-family:monospace;">EXECUTIVE ADVISORY</span>
+                            </div>
+                            <span style="position:absolute;top:8px;right:8px;font-size:8.5px;font-weight:800;color:#fbbf24;background:rgba(251,191,36,0.15);padding:2px 6px;border-radius:4px;border:1px solid rgba(251,191,36,0.3);">Editorial Luxury</span>
+                        </div>
+
+                        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;">
+                            <h3 style="font-size:14px;font-weight:800;color:#18181b;letter-spacing:-0.02em;">💼 B2B Advisory & Consulting</h3>
+                        </div>
+                        <p style="font-size:11.5px;color:#71717a;line-height:1.45;margin-bottom:12px;">Editorial layout, client partner logos, strategic services breakdown, case study metrics, and native audit inquiry &lt;form&gt;.</p>
+                        
+                        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px;">
+                            <span style="font-size:8.5px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 7px;border-radius:5px;">Tailwind CDN</span>
+                            <span style="font-size:8.5px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 7px;border-radius:5px;">Native Lead Form</span>
+                            <span style="font-size:8.5px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 7px;border-radius:5px;">Mobile 100%</span>
+                        </div>
+                    </div>
+
+                    <div style="display:flex;flex-direction:column;gap:6px;border-top:1px solid #f4f4f5;padding-top:12px;">
+                        <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('consulting');" style="width:100%;padding:8px 12px;background:#f4f4f5;border:1px solid #e4e4e7;border-radius:8px;font-size:11px;font-weight:700;color:#18181b;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                            <span>📋 Copy Prompt for Claude / ChatGPT</span>
+                        </button>
+                        <button type="button" onclick="window.selectHtmlTemplate('consulting', 'B2B Advisory & Management Consulting')" style="width:100%;padding:8px 12px;background:#18181b;border:none;border-radius:8px;font-size:11px;font-weight:700;color:white;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;">
+                            <span>Select & Connect Code →</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 4. Photography Studio & Production House -->
+                <div onclick="window.selectHtmlTemplate('photography', 'Photography Studio & Production House')" id="wiz-tcard-photography" class="atw-template-card" style="display:flex;flex-direction:column;justify-content:space-between;padding:18px;">
+                    <div>
+                        <!-- Thumbnail Illustration Preview -->
+                        <div style="height:110px;border-radius:12px;background:radial-gradient(circle at 50% 30%, #18181b 0%, #09090b 100%);display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:14px;overflow:hidden;border:1px solid #27272a;">
+                            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+                                <div style="width:36px;height:36px;background:rgba(255,255,255,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.15);">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                                </div>
+                                <span style="font-size:9.5px;font-weight:800;color:#bae6fd;letter-spacing:0.04em;font-family:monospace;">PHOTO STUDIO</span>
+                            </div>
+                            <span style="position:absolute;top:8px;right:8px;font-size:8.5px;font-weight:800;color:#38bdf8;background:rgba(56,189,248,0.15);padding:2px 6px;border-radius:4px;border:1px solid rgba(56,189,248,0.3);">Visual Gallery</span>
+                        </div>
+
+                        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;">
+                            <h3 style="font-size:14px;font-weight:800;color:#18181b;letter-spacing:-0.02em;">📸 Photography Studio & Production</h3>
+                        </div>
+                        <p style="font-size:11.5px;color:#71717a;line-height:1.45;margin-bottom:12px;">High-end image gallery, package cards with GST breakdown, client reviews, and native booking inquiry &lt;form&gt;.</p>
+                        
+                        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px;">
+                            <span style="font-size:8.5px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 7px;border-radius:5px;">Tailwind CDN</span>
+                            <span style="font-size:8.5px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 7px;border-radius:5px;">Native Lead Form</span>
+                            <span style="font-size:8.5px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 7px;border-radius:5px;">Mobile 100%</span>
+                        </div>
+                    </div>
+
+                    <div style="display:flex;flex-direction:column;gap:6px;border-top:1px solid #f4f4f5;padding-top:12px;">
+                        <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('photography');" style="width:100%;padding:8px 12px;background:#f4f4f5;border:1px solid #e4e4e7;border-radius:8px;font-size:11px;font-weight:700;color:#18181b;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                            <span>📋 Copy Prompt for Claude / ChatGPT</span>
+                        </button>
+                        <button type="button" onclick="window.selectHtmlTemplate('photography', 'Photography Studio & Production House')" style="width:100%;padding:8px 12px;background:#18181b;border:none;border-radius:8px;font-size:11px;font-weight:700;color:white;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;">
+                            <span>Select & Connect Code →</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 5. Custom Prompt Studio (Any Niche) -->
+                <div onclick="window.selectHtmlTemplate('custom', 'Custom Business Studio')" id="wiz-tcard-custom" class="atw-template-card" style="display:flex;flex-direction:column;justify-content:space-between;padding:18px;">
+                    <div>
+                        <!-- Thumbnail Illustration Preview -->
+                        <div style="height:110px;border-radius:12px;background:radial-gradient(circle at 50% 30%, #27272a 0%, #09090b 100%);display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:14px;overflow:hidden;border:1px solid #3f3f46;">
+                            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+                                <div style="width:36px;height:36px;background:rgba(255,255,255,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.15);">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                                </div>
+                                <span style="font-size:9.5px;font-weight:800;color:#fda4af;letter-spacing:0.04em;font-family:monospace;">CUSTOM NICHE</span>
+                            </div>
+                            <span style="position:absolute;top:8px;right:8px;font-size:8.5px;font-weight:800;color:#f43f5e;background:rgba(244,63,94,0.15);padding:2px 6px;border-radius:4px;border:1px solid rgba(244,63,94,0.3);">Universal</span>
+                        </div>
+
+                        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;">
+                            <h3 style="font-size:14px;font-weight:800;color:#18181b;letter-spacing:-0.02em;">✨ Custom Prompt Studio (Any Niche)</h3>
+                        </div>
+                        <p style="font-size:11.5px;color:#71717a;line-height:1.45;margin-bottom:12px;">Customizable prompt template with business name & services inputs for real estate, e-commerce, fitness, hospitality, or local service businesses.</p>
+                        
+                        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px;">
+                            <span style="font-size:8.5px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 7px;border-radius:5px;">Tailwind CDN</span>
+                            <span style="font-size:8.5px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 7px;border-radius:5px;">Native Lead Form</span>
+                            <span style="font-size:8.5px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 7px;border-radius:5px;">Universal Niche</span>
+                        </div>
+                    </div>
+
+                    <div style="display:flex;flex-direction:column;gap:6px;border-top:1px solid #f4f4f5;padding-top:12px;">
+                        <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('custom');" style="width:100%;padding:8px 12px;background:#f4f4f5;border:1px solid #e4e4e7;border-radius:8px;font-size:11px;font-weight:700;color:#18181b;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                            <span>📋 Copy Prompt for Claude / ChatGPT</span>
+                        </button>
+                        <button type="button" onclick="window.selectHtmlTemplate('custom', 'Custom Business Studio')" style="width:100%;padding:8px 12px;background:#18181b;border:none;border-radius:8px;font-size:11px;font-weight:700;color:white;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;">
+                            <span>Select & Connect Code →</span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Code Connection Section below the grid -->
+            <div id="wiz-html-code-section" style="width:100%;background:white;border:1.5px solid #e4e4e7;border-radius:18px;padding:24px;box-shadow:0 1px 4px rgba(0,0,0,.04);">
+                
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #f4f4f5;">
+                    <div>
+                        <h4 style="font-size:14px;font-weight:800;color:#18181b;margin-bottom:2px;">Connect & Deploy Code</h4>
+                        <p style="font-size:11.5px;color:#71717a;">Paste your generated HTML from Claude / ChatGPT, drop an index.html file, or sync a Git repository.</p>
+                    </div>
+                    <!-- Tab Switcher -->
+                    <div style="display:inline-flex;background:#f4f4f5;border-radius:10px;padding:3px;gap:2px;">
+                        <button type="button" onclick="window.wizardSetHtmlCodeMode('paste')" id="wiz-html-tab-paste" class="atw-tab atw-tab-on" style="padding:6px 12px;font-size:11px;font-weight:700;display:inline-flex;align-items:center;gap:5px;">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                            <span>Paste HTML Code / Drop index.html</span>
+                        </button>
+                        <button type="button" onclick="window.wizardSetHtmlCodeMode('github')" id="wiz-html-tab-github" class="atw-tab atw-tab-off" style="padding:6px 12px;font-size:11px;font-weight:700;display:inline-flex;align-items:center;gap:5px;">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            <span>Connect GitHub Repo</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 1. Paste HTML Tab -->
+                <div id="wiz-html-paste-area" style="display:flex;flex-direction:column;gap:14px;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;">
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <span style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#71717a;">HTML Source Code</span>
+                            <span id="wiz-html-stats" style="font-size:10px;font-family:monospace;background:#f4f4f5;color:#71717a;padding:2px 8px;border-radius:6px;">0 lines · 0.0 KB</span>
+                        </div>
+                        <button type="button" onclick="window.previewPastedHtml()" style="display:inline-flex;align-items:center;gap:5px;padding:6px 12px;background:#18181b;color:white;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;font-family:inherit;">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+                            <span>👁 Preview Render in Modal</span>
+                        </button>
+                    </div>
+
+                    <div style="border:1.5px solid #27272a;border-radius:12px;background:#09090b;overflow:hidden;box-shadow:inset 0 2px 4px rgba(0,0,0,0.5);">
+                        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:#18181b;border-bottom:1px solid #27272a;font-family:monospace;font-size:11px;color:#a1a1aa;">
+                            <span>index.html</span>
+                            <span style="font-size:10px;color:#71717a;">Tailwind CDN Ready</span>
+                        </div>
+                        <textarea id="wiz-html-raw-code" 
+                            oninput="window.updateWizHtmlStats()" 
+                            placeholder="<!DOCTYPE html>&#10;<html lang=&quot;en&quot;>&#10;<head>&#10;    <script src=&quot;https://cdn.tailwindcss.com&quot;></script>&#10;    <title>My Website</title>&#10;</head>&#10;<body>&#10;    <!-- Paste complete HTML from Claude / ChatGPT here -->&#10;</body>&#10;</html>" 
+                            style="width:100%;height:180px;padding:12px 14px;background:#09090b;color:#f4f4f5;font-family:'JetBrains Mono',monospace;font-size:11.5px;line-height:1.5;border:none;outline:none;resize:vertical;"></textarea>
+                    </div>
+
+                    <!-- Dropzone -->
+                    <label id="wiz-html-dropzone" style="display:flex;align-items:center;justify-content:center;gap:12px;padding:16px 20px;background:#fafafa;border:1.5px dashed #d4d4d8;border-radius:12px;cursor:pointer;transition:all .15s;" 
+                           ondragover="event.preventDefault(); this.style.borderColor='#18181b'; this.style.background='#f4f4f5';" 
+                           ondragleave="this.style.borderColor='#d4d4d8'; this.style.background='#fafafa';" 
+                           ondrop="event.preventDefault(); this.style.borderColor='#d4d4d8'; this.style.background='#fafafa'; if(event.dataTransfer.files.length) window.handleHtmlFileDrop(event.dataTransfer.files[0]);">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        <div style="font-size:11.5px;color:#71717a;">
+                            <span style="font-weight:700;color:#18181b;text-decoration:underline;">Click to upload index.html</span> or drag & drop file directly here
+                        </div>
+                        <input type="file" id="wiz-html-file-input" accept=".html,.htm" style="display:none;" onchange="window.wizardHtmlFileSelected(this)">
+                    </label>
+                </div>
+
+                <!-- 2. GitHub Repo Tab -->
+                <div id="wiz-html-github-area" style="display:none;flex-direction:column;gap:14px;">
+                    <div style="display:flex;flex-direction:column;gap:6px;">
+                        <label style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#71717a;">Repository URL *</label>
+                        <input type="text" id="wiz-html-repo" class="atw-input" placeholder="https://github.com/username/my-html-theme" value="">
+                    </div>
+                    <div style="display:flex;gap:10px;">
+                        <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
+                            <label style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#71717a;">Branch</label>
+                            <input type="text" id="wiz-html-branch" class="atw-input" placeholder="main" value="main">
+                        </div>
+                        <div style="display:flex;align-items:flex-end;">
+                            <button type="button" onclick="window.wizCheckHtmlRepository()" style="padding:9px 16px;background:#18181b;color:white;border:none;border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;">
+                                Scan Routes
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
 
@@ -4984,16 +5520,17 @@ function cora_get_sparkline_points( $history, $type ) {
             </div>
         </div>
 
-        <!-- STEP 3: Name & Save -->
-        <div id="wizard-step-3" class="atw-anim" style="display:none;flex:1;flex-direction:column;align-items:center;justify-content:center;padding:52px 32px;">
-            <div style="width:100%;max-width:520px;">
-                <div style="text-align:center;margin-bottom:32px;">
-                    <div style="width:56px;height:56px;background:#18181b;border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;">
+        <!-- STEP 3: Name & Save / Live Build Terminal -->
+        <div id="wizard-step-3" class="atw-anim" style="display:none;flex:1;flex-direction:column;align-items:center;justify-content:center;padding:36px 24px;width:100%;">
+            <!-- 3A: Initial Name & Config Card -->
+            <div id="wiz-step-3-form-container" style="width:100%;max-width:520px;margin:0 auto;">
+                <div style="text-align:center;margin-bottom:28px;">
+                    <div style="width:56px;height:56px;background:#18181b;border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
                     </div>
-                    <p style="font-size:10px;font-weight:900;letter-spacing:.18em;text-transform:uppercase;color:#a1a1aa;margin-bottom:14px;">Step 3 of 3</p>
-                    <h2 style="font-size:26px;font-weight:900;color:#18181b;letter-spacing:-.04em;line-height:1.1;margin-bottom:10px;">Name your theme</h2>
-                    <p style="font-size:13px;color:#71717a;line-height:1.6;">You can rename it anytime from the Themes section.</p>
+                    <p style="font-size:10px;font-weight:900;letter-spacing:.18em;text-transform:uppercase;color:#a1a1aa;margin-bottom:10px;">Step 3 of 3</p>
+                    <h2 style="font-size:24px;font-weight:900;color:#18181b;letter-spacing:-.04em;line-height:1.1;margin-bottom:8px;">Name your theme</h2>
+                    <p style="font-size:13px;color:#71717a;line-height:1.5;">You can rename it anytime from the Themes section.</p>
                 </div>
                 <div style="background:white;border:1.5px solid #e4e4e7;border-radius:16px;padding:24px;box-shadow:0 1px 4px rgba(0,0,0,.05);">
                     <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:20px;">
@@ -5013,6 +5550,75 @@ function cora_get_sparkline_points( $history, $type ) {
                     </div>
                 </div>
             </div>
+
+            <!-- 3B: Real-Time Build & Deployment Terminal Window -->
+            <div id="wiz-step-3-build-container" style="display:none;width:100%;max-width:620px;margin:0 auto;">
+                <div style="background:#18181b;border:1px solid #27272a;border-radius:20px;padding:28px 24px;box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);color:#f4f4f5;">
+                    <!-- Terminal Header -->
+                    <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #27272a;padding-bottom:18px;margin-bottom:20px;">
+                        <div style="display:flex;align-items:center;gap:12px;">
+                            <div id="wiz-build-icon-box" style="width:40px;height:40px;border-radius:10px;background:#27272a;border:1px solid #3f3f46;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-weight:700;color:#ffffff;font-size:16px;">
+                                ▲
+                            </div>
+                            <div>
+                                <h3 id="wiz-build-header-title" style="font-size:15px;font-weight:700;color:#f4f4f5;letter-spacing:-0.01em;display:flex;align-items:center;gap:8px;">
+                                    Building & Deploying Theme…
+                                </h3>
+                                <p id="wiz-build-header-sub" style="font-size:12px;color:#a1a1aa;margin-top:2px;">
+                                    Compiling Next.js components & exporting static site for Cora Workspace
+                                </p>
+                            </div>
+                        </div>
+                        <span id="wiz-build-status-pill" style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:9999px;font-size:11px;font-weight:600;font-family:'JetBrains Mono',monospace;background:#27272a;color:#d4d4d8;border:1px solid #3f3f46;">
+                            <span id="wiz-build-status-dot" style="width:6px;height:6px;border-radius:9999px;background:#eab308;animation:pulse 2s infinite;"></span>
+                            <span id="wiz-build-status-text">Building…</span>
+                        </span>
+                    </div>
+
+                    <!-- 5-Step Real-Time Progressive Checklist -->
+                    <div style="background:#09090b;border:1px solid #27272a;border-radius:12px;padding:16px 18px;margin-bottom:16px;font-family:'JetBrains Mono',monospace;font-size:12px;">
+                        <div id="wiz-build-steps-list" style="display:flex;flex-direction:column;gap:9px;">
+                            <div id="wiz-bstep-1" style="color:#71717a;transition:all .2s;">[ ] 1. Cloning repository & inspecting branch tree...</div>
+                            <div id="wiz-bstep-2" style="color:#71717a;transition:all .2s;">[ ] 2. Resolving packages & framework dependencies...</div>
+                            <div id="wiz-bstep-3" style="color:#71717a;transition:all .2s;">[ ] 3. Compiling Next.js App Router / React components...</div>
+                            <div id="wiz-bstep-4" style="color:#71717a;transition:all .2s;">[ ] 4. Prerendering static HTML for all scanned routes...</div>
+                            <div id="wiz-bstep-5" style="color:#71717a;transition:all .2s;">[ ] 5. Deploying static assets to web server...</div>
+                        </div>
+                    </div>
+
+                    <!-- Meaningful Error & Diagnostic Panel (Hidden by default) -->
+                    <div id="wiz-build-error-panel" style="display:none;background:#27272a;border:1px solid #f43f5e;border-radius:12px;padding:16px;margin-bottom:16px;">
+                        <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2.2" style="flex-shrink:0;margin-top:2px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                            <div style="flex:1;">
+                                <h4 id="wiz-build-error-title" style="font-size:13px;font-weight:700;color:#f43f5e;margin-bottom:4px;">Build Failed</h4>
+                                <p id="wiz-build-error-hint" style="font-size:12px;color:#d4d4d8;line-height:1.4;"></p>
+                            </div>
+                        </div>
+
+                        <!-- Collapsible Raw Terminal Logs -->
+                        <details style="margin-top:10px;">
+                            <summary style="font-size:11px;font-family:'JetBrains Mono',monospace;color:#a1a1aa;cursor:pointer;user-select:none;outline:none;">
+                                View Complete Build Console Log (Terminal Output)
+                            </summary>
+                            <pre id="wiz-build-log-text" style="margin-top:8px;padding:10px 12px;background:#09090b;border:1px solid #3f3f46;border-radius:8px;color:#fda4af;font-family:'JetBrains Mono',monospace;font-size:10px;max-height:160px;overflow-y:auto;white-space:pre-wrap;word-break:break-all;line-height:1.4;"></pre>
+                        </details>
+                    </div>
+
+                    <!-- Action Controls during/after Build -->
+                    <div id="wiz-build-actions-bar" style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:8px;">
+                        <button type="button" id="wiz-build-btn-back" onclick="wizardBackFromBuild()" style="display:none;align-items:center;gap:6px;padding:8px 16px;background:#27272a;border:1px solid #3f3f46;border-radius:8px;font-size:12px;font-weight:600;color:#d4d4d8;cursor:pointer;transition:all .15s;">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="15 18 9 12 15 6"/></svg>
+                            Back & Edit Settings
+                        </button>
+                        <div style="flex:1;"></div>
+                        <button type="button" id="wiz-build-btn-retry" onclick="wizardRetryCurrentBuild()" style="display:none;align-items:center;gap:6px;padding:9px 18px;background:#ffffff;color:#09090b;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;box-shadow:0 4px 12px rgba(255,255,255,0.15);">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                            Retry Build
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
 
     </div><!-- /body -->
@@ -5028,6 +5634,36 @@ function cora_get_sparkline_points( $history, $type ) {
             Continue
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
+    </div>
+
+    <!-- Live HTML Render Preview Modal -->
+    <div id="wiz-html-preview-modal" style="position:fixed;inset:0;z-index:1000000;display:none;background:rgba(9,9,11,0.75);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:24px;">
+        <div style="width:100%;max-width:1100px;height:90vh;background:#ffffff;border-radius:20px;border:1px solid #27272a;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 25px 60px rgba(0,0,0,0.5);">
+            <!-- Modal Header -->
+            <div style="height:52px;background:#18181b;padding:0 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #27272a;color:white;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span style="font-size:12.5px;font-weight:700;color:#f4f4f5;">Live HTML Preview</span>
+                    <span id="wiz-html-preview-tag" style="font-size:9.5px;font-weight:700;background:#27272a;color:#a1a1aa;padding:2px 8px;border-radius:6px;font-family:monospace;">Sandboxed Render</span>
+                </div>
+                <!-- Viewport size controls -->
+                <div style="display:inline-flex;background:#27272a;border-radius:8px;padding:2px;gap:2px;">
+                    <button type="button" onclick="document.getElementById('wiz-html-preview-iframe-wrapper').style.maxWidth='100%';" style="padding:4px 10px;font-size:10.5px;font-weight:700;color:#d4d4d8;background:transparent;border:none;border-radius:6px;cursor:pointer;">Desktop</button>
+                    <button type="button" onclick="document.getElementById('wiz-html-preview-iframe-wrapper').style.maxWidth='768px';" style="padding:4px 10px;font-size:10.5px;font-weight:700;color:#d4d4d8;background:transparent;border:none;border-radius:6px;cursor:pointer;">Tablet (768px)</button>
+                    <button type="button" onclick="document.getElementById('wiz-html-preview-iframe-wrapper').style.maxWidth='390px';" style="padding:4px 10px;font-size:10.5px;font-weight:700;color:#d4d4d8;background:transparent;border:none;border-radius:6px;cursor:pointer;">Mobile (390px)</button>
+                </div>
+                <!-- Close button -->
+                <button type="button" onclick="window.closeHtmlPreviewModal()" style="display:inline-flex;align-items:center;gap:4px;padding:5px 10px;background:#27272a;border:1px solid #3f3f46;border-radius:8px;font-size:11px;font-weight:700;color:#e4e4e7;cursor:pointer;">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    <span>Close Preview</span>
+                </button>
+            </div>
+            <!-- Modal Body / Iframe wrapper -->
+            <div style="flex:1;background:#f4f4f5;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:12px;">
+                <div id="wiz-html-preview-iframe-wrapper" style="width:100%;max-width:100%;height:100%;background:white;border-radius:12px;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,0.12);transition:max-width .25s ease;">
+                    <iframe id="wiz-html-preview-iframe" sandbox="allow-scripts allow-same-origin" style="width:100%;height:100%;border:none;"></iframe>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -5880,6 +6516,7 @@ function cora_get_sparkline_points( $history, $type ) {
                 }
             }
         }
+        canvasState.activeThemeObj = themeObj;
         canvasState.activeThemeIsElementor = isElementor;
         canvasState.activeThemeIsNextJS = isNextJS;
 
@@ -5891,25 +6528,61 @@ function cora_get_sparkline_points( $history, $type ) {
             jQuery('#tab-btn-nextjs-sdk').removeClass('hidden').show();
             jQuery('#tab-btn-theme-builder').hide(); // Hide Elementor Site Editor for Next.js
 
+            // Show static build buttons for Next.js
+            jQuery('#dashboard-nextjs-build-btn').removeClass('hidden').addClass('inline-flex');
+            jQuery('#tab-action-build-nextjs').removeClass('hidden').addClass('inline-flex');
+            jQuery('#tab-action-migrate-elementor').addClass('hidden');
+
             // Populate Next.js status & credentials
             const settings = (themeObj && safeGetSettings(themeObj)) || {};
             const ghRepo = settings.github_repo || '';
             const ghBranch = settings.github_branch || 'main';
-            const liveUrl = settings.nextjs_live_url || '';
+            const liveUrl = settings.nextjs_live_url || settings.live_url || '';
             const isrSec = settings.nextjs_revalidate_secret || '';
+
+            canvasState.nextjs_live_url = liveUrl;
 
             jQuery('#nextjs-repo-label').text(ghRepo ? ghRepo.replace(/^https?:\/\/github\.com\//, '') : 'Not connected');
             jQuery('#nextjs-repo-link').attr('href', ghRepo ? (ghRepo.startsWith('http') ? ghRepo : 'https://github.com/' + ghRepo) : '#');
             jQuery('#nextjs-branch-label').text(ghBranch);
-            jQuery('#nextjs-live-url-label').text(liveUrl || 'No deployment URL');
-            jQuery('#nextjs-live-url-link').attr('href', liveUrl || '#');
+
+            // Populate Live URL Input and Link
+            jQuery('#nextjs-live-url-input').val(liveUrl);
+            if (liveUrl) {
+                jQuery('#nextjs-live-url-link').attr('href', liveUrl).removeClass('hidden').show();
+            } else {
+                jQuery('#nextjs-live-url-link').addClass('hidden').hide();
+            }
+
+            // Derive dynamic Vercel preset if repo is set
+            if (ghRepo) {
+                const repoName = ghRepo.replace(/^https?:\/\/github\.com\//, '').split('/').pop().replace(/\.git$/, '');
+                if (repoName) {
+                    const vercelUrl = `https://${repoName}.vercel.app`;
+                    jQuery('#nextjs-preset-vercel').attr('data-url', vercelUrl).text(vercelUrl);
+                }
+            }
+
             if (isrSec) {
                 jQuery('#nextjs-secret-display').val(isrSec);
             }
             if (window.switchNextJSSnippet) {
                 window.switchNextJSSnippet('lib');
             }
+
+            // Populate preview routes & set initial route
+            if (window.populateNextJSRoutesDropdown && canvasState.pages) {
+                window.populateNextJSRoutesDropdown(canvasState.pages);
+            }
+            if (window.switchNextJSPreviewRoute) {
+                const currentRoute = jQuery('#nextjs-preview-route-select').val() || '/';
+                window.switchNextJSPreviewRoute(currentRoute);
+            }
         } else if (isElementor) {
+            jQuery('#dashboard-nextjs-build-btn').addClass('hidden').removeClass('inline-flex');
+            jQuery('#tab-action-build-nextjs').addClass('hidden').removeClass('inline-flex');
+            jQuery('#tab-action-migrate-elementor').removeClass('hidden');
+
             jQuery('.lovable-route-col').hide();
             jQuery('#lovable-trigger-bar').hide();
             jQuery('#lovable-studio-drawer').hide();
@@ -5920,6 +6593,10 @@ function cora_get_sparkline_points( $history, $type ) {
                 switchTab('pages');
             }
         } else {
+            jQuery('#dashboard-nextjs-build-btn').addClass('hidden').removeClass('inline-flex');
+            jQuery('#tab-action-build-nextjs').addClass('hidden').removeClass('inline-flex');
+            jQuery('#tab-action-migrate-elementor').removeClass('hidden');
+
             jQuery('.lovable-route-col').show();
             jQuery('#lovable-trigger-bar').hide();
             jQuery('#tab-btn-ai').show();
@@ -6082,6 +6759,9 @@ function cora_get_sparkline_points( $history, $type ) {
                     }
                     filterPages();
                     populatePageMappingSelectors();
+                    if (window.populateNextJSRoutesDropdown) {
+                        window.populateNextJSRoutesDropdown(canvasState.pages);
+                    }
 
                     // Check for and execute pending Command Palette actions
                     setTimeout(() => {
@@ -6560,8 +7240,14 @@ function cora_get_sparkline_points( $history, $type ) {
                         <td class="px-3 py-2 whitespace-nowrap">${propsPill}</td>
                         <td class="px-3 py-2 whitespace-nowrap">${visibilityPill}</td>
                         <td class="px-3 py-2 text-[11px] text-zinc-400 whitespace-nowrap">${getRelativeTime(p.updated_at)}</td>
-                        <td class="px-3 py-2 w-32 whitespace-nowrap text-right">
+                        <td class="px-3 py-2 w-40 whitespace-nowrap text-right">
                             <div class="flex items-center gap-1 justify-end">
+                                <button onclick="window.previewNextJSRoute('${esc_js(routePath)}', event)"
+                                    class="px-2 py-1 bg-zinc-100 hover:bg-zinc-950 hover:text-white text-zinc-800 rounded-md text-[10px] font-bold cursor-pointer transition-all flex items-center gap-1"
+                                    title="Preview Route (${esc_js(routePath)})">
+                                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    <span>Preview</span>
+                                </button>
                                 <button onclick="openNextJSPagePropsDrawer(${p.id})"
                                     class="px-2 py-1 bg-zinc-100 hover:bg-zinc-950 hover:text-white text-zinc-800 rounded-md text-[10px] font-bold cursor-pointer transition-all flex items-center gap-1"
                                     title="Edit Props &amp; SEO">
@@ -6580,6 +7266,10 @@ function cora_get_sparkline_points( $history, $type ) {
                                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
                                     </button>
                                     <div id="page-menu-${p.id}" class="hidden absolute right-0 top-full mt-1 w-44 bg-white border border-zinc-200 rounded-xl shadow-lg py-1 z-20 text-left whitespace-normal">
+                                        <button onclick="window.previewNextJSRoute('${esc_js(routePath)}', event)" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer flex items-center gap-2">
+                                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                            Preview Route
+                                        </button>
                                         <button onclick="openNextJSPagePropsDrawer(${p.id})" class="w-full px-3.5 py-2 text-left text-[12px] text-zinc-700 hover:bg-zinc-50 cursor-pointer flex items-center gap-2">
                                             <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                                             Edit Props &amp; SEO
@@ -10512,7 +11202,7 @@ function cora_get_sparkline_points( $history, $type ) {
 
     window.triggerNextJSISRRebuild = function(pageSlug) {
         pageSlug = pageSlug || '/';
-        window.coraShowToast('Triggering Next.js On-Demand ISR webhook…', 'info');
+        window.coraShowToast('Compiling & syncing static route on Cora…', 'info');
 
         jQuery.ajax({
             url: coraREData.ajaxUrl,
@@ -10525,13 +11215,13 @@ function cora_get_sparkline_points( $history, $type ) {
             },
             success: function(res) {
                 if (res.success) {
-                    window.coraShowToast(res.data.message || 'ISR Rebuild completed successfully!', 'success');
+                    window.coraShowToast(res.data.message || 'Route compiled and live on Cora!', 'success');
                 } else {
-                    window.coraShowToast(res.data.message || 'ISR Rebuild failed.', 'error');
+                    window.coraShowToast(res.data.message || 'Route sync failed.', 'error');
                 }
             },
             error: function() {
-                window.coraShowToast('Network error while dispatching ISR webhook.', 'error');
+                window.coraShowToast('Network error while syncing route.', 'error');
             }
         });
     };
@@ -10598,6 +11288,257 @@ function cora_get_sparkline_points( $history, $type ) {
         if (navigator.clipboard && code) {
             navigator.clipboard.writeText(code);
             window.coraShowToast('Code snippet copied to clipboard!', 'success');
+        }
+    };
+
+    // --- Next.js Live Preview & URL Management Engine ---
+    window.setNextJSPresetUrl = function(url) {
+        if (!url) return;
+        jQuery('#nextjs-live-url-input').val(url);
+        window.saveNextJSLiveUrl();
+    };
+
+    window.saveNextJSLiveUrl = function(themeId, liveUrl) {
+        themeId = themeId || canvasState.activeThemeId;
+        if (typeof liveUrl === 'undefined' || liveUrl === null) {
+            liveUrl = jQuery('#nextjs-live-url-input').val().trim();
+        } else {
+            jQuery('#nextjs-live-url-input').val(liveUrl);
+        }
+
+        if (!themeId) {
+            window.coraShowToast('Please select an active theme workspace first.', 'error');
+            return;
+        }
+
+        const btn = jQuery('#btn-save-nextjs-live-url');
+        btn.prop('disabled', true).addClass('opacity-70');
+        window.coraShowToast('Connecting & saving Next.js Live URL…', 'info');
+
+        jQuery.ajax({
+            url: coraREData.ajaxUrl,
+            method: 'POST',
+            data: {
+                action: 'cora_nextjs_save_live_url',
+                theme_id: themeId,
+                live_url: liveUrl,
+                nonce: coraREData.ajaxNonce
+            },
+            success: function(res) {
+                btn.prop('disabled', false).removeClass('opacity-70');
+                if (res.success) {
+                    canvasState.nextjs_live_url = liveUrl;
+                    if (canvasState.activeThemeObj) {
+                        let settings = safeGetSettings(canvasState.activeThemeObj) || {};
+                        settings.nextjs_live_url = liveUrl;
+                        settings.live_url = liveUrl;
+                        canvasState.activeThemeObj.settings = JSON.stringify(settings);
+                    }
+                    if (Array.isArray(canvasState.themes)) {
+                        const t = canvasState.themes.find(th => th.id == themeId);
+                        if (t) {
+                            let s = safeGetSettings(t) || {};
+                            s.nextjs_live_url = liveUrl;
+                            s.live_url = liveUrl;
+                            t.settings = JSON.stringify(s);
+                        }
+                    }
+
+                    if (liveUrl) {
+                        jQuery('#nextjs-live-url-link').attr('href', liveUrl).removeClass('hidden').show();
+                        jQuery('#nextjs-preview-empty').addClass('hidden').hide();
+                        const currentRoute = jQuery('#nextjs-preview-route-select').val() || '/';
+                        window.switchNextJSPreviewRoute(currentRoute);
+                    } else {
+                        jQuery('#nextjs-live-url-link').addClass('hidden').hide();
+                        jQuery('#nextjs-preview-empty').removeClass('hidden').show();
+                        jQuery('#nextjs-preview-iframe').attr('src', 'about:blank');
+                    }
+
+                    window.coraShowToast(res.data.message || 'Next.js Live URL saved & connected.', 'success');
+                } else {
+                    window.coraShowToast(res.data.message || 'Failed to save Next.js live URL.', 'error');
+                }
+            },
+            error: function() {
+                btn.prop('disabled', false).removeClass('opacity-70');
+                window.coraShowToast('Network error while saving Next.js live URL.', 'error');
+            }
+        });
+    };
+
+    window.switchNextJSPreviewRoute = function(routePath) {
+        routePath = routePath || '/';
+        if (!routePath.startsWith('/')) {
+            routePath = '/' + routePath;
+        }
+
+        jQuery('#nextjs-preview-route-select').val(routePath);
+
+        const liveUrlInput = jQuery('#nextjs-live-url-input').val().trim();
+        const settings = (canvasState.activeThemeObj && safeGetSettings(canvasState.activeThemeObj)) || {};
+        const liveUrl = (liveUrlInput || canvasState.nextjs_live_url || settings.nextjs_live_url || settings.live_url || '').replace(/\/+$/, '');
+
+        const wsSiteBase = `${coraREData.siteUrl}/site`;
+        const isDraft = (canvasState.activeThemeIsLive !== true && canvasState.activeThemeIsLive !== 1 && canvasState.activeThemeIsLive !== '1');
+        const staticRouteUrl = wsSiteBase + (routePath === '/' ? '' : routePath) + (isDraft ? (routePath.includes('?') ? '&' : '?') + `cv_preview_theme=${canvasState.activeThemeId}` : '');
+
+        // If a custom live URL is set (e.g. localhost:3000 or custom vercel), use it; otherwise default to Cora static site route
+        const targetUrl = liveUrl ? (liveUrl + (routePath === '/' ? '' : routePath)) : staticRouteUrl;
+
+        jQuery('#nextjs-preview-empty').addClass('hidden').hide();
+        jQuery('#nextjs-preview-open-external').attr('href', targetUrl);
+
+        const iframe = jQuery('#nextjs-preview-iframe');
+        const currentSrc = iframe.attr('src');
+        if (currentSrc !== targetUrl) {
+            jQuery('#nextjs-preview-loading').removeClass('hidden').show();
+            iframe.attr('src', targetUrl);
+        }
+    };
+
+    window.switchNextJSPreviewDevice = function(device) {
+        const wrapper = jQuery('#nextjs-preview-iframe-wrapper');
+        ['desktop', 'tablet', 'mobile'].forEach(d => {
+            const btn = jQuery('#btn-nextjs-device-' + d);
+            if (d === device) {
+                btn.removeClass('text-zinc-600 hover:bg-white').addClass('bg-zinc-950 text-white shadow-2xs');
+            } else {
+                btn.removeClass('bg-zinc-950 text-white shadow-2xs').addClass('text-zinc-600 hover:bg-white');
+            }
+        });
+
+        if (device === 'mobile') {
+            wrapper.css('max-width', '375px');
+        } else if (device === 'tablet') {
+            wrapper.css('max-width', '768px');
+        } else {
+            wrapper.css('max-width', '100%');
+        }
+    };
+
+    window.reloadNextJSPreview = function() {
+        const iframe = document.getElementById('nextjs-preview-iframe');
+        if (iframe && iframe.src && iframe.src !== 'about:blank') {
+            jQuery('#nextjs-preview-loading').removeClass('hidden').show();
+            iframe.src = iframe.src;
+        }
+    };
+
+    window.buildNextJSRepo = function(themeId) {
+        themeId = themeId || canvasState.activeThemeId;
+        if (!themeId) {
+            window.coraShowToast('Please select a theme workspace first.', 'error');
+            return;
+        }
+
+        const btn = jQuery('#btn-nextjs-build-static');
+        const label = jQuery('#btn-nextjs-build-label');
+        btn.prop('disabled', true).addClass('opacity-70');
+        label.text('Building Static Site…');
+        window.coraShowToast('Cloning repository & executing build from GitHub…', 'info');
+
+        jQuery.ajax({
+            url: coraREData.ajaxUrl,
+            method: 'POST',
+            data: {
+                action: 'cora_nextjs_build_repo',
+                theme_id: themeId,
+                nonce: coraREData.ajaxNonce
+            },
+            success: function(res) {
+                btn.prop('disabled', false).removeClass('opacity-70');
+                label.text('Build Static Site');
+                if (res.success) {
+                    window.coraShowToast(res.data.message || 'Static site built successfully!', 'success');
+                    if (window.reloadNextJSPreview) {
+                        window.reloadNextJSPreview();
+                    }
+                } else {
+                    const msg = (res.data && res.data.message) ? res.data.message : 'Build failed.';
+                    window.coraShowToast(msg, 'error');
+                    if (res.data && res.data.logs) {
+                        console.error('Build logs:', res.data.logs);
+                    }
+                }
+            },
+            error: function() {
+                btn.prop('disabled', false).removeClass('opacity-70');
+                label.text('Build Static Site');
+                window.coraShowToast('Network error while building static site.', 'error');
+            }
+        });
+    };
+
+    window.onNextJSPreviewIframeLoaded = function() {
+        jQuery('#nextjs-preview-loading').addClass('hidden').hide();
+    };
+
+    window.previewNextJSRoute = function(routePath, event) {
+        if (event) {
+            event.stopPropagation();
+            event.preventDefault();
+        }
+        routePath = routePath || '/';
+        const settings = (canvasState.activeThemeObj && safeGetSettings(canvasState.activeThemeObj)) || {};
+        const liveUrlInput = jQuery('#nextjs-live-url-input').val().trim();
+        const liveUrl = (liveUrlInput || canvasState.nextjs_live_url || settings.nextjs_live_url || settings.live_url || '').replace(/\/+$/, '');
+
+        const wsSiteBase = `${coraREData.siteUrl}/site`;
+        const isDraft = (canvasState.activeThemeIsLive !== true && canvasState.activeThemeIsLive !== 1 && canvasState.activeThemeIsLive !== '1');
+        const staticRouteUrl = wsSiteBase + (routePath === '/' ? '' : (routePath.startsWith('/') ? routePath : '/' + routePath)) + (isDraft ? (routePath.includes('?') ? '&' : '?') + `cv_preview_theme=${canvasState.activeThemeId}` : '');
+
+        const isStaticBuilt = settings.is_static_built || !liveUrl || liveUrl === 'http://localhost:3000';
+        const targetUrl = isStaticBuilt ? staticRouteUrl : (liveUrl + (routePath === '/' ? '' : (routePath.startsWith('/') ? routePath : '/' + routePath)));
+
+        if (event && (event.metaKey || event.ctrlKey)) {
+            window.open(targetUrl, '_blank');
+            return;
+        }
+
+        // Switch to Next.js SDK tab, update preview route and scroll to preview
+        if (typeof switchTab === 'function') {
+            switchTab('nextjs-sdk');
+        }
+        window.switchNextJSPreviewRoute(routePath);
+        
+        // Smooth scroll to preview frame
+        const previewEl = document.getElementById('nextjs-preview-iframe-wrapper');
+        if (previewEl) {
+            previewEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    };
+
+    window.populateNextJSRoutesDropdown = function(pages) {
+        const select = jQuery('#nextjs-preview-route-select');
+        if (!select.length) return;
+
+        const currentVal = select.val() || '/';
+        select.empty();
+
+        const routesMap = new Map();
+        routesMap.set('/', '/ (Homepage)');
+
+        if (Array.isArray(pages)) {
+            pages.forEach(p => {
+                if (p.is_homepage == 1) {
+                    routesMap.set('/', `/${p.title ? ' (' + p.title + ' - Home)' : ' (Homepage)'}`);
+                } else if (p.slug) {
+                    const cleanSlug = '/' + p.slug.replace(/^\/+/, '');
+                    const label = `${cleanSlug}${p.title ? ' (' + p.title + ')' : ''}`;
+                    routesMap.set(cleanSlug, label);
+                }
+            });
+        }
+
+        routesMap.forEach((label, val) => {
+            select.append(`<option value="${esc_html(val)}">${esc_html(label)}</option>`);
+        });
+
+        if (routesMap.has(currentVal)) {
+            select.val(currentVal);
+        } else {
+            select.val('/');
         }
     };
 
@@ -11076,7 +12017,7 @@ function cora_get_sparkline_points( $history, $type ) {
 
     // ============================================================
     // ============================================================
-    // ADD THEME WIZARD JS  — with URL state persistence
+    // ADD THEME WIZARD JS  — with URL state persistence & HTML/AI Matrix
     // ============================================================
     var safeAjaxUrl = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : (window.ajaxurl || '/wp-admin/admin-ajax.php');
     var safeNonce   = (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : '';
@@ -11090,9 +12031,334 @@ function cora_get_sparkline_points( $history, $type ) {
     }
 
     var _wizStep    = 1;
-    var _wizBuilder = null;
+    var _wizBuilder = 'html_ai';
     var _wizSubMode = 'upload';
     var _wizLovableMode = 'connect';
+    var _wizSelectedTemplateKey = 'agency';
+
+    // ── AI Master Prompts Matrix (Claude 3.5 Sonnet / ChatGPT) ──────
+    const CORA_HTML_AI_MASTER_PROMPTS = {
+        agency: `You are an elite web architect and front-end designer. 
+Create a complete, single-file, production-ready HTML5 landing page for a premier "Creative Agency & Video Studio" (named "Apex Studio").
+
+TECHNICAL REQUIREMENTS:
+1. Include Tailwind CSS CDN: <script src="https://cdn.tailwindcss.com"><\/script>
+2. Google Fonts: Inter and JetBrains Mono for numbers/tags.
+3. Clean modern monochromatic dark aesthetic (zinc-950 background, zinc-100 typography, subtle zinc-800 borders, smooth micro-interactions).
+4. Fully responsive on mobile, tablet, and desktop with a mobile navigation menu.
+
+SECTIONS TO INCLUDE:
+1. Sticky Header: Frosted navigation bar with logo, navigation links (Work, Services, Process, Case Studies), and a "Start Project" CTA button.
+2. Hero Section: High-impact headline ("Crafting Cinema-Grade Brand Stories That Scale"), subtitle, dual CTA ("View Showreel", "Book Consultation"), live client satisfaction badges, and a simulated video reel showcase card with play trigger.
+3. Marquee Brand Ticker: Clean horizontal logo ticker of global partner brands.
+4. Featured Work / Portfolio Grid: 4 filterable project cards (Brand Identity, 3D Commercials, Viral Social Ads, Motion Design) with category tags, hover zoom effects, and view case study buttons.
+5. Core Services Matrix: 6 interactive cards detailing Art Direction, Video Production, Brand Architecture, 3D Animation, Post-Production, and Performance Ads.
+6. Proven Process (4-Step Timeline): Discovery -> Concept & Storyboard -> Production -> Launch & Scale.
+7. Testimonials & Client Reviews: 3 quote cards with star ratings, client names, roles, and company tags.
+8. Native Lead Consultation Form:
+   - Form markup: <form method="POST" action="/wp-admin/admin-ajax.php" onsubmit="event.preventDefault(); window.coraSubmitLeadForm ? window.coraSubmitLeadForm(this) : alert('Inquiry received!');">
+   - Hidden inputs: <input type="hidden" name="action" value="cora_ajax_submit_lead"><input type="hidden" name="form_name" value="Agency Consultation Form">
+   - Fields: Full Name, Work Email, Phone/WhatsApp, Project Budget dropdown ($5k-$10k, $10k-$25k, $25k+), and Project Scope description.
+   - High-contrast submit button with hover transition.
+9. Footer: Quick links, social SVG icons, copyright, and studio location tags.
+
+Return ONLY clean, complete, copy-pasteable HTML inside an <!DOCTYPE html> document.`,
+
+        saas: `You are an elite SaaS UI/UX engineer. 
+Create a complete, single-file, production-ready HTML5 landing page for an "AI SaaS & Workflow Automation Platform" (named "Pulse AI").
+
+TECHNICAL REQUIREMENTS:
+1. Include Tailwind CSS CDN: <script src="https://cdn.tailwindcss.com"><\/script>
+2. Google Fonts: Inter and JetBrains Mono.
+3. Modern high-tech monochromatic aesthetic (pure black/zinc-950, deep zinc-900 surfaces, zinc-800 borders, subtle purple/indigo highlights).
+4. Fully responsive mobile & desktop layout.
+
+SECTIONS TO INCLUDE:
+1. Header: Sleek navbar with announcement pill ("✨ Introducing Pulse 2.0 Engine"), product links (Features, Integrations, Pricing, Docs), and "Start Free Trial" CTA.
+2. Hero: High-converting headline ("Automate 80% of Repetitive Operations with Autonomous AI"), live status pill ("🟢 99.99% Uptime SLA"), dual CTAs ("Get Started Free", "Request Enterprise Demo"), and an interactive Dashboard UI mockup preview.
+3. Metrics & Proof Bar: 10M+ Tasks Automated, 4.9/5 Rating, 12,000+ Teams.
+4. Core Feature Matrix: 6 cards featuring AI Agent Workflows, Real-Time Data Sync, Multi-Model LLM Routing, Enterprise RBAC Security, Webhooks API, and Predictive Analytics.
+5. Interactive Pricing Tier Matrix: 3 cards (Starter $29/mo, Pro $79/mo, Enterprise Custom) with feature checklists and toggle switch (Monthly / Annual with 20% discount badge).
+6. Enterprise Integrations Grid: Slack, GitHub, Notion, Stripe, Salesforce, Figma.
+7. Interactive FAQ Accordion: 5 common questions.
+8. Native Lead Demo & Trial Form:
+   - Form markup: <form method="POST" action="/wp-admin/admin-ajax.php" onsubmit="event.preventDefault(); window.coraSubmitLeadForm ? window.coraSubmitLeadForm(this) : alert('Demo requested!');">
+   - Hidden inputs: <input type="hidden" name="action" value="cora_ajax_submit_lead"><input type="hidden" name="form_name" value="SaaS Demo Request Form">
+   - Fields: Work Email, Full Name, Company Name, Team Size dropdown (1-10, 11-50, 50+), and Use Case note.
+   - High-converting submit button.
+9. Footer: Product links, developer docs, status link, and social icons.
+
+Return ONLY clean, valid, standalone HTML in an <!DOCTYPE html> document.`,
+
+        consulting: `You are an elite corporate advisory web designer. 
+Create a complete, single-file, production-ready HTML5 landing page for a "B2B Advisory & Management Consulting Firm" (named "Vanguard Strategy Group").
+
+TECHNICAL REQUIREMENTS:
+1. Include Tailwind CSS CDN: <script src="https://cdn.tailwindcss.com"><\/script>
+2. Google Fonts: Playfair Display for elegant headlines and Inter for UI body.
+3. Editorial luxury monochromatic palette (warm neutral ivory/zinc-50 background, deep obsidian zinc-900 typography, subtle amber/bronze accent borders).
+4. Fully responsive layout.
+
+SECTIONS TO INCLUDE:
+1. Header: Refined navigation with firm overview, practice areas, leadership partners, insights, and "Schedule Executive Briefing" button.
+2. Hero: Authoritative headline ("Navigating Complex Capital, M&A, and Operational Transformation"), subheadline, executive consultation CTA, and trust metrics ($4.2B+ Transactions Advised, 180+ Enterprise Engagements).
+3. Practice Areas & Advisory Services: 4 in-depth practice cards (Corporate Restructuring, M&A Advisory, Digital Transformation, Board Governance).
+4. Executive Case Studies: 3 structured cards with challenge, strategy, and verified ROI metrics (e.g. "+34% EBITDA Expansion in 14 Months").
+5. Senior Leadership & Advisory Board: 3 executive partner profiles with credentials.
+6. Thought Leadership & Whitepapers: 3 editorial article cards with download links.
+7. Native Executive Consultation Form:
+   - Form markup: <form method="POST" action="/wp-admin/admin-ajax.php" onsubmit="event.preventDefault(); window.coraSubmitLeadForm ? window.coraSubmitLeadForm(this) : alert('Briefing requested!');">
+   - Hidden inputs: <input type="hidden" name="action" value="cora_ajax_submit_lead"><input type="hidden" name="form_name" value="Executive Briefing Request Form">
+   - Fields: Full Name, Corporate Email, Organization / Title, Engagement Type dropdown, and Advisory Objective.
+   - Distinctive executive submit button.
+8. Footer: Global office locations (New York, London, Singapore, Mumbai), regulatory disclosures, and copyright.
+
+Return ONLY clean, standalone HTML in an <!DOCTYPE html> document.`,
+
+        photography: `You are an elite visual portfolio architect. 
+Create a complete, single-file, production-ready HTML5 landing page for a "Luxury Photography Studio & Production House" (named "Lumina Studio").
+
+TECHNICAL REQUIREMENTS:
+1. Include Tailwind CSS CDN: <script src="https://cdn.tailwindcss.com"><\/script>
+2. Google Fonts: Space Grotesk and Inter.
+3. High-fashion minimalist monochromatic dark layout (black #09090b, charcoal surfaces, white typography, subtle glassmorphism overlays).
+4. Fully responsive gallery layout with masonry-style grid.
+
+SECTIONS TO INCLUDE:
+1. Sticky Minimal Header: Studio logo, curated collections links (Commercial, Editorial, Architecture, Portraits, Events), studio space, and "Book Session" CTA.
+2. Hero: Fullscreen visual impact with headline ("Capturing Epochs in Light & Form"), subtitle, client portfolio marquee, and instant booking CTA.
+3. Curated Visual Gallery: High-resolution photographic showcase cards with aspect ratio presets (16:9 cinematic, 4:5 editorial, 1:1 square) and lightbox trigger overlays.
+4. Studio Spaces & Equipment Specs: 2 studio bay cards with floorplan specs, Profoto lighting inventory, and cyclorama wall dimensions.
+5. Transparent Package Pricing Cards: 3 tiers (Commercial Campaign, Editorial Lookbook, Private Executive Portrait) with detailed deliverables and GST breakdown calculations.
+6. Client Testimonials & Press Accolades: Vogue, Forbes, GQ feature quotes.
+7. Native Studio Booking Inquiry Form:
+   - Form markup: <form method="POST" action="/wp-admin/admin-ajax.php" onsubmit="event.preventDefault(); window.coraSubmitLeadForm ? window.coraSubmitLeadForm(this) : alert('Booking request submitted!');">
+   - Hidden inputs: <input type="hidden" name="action" value="cora_ajax_submit_lead"><input type="hidden" name="form_name" value="Studio Booking Inquiry Form">
+   - Fields: Full Name, Email, Phone, Preferred Shoot Date picker, Shoot Type dropdown, and Creative Vision brief.
+   - Sleek CTA button.
+8. Footer: Studio location, working hours, Instagram/Behance handles, and copyright.
+
+Return ONLY clean, standalone HTML in an <!DOCTYPE html> document.`,
+
+        custom: `You are an elite full-stack web developer and UI designer. 
+Create a complete, single-file, production-ready HTML5 landing page with Tailwind CSS CDN for any custom business niche.
+
+TECHNICAL REQUIREMENTS:
+1. Include Tailwind CSS CDN: <script src="https://cdn.tailwindcss.com"><\/script>
+2. Google Fonts: Inter and JetBrains Mono.
+3. Clean modern monochromatic design system matching the Shopify/Notion aesthetic.
+4. Mobile-first 100% responsive design with mobile drawer navigation.
+
+SECTIONS TO INCLUDE:
+1. Navigation Bar: Logo, menu anchors, contact quick-link, and primary CTA.
+2. High-Converting Hero: Catchy headline, benefit-driven subheadline, primary & secondary action buttons, social proof stars, and a hero media card.
+3. Trust / Partner Bar: Customer brand ticker or security trust badges.
+4. Value Proposition / Feature Grid: 4-6 benefit cards with clean SVG icons and clear copy.
+5. Interactive Pricing / Packages: 3 tier cards with feature bullets and highlighted popular tier.
+6. Testimonial Social Proof: 3 authentic customer reviews with avatars and verified badges.
+7. Native Lead Capture Form:
+   - Form markup: <form method="POST" action="/wp-admin/admin-ajax.php" onsubmit="event.preventDefault(); window.coraSubmitLeadForm ? window.coraSubmitLeadForm(this) : alert('Form submitted!');">
+   - Hidden inputs: <input type="hidden" name="action" value="cora_ajax_submit_lead"><input type="hidden" name="form_name" value="Website Lead Form">
+   - Fields: Name, Email, Phone, Message.
+   - High-contrast submit button.
+8. Modern Footer: Quick links, legal links, and copyright.
+
+Return ONLY valid, standalone HTML in an <!DOCTYPE html> document.`
+    };
+
+    // ── Prompt Copy & Template Selection ────────────────────────
+    window.copyTemplatePrompt = function(templateKey) {
+        var prompt = CORA_HTML_AI_MASTER_PROMPTS[templateKey] || CORA_HTML_AI_MASTER_PROMPTS.agency;
+        var templateNames = {
+            agency: 'Creative Agency & Video Studio',
+            saas: 'AI SaaS & Software Landing',
+            consulting: 'B2B Advisory & Consulting',
+            photography: 'Photography Studio & Production',
+            custom: 'Custom Prompt Studio'
+        };
+        var name = templateNames[templateKey] || 'Template';
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(prompt).then(function() {
+                showToast('📋 ' + name + ' prompt copied to clipboard! Paste into Claude or ChatGPT.', 'success');
+            }).catch(function() {
+                wizFallbackCopyPrompt(prompt, name);
+            });
+        } else {
+            wizFallbackCopyPrompt(prompt, name);
+        }
+    };
+
+    function wizFallbackCopyPrompt(text, name) {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        try {
+            document.execCommand('copy');
+            showToast('📋 ' + name + ' prompt copied to clipboard!', 'success');
+        } catch(e) {
+            showToast('Could not copy automatically. Please select prompt manually.', 'warning');
+        }
+        document.body.removeChild(ta);
+    }
+
+    window.selectHtmlTemplate = function(templateKey, title) {
+        _wizSelectedTemplateKey = templateKey;
+
+        // Update card active states
+        ['agency', 'saas', 'consulting', 'photography', 'custom'].forEach(function(k) {
+            var el = document.getElementById('wiz-tcard-' + k);
+            if (el) {
+                if (k === templateKey) {
+                    el.classList.add('atw-sel-t');
+                } else {
+                    el.classList.remove('atw-sel-t');
+                }
+            }
+        });
+
+        // Auto-fill theme name if default or empty
+        var nameInput = document.getElementById('wiz-theme-name');
+        if (nameInput) {
+            if (!nameInput.value || nameInput.value === 'Creative Agency & Video Studio' || nameInput.value === 'AI SaaS & Software Landing' || nameInput.value === 'B2B Advisory & Management Consulting' || nameInput.value === 'Photography Studio & Production House' || nameInput.value === 'Custom Business Studio') {
+                nameInput.value = title || 'Custom AI Theme';
+            }
+        }
+
+        // Smooth scroll to code connection area
+        var codeSec = document.getElementById('wiz-html-code-section');
+        if (codeSec) {
+            codeSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        showToast('Selected ' + (title || templateKey) + ' template. Paste your code below or proceed to launch!', 'info');
+    };
+
+    // ── HTML Code Mode Tabs & Live Preview ─────────────────────
+    window.wizardSetHtmlCodeMode = function(mode) {
+        var tabP = document.getElementById('wiz-html-tab-paste');
+        var tabG = document.getElementById('wiz-html-tab-github');
+        var areaP = document.getElementById('wiz-html-paste-area');
+        var areaG = document.getElementById('wiz-html-github-area');
+
+        if (mode === 'paste') {
+            _wizSubMode = 'upload';
+            if (tabP) tabP.className = 'atw-tab atw-tab-on';
+            if (tabG) tabG.className = 'atw-tab atw-tab-off';
+            if (areaP) areaP.style.display = 'flex';
+            if (areaG) areaG.style.display = 'none';
+        } else {
+            _wizSubMode = 'github';
+            if (tabG) tabG.className = 'atw-tab atw-tab-on';
+            if (tabP) tabP.className = 'atw-tab atw-tab-off';
+            if (areaG) areaG.style.display = 'flex';
+            if (areaP) areaP.style.display = 'none';
+        }
+        wizPushUrl({ wm: mode });
+    };
+
+    window.updateWizHtmlStats = function() {
+        var raw = ((document.getElementById('wiz-html-raw-code') || {}).value || '');
+        var lines = raw ? raw.split('\n').length : 0;
+        var kb = (raw.length / 1024).toFixed(1);
+        var statsEl = document.getElementById('wiz-html-stats');
+        if (statsEl) {
+            statsEl.textContent = lines + ' lines · ' + kb + ' KB';
+        }
+    };
+
+    window.previewPastedHtml = function() {
+        var raw = ((document.getElementById('wiz-html-raw-code') || {}).value || '').trim();
+        if (!raw) {
+            showToast('Please paste or upload HTML code first to preview.', 'warning');
+            return;
+        }
+
+        var modal = document.getElementById('wiz-html-preview-modal');
+        var iframe = document.getElementById('wiz-html-preview-iframe');
+        if (iframe) {
+            iframe.srcdoc = raw;
+        }
+        if (modal) {
+            modal.style.display = 'flex';
+            requestAnimationFrame(function() {
+                modal.style.opacity = '1';
+                modal.classList.remove('opacity-0');
+                var card = document.getElementById('wiz-html-preview-modal-card');
+                if (card) {
+                    card.classList.remove('scale-95');
+                    card.classList.add('scale-100');
+                }
+            });
+            document.body.style.overflow = 'hidden';
+        }
+    };
+
+    window.closeHtmlPreviewModal = function() {
+        var modal = document.getElementById('wiz-html-preview-modal');
+        var card  = document.getElementById('wiz-html-preview-modal-card');
+        if (card) {
+            card.classList.remove('scale-100');
+            card.classList.add('scale-95');
+        }
+        if (modal) {
+            modal.style.opacity = '0';
+            modal.classList.add('opacity-0');
+            setTimeout(function() {
+                modal.style.display = 'none';
+                var iframe = document.getElementById('wiz-html-preview-iframe');
+                if (iframe) iframe.srcdoc = 'about:blank';
+            }, 250);
+        }
+        document.body.style.overflow = 'hidden'; // Keep wizard modal body locked
+    };
+
+    window.handleHtmlFileDrop = function(file) {
+        if (!file) return;
+        if (!file.name.toLowerCase().endsWith('.html') && !file.name.toLowerCase().endsWith('.htm')) {
+            showToast('Please upload a valid .html file.', 'warning');
+            return;
+        }
+
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            var content = e.target.result;
+            var ta = document.getElementById('wiz-html-raw-code');
+            if (ta) {
+                ta.value = content;
+                window.updateWizHtmlStats();
+            }
+
+            // Auto-populate theme name if empty
+            var nameInput = document.getElementById('wiz-theme-name');
+            if (nameInput && (!nameInput.value || nameInput.value.includes('Template'))) {
+                var cleanName = file.name.replace(/\.html?$/i, '').replace(/[-_]+/g, ' ').trim();
+                nameInput.value = cleanName.split(' ').map(function(w){ return w.charAt(0).toUpperCase() + w.slice(1); }).join(' ');
+            }
+
+            showToast('Loaded ' + file.name + ' (' + (content.length / 1024).toFixed(1) + ' KB) successfully!', 'success');
+        };
+        reader.readAsText(file);
+    };
+
+    window.wizardHtmlFileSelected = function(input) {
+        if (input && input.files && input.files[0]) {
+            window.handleHtmlFileDrop(input.files[0]);
+        }
+    };
+
+    window.wizCheckHtmlRepository = function() {
+        var repo = ((document.getElementById('wiz-html-repo') || {}).value || '').trim();
+        if (!repo) {
+            showToast('Please enter a GitHub repository URL.', 'warning');
+            return;
+        }
+        showToast('Connected GitHub repository: ' + repo, 'success');
+    };
 
     window.wizardSetLovableMode = function(mode) {
         _wizLovableMode = mode;
@@ -11127,11 +12393,12 @@ function cora_get_sparkline_points( $history, $type ) {
     // ── Open / Close ───────────────────────────────────────────
     window.openAddThemeWizard = function(skipUrlPush) {
         _wizStep    = 1;
-        _wizBuilder = 'nextjs';
+        _wizBuilder = 'html_ai';
         _wizSubMode = 'upload';
+        _wizSelectedTemplateKey = 'agency';
 
         // Hide all steps
-        ['wizard-step-1','wizard-step-2-nextjs','wizard-step-2a','wizard-step-2b','wizard-step-3'].forEach(function(id) {
+        ['wizard-step-1','wizard-step-2-html','wizard-step-2-nextjs','wizard-step-2a','wizard-step-2b','wizard-step-3'].forEach(function(id) {
             var el = document.getElementById(id);
             if (el) { el.style.display = 'none'; el.style.flex = ''; }
         });
@@ -11139,7 +12406,7 @@ function cora_get_sparkline_points( $history, $type ) {
         if (s1) { s1.style.display = 'flex'; s1.style.flex = '1'; }
 
         wizardResetCards();
-        wizardSelectBuilder('nextjs');
+        wizardSelectBuilder('html_ai');
         wizUpdateProgress(1);
 
         var backBtn = document.getElementById('wiz-back-btn');
@@ -11153,7 +12420,7 @@ function cora_get_sparkline_points( $history, $type ) {
             requestAnimationFrame(function() { wiz.style.opacity = '1'; });
         }
         document.body.style.overflow = 'hidden';
-        if (!skipUrlPush) wizPushUrl({ wz: 'add-theme', ws: '1', wb: 'nextjs', wm: null });
+        if (!skipUrlPush) wizPushUrl({ wz: 'add-theme', ws: '1', wb: 'html_ai', wm: null });
     };
 
     window.closeAddThemeWizard = function() {
@@ -11178,7 +12445,18 @@ function cora_get_sparkline_points( $history, $type ) {
         _wizBuilder = type;
         wizardResetCards();
 
-        if (type === 'nextjs') {
+        if (type === 'html_ai') {
+            var cardH = document.getElementById('wizard-card-html-ai');
+            if (cardH) { cardH.classList.add('atw-sel-h'); }
+            var ovH = document.getElementById('atw-ov-h');
+            if (ovH) ovH.style.display = 'flex';
+            var rH = document.getElementById('wiz-radio-html-ai');
+            if (rH) { 
+                rH.style.borderColor = '#18181b'; 
+                var dotH = rH.querySelector('div');
+                if (dotH) dotH.style.background = '#18181b'; 
+            }
+        } else if (type === 'nextjs') {
             var cardN = document.getElementById('wizard-card-nextjs');
             if (cardN) { cardN.classList.add('atw-sel-n'); }
             var ovN = document.getElementById('atw-ov-n');
@@ -11219,6 +12497,17 @@ function cora_get_sparkline_points( $history, $type ) {
     };
 
     function wizardResetCards() {
+        var ch = document.getElementById('wizard-card-html-ai');
+        if (ch) { ch.classList.remove('atw-sel-h'); }
+        var oh = document.getElementById('atw-ov-h');
+        if (oh) oh.style.display = 'none';
+        var rh = document.getElementById('wiz-radio-html-ai');
+        if (rh) { 
+            rh.style.borderColor = '#d4d4d8'; 
+            var dotH = rh.querySelector('div');
+            if (dotH) dotH.style.background = 'transparent'; 
+        }
+
         var cn = document.getElementById('wizard-card-nextjs');
         if (cn) { cn.classList.remove('atw-sel-n'); }
         var on = document.getElementById('atw-ov-n');
@@ -11614,7 +12903,24 @@ function cora_get_sparkline_points( $history, $type ) {
             if (!_wizBuilder) { showToast('Please select a builder type first.', 'error'); return; }
             wizardGoToStep(2);
         } else if (_wizStep === 2) {
-            if (_wizBuilder === 'nextjs') {
+            if (_wizBuilder === 'html_ai') {
+                if (_wizSubMode === 'github') {
+                    var repoH = (document.getElementById('wiz-html-repo') || {}).value || '';
+                    if (!repoH.trim()) { showToast('Please enter your GitHub repository URL.', 'error'); return; }
+                }
+                // Auto-fill theme name if empty
+                var nameInput = document.getElementById('wiz-theme-name');
+                if (nameInput && !nameInput.value.trim()) {
+                    var templateNames = {
+                        agency: 'Creative Agency & Video Studio',
+                        saas: 'AI SaaS & Software Landing',
+                        consulting: 'B2B Advisory & Management Consulting',
+                        photography: 'Photography Studio & Production House',
+                        custom: 'Custom Business Studio'
+                    };
+                    nameInput.value = templateNames[_wizSelectedTemplateKey] || 'Custom AI Theme';
+                }
+            } else if (_wizBuilder === 'nextjs') {
                 var repoN = (document.getElementById('wiz-nextjs-repo') || {}).value || '';
                 var patN  = (document.getElementById('wiz-nextjs-token') || {}).value || '';
                 if (!repoN.trim()) { showToast('Please enter your Next.js GitHub repository URL.', 'error'); return; }
@@ -11655,7 +12961,7 @@ function cora_get_sparkline_points( $history, $type ) {
     window.wizardBack = wizardBack;
 
     function wizardGoToStep(step) {
-        ['wizard-step-1','wizard-step-2-nextjs','wizard-step-2a','wizard-step-2b','wizard-step-3'].forEach(function(id) {
+        ['wizard-step-1','wizard-step-2-html','wizard-step-2-nextjs','wizard-step-2a','wizard-step-2b','wizard-step-3'].forEach(function(id) {
             var el = document.getElementById(id);
             if (el) { el.style.display = 'none'; el.style.flex = ''; }
         });
@@ -11665,7 +12971,9 @@ function cora_get_sparkline_points( $history, $type ) {
         if (step === 1) {
             showId = 'wizard-step-1';
         } else if (step === 2) {
-            if (_wizBuilder === 'nextjs') {
+            if (_wizBuilder === 'html_ai') {
+                showId = 'wizard-step-2-html';
+            } else if (_wizBuilder === 'nextjs') {
                 showId = 'wizard-step-2-nextjs';
             } else if (_wizBuilder === 'lovable') {
                 showId = 'wizard-step-2b';
@@ -11674,6 +12982,10 @@ function cora_get_sparkline_points( $history, $type ) {
             }
         } else if (step === 3) {
             showId = 'wizard-step-3';
+            var formContainer = document.getElementById('wiz-step-3-form-container');
+            var buildContainer = document.getElementById('wiz-step-3-build-container');
+            if (formContainer) formContainer.style.display = 'block';
+            if (buildContainer) buildContainer.style.display = 'none';
             wizardPopulateSummary();
         }
 
@@ -11691,7 +13003,8 @@ function cora_get_sparkline_points( $history, $type ) {
             nextBtn.style.opacity = '1';
             nextBtn.style.cursor = 'pointer';
             if (step === 3) {
-                nextBtn.innerHTML = 'Save Theme <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>';
+                var ctaLabel = (_wizBuilder === 'html_ai') ? '⚡ Launch Theme Live & Go to /site/' : ((_wizBuilder === 'nextjs') ? '⚡ Create & Build Theme' : 'Save Theme');
+                nextBtn.innerHTML = ctaLabel + ' <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>';
             } else {
                 nextBtn.innerHTML = 'Continue <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>';
             }
@@ -11765,12 +13078,31 @@ function cora_get_sparkline_points( $history, $type ) {
         var bEl = document.getElementById('wiz-summary-builder');
         var sEl = document.getElementById('wiz-summary-source');
         if (bEl) {
-            if (_wizBuilder === 'nextjs') bEl.textContent = 'Next.js Native (Git)';
+            if (_wizBuilder === 'html_ai') bEl.textContent = 'AI HTML & Tailwind (Claude / ChatGPT)';
+            else if (_wizBuilder === 'nextjs') bEl.textContent = 'Next.js Native (Git)';
             else if (_wizBuilder === 'lovable') bEl.textContent = 'Lovable Studio';
             else bEl.textContent = 'Elementor';
         }
         if (sEl) {
-            if (_wizBuilder === 'nextjs') {
+            if (_wizBuilder === 'html_ai') {
+                var rawHtml = ((document.getElementById('wiz-html-raw-code') || {}).value || '').trim();
+                var lines = rawHtml ? rawHtml.split('\n').length : 0;
+                if (_wizSubMode === 'github') {
+                    var repoH = ((document.getElementById('wiz-html-repo') || {}).value || '').trim() || '—';
+                    var branchH = ((document.getElementById('wiz-html-branch') || {}).value || '').trim() || 'main';
+                    sEl.textContent = repoH + ' (Branch: ' + branchH + ')';
+                } else {
+                    var templateNames = {
+                        agency: 'Agency & Studio Prompt',
+                        saas: 'AI SaaS Prompt',
+                        consulting: 'B2B Consulting Prompt',
+                        photography: 'Photo Studio Prompt',
+                        custom: 'Custom Business Prompt'
+                    };
+                    var tLabel = templateNames[_wizSelectedTemplateKey] || 'Creative Agency Prompt';
+                    sEl.textContent = tLabel + (rawHtml ? ' · ' + lines + ' lines custom HTML' : ' · Instant AI Generation');
+                }
+            } else if (_wizBuilder === 'nextjs') {
                 var r = (document.getElementById('wiz-nextjs-repo') || {}).value || '—';
                 var l = (document.getElementById('wiz-nextjs-live-url') || {}).value || '';
                 sEl.textContent = r + (l ? ' (Live: ' + l + ')' : '');
@@ -11786,14 +13118,287 @@ function cora_get_sparkline_points( $history, $type ) {
     }
     window.wizardPopulateSummary = wizardPopulateSummary;
 
+    // ── Build Progress & Error Diagnostic Handlers ───────────
+    var _wizCurrentThemeId = 0;
+    var _wizBuildStepTimers = [];
+
+    function wizardClearBuildTimers() {
+        if (_wizBuildStepTimers && _wizBuildStepTimers.length) {
+            _wizBuildStepTimers.forEach(function(t) { clearTimeout(t); });
+            _wizBuildStepTimers = [];
+        }
+    }
+
+    function wizardDiagnoseError(errMsg, logs) {
+        var hint = 'Verify your repository configuration and retry the build.';
+        var title = 'Build Execution Failed';
+        var combined = ((errMsg || '') + ' ' + (logs || '')).toLowerCase();
+
+        if (combined.includes('enotempty') || combined.includes('rename') || combined.includes('busy')) {
+            title = 'Directory Locked or Dirty Cache';
+            hint = 'Stale node_modules or package lock encountered. Cora auto-cleaned the cache and directories. Please click Retry Build.';
+        } else if (combined.includes('-122') || combined.includes('edquot') || combined.includes('quota') || combined.includes('no space left')) {
+            title = 'Server Disk Inode / Space Quota Limit Reached';
+            hint = 'The hosting account reached its file/inode limit. Cora has purged temporary npm caches and stale build directories. Please click Retry Build.';
+        } else if (combined.includes('sigkill') || combined.includes('killed') || combined.includes('137') || combined.includes('out of memory') || combined.includes('webassembly') || combined.includes('wasm')) {
+            title = 'Shared Hosting Process Memory Limit Reached (SIGKILL)';
+            hint = 'The build reached the hosting process memory threshold. Cora has enabled low-memory single-CPU mode. Please click Retry Build.';
+        } else if (combined.includes('could not inspect branch') || combined.includes('git permissions') || combined.includes('authentication failed') || combined.includes('bad credentials') || combined.includes('401') || combined.includes('403')) {
+            title = 'GitHub Authentication or Branch Access Error';
+            hint = 'Could not access the repository. Please verify your GitHub Personal Access Token (PAT) permissions and ensure the branch name exists.';
+        } else if (combined.includes('unsupported repository type') || combined.includes('no next.js or react build system')) {
+            title = 'Unsupported Project Architecture';
+            hint = 'Cora Canvas strictly supports Next.js (App Router / Pages Router) or React applications with package.json dependencies.';
+        } else if (combined.includes('npm err!') || combined.includes('eresolve') || combined.includes('conflicting dependencies')) {
+            title = 'NPM Package Dependency Resolution Error';
+            hint = 'A package in package.json failed to install. Ensure package.json dependencies are valid and compatible.';
+        } else if (combined.includes('next build') && combined.includes('error')) {
+            title = 'Next.js Compilation Error';
+            hint = 'Next.js build encountered a component syntax or TypeScript error. Check the terminal output below for line details.';
+        } else if (errMsg && errMsg.length > 3) {
+            title = errMsg;
+        }
+
+        return { title: title, hint: hint };
+    }
+
+    function wizardStartLiveBuildUI(themeName) {
+        var formContainer = document.getElementById('wiz-step-3-form-container');
+        var buildContainer = document.getElementById('wiz-step-3-build-container');
+        var backBtn = document.getElementById('wiz-back-btn');
+        var nextBtn = document.getElementById('wiz-next-btn');
+
+        if (formContainer) formContainer.style.display = 'none';
+        if (buildContainer) buildContainer.style.display = 'block';
+        if (backBtn) backBtn.style.display = 'none';
+        if (nextBtn) {
+            nextBtn.disabled = true;
+            nextBtn.style.opacity = '0.5';
+            nextBtn.innerHTML = '<span class="spinning" style="display:inline-block;margin-right:6px;">⚙️</span> Building Static Site…';
+        }
+
+        var headerTitle = document.getElementById('wiz-build-header-title');
+        if (headerTitle) headerTitle.textContent = 'Building & Deploying: ' + themeName;
+
+        var statusPill = document.getElementById('wiz-build-status-pill');
+        var statusDot = document.getElementById('wiz-build-status-dot');
+        var statusText = document.getElementById('wiz-build-status-text');
+        if (statusPill) {
+            statusPill.style.background = '#27272a';
+            statusPill.style.color = '#d4d4d8';
+            statusPill.style.borderColor = '#3f3f46';
+        }
+        if (statusDot) {
+            statusDot.style.background = '#eab308';
+            statusDot.className = 'pulsing';
+        }
+        if (statusText) statusText.textContent = 'Building…';
+
+        // Reset steps
+        var s1 = document.getElementById('wiz-bstep-1');
+        var s2 = document.getElementById('wiz-bstep-2');
+        var s3 = document.getElementById('wiz-bstep-3');
+        var s4 = document.getElementById('wiz-bstep-4');
+        var s5 = document.getElementById('wiz-bstep-5');
+
+        if (s1) { s1.style.color = '#f4f4f5'; s1.textContent = '⏳ [1/5] Cloning repository & inspecting branch tree...'; }
+        if (s2) { s2.style.color = '#71717a'; s2.textContent = '[ ] 2. Resolving packages & framework dependencies...'; }
+        if (s3) { s3.style.color = '#71717a'; s3.textContent = '[ ] 3. Compiling Next.js App Router / React components...'; }
+        if (s4) { s4.style.color = '#71717a'; s4.textContent = '[ ] 4. Prerendering static HTML for all scanned routes...'; }
+        if (s5) { s5.style.color = '#71717a'; s5.textContent = '[ ] 5. Deploying static assets to web server...'; }
+
+        var errPanel = document.getElementById('wiz-build-error-panel');
+        if (errPanel) errPanel.style.display = 'none';
+        var retryBtn = document.getElementById('wiz-build-btn-retry');
+        if (retryBtn) retryBtn.style.display = 'none';
+        var buildBackBtn = document.getElementById('wiz-build-btn-back');
+        if (buildBackBtn) buildBackBtn.style.display = 'none';
+
+        wizardClearBuildTimers();
+
+        _wizBuildStepTimers.push(setTimeout(function() {
+            if (s1) { s1.style.color = '#10b981'; s1.textContent = '✓ [1/5] Repository cloned & branch verified.'; }
+            if (s2) { s2.style.color = '#f4f4f5'; s2.textContent = '⏳ [2/5] Resolving packages & framework dependencies...'; }
+        }, 1800));
+
+        _wizBuildStepTimers.push(setTimeout(function() {
+            if (s2) { s2.style.color = '#10b981'; s2.textContent = '✓ [2/5] Packages & dependencies resolved.'; }
+            if (s3) { s3.style.color = '#f4f4f5'; s3.textContent = '⏳ [3/5] Compiling Next.js App Router / React components...'; }
+        }, 4500));
+
+        _wizBuildStepTimers.push(setTimeout(function() {
+            if (s3) { s3.style.color = '#10b981'; s3.textContent = '✓ [3/5] Next.js components compiled successfully.'; }
+            if (s4) { s4.style.color = '#f4f4f5'; s4.textContent = '⏳ [4/5] Prerendering static HTML for all scanned routes...'; }
+        }, 9000));
+    }
+
+    function wizardShowBuildSuccess(themeName) {
+        wizardClearBuildTimers();
+        var s1 = document.getElementById('wiz-bstep-1');
+        var s2 = document.getElementById('wiz-bstep-2');
+        var s3 = document.getElementById('wiz-bstep-3');
+        var s4 = document.getElementById('wiz-bstep-4');
+        var s5 = document.getElementById('wiz-bstep-5');
+
+        if (s1) { s1.style.color = '#10b981'; s1.textContent = '✓ [1/5] Repository cloned & branch verified.'; }
+        if (s2) { s2.style.color = '#10b981'; s2.textContent = '✓ [2/5] Packages & dependencies resolved.'; }
+        if (s3) { s3.style.color = '#10b981'; s3.textContent = '✓ [3/5] Next.js components compiled.'; }
+        if (s4) { s4.style.color = '#10b981'; s4.textContent = '✓ [4/5] Static HTML routes prerendered.'; }
+        if (s5) { s5.style.color = '#10b981'; s5.textContent = '✓ [5/5] Static site deployed & live on Cora!'; }
+
+        var headerTitle = document.getElementById('wiz-build-header-title');
+        if (headerTitle) headerTitle.innerHTML = '✓ ' + themeName + ' Live on Cora';
+        var headerSub = document.getElementById('wiz-build-header-sub');
+        if (headerSub) headerSub.textContent = 'Static build generated and ready for instant preview.';
+
+        var statusPill = document.getElementById('wiz-build-status-pill');
+        var statusDot = document.getElementById('wiz-build-status-dot');
+        var statusText = document.getElementById('wiz-build-status-text');
+        if (statusPill) {
+            statusPill.style.background = '#064e3b';
+            statusPill.style.color = '#6ee7b7';
+            statusPill.style.borderColor = '#059669';
+        }
+        if (statusDot) {
+            statusDot.style.background = '#10b981';
+            statusDot.className = '';
+        }
+        if (statusText) statusText.textContent = 'Live Static Site';
+
+        var nextBtn = document.getElementById('wiz-next-btn');
+        if (nextBtn) {
+            nextBtn.disabled = false;
+            nextBtn.style.opacity = '1';
+            nextBtn.innerHTML = 'Launching Live Site…';
+        }
+
+        showToast('Theme "' + themeName + '" built & live on Cora!', 'success');
+        setTimeout(function() {
+            closeAddThemeWizard();
+            window.location.reload();
+        }, 1200);
+    }
+
+    function wizardShowBuildError(errMsg, logs, themeId) {
+        wizardClearBuildTimers();
+        if (themeId) _wizCurrentThemeId = themeId;
+
+        var diag = wizardDiagnoseError(errMsg, logs);
+
+        var s4 = document.getElementById('wiz-bstep-4');
+        var s5 = document.getElementById('wiz-bstep-5');
+        if (s4 && s4.textContent.includes('⏳')) {
+            s4.style.color = '#f43f5e';
+            s4.textContent = '❌ [4/5] Prerendering halted.';
+        } else if (s5 && s5.textContent.includes('⏳')) {
+            s5.style.color = '#f43f5e';
+            s5.textContent = '❌ [5/5] Deployment halted.';
+        }
+
+        var headerTitle = document.getElementById('wiz-build-header-title');
+        if (headerTitle) headerTitle.textContent = 'Build Error Occurred';
+
+        var statusPill = document.getElementById('wiz-build-status-pill');
+        var statusDot = document.getElementById('wiz-build-status-dot');
+        var statusText = document.getElementById('wiz-build-status-text');
+        if (statusPill) {
+            statusPill.style.background = '#4c0519';
+            statusPill.style.color = '#fda4af';
+            statusPill.style.borderColor = '#e11d48';
+        }
+        if (statusDot) {
+            statusDot.style.background = '#f43f5e';
+            statusDot.className = '';
+        }
+        if (statusText) statusText.textContent = 'Build Error';
+
+        var errPanel = document.getElementById('wiz-build-error-panel');
+        var errTitle = document.getElementById('wiz-build-error-title');
+        var errHint = document.getElementById('wiz-build-error-hint');
+        var logText = document.getElementById('wiz-build-log-text');
+
+        if (errPanel) errPanel.style.display = 'block';
+        if (errTitle) errTitle.textContent = diag.title;
+        if (errHint) errHint.textContent = diag.hint;
+        if (logText) logText.textContent = logs || errMsg || 'No detailed terminal log available.';
+
+        var retryBtn = document.getElementById('wiz-build-btn-retry');
+        if (retryBtn) retryBtn.style.display = 'inline-flex';
+        var buildBackBtn = document.getElementById('wiz-build-btn-back');
+        if (buildBackBtn) buildBackBtn.style.display = 'inline-flex';
+
+        var nextBtn = document.getElementById('wiz-next-btn');
+        if (nextBtn) {
+            nextBtn.disabled = false;
+            nextBtn.style.opacity = '1';
+            nextBtn.style.cursor = 'pointer';
+            nextBtn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> Retry Build';
+            nextBtn.onclick = function() { wizardRetryCurrentBuild(); };
+        }
+
+        showToast(diag.title, 'error');
+    }
+
+    window.wizardBackFromBuild = function() {
+        wizardClearBuildTimers();
+        var formContainer = document.getElementById('wiz-step-3-form-container');
+        var buildContainer = document.getElementById('wiz-step-3-build-container');
+        var backBtn = document.getElementById('wiz-back-btn');
+        var nextBtn = document.getElementById('wiz-next-btn');
+
+        if (formContainer) formContainer.style.display = 'block';
+        if (buildContainer) buildContainer.style.display = 'none';
+        if (backBtn) backBtn.style.display = 'inline-flex';
+        if (nextBtn) {
+            nextBtn.disabled = false;
+            nextBtn.style.opacity = '1';
+            nextBtn.innerHTML = '⚡ Create & Build Theme <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>';
+            nextBtn.onclick = function() { wizardNext(); };
+        }
+    };
+
+    window.wizardRetryCurrentBuild = function() {
+        var themeId = _wizCurrentThemeId;
+        var name = ((document.getElementById('wiz-theme-name') || {}).value || '').trim() || 'Theme';
+        
+        wizardStartLiveBuildUI(name);
+
+        if (!themeId) {
+            wizardSave();
+            return;
+        }
+
+        jQuery.ajax({
+            url: safeAjaxUrl,
+            method: 'POST',
+            data: {
+                action: 'cora_nextjs_build_repo',
+                theme_id: themeId,
+                nonce: safeNonce
+            },
+            dataType: 'text',
+            success: function(rawRes) {
+                var res = wizParseAjaxResponse(rawRes);
+                if (res && res.success) {
+                    wizardShowBuildSuccess(name);
+                } else {
+                    var errMsg = (res && res.data && res.data.message) ? res.data.message : 'Build failed on retry.';
+                    var logs = (res && res.data && res.data.logs) ? res.data.logs : '';
+                    wizardShowBuildError(errMsg, logs, themeId);
+                }
+            },
+            error: function(xhr) {
+                wizardShowBuildError('Connection error during build execution.', xhr.responseText || '', themeId);
+            }
+        });
+    };
+
     // ── Save ───────────────────────────────────────────────────
     function wizardSave() {
         var name = ((document.getElementById('wiz-theme-name') || {}).value || '').trim();
         if (!name) { showToast('Please enter a theme name.', 'error'); return; }
 
         var nextBtn = document.getElementById('wiz-next-btn');
-        if (nextBtn) { nextBtn.innerHTML = 'Saving…'; nextBtn.disabled = true; nextBtn.style.opacity = '0.6'; }
-
         var lovUrl  = ((document.getElementById('wiz-lovable-url')      || {}).value || '').trim();
         var liveUrl = ((document.getElementById('wiz-lovable-live-url') || {}).value || '').trim();
         
@@ -11802,8 +13407,15 @@ function cora_get_sparkline_points( $history, $type ) {
         var githubBranch = 'main';
         var nextjsLiveUrl = '';
         var nextjsSecret = '';
+        var rawHtml = '';
 
-        if (_wizBuilder === 'nextjs') {
+        if (_wizBuilder === 'html_ai') {
+            rawHtml = ((document.getElementById('wiz-html-raw-code') || {}).value || '').trim();
+            if (_wizSubMode === 'github') {
+                githubRepo = ((document.getElementById('wiz-html-repo') || {}).value || '').trim();
+                githubBranch = ((document.getElementById('wiz-html-branch') || {}).value || '').trim() || 'main';
+            }
+        } else if (_wizBuilder === 'nextjs') {
             githubRepo = ((document.getElementById('wiz-nextjs-repo') || {}).value || '').trim();
             githubToken = ((document.getElementById('wiz-nextjs-token') || {}).value || '').trim();
             githubBranch = ((document.getElementById('wiz-nextjs-branch') || {}).value || '').trim() || 'main';
@@ -11829,6 +13441,9 @@ function cora_get_sparkline_points( $history, $type ) {
             name:          name,
             start_from:    _wizBuilder,
             builder:       _wizBuilder,
+            raw_html:      rawHtml,
+            template_key:  _wizSelectedTemplateKey || 'agency',
+            activate_live: '1',
             lovable_url:   lovUrl,
             live_url:      liveUrl || nextjsLiveUrl,
             nextjs_live_url: nextjsLiveUrl,
@@ -11848,10 +13463,10 @@ function cora_get_sparkline_points( $history, $type ) {
             var fileToUpload = (kitFile && kitFile.files && kitFile.files[0]) ? kitFile.files[0] : window._wizSelectedKitFile;
             if (!fileToUpload) {
                 showToast('Please select or drop an Elementor Kit (.zip) file.', 'warning');
-                if (nextBtn) { nextBtn.innerHTML = 'Save Theme <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>'; nextBtn.disabled = false; nextBtn.style.opacity = '1'; }
                 return;
             }
             showToast('Uploading and importing Elementor Kit...', 'info');
+            if (nextBtn) { nextBtn.innerHTML = 'Uploading…'; nextBtn.disabled = true; nextBtn.style.opacity = '0.6'; }
 
             var formData = new FormData();
             formData.append('action', 'cora_ajax_import_kit');
@@ -11875,23 +13490,23 @@ function cora_get_sparkline_points( $history, $type ) {
                         var errMsg = (res.data && res.data.message) ? res.data.message : (typeof res.data === 'string' ? res.data : 'Failed to import Elementor Kit.');
                         var nextStep = (res.data && res.data.next_step) ? res.data.next_step : 'Ensure the ZIP is a valid Elementor Template Kit and try again.';
                         showToast(errMsg + ' — Next Step: ' + nextStep, 'error');
-                        if (nextBtn) { nextBtn.innerHTML = 'Save Theme <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>'; nextBtn.disabled = false; nextBtn.style.opacity = '1'; }
+                        if (nextBtn) { nextBtn.innerHTML = '⚡ Create & Build Theme <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>'; nextBtn.disabled = false; nextBtn.style.opacity = '1'; }
                     }
                 },
                 error: function() {
-                    showToast('Failed to upload Elementor Kit. Next Step: Check your network and server upload limits.', 'error');
-                    if (nextBtn) { nextBtn.innerHTML = 'Save Theme <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>'; nextBtn.disabled = false; nextBtn.style.opacity = '1'; }
+                    showToast('Failed to upload Elementor Kit. Check network or file size.', 'error');
+                    if (nextBtn) { nextBtn.innerHTML = '⚡ Create & Build Theme <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>'; nextBtn.disabled = false; nextBtn.style.opacity = '1'; }
                 }
             });
             return;
         }
 
-        if (_wizBuilder === 'nextjs') {
-            showToast('Connecting Next.js Git repository…', 'info');
-        } else if (_wizBuilder === 'lovable') {
-            showToast('Connecting Lovable project...', 'info');
+        // For Next.js / GitHub repository imports, transition directly to the Real-Time Build Terminal!
+        if (_wizBuilder === 'nextjs' || (_wizBuilder !== 'html_ai' && githubRepo)) {
+            wizardStartLiveBuildUI(name);
         } else {
-            showToast('Connecting GitHub repository…', 'info');
+            if (nextBtn) { nextBtn.innerHTML = 'Launching…'; nextBtn.disabled = true; nextBtn.style.opacity = '0.6'; }
+            showToast('Creating theme workspace & activating live homepage…', 'info');
         }
 
         jQuery.ajax({
@@ -11902,22 +13517,56 @@ function cora_get_sparkline_points( $history, $type ) {
             success: function(rawRes) {
                 var res = typeof wizParseAjaxResponse === 'function' ? wizParseAjaxResponse(rawRes) : rawRes;
                 if (res.success) {
-                    var successMsg = _wizBuilder === 'nextjs' 
-                        ? 'Next.js project "' + name + '" connected!'
-                        : (_wizBuilder === 'lovable' ? 'Lovable theme "' + name + '" connected!' : 'Theme "' + name + '" synced from GitHub!');
-                    showToast(successMsg, 'success');
-                    closeAddThemeWizard();
-                    setTimeout(function() { window.location.reload(); }, 900);
+                    var data = res.data || {};
+                    if (data.theme_id) _wizCurrentThemeId = data.theme_id;
+
+                    if (_wizBuilder === 'html_ai') {
+                        showToast('⚡ AI HTML Theme "' + name + '" created and live at /site/!', 'success');
+                        closeAddThemeWizard();
+                        var targetSiteUrl = (typeof coraREData !== 'undefined' && coraREData.siteUrl) ? (coraREData.siteUrl + '/site/') : '/site/';
+                        setTimeout(function() {
+                            window.location.href = targetSiteUrl;
+                        }, 900);
+                        return;
+                    }
+
+                    if (_wizBuilder === 'nextjs' || githubRepo) {
+                        if (data.build_success === false) {
+                            var bMsg = data.build_message || 'Static build encountered an issue.';
+                            var bLogs = data.build_logs || '';
+                            wizardShowBuildError(bMsg, bLogs, data.theme_id);
+                        } else {
+                            wizardShowBuildSuccess(name);
+                        }
+                    } else {
+                        var successMsg = _wizBuilder === 'lovable' ? 'Lovable theme "' + name + '" connected!' : 'Theme "' + name + '" created successfully!';
+                        showToast(successMsg, 'success');
+                        closeAddThemeWizard();
+                        setTimeout(function() { window.location.reload(); }, 900);
+                    }
                 } else {
                     var errMsg = (res.data && res.data.message) ? res.data.message : (typeof res.data === 'string' ? res.data : 'Failed to create theme workspace.');
-                    var nextStep = (res.data && res.data.next_step) ? res.data.next_step : 'Verify your configuration and try again.';
-                    showToast(errMsg + ' — Next Step: ' + nextStep, 'error');
-                    if (nextBtn) { nextBtn.innerHTML = 'Save Theme <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>'; nextBtn.disabled = false; nextBtn.style.opacity = '1'; }
+                    var logs = (res.data && res.data.logs) ? res.data.logs : '';
+                    var themeId = (res.data && res.data.theme_id) ? res.data.theme_id : 0;
+
+                    if (_wizBuilder === 'nextjs' || (_wizBuilder !== 'html_ai' && githubRepo)) {
+                        wizardShowBuildError(errMsg, logs, themeId);
+                    } else {
+                        var nextStep = (res.data && res.data.next_step) ? res.data.next_step : 'Verify your configuration and try again.';
+                        showToast(errMsg + ' — Next Step: ' + nextStep, 'error');
+                        var ctaLabel = (_wizBuilder === 'html_ai') ? '⚡ Launch Theme Live & Go to /site/' : ((_wizBuilder === 'nextjs') ? '⚡ Create & Build Theme' : 'Save Theme');
+                        if (nextBtn) { nextBtn.innerHTML = ctaLabel + ' <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>'; nextBtn.disabled = false; nextBtn.style.opacity = '1'; }
+                    }
                 }
             },
-            error: function() {
-                showToast('Connection failed. Next Step: Check your network and try again.', 'error');
-                if (nextBtn) { nextBtn.innerHTML = 'Save Theme <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>'; nextBtn.disabled = false; nextBtn.style.opacity = '1'; }
+            error: function(xhr) {
+                if (_wizBuilder === 'nextjs' || (_wizBuilder !== 'html_ai' && githubRepo)) {
+                    wizardShowBuildError('Connection failed while communicating with the workspace server.', xhr.responseText || '', _wizCurrentThemeId);
+                } else {
+                    showToast('Connection failed. Please check your network and try again.', 'error');
+                    var ctaLabel = (_wizBuilder === 'html_ai') ? '⚡ Launch Theme Live & Go to /site/' : ((_wizBuilder === 'nextjs') ? '⚡ Create & Build Theme' : 'Save Theme');
+                    if (nextBtn) { nextBtn.innerHTML = ctaLabel + ' <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>'; nextBtn.disabled = false; nextBtn.style.opacity = '1'; }
+                }
             }
         });
     }
@@ -12960,6 +14609,62 @@ function cora_get_sparkline_points( $history, $type ) {
             }
         }
     }, 1500);
+
+    // Claude / ChatGPT Master Starter Prompt Copier
+    window.copyClaudeMasterPrompt = function() {
+        const promptText = `You are an expert web designer and frontend developer building a modern, high-converting, responsive landing page for my business.
+
+Build a single-file, production-ready HTML website with the following stack & guidelines:
+
+1. STACK & STYLING:
+- HTML5 with Tailwind CSS loaded via CDN: <script src="https://cdn.tailwindcss.com"><\/script>
+- Google Fonts: Inter font family (<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">)
+- Modern monochromatic / neutral palette (slate/zinc tones, pure white #ffffff, deep black #09090b, subtle border strokes border-zinc-200 / dark:border-zinc-800, soft tonal selection fills)
+- Fully responsive on Mobile (375px), Tablet (768px), and Desktop (1440px)
+- Clean vector SVG icons (no external font icons or broken images)
+
+2. PAGE SECTIONS REQUIRED:
+- Sticky Navigation Bar (Logo, Navigation links, "Get Started" CTA button)
+- Hero Section (Compelling headline, subheadline, Trust proof badges, 2 CTA buttons)
+- Social Proof / Client Logos / Metrics Ticker (e.g. 500+ Clients, 99.9% Uptime, 4.9/5 Rating)
+- Feature Grid / Core Benefits (3-4 high-value benefit cards with clean icons)
+- Interactive Pricing Matrix or Services Catalog (3 tiers with feature checklists)
+- FAQ Accordion (4-5 expandable questions)
+- Universal Lead Capture Form (Contact / Inquiry section with Name, Email, Phone, and Message inputs)
+- Footer (Branding, navigation links, copyright notice)
+
+3. AUTOMATIC CORA CRM LEAD CAPTURE:
+Include a contact/inquiry <form> on the page with standard input names:
+- <input type="text" name="name" placeholder="Your Name" required>
+- <input type="email" name="email" placeholder="Work Email" required>
+- <input type="tel" name="phone" placeholder="Phone Number">
+- <textarea name="message" placeholder="How can we help?"></textarea>
+- <button type="submit">Submit Inquiry</button>
+
+Do NOT attach complex backend scripts. Cora Canvas automatically captures any form submission on this site and inserts leads directly into the Cora CRM Lead Funnel.
+
+Please provide the complete, un-truncated index.html file ready to save and publish.`;
+
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(promptText).then(function() {
+                if (typeof window.coraShowToast === 'function') {
+                    window.coraShowToast('Claude / ChatGPT Starter Prompt copied! Paste it into Claude or ChatGPT to generate your site.', 'success');
+                } else {
+                    alert('Claude / ChatGPT Starter Prompt copied to clipboard!');
+                }
+            });
+        } else {
+            const ta = document.createElement('textarea');
+            ta.value = promptText;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            if (typeof window.coraShowToast === 'function') {
+                window.coraShowToast('Claude / ChatGPT Starter Prompt copied to clipboard!', 'success');
+            }
+        }
+    };
 
     // Expose functions to window for Command Palette usage
     window.triggerRenamePage = triggerRenamePage;

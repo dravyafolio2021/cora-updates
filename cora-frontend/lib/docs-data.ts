@@ -552,6 +552,7 @@ Creative clients frequently send chaotic 5-minute audio voice notes instead of w
       { id: 'pipeline-stages', title: '1. Visual Pipeline Stages' },
       { id: 'whatsapp-automation', title: '2. Automated WhatsApp Outreach' },
       { id: 'lead-scoring', title: '3. AI Intent Lead Scoring' },
+      { id: 'draggable-drawer', title: '4. Edge-to-Edge Draggable Drawer & Sync' },
     ],
     content: `
 The Cora **Kanban Lead CRM** gives creative studios a Notion-style drag-and-drop deal board tailored for high-ticket commercial shoots, retainer contracts, and wedding bookings.
@@ -567,6 +568,16 @@ By default, every new workspace seeds with five industry-standard pipeline stage
 3. **Proposal & Quote Sent**: Staged SHA-256 agreement with GST breakdown.
 4. **Contract Signed & Advance Paid**: 50% advance invoice settled.
 5. **Shoot Scheduled**: Transferred directly to Master Calendar and Crew Dispatch.
+
+---
+
+## 4. Edge-to-Edge Draggable Drawer & Bi-Directional Sync
+
+Starting in **v4.9.300–v4.9.302**, lead inspection features:
+- **Full-Height Portaled Drawer**: Auto-portaled to the root document body with transparent backdrop, preserving live context on the underlying Kanban board.
+- **Draggable Left-Edge Resizer**: Adjust drawer width smoothly, with preferences saved to \`localStorage\`.
+- **Sanitized Assignee Roster**: Prevents assigning system or inactive accounts.
+- **Bi-Directional Real-Time Sync**: Updates made inside the drawer instantly reflect on the Kanban card and top KPI scorecards without page reload.
     `,
   },
   {
@@ -581,10 +592,36 @@ By default, every new workspace seeds with five industry-standard pipeline stage
     toc: [
       { id: 'visual-editor', title: '1. Visual Editor Toolbar' },
       { id: 'white-labeling', title: '2. Zero Third-Party Branding' },
-      { id: 'git-sync', title: '3. Version-Controlled Theme Sync' },
+      { id: 'git-sync', title: '3. Next.js Git Connector & Route Scanner' },
+      { id: 'headless-preview', title: '4. Headless REST APIs & Preview Proxy' },
     ],
     content: `
-The **Canvas Builder** enables creative agencies to design and publish lightning-fast client landing pages, portfolio showcases, and lead-capture funnels directly inside the Cora workspace.
+The **Canvas Builder** enables creative agencies to design and publish lightning-fast client landing pages, portfolio showcases, and lead-capture funnels directly inside the Cora workspace across Elementor, Visual HTML, and Next.js engines.
+
+---
+
+## 1. Multi-Engine Website Creation
+
+- **Visual HTML Engine**: In-browser inline editing with code-split view and live DOM synchronization.
+- **Universal Migrator**: Ingest public websites into editable draft themes with 1 click.
+- **Elementor Reskin**: 100% white-labeled builder sandboxed from WordPress branding.
+
+---
+
+## 3. Next.js Git Connector & Route Scanner (v4.9.308–v4.9.316)
+
+Connect your production Next.js repositories directly via GitHub Personal Access Tokens (PAT):
+- **App Router Scanner**: Recursively scans \`app/**/page.tsx\` files and automatically registers discovered routes and page titles.
+- **Private Repo Support**: Dual authorization header support (\`Bearer <token>\` and \`token <token>\`) with dynamic branch resolution.
+- **On-Demand ISR Revalidation**: Dispatches secure webhook revalidations whenever page props or content are updated.
+
+---
+
+## 4. Headless REST APIs & Live Dev Server Preview Proxy
+
+- **Clean REST Endpoints**: \`/wp-json/cora-canvas/v1/manifest\`, \`/wp-json/cora-canvas/v1/page\`, and \`/wp-json/cora-canvas/v1/form-submit\`.
+- **Offline Dev Server Ping**: Automatically tests \`localhost:3000\` within 150ms and provides clear instructions if offline.
+- **Isolated Preview Cookies**: Scopes \`cora_canvas_preview\` cookies strictly to explicit preview queries, preventing unintended leaks to production visitors.
     `,
   },
   {
@@ -740,32 +777,65 @@ Track post-production status from RAW ingest to rough cut, color grading, client
       { id: 'tax-math', title: '1. Automated GST Tax Splitting' },
       { id: 'hsn-sac-registry', title: '2. HSN & SAC Code Registry' },
       { id: 'invoice-pdf', title: '3. Compliant PDF Tax Invoices' },
+      { id: 'vault-sync', title: '4. Automated Document Vault & SHA-256 Linkage' },
     ],
     content: `
 The Cora **GST Math Engine** handles all tax calculations required for Indian service businesses and commercial studios:
 
 - **Intra-State (Same State)**: Splits 18% GST into **9% CGST** + **9% SGST**.
 - **Inter-State (Different State)**: Applies unified **18% IGST**.
-- **SAC Codes**: Pre-seeded with SAC 998381 (Commercial Photography & Film Production Services).
+- **SAC & HSN Codes**: Pre-seeded with SAC 998381 (Commercial Photography & Film Production Services) and manufacturing HSN codes.
 - **Pro-Forma & Tax Invoices**: Generate 50% advance pro-formas and final tax invoices with instant payment links.
+
+---
+
+## 4. Automated Document Vault & SHA-256 Linkage (v4.9.303–v4.9.304)
+
+- **Multi-Step Creator Validation**: Strict validation across client GSTIN, line item rates, and tax calculations.
+- **Instant Vault Registration**: Publishing an invoice automatically creates an immutable record in the Document Vault with a cryptographic SHA-256 hash.
+- **End-to-End Audit Trail**: Ties invoices directly to signed contracts and accountant tax packs.
     `,
   },
   {
     slug: 'asset-gear',
-    title: 'Gear & Inventory Equipment Registry',
-    shortTitle: 'Gear & Inventory',
+    title: 'Gear & Inventory Equipment Registry & Van Sales',
+    shortTitle: 'Inventory & Van Sales',
     category: 'finance',
     categoryLabel: 'Finance & Assets',
-    description: 'Catalog cameras, lenses, lighting kits, track serial numbers, condition logs, and booking checkouts.',
-    readTime: '5 min read',
-    lastUpdated: 'August 2026',
+    description: 'Catalog gear, equipment, factory SKUs, 3-step van dispatches, weight-based spot billing, and sales registers.',
+    readTime: '6 min read',
+    lastUpdated: 'October 2026',
     toc: [
-      { id: 'inventory-registry', title: '1. Gear Catalog & Serial Numbers' },
-      { id: 'checkout-tracking', title: '2. Shoot Checkout Tracking' },
-      { id: 'condition-logs', title: '3. Maintenance & Damage Logs' },
+      { id: 'inventory-registry', title: '1. Gear & Factory SKU Catalog' },
+      { id: 'van-dispatch', title: '2. 3-Step Van Dispatch Wizard & Weight Allocation' },
+      { id: 'spot-billing', title: '3. Spot Billing & Auto-Print GST Invoices' },
+      { id: 'sales-register', title: '4. Canonical Sales Register & Ledger Export' },
     ],
     content: `
-Maintain full tracking of your physical production assets, prevent double-booking of specialty lenses, and log maintenance repair histories.
+Maintain full tracking of physical production assets, factory inventory SKUs, and mobile van sales logistics across central plants and route drivers.
+
+---
+
+## 2. 3-Step Van Dispatch Wizard & Weight Allocation (v4.9.314)
+
+- **Guided Dispatch**: Assign verified field drivers, delivery vehicles, and route coverage via quick city chips.
+- **Weight-Based Allocation**: Allocate bulk weighted goods (standard base: ₹401.25/kg) alongside unit piece items with real-time valuation calculations.
+- **Manifest Print**: Auto-generates standard 5-column warehouse dispatch manifests and 4-column inventory reports.
+
+---
+
+## 3. Spot Billing & Auto-Print GST Invoices (v4.9.314–v4.9.315)
+
+- **Field POS**: Mobile drivers bill retail stores on-the-spot with standardized 4-digit bill numbers (e.g. #0001).
+- **Auto-Print**: 1-click printable tax invoices with words conversion in official Indian currency.
+- **Safe Stock Rollback**: Deleting or editing a spot invoice returns units back to van inventory atomically.
+
+---
+
+## 4. Canonical Sales Register & Ledger Export
+
+- **Itemized Ledger**: Central ledger tracking customer names, payment channels (Cash, UPI, Credit), and item breakdowns.
+- **Accountant Export**: Auditor-ready itemized CSV exports and printable sales register sheets.
     `,
   },
   {

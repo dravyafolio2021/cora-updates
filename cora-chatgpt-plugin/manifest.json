@@ -1,0 +1,25 @@
+{
+  "schema_version": "v1",
+  "name_for_human": "Cora Workspace & Studio OS",
+  "name_for_model": "cora_workspace",
+  "description_for_human": "Manage your creative studio operations, CRM leads, client shoot dates, GST invoices, and field ops directly from ChatGPT.",
+  "description_for_model": "Cora is an all-in-one Operating System for Creative Studios and Field Workspaces. You have access to tools that query business pulse, search semantic living memory, manage CRM client and lead pipelines, book calendar dates and photography shoots, compute GST tax calculations, generate digital tax invoices, inspect the document vault, and track team tasks and field attendance. ALWAYS search existing leads or clients before creating new records to avoid duplicate data. When invoicing, ensure GST rates and breakdowns (CGST+SGST for intra-state or IGST for inter-state) are strictly validated.",
+  "auth": {
+    "type": "oauth",
+    "client_url": "https://stagging.heycora.in/oauth/authorize",
+    "scope": "workspace:read leads:read leads:write clients:read clients:write bookings:read bookings:write invoices:read invoices:write tasks:read tasks:write knowledge:read knowledge:write",
+    "authorization_url": "https://stagging.heycora.in/oauth/token",
+    "authorization_content_type": "application/x-www-form-urlencoded",
+    "verification_tokens": {
+      "openai": "cora_oauth_token_verification_key"
+    }
+  },
+  "api": {
+    "type": "openapi",
+    "url": "https://stagging.heycora.in/wp-json/cora/v1/mcp/openapi.json",
+    "is_user_authenticated": true
+  },
+  "logo_url": "https://stagging.heycora.in/favicon.png",
+  "contact_email": "support@heycora.in",
+  "legal_info_url": "https://stagging.heycora.in/terms"
+}
