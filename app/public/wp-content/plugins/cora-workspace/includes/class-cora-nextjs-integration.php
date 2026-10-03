@@ -37,11 +37,15 @@ class Cora_NextJS_Integration {
             'cora_nextjs_save_page_props',
             'cora_nextjs_sync_repo',
             'cora_nextjs_save_live_url',
-            'cora_nextjs_build_repo'
+            'cora_nextjs_build_repo',
+            'cora_nextjs_github_webhook'
         );
 
         foreach ( $actions as $action ) {
             add_action( 'wp_ajax_' . $action, array( $this, $action ) );
+            if ( $action === 'cora_nextjs_github_webhook' ) {
+                add_action( 'wp_ajax_nopriv_' . $action, array( $this, $action ) );
+            }
         }
     }
 
@@ -74,6 +78,13 @@ class Cora_NextJS_Integration {
         register_rest_route( self::REST_NAMESPACE, '/nextjs/forms/submit', array(
             'methods'             => 'POST',
             'callback'            => array( $this, 'rest_submit_form' ),
+            'permission_callback' => '__return_true',
+        ) );
+
+        // 5. GitHub Automated Push Webhook -> Auto-Rebuild Static Site
+        register_rest_route( self::REST_NAMESPACE, '/nextjs/github-webhook', array(
+            'methods'             => array( 'GET', 'POST' ),
+            'callback'            => array( $this, 'rest_github_webhook' ),
             'permission_callback' => '__return_true',
         ) );
     }
@@ -904,18 +915,107 @@ class Cora_NextJS_Integration {
             wp_send_json_error( array( 'message' => 'Theme ID is required.' ) );
         }
 
+        $result = self::execute_static_build( $theme_id );
+
+        if ( is_wp_error( $result ) ) {
+            wp_send_json_error( array(
+                'message'    => $result->get_error_message(),
+                'error_code' => $result->get_error_code(),
+                'logs'       => $result->get_error_data()
+            ) );
+        }
+
+        wp_send_json_success( $result );
+    }
+
+    /**
+     * REST: GitHub Webhook to trigger auto-rebuild on git push
+     */
+    public function rest_github_webhook( $request ) {
+        $body = $request->get_json_params() ?: $request->get_body_params();
+        $theme_id = intval( $request->get_param( 'theme_id' ) ?: 0 );
+
+        global $wpdb;
+        if ( $theme_id <= 0 && ! empty( $body['repository']['full_name'] ) ) {
+            $repo_slug = trim( $body['repository']['full_name'] );
+            $match_theme = $wpdb->get_row( $wpdb->prepare( "SELECT id FROM {$wpdb->prefix}cora_canvas_themes WHERE settings LIKE %s ORDER BY id DESC LIMIT 1", '%' . $wpdb->esc_like( $repo_slug ) . '%' ), ARRAY_A );
+            if ( $match_theme ) {
+                $theme_id = intval( $match_theme['id'] );
+            }
+        }
+
+        if ( $theme_id <= 0 ) {
+            $live_theme = $wpdb->get_row( "SELECT id FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live' ORDER BY id DESC LIMIT 1", ARRAY_A );
+            $theme_id = $live_theme ? intval( $live_theme['id'] ) : 0;
+        }
+
+        if ( $theme_id <= 0 ) {
+            return new WP_REST_Response( array( 'success' => false, 'message' => 'Target theme not found.' ), 404 );
+        }
+
+        $result = self::execute_static_build( $theme_id );
+        if ( is_wp_error( $result ) ) {
+            return new WP_REST_Response( array( 'success' => false, 'message' => $result->get_error_message(), 'logs' => $result->get_error_data() ), 500 );
+        }
+
+        return new WP_REST_Response( array( 'success' => true, 'message' => 'Static build completed from GitHub webhook.', 'data' => $result ), 200 );
+    }
+
+    /**
+     * AJAX: Public / NoPriv GitHub Webhook Handler
+     */
+    public function cora_nextjs_github_webhook() {
+        $theme_id = intval( $_GET['theme_id'] ?? ( $_POST['theme_id'] ?? 0 ) );
+        $body = json_decode( file_get_contents( 'php://input' ), true ) ?: $_POST;
+
+        global $wpdb;
+        if ( $theme_id <= 0 && ! empty( $body['repository']['full_name'] ) ) {
+            $repo_slug = trim( $body['repository']['full_name'] );
+            $match_theme = $wpdb->get_row( $wpdb->prepare( "SELECT id FROM {$wpdb->prefix}cora_canvas_themes WHERE settings LIKE %s ORDER BY id DESC LIMIT 1", '%' . $wpdb->esc_like( $repo_slug ) . '%' ), ARRAY_A );
+            if ( $match_theme ) {
+                $theme_id = intval( $match_theme['id'] );
+            }
+        }
+
+        if ( $theme_id <= 0 ) {
+            $live_theme = $wpdb->get_row( "SELECT id FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live' ORDER BY id DESC LIMIT 1", ARRAY_A );
+            $theme_id = $live_theme ? intval( $live_theme['id'] ) : 0;
+        }
+
+        if ( $theme_id <= 0 ) {
+            wp_send_json_error( array( 'message' => 'Target theme not found.' ), 404 );
+        }
+
+        $result = self::execute_static_build( $theme_id );
+        if ( is_wp_error( $result ) ) {
+            wp_send_json_error( array( 'message' => $result->get_error_message(), 'logs' => $result->get_error_data() ), 500 );
+        }
+
+        wp_send_json_success( $result );
+    }
+
+    /**
+     * Core: Execute Static Build & Prerendering for a Canvas Theme
+     *
+     * @param int $theme_id
+     * @return array|WP_Error
+     */
+    public static function execute_static_build( $theme_id ) {
+        global $wpdb;
+        $theme_id = intval( $theme_id );
+
         $theme = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d", $theme_id ), ARRAY_A );
         if ( ! $theme ) {
-            wp_send_json_error( array( 'message' => 'Theme workspace not found.' ) );
+            return new WP_Error( 'theme_not_found', 'Theme workspace not found.' );
         }
 
         $settings = json_decode( $theme['settings'] ?? '{}', true ) ?: array();
-        $repo_raw = $settings['github_repo'] ?? ( $_POST['repo'] ?? '' );
-        $branch   = $settings['github_branch'] ?? ( $_POST['branch'] ?? 'main' );
+        $repo_raw = $settings['github_repo'] ?? '';
+        $branch   = $settings['github_branch'] ?? 'main';
         $pat      = $settings['lovable_pat'] ?? ( $settings['github_pat'] ?? get_option( 'cora_git_sync_token', '' ) );
 
         if ( empty( $repo_raw ) ) {
-            wp_send_json_error( array( 'message' => 'No GitHub repository connected to this theme.' ) );
+            return new WP_Error( 'missing_repo', 'No GitHub repository connected to this theme.' );
         }
 
         // Parse owner/repo
@@ -925,7 +1025,7 @@ class Cora_NextJS_Integration {
         } elseif ( count( explode( '/', trim( $repo_raw, '/' ) ) ) === 2 ) {
             $repo_slug = trim( $repo_raw, '/' );
         } else {
-            wp_send_json_error( array( 'message' => 'Invalid repository format. Please enter owner/repo or full GitHub URL.' ) );
+            return new WP_Error( 'invalid_repo', 'Invalid repository format. Please enter owner/repo or full GitHub URL.' );
         }
 
         $upload_dir = wp_upload_dir();
@@ -1006,10 +1106,13 @@ class Cora_NextJS_Integration {
         }
 
         if ( ! file_exists( $working_dir . '/package.json' ) ) {
-            wp_send_json_error( array(
-                'message' => 'Could not locate package.json in repository. Build failed.',
-                'logs'    => implode( "\n", $git_log )
-            ) );
+            return new WP_Error( 'missing_package_json', 'Could not locate package.json in repository. Build failed.', implode( "\n", $git_log ) );
+        }
+
+        // Auto-create .openai/hosting.json if needed by OpenAI/Codex Vite templates
+        if ( ! file_exists( $working_dir . '/.openai/hosting.json' ) ) {
+            @wp_mkdir_p( $working_dir . '/.openai' );
+            @file_put_contents( $working_dir . '/.openai/hosting.json', '{"d1":null,"r2":null}' );
         }
 
         $package_json = json_decode( file_get_contents( $working_dir . '/package.json' ), true ) ?: array();
@@ -1023,30 +1126,44 @@ class Cora_NextJS_Integration {
             if ( empty( $deps['react-dom'] ) || empty( $deps['react-native-web'] ) ) {
                 $extra_deps = 'npm install --no-audit react-dom@19.1.0 react-native-web@^0.21.0 --prefer-offline 2>&1 && ';
             }
-            $build_cmd = 'npm install --no-audit --prefer-offline 2>&1 && ' . $extra_deps . 'npx expo export -p web 2>&1';
+            $build_cmd = 'npm install --no-audit 2>&1 && ' . $extra_deps . 'npx expo export -p web 2>&1';
         } elseif ( isset( $deps['next'] ) ) {
             $framework = 'nextjs';
-            $build_cmd = 'npm install --no-audit --prefer-offline 2>&1 && npm run build 2>&1';
+            $build_cmd = 'npm install --no-audit 2>&1 && npm run build 2>&1';
+        } elseif ( isset( $deps['vinext'] ) ) {
+            $framework = 'vinext';
+            $build_cmd = 'npm install --no-audit 2>&1 && npm run build 2>&1';
         } elseif ( isset( $deps['vite'] ) ) {
             $framework = 'vite';
-            $build_cmd = 'npm install --no-audit --prefer-offline 2>&1 && npm run build 2>&1';
+            $build_cmd = 'npm install --no-audit 2>&1 && npm run build 2>&1';
         } else {
             $framework = 'react';
-            $build_cmd = 'npm install --no-audit --prefer-offline 2>&1 && npm run build 2>&1';
+            $build_cmd = 'npm install --no-audit 2>&1 && npm run build 2>&1';
         }
+
+        // Environment paths: includes user local standalone binaries and limits thread count for shared hosts
+        $path_env = 'export PATH=$HOME/.local/bin:$HOME/.local/share/node-v22.14.0-linux-x64/bin:$HOME/.local/share/node-v20.18.0-linux-x64/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:$PATH; export RAYON_NUM_THREADS=1; export UV_THREADPOOL_SIZE=1;';
 
         // Verify Node.js / npm existence
         $node_check = array();
         $node_ret = 0;
-        $path_env = 'export PATH=/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:$PATH';
         @exec( "{$path_env} && node -v 2>&1 && npm -v 2>&1", $node_check, $node_ret );
 
         if ( $node_ret !== 0 ) {
-            wp_send_json_error( array(
-                'message'   => 'Node.js or npm is not installed or accessible on the server.',
-                'framework' => $framework,
-                'logs'      => implode( "\n", $node_check )
-            ) );
+            // Auto-install portable node if missing
+            $inst_out = array();
+            $inst_code = 0;
+            @exec( "mkdir -p ~/.local/share ~/.local/bin && curl -fsSL https://nodejs.org/dist/v22.14.0/node-v22.14.0-linux-x64.tar.gz | tar -xz -C ~/.local/share/ && ln -sf ~/.local/share/node-v22.14.0-linux-x64/bin/node ~/.local/bin/node && ln -sf ~/.local/share/node-v22.14.0-linux-x64/bin/npm ~/.local/bin/npm && ln -sf ~/.local/share/node-v22.14.0-linux-x64/bin/npx ~/.local/bin/npx", $inst_out, $inst_code );
+            @exec( "{$path_env} && node -v 2>&1 && npm -v 2>&1", $node_check, $node_ret );
+        }
+
+        if ( $node_ret !== 0 ) {
+            return new WP_Error( 'node_missing', 'Node.js or npm is not installed or accessible on the server.', implode( "\n", $node_check ) );
+        }
+
+        // Remove stale lockfile if conflicting target version exists
+        if ( file_exists( $working_dir . '/package-lock.json' ) ) {
+            @unlink( $working_dir . '/package-lock.json' );
         }
 
         // Execute build
@@ -1055,44 +1172,96 @@ class Cora_NextJS_Integration {
         $build_exit_code = 0;
         @exec( $exec_cmd, $build_output, $build_exit_code );
 
+        // If Vinext / Next.js SSR server worker exists (dist/server/index.js), prerender all scanned routes into static HTML!
+        $server_worker = $working_dir . '/dist/server/index.js';
+        if ( file_exists( $server_worker ) ) {
+            $scanned_routes = array( '/' );
+            $page_rows = $wpdb->get_results( $wpdb->prepare( "SELECT slug, is_homepage FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d", $theme_id ), ARRAY_A );
+            if ( ! empty( $page_rows ) ) {
+                foreach ( $page_rows as $prow ) {
+                    $r_path = ( ! empty( $prow['is_homepage'] ) || $prow['slug'] === 'home' ) ? '/' : '/' . ltrim( $prow['slug'], '/' );
+                    $scanned_routes[] = $r_path;
+                }
+            }
+            $scanned_routes = array_values( array_unique( $scanned_routes ) );
+            $routes_json = json_encode( $scanned_routes );
+
+            $prerender_script = "
+import('./dist/server/index.js').then(async ({ default: worker }) => {
+  const { writeFileSync, mkdirSync } = await import('node:fs');
+  const { resolve, dirname } = await import('node:path');
+  const routes = {$routes_json};
+  for (const route of routes) {
+    try {
+      const res = await worker.fetch(new Request('https://cora.internal' + route));
+      if (res.status === 200) {
+        const html = await res.text();
+        const cleanRoute = route === '/' ? '/index.html' : route.replace(/\\/$/, '') + '/index.html';
+        const outPath = resolve('./dist/client' + cleanRoute);
+        mkdirSync(dirname(outPath), { recursive: true });
+        writeFileSync(outPath, html, 'utf8');
+        if (route !== '/') {
+          const flatPath = resolve('./dist/client' + route.replace(/\\/$/, '') + '.html');
+          mkdirSync(dirname(flatPath), { recursive: true });
+          writeFileSync(flatPath, html, 'utf8');
+        }
+      }
+    } catch(err) {
+      console.error('Prerender error on ' + route, err);
+    }
+  }
+  console.log('Prerender complete.');
+}).catch(console.error);
+";
+            $prerender_file = $working_dir . '/cora_prerender_temp.mjs';
+            @file_put_contents( $prerender_file, $prerender_script );
+            $prerender_out = array();
+            $prerender_ret = 0;
+            @exec( "{$path_env} && cd " . escapeshellarg( $working_dir ) . " && node cora_prerender_temp.mjs 2>&1", $prerender_out, $prerender_ret );
+            @unlink( $prerender_file );
+            $build_output = array_merge( $build_output, $prerender_out );
+        }
+
         $build_logs_str = implode( "\n", array_merge( $git_log, $build_output ) );
 
         // Scan for static output directory
-        $candidate_dirs = array( 'out', 'dist', 'build', 'web-build', '.next/server/pages', '.next/standalone/out' );
-        $static_dir_path = '';
+        $candidate_dirs = array( 'dist/client', 'out', 'dist', 'build', 'web-build', '.next/server/pages', '.next/standalone/out' );
+        $static_source_path = '';
 
         foreach ( $candidate_dirs as $cand ) {
             $test_path = $working_dir . '/' . $cand;
             if ( is_dir( $test_path ) ) {
-                $static_dir_path = realpath( $test_path );
+                $static_source_path = realpath( $test_path );
                 break;
             }
         }
 
-        if ( empty( $static_dir_path ) && $working_dir !== $repo_dir ) {
+        if ( empty( $static_source_path ) && $working_dir !== $repo_dir ) {
             foreach ( $candidate_dirs as $cand ) {
                 $test_path = $repo_dir . '/' . $cand;
                 if ( is_dir( $test_path ) ) {
-                    $static_dir_path = realpath( $test_path );
+                    $static_source_path = realpath( $test_path );
                     break;
                 }
             }
         }
 
-        if ( empty( $static_dir_path ) || ! is_dir( $static_dir_path ) ) {
-            wp_send_json_error( array(
-                'message'    => 'Build completed but no static output directory (out, dist, build, web-build) was found.',
-                'framework'  => $framework,
-                'exit_code'  => $build_exit_code,
-                'logs'       => $build_logs_str
-            ) );
+        if ( empty( $static_source_path ) || ! is_dir( $static_source_path ) ) {
+            return new WP_Error( 'static_dir_missing', 'Build completed but no static output directory (dist/client, out, dist, build, web-build) was found.', $build_logs_str );
         }
+
+        // Copy compiled static files into standard static output directory
+        $final_static_dir = $theme_build_dir . '/out';
+        if ( ! file_exists( $final_static_dir ) ) {
+            wp_mkdir_p( $final_static_dir );
+        }
+        self::copy_dir_recursive( $static_source_path, $final_static_dir );
 
         // Count static files
         $file_count = 0;
         try {
             $iter = new RecursiveIteratorIterator(
-                new RecursiveDirectoryIterator( $static_dir_path, RecursiveDirectoryIterator::SKIP_DOTS ),
+                new RecursiveDirectoryIterator( $final_static_dir, RecursiveDirectoryIterator::SKIP_DOTS ),
                 RecursiveIteratorIterator::SELF_FIRST
             );
             foreach ( $iter as $f ) {
@@ -1105,7 +1274,7 @@ class Cora_NextJS_Integration {
         // Save theme settings
         $settings['source']            = 'nextjs';
         $settings['is_static_built']   = true;
-        $settings['static_build_path'] = $static_dir_path;
+        $settings['static_build_path'] = $final_static_dir;
         $settings['static_built_at']   = current_time( 'mysql' );
         $settings['framework']         = $framework;
 
@@ -1120,14 +1289,15 @@ class Cora_NextJS_Integration {
             array( '%d' )
         );
 
-        wp_send_json_success( array(
+        return array(
+            'success'     => true,
             'message'     => 'Static site built successfully.',
-            'static_dir'  => $static_dir_path,
+            'static_dir'  => $final_static_dir,
             'framework'   => $framework,
             'files_count' => $file_count,
             'theme_id'    => $theme_id,
             'build_logs'  => $build_logs_str
-        ) );
+        );
     }
 
     /**
