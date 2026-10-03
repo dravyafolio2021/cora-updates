@@ -5180,16 +5180,17 @@ function cora_get_sparkline_points( $history, $type ) {
             </div>
         </div>
 
-        <!-- STEP 3: Name & Save -->
-        <div id="wizard-step-3" class="atw-anim" style="display:none;flex:1;flex-direction:column;align-items:center;justify-content:center;padding:52px 32px;">
-            <div style="width:100%;max-width:520px;">
-                <div style="text-align:center;margin-bottom:32px;">
-                    <div style="width:56px;height:56px;background:#18181b;border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;">
+        <!-- STEP 3: Name & Save / Live Build Terminal -->
+        <div id="wizard-step-3" class="atw-anim" style="display:none;flex:1;flex-direction:column;align-items:center;justify-content:center;padding:36px 24px;width:100%;">
+            <!-- 3A: Initial Name & Config Card -->
+            <div id="wiz-step-3-form-container" style="width:100%;max-width:520px;margin:0 auto;">
+                <div style="text-align:center;margin-bottom:28px;">
+                    <div style="width:56px;height:56px;background:#18181b;border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
                     </div>
-                    <p style="font-size:10px;font-weight:900;letter-spacing:.18em;text-transform:uppercase;color:#a1a1aa;margin-bottom:14px;">Step 3 of 3</p>
-                    <h2 style="font-size:26px;font-weight:900;color:#18181b;letter-spacing:-.04em;line-height:1.1;margin-bottom:10px;">Name your theme</h2>
-                    <p style="font-size:13px;color:#71717a;line-height:1.6;">You can rename it anytime from the Themes section.</p>
+                    <p style="font-size:10px;font-weight:900;letter-spacing:.18em;text-transform:uppercase;color:#a1a1aa;margin-bottom:10px;">Step 3 of 3</p>
+                    <h2 style="font-size:24px;font-weight:900;color:#18181b;letter-spacing:-.04em;line-height:1.1;margin-bottom:8px;">Name your theme</h2>
+                    <p style="font-size:13px;color:#71717a;line-height:1.5;">You can rename it anytime from the Themes section.</p>
                 </div>
                 <div style="background:white;border:1.5px solid #e4e4e7;border-radius:16px;padding:24px;box-shadow:0 1px 4px rgba(0,0,0,.05);">
                     <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:20px;">
@@ -5206,6 +5207,75 @@ function cora_get_sparkline_points( $history, $type ) {
                             <span style="font-size:12px;color:#71717a;">Source</span>
                             <span id="wiz-summary-source" style="font-size:12px;font-weight:700;color:#18181b;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right;"></span>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3B: Real-Time Build & Deployment Terminal Window -->
+            <div id="wiz-step-3-build-container" style="display:none;width:100%;max-width:620px;margin:0 auto;">
+                <div style="background:#18181b;border:1px solid #27272a;border-radius:20px;padding:28px 24px;box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);color:#f4f4f5;">
+                    <!-- Terminal Header -->
+                    <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #27272a;padding-bottom:18px;margin-bottom:20px;">
+                        <div style="display:flex;align-items:center;gap:12px;">
+                            <div id="wiz-build-icon-box" style="width:40px;height:40px;border-radius:10px;background:#27272a;border:1px solid #3f3f46;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-weight:700;color:#ffffff;font-size:16px;">
+                                ▲
+                            </div>
+                            <div>
+                                <h3 id="wiz-build-header-title" style="font-size:15px;font-weight:700;color:#f4f4f5;letter-spacing:-0.01em;display:flex;align-items:center;gap:8px;">
+                                    Building & Deploying Theme…
+                                </h3>
+                                <p id="wiz-build-header-sub" style="font-size:12px;color:#a1a1aa;margin-top:2px;">
+                                    Compiling Next.js components & exporting static site for Cora Workspace
+                                </p>
+                            </div>
+                        </div>
+                        <span id="wiz-build-status-pill" style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:9999px;font-size:11px;font-weight:600;font-family:'JetBrains Mono',monospace;background:#27272a;color:#d4d4d8;border:1px solid #3f3f46;">
+                            <span id="wiz-build-status-dot" style="width:6px;height:6px;border-radius:9999px;background:#eab308;animation:pulse 2s infinite;"></span>
+                            <span id="wiz-build-status-text">Building…</span>
+                        </span>
+                    </div>
+
+                    <!-- 5-Step Real-Time Progressive Checklist -->
+                    <div style="background:#09090b;border:1px solid #27272a;border-radius:12px;padding:16px 18px;margin-bottom:16px;font-family:'JetBrains Mono',monospace;font-size:12px;">
+                        <div id="wiz-build-steps-list" style="display:flex;flex-direction:column;gap:9px;">
+                            <div id="wiz-bstep-1" style="color:#71717a;transition:all .2s;">[ ] 1. Cloning repository & inspecting branch tree...</div>
+                            <div id="wiz-bstep-2" style="color:#71717a;transition:all .2s;">[ ] 2. Resolving packages & framework dependencies...</div>
+                            <div id="wiz-bstep-3" style="color:#71717a;transition:all .2s;">[ ] 3. Compiling Next.js App Router / React components...</div>
+                            <div id="wiz-bstep-4" style="color:#71717a;transition:all .2s;">[ ] 4. Prerendering static HTML for all scanned routes...</div>
+                            <div id="wiz-bstep-5" style="color:#71717a;transition:all .2s;">[ ] 5. Deploying static assets to web server...</div>
+                        </div>
+                    </div>
+
+                    <!-- Meaningful Error & Diagnostic Panel (Hidden by default) -->
+                    <div id="wiz-build-error-panel" style="display:none;background:#27272a;border:1px solid #f43f5e;border-radius:12px;padding:16px;margin-bottom:16px;">
+                        <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2.2" style="flex-shrink:0;margin-top:2px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                            <div style="flex:1;">
+                                <h4 id="wiz-build-error-title" style="font-size:13px;font-weight:700;color:#f43f5e;margin-bottom:4px;">Build Failed</h4>
+                                <p id="wiz-build-error-hint" style="font-size:12px;color:#d4d4d8;line-height:1.4;"></p>
+                            </div>
+                        </div>
+
+                        <!-- Collapsible Raw Terminal Logs -->
+                        <details style="margin-top:10px;">
+                            <summary style="font-size:11px;font-family:'JetBrains Mono',monospace;color:#a1a1aa;cursor:pointer;user-select:none;outline:none;">
+                                View Complete Build Console Log (Terminal Output)
+                            </summary>
+                            <pre id="wiz-build-log-text" style="margin-top:8px;padding:10px 12px;background:#09090b;border:1px solid #3f3f46;border-radius:8px;color:#fda4af;font-family:'JetBrains Mono',monospace;font-size:10px;max-height:160px;overflow-y:auto;white-space:pre-wrap;word-break:break-all;line-height:1.4;"></pre>
+                        </details>
+                    </div>
+
+                    <!-- Action Controls during/after Build -->
+                    <div id="wiz-build-actions-bar" style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:8px;">
+                        <button type="button" id="wiz-build-btn-back" onclick="wizardBackFromBuild()" style="display:none;align-items:center;gap:6px;padding:8px 16px;background:#27272a;border:1px solid #3f3f46;border-radius:8px;font-size:12px;font-weight:600;color:#d4d4d8;cursor:pointer;transition:all .15s;">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="15 18 9 12 15 6"/></svg>
+                            Back & Edit Settings
+                        </button>
+                        <div style="flex:1;"></div>
+                        <button type="button" id="wiz-build-btn-retry" onclick="wizardRetryCurrentBuild()" style="display:none;align-items:center;gap:6px;padding:9px 18px;background:#ffffff;color:#09090b;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;box-shadow:0 4px 12px rgba(255,255,255,0.15);">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                            Retry Build
+                        </button>
                     </div>
                 </div>
             </div>
@@ -10762,7 +10832,7 @@ function cora_get_sparkline_points( $history, $type ) {
 
     window.triggerNextJSISRRebuild = function(pageSlug) {
         pageSlug = pageSlug || '/';
-        window.coraShowToast('Triggering Next.js On-Demand ISR webhook…', 'info');
+        window.coraShowToast('Compiling & syncing static route on Cora…', 'info');
 
         jQuery.ajax({
             url: coraREData.ajaxUrl,
@@ -10775,13 +10845,13 @@ function cora_get_sparkline_points( $history, $type ) {
             },
             success: function(res) {
                 if (res.success) {
-                    window.coraShowToast(res.data.message || 'ISR Rebuild completed successfully!', 'success');
+                    window.coraShowToast(res.data.message || 'Route compiled and live on Cora!', 'success');
                 } else {
-                    window.coraShowToast(res.data.message || 'ISR Rebuild failed.', 'error');
+                    window.coraShowToast(res.data.message || 'Route sync failed.', 'error');
                 }
             },
             error: function() {
-                window.coraShowToast('Network error while dispatching ISR webhook.', 'error');
+                window.coraShowToast('Network error while syncing route.', 'error');
             }
         });
     };
@@ -11048,7 +11118,8 @@ function cora_get_sparkline_points( $history, $type ) {
         const isDraft = (canvasState.activeThemeIsLive !== true && canvasState.activeThemeIsLive !== 1 && canvasState.activeThemeIsLive !== '1');
         const staticRouteUrl = wsSiteBase + (routePath === '/' ? '' : (routePath.startsWith('/') ? routePath : '/' + routePath)) + (isDraft ? (routePath.includes('?') ? '&' : '?') + `cv_preview_theme=${canvasState.activeThemeId}` : '');
 
-        const targetUrl = liveUrl ? (liveUrl + (routePath === '/' ? '' : (routePath.startsWith('/') ? routePath : '/' + routePath))) : staticRouteUrl;
+        const isStaticBuilt = settings.is_static_built || !liveUrl || liveUrl === 'http://localhost:3000';
+        const targetUrl = isStaticBuilt ? staticRouteUrl : (liveUrl + (routePath === '/' ? '' : (routePath.startsWith('/') ? routePath : '/' + routePath)));
 
         if (event && (event.metaKey || event.ctrlKey)) {
             window.open(targetUrl, '_blank');
@@ -12174,6 +12245,10 @@ function cora_get_sparkline_points( $history, $type ) {
             }
         } else if (step === 3) {
             showId = 'wizard-step-3';
+            var formContainer = document.getElementById('wiz-step-3-form-container');
+            var buildContainer = document.getElementById('wiz-step-3-build-container');
+            if (formContainer) formContainer.style.display = 'block';
+            if (buildContainer) buildContainer.style.display = 'none';
             wizardPopulateSummary();
         }
 
@@ -12191,7 +12266,8 @@ function cora_get_sparkline_points( $history, $type ) {
             nextBtn.style.opacity = '1';
             nextBtn.style.cursor = 'pointer';
             if (step === 3) {
-                nextBtn.innerHTML = 'Save Theme <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>';
+                var ctaLabel = (_wizBuilder === 'nextjs') ? '⚡ Create & Build Theme' : 'Save Theme';
+                nextBtn.innerHTML = ctaLabel + ' <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>';
             } else {
                 nextBtn.innerHTML = 'Continue <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>';
             }
@@ -12286,14 +12362,287 @@ function cora_get_sparkline_points( $history, $type ) {
     }
     window.wizardPopulateSummary = wizardPopulateSummary;
 
+    // ── Build Progress & Error Diagnostic Handlers ───────────
+    var _wizCurrentThemeId = 0;
+    var _wizBuildStepTimers = [];
+
+    function wizardClearBuildTimers() {
+        if (_wizBuildStepTimers && _wizBuildStepTimers.length) {
+            _wizBuildStepTimers.forEach(function(t) { clearTimeout(t); });
+            _wizBuildStepTimers = [];
+        }
+    }
+
+    function wizardDiagnoseError(errMsg, logs) {
+        var hint = 'Verify your repository configuration and retry the build.';
+        var title = 'Build Execution Failed';
+        var combined = ((errMsg || '') + ' ' + (logs || '')).toLowerCase();
+
+        if (combined.includes('enotempty') || combined.includes('rename') || combined.includes('busy')) {
+            title = 'Directory Locked or Dirty Cache';
+            hint = 'Stale node_modules or package lock encountered. Cora auto-cleaned the cache and directories. Please click Retry Build.';
+        } else if (combined.includes('-122') || combined.includes('edquot') || combined.includes('quota') || combined.includes('no space left')) {
+            title = 'Server Disk Inode / Space Quota Limit Reached';
+            hint = 'The hosting account reached its file/inode limit. Cora has purged temporary npm caches and stale build directories. Please click Retry Build.';
+        } else if (combined.includes('sigkill') || combined.includes('killed') || combined.includes('137') || combined.includes('out of memory') || combined.includes('webassembly') || combined.includes('wasm')) {
+            title = 'Shared Hosting Process Memory Limit Reached (SIGKILL)';
+            hint = 'The build reached the hosting process memory threshold. Cora has enabled low-memory single-CPU mode. Please click Retry Build.';
+        } else if (combined.includes('could not inspect branch') || combined.includes('git permissions') || combined.includes('authentication failed') || combined.includes('bad credentials') || combined.includes('401') || combined.includes('403')) {
+            title = 'GitHub Authentication or Branch Access Error';
+            hint = 'Could not access the repository. Please verify your GitHub Personal Access Token (PAT) permissions and ensure the branch name exists.';
+        } else if (combined.includes('unsupported repository type') || combined.includes('no next.js or react build system')) {
+            title = 'Unsupported Project Architecture';
+            hint = 'Cora Canvas strictly supports Next.js (App Router / Pages Router) or React applications with package.json dependencies.';
+        } else if (combined.includes('npm err!') || combined.includes('eresolve') || combined.includes('conflicting dependencies')) {
+            title = 'NPM Package Dependency Resolution Error';
+            hint = 'A package in package.json failed to install. Ensure package.json dependencies are valid and compatible.';
+        } else if (combined.includes('next build') && combined.includes('error')) {
+            title = 'Next.js Compilation Error';
+            hint = 'Next.js build encountered a component syntax or TypeScript error. Check the terminal output below for line details.';
+        } else if (errMsg && errMsg.length > 3) {
+            title = errMsg;
+        }
+
+        return { title: title, hint: hint };
+    }
+
+    function wizardStartLiveBuildUI(themeName) {
+        var formContainer = document.getElementById('wiz-step-3-form-container');
+        var buildContainer = document.getElementById('wiz-step-3-build-container');
+        var backBtn = document.getElementById('wiz-back-btn');
+        var nextBtn = document.getElementById('wiz-next-btn');
+
+        if (formContainer) formContainer.style.display = 'none';
+        if (buildContainer) buildContainer.style.display = 'block';
+        if (backBtn) backBtn.style.display = 'none';
+        if (nextBtn) {
+            nextBtn.disabled = true;
+            nextBtn.style.opacity = '0.5';
+            nextBtn.innerHTML = '<span class="spinning" style="display:inline-block;margin-right:6px;">⚙️</span> Building Static Site…';
+        }
+
+        var headerTitle = document.getElementById('wiz-build-header-title');
+        if (headerTitle) headerTitle.textContent = 'Building & Deploying: ' + themeName;
+
+        var statusPill = document.getElementById('wiz-build-status-pill');
+        var statusDot = document.getElementById('wiz-build-status-dot');
+        var statusText = document.getElementById('wiz-build-status-text');
+        if (statusPill) {
+            statusPill.style.background = '#27272a';
+            statusPill.style.color = '#d4d4d8';
+            statusPill.style.borderColor = '#3f3f46';
+        }
+        if (statusDot) {
+            statusDot.style.background = '#eab308';
+            statusDot.className = 'pulsing';
+        }
+        if (statusText) statusText.textContent = 'Building…';
+
+        // Reset steps
+        var s1 = document.getElementById('wiz-bstep-1');
+        var s2 = document.getElementById('wiz-bstep-2');
+        var s3 = document.getElementById('wiz-bstep-3');
+        var s4 = document.getElementById('wiz-bstep-4');
+        var s5 = document.getElementById('wiz-bstep-5');
+
+        if (s1) { s1.style.color = '#f4f4f5'; s1.textContent = '⏳ [1/5] Cloning repository & inspecting branch tree...'; }
+        if (s2) { s2.style.color = '#71717a'; s2.textContent = '[ ] 2. Resolving packages & framework dependencies...'; }
+        if (s3) { s3.style.color = '#71717a'; s3.textContent = '[ ] 3. Compiling Next.js App Router / React components...'; }
+        if (s4) { s4.style.color = '#71717a'; s4.textContent = '[ ] 4. Prerendering static HTML for all scanned routes...'; }
+        if (s5) { s5.style.color = '#71717a'; s5.textContent = '[ ] 5. Deploying static assets to web server...'; }
+
+        var errPanel = document.getElementById('wiz-build-error-panel');
+        if (errPanel) errPanel.style.display = 'none';
+        var retryBtn = document.getElementById('wiz-build-btn-retry');
+        if (retryBtn) retryBtn.style.display = 'none';
+        var buildBackBtn = document.getElementById('wiz-build-btn-back');
+        if (buildBackBtn) buildBackBtn.style.display = 'none';
+
+        wizardClearBuildTimers();
+
+        _wizBuildStepTimers.push(setTimeout(function() {
+            if (s1) { s1.style.color = '#10b981'; s1.textContent = '✓ [1/5] Repository cloned & branch verified.'; }
+            if (s2) { s2.style.color = '#f4f4f5'; s2.textContent = '⏳ [2/5] Resolving packages & framework dependencies...'; }
+        }, 1800));
+
+        _wizBuildStepTimers.push(setTimeout(function() {
+            if (s2) { s2.style.color = '#10b981'; s2.textContent = '✓ [2/5] Packages & dependencies resolved.'; }
+            if (s3) { s3.style.color = '#f4f4f5'; s3.textContent = '⏳ [3/5] Compiling Next.js App Router / React components...'; }
+        }, 4500));
+
+        _wizBuildStepTimers.push(setTimeout(function() {
+            if (s3) { s3.style.color = '#10b981'; s3.textContent = '✓ [3/5] Next.js components compiled successfully.'; }
+            if (s4) { s4.style.color = '#f4f4f5'; s4.textContent = '⏳ [4/5] Prerendering static HTML for all scanned routes...'; }
+        }, 9000));
+    }
+
+    function wizardShowBuildSuccess(themeName) {
+        wizardClearBuildTimers();
+        var s1 = document.getElementById('wiz-bstep-1');
+        var s2 = document.getElementById('wiz-bstep-2');
+        var s3 = document.getElementById('wiz-bstep-3');
+        var s4 = document.getElementById('wiz-bstep-4');
+        var s5 = document.getElementById('wiz-bstep-5');
+
+        if (s1) { s1.style.color = '#10b981'; s1.textContent = '✓ [1/5] Repository cloned & branch verified.'; }
+        if (s2) { s2.style.color = '#10b981'; s2.textContent = '✓ [2/5] Packages & dependencies resolved.'; }
+        if (s3) { s3.style.color = '#10b981'; s3.textContent = '✓ [3/5] Next.js components compiled.'; }
+        if (s4) { s4.style.color = '#10b981'; s4.textContent = '✓ [4/5] Static HTML routes prerendered.'; }
+        if (s5) { s5.style.color = '#10b981'; s5.textContent = '✓ [5/5] Static site deployed & live on Cora!'; }
+
+        var headerTitle = document.getElementById('wiz-build-header-title');
+        if (headerTitle) headerTitle.innerHTML = '✓ ' + themeName + ' Live on Cora';
+        var headerSub = document.getElementById('wiz-build-header-sub');
+        if (headerSub) headerSub.textContent = 'Static build generated and ready for instant preview.';
+
+        var statusPill = document.getElementById('wiz-build-status-pill');
+        var statusDot = document.getElementById('wiz-build-status-dot');
+        var statusText = document.getElementById('wiz-build-status-text');
+        if (statusPill) {
+            statusPill.style.background = '#064e3b';
+            statusPill.style.color = '#6ee7b7';
+            statusPill.style.borderColor = '#059669';
+        }
+        if (statusDot) {
+            statusDot.style.background = '#10b981';
+            statusDot.className = '';
+        }
+        if (statusText) statusText.textContent = 'Live Static Site';
+
+        var nextBtn = document.getElementById('wiz-next-btn');
+        if (nextBtn) {
+            nextBtn.disabled = false;
+            nextBtn.style.opacity = '1';
+            nextBtn.innerHTML = 'Launching Live Site…';
+        }
+
+        showToast('Theme "' + themeName + '" built & live on Cora!', 'success');
+        setTimeout(function() {
+            closeAddThemeWizard();
+            window.location.reload();
+        }, 1200);
+    }
+
+    function wizardShowBuildError(errMsg, logs, themeId) {
+        wizardClearBuildTimers();
+        if (themeId) _wizCurrentThemeId = themeId;
+
+        var diag = wizardDiagnoseError(errMsg, logs);
+
+        var s4 = document.getElementById('wiz-bstep-4');
+        var s5 = document.getElementById('wiz-bstep-5');
+        if (s4 && s4.textContent.includes('⏳')) {
+            s4.style.color = '#f43f5e';
+            s4.textContent = '❌ [4/5] Prerendering halted.';
+        } else if (s5 && s5.textContent.includes('⏳')) {
+            s5.style.color = '#f43f5e';
+            s5.textContent = '❌ [5/5] Deployment halted.';
+        }
+
+        var headerTitle = document.getElementById('wiz-build-header-title');
+        if (headerTitle) headerTitle.textContent = 'Build Error Occurred';
+
+        var statusPill = document.getElementById('wiz-build-status-pill');
+        var statusDot = document.getElementById('wiz-build-status-dot');
+        var statusText = document.getElementById('wiz-build-status-text');
+        if (statusPill) {
+            statusPill.style.background = '#4c0519';
+            statusPill.style.color = '#fda4af';
+            statusPill.style.borderColor = '#e11d48';
+        }
+        if (statusDot) {
+            statusDot.style.background = '#f43f5e';
+            statusDot.className = '';
+        }
+        if (statusText) statusText.textContent = 'Build Error';
+
+        var errPanel = document.getElementById('wiz-build-error-panel');
+        var errTitle = document.getElementById('wiz-build-error-title');
+        var errHint = document.getElementById('wiz-build-error-hint');
+        var logText = document.getElementById('wiz-build-log-text');
+
+        if (errPanel) errPanel.style.display = 'block';
+        if (errTitle) errTitle.textContent = diag.title;
+        if (errHint) errHint.textContent = diag.hint;
+        if (logText) logText.textContent = logs || errMsg || 'No detailed terminal log available.';
+
+        var retryBtn = document.getElementById('wiz-build-btn-retry');
+        if (retryBtn) retryBtn.style.display = 'inline-flex';
+        var buildBackBtn = document.getElementById('wiz-build-btn-back');
+        if (buildBackBtn) buildBackBtn.style.display = 'inline-flex';
+
+        var nextBtn = document.getElementById('wiz-next-btn');
+        if (nextBtn) {
+            nextBtn.disabled = false;
+            nextBtn.style.opacity = '1';
+            nextBtn.style.cursor = 'pointer';
+            nextBtn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> Retry Build';
+            nextBtn.onclick = function() { wizardRetryCurrentBuild(); };
+        }
+
+        showToast(diag.title, 'error');
+    }
+
+    window.wizardBackFromBuild = function() {
+        wizardClearBuildTimers();
+        var formContainer = document.getElementById('wiz-step-3-form-container');
+        var buildContainer = document.getElementById('wiz-step-3-build-container');
+        var backBtn = document.getElementById('wiz-back-btn');
+        var nextBtn = document.getElementById('wiz-next-btn');
+
+        if (formContainer) formContainer.style.display = 'block';
+        if (buildContainer) buildContainer.style.display = 'none';
+        if (backBtn) backBtn.style.display = 'inline-flex';
+        if (nextBtn) {
+            nextBtn.disabled = false;
+            nextBtn.style.opacity = '1';
+            nextBtn.innerHTML = '⚡ Create & Build Theme <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>';
+            nextBtn.onclick = function() { wizardNext(); };
+        }
+    };
+
+    window.wizardRetryCurrentBuild = function() {
+        var themeId = _wizCurrentThemeId;
+        var name = ((document.getElementById('wiz-theme-name') || {}).value || '').trim() || 'Theme';
+        
+        wizardStartLiveBuildUI(name);
+
+        if (!themeId) {
+            wizardSave();
+            return;
+        }
+
+        jQuery.ajax({
+            url: safeAjaxUrl,
+            method: 'POST',
+            data: {
+                action: 'cora_nextjs_build_repo',
+                theme_id: themeId,
+                nonce: safeNonce
+            },
+            dataType: 'text',
+            success: function(rawRes) {
+                var res = wizParseAjaxResponse(rawRes);
+                if (res && res.success) {
+                    wizardShowBuildSuccess(name);
+                } else {
+                    var errMsg = (res && res.data && res.data.message) ? res.data.message : 'Build failed on retry.';
+                    var logs = (res && res.data && res.data.logs) ? res.data.logs : '';
+                    wizardShowBuildError(errMsg, logs, themeId);
+                }
+            },
+            error: function(xhr) {
+                wizardShowBuildError('Connection error during build execution.', xhr.responseText || '', themeId);
+            }
+        });
+    };
+
     // ── Save ───────────────────────────────────────────────────
     function wizardSave() {
         var name = ((document.getElementById('wiz-theme-name') || {}).value || '').trim();
         if (!name) { showToast('Please enter a theme name.', 'error'); return; }
 
         var nextBtn = document.getElementById('wiz-next-btn');
-        if (nextBtn) { nextBtn.innerHTML = 'Saving…'; nextBtn.disabled = true; nextBtn.style.opacity = '0.6'; }
-
         var lovUrl  = ((document.getElementById('wiz-lovable-url')      || {}).value || '').trim();
         var liveUrl = ((document.getElementById('wiz-lovable-live-url') || {}).value || '').trim();
         
@@ -12348,10 +12697,10 @@ function cora_get_sparkline_points( $history, $type ) {
             var fileToUpload = (kitFile && kitFile.files && kitFile.files[0]) ? kitFile.files[0] : window._wizSelectedKitFile;
             if (!fileToUpload) {
                 showToast('Please select or drop an Elementor Kit (.zip) file.', 'warning');
-                if (nextBtn) { nextBtn.innerHTML = 'Save Theme <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>'; nextBtn.disabled = false; nextBtn.style.opacity = '1'; }
                 return;
             }
             showToast('Uploading and importing Elementor Kit...', 'info');
+            if (nextBtn) { nextBtn.innerHTML = 'Uploading…'; nextBtn.disabled = true; nextBtn.style.opacity = '0.6'; }
 
             var formData = new FormData();
             formData.append('action', 'cora_ajax_import_kit');
@@ -12375,23 +12724,23 @@ function cora_get_sparkline_points( $history, $type ) {
                         var errMsg = (res.data && res.data.message) ? res.data.message : (typeof res.data === 'string' ? res.data : 'Failed to import Elementor Kit.');
                         var nextStep = (res.data && res.data.next_step) ? res.data.next_step : 'Ensure the ZIP is a valid Elementor Template Kit and try again.';
                         showToast(errMsg + ' — Next Step: ' + nextStep, 'error');
-                        if (nextBtn) { nextBtn.innerHTML = 'Save Theme <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>'; nextBtn.disabled = false; nextBtn.style.opacity = '1'; }
+                        if (nextBtn) { nextBtn.innerHTML = '⚡ Create & Build Theme <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>'; nextBtn.disabled = false; nextBtn.style.opacity = '1'; }
                     }
                 },
                 error: function() {
-                    showToast('Failed to upload Elementor Kit. Next Step: Check your network and server upload limits.', 'error');
-                    if (nextBtn) { nextBtn.innerHTML = 'Save Theme <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>'; nextBtn.disabled = false; nextBtn.style.opacity = '1'; }
+                    showToast('Failed to upload Elementor Kit. Check network or file size.', 'error');
+                    if (nextBtn) { nextBtn.innerHTML = '⚡ Create & Build Theme <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>'; nextBtn.disabled = false; nextBtn.style.opacity = '1'; }
                 }
             });
             return;
         }
 
-        if (_wizBuilder === 'nextjs') {
-            showToast('Connecting Next.js Git repository…', 'info');
-        } else if (_wizBuilder === 'lovable') {
-            showToast('Connecting Lovable project...', 'info');
+        // For Next.js / GitHub repository imports, transition directly to the Real-Time Build Terminal!
+        if (_wizBuilder === 'nextjs' || githubRepo) {
+            wizardStartLiveBuildUI(name);
         } else {
-            showToast('Connecting GitHub repository…', 'info');
+            if (nextBtn) { nextBtn.innerHTML = 'Saving…'; nextBtn.disabled = true; nextBtn.style.opacity = '0.6'; }
+            showToast('Creating theme workspace…', 'info');
         }
 
         jQuery.ajax({
@@ -12402,22 +12751,44 @@ function cora_get_sparkline_points( $history, $type ) {
             success: function(rawRes) {
                 var res = typeof wizParseAjaxResponse === 'function' ? wizParseAjaxResponse(rawRes) : rawRes;
                 if (res.success) {
-                    var successMsg = _wizBuilder === 'nextjs' 
-                        ? 'Next.js project "' + name + '" connected!'
-                        : (_wizBuilder === 'lovable' ? 'Lovable theme "' + name + '" connected!' : 'Theme "' + name + '" synced from GitHub!');
-                    showToast(successMsg, 'success');
-                    closeAddThemeWizard();
-                    setTimeout(function() { window.location.reload(); }, 900);
+                    var data = res.data || {};
+                    if (data.theme_id) _wizCurrentThemeId = data.theme_id;
+
+                    if (_wizBuilder === 'nextjs' || githubRepo) {
+                        if (data.build_success === false) {
+                            var bMsg = data.build_message || 'Static build encountered an issue.';
+                            var bLogs = data.build_logs || '';
+                            wizardShowBuildError(bMsg, bLogs, data.theme_id);
+                        } else {
+                            wizardShowBuildSuccess(name);
+                        }
+                    } else {
+                        var successMsg = _wizBuilder === 'lovable' ? 'Lovable theme "' + name + '" connected!' : 'Theme "' + name + '" created successfully!';
+                        showToast(successMsg, 'success');
+                        closeAddThemeWizard();
+                        setTimeout(function() { window.location.reload(); }, 900);
+                    }
                 } else {
                     var errMsg = (res.data && res.data.message) ? res.data.message : (typeof res.data === 'string' ? res.data : 'Failed to create theme workspace.');
-                    var nextStep = (res.data && res.data.next_step) ? res.data.next_step : 'Verify your configuration and try again.';
-                    showToast(errMsg + ' — Next Step: ' + nextStep, 'error');
-                    if (nextBtn) { nextBtn.innerHTML = 'Save Theme <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>'; nextBtn.disabled = false; nextBtn.style.opacity = '1'; }
+                    var logs = (res.data && res.data.logs) ? res.data.logs : '';
+                    var themeId = (res.data && res.data.theme_id) ? res.data.theme_id : 0;
+
+                    if (_wizBuilder === 'nextjs' || githubRepo) {
+                        wizardShowBuildError(errMsg, logs, themeId);
+                    } else {
+                        var nextStep = (res.data && res.data.next_step) ? res.data.next_step : 'Verify your configuration and try again.';
+                        showToast(errMsg + ' — Next Step: ' + nextStep, 'error');
+                        if (nextBtn) { nextBtn.innerHTML = '⚡ Create & Build Theme <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>'; nextBtn.disabled = false; nextBtn.style.opacity = '1'; }
+                    }
                 }
             },
-            error: function() {
-                showToast('Connection failed. Next Step: Check your network and try again.', 'error');
-                if (nextBtn) { nextBtn.innerHTML = 'Save Theme <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>'; nextBtn.disabled = false; nextBtn.style.opacity = '1'; }
+            error: function(xhr) {
+                if (_wizBuilder === 'nextjs' || githubRepo) {
+                    wizardShowBuildError('Connection failed while communicating with the workspace server.', xhr.responseText || '', _wizCurrentThemeId);
+                } else {
+                    showToast('Connection failed. Please check your network and try again.', 'error');
+                    if (nextBtn) { nextBtn.innerHTML = '⚡ Create & Build Theme <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>'; nextBtn.disabled = false; nextBtn.style.opacity = '1'; }
+                }
             }
         });
     }

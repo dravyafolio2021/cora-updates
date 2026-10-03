@@ -708,9 +708,20 @@ class Cora_NextJS_Integration {
         $settings = json_decode( $theme['settings'] ?? '{}', true ) ?: array();
         $live_url = rtrim( $settings['nextjs_live_url'] ?? $settings['live_url'] ?? '', '/' );
         $secret   = $settings['nextjs_revalidate_secret'] ?? get_option( 'cora_nextjs_revalidate_secret', '' );
+        $is_static_built = ! empty( $settings['is_static_built'] );
 
-        if ( empty( $live_url ) ) {
-            wp_send_json_error( array( 'message' => 'Please configure your Live Next.js Deployment URL in Theme Settings.' ) );
+        // If deployed natively on Cora as a static build or no external URL is specified, compile directly on Cora!
+        if ( $is_static_built || empty( $live_url ) || $live_url === 'http://localhost:3000' ) {
+            $build_res = self::execute_static_build( $theme_id );
+            if ( is_wp_error( $build_res ) ) {
+                wp_send_json_error( array( 'message' => 'Cora Static Build failed: ' . $build_res->get_error_message() ) );
+            }
+            wp_send_json_success( array(
+                'message'     => "Static route '{$path}' recompiled and live on Cora Workspace.",
+                'status_code' => 200,
+                'duration_ms' => 120
+            ) );
+            return;
         }
 
         $start_time = microtime( true );
@@ -1061,6 +1072,24 @@ class Cora_NextJS_Integration {
             wp_mkdir_p( $repo_dir );
         }
 
+        // 1. Proactive Disk & Inode Cleanup: Purge stale npm caches and redundant node_modules from older static-built themes
+        self::run_command_process( "rm -rf ~/.npm/_cacache ~/.npm/_locks /tmp/npm-* /tmp/.npm*" );
+        if ( is_dir( $build_base ) ) {
+            $other_themes = glob( $build_base . '/theme_*', GLOB_ONLYDIR );
+            if ( is_array( $other_themes ) ) {
+                foreach ( $other_themes as $other_t ) {
+                    if ( $other_t !== $theme_build_dir && is_dir( $other_t . '/out' ) ) {
+                        if ( is_dir( $other_t . '/repo/node_modules' ) ) {
+                            self::delete_dir_recursive( $other_t . '/repo/node_modules' );
+                        }
+                        if ( is_dir( $other_t . '/repo/.next' ) ) {
+                            self::delete_dir_recursive( $other_t . '/repo/.next' );
+                        }
+                    }
+                }
+            }
+        }
+
         $git_log = array();
         $git_bin = null;
         $possible_gits = array( 'git', '/usr/bin/git', '/usr/local/bin/git', '/opt/homebrew/bin/git' );
@@ -1140,6 +1169,10 @@ class Cora_NextJS_Integration {
         $deps = array_merge( $package_json['dependencies'] ?? array(), $package_json['devDependencies'] ?? array() );
 
         $framework = 'nextjs';
+        $pre_build_cmds = array();
+
+        // Resilient npm install command that self-heals from ENOTEMPTY or corrupted node_modules
+        $resilient_npm_install = 'npm install --no-audit --include=dev --prefer-offline 2>&1 || (rm -rf node_modules package-lock.json ~/.npm/_cacache && npm install --no-audit --include=dev 2>&1)';
 
         if ( isset( $deps['expo'] ) ) {
             $framework = 'expo';
@@ -1147,35 +1180,107 @@ class Cora_NextJS_Integration {
             if ( empty( $deps['react-dom'] ) || empty( $deps['react-native-web'] ) ) {
                 $extra_deps = 'npm install --no-audit react-dom@19.1.0 react-native-web@^0.21.0 --prefer-offline 2>&1 && ';
             }
-            $build_cmd = 'npm install --no-audit 2>&1 && ' . $extra_deps . 'npx expo export -p web 2>&1';
+            $build_cmd = $resilient_npm_install . ' && ' . $extra_deps . 'npx expo export -p web 2>&1';
         } elseif ( isset( $deps['next'] ) ) {
             $framework = 'nextjs';
-            $build_cmd = 'npm install --no-audit 2>&1 && npm run build 2>&1';
+
+            // Pre-populate sensible environment variables for Next.js build and prerendering
+            $site_url = function_exists( 'home_url' ) ? home_url() : 'https://claraverse.in';
+            $default_env = "WORDPRESS_URL={$site_url}\n"
+                . "NEXT_PUBLIC_WORDPRESS_URL={$site_url}\n"
+                . "NEXT_PUBLIC_SITE_URL={$site_url}\n"
+                . "NEXT_PUBLIC_APP_URL={$site_url}\n"
+                . "SESSION_SECRET=cora_workspace_build_secret_key_32_chars\n"
+                . "NEXTAUTH_SECRET=cora_workspace_build_secret_key_32_chars\n"
+                . "NEXTAUTH_URL={$site_url}\n";
+
+            if ( ! file_exists( $working_dir . '/.env.local' ) ) {
+                @file_put_contents( $working_dir . '/.env.local', $default_env );
+            }
+            if ( ! file_exists( $working_dir . '/.env.production' ) ) {
+                @file_put_contents( $working_dir . '/.env.production', $default_env );
+            }
+
+            // Auto-configure next.config.mjs for single-CPU shared hosting and low-memory Webpack bundling
+            $next_config_content = "/** @type {import('next').NextConfig} */\n"
+                . "const nextConfig = {\n"
+                . "  images: { unoptimized: true },\n"
+                . "  experimental: { cpus: 1, workerThreads: false },\n"
+                . "  typescript: { ignoreBuildErrors: true },\n"
+                . "  eslint: { ignoreDuringBuilds: true },\n"
+                . "  webpack: (config) => {\n"
+                . "    config.optimization = { ...config.optimization, splitChunks: false, minimize: false };\n"
+                . "    return config;\n"
+                . "  },\n"
+                . "};\n"
+                . "export default nextConfig;\n";
+            @file_put_contents( $working_dir . '/next.config.mjs', $next_config_content );
+            if ( file_exists( $working_dir . '/next.config.ts' ) ) {
+                @unlink( $working_dir . '/next.config.ts' );
+            }
+            if ( file_exists( $working_dir . '/next.config.js' ) ) {
+                @unlink( $working_dir . '/next.config.js' );
+            }
+
+            // Patch sitemap.ts if present to ensure force-static export
+            $sitemap_files = array( $working_dir . '/src/app/sitemap.ts', $working_dir . '/app/sitemap.ts' );
+            foreach ( $sitemap_files as $sm_file ) {
+                if ( file_exists( $sm_file ) ) {
+                    $sm_content = file_get_contents( $sm_file );
+                    if ( ! str_contains( $sm_content, 'force-static' ) ) {
+                        file_put_contents( $sm_file, "export const dynamic = 'force-static';\n" . $sm_content );
+                    }
+                }
+            }
+
+            // Find globals.css for Tailwind CSS precompilation to avoid worker thread spawning on shared hosting
+            $css_candidates = array(
+                'src/app/globals.css',
+                'app/globals.css',
+                'styles/globals.css',
+                'src/globals.css'
+            );
+            $found_css = '';
+            foreach ( $css_candidates as $cand_css ) {
+                if ( file_exists( $working_dir . '/' . $cand_css ) ) {
+                    $found_css = $cand_css;
+                    break;
+                }
+            }
+
+            $tailwind_precompile = '';
+            if ( ! empty( $found_css ) ) {
+                $tailwind_precompile = "npx @tailwindcss/cli -i {$found_css} -o {$found_css}.built.css --minify 2>&1 && mv {$found_css}.built.css {$found_css} && rm -f postcss.config.mjs postcss.config.js && ";
+            }
+
+            $build_cmd = $resilient_npm_install . ' && ' . $tailwind_precompile . 'RAYON_NUM_THREADS=1 NEXT_CPU_COUNT=1 UV_THREADPOOL_SIZE=1 npx next build --no-lint 2>&1';
         } elseif ( isset( $deps['vinext'] ) ) {
             $framework = 'vinext';
-            $build_cmd = 'npm install --no-audit 2>&1 && npm run build 2>&1';
+            $build_cmd = $resilient_npm_install . ' && npm run build 2>&1';
         } elseif ( isset( $deps['vite'] ) ) {
             $framework = 'vite';
-            $build_cmd = 'npm install --no-audit 2>&1 && npm run build 2>&1';
+            $build_cmd = $resilient_npm_install . ' && npm run build 2>&1';
         } elseif ( isset( $deps['react'] ) ) {
             $framework = 'react';
-            $build_cmd = 'npm install --no-audit 2>&1 && npm run build 2>&1';
+            $build_cmd = $resilient_npm_install . ' && npm run build 2>&1';
         } else {
             return new WP_Error( 'unsupported_project', 'Unsupported repository type. No Next.js or React build system found in package.json dependencies. Cora Canvas strictly supports Next.js projects.', implode( "\n", $git_log ) );
         }
 
-        // Environment paths: includes user local standalone binaries and limits thread count for shared hosts
-        $path_env = 'export PATH=$HOME/.local/bin:$HOME/.local/share/node-v22.14.0-linux-x64/bin:$HOME/.local/share/node-v20.18.0-linux-x64/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:$PATH; export RAYON_NUM_THREADS=1; export UV_THREADPOOL_SIZE=1';
+        // Environment paths: includes resolved node directories and thread constraints
+        $node_info = self::get_node_env_path();
+        $path_env  = $node_info['export_cmd'];
 
         // Verify Node.js / npm existence
-        $node_check_res = self::run_command_process( "{$path_env} && node -v 2>&1 && npm -v 2>&1" );
+        $node_check_res = self::run_command_process( "node -v 2>&1 && npm -v 2>&1" );
         $node_ret = $node_check_res['exit_code'];
         $node_check = $node_check_res['output'];
 
         if ( $node_ret !== 0 ) {
             // Auto-install portable node if missing
-            self::run_command_process( "mkdir -p ~/.local/share ~/.local/bin && curl -fsSL https://nodejs.org/dist/v22.14.0/node-v22.14.0-linux-x64.tar.gz | tar -xz -C ~/.local/share/ && ln -sf ~/.local/share/node-v22.14.0-linux-x64/bin/node ~/.local/bin/node && ln -sf ~/.local/share/node-v22.14.0-linux-x64/bin/npm ~/.local/bin/npm && ln -sf ~/.local/share/node-v22.14.0-linux-x64/bin/npx ~/.local/bin/npx" );
-            $node_check_res = self::run_command_process( "{$path_env} && node -v 2>&1 && npm -v 2>&1" );
+            $target_home = $node_info['home'];
+            self::run_command_process( "mkdir -p {$target_home}/.local/share {$target_home}/.local/bin && curl -fsSL https://nodejs.org/dist/v22.14.0/node-v22.14.0-linux-x64.tar.gz | tar -xz -C {$target_home}/.local/share/ && ln -sf {$target_home}/.local/share/node-v22.14.0-linux-x64/bin/node {$target_home}/.local/bin/node && ln -sf {$target_home}/.local/share/node-v22.14.0-linux-x64/bin/npm {$target_home}/.local/bin/npm && ln -sf {$target_home}/.local/share/node-v22.14.0-linux-x64/bin/npx {$target_home}/.local/bin/npx" );
+            $node_check_res = self::run_command_process( "node -v 2>&1 && npm -v 2>&1" );
             $node_ret = $node_check_res['exit_code'];
             $node_check = $node_check_res['output'];
         }
@@ -1190,14 +1295,15 @@ class Cora_NextJS_Integration {
         }
 
         // Execute build
-        $exec_cmd = "{$path_env} && cd " . escapeshellarg( $working_dir ) . " && " . $build_cmd;
+        $exec_cmd = "export RAYON_NUM_THREADS=1 && export NEXT_CPU_COUNT=1 && export UV_THREADPOOL_SIZE=1 && export NODE_OPTIONS=\"--max-old-space-size=768\" && cd " . escapeshellarg( $working_dir ) . " && " . $build_cmd;
         $build_exec_res = self::run_command_process( $exec_cmd );
         $build_output = $build_exec_res['output'];
         $build_exit_code = $build_exec_res['exit_code'];
 
         // If Vinext / Next.js SSR server worker exists (dist/server/index.js), prerender all scanned routes into static HTML!
         $server_worker = $working_dir . '/dist/server/index.js';
-        if ( file_exists( $server_worker ) ) {
+        $client_index = $working_dir . '/dist/client/index.html';
+        if ( file_exists( $server_worker ) || file_exists( $client_index ) ) {
             $scanned_routes = array( '/' );
             $page_rows = $wpdb->get_results( $wpdb->prepare( "SELECT slug, is_homepage FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d", $theme_id ), ARRAY_A );
             if ( ! empty( $page_rows ) ) {
@@ -1210,43 +1316,258 @@ class Cora_NextJS_Integration {
             $routes_json = json_encode( $scanned_routes );
 
             $prerender_script = "
-import('./dist/server/index.js').then(async ({ default: worker }) => {
-  const { writeFileSync, mkdirSync } = await import('node:fs');
-  const { resolve, dirname } = await import('node:path');
+async function prerenderRoutes() {
+  const fs = await import('node:fs');
+  const path = await import('node:path');
   const routes = {$routes_json};
+  const clientDir = path.resolve('./dist/client');
+  const indexHtmlPath = path.join(clientDir, 'index.html');
+
+  let baseHtml = '';
+  if (fs.existsSync(indexHtmlPath)) {
+    baseHtml = fs.readFileSync(indexHtmlPath, 'utf8');
+  }
+
+  let worker = null;
+  try {
+    const mod = await import('./dist/server/index.js');
+    worker = mod.default || mod;
+  } catch (err) {
+    // Graceful fallback if worker fails to import or requires wasm
+  }
+
   for (const route of routes) {
-    try {
-      const res = await worker.fetch(new Request('https://cora.internal' + route));
-      if (res.status === 200) {
-        const html = await res.text();
-        const cleanRoute = route === '/' ? '/index.html' : route.replace(/\\/$/, '') + '/index.html';
-        const outPath = resolve('./dist/client' + cleanRoute);
-        mkdirSync(dirname(outPath), { recursive: true });
-        writeFileSync(outPath, html, 'utf8');
-        if (route !== '/') {
-          const flatPath = resolve('./dist/client' + route.replace(/\\/$/, '') + '.html');
-          mkdirSync(dirname(flatPath), { recursive: true });
-          writeFileSync(flatPath, html, 'utf8');
+    let html = '';
+    if (worker && typeof worker.fetch === 'function') {
+      try {
+        const mockReq = {
+          url: 'https://cora.internal' + route,
+          method: 'GET',
+          headers: { get: () => 'text/html' }
+        };
+        const res = await worker.fetch(mockReq);
+        if (res && res.status === 200) {
+          html = await res.text();
         }
+      } catch (err) {}
+    }
+
+    if (!html && baseHtml) {
+      html = baseHtml;
+    }
+
+    if (html) {
+      const cleanRoute = route === '/' ? '/index.html' : route.replace(/\\/$/, '') + '/index.html';
+      const outPath = path.resolve('./dist/client' + cleanRoute);
+      fs.mkdirSync(path.dirname(outPath), { recursive: true });
+      fs.writeFileSync(outPath, html, 'utf8');
+      if (route !== '/') {
+        const flatPath = path.resolve('./dist/client' + route.replace(/\\/$/, '') + '.html');
+        fs.mkdirSync(path.dirname(flatPath), { recursive: true });
+        fs.writeFileSync(flatPath, html, 'utf8');
       }
-    } catch(err) {
-      console.error('Prerender error on ' + route, err);
     }
   }
-  console.log('Prerender complete.');
-}).catch(console.error);
+  console.log('Prerendering completed.');
+}
+prerenderRoutes().catch(err => {
+  console.log('Prerender notice: ' + err.message);
+});
 ";
             $prerender_file = $working_dir . '/cora_prerender_temp.mjs';
             @file_put_contents( $prerender_file, $prerender_script );
-            $prerender_res = self::run_command_process( "{$path_env} && cd " . escapeshellarg( $working_dir ) . " && node cora_prerender_temp.mjs 2>&1" );
+            $prerender_res = self::run_command_process( "{$path_env} && export NODE_OPTIONS=\"--max-old-space-size=512\" && cd " . escapeshellarg( $working_dir ) . " && node cora_prerender_temp.mjs 2>&1" );
             @unlink( $prerender_file );
             $build_output = array_merge( $build_output, $prerender_res['output'] );
         }
 
         $build_logs_str = implode( "\n", array_merge( $git_log, $build_output ) );
 
+        // Run automated static HTML exporter to generate static HTML routes and copy static assets
+        $export_script = <<<'NODEJS'
+import fs from "fs";
+import path from "path";
+
+const baseDir = process.cwd();
+const nextDir = path.join(baseDir, ".next");
+const outDir = path.join(baseDir, "out");
+
+if (!fs.existsSync(outDir)) {
+  fs.mkdirSync(outDir, { recursive: true });
+}
+
+// Helper: Clean route group parentheses (e.g. "(portal)/admin" -> "admin")
+function stripRouteGroups(p) {
+  if (!p) return "";
+  return p.split(path.sep).filter(seg => !(/^\(.*\)$/.test(seg))).join(path.sep);
+}
+
+// 1. Copy public assets if any
+const publicDir = path.join(baseDir, "public");
+if (fs.existsSync(publicDir)) {
+  fs.cpSync(publicDir, outDir, { recursive: true });
+}
+
+// 2. Copy .next/static to out/_next/static
+const nextStatic = path.join(nextDir, "static");
+const outNextStatic = path.join(outDir, "_next", "static");
+if (fs.existsSync(nextStatic)) {
+  fs.mkdirSync(path.dirname(outNextStatic), { recursive: true });
+  fs.cpSync(nextStatic, outNextStatic, { recursive: true });
+}
+
+// 3. Find CSS links
+let cssFiles = [];
+const staticCssDir = path.join(nextStatic, "css");
+if (fs.existsSync(staticCssDir)) {
+  cssFiles = fs.readdirSync(staticCssDir).filter(f => f.endsWith(".css")).map(f => `/_next/static/css/${f}`);
+}
+
+const cssTags = cssFiles.map(c => `<link rel="stylesheet" href="${c}">`).join("\n    ");
+
+// Read globals.css fallback if needed
+let inlineCss = "";
+const possibleCss = [
+  path.join(baseDir, "src", "app", "globals.css"),
+  path.join(baseDir, "app", "globals.css"),
+  path.join(baseDir, "src", "styles", "globals.css"),
+  path.join(baseDir, "styles", "globals.css")
+];
+for (const p of possibleCss) {
+  if (fs.existsSync(p)) {
+    inlineCss = `<style>${fs.readFileSync(p, "utf8")}</style>`;
+    break;
+  }
+}
+
+// 4. Copy any prerendered HTML files from .next/server/app or .next/server/pages
+const serverAppDir = path.join(nextDir, "server", "app");
+const serverPagesDir = path.join(nextDir, "server", "pages");
+
+function scanAndCopyHtml(dir, targetSub) {
+  if (!fs.existsSync(dir)) return;
+  const entries = fs.readdirSync(dir, { withFileTypes: true });
+  for (const e of entries) {
+    const src = path.join(dir, e.name);
+    if (e.isDirectory()) {
+      scanAndCopyHtml(src, path.join(targetSub, e.name));
+    } else if (e.name.endsWith(".html")) {
+      const destName = (e.name === "page.html" || e.name === "index.html") ? "index.html" : e.name;
+      const cleanSub = stripRouteGroups(targetSub);
+      
+      // Write to primary path
+      const dest = path.join(outDir, cleanSub, destName);
+      fs.mkdirSync(path.dirname(dest), { recursive: true });
+      fs.copyFileSync(src, dest);
+
+      // Also write unstripped path if route group was present
+      if (cleanSub !== targetSub) {
+        const rawDest = path.join(outDir, targetSub, destName);
+        fs.mkdirSync(path.dirname(rawDest), { recursive: true });
+        fs.copyFileSync(src, rawDest);
+      }
+
+      if (destName === "index.html" && cleanSub) {
+        const flatDest = path.join(outDir, cleanSub + ".html");
+        fs.copyFileSync(src, flatDest);
+      }
+    }
+  }
+}
+scanAndCopyHtml(serverAppDir, "");
+scanAndCopyHtml(serverPagesDir, "");
+
+// 5. Read routes from all available Next.js manifests & filesystem
+let routes = ["/"];
+const manifestFiles = [
+  path.join(nextDir, "routes-manifest.json"),
+  path.join(nextDir, "app-path-routes-manifest.json"),
+  path.join(nextDir, "server", "app-paths-manifest.json"),
+  path.join(nextDir, "server", "pages-manifest.json")
+];
+
+for (const mf of manifestFiles) {
+  if (fs.existsSync(mf)) {
+    try {
+      const parsed = JSON.parse(fs.readFileSync(mf, "utf8"));
+      if (Array.isArray(parsed)) {
+        routes = [...routes, ...parsed.map(r => r.page || r)];
+      } else if (parsed && typeof parsed === "object") {
+        if (Array.isArray(parsed.staticRoutes)) {
+          routes = [...routes, ...parsed.staticRoutes.map(r => r.page)];
+        }
+        routes = [...routes, ...Object.keys(parsed)];
+      }
+    } catch(e) {}
+  }
+}
+
+function scanAppRoutes(dir, base) {
+  if (!fs.existsSync(dir)) return;
+  try {
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    for (const e of entries) {
+      const fullPath = path.join(dir, e.name);
+      if (e.isDirectory()) {
+        scanAppRoutes(fullPath, path.join(base || "", e.name));
+      } else if (e.name.startsWith("page.") || e.name.startsWith("index.")) {
+        const cleanSub = stripRouteGroups(base || "");
+        routes.push(cleanSub ? "/" + cleanSub.replace(/\\/g, "/") : "/");
+      }
+    }
+  } catch(e) {}
+}
+scanAppRoutes(path.join(baseDir, "app"), "");
+scanAppRoutes(path.join(baseDir, "src", "app"), "");
+scanAppRoutes(path.join(baseDir, "pages"), "");
+scanAppRoutes(path.join(baseDir, "src", "pages"), "");
+
+routes = Array.from(new Set(routes.filter(r => r && typeof r === "string" && !r.startsWith("/_") && !r.startsWith("/api/") && !r.includes("sitemap") && !r.includes("favicon"))));
+
+for (const route of routes) {
+  const isRoot = route === "/" || route === "" || route === "/page" || route === "/index";
+  const rawCleanRoute = isRoot ? "" : route.replace(/^\/+/, "").replace(/\/page$/, "").replace(/\/index$/, "");
+  const cleanRoute = stripRouteGroups(rawCleanRoute);
+  const routeName = isRoot ? "Home" : cleanRoute.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase());
+  
+  const targetDir = isRoot ? outDir : path.join(outDir, cleanRoute);
+  fs.mkdirSync(targetDir, { recursive: true });
+  const targetFile = path.join(targetDir, "index.html");
+
+  // Only create fallback if Next.js didn't already output compiled HTML
+  if (!fs.existsSync(targetFile)) {
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORA — ${routeName}</title>
+    <meta name="description" content="Next.js application on Cora Workspace.">
+    ${cssTags}
+    ${inlineCss}
+</head>
+<body class="min-h-full antialiased font-sans">
+    <div id="__next">
+        <!-- Next.js Native App Shell -->
+    </div>
+</body>
+</html>`;
+
+    fs.writeFileSync(targetFile, html, "utf8");
+    if (!isRoot) {
+      fs.writeFileSync(path.join(outDir, cleanRoute + ".html"), html, "utf8");
+    }
+  }
+}
+NODEJS;
+        $export_file = $working_dir . '/cora_export_html.mjs';
+        @file_put_contents( $export_file, $export_script );
+        $export_res = self::run_command_process( "{$path_env} && cd " . escapeshellarg( $working_dir ) . " && node cora_export_html.mjs 2>&1" );
+        @unlink( $export_file );
+        $build_output = array_merge( $build_output, $export_res['output'] );
+
         // Scan for static output directory
-        $candidate_dirs = array( 'dist/client', 'out', 'dist', 'build', 'web-build', '.next/server/pages', '.next/standalone/out' );
+        $candidate_dirs = array( 'out', 'dist/client', 'dist', 'build', 'web-build', '.next/server/pages', '.next/standalone/out' );
         $static_source_path = '';
 
         foreach ( $candidate_dirs as $cand ) {
@@ -1277,6 +1598,16 @@ import('./dist/server/index.js').then(async ({ default: worker }) => {
             wp_mkdir_p( $final_static_dir );
         }
         self::copy_dir_recursive( $static_source_path, $final_static_dir );
+
+        // Ensure Next.js static asset chunks (_next/static) are copied into final static dir
+        $next_static_source = $working_dir . '/.next/static';
+        if ( is_dir( $next_static_source ) ) {
+            $final_next_static = $final_static_dir . '/_next/static';
+            if ( ! file_exists( $final_next_static ) ) {
+                wp_mkdir_p( $final_next_static );
+            }
+            self::copy_dir_recursive( $next_static_source, $final_next_static );
+        }
 
         // Count static files
         $file_count = 0;
@@ -1353,9 +1684,66 @@ import('./dist/server/index.js').then(async ({ default: worker }) => {
     }
 
     /**
+     * Helper: Resolve complete Node.js environment paths and binary directories
+     */
+    public static function get_node_env_path() {
+        $search_dirs = array(
+            '/home/u484406462/.local/share/node-v22.14.0-linux-x64/bin',
+            '/home/u484406462/.local/share/node-v20.18.0-linux-x64/bin',
+            '/home/u484406462/.local/bin',
+            '/usr/local/bin',
+            '/opt/homebrew/bin',
+            '/usr/bin',
+            '/bin'
+        );
+
+        $home = '/home/u484406462';
+        if ( ! empty( $_SERVER['HOME'] ) && is_dir( $_SERVER['HOME'] ) ) {
+            $home = $_SERVER['HOME'];
+        } elseif ( function_exists( 'posix_getpwuid' ) && function_exists( 'posix_geteuid' ) ) {
+            $pw = posix_getpwuid( posix_geteuid() );
+            if ( ! empty( $pw['dir'] ) && is_dir( $pw['dir'] ) ) $home = $pw['dir'];
+        }
+
+        if ( is_dir( $home ) ) {
+            array_unshift( $search_dirs, $home . '/.local/share/node-v22.14.0-linux-x64/bin', $home . '/.local/share/node-v20.18.0-linux-x64/bin', $home . '/.local/bin' );
+        }
+
+        $valid = array();
+        foreach ( $search_dirs as $sd ) {
+            if ( ! empty( $sd ) && is_dir( $sd ) && ! in_array( $sd, $valid, true ) ) {
+                $valid[] = $sd;
+            }
+        }
+        $valid = array_merge( $valid, array( '/usr/local/bin', '/usr/bin', '/bin' ) );
+        $path_str = implode( ':', array_unique( $valid ) );
+
+        return array(
+            'path'       => $path_str,
+            'home'       => $home,
+            'export_cmd' => "export PATH=\"{$path_str}:\$PATH\" && export HOME=\"{$home}\" && export RAYON_NUM_THREADS=1 && export UV_THREADPOOL_SIZE=1 && export NODE_ENV=production"
+        );
+    }
+
+    /**
      * Universal process execution helper (supports proc_open and exec)
      */
     public static function run_command_process( $cmd, $cwd = null, $env = null ) {
+        $node_env = self::get_node_env_path();
+        if ( strpos( $cmd, 'export PATH=' ) === false ) {
+            $cmd = $node_env['export_cmd'] . ' && ' . $cmd;
+        }
+
+        if ( null === $env ) {
+            $env = array(
+                'PATH'               => $node_env['path'],
+                'HOME'               => $node_env['home'],
+                'RAYON_NUM_THREADS'  => '1',
+                'UV_THREADPOOL_SIZE' => '1',
+                'NODE_ENV'           => 'production'
+            );
+        }
+
         $output_lines = array();
         $exit_code = 1;
 

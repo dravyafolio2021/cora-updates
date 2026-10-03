@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.321
+ * Version:           4.9.331
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.321' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.331' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -9824,6 +9824,16 @@ function cora_render_nextjs_connector_screen( $active_theme = array(), $target_w
             coraShowToast(err.message, 'error');
         });
     }
+
+    // Automatically trigger static build on first load
+    document.addEventListener('DOMContentLoaded', function() {
+        var repo = <?php echo json_encode( $repo ); ?>;
+        if (repo) {
+            setTimeout(function() {
+                coraTriggerStaticBuild();
+            }, 300);
+        }
+    });
     </script>
 
     <?php echo $preview_bar_html; ?>
@@ -39675,10 +39685,12 @@ function cora_ajax_canvas_create_theme() {
         }
     }
 
+    $agency_id = function_exists( 'cora_db_get_agency_id' ) ? cora_db_get_agency_id() : 1;
+
     $wpdb->insert(
         $wpdb->prefix . 'cora_canvas_themes',
         array(
-            'agency_id' => 1,
+            'agency_id' => $agency_id,
             'name' => $name,
             'status' => 'draft',
             'settings' => json_encode($settings),
@@ -39731,7 +39743,7 @@ function cora_ajax_canvas_create_theme() {
                 $wpdb->insert(
                     $wpdb->prefix . 'cora_canvas_pages',
                     array(
-                        'agency_id'       => 1,
+                        'agency_id'       => $agency_id,
                         'theme_id'        => $new_id,
                         'wp_post_id'      => $wp_post_id,
                         'title'           => $title,
@@ -39760,6 +39772,26 @@ function cora_ajax_canvas_create_theme() {
                     )
                 );
                 update_post_meta( $page_id, '_cora_nextjs_props', $initial_props );
+            }
+        }
+
+        // Automatically trigger static build immediately upon connecting repository
+        $repo_url = isset( $settings['github_repo'] ) ? $settings['github_repo'] : '';
+        $build_res_payload = array();
+        if ( ! empty( $repo_url ) && class_exists( 'Cora_NextJS_Integration' ) ) {
+            $build_res = Cora_NextJS_Integration::execute_static_build( $new_id );
+            if ( is_wp_error( $build_res ) ) {
+                $build_res_payload = array(
+                    'build_success' => false,
+                    'build_message' => $build_res->get_error_message(),
+                    'build_logs'    => $build_res->get_error_data(),
+                );
+            } else {
+                $build_res_payload = array(
+                    'build_success' => true,
+                    'build_message' => $build_res['message'] ?? 'Static site built successfully.',
+                    'build_logs'    => $build_res['build_logs'] ?? '',
+                );
             }
         }
     }
@@ -39883,7 +39915,12 @@ function cora_ajax_canvas_create_theme() {
     }
 
     cora_log_activity( 'Canvas', "Created draft theme workspace '{$name}'." );
-    wp_send_json_success();
+    $response_data = array_merge( array(
+        'theme_id' => $new_id,
+        'name'     => $name,
+        'builder'  => $settings['source'] ?? 'elementor',
+    ), isset( $build_res_payload ) ? $build_res_payload : array() );
+    wp_send_json_success( $response_data );
 }
 }
 add_action( 'wp_ajax_cora_ajax_create_theme', 'cora_ajax_canvas_create_theme' );
