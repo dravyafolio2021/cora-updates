@@ -462,8 +462,17 @@ function cora_get_sparkline_points( $history, $type ) {
                 $is_lovable = ($live_source === 'lovable');
 
                 if ( $is_nextjs ) {
-                    $nextjs_live_url = ! empty( $live_theme_settings['nextjs_live_url'] ) ? $live_theme_settings['nextjs_live_url'] : ( ! empty( $live_theme_settings['live_url'] ) ? $live_theme_settings['live_url'] : 'http://localhost:3000' );
-                    $nextjs_display_url = preg_replace( '#^https?://#', '', rtrim( $nextjs_live_url, '/' ) );
+                    $is_static_built = ! empty( $live_theme_settings['is_static_built'] );
+                    $static_built_at = ! empty( $live_theme_settings['static_built_at'] ) ? $live_theme_settings['static_built_at'] : '';
+                    $static_file_count = ! empty( $live_theme_settings['static_file_count'] ) ? intval( $live_theme_settings['static_file_count'] ) : 0;
+                    $nextjs_live_url = ! empty( $live_theme_settings['nextjs_live_url'] ) ? $live_theme_settings['nextjs_live_url'] : ( ! empty( $live_theme_settings['live_url'] ) ? $live_theme_settings['live_url'] : '' );
+                    
+                    if ( empty( $nextjs_live_url ) || $nextjs_live_url === 'http://localhost:3000' || $is_static_built ) {
+                        $nextjs_display_url = preg_replace( '#^https?://#', '', rtrim( $canvas_preview_url, '/' ) );
+                    } else {
+                        $nextjs_display_url = preg_replace( '#^https?://#', '', rtrim( $nextjs_live_url, '/' ) );
+                    }
+
                     $nextjs_repo = ! empty( $live_theme_settings['github_repo'] ) ? $live_theme_settings['github_repo'] : ( ! empty( $live_theme_settings['repo'] ) ? $live_theme_settings['repo'] : 'cora/nextjs-starter' );
                     $nextjs_branch = ! empty( $live_theme_settings['github_branch'] ) ? $live_theme_settings['github_branch'] : ( ! empty( $live_theme_settings['branch'] ) ? $live_theme_settings['branch'] : 'main' );
 
@@ -497,11 +506,18 @@ function cora_get_sparkline_points( $history, $type ) {
                                 <span class="w-1.5 h-1.5 rounded-full bg-zinc-700"></span>
                                 <span class="w-1.5 h-1.5 rounded-full bg-zinc-700"></span>
                                 <span class="w-1.5 h-1.5 rounded-full bg-zinc-700"></span>
+                                <?php if ( $is_static_built ) : ?>
+                                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-950 border border-emerald-800 text-[8px] font-mono font-bold text-emerald-400">
+                                    <svg viewBox="0 0 24 24" width="7" height="7" fill="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                                    Static Site
+                                </span>
+                                <?php else : ?>
                                 <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-zinc-950 border border-zinc-800 text-[8px] font-mono font-bold text-zinc-200">
                                     <svg viewBox="0 0 24 24" width="7" height="7" fill="currentColor" class="text-white shrink-0"><path d="M12 2L2 22h20L12 2z"/></svg>
                                     Next.js
                                 </span>
-                                <div class="flex-1 mx-1.5 bg-zinc-950/80 border border-zinc-800/60 rounded px-2 py-0.5 text-[8px] font-mono text-zinc-400 text-center truncate" title="<?php echo esc_attr($nextjs_live_url); ?>">
+                                <?php endif; ?>
+                                <div class="flex-1 mx-1.5 bg-zinc-950/80 border border-zinc-800/60 rounded px-2 py-0.5 text-[8px] font-mono text-zinc-400 text-center truncate" title="<?php echo esc_attr($canvas_preview_url); ?>">
                                     <?php echo esc_html( $nextjs_display_url ); ?>
                                 </div>
                                 <a href="<?php echo esc_url( $canvas_preview_url ); ?>" target="_blank" class="text-zinc-500 hover:text-white transition-colors" title="Open Live Site">
@@ -523,10 +539,17 @@ function cora_get_sparkline_points( $history, $type ) {
                                             </div>
                                         </div>
                                     </div>
-                                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-emerald-950/80 border border-emerald-800/60 text-[8px] font-bold text-emerald-400 shrink-0">
+                                    <?php if ( $is_static_built ) : ?>
+                                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-emerald-950/80 border border-emerald-800/60 text-[8px] font-bold text-emerald-400 shrink-0" title="Static HTML build live on Cora">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                                        Static Live
+                                    </span>
+                                    <?php else : ?>
+                                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-zinc-900 border border-zinc-800 text-[8px] font-bold text-zinc-300 shrink-0">
                                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
                                         Active
                                     </span>
+                                    <?php endif; ?>
                                 </div>
 
                                 <!-- Middle Row: Connected Repo & Branch + Scanned Route Chips -->
@@ -553,9 +576,9 @@ function cora_get_sparkline_points( $history, $type ) {
                                         <span>Open Live Site</span>
                                         <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
                                     </a>
-                                    <button type="button" onclick="editTheme(<?php echo $live_theme['id']; ?>, '<?php echo esc_js($live_theme['name']); ?>', true); switchTab('nextjs-sdk');" class="flex-1 h-6 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 text-zinc-200 font-semibold text-[9.5px] rounded-md flex items-center justify-center gap-1 transition-all cursor-pointer select-none">
-                                        <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2" fill="none"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-                                        <span>Dev SDK & Ops</span>
+                                    <button type="button" onclick="window.buildNextJSRepo(<?php echo $live_theme['id']; ?>)" class="flex-1 h-6 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 text-zinc-200 font-semibold text-[9.5px] rounded-md flex items-center justify-center gap-1 transition-all cursor-pointer select-none" title="Rebuild &amp; sync static build from GitHub">
+                                        <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                                        <span>Build Static</span>
                                     </button>
                                 </div>
                             </div>
@@ -661,6 +684,15 @@ function cora_get_sparkline_points( $history, $type ) {
                                 <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                                 <span>Customize Theme</span>
                             </button>
+
+                            <?php if ( $is_nextjs ) : ?>
+                            <!-- Static Build Action -->
+                            <button type="button" onclick="window.buildNextJSRepo(<?php echo $live_theme['id']; ?>)"
+                                    class="h-8 px-3.5 bg-white hover:bg-zinc-50 border border-zinc-200/80 text-zinc-900 rounded-lg text-xs font-semibold cursor-pointer transition-all flex items-center gap-1.5 shadow-3xs shrink-0" title="Build &amp; sync static distribution from GitHub">
+                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                                <span>Build Static</span>
+                            </button>
+                            <?php endif; ?>
 
                             <!-- Secondary Settings -->
                             <button type="button" onclick="editTheme(<?php echo $live_theme['id']; ?>, '<?php echo esc_js($live_theme['name']); ?>', true); switchTab('settings');"
@@ -1098,8 +1130,12 @@ function cora_get_sparkline_points( $history, $type ) {
                     <span id="dashboard-theme-badge" class="px-1.5 py-0.5 text-[8px] font-bold uppercase rounded bg-green-50 text-green-700 border border-green-200 ml-1">Live</span>
                 </div>
             </div>
-            <div>
+            <div class="flex items-center gap-2">
                 <?php if ( ! $is_read_only ) : ?>
+                <button id="dashboard-nextjs-build-btn" onclick="window.buildNextJSRepo(canvasState.activeThemeId)" class="px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-semibold shadow-sm cursor-pointer transition-all hidden items-center gap-1.5" title="Rebuild &amp; sync static frontend from GitHub">
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                    <span>Build Static</span>
+                </button>
                 <button id="activate-theme-header-btn" onclick="triggerActivateThemeFromHeader()" class="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-semibold shadow-sm cursor-pointer transition-all">Activate Theme</button>
                 <?php endif; ?>
                 <a id="preview-site-header-btn" href="<?php echo home_url( '/site/' ); ?>" target="_blank" class="px-3 py-1.5 border border-zinc-200 rounded-lg text-xs font-semibold text-zinc-700 bg-white hover:bg-zinc-50 shadow-sm cursor-pointer transition-all hidden">Preview Site</a>
@@ -1129,6 +1165,10 @@ function cora_get_sparkline_points( $history, $type ) {
                 <!-- Action button for Pages tab -->
                 <?php if ( ! $is_read_only ) : ?>
                 <div id="tab-action-pages" class="tab-action-btn flex items-center gap-2">
+                    <button onclick="window.buildNextJSRepo()" id="tab-action-build-nextjs" class="hidden px-3 py-1.5 border border-zinc-900 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg text-[11px] font-bold shadow-2xs cursor-pointer transition-all active:scale-95 flex items-center gap-1.5" title="Rebuild &amp; sync static frontend from GitHub">
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                        <span>Build Static</span>
+                    </button>
                     <button onclick="triggerNextJSISRRebuild()" id="tab-action-revalidate-nextjs" class="hidden px-3 py-1.5 border border-zinc-900 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg text-[11px] font-bold shadow-2xs cursor-pointer transition-all active:scale-95 flex items-center gap-1.5">
                         <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
                         <span>Rebuild ISR</span>
@@ -6103,6 +6143,11 @@ function cora_get_sparkline_points( $history, $type ) {
             jQuery('#tab-btn-nextjs-sdk').removeClass('hidden').show();
             jQuery('#tab-btn-theme-builder').hide(); // Hide Elementor Site Editor for Next.js
 
+            // Show static build buttons for Next.js
+            jQuery('#dashboard-nextjs-build-btn').removeClass('hidden').addClass('inline-flex');
+            jQuery('#tab-action-build-nextjs').removeClass('hidden').addClass('inline-flex');
+            jQuery('#tab-action-migrate-elementor').addClass('hidden');
+
             // Populate Next.js status & credentials
             const settings = (themeObj && safeGetSettings(themeObj)) || {};
             const ghRepo = settings.github_repo || '';
@@ -6149,6 +6194,10 @@ function cora_get_sparkline_points( $history, $type ) {
                 window.switchNextJSPreviewRoute(currentRoute);
             }
         } else if (isElementor) {
+            jQuery('#dashboard-nextjs-build-btn').addClass('hidden').removeClass('inline-flex');
+            jQuery('#tab-action-build-nextjs').addClass('hidden').removeClass('inline-flex');
+            jQuery('#tab-action-migrate-elementor').removeClass('hidden');
+
             jQuery('.lovable-route-col').hide();
             jQuery('#lovable-trigger-bar').hide();
             jQuery('#lovable-studio-drawer').hide();
@@ -6159,6 +6208,10 @@ function cora_get_sparkline_points( $history, $type ) {
                 switchTab('pages');
             }
         } else {
+            jQuery('#dashboard-nextjs-build-btn').addClass('hidden').removeClass('inline-flex');
+            jQuery('#tab-action-build-nextjs').addClass('hidden').removeClass('inline-flex');
+            jQuery('#tab-action-migrate-elementor').removeClass('hidden');
+
             jQuery('.lovable-route-col').show();
             jQuery('#lovable-trigger-bar').hide();
             jQuery('#tab-btn-ai').show();
@@ -10941,17 +10994,14 @@ function cora_get_sparkline_points( $history, $type ) {
         const settings = (canvasState.activeThemeObj && safeGetSettings(canvasState.activeThemeObj)) || {};
         const liveUrl = (liveUrlInput || canvasState.nextjs_live_url || settings.nextjs_live_url || settings.live_url || '').replace(/\/+$/, '');
 
-        if (!liveUrl) {
-            jQuery('#nextjs-preview-empty').removeClass('hidden').show();
-            jQuery('#nextjs-preview-loading').addClass('hidden').hide();
-            jQuery('#nextjs-preview-iframe').attr('src', 'about:blank');
-            jQuery('#nextjs-preview-open-external').attr('href', '#');
-            return;
-        }
+        const wsSiteBase = `${coraREData.siteUrl}/site`;
+        const isDraft = (canvasState.activeThemeIsLive !== true && canvasState.activeThemeIsLive !== 1 && canvasState.activeThemeIsLive !== '1');
+        const staticRouteUrl = wsSiteBase + (routePath === '/' ? '' : routePath) + (isDraft ? (routePath.includes('?') ? '&' : '?') + `cv_preview_theme=${canvasState.activeThemeId}` : '');
+
+        // If a custom live URL is set (e.g. localhost:3000 or custom vercel), use it; otherwise default to Cora static site route
+        const targetUrl = liveUrl ? (liveUrl + (routePath === '/' ? '' : routePath)) : staticRouteUrl;
 
         jQuery('#nextjs-preview-empty').addClass('hidden').hide();
-        
-        const targetUrl = liveUrl + (routePath === '/' ? '' : routePath);
         jQuery('#nextjs-preview-open-external').attr('href', targetUrl);
 
         const iframe = jQuery('#nextjs-preview-iframe');
@@ -11049,12 +11099,14 @@ function cora_get_sparkline_points( $history, $type ) {
         const liveUrlInput = jQuery('#nextjs-live-url-input').val().trim();
         const liveUrl = (liveUrlInput || canvasState.nextjs_live_url || settings.nextjs_live_url || settings.live_url || '').replace(/\/+$/, '');
 
+        const wsSiteBase = `${coraREData.siteUrl}/site`;
+        const isDraft = (canvasState.activeThemeIsLive !== true && canvasState.activeThemeIsLive !== 1 && canvasState.activeThemeIsLive !== '1');
+        const staticRouteUrl = wsSiteBase + (routePath === '/' ? '' : (routePath.startsWith('/') ? routePath : '/' + routePath)) + (isDraft ? (routePath.includes('?') ? '&' : '?') + `cv_preview_theme=${canvasState.activeThemeId}` : '');
+
+        const targetUrl = liveUrl ? (liveUrl + (routePath === '/' ? '' : (routePath.startsWith('/') ? routePath : '/' + routePath))) : staticRouteUrl;
+
         if (event && (event.metaKey || event.ctrlKey)) {
-            if (liveUrl) {
-                window.open(liveUrl + (routePath === '/' ? '' : (routePath.startsWith('/') ? routePath : '/' + routePath)), '_blank');
-            } else {
-                window.coraShowToast('No Next.js Live URL configured yet.', 'warning');
-            }
+            window.open(targetUrl, '_blank');
             return;
         }
 
