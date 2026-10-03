@@ -326,24 +326,79 @@ class Cora_NextJS_Integration {
     }
 
     /**
-     * REST: Handle Next.js Form Submission into Cora Leads CRM
+     * REST: Handle Next.js / HTML Form Submission into Cora Leads CRM
      */
     public function rest_submit_form( $request ) {
+        // Send CORS headers so any headless / cross-origin request succeeds
+        header( 'Access-Control-Allow-Origin: *' );
+        header( 'Access-Control-Allow-Methods: POST, GET, OPTIONS' );
+        header( 'Access-Control-Allow-Headers: Content-Type, Authorization, X-WP-Nonce, X-Requested-With' );
+
+        if ( 'OPTIONS' === $_SERVER['REQUEST_METHOD'] ) {
+            status_header( 200 );
+            exit;
+        }
+
         global $wpdb;
 
         $body = $request->get_json_params() ?: $request->get_body_params();
-        $name    = sanitize_text_field( $body['name'] ?? $body['full_name'] ?? 'Anonymous' );
-        $email   = sanitize_email( $body['email'] ?? '' );
-        $phone   = sanitize_text_field( $body['phone'] ?? $body['telephone'] ?? '' );
-        $message = sanitize_textarea_field( $body['message'] ?? $body['notes'] ?? '' );
-        $source  = sanitize_text_field( $body['source'] ?? 'Next.js Frontend' );
-        $form_id = sanitize_text_field( $body['form_id'] ?? 'contact' );
+        $name    = sanitize_text_field( $body['name'] ?? $body['full_name'] ?? $body['contact_name'] ?? $body['your-name'] ?? 'Website Inquiry' );
+        $email   = sanitize_email( $body['email'] ?? $body['email_address'] ?? $body['your-email'] ?? '' );
+        $phone   = sanitize_text_field( $body['phone'] ?? $body['telephone'] ?? $body['phone_number'] ?? $body['mobile'] ?? $body['your-phone'] ?? '' );
+        $message = sanitize_textarea_field( $body['message'] ?? $body['notes'] ?? $body['comments'] ?? $body['inquiry'] ?? $body['your-message'] ?? '' );
+        $source  = sanitize_text_field( $body['source'] ?? 'Cora Canvas Form' );
+        $theme_id = intval( $body['theme_id'] ?? $request->get_param( 'theme_id' ) ?? 0 );
 
-        if ( empty( $email ) && empty( $phone ) ) {
+        // If email or phone wasn't detected in standard keys, search all payload fields
+        if ( empty( $email ) || empty( $phone ) ) {
+            foreach ( $body as $k => $v ) {
+                if ( is_string( $v ) ) {
+                    if ( empty( $email ) && filter_var( trim( $v ), FILTER_VALIDATE_EMAIL ) ) {
+                        $email = sanitize_email( trim( $v ) );
+                    }
+                    if ( empty( $phone ) && preg_match( '/(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/', $v, $pm ) ) {
+                        $phone = sanitize_text_field( $pm[0] );
+                    }
+                }
+            }
+        }
+
+        if ( empty( $email ) && empty( $phone ) && empty( $message ) ) {
             return new WP_REST_Response( array(
                 'success' => false,
-                'message' => 'Please provide at least an email address or phone number.'
+                'message' => 'Please provide at least an email address, phone number, or message.'
             ), 400 );
+        }
+
+        // Dynamically resolve agency_id
+        $agency_id = intval( $body['agency_id'] ?? $request->get_param( 'agency_id' ) ?? 0 );
+        if ( $agency_id <= 0 && $theme_id > 0 ) {
+            $theme_row = $wpdb->get_row( $wpdb->prepare( "SELECT agency_id FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d", $theme_id ), ARRAY_A );
+            if ( ! empty( $theme_row['agency_id'] ) ) {
+                $agency_id = intval( $theme_row['agency_id'] );
+            }
+        }
+
+        if ( $agency_id <= 0 ) {
+            $agency_id = 1;
+            if ( function_exists( 'cora_get_current_agency_id' ) ) {
+                $cur_agency = cora_get_current_agency_id();
+                if ( $cur_agency > 0 ) {
+                    $agency_id = $cur_agency;
+                }
+            }
+        }
+
+        $name_parts = explode( ' ', trim( $name ), 2 );
+        $first_name = ! empty( $name_parts[0] ) ? $name_parts[0] : 'Website';
+        $last_name  = ! empty( $name_parts[1] ) ? $name_parts[1] : '';
+
+        $branch_id = 1;
+        if ( function_exists( 'cora_get_default_branch_id' ) ) {
+            $def_b = cora_get_default_branch_id( $agency_id );
+            if ( $def_b > 0 ) {
+                $branch_id = $def_b;
+            }
         }
 
         // Insert into Cora leads table if present
@@ -354,8 +409,10 @@ class Cora_NextJS_Integration {
             $inserted = $wpdb->insert(
                 $leads_table,
                 array(
-                    'agency_id'   => 1,
-                    'name'        => $name,
+                    'agency_id'   => $agency_id,
+                    'branch_id'   => $branch_id,
+                    'first_name'  => $first_name,
+                    'last_name'   => $last_name,
                     'email'       => $email,
                     'phone'       => $phone,
                     'notes'       => $message,
@@ -364,11 +421,13 @@ class Cora_NextJS_Integration {
                     'created_at'  => current_time( 'mysql' ),
                     'updated_at'  => current_time( 'mysql' )
                 ),
-                array( '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s' )
+                array( '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s' )
             );
         }
 
-        cora_log_activity( 'Lead Funnel', "New lead received from Next.js form: {$name} ({$email})" );
+        if ( function_exists( 'cora_log_activity' ) ) {
+            cora_log_activity( 'Lead Funnel', "New lead received from {$source}: {$name}" . ( $email ? " ({$email})" : "" ) );
+        }
 
         return new WP_REST_Response( array(
             'success' => true,
@@ -534,12 +593,32 @@ class Cora_NextJS_Integration {
         $has_typescript = false;
 
         $has_package_json = false;
+        $has_html_file = false;
+        $html_routes = array();
+
         foreach ( $tree_files as $file ) {
             $path = $file['path'];
 
             if ( preg_match( '#(^|/)package\.json$#i', $path ) ) $has_package_json = true;
             if ( preg_match( '/\.(ts|tsx)$/', $path ) ) $has_typescript = true;
             if ( preg_match( '/tailwind\.config\./', $path ) ) $has_tailwind = true;
+
+            // HTML static templates (index.html, about.html, contact.html, public/index.html)
+            if ( preg_match( '#^(?:.+/)?(?:public/|dist/|src/)?([^/]+)\.html?$#i', $path, $html_m ) ) {
+                $has_html_file = true;
+                $html_file_name = strtolower( $html_m[1] );
+                $clean_html_route = ( $html_file_name === 'index' || $html_file_name === 'home' ) ? '/' : '/' . $html_file_name;
+                $html_slug = ( $clean_html_route === '/' ) ? 'home' : $html_file_name;
+                $html_routes[ $clean_html_route ] = array(
+                    'path'        => $clean_html_route,
+                    'slug'        => $html_slug,
+                    'title'       => self::format_route_title( $clean_html_route, $html_slug ),
+                    'file'        => $path,
+                    'router'      => 'html',
+                    'is_dynamic'  => false,
+                    'is_homepage' => ( $clean_html_route === '/' )
+                );
+            }
 
             // Next.js App Router (app/page.tsx, src/app/about/page.tsx, cora-frontend/app/page.tsx)
             if ( preg_match( '#^(?:.+/)?(?:src/)?app/(.+/)?page\.(tsx|jsx|js|ts)$#i', $path, $matches ) ) {
@@ -599,9 +678,18 @@ class Cora_NextJS_Integration {
             }
         }
 
-        // Strict Validation: Ensure repository is a Next.js / Web project
-        if ( ! $is_app_router && ! $is_pages_router && ! $has_package_json ) {
-            return new WP_Error( 'not_nextjs_repo', "The connected repository '{$repo_slug}' does not contain a Next.js project (no App Router, Pages Router, or package.json found). Cora Canvas exclusively supports Next.js builds." );
+        // If no Next.js router files but HTML files exist, adopt HTML routes
+        if ( ! $is_app_router && ! $is_pages_router && ! empty( $html_routes ) ) {
+            foreach ( $html_routes as $hr_path => $hr_data ) {
+                if ( ! isset( $routes[ $hr_path ] ) ) {
+                    $routes[ $hr_path ] = $hr_data;
+                }
+            }
+        }
+
+        // Strict Validation: Ensure repository contains a Next.js / React / HTML project
+        if ( ! $is_app_router && ! $is_pages_router && ! $has_package_json && ! $has_html_file ) {
+            return new WP_Error( 'not_nextjs_repo', "The connected repository '{$repo_slug}' does not contain a supported web project (no Next.js App Router, Pages Router, package.json, or HTML template found). Cora Canvas supports Next.js, React, Vite, Expo, and HTML/Tailwind builds." );
         }
 
         if ( ! $is_app_router && ! $is_pages_router && $has_package_json ) {
@@ -612,8 +700,8 @@ class Cora_NextJS_Integration {
             if ( ! is_wp_error( $pkg_resp ) && wp_remote_retrieve_response_code( $pkg_resp ) === 200 ) {
                 $pkg_json = json_decode( wp_remote_retrieve_body( $pkg_resp ), true ) ?: array();
                 $all_deps = array_merge( $pkg_json['dependencies'] ?? array(), $pkg_json['devDependencies'] ?? array() );
-                if ( ! isset( $all_deps['next'] ) && ! isset( $all_deps['vinext'] ) && ! isset( $all_deps['react'] ) && ! isset( $all_deps['expo'] ) && ! isset( $all_deps['vite'] ) ) {
-                    return new WP_Error( 'not_nextjs_project', "The repository '{$repo_slug}' does not contain Next.js dependencies. Cora Canvas exclusively supports Next.js (or React/Vite/Expo Web) projects." );
+                if ( ! isset( $all_deps['next'] ) && ! isset( $all_deps['vinext'] ) && ! isset( $all_deps['react'] ) && ! isset( $all_deps['expo'] ) && ! isset( $all_deps['vite'] ) && ! $has_html_file ) {
+                    return new WP_Error( 'not_nextjs_project', "The repository '{$repo_slug}' does not contain Next.js or React dependencies. Cora Canvas supports Next.js, React, Vite, Expo, or static HTML templates." );
                 }
             }
         }
@@ -624,8 +712,8 @@ class Cora_NextJS_Integration {
                 'path'        => '/',
                 'slug'        => 'home',
                 'title'       => 'Home',
-                'file'        => 'app/page.tsx',
-                'router'      => 'app',
+                'file'        => $has_html_file ? 'index.html' : 'app/page.tsx',
+                'router'      => $has_html_file ? 'html' : 'app',
                 'is_dynamic'  => false,
                 'is_homepage' => true
             );
@@ -639,7 +727,7 @@ class Cora_NextJS_Integration {
             return strcmp( $a['path'], $b['path'] );
         } );
 
-        $framework_name = $is_app_router ? 'Next.js 14/15 (App Router)' : ( $is_pages_router ? 'Next.js (Pages Router)' : 'Next.js React Native' );
+        $framework_name = $is_app_router ? 'Next.js 14/15 (App Router)' : ( $is_pages_router ? 'Next.js (Pages Router)' : ( $has_html_file && ! $has_package_json ? 'HTML / Tailwind Static' : 'Next.js React Native' ) );
 
         return array(
             'repo'                => $repo_slug,
@@ -1146,8 +1234,10 @@ class Cora_NextJS_Integration {
             }
         }
 
-        // Locate package.json
+        // Locate package.json or direct HTML template
         $working_dir = $repo_dir;
+        $has_direct_html = file_exists( $working_dir . '/index.html' ) || file_exists( $working_dir . '/index.htm' ) || glob( $repo_dir . '/*/index.html' ) || glob( $repo_dir . '/public/index.html' ) || glob( $repo_dir . '/src/index.html' );
+
         if ( ! file_exists( $working_dir . '/package.json' ) ) {
             $sub_packages = glob( $repo_dir . '/*/package.json' );
             if ( ! empty( $sub_packages ) ) {
@@ -1155,8 +1245,68 @@ class Cora_NextJS_Integration {
             }
         }
 
+        // Zero-build Instant Static Mode for pure HTML / Tailwind sites (e.g. built with Claude / ChatGPT)
+        if ( ! file_exists( $working_dir . '/package.json' ) && $has_direct_html ) {
+            $html_source_dir = $repo_dir;
+            if ( ! file_exists( $html_source_dir . '/index.html' ) && ! file_exists( $html_source_dir . '/index.htm' ) ) {
+                $sub_html = glob( $repo_dir . '/*/index.html' );
+                if ( ! empty( $sub_html ) ) {
+                    $html_source_dir = dirname( $sub_html[0] );
+                } elseif ( is_dir( $repo_dir . '/public' ) && file_exists( $repo_dir . '/public/index.html' ) ) {
+                    $html_source_dir = $repo_dir . '/public';
+                } elseif ( is_dir( $repo_dir . '/src' ) && file_exists( $repo_dir . '/src/index.html' ) ) {
+                    $html_source_dir = $repo_dir . '/src';
+                }
+            }
+
+            $final_static_dir = $theme_build_dir . '/out';
+            if ( ! file_exists( $final_static_dir ) ) {
+                wp_mkdir_p( $final_static_dir );
+            }
+            self::copy_dir_recursive( $html_source_dir, $final_static_dir );
+
+            // Count files
+            $file_count = 0;
+            try {
+                $iter = new RecursiveIteratorIterator(
+                    new RecursiveDirectoryIterator( $final_static_dir, RecursiveDirectoryIterator::SKIP_DOTS ),
+                    RecursiveIteratorIterator::SELF_FIRST
+                );
+                foreach ( $iter as $f ) {
+                    if ( $f->isFile() ) $file_count++;
+                }
+            } catch ( Exception $e ) {}
+
+            $settings['source']            = 'nextjs';
+            $settings['is_static_built']   = true;
+            $settings['static_build_path'] = $final_static_dir;
+            $settings['static_built_at']   = current_time( 'mysql' );
+            $settings['framework']         = 'HTML / Tailwind Static';
+
+            $wpdb->update(
+                "{$wpdb->prefix}cora_canvas_themes",
+                array(
+                    'settings'   => wp_json_encode( $settings ),
+                    'updated_at' => current_time( 'mysql' )
+                ),
+                array( 'id' => $theme_id ),
+                array( '%s', '%s' ),
+                array( '%d' )
+            );
+
+            return array(
+                'success'     => true,
+                'message'     => 'Static HTML site deployed instantly to Cora Workspace.',
+                'static_dir'  => $final_static_dir,
+                'framework'   => 'HTML / Tailwind Static',
+                'files_count' => $file_count,
+                'theme_id'    => $theme_id,
+                'build_logs'  => implode( "\n", $git_log ) . "\n✓ Deployed pure static HTML / Tailwind template directly."
+            );
+        }
+
         if ( ! file_exists( $working_dir . '/package.json' ) ) {
-            return new WP_Error( 'missing_package_json', 'Could not locate package.json in repository. Build failed.', implode( "\n", $git_log ) );
+            return new WP_Error( 'missing_package_json', 'Could not locate package.json or index.html in repository. Build failed.', implode( "\n", $git_log ) );
         }
 
         // Auto-create .openai/hosting.json if needed by OpenAI/Codex Vite templates

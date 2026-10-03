@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.331
+ * Version:           4.9.333
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.331' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.333' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -9166,6 +9166,71 @@ function cora_render_nextjs_static_build( $static_dir, $route_path = '/', $activ
         . "window.CORA_THEME_ID = " . json_encode( $theme_id ) . ";\n"
         . "window.CORA_WORKSPACE_SLUG = " . json_encode( $ws_slug ) . ";\n"
         . "window.CORA_IS_STATIC_BUILD = true;\n"
+        . "\n"
+        . "/* Cora Universal Lead Form Bridge */\n"
+        . "window.submitCoraLead = async function(formData) {\n"
+        . "    try {\n"
+        . "        var payload = {};\n"
+        . "        if (formData instanceof HTMLFormElement) {\n"
+        . "            var fd = new FormData(formData);\n"
+        . "            fd.forEach(function(v, k) { payload[k] = v; });\n"
+        . "        } else if (typeof formData === 'object' && formData !== null) {\n"
+        . "            payload = formData;\n"
+        . "        }\n"
+        . "        if (!payload.source) payload.source = 'Website Form';\n"
+        . "        if (window.CORA_THEME_ID) payload.theme_id = window.CORA_THEME_ID;\n"
+        . "        var endpoint = (window.CORA_API_URL ? window.CORA_API_URL + 'nextjs/forms/submit' : '/wp-json/cora-canvas/v1/nextjs/forms/submit');\n"
+        . "        var res = await fetch(endpoint, {\n"
+        . "            method: 'POST',\n"
+        . "            headers: {\n"
+        . "                'Content-Type': 'application/json',\n"
+        . "                'X-WP-Nonce': window.CORA_NONCE || ''\n"
+        . "            },\n"
+        . "            body: JSON.stringify(payload)\n"
+        . "        });\n"
+        . "        return await res.json();\n"
+        . "    } catch(err) {\n"
+        . "        console.error('Cora lead submission error:', err);\n"
+        . "        return { success: false, message: err.message };\n"
+        . "    }\n"
+        . "};\n"
+        . "\n"
+        . "/* Automatic Form Interception: Any standard form submits directly to Cora Leads CRM */\n"
+        . "document.addEventListener('submit', async function(e) {\n"
+        . "    var form = e.target;\n"
+        . "    if (!form || form.tagName !== 'FORM') return;\n"
+        . "    if (form.getAttribute('data-cora-ignore') === 'true') return;\n"
+        . "    var action = form.getAttribute('action') || '';\n"
+        . "    if (!action || action === '#' || action === '' || action.startsWith('javascript:')) {\n"
+        . "        e.preventDefault();\n"
+        . "        var submitBtn = form.querySelector('button[type=\"submit\"], input[type=\"submit\"], button:not([type])');\n"
+        . "        var originalText = submitBtn ? submitBtn.innerHTML : '';\n"
+        . "        if (submitBtn) {\n"
+        . "            submitBtn.disabled = true;\n"
+        . "            submitBtn.innerHTML = 'Submitting…';\n"
+        . "        }\n"
+        . "        var result = await window.submitCoraLead(form);\n"
+        . "        if (submitBtn) {\n"
+        . "            submitBtn.disabled = false;\n"
+        . "            submitBtn.innerHTML = originalText;\n"
+        . "        }\n"
+        . "        var alertBox = form.querySelector('.cora-form-feedback');\n"
+        . "        if (!alertBox) {\n"
+        . "            alertBox = document.createElement('div');\n"
+        . "            alertBox.className = 'cora-form-feedback';\n"
+        . "            form.appendChild(alertBox);\n"
+        . "        }\n"
+        . "        if (result && result.success) {\n"
+        . "            alertBox.style.cssText = 'margin-top:12px;padding:12px 16px;background:#18181b;color:#10b981;border:1px solid #27272a;border-radius:10px;font-size:13px;font-weight:600;text-align:center;display:flex;align-items:center;justify-content:center;gap:8px;';\n"
+        . "            alertBox.innerHTML = '<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#10b981\" stroke-width=\"2.5\"><polyline points=\"20 6 9 17 4 12\"></polyline></svg> <span>' + (result.message || 'Thank you! Your message has been received.') + '</span>';\n"
+        . "            form.reset();\n"
+        . "            setTimeout(function() { if (alertBox) alertBox.remove(); }, 6000);\n"
+        . "        } else {\n"
+        . "            alertBox.style.cssText = 'margin-top:12px;padding:12px 16px;background:#18181b;color:#f43f5e;border:1px solid #27272a;border-radius:10px;font-size:13px;font-weight:600;text-align:center;display:flex;align-items:center;justify-content:center;gap:8px;';\n"
+        . "            alertBox.innerHTML = '<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#f43f5e\" stroke-width=\"2.5\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle><line x1=\"12\" y1=\"8\" x2=\"12\" y2=\"12\"></line><line x1=\"12\" y1=\"16\" x2=\"12.01\" y2=\"16\"></line></svg> <span>' + (result && result.message ? result.message : 'Submission failed. Please check required fields.') + '</span>';\n"
+        . "        }\n"
+        . "    }\n"
+        . "});\n"
         . "</script>\n";
 
     if ( $is_preview && function_exists( 'cora_canvas_preview_bar_js' ) ) {

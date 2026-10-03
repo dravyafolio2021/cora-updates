@@ -2520,6 +2520,10 @@ function cora_get_sparkline_points( $history, $type ) {
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
                                 <span id="btn-nextjs-build-label">Build Static Site</span>
                             </button>
+                            <button onclick="window.copyClaudeMasterPrompt()" class="px-3 py-2 border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-800 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs" title="Copy starter foundation prompt for Claude / ChatGPT">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+                                <span>Copy Claude / ChatGPT Prompt</span>
+                            </button>
                         </div>
                         <button onclick="triggerNextJSISRRebuild()" id="btn-nextjs-trigger-isr" class="px-3 py-2 border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5">
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
@@ -13831,6 +13835,62 @@ function cora_get_sparkline_points( $history, $type ) {
             }
         }
     }, 1500);
+
+    // Claude / ChatGPT Master Starter Prompt Copier
+    window.copyClaudeMasterPrompt = function() {
+        const promptText = `You are an expert web designer and frontend developer building a modern, high-converting, responsive landing page for my business.
+
+Build a single-file, production-ready HTML website with the following stack & guidelines:
+
+1. STACK & STYLING:
+- HTML5 with Tailwind CSS loaded via CDN: <script src="https://cdn.tailwindcss.com"><\/script>
+- Google Fonts: Inter font family (<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">)
+- Modern monochromatic / neutral palette (slate/zinc tones, pure white #ffffff, deep black #09090b, subtle border strokes border-zinc-200 / dark:border-zinc-800, soft tonal selection fills)
+- Fully responsive on Mobile (375px), Tablet (768px), and Desktop (1440px)
+- Clean vector SVG icons (no external font icons or broken images)
+
+2. PAGE SECTIONS REQUIRED:
+- Sticky Navigation Bar (Logo, Navigation links, "Get Started" CTA button)
+- Hero Section (Compelling headline, subheadline, Trust proof badges, 2 CTA buttons)
+- Social Proof / Client Logos / Metrics Ticker (e.g. 500+ Clients, 99.9% Uptime, 4.9/5 Rating)
+- Feature Grid / Core Benefits (3-4 high-value benefit cards with clean icons)
+- Interactive Pricing Matrix or Services Catalog (3 tiers with feature checklists)
+- FAQ Accordion (4-5 expandable questions)
+- Universal Lead Capture Form (Contact / Inquiry section with Name, Email, Phone, and Message inputs)
+- Footer (Branding, navigation links, copyright notice)
+
+3. AUTOMATIC CORA CRM LEAD CAPTURE:
+Include a contact/inquiry <form> on the page with standard input names:
+- <input type="text" name="name" placeholder="Your Name" required>
+- <input type="email" name="email" placeholder="Work Email" required>
+- <input type="tel" name="phone" placeholder="Phone Number">
+- <textarea name="message" placeholder="How can we help?"></textarea>
+- <button type="submit">Submit Inquiry</button>
+
+Do NOT attach complex backend scripts. Cora Canvas automatically captures any form submission on this site and inserts leads directly into the Cora CRM Lead Funnel.
+
+Please provide the complete, un-truncated index.html file ready to save and publish.`;
+
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(promptText).then(function() {
+                if (typeof window.coraShowToast === 'function') {
+                    window.coraShowToast('Claude / ChatGPT Starter Prompt copied! Paste it into Claude or ChatGPT to generate your site.', 'success');
+                } else {
+                    alert('Claude / ChatGPT Starter Prompt copied to clipboard!');
+                }
+            });
+        } else {
+            const ta = document.createElement('textarea');
+            ta.value = promptText;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            if (typeof window.coraShowToast === 'function') {
+                window.coraShowToast('Claude / ChatGPT Starter Prompt copied to clipboard!', 'success');
+            }
+        }
+    };
 
     // Expose functions to window for Command Palette usage
     window.triggerRenamePage = triggerRenamePage;
