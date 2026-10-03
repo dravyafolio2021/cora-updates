@@ -86,7 +86,17 @@ $accounts = array(
     array(
         'username' => 'cora_admin',
         'email'    => 'admin@cora.local',
-        'password' => 'cora_secure_pass_123',
+        'password' => 'Dravya@2026SHRUTIHAASAN',
+        'display'  => 'Platform Super Admin',
+        'role'     => 'administrator',
+        'agency_id'=> 1,
+        'industry' => 'real_estate',
+        'avatar'   => 'http://cora.local/wp-content/uploads/2026/07/image-560.png'
+    ),
+    array(
+        'username' => 'dravya_admin',
+        'email'    => 'dravya.bansal@heycora.in',
+        'password' => 'Dravya@2026SHRUTIHAASAN',
         'display'  => 'Platform Super Admin',
         'role'     => 'administrator',
         'agency_id'=> 1,
@@ -96,8 +106,8 @@ $accounts = array(
     array(
         'username' => 'shruti',
         'email'    => 'shruti.bansal@claraverse.in',
-        'password' => 'Shruti@2028',
-        'display'  => 'Shruti Bansal',
+        'password' => 'Dravya@2026SHRUTIHAASAN',
+        'display'  => 'Platform Super Admin',
         'role'     => 'administrator',
         'agency_id'=> 1,
         'industry' => 'real_estate',
