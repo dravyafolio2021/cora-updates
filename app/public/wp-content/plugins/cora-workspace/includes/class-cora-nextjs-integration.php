@@ -1142,7 +1142,7 @@ class Cora_NextJS_Integration {
         }
 
         // Environment paths: includes user local standalone binaries and limits thread count for shared hosts
-        $path_env = 'export PATH=$HOME/.local/bin:$HOME/.local/share/node-v22.14.0-linux-x64/bin:$HOME/.local/share/node-v20.18.0-linux-x64/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:$PATH; export RAYON_NUM_THREADS=1; export UV_THREADPOOL_SIZE=1;';
+        $path_env = 'export PATH=$HOME/.local/bin:$HOME/.local/share/node-v22.14.0-linux-x64/bin:$HOME/.local/share/node-v20.18.0-linux-x64/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:$PATH; export RAYON_NUM_THREADS=1; export UV_THREADPOOL_SIZE=1';
 
         // Verify Node.js / npm existence
         $node_check_res = self::run_command_process( "{$path_env} && node -v 2>&1 && npm -v 2>&1" );
