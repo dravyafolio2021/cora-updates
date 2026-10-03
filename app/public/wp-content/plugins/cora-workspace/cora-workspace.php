@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.335
+ * Version:           4.9.336
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.335' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.336' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -39988,8 +39988,9 @@ function cora_ajax_canvas_create_theme() {
             } else {
                 $settings['github_branch'] = 'main';
             }
-        } elseif ( $_POST['builder'] === 'html_ai' ) {
-            $settings['source'] = 'html_ai';
+        } elseif ( $_POST['builder'] === 'html_ai' || ( isset( $_POST['start_from'] ) && $_POST['start_from'] === 'html_ai' ) ) {
+            $settings['source'] = 'nextjs';
+            $settings['framework'] = 'html_tailwind';
             $settings['template_key'] = sanitize_text_field( $_POST['template_key'] ?? 'agency' );
             if ( ! empty( $_POST['github_repo'] ) ) {
                 $settings['github_repo'] = esc_url_raw( $_POST['github_repo'] );
@@ -40048,60 +40049,127 @@ function cora_ajax_canvas_create_theme() {
     
     $new_id = $wpdb->insert_id;
 
-    if ( isset( $_POST['builder'] ) && $_POST['builder'] === 'html_ai' ) {
-        $raw_html = isset( $_POST['raw_html'] ) ? wp_unslash( $_POST['raw_html'] ) : '';
+    $is_html_ai = ( ( isset( $_POST['builder'] ) && $_POST['builder'] === 'html_ai' ) || ( isset( $_POST['start_from'] ) && $_POST['start_from'] === 'html_ai' ) || ! empty( $_POST['raw_html'] ) || ! empty( $_POST['html_code'] ) );
+
+    if ( $is_html_ai ) {
+        $raw_html = wp_unslash( ! empty( $_POST['raw_html'] ) ? $_POST['raw_html'] : ( ! empty( $_POST['html_code'] ) ? $_POST['html_code'] : '' ) );
         $template_key = sanitize_text_field( $_POST['template_key'] ?? 'agency' );
         if ( empty( trim( $raw_html ) ) && function_exists( 'cora_canvas_get_default_starter_html' ) ) {
             $raw_html = cora_canvas_get_default_starter_html( $template_key, $name );
         }
 
-        $wp_post_id = wp_insert_post( array(
-            'post_title'    => 'Home',
-            'post_name'     => 'home',
-            'post_type'     => 'page',
-            'post_status'   => 'publish',
-            'post_content'  => $raw_html,
-            'page_template' => 'cora_canvas_standalone'
-        ) );
+        $upload_dir = wp_get_upload_dir();
+        $theme_build_dir = $upload_dir['basedir'] . '/cora-nextjs-builds/theme_' . $new_id;
+        $out_dir = $theme_build_dir . '/out';
+        wp_mkdir_p( $out_dir );
 
-        if ( ! is_wp_error( $wp_post_id ) ) {
-            update_post_meta( $wp_post_id, '_cora_page_engine', 'html_canvas' );
-            update_post_meta( $wp_post_id, '_wp_page_template', 'cora_canvas_standalone' );
-            update_post_meta( $wp_post_id, '_cora_canvas_theme_id', $new_id );
-            update_post_meta( $wp_post_id, '_cora_canvas_html_compiled', wp_slash( $raw_html ) );
-
-            $wpdb->insert(
-                $wpdb->prefix . 'cora_canvas_pages',
-                array(
-                    'agency_id'       => $agency_id,
-                    'theme_id'        => $new_id,
-                    'wp_post_id'      => $wp_post_id,
-                    'title'           => 'Home',
-                    'slug'            => 'home',
-                    'status'          => 'publish',
-                    'is_homepage'     => 1,
-                    'template'        => 'cora_canvas_standalone',
-                    'seo_title'       => $name . ' · Home',
-                    'seo_description' => 'Modern high-converting web presence built with Cora Canvas AI.',
-                    'seo_og_image'    => '',
-                    'created_by'      => get_current_user_id(),
-                    'created_at'      => current_time( 'mysql' ),
-                    'updated_at'      => current_time( 'mysql' )
-                ),
-                array( '%d', '%d', '%d', '%s', '%s', '%s', '%d', '%s', '%s', '%s', '%s', '%d', '%s', '%s' )
-            );
+        if ( ! empty( $raw_html ) ) {
+            file_put_contents( $theme_build_dir . '/index.html', $raw_html );
+            file_put_contents( $out_dir . '/index.html', $raw_html );
         }
 
-        $activate_live = isset( $_POST['activate_live'] ) && ( $_POST['activate_live'] === '1' || $_POST['activate_live'] === 1 );
-        if ( $activate_live ) {
-            $wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->prefix}cora_canvas_themes SET status = 'draft' WHERE agency_id = %d", $agency_id ) );
+        $settings['is_static_built']   = true;
+        $settings['static_build_path'] = $out_dir;
+        $settings['static_built_at']   = current_time( 'mysql' );
+        $settings['static_file_count'] = 1;
+        $settings['source']            = 'nextjs';
+        $settings['framework']         = 'html_tailwind';
+        $settings['template_key']      = $template_key;
+
+        $wpdb->update(
+            $wpdb->prefix . 'cora_canvas_themes',
+            array(
+                'settings'   => json_encode( $settings ),
+                'updated_at' => current_time( 'mysql' ),
+            ),
+            array( 'id' => $new_id ),
+            array( '%s', '%s' ),
+            array( '%d' )
+        );
+
+        $is_live = false;
+        if ( ( isset( $_POST['activate_live'] ) && ( $_POST['activate_live'] === '1' || $_POST['activate_live'] === 1 || $_POST['activate_live'] === 'true' || $_POST['activate_live'] === true ) ) || ( isset( $_POST['builder'] ) && $_POST['builder'] === 'html_ai' ) || ( isset( $_POST['start_from'] ) && $_POST['start_from'] === 'html_ai' ) ) {
+            $is_live = true;
+            // Set all other themes for this agency to draft
             $wpdb->update(
                 $wpdb->prefix . 'cora_canvas_themes',
-                array( 'status' => 'live', 'updated_at' => current_time( 'mysql' ) ),
-                array( 'id' => $new_id )
+                array( 'status' => 'draft', 'updated_at' => current_time( 'mysql' ) ),
+                array( 'agency_id' => $agency_id, 'status' => 'live' ),
+                array( '%s', '%s' ),
+                array( '%d', '%s' )
             );
-            cora_canvas_sync_homepage_options( $agency_id );
+
+            // Set this new theme to live
+            $wpdb->update(
+                $wpdb->prefix . 'cora_canvas_themes',
+                array( 'status' => 'live', 'activated_at' => current_time( 'mysql' ), 'updated_at' => current_time( 'mysql' ) ),
+                array( 'id' => $new_id ),
+                array( '%s', '%s', '%s' ),
+                array( '%d' )
+            );
+
+            // Clear the cora_preview_theme_id cookie
+            if ( ! headers_sent() ) {
+                setcookie( 'cora_preview_theme_id', '', time() - 3600, '/' );
+            }
+            if ( function_exists( 'cora_canvas_sync_homepage_options' ) ) {
+                cora_canvas_sync_homepage_options( $agency_id );
+            }
         }
+
+        // Ensure a Canvas Page record (is_homepage = 1, slug = 'home', title = 'Home', status = 'publish') is created in wp_cora_canvas_pages for $new_id
+        $existing_page = $wpdb->get_row( $wpdb->prepare( "SELECT id FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d AND (slug = 'home' OR is_homepage = 1) LIMIT 1", $new_id ), ARRAY_A );
+        if ( ! $existing_page ) {
+            $wp_post_id = wp_insert_post( array(
+                'post_title'    => 'Home',
+                'post_name'     => 'home',
+                'post_type'     => 'page',
+                'post_status'   => 'publish',
+                'post_content'  => ! empty( $raw_html ) ? $raw_html : '<!-- HTML AI Static Page -->',
+                'page_template' => 'cora_canvas_standalone'
+            ) );
+
+            if ( ! is_wp_error( $wp_post_id ) ) {
+                update_post_meta( $wp_post_id, '_cora_page_engine', 'html_canvas' );
+                update_post_meta( $wp_post_id, '_wp_page_template', 'cora_canvas_standalone' );
+                update_post_meta( $wp_post_id, '_cora_canvas_theme_id', $new_id );
+                if ( ! empty( $raw_html ) ) {
+                    update_post_meta( $wp_post_id, '_cora_canvas_html_compiled', wp_slash( $raw_html ) );
+                }
+
+                $wpdb->insert(
+                    $wpdb->prefix . 'cora_canvas_pages',
+                    array(
+                        'agency_id'       => $agency_id,
+                        'theme_id'        => $new_id,
+                        'wp_post_id'      => $wp_post_id,
+                        'title'           => 'Home',
+                        'slug'            => 'home',
+                        'status'          => 'publish',
+                        'is_homepage'     => 1,
+                        'template'        => 'cora_canvas_standalone',
+                        'seo_title'       => $name . ' · Home',
+                        'seo_description' => $settings['site_tagline'] ?? 'Modern high-converting web presence built with Cora Canvas AI.',
+                        'seo_og_image'    => $settings['site_logo'] ?? '',
+                        'created_by'      => get_current_user_id(),
+                        'created_at'      => current_time( 'mysql' ),
+                        'updated_at'      => current_time( 'mysql' )
+                    ),
+                    array( '%d', '%d', '%d', '%s', '%s', '%s', '%d', '%s', '%s', '%s', '%s', '%d', '%s', '%s' )
+                );
+            }
+        }
+
+        cora_log_activity( 'Canvas', "Created HTML AI theme workspace '{$name}'." );
+
+        wp_send_json_success( array(
+            'theme_id'        => $new_id,
+            'name'            => $name,
+            'builder'         => 'html_ai',
+            'is_static_built' => true,
+            'is_live'         => $is_live,
+            'preview_url'     => home_url( '/site/' )
+        ) );
     }
 
     if ( isset( $_POST['builder'] ) && $_POST['builder'] === 'nextjs' ) {

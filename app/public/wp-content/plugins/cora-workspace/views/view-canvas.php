@@ -3046,8 +3046,6 @@ function cora_get_sparkline_points( $history, $type ) {
             </div>
         </div>
     </div>
-        </div>
-    </div>
 
     <!-- ═══ FLOATING INLINE EDITING MODALS & TOOLBARS ════════════════════════════ -->
 
