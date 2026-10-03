@@ -533,9 +533,11 @@ class Cora_NextJS_Integration {
         $has_tailwind = false;
         $has_typescript = false;
 
+        $has_package_json = false;
         foreach ( $tree_files as $file ) {
             $path = $file['path'];
 
+            if ( preg_match( '#(^|/)package\.json$#i', $path ) ) $has_package_json = true;
             if ( preg_match( '/\.(ts|tsx)$/', $path ) ) $has_typescript = true;
             if ( preg_match( '/tailwind\.config\./', $path ) ) $has_tailwind = true;
 
@@ -593,6 +595,25 @@ class Cora_NextJS_Integration {
                             'is_homepage' => ( $clean_route === '/' )
                         );
                     }
+                }
+            }
+        }
+
+        // Strict Validation: Ensure repository is a Next.js / Web project
+        if ( ! $is_app_router && ! $is_pages_router && ! $has_package_json ) {
+            return new WP_Error( 'not_nextjs_repo', "The connected repository '{$repo_slug}' does not contain a Next.js project (no App Router, Pages Router, or package.json found). Cora Canvas exclusively supports Next.js builds." );
+        }
+
+        if ( ! $is_app_router && ! $is_pages_router && $has_package_json ) {
+            $pkg_resp = wp_remote_get( "https://raw.githubusercontent.com/{$repo_slug}/{$branch}/package.json", array( 'headers' => $headers, 'timeout' => 10 ) );
+            if ( is_wp_error( $pkg_resp ) || wp_remote_retrieve_response_code( $pkg_resp ) !== 200 ) {
+                $pkg_resp = wp_remote_get( "https://api.github.com/repos/{$repo_slug}/contents/package.json?ref={$branch}", array( 'headers' => array_merge( $headers, array( 'Accept' => 'application/vnd.github.raw+json' ) ), 'timeout' => 10 ) );
+            }
+            if ( ! is_wp_error( $pkg_resp ) && wp_remote_retrieve_response_code( $pkg_resp ) === 200 ) {
+                $pkg_json = json_decode( wp_remote_retrieve_body( $pkg_resp ), true ) ?: array();
+                $all_deps = array_merge( $pkg_json['dependencies'] ?? array(), $pkg_json['devDependencies'] ?? array() );
+                if ( ! isset( $all_deps['next'] ) && ! isset( $all_deps['vinext'] ) && ! isset( $all_deps['react'] ) && ! isset( $all_deps['expo'] ) && ! isset( $all_deps['vite'] ) ) {
+                    return new WP_Error( 'not_nextjs_project', "The repository '{$repo_slug}' does not contain Next.js dependencies. Cora Canvas exclusively supports Next.js (or React/Vite/Expo Web) projects." );
                 }
             }
         }
@@ -1136,9 +1157,11 @@ class Cora_NextJS_Integration {
         } elseif ( isset( $deps['vite'] ) ) {
             $framework = 'vite';
             $build_cmd = 'npm install --no-audit 2>&1 && npm run build 2>&1';
-        } else {
+        } elseif ( isset( $deps['react'] ) ) {
             $framework = 'react';
             $build_cmd = 'npm install --no-audit 2>&1 && npm run build 2>&1';
+        } else {
+            return new WP_Error( 'unsupported_project', 'Unsupported repository type. No Next.js or React build system found in package.json dependencies. Cora Canvas strictly supports Next.js projects.', implode( "\n", $git_log ) );
         }
 
         // Environment paths: includes user local standalone binaries and limits thread count for shared hosts

@@ -498,120 +498,65 @@ function cora_get_sparkline_points( $history, $type ) {
                 <div class="flex flex-col md:flex-row items-stretch md:items-center gap-5 sm:gap-6">
                     <!-- Left: Streamlined Browser Preview Box -->
                     <div class="relative shrink-0 flex items-center justify-center md:justify-start w-full md:w-80 max-w-full md:max-w-[340px]" style="flex: 0 0 auto;">
-                        <?php if ( $is_nextjs ) : ?>
-                        <!-- Sleek Next.js App Preview Mockup Container -->
-                        <div class="w-full rounded-xl border border-zinc-800 shadow-3xs overflow-hidden flex flex-col bg-zinc-950 select-none text-zinc-100" style="height: 190px; width: 100%; max-width: 340px;">
+                        <!-- Sleek Theme Browser Preview Box with Live Iframe -->
+                        <div class="w-full rounded-xl border border-zinc-800 shadow-3xs overflow-hidden flex flex-col bg-zinc-950 select-none text-zinc-100 relative group" style="height: 190px; width: 100%; max-width: 340px;">
                             <!-- Browser Top Bar -->
-                            <div class="flex items-center gap-1.5 px-3 py-1.5 border-b border-zinc-800/80 shrink-0 bg-zinc-900/90">
+                            <div class="flex items-center gap-1.5 px-3 py-1.5 border-b border-zinc-800/80 shrink-0 bg-zinc-900/90 z-10">
                                 <span class="w-1.5 h-1.5 rounded-full bg-zinc-700"></span>
                                 <span class="w-1.5 h-1.5 rounded-full bg-zinc-700"></span>
                                 <span class="w-1.5 h-1.5 rounded-full bg-zinc-700"></span>
-                                <?php if ( $is_static_built ) : ?>
+                                <?php if ( $is_nextjs && ! empty( $is_static_built ) ) : ?>
                                 <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-950 border border-emerald-800 text-[8px] font-mono font-bold text-emerald-400">
                                     <svg viewBox="0 0 24 24" width="7" height="7" fill="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
                                     Static Site
                                 </span>
-                                <?php else : ?>
+                                <?php elseif ( $is_nextjs ) : ?>
                                 <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-zinc-950 border border-zinc-800 text-[8px] font-mono font-bold text-zinc-200">
                                     <svg viewBox="0 0 24 24" width="7" height="7" fill="currentColor" class="text-white shrink-0"><path d="M12 2L2 22h20L12 2z"/></svg>
                                     Next.js
                                 </span>
+                                <?php else : ?>
+                                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-zinc-800 border border-zinc-700 text-[8px] font-mono font-bold text-zinc-200">
+                                    Live
+                                </span>
                                 <?php endif; ?>
                                 <div class="flex-1 mx-1.5 bg-zinc-950/80 border border-zinc-800/60 rounded px-2 py-0.5 text-[8px] font-mono text-zinc-400 text-center truncate" title="<?php echo esc_attr($canvas_preview_url); ?>">
-                                    <?php echo esc_html( $nextjs_display_url ); ?>
+                                    <?php echo esc_html( ! empty($nextjs_display_url) ? $nextjs_display_url : $canvas_display_url ); ?>
                                 </div>
-                                <a href="<?php echo esc_url( $canvas_preview_url ); ?>" target="_blank" class="text-zinc-500 hover:text-white transition-colors" title="Open Live Site">
+                                <a href="<?php echo esc_url( $canvas_preview_url ); ?>" target="_blank" class="text-zinc-500 hover:text-white transition-colors" title="Open Live Site in New Tab">
                                     <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
                                 </a>
                             </div>
-                            <!-- High-Density Next.js App Card Body -->
-                            <div class="flex-1 p-3 flex flex-col justify-between bg-zinc-950">
-                                <!-- Top Row: Logo, App Router, Active Indicator -->
-                                <div class="flex items-center justify-between gap-2">
-                                    <div class="flex items-center gap-2 min-w-0">
-                                        <div class="w-5 h-5 rounded bg-white text-zinc-950 flex items-center justify-center shrink-0 shadow-3xs">
-                                            <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><path d="M12 2L2 22h20L12 2z"/></svg>
-                                        </div>
-                                        <div class="min-w-0">
-                                            <div class="flex items-center gap-1.5">
-                                                <span class="text-[11px] font-bold text-white tracking-tight truncate"><?php echo esc_html( $live_theme['name'] ); ?></span>
-                                                <span class="px-1.5 py-0.2 rounded bg-zinc-900 border border-zinc-800 text-[8px] font-mono text-zinc-300 font-medium">App Router</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <?php if ( $is_static_built ) : ?>
-                                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-emerald-950/80 border border-emerald-800/60 text-[8px] font-bold text-emerald-400 shrink-0" title="Static HTML build live on Cora">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                                        Static Live
-                                    </span>
-                                    <?php else : ?>
-                                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-zinc-900 border border-zinc-800 text-[8px] font-bold text-zinc-300 shrink-0">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                                        Active
-                                    </span>
-                                    <?php endif; ?>
-                                </div>
-
-                                <!-- Middle Row: Connected Repo & Branch + Scanned Route Chips -->
-                                <div class="space-y-1.5 py-1">
-                                    <div class="flex items-center gap-1.5 text-[9px] font-mono text-zinc-400">
-                                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500 shrink-0"><path d="M6 3v12"></path><circle cx="18" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><path d="M18 9a9 9 0 0 1-9 9"></path></svg>
-                                        <span class="text-zinc-300 font-medium truncate max-w-[145px]" title="<?php echo esc_attr($nextjs_repo); ?>"><?php echo esc_html( $nextjs_repo ); ?></span>
-                                        <span class="px-1 py-0.2 rounded bg-zinc-900 border border-zinc-800 text-[8px] text-zinc-400 shrink-0"><?php echo esc_html( $nextjs_branch ); ?></span>
-                                    </div>
-                                    <div class="flex items-center gap-1 flex-wrap">
-                                        <span class="text-[8px] font-mono text-zinc-500 uppercase tracking-wider">Routes:</span>
-                                        <?php foreach ( array_slice( $nextjs_routes, 0, 3 ) as $r_chip ) : ?>
-                                            <span class="px-1.5 py-0.2 rounded bg-zinc-900 border border-zinc-800/80 text-[8.5px] font-mono text-zinc-300"><?php echo esc_html( $r_chip ); ?></span>
-                                        <?php endforeach; ?>
-                                        <?php if ( count( $nextjs_routes ) > 3 ) : ?>
-                                            <span class="text-[8px] font-mono text-zinc-500">+<?php echo count( $nextjs_routes ) - 3; ?> more</span>
-                                        <?php endif; ?>
-                                    </div>
-                                </div>
-
-                                <!-- Bottom Row: 1-Click Quick Actions -->
-                                <div class="flex items-center gap-2 pt-1.5 border-t border-zinc-900">
-                                    <a href="<?php echo esc_url( $canvas_preview_url ); ?>" target="_blank" class="flex-1 h-6 bg-white hover:bg-zinc-100 text-zinc-950 font-bold text-[9.5px] rounded-md flex items-center justify-center gap-1 transition-all no-underline shadow-3xs cursor-pointer select-none">
-                                        <span>Open Live Site</span>
-                                        <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                                    </a>
-                                    <button type="button" onclick="window.buildNextJSRepo(<?php echo $live_theme['id']; ?>)" class="flex-1 h-6 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 text-zinc-200 font-semibold text-[9.5px] rounded-md flex items-center justify-center gap-1 transition-all cursor-pointer select-none" title="Rebuild &amp; sync static build from GitHub">
-                                        <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                                        <span>Build Static</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <?php else : ?>
-                        <!-- Standard Theme Browser Preview Box -->
-                        <div class="w-full rounded-xl border border-zinc-200/80 shadow-3xs overflow-hidden flex flex-col bg-zinc-50 select-none" style="height: 190px; width: 100%; max-width: 340px;">
-                            <!-- Browser Top Bar -->
-                            <div class="flex items-center gap-1.5 px-3 py-1.5 border-b border-zinc-200/60 shrink-0 bg-white">
-                                <span class="w-1.5 h-1.5 rounded-full bg-zinc-300"></span>
-                                <span class="w-1.5 h-1.5 rounded-full bg-zinc-300"></span>
-                                <span class="w-1.5 h-1.5 rounded-full bg-zinc-300"></span>
-                                <div class="flex-1 mx-2 bg-zinc-100/90 rounded px-2 py-0.5 text-[8px] font-mono text-zinc-500 text-center truncate">
-                                    <?php echo esc_html( $canvas_display_url ); ?>
-                                </div>
-                                <a href="<?php echo esc_url( $canvas_preview_url ); ?>" target="_blank" class="text-zinc-400 hover:text-zinc-800 transition-colors" title="Open Preview">
-                                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                                </a>
-                            </div>
-                            <!-- Live Preview Frame -->
-                            <div class="flex-1 relative overflow-hidden bg-white">
+                            <!-- Live Rendered Preview Frame -->
+                            <div class="flex-1 relative overflow-hidden bg-zinc-950">
                                 <iframe 
                                     src="<?php echo esc_url( $canvas_preview_url ); ?>" 
                                     loading="lazy"
                                     sandbox="allow-scripts allow-same-origin"
                                     class="absolute border-none pointer-events-none" 
-                                    style="top:0;left:0;width:1280px;height:760px;transform:scale(0.25);transform-origin:0 0;background:#ffffff;"
+                                    style="top:0;left:0;width:1280px;height:760px;transform:scale(0.265);transform-origin:0 0;background:#09090b;"
                                     tabindex="-1"
                                     aria-hidden="true">
                                 </iframe>
+                                <?php if ( $is_nextjs ) : ?>
+                                <!-- Bottom Monochromatic Quick Strip -->
+                                <div class="absolute inset-x-0 bottom-0 py-1.5 px-2.5 bg-gradient-to-t from-zinc-950 via-zinc-950/90 to-transparent flex items-center justify-between gap-2 z-10 opacity-90 group-hover:opacity-100 transition-opacity">
+                                    <div class="flex items-center gap-1.5 min-w-0">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
+                                        <span class="text-[9px] font-mono font-medium text-zinc-300 truncate max-w-[130px]" title="<?php echo esc_attr($nextjs_repo); ?>"><?php echo esc_html( $nextjs_repo ); ?></span>
+                                    </div>
+                                    <div class="flex items-center gap-1 shrink-0">
+                                        <a href="<?php echo esc_url( $canvas_preview_url ); ?>" target="_blank" class="px-1.5 py-0.5 bg-white hover:bg-zinc-100 text-zinc-950 font-bold text-[8.5px] rounded flex items-center gap-0.5 no-underline shadow-3xs cursor-pointer select-none">
+                                            <span>Open ↗</span>
+                                        </a>
+                                        <button type="button" onclick="window.buildNextJSRepo(<?php echo $live_theme['id']; ?>)" class="px-1.5 py-0.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 font-medium text-[8.5px] rounded flex items-center gap-0.5 cursor-pointer select-none" title="Build static site">
+                                            <span>⚡ Build</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <?php endif; ?>
                             </div>
                         </div>
-                        <?php endif; ?>
                     </div>
 
                     <!-- Vertical Divider (Desktop/Tablet) -->
