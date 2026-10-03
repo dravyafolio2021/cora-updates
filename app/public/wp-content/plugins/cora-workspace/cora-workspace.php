@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.318
+ * Version:           4.9.319
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.318' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.319' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -9980,6 +9980,21 @@ function cora_canvas_theme_frontend_router() {
         return;
     }
 
+    // Direct static asset fast-path: /_next/*, /_expo/*, /brand/*, /favicon.svg, /og.png, /earth-atmos.jpg, etc.
+    $path_ext = strtolower( pathinfo( $path, PATHINFO_EXTENSION ) );
+    $is_static_asset_req = ( $first_part === '_next' || $first_part === '_expo' || $first_part === 'brand' || in_array( $path_ext, array( 'css', 'js', 'png', 'svg', 'jpg', 'jpeg', 'webp', 'ico', 'woff', 'woff2', 'ttf', 'json', 'map' ), true ) );
+    if ( $is_static_asset_req && ! in_array( $first_part, array( 'wp-content', 'wp-includes', 'assets', 'core', 'wp-admin' ), true ) ) {
+        global $wpdb;
+        $static_theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE settings LIKE '%is_static_built%' ORDER BY status = 'live' DESC, updated_at DESC, id DESC LIMIT 1", ARRAY_A );
+        if ( $static_theme ) {
+            $st_settings = json_decode( $static_theme['settings'] ?? '{}', true ) ?: array();
+            if ( ! empty( $st_settings['static_build_path'] ) && is_dir( $st_settings['static_build_path'] ) ) {
+                cora_render_nextjs_static_build( $st_settings['static_build_path'], $path, $static_theme, null, false );
+                exit;
+            }
+        }
+    }
+
     // List of known admin dashboard subpages and public auth pages
     $admin_subpages = function_exists( 'cora_get_all_workspace_subpages' ) ? cora_get_all_workspace_subpages() : array( 
         'dashboard', 'canvas', 'users', 'team-roles', 'user-roles', 'cora-roles',
@@ -10100,9 +10115,20 @@ function cora_canvas_theme_frontend_router() {
 
         if ( ! empty( $cand_agency_ids ) ) {
             $in_sql = implode( ',', array_map( 'intval', $cand_agency_ids ) );
-            $live_theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE agency_id IN ($in_sql) AND status = 'live' ORDER BY id DESC LIMIT 1", ARRAY_A );
+            $live_theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE agency_id IN ($in_sql) AND status = 'live' ORDER BY updated_at DESC, id DESC LIMIT 1", ARRAY_A );
             if ( ! $live_theme ) {
-                $live_theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE agency_id IN ($in_sql) ORDER BY id DESC LIMIT 1", ARRAY_A );
+                $live_theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE agency_id IN ($in_sql) ORDER BY updated_at DESC, id DESC LIMIT 1", ARRAY_A );
+            }
+            if ( $live_theme ) {
+                $active_theme_id = intval( $live_theme['id'] );
+            }
+        }
+
+        // Global fallback: If still no theme found by agency, fetch latest live theme globally!
+        if ( ! $active_theme_id ) {
+            $live_theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live' ORDER BY updated_at DESC, id DESC LIMIT 1", ARRAY_A );
+            if ( ! $live_theme ) {
+                $live_theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes ORDER BY updated_at DESC, id DESC LIMIT 1", ARRAY_A );
             }
             if ( $live_theme ) {
                 $active_theme_id = intval( $live_theme['id'] );
@@ -10118,8 +10144,10 @@ function cora_canvas_theme_frontend_router() {
             return; // Delegate routing to cora_git_sync_serve_frontend running at priority 4
         }
 
+        $is_nextjs = ( 'nextjs' === $source || ( ! empty( $active_theme['source'] ) && 'nextjs' === $active_theme['source'] ) || ! empty( $theme_settings['github_repo'] ) || ! empty( $theme_settings['is_static_built'] ) );
+
         // If active/preview theme source is Next.js, render static build, live frame bridge, or native connector screen immediately
-        if ( 'nextjs' === $source || ( ! empty( $active_theme['source'] ) && 'nextjs' === $active_theme['source'] ) ) {
+        if ( $is_nextjs ) {
             $nextjs_live_url = ! empty( $theme_settings['nextjs_live_url'] ) ? trim( $theme_settings['nextjs_live_url'] ) : ( ! empty( $theme_settings['live_url'] ) ? trim( $theme_settings['live_url'] ) : '' );
             $nextjs_live_url = rtrim( $nextjs_live_url, '/' );
 
