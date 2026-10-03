@@ -36,7 +36,8 @@ class Cora_NextJS_Integration {
             'cora_nextjs_trigger_isr',
             'cora_nextjs_save_page_props',
             'cora_nextjs_sync_repo',
-            'cora_nextjs_save_live_url'
+            'cora_nextjs_save_live_url',
+            'cora_nextjs_build_repo'
         );
 
         foreach ( $actions as $action ) {
@@ -438,6 +439,36 @@ class Cora_NextJS_Integration {
         $default_branch = $repo_data['default_branch'] ?? 'main';
         $is_private = ! empty( $repo_data['private'] );
 
+        $discovered_live_url = '';
+        if ( ! empty( $repo_data['homepage'] ) && filter_var( $repo_data['homepage'], FILTER_VALIDATE_URL ) ) {
+            $discovered_live_url = rtrim( trim( $repo_data['homepage'] ), '/' );
+        }
+
+        // Also query GitHub deployments for any active production deployment URLs if homepage is empty
+        if ( empty( $discovered_live_url ) ) {
+            $dep_resp = wp_remote_get( "https://api.github.com/repos/{$repo_slug}/deployments?per_page=5", array( 'headers' => $headers, 'timeout' => 10 ) );
+            if ( ! is_wp_error( $dep_resp ) && wp_remote_retrieve_response_code( $dep_resp ) === 200 ) {
+                $deps = json_decode( wp_remote_retrieve_body( $dep_resp ), true ) ?: array();
+                if ( is_array( $deps ) ) {
+                    foreach ( $deps as $dep ) {
+                        if ( ! empty( $dep['id'] ) ) {
+                            $status_resp = wp_remote_get( "https://api.github.com/repos/{$repo_slug}/deployments/{$dep['id']}/statuses?per_page=1", array( 'headers' => $headers, 'timeout' => 10 ) );
+                            if ( ! is_wp_error( $status_resp ) && wp_remote_retrieve_response_code( $status_resp ) === 200 ) {
+                                $statuses = json_decode( wp_remote_retrieve_body( $status_resp ), true ) ?: array();
+                                if ( ! empty( $statuses[0]['environment_url'] ) && filter_var( $statuses[0]['environment_url'], FILTER_VALIDATE_URL ) ) {
+                                    $discovered_live_url = rtrim( trim( $statuses[0]['environment_url'] ), '/' );
+                                    break;
+                                } elseif ( ! empty( $statuses[0]['target_url'] ) && filter_var( $statuses[0]['target_url'], FILTER_VALIDATE_URL ) && false === strpos( $statuses[0]['target_url'], 'github.com' ) ) {
+                                    $discovered_live_url = rtrim( trim( $statuses[0]['target_url'] ), '/' );
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         // 2. Fetch Branches Roster
         $branches_list = array();
         $branches_resp = wp_remote_get( "https://api.github.com/repos/{$repo_slug}/branches?per_page=100", array( 'headers' => $headers, 'timeout' => 15 ) );
@@ -579,17 +610,18 @@ class Cora_NextJS_Integration {
         $framework_name = $is_app_router ? 'Next.js 14/15 (App Router)' : ( $is_pages_router ? 'Next.js (Pages Router)' : 'Next.js React Native' );
 
         return array(
-            'repo'           => $repo_slug,
-            'branch'         => $branch,
-            'default_branch' => $default_branch,
-            'branches'       => $branches_list,
-            'is_private'     => $is_private,
-            'framework'      => $framework_name,
-            'is_app_router'  => $is_app_router,
-            'has_typescript' => $has_typescript,
-            'has_tailwind'   => $has_tailwind,
-            'routes_count'   => count( $route_list ),
-            'routes'         => $route_list
+            'repo'                => $repo_slug,
+            'branch'              => $branch,
+            'default_branch'      => $default_branch,
+            'branches'            => $branches_list,
+            'is_private'          => $is_private,
+            'framework'           => $framework_name,
+            'is_app_router'       => $is_app_router,
+            'has_typescript'      => $has_typescript,
+            'has_tailwind'        => $has_tailwind,
+            'discovered_live_url' => $discovered_live_url,
+            'routes_count'        => count( $route_list ),
+            'routes'              => $route_list
         );
     }
 
@@ -843,6 +875,290 @@ class Cora_NextJS_Integration {
             'live_url' => $live_url,
             'theme_id' => $theme_id,
         ) );
+    }
+
+    /**
+     * AJAX: Build Connected Repository (Expo, Next.js, Vite, React) into Static Site
+     */
+    public function cora_nextjs_build_repo() {
+        $nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( $_POST['nonce'] ) : ( isset( $_POST['_wpnonce'] ) ? sanitize_text_field( $_POST['_wpnonce'] ) : '' );
+        if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'wp_rest' ) && ! check_ajax_referer( 'cora_ajax_nonce', 'nonce', false ) ) {
+            wp_send_json_error( array( 'message' => 'Security check failed. Please refresh the page.' ) );
+        }
+
+        if ( ! current_user_can( 'edit_theme_options' ) && ! current_user_can( 'manage_options' ) && ! is_user_logged_in() ) {
+            wp_send_json_error( array( 'message' => 'Permission denied. Please log in.' ) );
+        }
+
+        global $wpdb;
+        $theme_id = intval( $_POST['theme_id'] ?? 0 );
+        if ( $theme_id <= 0 ) {
+            $live_theme = $wpdb->get_row( "SELECT id FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live' ORDER BY id DESC LIMIT 1", ARRAY_A );
+            if ( ! $live_theme ) {
+                $live_theme = $wpdb->get_row( "SELECT id FROM {$wpdb->prefix}cora_canvas_themes ORDER BY id DESC LIMIT 1", ARRAY_A );
+            }
+            $theme_id = $live_theme ? intval( $live_theme['id'] ) : 0;
+        }
+
+        if ( $theme_id <= 0 ) {
+            wp_send_json_error( array( 'message' => 'Theme ID is required.' ) );
+        }
+
+        $theme = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d", $theme_id ), ARRAY_A );
+        if ( ! $theme ) {
+            wp_send_json_error( array( 'message' => 'Theme workspace not found.' ) );
+        }
+
+        $settings = json_decode( $theme['settings'] ?? '{}', true ) ?: array();
+        $repo_raw = $settings['github_repo'] ?? ( $_POST['repo'] ?? '' );
+        $branch   = $settings['github_branch'] ?? ( $_POST['branch'] ?? 'main' );
+        $pat      = $settings['lovable_pat'] ?? ( $settings['github_pat'] ?? get_option( 'cora_git_sync_token', '' ) );
+
+        if ( empty( $repo_raw ) ) {
+            wp_send_json_error( array( 'message' => 'No GitHub repository connected to this theme.' ) );
+        }
+
+        // Parse owner/repo
+        $repo_slug = '';
+        if ( preg_match( '/github\.com\/([^\/]+)\/([^\/\#\?]+)/i', $repo_raw, $m ) ) {
+            $repo_slug = trim( $m[1] ) . '/' . trim( preg_replace( '/\.git$/i', '', $m[2] ) );
+        } elseif ( count( explode( '/', trim( $repo_raw, '/' ) ) ) === 2 ) {
+            $repo_slug = trim( $repo_raw, '/' );
+        } else {
+            wp_send_json_error( array( 'message' => 'Invalid repository format. Please enter owner/repo or full GitHub URL.' ) );
+        }
+
+        $upload_dir = wp_upload_dir();
+        $build_base = trailingslashit( $upload_dir['basedir'] ) . 'cora-nextjs-builds';
+        $theme_build_dir = $build_base . '/theme_' . $theme_id;
+        $repo_dir = $theme_build_dir . '/repo';
+
+        if ( ! file_exists( $theme_build_dir ) ) {
+            wp_mkdir_p( $theme_build_dir );
+        }
+        if ( ! file_exists( $repo_dir ) ) {
+            wp_mkdir_p( $repo_dir );
+        }
+
+        $git_log = array();
+        $git_bin = null;
+        $possible_gits = array( 'git', '/usr/bin/git', '/usr/local/bin/git', '/opt/homebrew/bin/git' );
+        foreach ( $possible_gits as $g ) {
+            $test_out = array();
+            $test_ret = 0;
+            @exec( "$g --version 2>&1", $test_out, $test_ret );
+            if ( $test_ret === 0 ) {
+                $git_bin = $g;
+                break;
+            }
+        }
+
+        $auth_repo_url = ! empty( $pat ) ? "https://{$pat}@github.com/{$repo_slug}.git" : "https://github.com/{$repo_slug}.git";
+
+        if ( $git_bin ) {
+            if ( is_dir( $repo_dir . '/.git' ) ) {
+                $fetch_cmd = "cd " . escapeshellarg( $repo_dir ) . " && {$git_bin} remote set-url origin " . escapeshellarg( $auth_repo_url ) . " 2>&1 && {$git_bin} fetch origin " . escapeshellarg( $branch ) . " --depth 1 2>&1 && {$git_bin} reset --hard origin/" . escapeshellarg( $branch ) . " 2>&1";
+                @exec( $fetch_cmd, $git_log, $git_ret );
+            } else {
+                $clone_cmd = "{$git_bin} clone --depth 1 -b " . escapeshellarg( $branch ) . " " . escapeshellarg( $auth_repo_url ) . " " . escapeshellarg( $repo_dir ) . " 2>&1";
+                @exec( $clone_cmd, $git_log, $git_ret );
+            }
+        }
+
+        // Fallback: If git clone didn't produce package.json, try GitHub zipball archive download
+        if ( ! file_exists( $repo_dir . '/package.json' ) && ! glob( $repo_dir . '/*/package.json' ) ) {
+            $zip_url = "https://api.github.com/repos/{$repo_slug}/zipball/" . urlencode( $branch );
+            $headers = array(
+                'User-Agent' => 'Cora-Workspace-Build/1.0',
+                'Accept'     => 'application/vnd.github+json',
+            );
+            if ( ! empty( $pat ) ) {
+                $headers['Authorization'] = ( str_starts_with( $pat, 'github_pat_' ) ? 'Bearer ' : 'token ' ) . $pat;
+            }
+
+            $zip_res = wp_remote_get( $zip_url, array( 'headers' => $headers, 'timeout' => 60 ) );
+            if ( ! is_wp_error( $zip_res ) && wp_remote_retrieve_response_code( $zip_res ) === 200 ) {
+                require_once ABSPATH . 'wp-admin/includes/file.php';
+                WP_Filesystem();
+                $temp_zip = $theme_build_dir . '/repo_temp.zip';
+                file_put_contents( $temp_zip, wp_remote_retrieve_body( $zip_res ) );
+                $unzip_dir = $theme_build_dir . '/unzipped_' . time();
+                wp_mkdir_p( $unzip_dir );
+                $unzipped = unzip_file( $temp_zip, $unzip_dir );
+                @unlink( $temp_zip );
+                if ( ! is_wp_error( $unzipped ) ) {
+                    $extracted_dirs = glob( $unzip_dir . '/*', GLOB_ONLYDIR );
+                    if ( ! empty( $extracted_dirs ) ) {
+                        self::copy_dir_recursive( $extracted_dirs[0], $repo_dir );
+                    }
+                    self::delete_dir_recursive( $unzip_dir );
+                }
+            }
+        }
+
+        // Locate package.json
+        $working_dir = $repo_dir;
+        if ( ! file_exists( $working_dir . '/package.json' ) ) {
+            $sub_packages = glob( $repo_dir . '/*/package.json' );
+            if ( ! empty( $sub_packages ) ) {
+                $working_dir = dirname( $sub_packages[0] );
+            }
+        }
+
+        if ( ! file_exists( $working_dir . '/package.json' ) ) {
+            wp_send_json_error( array(
+                'message' => 'Could not locate package.json in repository. Build failed.',
+                'logs'    => implode( "\n", $git_log )
+            ) );
+        }
+
+        $package_json = json_decode( file_get_contents( $working_dir . '/package.json' ), true ) ?: array();
+        $deps = array_merge( $package_json['dependencies'] ?? array(), $package_json['devDependencies'] ?? array() );
+
+        $framework = 'nextjs';
+
+        if ( isset( $deps['expo'] ) ) {
+            $framework = 'expo';
+            $extra_deps = '';
+            if ( empty( $deps['react-dom'] ) || empty( $deps['react-native-web'] ) ) {
+                $extra_deps = 'npm install --no-audit react-dom@19.1.0 react-native-web@^0.21.0 --prefer-offline 2>&1 && ';
+            }
+            $build_cmd = 'npm install --no-audit --prefer-offline 2>&1 && ' . $extra_deps . 'npx expo export -p web 2>&1';
+        } elseif ( isset( $deps['next'] ) ) {
+            $framework = 'nextjs';
+            $build_cmd = 'npm install --no-audit --prefer-offline 2>&1 && npm run build 2>&1';
+        } elseif ( isset( $deps['vite'] ) ) {
+            $framework = 'vite';
+            $build_cmd = 'npm install --no-audit --prefer-offline 2>&1 && npm run build 2>&1';
+        } else {
+            $framework = 'react';
+            $build_cmd = 'npm install --no-audit --prefer-offline 2>&1 && npm run build 2>&1';
+        }
+
+        // Verify Node.js / npm existence
+        $node_check = array();
+        $node_ret = 0;
+        $path_env = 'export PATH=/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:$PATH';
+        @exec( "{$path_env} && node -v 2>&1 && npm -v 2>&1", $node_check, $node_ret );
+
+        if ( $node_ret !== 0 ) {
+            wp_send_json_error( array(
+                'message'   => 'Node.js or npm is not installed or accessible on the server.',
+                'framework' => $framework,
+                'logs'      => implode( "\n", $node_check )
+            ) );
+        }
+
+        // Execute build
+        $exec_cmd = "{$path_env} && cd " . escapeshellarg( $working_dir ) . " && " . $build_cmd;
+        $build_output = array();
+        $build_exit_code = 0;
+        @exec( $exec_cmd, $build_output, $build_exit_code );
+
+        $build_logs_str = implode( "\n", array_merge( $git_log, $build_output ) );
+
+        // Scan for static output directory
+        $candidate_dirs = array( 'out', 'dist', 'build', 'web-build', '.next/server/pages', '.next/standalone/out' );
+        $static_dir_path = '';
+
+        foreach ( $candidate_dirs as $cand ) {
+            $test_path = $working_dir . '/' . $cand;
+            if ( is_dir( $test_path ) ) {
+                $static_dir_path = realpath( $test_path );
+                break;
+            }
+        }
+
+        if ( empty( $static_dir_path ) && $working_dir !== $repo_dir ) {
+            foreach ( $candidate_dirs as $cand ) {
+                $test_path = $repo_dir . '/' . $cand;
+                if ( is_dir( $test_path ) ) {
+                    $static_dir_path = realpath( $test_path );
+                    break;
+                }
+            }
+        }
+
+        if ( empty( $static_dir_path ) || ! is_dir( $static_dir_path ) ) {
+            wp_send_json_error( array(
+                'message'    => 'Build completed but no static output directory (out, dist, build, web-build) was found.',
+                'framework'  => $framework,
+                'exit_code'  => $build_exit_code,
+                'logs'       => $build_logs_str
+            ) );
+        }
+
+        // Count static files
+        $file_count = 0;
+        try {
+            $iter = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator( $static_dir_path, RecursiveDirectoryIterator::SKIP_DOTS ),
+                RecursiveIteratorIterator::SELF_FIRST
+            );
+            foreach ( $iter as $f ) {
+                if ( $f->isFile() ) {
+                    $file_count++;
+                }
+            }
+        } catch ( Exception $e ) {}
+
+        // Save theme settings
+        $settings['source']            = 'nextjs';
+        $settings['is_static_built']   = true;
+        $settings['static_build_path'] = $static_dir_path;
+        $settings['static_built_at']   = current_time( 'mysql' );
+        $settings['framework']         = $framework;
+
+        $wpdb->update(
+            "{$wpdb->prefix}cora_canvas_themes",
+            array(
+                'settings'   => wp_json_encode( $settings ),
+                'updated_at' => current_time( 'mysql' )
+            ),
+            array( 'id' => $theme_id ),
+            array( '%s', '%s' ),
+            array( '%d' )
+        );
+
+        wp_send_json_success( array(
+            'message'     => 'Static site built successfully.',
+            'static_dir'  => $static_dir_path,
+            'framework'   => $framework,
+            'files_count' => $file_count,
+            'theme_id'    => $theme_id,
+            'build_logs'  => $build_logs_str
+        ) );
+    }
+
+    /**
+     * Helper: Recursively copy directory
+     */
+    public static function copy_dir_recursive( $src, $dst ) {
+        $dir = opendir( $src );
+        if ( ! $dir ) return;
+        @wp_mkdir_p( $dst );
+        while ( false !== ( $file = readdir( $dir ) ) ) {
+            if ( ( $file !== '.' ) && ( $file !== '..' ) ) {
+                if ( is_dir( $src . '/' . $file ) ) {
+                    self::copy_dir_recursive( $src . '/' . $file, $dst . '/' . $file );
+                } else {
+                    copy( $src . '/' . $file, $dst . '/' . $file );
+                }
+            }
+        }
+        closedir( $dir );
+    }
+
+    /**
+     * Helper: Recursively delete directory
+     */
+    public static function delete_dir_recursive( $dir ) {
+        if ( ! is_dir( $dir ) ) return;
+        $files = array_diff( scandir( $dir ), array( '.', '..' ) );
+        foreach ( $files as $file ) {
+            ( is_dir( "$dir/$file" ) ) ? self::delete_dir_recursive( "$dir/$file" ) : @unlink( "$dir/$file" );
+        }
+        return @rmdir( $dir );
     }
 }
 

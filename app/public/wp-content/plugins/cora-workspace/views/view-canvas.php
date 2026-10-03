@@ -2525,13 +2525,19 @@ function cora_get_sparkline_points( $history, $type ) {
                         </div>
                     </div>
 
-                    <div class="pt-3 border-t border-zinc-100 flex items-center justify-between gap-3">
-                        <button onclick="syncNextJSRoutesFromGit()" id="btn-nextjs-sync-git" class="px-3.5 py-2 border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-900 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
-                            <span>Sync Git Routes</span>
-                        </button>
-                        <button onclick="triggerNextJSISRRebuild()" id="btn-nextjs-trigger-isr" class="px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 border-none shadow-xs">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                    <div class="pt-3 border-t border-zinc-100 flex items-center justify-between gap-2 flex-wrap">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <button onclick="syncNextJSRoutesFromGit()" id="btn-nextjs-sync-git" class="px-3.5 py-2 border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-900 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                                <span>Sync Git Routes</span>
+                            </button>
+                            <button onclick="window.buildNextJSRepo()" id="btn-nextjs-build-static" class="px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 border-none shadow-xs">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                                <span id="btn-nextjs-build-label">Build Static Site</span>
+                            </button>
+                        </div>
+                        <button onclick="triggerNextJSISRRebuild()" id="btn-nextjs-trigger-isr" class="px-3 py-2 border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
                             <span>Trigger ISR Rebuild</span>
                         </button>
                     </div>
@@ -10982,6 +10988,51 @@ function cora_get_sparkline_points( $history, $type ) {
             jQuery('#nextjs-preview-loading').removeClass('hidden').show();
             iframe.src = iframe.src;
         }
+    };
+
+    window.buildNextJSRepo = function(themeId) {
+        themeId = themeId || canvasState.activeThemeId;
+        if (!themeId) {
+            window.coraShowToast('Please select a theme workspace first.', 'error');
+            return;
+        }
+
+        const btn = jQuery('#btn-nextjs-build-static');
+        const label = jQuery('#btn-nextjs-build-label');
+        btn.prop('disabled', true).addClass('opacity-70');
+        label.text('Building Static Site…');
+        window.coraShowToast('Cloning repository & executing build from GitHub…', 'info');
+
+        jQuery.ajax({
+            url: coraREData.ajaxUrl,
+            method: 'POST',
+            data: {
+                action: 'cora_nextjs_build_repo',
+                theme_id: themeId,
+                nonce: coraREData.ajaxNonce
+            },
+            success: function(res) {
+                btn.prop('disabled', false).removeClass('opacity-70');
+                label.text('Build Static Site');
+                if (res.success) {
+                    window.coraShowToast(res.data.message || 'Static site built successfully!', 'success');
+                    if (window.reloadNextJSPreview) {
+                        window.reloadNextJSPreview();
+                    }
+                } else {
+                    const msg = (res.data && res.data.message) ? res.data.message : 'Build failed.';
+                    window.coraShowToast(msg, 'error');
+                    if (res.data && res.data.logs) {
+                        console.error('Build logs:', res.data.logs);
+                    }
+                }
+            },
+            error: function() {
+                btn.prop('disabled', false).removeClass('opacity-70');
+                label.text('Build Static Site');
+                window.coraShowToast('Network error while building static site.', 'error');
+            }
+        });
     };
 
     window.onNextJSPreviewIframeLoaded = function() {

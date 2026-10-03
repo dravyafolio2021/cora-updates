@@ -8966,6 +8966,153 @@ function cora_provision_default_canvas_theme_for_agency( $agency_id ) {
 }
 
 /**
+ * Render Next.js / React Static Build Output & Asset Proxy
+ */
+if ( ! function_exists( 'cora_render_nextjs_static_build' ) ) {
+function cora_render_nextjs_static_build( $static_dir, $route_path = '/', $active_theme = array(), $target_ws = array(), $is_preview = false ) {
+    $static_dir = rtrim( $static_dir, '/' );
+    if ( ! is_dir( $static_dir ) ) {
+        return false;
+    }
+
+    $request_uri = $_SERVER['REQUEST_URI'];
+    $parsed_url  = parse_url( $request_uri );
+    $uri_path    = trim( $parsed_url['path'] ?? '', '/' );
+
+    // Normalize path to strip workspace prefix if needed
+    $home_path = trim( parse_url( home_url(), PHP_URL_PATH ) ?? '', '/' );
+    if ( ! empty( $home_path ) && strpos( $uri_path, $home_path ) === 0 ) {
+        $uri_path = trim( substr( $uri_path, strlen( $home_path ) ), '/' );
+    }
+
+    $clean_route = ( empty( $route_path ) || $route_path === 'home' || $route_path === '/' ) ? '' : trim( $route_path, '/' );
+
+    // 1. Check if requesting a static asset file (css, js, png, svg, json, font, etc.)
+    $asset_extensions = array( 'js', 'css', 'png', 'jpg', 'jpeg', 'gif', 'svg', 'webp', 'ico', 'json', 'woff', 'woff2', 'ttf', 'eot', 'map', 'wasm' );
+    $path_info = pathinfo( $uri_path );
+    $ext = strtolower( $path_info['extension'] ?? '' );
+
+    if ( in_array( $ext, $asset_extensions, true ) ) {
+        // Try finding asset inside static_dir
+        $candidate_asset_paths = array(
+            $static_dir . '/' . $uri_path,
+            $static_dir . '/' . preg_replace( '#^(site/[^/]+/|site/|[^/]+/site/|[^/]+/)#', '', $uri_path ),
+            $static_dir . '/' . basename( $uri_path )
+        );
+
+        foreach ( $candidate_asset_paths as $cap ) {
+            if ( file_exists( $cap ) && ! is_dir( $cap ) ) {
+                while ( ob_get_level() > 0 ) {
+                    ob_end_clean();
+                }
+                status_header( 200 );
+                
+                $mime_types = array(
+                    'js'    => 'application/javascript; charset=UTF-8',
+                    'css'   => 'text/css; charset=UTF-8',
+                    'json'  => 'application/json; charset=UTF-8',
+                    'png'   => 'image/png',
+                    'jpg'   => 'image/jpeg',
+                    'jpeg'  => 'image/jpeg',
+                    'gif'   => 'image/gif',
+                    'svg'   => 'image/svg+xml',
+                    'webp'  => 'image/webp',
+                    'ico'   => 'image/x-icon',
+                    'woff'  => 'font/woff',
+                    'woff2' => 'font/woff2',
+                    'ttf'   => 'font/ttf',
+                    'eot'   => 'application/vnd.ms-fontobject',
+                    'map'   => 'application/json',
+                    'wasm'  => 'application/wasm'
+                );
+
+                $content_type = $mime_types[ $ext ] ?? 'application/octet-stream';
+                header( 'Content-Type: ' . $content_type );
+                header( 'Cache-Control: public, max-age=31536000, immutable' );
+                header( 'Access-Control-Allow-Origin: *' );
+                readfile( $cap );
+                exit;
+            }
+        }
+    }
+
+    // 2. Serve HTML Route
+    $html_file = '';
+    if ( empty( $clean_route ) || $clean_route === 'home' ) {
+        if ( file_exists( $static_dir . '/index.html' ) ) {
+            $html_file = $static_dir . '/index.html';
+        }
+    } else {
+        if ( file_exists( $static_dir . '/' . $clean_route . '.html' ) ) {
+            $html_file = $static_dir . '/' . $clean_route . '.html';
+        } elseif ( file_exists( $static_dir . '/' . $clean_route . '/index.html' ) ) {
+            $html_file = $static_dir . '/' . $clean_route . '/index.html';
+        } elseif ( file_exists( $static_dir . '/index.html' ) ) {
+            // SPA fallback
+            $html_file = $static_dir . '/index.html';
+        }
+    }
+
+    if ( ! $html_file || ! file_exists( $html_file ) ) {
+        if ( file_exists( $static_dir . '/404.html' ) ) {
+            $html_file = $static_dir . '/404.html';
+        } elseif ( file_exists( $static_dir . '/index.html' ) ) {
+            $html_file = $static_dir . '/index.html';
+        } else {
+            return false;
+        }
+    }
+
+    $html = file_get_contents( $html_file );
+
+    while ( ob_get_level() > 0 ) {
+        ob_end_clean();
+    }
+    status_header( 200 );
+    nocache_headers();
+    header( 'Content-Type: text/html; charset=UTF-8' );
+
+    $ws_name = ! empty( $target_ws['name'] ) ? $target_ws['name'] : get_bloginfo( 'name' );
+    $ws_slug = ! empty( $target_ws['slug'] ) ? $target_ws['slug'] : 'workspace';
+    $theme_id = ! empty( $active_theme['id'] ) ? intval( $active_theme['id'] ) : 0;
+
+    $api_url = rest_url( 'cora-canvas/v1/' );
+    $public_api_url = home_url( '/api/v1/public/' );
+    $rest_nonce = wp_create_nonce( 'wp_rest' );
+    $ajax_nonce = wp_create_nonce( 'cora_ajax_nonce' );
+
+    $injection = "\n<script id=\"cora-context-bridge\">\n"
+        . "window.CORA_API_URL = " . json_encode( $api_url ) . ";\n"
+        . "window.CORA_PUBLIC_API_URL = " . json_encode( $public_api_url ) . ";\n"
+        . "window.CORA_NONCE = " . json_encode( $rest_nonce ) . ";\n"
+        . "window.CORA_AJAX_NONCE = " . json_encode( $ajax_nonce ) . ";\n"
+        . "window.CORA_THEME_ID = " . json_encode( $theme_id ) . ";\n"
+        . "window.CORA_WORKSPACE_SLUG = " . json_encode( $ws_slug ) . ";\n"
+        . "window.CORA_IS_STATIC_BUILD = true;\n"
+        . "</script>\n";
+
+    if ( $is_preview && function_exists( 'cora_canvas_preview_bar_js' ) ) {
+        $rest_url = esc_url( cora_get_origin_relative_url( rest_url( 'cora/v1/preview-bar-data' ) ) );
+        $site_url = esc_url( home_url() );
+        $injection .= '<script id="cora-preview-bar-injector">' . "\n"
+            . 'var REST_BASE = ' . json_encode( $rest_url ) . ";\n"
+            . 'var SITE_URL = ' . json_encode( $site_url ) . ";\n"
+            . cora_canvas_preview_bar_js()
+            . '</script>' . "\n";
+    }
+
+    if ( stripos( $html, '</head>' ) !== false ) {
+        $html = str_ireplace( '</head>', $injection . '</head>', $html );
+    } else {
+        $html = $injection . $html;
+    }
+
+    echo $html;
+    exit;
+}
+}
+
+/**
  * Render Next.js Live Frame Bridge & Embedded Headless View
  */
 if ( ! function_exists( 'cora_render_nextjs_live_frame' ) ) {
@@ -9050,15 +9197,21 @@ function cora_render_nextjs_live_frame( $live_url, $route_path = '/', $active_th
 
     <!-- Error / Local Dev Server Offline Card Overlay -->
     <div id="cora-error-overlay">
-        <div style="max-width: 480px; width: 100%; background: #18181b; border: 1px solid #27272a; border-radius: 16px; padding: 30px 26px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7); text-align: center;">
+        <div style="max-width: 500px; width: 100%; background: #18181b; border: 1px solid #27272a; border-radius: 16px; padding: 30px 26px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7); text-align: center;">
             <div style="width: 48px; height: 48px; border-radius: 14px; background: #27272a; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px; border: 1px solid #3f3f46;">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f4f4f5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
             </div>
             <h3 style="font-size: 17px; font-weight: 700; color: #ffffff; margin-bottom: 8px; letter-spacing: -0.01em;">Local Dev Server Offline</h3>
             <p style="font-size: 13px; color: #a1a1aa; line-height: 1.55; margin-bottom: 18px;">
                 Unable to connect to <code style="background: #27272a; color: #f4f4f5; padding: 2px 7px; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 12px; border: 1px solid #3f3f46;"><?php echo esc_html( $live_url ); ?></code>.<br>
-                Please ensure your local Next.js development server is active in terminal.
+                Build the static site from your GitHub repo or start your local dev server.
             </p>
+
+            <!-- 1-Click Primary Action: Build Static Site from GitHub -->
+            <button id="btn-inline-build" onclick="runInlineStaticBuild()" style="background: #ffffff; color: #09090b; border: none; font-weight: 700; font-size: 13px; padding: 11px 20px; border-radius: 8px; cursor: pointer; transition: all 0.15s ease; display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-bottom: 14px; box-shadow: 0 4px 14px rgba(255,255,255,0.12);">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                <span id="btn-inline-build-label">Build Static Site from GitHub</span>
+            </button>
             
             <!-- Terminal Instruction Card -->
             <div style="background: #09090b; border: 1px solid #27272a; border-radius: 10px; padding: 12px 14px; text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #d4d4d8; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
@@ -9071,7 +9224,7 @@ function cora_render_nextjs_live_frame( $live_url, $route_path = '/', $active_th
 
             <!-- Action Buttons Grid -->
             <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
-                <button onclick="window.location.reload()" style="background: #ffffff; color: #09090b; border: none; font-weight: 700; font-size: 12.5px; padding: 9px 18px; border-radius: 8px; cursor: pointer; transition: opacity 0.15s ease; display: inline-flex; align-items: center; gap: 6px;">
+                <button onclick="window.location.reload()" style="background: #27272a; color: #f4f4f5; border: 1px solid #3f3f46; font-weight: 600; font-size: 12.5px; padding: 9px 16px; border-radius: 8px; cursor: pointer; transition: opacity 0.15s ease; display: inline-flex; align-items: center; gap: 6px;">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
                     Retry Connection
                 </button>
@@ -9105,6 +9258,45 @@ function cora_render_nextjs_live_frame( $live_url, $route_path = '/', $active_th
             if (overlay) overlay.classList.add('active');
             if (loader) loader.style.display = 'none';
         }
+
+        window.runInlineStaticBuild = function() {
+            var btn = document.getElementById('btn-inline-build');
+            var label = document.getElementById('btn-inline-build-label');
+            if (btn) btn.disabled = true;
+            if (label) label.innerText = 'Cloning & Building from GitHub…';
+
+            var fd = new FormData();
+            fd.append('action', 'cora_nextjs_build_repo');
+            fd.append('theme_id', themeId);
+            fd.append('nonce', window.CORA_AJAX_NONCE || '');
+
+            fetch('/wp-admin/admin-ajax.php', {
+                method: 'POST',
+                body: fd
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(res) {
+                if (res && res.success) {
+                    if (label) label.innerText = 'Build Complete! Loading…';
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 600);
+                } else {
+                    if (btn) btn.disabled = false;
+                    if (label) label.innerText = 'Build Static Site from GitHub';
+                    var errMsg = (res && res.data && res.data.message) ? res.data.message : 'Build failed.';
+                    alert(errMsg);
+                    if (res && res.data && res.data.logs) {
+                        console.error('Build logs:', res.data.logs);
+                    }
+                }
+            })
+            .catch(function(err) {
+                if (btn) btn.disabled = false;
+                if (label) label.innerText = 'Build Static Site from GitHub';
+                alert('Network error while building repository.');
+            });
+        };
 
         // Fast probe check via fetch (immediately detects offline localhost)
         if (window.fetch && window.CORA_NEXTJS_LIVE_URL) {
@@ -9785,14 +9977,20 @@ function cora_canvas_theme_frontend_router() {
             return; // Delegate routing to cora_git_sync_serve_frontend running at priority 4
         }
 
-        // If active/preview theme source is Next.js, render live frame bridge or native connector screen immediately
+        // If active/preview theme source is Next.js, render static build, live frame bridge, or native connector screen immediately
         if ( 'nextjs' === $source || ( ! empty( $active_theme['source'] ) && 'nextjs' === $active_theme['source'] ) ) {
             $nextjs_live_url = ! empty( $theme_settings['nextjs_live_url'] ) ? trim( $theme_settings['nextjs_live_url'] ) : ( ! empty( $theme_settings['live_url'] ) ? trim( $theme_settings['live_url'] ) : '' );
             $nextjs_live_url = rtrim( $nextjs_live_url, '/' );
 
             $target_route = ( empty( $target_page_slug ) || $target_page_slug === 'home' ) ? '/' : '/' . ltrim( $target_page_slug, '/' );
 
-            if ( ! empty( $nextjs_live_url ) ) {
+            // Prioritize static build if compiled from GitHub
+            if ( ! empty( $theme_settings['is_static_built'] ) && ! empty( $theme_settings['static_build_path'] ) && is_dir( $theme_settings['static_build_path'] ) && empty( $_GET['cv_edit_url'] ) ) {
+                cora_render_nextjs_static_build( $theme_settings['static_build_path'], $target_route, $active_theme, $target_ws, $is_preview );
+                exit;
+            }
+
+            if ( ! empty( $nextjs_live_url ) && empty( $_GET['cv_edit_url'] ) ) {
                 cora_render_nextjs_live_frame( $nextjs_live_url, $target_route, $active_theme, $target_ws, $is_preview );
                 exit;
             } else {
@@ -9908,7 +10106,7 @@ function cora_canvas_theme_frontend_router() {
 
     $source = isset( $theme_settings['source'] ) ? $theme_settings['source'] : ( isset( $active_theme['source'] ) ? $active_theme['source'] : '' );
 
-    // If active/preview theme source is Next.js, render live frame bridge or native connector screen
+    // If active/preview theme source is Next.js, render static build, live frame bridge, or native connector screen
     if ( 'nextjs' === $source || ( ! empty( $active_theme['source'] ) && 'nextjs' === $active_theme['source'] ) ) {
         $nextjs_live_url = ! empty( $theme_settings['nextjs_live_url'] ) ? trim( $theme_settings['nextjs_live_url'] ) : ( ! empty( $theme_settings['live_url'] ) ? trim( $theme_settings['live_url'] ) : '' );
         $nextjs_live_url = rtrim( $nextjs_live_url, '/' );
@@ -9918,6 +10116,12 @@ function cora_canvas_theme_frontend_router() {
             $target_route = ( ! empty( $canvas_page['is_homepage'] ) || ( isset( $canvas_page['slug'] ) && $canvas_page['slug'] === 'home' ) ) ? '/' : '/' . ltrim( $canvas_page['slug'], '/' );
         } elseif ( ! empty( $target_page_slug ) && $target_page_slug !== 'home' ) {
             $target_route = '/' . ltrim( $target_page_slug, '/' );
+        }
+
+        // Prioritize static build if compiled
+        if ( ! empty( $theme_settings['is_static_built'] ) && ! empty( $theme_settings['static_build_path'] ) && is_dir( $theme_settings['static_build_path'] ) && empty( $_GET['cv_edit_url'] ) ) {
+            cora_render_nextjs_static_build( $theme_settings['static_build_path'], $target_route, $active_theme, $target_ws, $is_preview );
+            exit;
         }
 
         if ( ! empty( $nextjs_live_url ) && empty( $_GET['cv_edit_url'] ) ) {
