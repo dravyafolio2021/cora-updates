@@ -9048,11 +9048,12 @@ function cora_provision_default_canvas_theme_for_agency( $agency_id ) {
 if ( ! function_exists( 'cora_render_nextjs_static_build' ) ) {
 function cora_render_nextjs_static_build( $static_dir, $route_path = '/', $active_theme = array(), $target_ws = array(), $is_preview = false ) {
     $static_dir = rtrim( $static_dir, '/' );
-    if ( ! is_dir( $static_dir ) ) {
+    $real_static_dir = realpath( $static_dir );
+    if ( ! $real_static_dir || ! is_dir( $real_static_dir ) ) {
         return false;
     }
 
-    $request_uri = $_SERVER['REQUEST_URI'];
+    $request_uri = $_SERVER['REQUEST_URI'] ?? '';
     $parsed_url  = parse_url( $request_uri );
     $uri_path    = trim( $parsed_url['path'] ?? '', '/' );
 
@@ -9072,16 +9073,27 @@ function cora_render_nextjs_static_build( $static_dir, $route_path = '/', $activ
     if ( in_array( $ext, $asset_extensions, true ) ) {
         // Try finding asset inside static_dir
         $candidate_asset_paths = array(
-            $static_dir . '/' . $uri_path,
-            $static_dir . '/' . preg_replace( '#^(site/[^/]+/|site/|[^/]+/site/|[^/]+/)#', '', $uri_path ),
-            $static_dir . '/' . basename( $uri_path )
+            $real_static_dir . '/' . $uri_path,
+            $real_static_dir . '/' . preg_replace( '#^(site/[^/]+/|site/|[^/]+/site/|[^/]+/)#', '', $uri_path ),
+            $real_static_dir . '/' . basename( $uri_path )
         );
 
         foreach ( $candidate_asset_paths as $cap ) {
-            if ( file_exists( $cap ) && ! is_dir( $cap ) ) {
+            $real_cap = realpath( $cap );
+            // Path traversal defense: file must reside strictly inside $real_static_dir
+            if ( $real_cap && strpos( $real_cap, $real_static_dir ) === 0 && file_exists( $real_cap ) && ! is_dir( $real_cap ) ) {
                 while ( ob_get_level() > 0 ) {
                     ob_end_clean();
                 }
+
+                // Fast 304 Not Modified check
+                $filemtime = filemtime( $real_cap );
+                $etag = '"' . md5( $real_cap . $filemtime ) . '"';
+                if ( isset( $_SERVER['HTTP_IF_NONE_MATCH'] ) && trim( $_SERVER['HTTP_IF_NONE_MATCH'] ) === $etag ) {
+                    status_header( 304 );
+                    exit;
+                }
+
                 status_header( 200 );
                 
                 $mime_types = array(
@@ -9106,8 +9118,9 @@ function cora_render_nextjs_static_build( $static_dir, $route_path = '/', $activ
                 $content_type = $mime_types[ $ext ] ?? 'application/octet-stream';
                 header( 'Content-Type: ' . $content_type );
                 header( 'Cache-Control: public, max-age=31536000, immutable' );
+                header( 'ETag: ' . $etag );
                 header( 'Access-Control-Allow-Origin: *' );
-                readfile( $cap );
+                readfile( $real_cap );
                 exit;
             }
         }
@@ -9116,31 +9129,36 @@ function cora_render_nextjs_static_build( $static_dir, $route_path = '/', $activ
     // 2. Serve HTML Route
     $html_file = '';
     if ( empty( $clean_route ) || $clean_route === 'home' ) {
-        if ( file_exists( $static_dir . '/index.html' ) ) {
-            $html_file = $static_dir . '/index.html';
+        if ( file_exists( $real_static_dir . '/index.html' ) ) {
+            $html_file = $real_static_dir . '/index.html';
         }
     } else {
-        if ( file_exists( $static_dir . '/' . $clean_route . '.html' ) ) {
-            $html_file = $static_dir . '/' . $clean_route . '.html';
-        } elseif ( file_exists( $static_dir . '/' . $clean_route . '/index.html' ) ) {
-            $html_file = $static_dir . '/' . $clean_route . '/index.html';
-        } elseif ( file_exists( $static_dir . '/index.html' ) ) {
+        if ( file_exists( $real_static_dir . '/' . $clean_route . '.html' ) ) {
+            $html_file = $real_static_dir . '/' . $clean_route . '.html';
+        } elseif ( file_exists( $real_static_dir . '/' . $clean_route . '/index.html' ) ) {
+            $html_file = $real_static_dir . '/' . $clean_route . '/index.html';
+        } elseif ( file_exists( $real_static_dir . '/index.html' ) ) {
             // SPA fallback
-            $html_file = $static_dir . '/index.html';
+            $html_file = $real_static_dir . '/index.html';
         }
     }
 
     if ( ! $html_file || ! file_exists( $html_file ) ) {
-        if ( file_exists( $static_dir . '/404.html' ) ) {
-            $html_file = $static_dir . '/404.html';
-        } elseif ( file_exists( $static_dir . '/index.html' ) ) {
-            $html_file = $static_dir . '/index.html';
+        if ( file_exists( $real_static_dir . '/404.html' ) ) {
+            $html_file = $real_static_dir . '/404.html';
+        } elseif ( file_exists( $real_static_dir . '/index.html' ) ) {
+            $html_file = $real_static_dir . '/index.html';
         } else {
             return false;
         }
     }
 
-    $html = file_get_contents( $html_file );
+    $real_html = realpath( $html_file );
+    if ( ! $real_html || strpos( $real_html, $real_static_dir ) !== 0 ) {
+        return false;
+    }
+
+    $html = file_get_contents( $real_html );
 
     while ( ob_get_level() > 0 ) {
         ob_end_clean();
