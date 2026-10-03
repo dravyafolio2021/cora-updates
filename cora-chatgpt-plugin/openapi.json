@@ -1,0 +1,560 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Cora Workspace AI Actions Gateway",
+    "description": "Universal Model Context Protocol & OpenAI Actions API allowing ChatGPT Custom GPTs, Claude, and external AI agents to query and operate the Cora Workspace.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://stagging.heycora.in",
+      "description": "Cora Production Gateway"
+    }
+  ],
+  "paths": {
+    "/wp-json/cora/v1/mcp/tool/cora_get_workspace_overview": {
+      "post": {
+        "operationId": "cora_get_workspace_overview",
+        "summary": "Retrieve high-level business pulse, key performance metrics, pipeline deal value, collected revenue, outstanding receivables, active bookings/shoots, and pending tasks for the authenticated workspace.",
+        "description": "Retrieve high-level business pulse, key performance metrics, pipeline deal value, collected revenue, outstanding receivables, active bookings/shoots, and pending tasks for the authenticated workspace.",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Overview retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "data": { "type": "object" }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized / Invalid Bearer token" }
+        },
+        "security": [
+          { "BearerAuth": [] },
+          { "OAuth2": ["workspace:read"] }
+        ]
+      }
+    },
+    "/wp-json/cora/v1/mcp/tool/cora_search_knowledge_base": {
+      "post": {
+        "operationId": "cora_search_knowledge_base",
+        "summary": "Semantic & keyword search across workspace living memory and operational documents.",
+        "description": "Semantic & keyword search across the workspace living memory, ingested operational history, policy guidelines, client records, and documents.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "query": { "type": "string", "description": "Search query or question." },
+                  "category": { "type": "string", "description": "Optional category filter: financials, crm, operations, vault, reviews, activity, clients." },
+                  "limit": { "type": "integer", "description": "Max fragments (default: 5)." }
+                },
+                "required": ["query"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Search results retrieved" }
+        },
+        "security": [
+          { "BearerAuth": [] },
+          { "OAuth2": ["knowledge:read"] }
+        ]
+      }
+    },
+    "/wp-json/cora/v1/mcp/tool/cora_list_clients": {
+      "post": {
+        "operationId": "cora_list_clients",
+        "summary": "List client profiles and contact records.",
+        "description": "List client profiles, company names, contact phone/emails, and records in the workspace.",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "search": { "type": "string", "description": "Search query by name, email, phone, or company." },
+                  "type": { "type": "string", "description": "Filter by client type: client, buyer, seller, commercial, vip, or all." },
+                  "limit": { "type": "integer", "description": "Max records (default: 20)." }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Clients listed successfully" }
+        },
+        "security": [
+          { "BearerAuth": [] },
+          { "OAuth2": ["clients:read"] }
+        ]
+      }
+    },
+    "/wp-json/cora/v1/mcp/tool/cora_get_client": {
+      "post": {
+        "operationId": "cora_get_client",
+        "summary": "Retrieve complete profile details for a specific client.",
+        "description": "Retrieve complete profile details, active bookings, transactions, and notes for a specific client.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "client_id": { "type": "integer", "description": "Unique ID of the client." }
+                },
+                "required": ["client_id"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Client profile details" }
+        },
+        "security": [
+          { "BearerAuth": [] },
+          { "OAuth2": ["clients:read"] }
+        ]
+      }
+    },
+    "/wp-json/cora/v1/mcp/tool/cora_create_client": {
+      "post": {
+        "operationId": "cora_create_client",
+        "summary": "Create a new client record in CRM.",
+        "description": "Create a new client record in the workspace CRM.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string", "description": "Full name of the client or representative." },
+                  "email": { "type": "string", "description": "Email address." },
+                  "phone": { "type": "string", "description": "Phone number." },
+                  "company": { "type": "string", "description": "Company or organization name." },
+                  "type": { "type": "string", "description": "Type: client, commercial, buyer, seller, vip (default: client)." },
+                  "notes": { "type": "string", "description": "Initial notes or background." }
+                },
+                "required": ["name"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Client created successfully" }
+        },
+        "security": [
+          { "BearerAuth": [] },
+          { "OAuth2": ["clients:write"] }
+        ]
+      }
+    },
+    "/wp-json/cora/v1/mcp/tool/cora_list_leads": {
+      "post": {
+        "operationId": "cora_list_leads",
+        "summary": "List sales inquiries and deals across the CRM funnel.",
+        "description": "List inquiries, prospect leads, and deals across the CRM funnel with status and estimated deal values.",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": { "type": "string", "description": "Filter by status: new, contacted, qualified, proposal_sent, won, lost, or all." },
+                  "search": { "type": "string", "description": "Search by lead name, email, phone, or requirement." },
+                  "limit": { "type": "integer", "description": "Max records (default: 20)." }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Leads retrieved successfully" }
+        },
+        "security": [
+          { "BearerAuth": [] },
+          { "OAuth2": ["leads:read"] }
+        ]
+      }
+    },
+    "/wp-json/cora/v1/mcp/tool/cora_create_lead": {
+      "post": {
+        "operationId": "cora_create_lead",
+        "summary": "Capture a new incoming inquiry or sales opportunity.",
+        "description": "Capture a new incoming inquiry, project lead, or sales opportunity into the pipeline.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string", "description": "Full name of the prospect." },
+                  "email": { "type": "string", "description": "Email address." },
+                  "phone": { "type": "string", "description": "Phone number." },
+                  "requirement": { "type": "string", "description": "Service needed or project description." },
+                  "estimated_value": { "type": "number", "description": "Estimated deal value in INR/currency." },
+                  "source": { "type": "string", "description": "Lead source: website, instagram, referral, phone, walk_in, ai_chat." }
+                },
+                "required": ["name"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Lead captured successfully" }
+        },
+        "security": [
+          { "BearerAuth": [] },
+          { "OAuth2": ["leads:write"] }
+        ]
+      }
+    },
+    "/wp-json/cora/v1/mcp/tool/cora_update_lead_status": {
+      "post": {
+        "operationId": "cora_update_lead_status",
+        "summary": "Update the pipeline stage or details of a lead.",
+        "description": "Update the pipeline stage, estimated value, or notes of a CRM lead.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "lead_id": { "type": "integer", "description": "ID of the lead." },
+                  "status": { "type": "string", "description": "New status: new, contacted, qualified, proposal_sent, won, lost." },
+                  "notes": { "type": "string", "description": "Optional status update notes." },
+                  "estimated_value": { "type": "number", "description": "Updated deal value." }
+                },
+                "required": ["lead_id", "status"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Lead status updated" }
+        },
+        "security": [
+          { "BearerAuth": [] },
+          { "OAuth2": ["leads:write"] }
+        ]
+      }
+    },
+    "/wp-json/cora/v1/mcp/tool/cora_list_bookings": {
+      "post": {
+        "operationId": "cora_list_bookings",
+        "summary": "List calendar schedule and booking sessions.",
+        "description": "List calendar schedule, photo shoots, client appointments, and project dates.",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "start_date": { "type": "string", "description": "Start date filter (YYYY-MM-DD)." },
+                  "end_date": { "type": "string", "description": "End date filter (YYYY-MM-DD)." },
+                  "status": { "type": "string", "description": "Filter: confirmed, tentative, completed, cancelled, or all." },
+                  "limit": { "type": "integer", "description": "Max records (default: 20)." }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Bookings listed successfully" }
+        },
+        "security": [
+          { "BearerAuth": [] },
+          { "OAuth2": ["bookings:read"] }
+        ]
+      }
+    },
+    "/wp-json/cora/v1/mcp/tool/cora_create_booking": {
+      "post": {
+        "operationId": "cora_create_booking",
+        "summary": "Schedule a new photo shoot or client appointment.",
+        "description": "Schedule a new photo shoot, client appointment, or project session on the studio calendar.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": { "type": "string", "description": "Title of the session or shoot." },
+                  "client_id": { "type": "integer", "description": "Optional linked client ID." },
+                  "client_name": { "type": "string", "description": "Client name if not linked to client_id." },
+                  "shoot_date": { "type": "string", "description": "Date of the shoot (YYYY-MM-DD)." },
+                  "start_time": { "type": "string", "description": "Start time (HH:MM or HH:MM:SS)." },
+                  "end_time": { "type": "string", "description": "End time (HH:MM or HH:MM:SS)." },
+                  "location": { "type": "string", "description": "Location or studio bay." },
+                  "package_name": { "type": "string", "description": "Service package name." },
+                  "total_amount": { "type": "number", "description": "Total session booking amount." }
+                },
+                "required": ["title", "shoot_date"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Booking scheduled" }
+        },
+        "security": [
+          { "BearerAuth": [] },
+          { "OAuth2": ["bookings:write"] }
+        ]
+      }
+    },
+    "/wp-json/cora/v1/mcp/tool/cora_calculate_gst": {
+      "post": {
+        "operationId": "cora_calculate_gst",
+        "summary": "Calculate statutory GST tax breakdowns.",
+        "description": "Calculate exact Indian statutory GST tax breakdowns, CGST, SGST, IGST, and total invoice amounts given a base amount and state parameters.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "base_amount": { "type": "number", "description": "Net taxable base amount in INR." },
+                  "gst_rate": { "type": "number", "description": "GST rate percentage (e.g. 18 for 18%). Default: 18." },
+                  "is_interstate": { "type": "boolean", "description": "Set true if client is located in a different state (applies IGST). Default: false (applies CGST + SGST)." },
+                  "is_inclusive": { "type": "boolean", "description": "Set true if the base_amount already includes GST (reverse calculation). Default: false." }
+                },
+                "required": ["base_amount"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "GST breakdown calculation" }
+        },
+        "security": [
+          { "BearerAuth": [] },
+          { "OAuth2": ["invoices:read"] }
+        ]
+      }
+    },
+    "/wp-json/cora/v1/mcp/tool/cora_list_invoices": {
+      "post": {
+        "operationId": "cora_list_invoices",
+        "summary": "List client invoices and receivables.",
+        "description": "List client invoices, quotations, paid amounts, and outstanding receivables.",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": { "type": "string", "description": "Filter: paid, unpaid, partially_paid, overdue, draft, or all." },
+                  "client_id": { "type": "integer", "description": "Filter by client ID." },
+                  "search": { "type": "string", "description": "Search by invoice number or client name." },
+                  "limit": { "type": "integer", "description": "Max records (default: 20)." }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Invoices listed" }
+        },
+        "security": [
+          { "BearerAuth": [] },
+          { "OAuth2": ["invoices:read"] }
+        ]
+      }
+    },
+    "/wp-json/cora/v1/mcp/tool/cora_create_invoice": {
+      "post": {
+        "operationId": "cora_create_invoice",
+        "summary": "Generate a compliant tax invoice or quotation.",
+        "description": "Generate a compliant tax invoice or quotation with line items and GST calculation.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "client_id": { "type": "integer", "description": "Optional linked client ID." },
+                  "client_name": { "type": "string", "description": "Client full name or company." },
+                  "client_gstin": { "type": "string", "description": "Optional Client 15-digit GSTIN." },
+                  "line_items": {
+                    "type": "array",
+                    "description": "List of line items with description, quantity, rate, and amount.",
+                    "items": { "type": "object" }
+                  },
+                  "gst_rate": { "type": "number", "description": "GST percentage rate (default: 18)." },
+                  "is_interstate": { "type": "boolean", "description": "True for IGST, false for CGST+SGST." },
+                  "due_date": { "type": "string", "description": "Payment due date (YYYY-MM-DD)." },
+                  "notes": { "type": "string", "description": "Terms, bank account details, or payment notes." }
+                },
+                "required": ["client_name", "line_items"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Invoice generated" }
+        },
+        "security": [
+          { "BearerAuth": [] },
+          { "OAuth2": ["invoices:write"] }
+        ]
+      }
+    },
+    "/wp-json/cora/v1/mcp/tool/cora_list_tasks": {
+      "post": {
+        "operationId": "cora_list_tasks",
+        "summary": "List operational tasks and crew assignments.",
+        "description": "List operational tasks, team assignments, shoot prep checklists, and deadlines.",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": { "type": "string", "description": "Filter: pending, in_progress, completed, cancelled, or all." },
+                  "priority": { "type": "string", "description": "Filter: low, medium, high, urgent." },
+                  "assigned_to": { "type": "integer", "description": "Filter by assigned user ID." },
+                  "limit": { "type": "integer", "description": "Max records (default: 20)." }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Tasks listed" }
+        },
+        "security": [
+          { "BearerAuth": [] },
+          { "OAuth2": ["tasks:read"] }
+        ]
+      }
+    },
+    "/wp-json/cora/v1/mcp/tool/cora_create_task": {
+      "post": {
+        "operationId": "cora_create_task",
+        "summary": "Create an operational task or assignment.",
+        "description": "Create an operational task, shoot checklist item, or team assignment.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": { "type": "string", "description": "Task title or instruction." },
+                  "description": { "type": "string", "description": "Detailed description or checklist." },
+                  "priority": { "type": "string", "description": "Priority: low, medium, high, urgent (default: medium)." },
+                  "due_date": { "type": "string", "description": "Due date (YYYY-MM-DD)." },
+                  "assigned_to": { "type": "integer", "description": "User ID to assign task to." }
+                },
+                "required": ["title"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Task created" }
+        },
+        "security": [
+          { "BearerAuth": [] },
+          { "OAuth2": ["tasks:write"] }
+        ]
+      }
+    },
+    "/wp-json/cora/v1/mcp/tool/cora_list_vault_documents": {
+      "post": {
+        "operationId": "cora_list_vault_documents",
+        "summary": "List client contracts and e-sign records.",
+        "description": "List client contracts, agreements, model releases, and e-sign registry records in the document vault.",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "client_id": { "type": "integer", "description": "Filter by client ID." },
+                  "status": { "type": "string", "description": "Filter: signed, pending, expired, draft, or all." },
+                  "search": { "type": "string", "description": "Search by document title or reference number." },
+                  "limit": { "type": "integer", "description": "Max records (default: 20)." }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Vault documents listed" }
+        },
+        "security": [
+          { "BearerAuth": [] },
+          { "OAuth2": ["workspace:read"] }
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Enter your Cora Workspace MCP Access Token (found in Cora Workspace -> AI Tools / MCP)"
+      },
+      "OAuth2": {
+        "type": "oauth2",
+        "description": "Cora Workspace OAuth 2.1 Authorization Code Flow",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "https://stagging.heycora.in/oauth/authorize",
+            "tokenUrl": "https://stagging.heycora.in/oauth/token",
+            "scopes": {
+              "workspace:read": "Read workspace pulse and metrics",
+              "leads:read": "Read CRM leads and deal pipeline",
+              "leads:write": "Create and update CRM leads",
+              "clients:read": "Read client profiles and contacts",
+              "clients:write": "Create and edit client profiles",
+              "bookings:read": "Read calendar bookings and shoot schedules",
+              "bookings:write": "Create and update shoot bookings",
+              "invoices:read": "Read invoices and GST tax math",
+              "invoices:write": "Generate compliant tax invoices",
+              "tasks:read": "Read operational tasks and attendance",
+              "tasks:write": "Create and assign team tasks",
+              "knowledge:read": "Search living memory and documents",
+              "knowledge:write": "Store new operational memory fragments"
+            }
+          }
+        }
+      }
+    }
+  }
+}

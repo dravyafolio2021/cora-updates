@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.333
+ * Version:           4.9.334
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -9155,12 +9155,14 @@ function cora_render_nextjs_static_build( $static_dir, $route_path = '/', $activ
 
     $api_url = rest_url( 'cora-canvas/v1/' );
     $public_api_url = home_url( '/api/v1/public/' );
+    $form_embed_url = plugins_url( 'assets/js/cora-form-embed.js', __FILE__ );
     $rest_nonce = wp_create_nonce( 'wp_rest' );
     $ajax_nonce = wp_create_nonce( 'cora_ajax_nonce' );
 
     $injection = "\n<script id=\"cora-context-bridge\">\n"
         . "window.CORA_API_URL = " . json_encode( $api_url ) . ";\n"
         . "window.CORA_PUBLIC_API_URL = " . json_encode( $public_api_url ) . ";\n"
+        . "window.CORA_FORM_EMBED_URL = " . json_encode( $form_embed_url ) . ";\n"
         . "window.CORA_NONCE = " . json_encode( $rest_nonce ) . ";\n"
         . "window.CORA_AJAX_NONCE = " . json_encode( $ajax_nonce ) . ";\n"
         . "window.CORA_THEME_ID = " . json_encode( $theme_id ) . ";\n"
@@ -9195,13 +9197,31 @@ function cora_render_nextjs_static_build( $static_dir, $route_path = '/', $activ
         . "    }\n"
         . "};\n"
         . "\n"
-        . "/* Automatic Form Interception: Any standard form submits directly to Cora Leads CRM */\n"
+        . "/* Automatic Form Interception & Modal Embed Support */\n"
+        . "document.addEventListener('DOMContentLoaded', function() {\n"
+        . "    if (document.querySelector('.cora-form-embed, [data-cora-open-form]')) {\n"
+        . "        if (!document.querySelector('script[src*=\"cora-form-embed.js\"]')) {\n"
+        . "            var s = document.createElement('script');\n"
+        . "            s.src = window.CORA_FORM_EMBED_URL || '/wp-content/plugins/cora-workspace/assets/js/cora-form-embed.js';\n"
+        . "            s.defer = true;\n"
+        . "            document.head.appendChild(s);\n"
+        . "        }\n"
+        . "    }\n"
+        . "});\n"
+        . "\n"
         . "document.addEventListener('submit', async function(e) {\n"
         . "    var form = e.target;\n"
         . "    if (!form || form.tagName !== 'FORM') return;\n"
         . "    if (form.getAttribute('data-cora-ignore') === 'true') return;\n"
-        . "    var action = form.getAttribute('action') || '';\n"
-        . "    if (!action || action === '#' || action === '' || action.startsWith('javascript:')) {\n"
+        . "    var action = (form.getAttribute('action') || '').trim();\n"
+        . "    var isCoraEndpoint = action.indexOf('/wp-json/cora-canvas/v1/nextjs/forms/submit') !== -1 ||\n"
+        . "                         action.indexOf('/wp-json/cora/v1/forms/submit') !== -1 ||\n"
+        . "                         action.indexOf('cora-canvas/v1/nextjs/forms/submit') !== -1 ||\n"
+        . "                         action.indexOf('cora/v1/forms/submit') !== -1;\n"
+        . "    var isBlankAction = !action || action === '#' || action === '' || action.startsWith('javascript:');\n"
+        . "    var hasLeadFields = !!form.querySelector('[name=\"name\"], [name=\"email\"], [name=\"full_name\"], [name=\"first_name\"], [name=\"contact_name\"], [name=\"your-name\"], [name=\"your-email\"], input[type=\"email\"]');\n"
+        . "\n"
+        . "    if (isCoraEndpoint || isBlankAction || hasLeadFields) {\n"
         . "        e.preventDefault();\n"
         . "        var submitBtn = form.querySelector('button[type=\"submit\"], input[type=\"submit\"], button:not([type])');\n"
         . "        var originalText = submitBtn ? submitBtn.innerHTML : '';\n"
@@ -9218,20 +9238,28 @@ function cora_render_nextjs_static_build( $static_dir, $route_path = '/', $activ
         . "        if (!alertBox) {\n"
         . "            alertBox = document.createElement('div');\n"
         . "            alertBox.className = 'cora-form-feedback';\n"
-        . "            form.appendChild(alertBox);\n"
+        . "            if (submitBtn && submitBtn.parentNode === form) {\n"
+        . "                form.insertBefore(alertBox, submitBtn);\n"
+        . "            } else {\n"
+        . "                form.appendChild(alertBox);\n"
+        . "            }\n"
         . "        }\n"
         . "        if (result && result.success) {\n"
-        . "            alertBox.style.cssText = 'margin-top:12px;padding:12px 16px;background:#18181b;color:#10b981;border:1px solid #27272a;border-radius:10px;font-size:13px;font-weight:600;text-align:center;display:flex;align-items:center;justify-content:center;gap:8px;';\n"
-        . "            alertBox.innerHTML = '<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#10b981\" stroke-width=\"2.5\"><polyline points=\"20 6 9 17 4 12\"></polyline></svg> <span>' + (result.message || 'Thank you! Your message has been received.') + '</span>';\n"
+        . "            alertBox.style.cssText = 'margin-top:14px;margin-bottom:14px;padding:14px 18px;background:#09090b;color:#f4f4f5;border:1px solid #27272a;border-radius:10px;font-size:13px;font-weight:500;text-align:center;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 4px 12px rgba(0,0,0,0.3);';\n"
+        . "            alertBox.innerHTML = '<svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#10b981\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M22 11.08V12a10 10 0 1 1-5.93-9.14\"></path><polyline points=\"22 4 12 14.01 9 11.01\"></polyline></svg> <span>' + (result.message || 'Thank you! Your message has been received.') + '</span>';\n"
         . "            form.reset();\n"
-        . "            setTimeout(function() { if (alertBox) alertBox.remove(); }, 6000);\n"
+        . "            setTimeout(function() { if (alertBox && alertBox.parentNode) alertBox.remove(); }, 8000);\n"
         . "        } else {\n"
-        . "            alertBox.style.cssText = 'margin-top:12px;padding:12px 16px;background:#18181b;color:#f43f5e;border:1px solid #27272a;border-radius:10px;font-size:13px;font-weight:600;text-align:center;display:flex;align-items:center;justify-content:center;gap:8px;';\n"
-        . "            alertBox.innerHTML = '<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#f43f5e\" stroke-width=\"2.5\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle><line x1=\"12\" y1=\"8\" x2=\"12\" y2=\"12\"></line><line x1=\"12\" y1=\"16\" x2=\"12.01\" y2=\"16\"></line></svg> <span>' + (result && result.message ? result.message : 'Submission failed. Please check required fields.') + '</span>';\n"
+        . "            alertBox.style.cssText = 'margin-top:14px;margin-bottom:14px;padding:14px 18px;background:#09090b;color:#f43f5e;border:1px solid #27272a;border-radius:10px;font-size:13px;font-weight:500;text-align:center;display:flex;align-items:center;justify-content:center;gap:10px;';\n"
+        . "            alertBox.innerHTML = '<svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#f43f5e\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle><line x1=\"12\" y1=\"8\" x2=\"12\" y2=\"12\"></line><line x1=\"12\" y1=\"16\" x2=\"12.01\" y2=\"16\"></line></svg> <span>' + (result && result.message ? result.message : 'Submission failed. Please check required fields.') + '</span>';\n"
         . "        }\n"
         . "    }\n"
         . "});\n"
         . "</script>\n";
+
+    if ( strpos( $html, 'cora-form-embed' ) !== false || strpos( $html, 'data-cora-open-form' ) !== false ) {
+        $injection .= '<script src="' . esc_url( $form_embed_url ) . '" defer></script>' . "\n";
+    }
 
     if ( $is_preview && function_exists( 'cora_canvas_preview_bar_js' ) ) {
         $rest_url = esc_url( cora_get_origin_relative_url( rest_url( 'cora/v1/preview-bar-data' ) ) );
