@@ -4605,9 +4605,13 @@ function cora_get_sparkline_points( $history, $type ) {
 .atw-card:hover{transform:translateY(-4px);box-shadow:0 16px 48px rgba(0,0,0,.11),0 4px 16px rgba(0,0,0,.07)!important;}
 .atw-card:hover .atw-thumb{transform:scale(1.04);}
 .atw-thumb{transition:transform .5s cubic-bezier(.4,0,.2,1);display:block;width:100%;height:100%;object-fit:cover;}
+.atw-card.atw-sel-h{background:#ffffff!important;border-color:#18181b!important;box-shadow:0 0 0 3px rgba(24,24,27,.18),0 8px 32px rgba(0,0,0,.12)!important;}
 .atw-card.atw-sel-e{border-color:#18181b!important;box-shadow:0 0 0 3px rgba(24,24,27,.15),0 8px 32px rgba(0,0,0,.1)!important;}
 .atw-card.atw-sel-n{border-color:#18181b!important;box-shadow:0 0 0 3px rgba(24,24,27,.18),0 8px 32px rgba(0,0,0,.12)!important;}
 .atw-card.atw-sel-l{border-color:#7c3aed!important;box-shadow:0 0 0 3px rgba(124,58,237,.18),0 8px 32px rgba(124,58,237,.1)!important;}
+.atw-template-card{background:#ffffff;border:1.5px solid #e4e4e7;border-radius:16px;transition:all .2s cubic-bezier(.4,0,.2,1);cursor:pointer;overflow:hidden;}
+.atw-template-card:hover{border-color:#a1a1aa!important;transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.06)!important;}
+.atw-template-card.atw-sel-t{background:#fafafa!important;border-color:#18181b!important;box-shadow:0 0 0 2px rgba(24,24,27,.12),0 8px 28px rgba(0,0,0,.08)!important;}
 .atw-tab{transition:all .15s;border:none;cursor:pointer;font-size:11px;font-weight:700;font-family:inherit;}
 .atw-tab.atw-tab-on{background:white;color:#18181b;border:1px solid #e4e4e7!important;box-shadow:0 1px 3px rgba(0,0,0,.08);border-radius:10px;}
 .atw-tab.atw-tab-off{background:transparent;color:#71717a;border:1px solid transparent!important;border-radius:10px;}
@@ -4628,13 +4632,15 @@ function cora_get_sparkline_points( $history, $type ) {
 .atw-title-text { display: inline !important; }
 .atw-lbl-text { display: inline !important; }
 .atw-line-connector { width: 44px !important; margin: 0 6px !important; }
-.atw-builder-grid { display: grid !important; grid-template-columns: repeat(3, 1fr) !important; gap: 18px !important; width: 100% !important; max-width: 1060px !important; }
+.atw-builder-grid { display: grid !important; grid-template-columns: repeat(4, 1fr) !important; gap: 16px !important; width: 100% !important; max-width: 1160px !important; }
+.atw-prompts-grid { display: grid !important; grid-template-columns: repeat(3, 1fr) !important; gap: 16px !important; width: 100% !important; }
 .atw-token-branch-row { display: grid !important; grid-template-columns: 1fr 120px !important; gap: 12px !important; }
 .atw-template-grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 12px !important; }
 .atw-cancel-text { display: inline !important; }
 
-@media (max-width: 900px) {
-    .atw-builder-grid { grid-template-columns: 1fr !important; gap: 14px !important; }
+@media (max-width: 1024px) {
+    .atw-builder-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 14px !important; }
+    .atw-prompts-grid { grid-template-columns: repeat(2, 1fr) !important; }
 }
 
 @media (max-width: 640px) {
@@ -4642,6 +4648,8 @@ function cora_get_sparkline_points( $history, $type ) {
     .atw-title-text { display: none !important; }
     .atw-lbl-text { display: none !important; }
     .atw-line-connector { width: 20px !important; margin: 0 3px !important; }
+    .atw-builder-grid { grid-template-columns: 1fr !important; gap: 12px !important; }
+    .atw-prompts-grid { grid-template-columns: 1fr !important; }
     .atw-token-branch-row { grid-template-columns: 1fr !important; }
     .atw-template-grid { grid-template-columns: 1fr !important; }
     .atw-cancel-text { display: none !important; }
@@ -4690,28 +4698,71 @@ function cora_get_sparkline_points( $history, $type ) {
     <div id="atw-body" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;">
 
         <!-- STEP 1: Choose Builder -->
-        <div id="wizard-step-1" class="atw-anim" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:52px 32px 40px;">
-            <div style="text-align:center;margin-bottom:44px;max-width:540px;">
-                <p style="font-size:10px;font-weight:900;letter-spacing:.18em;text-transform:uppercase;color:#a1a1aa;margin-bottom:14px;">Step 1 of 3</p>
-                <h2 style="font-size:34px;font-weight:900;color:#18181b;letter-spacing:-.045em;line-height:1.08;margin-bottom:14px;">What are you<br>building with?</h2>
-                <p style="font-size:14px;color:#71717a;line-height:1.65;">Choose your frontend technology. Connect modern Next.js Git projects or import Elementor themes with full Cora operational control.</p>
+        <div id="wizard-step-1" class="atw-anim" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 28px 36px;">
+            <div style="text-align:center;margin-bottom:38px;max-width:580px;">
+                <p style="font-size:10px;font-weight:900;letter-spacing:.18em;text-transform:uppercase;color:#a1a1aa;margin-bottom:12px;">Step 1 of 3</p>
+                <h2 style="font-size:32px;font-weight:900;color:#18181b;letter-spacing:-.045em;line-height:1.1;margin-bottom:12px;">What are you<br>building with?</h2>
+                <p style="font-size:13.5px;color:#71717a;line-height:1.6;">Choose your frontend technology. Launch with instant AI Tailwind templates, connect Next.js Git repositories, or import Elementor kits.</p>
             </div>
             <div class="atw-builder-grid">
 
-                <!-- 1. Next.js Native Card (Featured / Headless) -->
-                <button onclick="wizardSelectBuilder('nextjs')" id="wizard-card-nextjs" class="atw-card atw-sel-n" style="text-align:left;background:white;border:2px solid #18181b;border-radius:20px;overflow:hidden;cursor:pointer;padding:0;box-shadow:0 1px 4px rgba(0,0,0,.06);">
+                <!-- 1. AI HTML & Tailwind Card (Featured / Default - html_ai) -->
+                <button onclick="wizardSelectBuilder('html_ai')" id="wizard-card-html-ai" class="atw-card atw-sel-h" style="text-align:left;background:white;border:2px solid #18181b;border-radius:20px;overflow:hidden;cursor:pointer;padding:0;box-shadow:0 1px 4px rgba(0,0,0,.06);display:flex;flex-direction:column;justify-content:space-between;">
+                    <div style="position:relative;overflow:hidden;background:#09090b;">
+                        <div style="width:100%;padding-bottom:56.25%;position:relative;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 40%, #27272a 0%, #09090b 100%);">
+                            <!-- Minimalist AI Visual -->
+                            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;">
+                                <div style="width:44px;height:44px;background:white;border-radius:12px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,0,0,.4);">
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#09090b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                </div>
+                                <span style="font-size:10px;font-weight:800;color:#e4e4e7;letter-spacing:0.04em;font-family:monospace;">HTML + TAILWIND AI</span>
+                            </div>
+                            <div id="atw-ov-h" style="display:flex;position:absolute;inset:0;background:rgba(24,24,27,.48);align-items:center;justify-content:center;">
+                                <div style="width:44px;height:44px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 24px rgba(0,0,0,.2);">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#18181b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Top left badge -->
+                        <div style="position:absolute;top:11px;left:11px;display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.95);backdrop-filter:blur(8px);border-radius:100px;padding:4px 9px 4px 6px;box-shadow:0 1px 6px rgba(0,0,0,.14);">
+                            <span style="width:6px;height:6px;background:#10b981;border-radius:50%;"></span>
+                            <span style="font-size:10px;font-weight:800;color:#18181b;letter-spacing:-.01em;">⚡ 10-Min AI Launch</span>
+                        </div>
+                    </div>
+                    <div style="padding:16px 18px 18px;display:flex;flex-direction:column;flex:1;justify-content:space-between;">
+                        <div>
+                            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:4px;">
+                                <div>
+                                    <h3 style="font-size:14px;font-weight:800;color:#18181b;letter-spacing:-.02em;margin-bottom:4px;line-height:1.2;">AI HTML & Tailwind (Claude / ChatGPT)</h3>
+                                    <p style="font-size:11.5px;color:#71717a;line-height:1.45;">Prompt-driven templates · Instant Zero-Build live launch · Built-in Lead CRM.</p>
+                                </div>
+                                <div id="wiz-radio-html-ai" style="width:18px;height:18px;min-width:18px;border-radius:50%;border:2px solid #18181b;display:flex;align-items:center;justify-content:center;margin-top:2px;transition:all .18s;flex-shrink:0;">
+                                    <div style="width:8px;height:8px;border-radius:50%;background:#18181b;transition:all .18s;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:12px;">
+                            <span style="font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:3px 7px;background:#18181b;color:white;border-radius:6px;">Claude Prompt Matrix</span>
+                            <span style="font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:3px 7px;background:#f4f4f5;color:#71717a;border-radius:6px;">Tailwind CSS</span>
+                            <span style="font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:3px 7px;background:#f4f4f5;color:#71717a;border-radius:6px;">Auto CRM Lead Capture</span>
+                        </div>
+                    </div>
+                </button>
+
+                <!-- 2. Next.js Native Card (Git) -->
+                <button onclick="wizardSelectBuilder('nextjs')" id="wizard-card-nextjs" class="atw-card" style="text-align:left;background:white;border:2px solid #e4e4e7;border-radius:20px;overflow:hidden;cursor:pointer;padding:0;box-shadow:0 1px 4px rgba(0,0,0,.06);display:flex;flex-direction:column;justify-content:space-between;">
                     <div style="position:relative;overflow:hidden;background:#09090b;">
                         <div style="width:100%;padding-bottom:56.25%;position:relative;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 40%, #27272a 0%, #09090b 100%);">
                             <!-- Next.js Dark Minimalist Visual -->
                             <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;">
-                                <div style="width:48px;height:48px;background:white;border-radius:12px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,0,0,.4);">
-                                    <svg width="26" height="26" viewBox="0 0 24 24" fill="#09090b"><path d="M12 2L2 19.7778H22L12 2Z"/></svg>
+                                <div style="width:44px;height:44px;background:white;border-radius:12px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,0,0,.4);">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="#09090b"><path d="M12 2L2 19.7778H22L12 2Z"/></svg>
                                 </div>
-                                <span style="font-size:11px;font-weight:800;color:#e4e4e7;letter-spacing:0.04em;font-family:monospace;">NEXT.JS APP ROUTER</span>
+                                <span style="font-size:10px;font-weight:800;color:#e4e4e7;letter-spacing:0.04em;font-family:monospace;">NEXT.JS APP ROUTER</span>
                             </div>
-                            <div id="atw-ov-n" style="display:flex;position:absolute;inset:0;background:rgba(24,24,27,.48);align-items:center;justify-content:center;">
-                                <div style="width:48px;height:48px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 24px rgba(0,0,0,.2);">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#18181b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            <div id="atw-ov-n" style="display:none;position:absolute;inset:0;background:rgba(24,24,27,.48);align-items:center;justify-content:center;">
+                                <div style="width:44px;height:44px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 24px rgba(0,0,0,.2);">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#18181b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                                 </div>
                             </div>
                         </div>
@@ -4721,32 +4772,34 @@ function cora_get_sparkline_points( $history, $type ) {
                             <span style="font-size:10px;font-weight:800;color:#18181b;letter-spacing:-.01em;">Native Next.js</span>
                         </div>
                     </div>
-                    <div style="padding:18px 20px 20px;">
-                        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:4px;">
-                            <div>
-                                <h3 style="font-size:15px;font-weight:800;color:#18181b;letter-spacing:-.025em;margin-bottom:4px;">Next.js Native (Git)</h3>
-                                <p style="font-size:12px;color:#71717a;line-height:1.55;">Connect GitHub repo · Headless React App Router · Full operational control.</p>
-                            </div>
-                            <div id="wiz-radio-nextjs" style="width:18px;height:18px;min-width:18px;border-radius:50%;border:2px solid #18181b;display:flex;align-items:center;justify-content:center;margin-top:2px;transition:all .18s;flex-shrink:0;">
-                                <div style="width:8px;height:8px;border-radius:50%;background:#18181b;transition:all .18s;"></div>
+                    <div style="padding:16px 18px 18px;display:flex;flex-direction:column;flex:1;justify-content:space-between;">
+                        <div>
+                            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:4px;">
+                                <div>
+                                    <h3 style="font-size:14px;font-weight:800;color:#18181b;letter-spacing:-.02em;margin-bottom:4px;line-height:1.2;">Next.js Native (Git)</h3>
+                                    <p style="font-size:11.5px;color:#71717a;line-height:1.45;">Connect GitHub repo · Headless React App Router · Full operational control.</p>
+                                </div>
+                                <div id="wiz-radio-nextjs" style="width:18px;height:18px;min-width:18px;border-radius:50%;border:2px solid #d4d4d8;display:flex;align-items:center;justify-content:center;margin-top:2px;transition:all .18s;flex-shrink:0;">
+                                    <div style="width:8px;height:8px;border-radius:50%;background:transparent;transition:all .18s;"></div>
+                                </div>
                             </div>
                         </div>
-                        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;">
-                            <span style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:3px 8px;background:#18181b;color:white;border-radius:6px;">App Router</span>
-                            <span style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:3px 8px;background:#f4f4f5;color:#71717a;border-radius:6px;">GitHub Sync</span>
-                            <span style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:3px 8px;background:#f4f4f5;color:#71717a;border-radius:6px;">ISR Rebuild</span>
+                        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:12px;">
+                            <span style="font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:3px 7px;background:#f4f4f5;color:#71717a;border-radius:6px;">App Router</span>
+                            <span style="font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:3px 7px;background:#f4f4f5;color:#71717a;border-radius:6px;">GitHub Sync</span>
+                            <span style="font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:3px 7px;background:#f4f4f5;color:#71717a;border-radius:6px;">ISR Rebuild</span>
                         </div>
                     </div>
                 </button>
 
-                <!-- 2. Elementor Card -->
-                <button onclick="wizardSelectBuilder('elementor')" id="wizard-card-elementor" class="atw-card" style="text-align:left;background:white;border:2px solid #e4e4e7;border-radius:20px;overflow:hidden;cursor:pointer;padding:0;box-shadow:0 1px 4px rgba(0,0,0,.06);">
+                <!-- 3. Elementor Card -->
+                <button onclick="wizardSelectBuilder('elementor')" id="wizard-card-elementor" class="atw-card" style="text-align:left;background:white;border:2px solid #e4e4e7;border-radius:20px;overflow:hidden;cursor:pointer;padding:0;box-shadow:0 1px 4px rgba(0,0,0,.06);display:flex;flex-direction:column;justify-content:space-between;">
                     <div style="position:relative;overflow:hidden;background:#f0f0ef;">
                         <div style="width:100%;padding-bottom:56.25%;position:relative;">
                             <img src="<?php echo esc_url( plugin_dir_url(dirname(__FILE__)) . 'assets/img/wizard-elementor-thumb.jpg' ); ?>" alt="Elementor editor" class="atw-thumb" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;" loading="lazy">
                             <div id="atw-ov-e" style="display:none;position:absolute;inset:0;background:rgba(24,24,27,.48);align-items:center;justify-content:center;">
-                                <div style="width:48px;height:48px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 24px rgba(0,0,0,.2);">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#18181b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                <div style="width:44px;height:44px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 24px rgba(0,0,0,.2);">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#18181b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                                 </div>
                             </div>
                         </div>
@@ -4755,32 +4808,34 @@ function cora_get_sparkline_points( $history, $type ) {
                             <span style="font-size:10px;font-weight:800;color:#18181b;letter-spacing:-.01em;">Elementor</span>
                         </div>
                     </div>
-                    <div style="padding:18px 20px 20px;">
-                        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:4px;">
-                            <div>
-                                <h3 style="font-size:15px;font-weight:800;color:#18181b;letter-spacing:-.025em;margin-bottom:4px;">Elementor Builder</h3>
-                                <p style="font-size:12px;color:#71717a;line-height:1.55;">Upload a Kit (.zip) or manage Elementor pages.</p>
-                            </div>
-                            <div id="wiz-radio-elementor" style="width:18px;height:18px;min-width:18px;border-radius:50%;border:2px solid #d4d4d8;display:flex;align-items:center;justify-content:center;margin-top:2px;transition:all .18s;flex-shrink:0;">
-                                <div style="width:8px;height:8px;border-radius:50%;background:transparent;transition:all .18s;"></div>
+                    <div style="padding:16px 18px 18px;display:flex;flex-direction:column;flex:1;justify-content:space-between;">
+                        <div>
+                            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:4px;">
+                                <div>
+                                    <h3 style="font-size:14px;font-weight:800;color:#18181b;letter-spacing:-.02em;margin-bottom:4px;line-height:1.2;">Elementor Builder / Kit</h3>
+                                    <p style="font-size:11.5px;color:#71717a;line-height:1.45;">Upload Elementor Kit (.zip) or manage Elementor pages.</p>
+                                </div>
+                                <div id="wiz-radio-elementor" style="width:18px;height:18px;min-width:18px;border-radius:50%;border:2px solid #d4d4d8;display:flex;align-items:center;justify-content:center;margin-top:2px;transition:all .18s;flex-shrink:0;">
+                                    <div style="width:8px;height:8px;border-radius:50%;background:transparent;transition:all .18s;"></div>
+                                </div>
                             </div>
                         </div>
-                        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;">
-                            <span style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:3px 8px;background:#f4f4f5;color:#71717a;border-radius:6px;">Upload Kit</span>
-                            <span style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:3px 8px;background:#f4f4f5;color:#71717a;border-radius:6px;">Visual Editor</span>
+                        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:12px;">
+                            <span style="font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:3px 7px;background:#f4f4f5;color:#71717a;border-radius:6px;">Upload Kit</span>
+                            <span style="font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:3px 7px;background:#f4f4f5;color:#71717a;border-radius:6px;">Visual Editor</span>
                         </div>
                     </div>
                 </button>
 
-                <!-- 3. Lovable Card — LOCKED / Coming Soon -->
-                <div id="wizard-card-lovable" onclick="if(typeof window.coraShowToast==='function'){window.coraShowToast('Lovable integration is coming soon!','info');}else{console.log('Lovable coming soon');}" class="atw-card" style="text-align:left;background:#fafafa;border:2px solid #e4e4e7;border-radius:20px;overflow:hidden;cursor:not-allowed;padding:0;box-shadow:0 1px 4px rgba(0,0,0,.04);opacity:.55;filter:grayscale(.35);position:relative;transition:opacity .2s,filter .2s;user-select:none;" onmouseover="this.style.opacity='.62';" onmouseout="this.style.opacity='.55';">
+                <!-- 4. Lovable Card — LOCKED / Coming Soon -->
+                <div id="wizard-card-lovable" onclick="if(typeof window.coraShowToast==='function'){window.coraShowToast('Lovable integration is coming soon!','info');}else{console.log('Lovable coming soon');}" class="atw-card" style="text-align:left;background:#fafafa;border:2px solid #e4e4e7;border-radius:20px;overflow:hidden;cursor:not-allowed;padding:0;box-shadow:0 1px 4px rgba(0,0,0,.04);opacity:.55;filter:grayscale(.35);position:relative;transition:opacity .2s,filter .2s;user-select:none;display:flex;flex-direction:column;justify-content:space-between;" onmouseover="this.style.opacity='.62';" onmouseout="this.style.opacity='.55';">
                     <div style="position:relative;overflow:hidden;background:#f0eef5;">
                         <div style="width:100%;padding-bottom:56.25%;position:relative;">
                             <img src="<?php echo esc_url( plugin_dir_url(dirname(__FILE__)) . 'assets/img/wizard-lovable-thumb.jpg' ); ?>" alt="Lovable Studio" class="atw-thumb" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;filter:grayscale(.3);" loading="lazy">
                             <!-- Permanent lock overlay -->
                             <div style="position:absolute;inset:0;background:rgba(24,24,27,.32);display:flex;align-items:center;justify-content:center;">
-                                <div style="width:48px;height:48px;background:rgba(255,255,255,.92);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.12);">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                <div style="width:44px;height:44px;background:rgba(255,255,255,.92);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.12);">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                                 </div>
                             </div>
                         </div>
@@ -4795,22 +4850,305 @@ function cora_get_sparkline_points( $history, $type ) {
                             <span style="font-size:9px;font-weight:800;color:#e4e4e7;letter-spacing:.04em;text-transform:uppercase;">Coming Soon</span>
                         </div>
                     </div>
-                    <div style="padding:18px 20px 20px;">
-                        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:4px;">
-                            <div>
-                                <h3 style="font-size:15px;font-weight:800;color:#a1a1aa;letter-spacing:-.025em;margin-bottom:4px;">Lovable Studio</h3>
-                                <p style="font-size:12px;color:#a1a1aa;line-height:1.55;">Connect a live AI-built Lovable.dev project.</p>
-                            </div>
-                            <div style="width:18px;height:18px;min-width:18px;display:flex;align-items:center;justify-content:center;margin-top:2px;flex-shrink:0;">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d4d4d8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    <div style="padding:16px 18px 18px;display:flex;flex-direction:column;flex:1;justify-content:space-between;">
+                        <div>
+                            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:4px;">
+                                <div>
+                                    <h3 style="font-size:14px;font-weight:800;color:#a1a1aa;letter-spacing:-.02em;margin-bottom:4px;line-height:1.2;">Lovable Studio (Locked / Coming Soon)</h3>
+                                    <p style="font-size:11.5px;color:#a1a1aa;line-height:1.45;">Connect a live AI-built Lovable.dev project.</p>
+                                </div>
+                                <div style="width:18px;height:18px;min-width:18px;display:flex;align-items:center;justify-content:center;margin-top:2px;flex-shrink:0;">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d4d4d8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                </div>
                             </div>
                         </div>
-                        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;">
-                            <span style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:3px 8px;background:#f4f4f5;color:#a1a1aa;border-radius:6px;border:1px solid #e4e4e7;">Lovable API</span>
-                            <span style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:3px 8px;background:#f4f4f5;color:#a1a1aa;border-radius:6px;border:1px solid #e4e4e7;">Live Sync</span>
+                        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:12px;">
+                            <span style="font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:3px 7px;background:#f4f4f5;color:#a1a1aa;border-radius:6px;border:1px solid #e4e4e7;">Lovable API</span>
+                            <span style="font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:3px 7px;background:#f4f4f5;color:#a1a1aa;border-radius:6px;border:1px solid #e4e4e7;">Live Sync</span>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- STEP 2-HTML: AI HTML & Tailwind Starter Prompts Matrix -->
+        <div id="wizard-step-2-html" class="atw-anim" style="display:none;flex:1;flex-direction:column;align-items:center;justify-content:flex-start;padding:36px 28px;max-width:1160px;margin:0 auto;width:100%;">
+            <!-- Header -->
+            <div style="text-align:center;margin-bottom:28px;max-width:680px;">
+                <div style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;background:#18181b;border-radius:100px;margin-bottom:12px;">
+                    <span style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:white;">⚡ Claude & ChatGPT Master Prompts</span>
+                </div>
+                <h2 style="font-size:26px;font-weight:900;color:#18181b;letter-spacing:-.04em;line-height:1.15;margin-bottom:8px;">Choose a Business Template Prompt</h2>
+                <p style="font-size:13px;color:#71717a;line-height:1.55;">Select a template below to copy its tailored master prompt for Claude or ChatGPT, or paste your generated HTML code directly.</p>
+            </div>
+
+            <!-- Template Prompts Grid (High-Density Responsive Cards) -->
+            <div class="atw-prompts-grid" style="margin-bottom:24px;">
+
+                <!-- 1. Creative Agency & Video Studio -->
+                <div onclick="window.selectHtmlTemplate('agency', 'Creative Agency & Video Studio')" id="wiz-tcard-agency" class="atw-template-card atw-sel-t" style="display:flex;flex-direction:column;justify-content:space-between;padding:18px;">
+                    <div>
+                        <!-- Thumbnail Illustration Preview -->
+                        <div style="height:110px;border-radius:12px;background:radial-gradient(circle at 50% 30%, #27272a 0%, #09090b 100%);display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:14px;overflow:hidden;border:1px solid #27272a;">
+                            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+                                <div style="width:36px;height:36px;background:rgba(255,255,255,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.15);">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                </div>
+                                <span style="font-size:9.5px;font-weight:800;color:#e4e4e7;letter-spacing:0.04em;font-family:monospace;">CREATIVE AGENCY</span>
+                            </div>
+                            <span style="position:absolute;top:8px;right:8px;font-size:8.5px;font-weight:800;color:#10b981;background:rgba(16,185,129,0.15);padding:2px 6px;border-radius:4px;border:1px solid rgba(16,185,129,0.3);">Dark Minimal</span>
+                        </div>
+
+                        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;">
+                            <h3 style="font-size:14px;font-weight:800;color:#18181b;letter-spacing:-0.02em;">🎨 Creative Agency & Video Studio</h3>
+                        </div>
+                        <p style="font-size:11.5px;color:#71717a;line-height:1.45;margin-bottom:12px;">Tailwind CDN, dark modern minimalist aesthetic, video reel hero, portfolio showcase cards, services grid, testimonial ticker, and a native lead consultation &lt;form&gt;.</p>
+                        
+                        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px;">
+                            <span style="font-size:8.5px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 7px;border-radius:5px;">Tailwind CDN</span>
+                            <span style="font-size:8.5px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 7px;border-radius:5px;">Native Lead Form</span>
+                            <span style="font-size:8.5px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 7px;border-radius:5px;">Mobile 100%</span>
+                        </div>
+                    </div>
+
+                    <div style="display:flex;flex-direction:column;gap:6px;border-top:1px solid #f4f4f5;padding-top:12px;">
+                        <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('agency');" style="width:100%;padding:8px 12px;background:#f4f4f5;border:1px solid #e4e4e7;border-radius:8px;font-size:11px;font-weight:700;color:#18181b;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                            <span>📋 Copy Prompt for Claude / ChatGPT</span>
+                        </button>
+                        <button type="button" onclick="window.selectHtmlTemplate('agency', 'Creative Agency & Video Studio')" style="width:100%;padding:8px 12px;background:#18181b;border:none;border-radius:8px;font-size:11px;font-weight:700;color:white;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;">
+                            <span>Select & Connect Code →</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 2. AI SaaS & Software Landing -->
+                <div onclick="window.selectHtmlTemplate('saas', 'AI SaaS & Software Landing')" id="wiz-tcard-saas" class="atw-template-card" style="display:flex;flex-direction:column;justify-content:space-between;padding:18px;">
+                    <div>
+                        <!-- Thumbnail Illustration Preview -->
+                        <div style="height:110px;border-radius:12px;background:radial-gradient(circle at 50% 30%, #1e1b4b 0%, #09090b 100%);display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:14px;overflow:hidden;border:1px solid #2e1065;">
+                            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+                                <div style="width:36px;height:36px;background:rgba(255,255,255,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.15);">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                                </div>
+                                <span style="font-size:9.5px;font-weight:800;color:#c4b5fd;letter-spacing:0.04em;font-family:monospace;">AI SAAS PLATFORM</span>
+                            </div>
+                            <span style="position:absolute;top:8px;right:8px;font-size:8.5px;font-weight:800;color:#a78bfa;background:rgba(167,139,250,0.15);padding:2px 6px;border-radius:4px;border:1px solid rgba(167,139,250,0.3);">High Tech</span>
+                        </div>
+
+                        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;">
+                            <h3 style="font-size:14px;font-weight:800;color:#18181b;letter-spacing:-0.02em;">⚡ AI SaaS & Software Landing</h3>
+                        </div>
+                        <p style="font-size:11.5px;color:#71717a;line-height:1.45;margin-bottom:12px;">Modern software company layout, live status pill, interactive feature cards, pricing tiers with toggle, and native product demo/waitlist &lt;form&gt;.</p>
+                        
+                        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px;">
+                            <span style="font-size:8.5px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 7px;border-radius:5px;">Tailwind CDN</span>
+                            <span style="font-size:8.5px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 7px;border-radius:5px;">Native Lead Form</span>
+                            <span style="font-size:8.5px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 7px;border-radius:5px;">Mobile 100%</span>
+                        </div>
+                    </div>
+
+                    <div style="display:flex;flex-direction:column;gap:6px;border-top:1px solid #f4f4f5;padding-top:12px;">
+                        <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('saas');" style="width:100%;padding:8px 12px;background:#f4f4f5;border:1px solid #e4e4e7;border-radius:8px;font-size:11px;font-weight:700;color:#18181b;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                            <span>📋 Copy Prompt for Claude / ChatGPT</span>
+                        </button>
+                        <button type="button" onclick="window.selectHtmlTemplate('saas', 'AI SaaS & Software Landing')" style="width:100%;padding:8px 12px;background:#18181b;border:none;border-radius:8px;font-size:11px;font-weight:700;color:white;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;">
+                            <span>Select & Connect Code →</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 3. B2B Advisory & Management Consulting -->
+                <div onclick="window.selectHtmlTemplate('consulting', 'B2B Advisory & Management Consulting')" id="wiz-tcard-consulting" class="atw-template-card" style="display:flex;flex-direction:column;justify-content:space-between;padding:18px;">
+                    <div>
+                        <!-- Thumbnail Illustration Preview -->
+                        <div style="height:110px;border-radius:12px;background:radial-gradient(circle at 50% 30%, #1c1917 0%, #09090b 100%);display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:14px;overflow:hidden;border:1px solid #292524;">
+                            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+                                <div style="width:36px;height:36px;background:rgba(255,255,255,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.15);">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d6d3d1" stroke-width="2"><path d="M20 7h-7L10 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg>
+                                </div>
+                                <span style="font-size:9.5px;font-weight:800;color:#e7e5e4;letter-spacing:0.04em;font-family:monospace;">EXECUTIVE ADVISORY</span>
+                            </div>
+                            <span style="position:absolute;top:8px;right:8px;font-size:8.5px;font-weight:800;color:#fbbf24;background:rgba(251,191,36,0.15);padding:2px 6px;border-radius:4px;border:1px solid rgba(251,191,36,0.3);">Editorial Luxury</span>
+                        </div>
+
+                        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;">
+                            <h3 style="font-size:14px;font-weight:800;color:#18181b;letter-spacing:-0.02em;">💼 B2B Advisory & Consulting</h3>
+                        </div>
+                        <p style="font-size:11.5px;color:#71717a;line-height:1.45;margin-bottom:12px;">Editorial layout, client partner logos, strategic services breakdown, case study metrics, and native audit inquiry &lt;form&gt;.</p>
+                        
+                        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px;">
+                            <span style="font-size:8.5px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 7px;border-radius:5px;">Tailwind CDN</span>
+                            <span style="font-size:8.5px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 7px;border-radius:5px;">Native Lead Form</span>
+                            <span style="font-size:8.5px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 7px;border-radius:5px;">Mobile 100%</span>
+                        </div>
+                    </div>
+
+                    <div style="display:flex;flex-direction:column;gap:6px;border-top:1px solid #f4f4f5;padding-top:12px;">
+                        <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('consulting');" style="width:100%;padding:8px 12px;background:#f4f4f5;border:1px solid #e4e4e7;border-radius:8px;font-size:11px;font-weight:700;color:#18181b;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                            <span>📋 Copy Prompt for Claude / ChatGPT</span>
+                        </button>
+                        <button type="button" onclick="window.selectHtmlTemplate('consulting', 'B2B Advisory & Management Consulting')" style="width:100%;padding:8px 12px;background:#18181b;border:none;border-radius:8px;font-size:11px;font-weight:700;color:white;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;">
+                            <span>Select & Connect Code →</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 4. Photography Studio & Production House -->
+                <div onclick="window.selectHtmlTemplate('photography', 'Photography Studio & Production House')" id="wiz-tcard-photography" class="atw-template-card" style="display:flex;flex-direction:column;justify-content:space-between;padding:18px;">
+                    <div>
+                        <!-- Thumbnail Illustration Preview -->
+                        <div style="height:110px;border-radius:12px;background:radial-gradient(circle at 50% 30%, #18181b 0%, #09090b 100%);display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:14px;overflow:hidden;border:1px solid #27272a;">
+                            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+                                <div style="width:36px;height:36px;background:rgba(255,255,255,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.15);">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                                </div>
+                                <span style="font-size:9.5px;font-weight:800;color:#bae6fd;letter-spacing:0.04em;font-family:monospace;">PHOTO STUDIO</span>
+                            </div>
+                            <span style="position:absolute;top:8px;right:8px;font-size:8.5px;font-weight:800;color:#38bdf8;background:rgba(56,189,248,0.15);padding:2px 6px;border-radius:4px;border:1px solid rgba(56,189,248,0.3);">Visual Gallery</span>
+                        </div>
+
+                        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;">
+                            <h3 style="font-size:14px;font-weight:800;color:#18181b;letter-spacing:-0.02em;">📸 Photography Studio & Production</h3>
+                        </div>
+                        <p style="font-size:11.5px;color:#71717a;line-height:1.45;margin-bottom:12px;">High-end image gallery, package cards with GST breakdown, client reviews, and native booking inquiry &lt;form&gt;.</p>
+                        
+                        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px;">
+                            <span style="font-size:8.5px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 7px;border-radius:5px;">Tailwind CDN</span>
+                            <span style="font-size:8.5px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 7px;border-radius:5px;">Native Lead Form</span>
+                            <span style="font-size:8.5px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 7px;border-radius:5px;">Mobile 100%</span>
+                        </div>
+                    </div>
+
+                    <div style="display:flex;flex-direction:column;gap:6px;border-top:1px solid #f4f4f5;padding-top:12px;">
+                        <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('photography');" style="width:100%;padding:8px 12px;background:#f4f4f5;border:1px solid #e4e4e7;border-radius:8px;font-size:11px;font-weight:700;color:#18181b;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                            <span>📋 Copy Prompt for Claude / ChatGPT</span>
+                        </button>
+                        <button type="button" onclick="window.selectHtmlTemplate('photography', 'Photography Studio & Production House')" style="width:100%;padding:8px 12px;background:#18181b;border:none;border-radius:8px;font-size:11px;font-weight:700;color:white;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;">
+                            <span>Select & Connect Code →</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 5. Custom Prompt Studio (Any Niche) -->
+                <div onclick="window.selectHtmlTemplate('custom', 'Custom Business Studio')" id="wiz-tcard-custom" class="atw-template-card" style="display:flex;flex-direction:column;justify-content:space-between;padding:18px;">
+                    <div>
+                        <!-- Thumbnail Illustration Preview -->
+                        <div style="height:110px;border-radius:12px;background:radial-gradient(circle at 50% 30%, #27272a 0%, #09090b 100%);display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:14px;overflow:hidden;border:1px solid #3f3f46;">
+                            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+                                <div style="width:36px;height:36px;background:rgba(255,255,255,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.15);">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                                </div>
+                                <span style="font-size:9.5px;font-weight:800;color:#fda4af;letter-spacing:0.04em;font-family:monospace;">CUSTOM NICHE</span>
+                            </div>
+                            <span style="position:absolute;top:8px;right:8px;font-size:8.5px;font-weight:800;color:#f43f5e;background:rgba(244,63,94,0.15);padding:2px 6px;border-radius:4px;border:1px solid rgba(244,63,94,0.3);">Universal</span>
+                        </div>
+
+                        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;">
+                            <h3 style="font-size:14px;font-weight:800;color:#18181b;letter-spacing:-0.02em;">✨ Custom Prompt Studio (Any Niche)</h3>
+                        </div>
+                        <p style="font-size:11.5px;color:#71717a;line-height:1.45;margin-bottom:12px;">Customizable prompt template with business name & services inputs for real estate, e-commerce, fitness, hospitality, or local service businesses.</p>
+                        
+                        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px;">
+                            <span style="font-size:8.5px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 7px;border-radius:5px;">Tailwind CDN</span>
+                            <span style="font-size:8.5px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 7px;border-radius:5px;">Native Lead Form</span>
+                            <span style="font-size:8.5px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 7px;border-radius:5px;">Universal Niche</span>
+                        </div>
+                    </div>
+
+                    <div style="display:flex;flex-direction:column;gap:6px;border-top:1px solid #f4f4f5;padding-top:12px;">
+                        <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('custom');" style="width:100%;padding:8px 12px;background:#f4f4f5;border:1px solid #e4e4e7;border-radius:8px;font-size:11px;font-weight:700;color:#18181b;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                            <span>📋 Copy Prompt for Claude / ChatGPT</span>
+                        </button>
+                        <button type="button" onclick="window.selectHtmlTemplate('custom', 'Custom Business Studio')" style="width:100%;padding:8px 12px;background:#18181b;border:none;border-radius:8px;font-size:11px;font-weight:700;color:white;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;">
+                            <span>Select & Connect Code →</span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Code Connection Section below the grid -->
+            <div id="wiz-html-code-section" style="width:100%;background:white;border:1.5px solid #e4e4e7;border-radius:18px;padding:24px;box-shadow:0 1px 4px rgba(0,0,0,.04);">
+                
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #f4f4f5;">
+                    <div>
+                        <h4 style="font-size:14px;font-weight:800;color:#18181b;margin-bottom:2px;">Connect & Deploy Code</h4>
+                        <p style="font-size:11.5px;color:#71717a;">Paste your generated HTML from Claude / ChatGPT, drop an index.html file, or sync a Git repository.</p>
+                    </div>
+                    <!-- Tab Switcher -->
+                    <div style="display:inline-flex;background:#f4f4f5;border-radius:10px;padding:3px;gap:2px;">
+                        <button type="button" onclick="window.wizardSetHtmlCodeMode('paste')" id="wiz-html-tab-paste" class="atw-tab atw-tab-on" style="padding:6px 12px;font-size:11px;font-weight:700;display:inline-flex;align-items:center;gap:5px;">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                            <span>Paste HTML Code / Drop index.html</span>
+                        </button>
+                        <button type="button" onclick="window.wizardSetHtmlCodeMode('github')" id="wiz-html-tab-github" class="atw-tab atw-tab-off" style="padding:6px 12px;font-size:11px;font-weight:700;display:inline-flex;align-items:center;gap:5px;">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            <span>Connect GitHub Repo</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 1. Paste HTML Tab -->
+                <div id="wiz-html-paste-area" style="display:flex;flex-direction:column;gap:14px;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;">
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <span style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#71717a;">HTML Source Code</span>
+                            <span id="wiz-html-stats" style="font-size:10px;font-family:monospace;background:#f4f4f5;color:#71717a;padding:2px 8px;border-radius:6px;">0 lines · 0.0 KB</span>
+                        </div>
+                        <button type="button" onclick="window.previewPastedHtml()" style="display:inline-flex;align-items:center;gap:5px;padding:6px 12px;background:#18181b;color:white;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;font-family:inherit;">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+                            <span>👁 Preview Render in Modal</span>
+                        </button>
+                    </div>
+
+                    <div style="border:1.5px solid #27272a;border-radius:12px;background:#09090b;overflow:hidden;box-shadow:inset 0 2px 4px rgba(0,0,0,0.5);">
+                        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:#18181b;border-bottom:1px solid #27272a;font-family:monospace;font-size:11px;color:#a1a1aa;">
+                            <span>index.html</span>
+                            <span style="font-size:10px;color:#71717a;">Tailwind CDN Ready</span>
+                        </div>
+                        <textarea id="wiz-html-raw-code" 
+                            oninput="window.updateWizHtmlStats()" 
+                            placeholder="<!DOCTYPE html>&#10;<html lang=&quot;en&quot;>&#10;<head>&#10;    <script src=&quot;https://cdn.tailwindcss.com&quot;></script>&#10;    <title>My Website</title>&#10;</head>&#10;<body>&#10;    <!-- Paste complete HTML from Claude / ChatGPT here -->&#10;</body>&#10;</html>" 
+                            style="width:100%;height:180px;padding:12px 14px;background:#09090b;color:#f4f4f5;font-family:'JetBrains Mono',monospace;font-size:11.5px;line-height:1.5;border:none;outline:none;resize:vertical;"></textarea>
+                    </div>
+
+                    <!-- Dropzone -->
+                    <label id="wiz-html-dropzone" style="display:flex;align-items:center;justify-content:center;gap:12px;padding:16px 20px;background:#fafafa;border:1.5px dashed #d4d4d8;border-radius:12px;cursor:pointer;transition:all .15s;" 
+                           ondragover="event.preventDefault(); this.style.borderColor='#18181b'; this.style.background='#f4f4f5';" 
+                           ondragleave="this.style.borderColor='#d4d4d8'; this.style.background='#fafafa';" 
+                           ondrop="event.preventDefault(); this.style.borderColor='#d4d4d8'; this.style.background='#fafafa'; if(event.dataTransfer.files.length) window.handleHtmlFileDrop(event.dataTransfer.files[0]);">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        <div style="font-size:11.5px;color:#71717a;">
+                            <span style="font-weight:700;color:#18181b;text-decoration:underline;">Click to upload index.html</span> or drag & drop file directly here
+                        </div>
+                        <input type="file" id="wiz-html-file-input" accept=".html,.htm" style="display:none;" onchange="window.wizardHtmlFileSelected(this)">
+                    </label>
+                </div>
+
+                <!-- 2. GitHub Repo Tab -->
+                <div id="wiz-html-github-area" style="display:none;flex-direction:column;gap:14px;">
+                    <div style="display:flex;flex-direction:column;gap:6px;">
+                        <label style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#71717a;">Repository URL *</label>
+                        <input type="text" id="wiz-html-repo" class="atw-input" placeholder="https://github.com/username/my-html-theme" value="">
+                    </div>
+                    <div style="display:flex;gap:10px;">
+                        <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
+                            <label style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#71717a;">Branch</label>
+                            <input type="text" id="wiz-html-branch" class="atw-input" placeholder="main" value="main">
+                        </div>
+                        <div style="display:flex;align-items:flex-end;">
+                            <button type="button" onclick="window.wizCheckHtmlRepository()" style="padding:9px 16px;background:#18181b;color:white;border:none;border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;">
+                                Scan Routes
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
 
@@ -5298,6 +5636,36 @@ function cora_get_sparkline_points( $history, $type ) {
             Continue
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
+    </div>
+
+    <!-- Live HTML Render Preview Modal -->
+    <div id="wiz-html-preview-modal" style="position:fixed;inset:0;z-index:1000000;display:none;background:rgba(9,9,11,0.75);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:24px;">
+        <div style="width:100%;max-width:1100px;height:90vh;background:#ffffff;border-radius:20px;border:1px solid #27272a;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 25px 60px rgba(0,0,0,0.5);">
+            <!-- Modal Header -->
+            <div style="height:52px;background:#18181b;padding:0 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #27272a;color:white;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span style="font-size:12.5px;font-weight:700;color:#f4f4f5;">Live HTML Preview</span>
+                    <span id="wiz-html-preview-tag" style="font-size:9.5px;font-weight:700;background:#27272a;color:#a1a1aa;padding:2px 8px;border-radius:6px;font-family:monospace;">Sandboxed Render</span>
+                </div>
+                <!-- Viewport size controls -->
+                <div style="display:inline-flex;background:#27272a;border-radius:8px;padding:2px;gap:2px;">
+                    <button type="button" onclick="document.getElementById('wiz-html-preview-iframe-wrapper').style.maxWidth='100%';" style="padding:4px 10px;font-size:10.5px;font-weight:700;color:#d4d4d8;background:transparent;border:none;border-radius:6px;cursor:pointer;">Desktop</button>
+                    <button type="button" onclick="document.getElementById('wiz-html-preview-iframe-wrapper').style.maxWidth='768px';" style="padding:4px 10px;font-size:10.5px;font-weight:700;color:#d4d4d8;background:transparent;border:none;border-radius:6px;cursor:pointer;">Tablet (768px)</button>
+                    <button type="button" onclick="document.getElementById('wiz-html-preview-iframe-wrapper').style.maxWidth='390px';" style="padding:4px 10px;font-size:10.5px;font-weight:700;color:#d4d4d8;background:transparent;border:none;border-radius:6px;cursor:pointer;">Mobile (390px)</button>
+                </div>
+                <!-- Close button -->
+                <button type="button" onclick="window.closeHtmlPreviewModal()" style="display:inline-flex;align-items:center;gap:4px;padding:5px 10px;background:#27272a;border:1px solid #3f3f46;border-radius:8px;font-size:11px;font-weight:700;color:#e4e4e7;cursor:pointer;">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    <span>Close Preview</span>
+                </button>
+            </div>
+            <!-- Modal Body / Iframe wrapper -->
+            <div style="flex:1;background:#f4f4f5;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:12px;">
+                <div id="wiz-html-preview-iframe-wrapper" style="width:100%;max-width:100%;height:100%;background:white;border-radius:12px;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,0.12);transition:max-width .25s ease;">
+                    <iframe id="wiz-html-preview-iframe" sandbox="allow-scripts allow-same-origin" style="width:100%;height:100%;border:none;"></iframe>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -11651,7 +12019,7 @@ function cora_get_sparkline_points( $history, $type ) {
 
     // ============================================================
     // ============================================================
-    // ADD THEME WIZARD JS  — with URL state persistence
+    // ADD THEME WIZARD JS  — with URL state persistence & HTML/AI Matrix
     // ============================================================
     var safeAjaxUrl = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : (window.ajaxurl || '/wp-admin/admin-ajax.php');
     var safeNonce   = (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : '';
@@ -11665,9 +12033,334 @@ function cora_get_sparkline_points( $history, $type ) {
     }
 
     var _wizStep    = 1;
-    var _wizBuilder = null;
+    var _wizBuilder = 'html_ai';
     var _wizSubMode = 'upload';
     var _wizLovableMode = 'connect';
+    var _wizSelectedTemplateKey = 'agency';
+
+    // ── AI Master Prompts Matrix (Claude 3.5 Sonnet / ChatGPT) ──────
+    const CORA_HTML_AI_MASTER_PROMPTS = {
+        agency: `You are an elite web architect and front-end designer. 
+Create a complete, single-file, production-ready HTML5 landing page for a premier "Creative Agency & Video Studio" (named "Apex Studio").
+
+TECHNICAL REQUIREMENTS:
+1. Include Tailwind CSS CDN: <script src="https://cdn.tailwindcss.com"></script>
+2. Google Fonts: Inter and JetBrains Mono for numbers/tags.
+3. Clean modern monochromatic dark aesthetic (zinc-950 background, zinc-100 typography, subtle zinc-800 borders, smooth micro-interactions).
+4. Fully responsive on mobile, tablet, and desktop with a mobile navigation menu.
+
+SECTIONS TO INCLUDE:
+1. Sticky Header: Frosted navigation bar with logo, navigation links (Work, Services, Process, Case Studies), and a "Start Project" CTA button.
+2. Hero Section: High-impact headline ("Crafting Cinema-Grade Brand Stories That Scale"), subtitle, dual CTA ("View Showreel", "Book Consultation"), live client satisfaction badges, and a simulated video reel showcase card with play trigger.
+3. Marquee Brand Ticker: Clean horizontal logo ticker of global partner brands.
+4. Featured Work / Portfolio Grid: 4 filterable project cards (Brand Identity, 3D Commercials, Viral Social Ads, Motion Design) with category tags, hover zoom effects, and view case study buttons.
+5. Core Services Matrix: 6 interactive cards detailing Art Direction, Video Production, Brand Architecture, 3D Animation, Post-Production, and Performance Ads.
+6. Proven Process (4-Step Timeline): Discovery -> Concept & Storyboard -> Production -> Launch & Scale.
+7. Testimonials & Client Reviews: 3 quote cards with star ratings, client names, roles, and company tags.
+8. Native Lead Consultation Form:
+   - Form markup: <form method="POST" action="/wp-admin/admin-ajax.php" onsubmit="event.preventDefault(); window.coraSubmitLeadForm ? window.coraSubmitLeadForm(this) : alert('Inquiry received!');">
+   - Hidden inputs: <input type="hidden" name="action" value="cora_ajax_submit_lead"><input type="hidden" name="form_name" value="Agency Consultation Form">
+   - Fields: Full Name, Work Email, Phone/WhatsApp, Project Budget dropdown ($5k-$10k, $10k-$25k, $25k+), and Project Scope description.
+   - High-contrast submit button with hover transition.
+9. Footer: Quick links, social SVG icons, copyright, and studio location tags.
+
+Return ONLY clean, complete, copy-pasteable HTML inside an <!DOCTYPE html> document.`,
+
+        saas: `You are an elite SaaS UI/UX engineer. 
+Create a complete, single-file, production-ready HTML5 landing page for an "AI SaaS & Workflow Automation Platform" (named "Pulse AI").
+
+TECHNICAL REQUIREMENTS:
+1. Include Tailwind CSS CDN: <script src="https://cdn.tailwindcss.com"></script>
+2. Google Fonts: Inter and JetBrains Mono.
+3. Modern high-tech monochromatic aesthetic (pure black/zinc-950, deep zinc-900 surfaces, zinc-800 borders, subtle purple/indigo highlights).
+4. Fully responsive mobile & desktop layout.
+
+SECTIONS TO INCLUDE:
+1. Header: Sleek navbar with announcement pill ("✨ Introducing Pulse 2.0 Engine"), product links (Features, Integrations, Pricing, Docs), and "Start Free Trial" CTA.
+2. Hero: High-converting headline ("Automate 80% of Repetitive Operations with Autonomous AI"), live status pill ("🟢 99.99% Uptime SLA"), dual CTAs ("Get Started Free", "Request Enterprise Demo"), and an interactive Dashboard UI mockup preview.
+3. Metrics & Proof Bar: 10M+ Tasks Automated, 4.9/5 Rating, 12,000+ Teams.
+4. Core Feature Matrix: 6 cards featuring AI Agent Workflows, Real-Time Data Sync, Multi-Model LLM Routing, Enterprise RBAC Security, Webhooks API, and Predictive Analytics.
+5. Interactive Pricing Tier Matrix: 3 cards (Starter $29/mo, Pro $79/mo, Enterprise Custom) with feature checklists and toggle switch (Monthly / Annual with 20% discount badge).
+6. Enterprise Integrations Grid: Slack, GitHub, Notion, Stripe, Salesforce, Figma.
+7. Interactive FAQ Accordion: 5 common questions.
+8. Native Lead Demo & Trial Form:
+   - Form markup: <form method="POST" action="/wp-admin/admin-ajax.php" onsubmit="event.preventDefault(); window.coraSubmitLeadForm ? window.coraSubmitLeadForm(this) : alert('Demo requested!');">
+   - Hidden inputs: <input type="hidden" name="action" value="cora_ajax_submit_lead"><input type="hidden" name="form_name" value="SaaS Demo Request Form">
+   - Fields: Work Email, Full Name, Company Name, Team Size dropdown (1-10, 11-50, 50+), and Use Case note.
+   - High-converting submit button.
+9. Footer: Product links, developer docs, status link, and social icons.
+
+Return ONLY clean, valid, standalone HTML in an <!DOCTYPE html> document.`,
+
+        consulting: `You are an elite corporate advisory web designer. 
+Create a complete, single-file, production-ready HTML5 landing page for a "B2B Advisory & Management Consulting Firm" (named "Vanguard Strategy Group").
+
+TECHNICAL REQUIREMENTS:
+1. Include Tailwind CSS CDN: <script src="https://cdn.tailwindcss.com"></script>
+2. Google Fonts: Playfair Display for elegant headlines and Inter for UI body.
+3. Editorial luxury monochromatic palette (warm neutral ivory/zinc-50 background, deep obsidian zinc-900 typography, subtle amber/bronze accent borders).
+4. Fully responsive layout.
+
+SECTIONS TO INCLUDE:
+1. Header: Refined navigation with firm overview, practice areas, leadership partners, insights, and "Schedule Executive Briefing" button.
+2. Hero: Authoritative headline ("Navigating Complex Capital, M&A, and Operational Transformation"), subheadline, executive consultation CTA, and trust metrics ($4.2B+ Transactions Advised, 180+ Enterprise Engagements).
+3. Practice Areas & Advisory Services: 4 in-depth practice cards (Corporate Restructuring, M&A Advisory, Digital Transformation, Board Governance).
+4. Executive Case Studies: 3 structured cards with challenge, strategy, and verified ROI metrics (e.g. "+34% EBITDA Expansion in 14 Months").
+5. Senior Leadership & Advisory Board: 3 executive partner profiles with credentials.
+6. Thought Leadership & Whitepapers: 3 editorial article cards with download links.
+7. Native Executive Consultation Form:
+   - Form markup: <form method="POST" action="/wp-admin/admin-ajax.php" onsubmit="event.preventDefault(); window.coraSubmitLeadForm ? window.coraSubmitLeadForm(this) : alert('Briefing requested!');">
+   - Hidden inputs: <input type="hidden" name="action" value="cora_ajax_submit_lead"><input type="hidden" name="form_name" value="Executive Briefing Request Form">
+   - Fields: Full Name, Corporate Email, Organization / Title, Engagement Type dropdown, and Advisory Objective.
+   - Distinctive executive submit button.
+8. Footer: Global office locations (New York, London, Singapore, Mumbai), regulatory disclosures, and copyright.
+
+Return ONLY clean, standalone HTML in an <!DOCTYPE html> document.`,
+
+        photography: `You are an elite visual portfolio architect. 
+Create a complete, single-file, production-ready HTML5 landing page for a "Luxury Photography Studio & Production House" (named "Lumina Studio").
+
+TECHNICAL REQUIREMENTS:
+1. Include Tailwind CSS CDN: <script src="https://cdn.tailwindcss.com"></script>
+2. Google Fonts: Space Grotesk and Inter.
+3. High-fashion minimalist monochromatic dark layout (black #09090b, charcoal surfaces, white typography, subtle glassmorphism overlays).
+4. Fully responsive gallery layout with masonry-style grid.
+
+SECTIONS TO INCLUDE:
+1. Sticky Minimal Header: Studio logo, curated collections links (Commercial, Editorial, Architecture, Portraits, Events), studio space, and "Book Session" CTA.
+2. Hero: Fullscreen visual impact with headline ("Capturing Epochs in Light & Form"), subtitle, client portfolio marquee, and instant booking CTA.
+3. Curated Visual Gallery: High-resolution photographic showcase cards with aspect ratio presets (16:9 cinematic, 4:5 editorial, 1:1 square) and lightbox trigger overlays.
+4. Studio Spaces & Equipment Specs: 2 studio bay cards with floorplan specs, Profoto lighting inventory, and cyclorama wall dimensions.
+5. Transparent Package Pricing Cards: 3 tiers (Commercial Campaign, Editorial Lookbook, Private Executive Portrait) with detailed deliverables and GST breakdown calculations.
+6. Client Testimonials & Press Accolades: Vogue, Forbes, GQ feature quotes.
+7. Native Studio Booking Inquiry Form:
+   - Form markup: <form method="POST" action="/wp-admin/admin-ajax.php" onsubmit="event.preventDefault(); window.coraSubmitLeadForm ? window.coraSubmitLeadForm(this) : alert('Booking request submitted!');">
+   - Hidden inputs: <input type="hidden" name="action" value="cora_ajax_submit_lead"><input type="hidden" name="form_name" value="Studio Booking Inquiry Form">
+   - Fields: Full Name, Email, Phone, Preferred Shoot Date picker, Shoot Type dropdown, and Creative Vision brief.
+   - Sleek CTA button.
+8. Footer: Studio location, working hours, Instagram/Behance handles, and copyright.
+
+Return ONLY clean, standalone HTML in an <!DOCTYPE html> document.`,
+
+        custom: `You are an elite full-stack web developer and UI designer. 
+Create a complete, single-file, production-ready HTML5 landing page with Tailwind CSS CDN for any custom business niche.
+
+TECHNICAL REQUIREMENTS:
+1. Include Tailwind CSS CDN: <script src="https://cdn.tailwindcss.com"></script>
+2. Google Fonts: Inter and JetBrains Mono.
+3. Clean modern monochromatic design system matching the Shopify/Notion aesthetic.
+4. Mobile-first 100% responsive design with mobile drawer navigation.
+
+SECTIONS TO INCLUDE:
+1. Navigation Bar: Logo, menu anchors, contact quick-link, and primary CTA.
+2. High-Converting Hero: Catchy headline, benefit-driven subheadline, primary & secondary action buttons, social proof stars, and a hero media card.
+3. Trust / Partner Bar: Customer brand ticker or security trust badges.
+4. Value Proposition / Feature Grid: 4-6 benefit cards with clean SVG icons and clear copy.
+5. Interactive Pricing / Packages: 3 tier cards with feature bullets and highlighted popular tier.
+6. Testimonial Social Proof: 3 authentic customer reviews with avatars and verified badges.
+7. Native Lead Capture Form:
+   - Form markup: <form method="POST" action="/wp-admin/admin-ajax.php" onsubmit="event.preventDefault(); window.coraSubmitLeadForm ? window.coraSubmitLeadForm(this) : alert('Form submitted!');">
+   - Hidden inputs: <input type="hidden" name="action" value="cora_ajax_submit_lead"><input type="hidden" name="form_name" value="Website Lead Form">
+   - Fields: Name, Email, Phone, Message.
+   - High-contrast submit button.
+8. Modern Footer: Quick links, legal links, and copyright.
+
+Return ONLY valid, standalone HTML in an <!DOCTYPE html> document.`
+    };
+
+    // ── Prompt Copy & Template Selection ────────────────────────
+    window.copyTemplatePrompt = function(templateKey) {
+        var prompt = CORA_HTML_AI_MASTER_PROMPTS[templateKey] || CORA_HTML_AI_MASTER_PROMPTS.agency;
+        var templateNames = {
+            agency: 'Creative Agency & Video Studio',
+            saas: 'AI SaaS & Software Landing',
+            consulting: 'B2B Advisory & Consulting',
+            photography: 'Photography Studio & Production',
+            custom: 'Custom Prompt Studio'
+        };
+        var name = templateNames[templateKey] || 'Template';
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(prompt).then(function() {
+                showToast('📋 ' + name + ' prompt copied to clipboard! Paste into Claude or ChatGPT.', 'success');
+            }).catch(function() {
+                wizFallbackCopyPrompt(prompt, name);
+            });
+        } else {
+            wizFallbackCopyPrompt(prompt, name);
+        }
+    };
+
+    function wizFallbackCopyPrompt(text, name) {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        try {
+            document.execCommand('copy');
+            showToast('📋 ' + name + ' prompt copied to clipboard!', 'success');
+        } catch(e) {
+            showToast('Could not copy automatically. Please select prompt manually.', 'warning');
+        }
+        document.body.removeChild(ta);
+    }
+
+    window.selectHtmlTemplate = function(templateKey, title) {
+        _wizSelectedTemplateKey = templateKey;
+
+        // Update card active states
+        ['agency', 'saas', 'consulting', 'photography', 'custom'].forEach(function(k) {
+            var el = document.getElementById('wiz-tcard-' + k);
+            if (el) {
+                if (k === templateKey) {
+                    el.classList.add('atw-sel-t');
+                } else {
+                    el.classList.remove('atw-sel-t');
+                }
+            }
+        });
+
+        // Auto-fill theme name if default or empty
+        var nameInput = document.getElementById('wiz-theme-name');
+        if (nameInput) {
+            if (!nameInput.value || nameInput.value === 'Creative Agency & Video Studio' || nameInput.value === 'AI SaaS & Software Landing' || nameInput.value === 'B2B Advisory & Management Consulting' || nameInput.value === 'Photography Studio & Production House' || nameInput.value === 'Custom Business Studio') {
+                nameInput.value = title || 'Custom AI Theme';
+            }
+        }
+
+        // Smooth scroll to code connection area
+        var codeSec = document.getElementById('wiz-html-code-section');
+        if (codeSec) {
+            codeSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        showToast('Selected ' + (title || templateKey) + ' template. Paste your code below or proceed to launch!', 'info');
+    };
+
+    // ── HTML Code Mode Tabs & Live Preview ─────────────────────
+    window.wizardSetHtmlCodeMode = function(mode) {
+        var tabP = document.getElementById('wiz-html-tab-paste');
+        var tabG = document.getElementById('wiz-html-tab-github');
+        var areaP = document.getElementById('wiz-html-paste-area');
+        var areaG = document.getElementById('wiz-html-github-area');
+
+        if (mode === 'paste') {
+            _wizSubMode = 'upload';
+            if (tabP) tabP.className = 'atw-tab atw-tab-on';
+            if (tabG) tabG.className = 'atw-tab atw-tab-off';
+            if (areaP) areaP.style.display = 'flex';
+            if (areaG) areaG.style.display = 'none';
+        } else {
+            _wizSubMode = 'github';
+            if (tabG) tabG.className = 'atw-tab atw-tab-on';
+            if (tabP) tabP.className = 'atw-tab atw-tab-off';
+            if (areaG) areaG.style.display = 'flex';
+            if (areaP) areaP.style.display = 'none';
+        }
+        wizPushUrl({ wm: mode });
+    };
+
+    window.updateWizHtmlStats = function() {
+        var raw = ((document.getElementById('wiz-html-raw-code') || {}).value || '');
+        var lines = raw ? raw.split('\n').length : 0;
+        var kb = (raw.length / 1024).toFixed(1);
+        var statsEl = document.getElementById('wiz-html-stats');
+        if (statsEl) {
+            statsEl.textContent = lines + ' lines · ' + kb + ' KB';
+        }
+    };
+
+    window.previewPastedHtml = function() {
+        var raw = ((document.getElementById('wiz-html-raw-code') || {}).value || '').trim();
+        if (!raw) {
+            showToast('Please paste or upload HTML code first to preview.', 'warning');
+            return;
+        }
+
+        var modal = document.getElementById('wiz-html-preview-modal');
+        var iframe = document.getElementById('wiz-html-preview-iframe');
+        if (iframe) {
+            iframe.srcdoc = raw;
+        }
+        if (modal) {
+            modal.style.display = 'flex';
+            requestAnimationFrame(function() {
+                modal.style.opacity = '1';
+                modal.classList.remove('opacity-0');
+                var card = document.getElementById('wiz-html-preview-modal-card');
+                if (card) {
+                    card.classList.remove('scale-95');
+                    card.classList.add('scale-100');
+                }
+            });
+            document.body.style.overflow = 'hidden';
+        }
+    };
+
+    window.closeHtmlPreviewModal = function() {
+        var modal = document.getElementById('wiz-html-preview-modal');
+        var card  = document.getElementById('wiz-html-preview-modal-card');
+        if (card) {
+            card.classList.remove('scale-100');
+            card.classList.add('scale-95');
+        }
+        if (modal) {
+            modal.style.opacity = '0';
+            modal.classList.add('opacity-0');
+            setTimeout(function() {
+                modal.style.display = 'none';
+                var iframe = document.getElementById('wiz-html-preview-iframe');
+                if (iframe) iframe.srcdoc = 'about:blank';
+            }, 250);
+        }
+        document.body.style.overflow = 'hidden'; // Keep wizard modal body locked
+    };
+
+    window.handleHtmlFileDrop = function(file) {
+        if (!file) return;
+        if (!file.name.toLowerCase().endsWith('.html') && !file.name.toLowerCase().endsWith('.htm')) {
+            showToast('Please upload a valid .html file.', 'warning');
+            return;
+        }
+
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            var content = e.target.result;
+            var ta = document.getElementById('wiz-html-raw-code');
+            if (ta) {
+                ta.value = content;
+                window.updateWizHtmlStats();
+            }
+
+            // Auto-populate theme name if empty
+            var nameInput = document.getElementById('wiz-theme-name');
+            if (nameInput && (!nameInput.value || nameInput.value.includes('Template'))) {
+                var cleanName = file.name.replace(/\.html?$/i, '').replace(/[-_]+/g, ' ').trim();
+                nameInput.value = cleanName.split(' ').map(function(w){ return w.charAt(0).toUpperCase() + w.slice(1); }).join(' ');
+            }
+
+            showToast('Loaded ' + file.name + ' (' + (content.length / 1024).toFixed(1) + ' KB) successfully!', 'success');
+        };
+        reader.readAsText(file);
+    };
+
+    window.wizardHtmlFileSelected = function(input) {
+        if (input && input.files && input.files[0]) {
+            window.handleHtmlFileDrop(input.files[0]);
+        }
+    };
+
+    window.wizCheckHtmlRepository = function() {
+        var repo = ((document.getElementById('wiz-html-repo') || {}).value || '').trim();
+        if (!repo) {
+            showToast('Please enter a GitHub repository URL.', 'warning');
+            return;
+        }
+        showToast('Connected GitHub repository: ' + repo, 'success');
+    };
 
     window.wizardSetLovableMode = function(mode) {
         _wizLovableMode = mode;
@@ -11702,11 +12395,12 @@ function cora_get_sparkline_points( $history, $type ) {
     // ── Open / Close ───────────────────────────────────────────
     window.openAddThemeWizard = function(skipUrlPush) {
         _wizStep    = 1;
-        _wizBuilder = 'nextjs';
+        _wizBuilder = 'html_ai';
         _wizSubMode = 'upload';
+        _wizSelectedTemplateKey = 'agency';
 
         // Hide all steps
-        ['wizard-step-1','wizard-step-2-nextjs','wizard-step-2a','wizard-step-2b','wizard-step-3'].forEach(function(id) {
+        ['wizard-step-1','wizard-step-2-html','wizard-step-2-nextjs','wizard-step-2a','wizard-step-2b','wizard-step-3'].forEach(function(id) {
             var el = document.getElementById(id);
             if (el) { el.style.display = 'none'; el.style.flex = ''; }
         });
@@ -11714,7 +12408,7 @@ function cora_get_sparkline_points( $history, $type ) {
         if (s1) { s1.style.display = 'flex'; s1.style.flex = '1'; }
 
         wizardResetCards();
-        wizardSelectBuilder('nextjs');
+        wizardSelectBuilder('html_ai');
         wizUpdateProgress(1);
 
         var backBtn = document.getElementById('wiz-back-btn');
@@ -11728,7 +12422,7 @@ function cora_get_sparkline_points( $history, $type ) {
             requestAnimationFrame(function() { wiz.style.opacity = '1'; });
         }
         document.body.style.overflow = 'hidden';
-        if (!skipUrlPush) wizPushUrl({ wz: 'add-theme', ws: '1', wb: 'nextjs', wm: null });
+        if (!skipUrlPush) wizPushUrl({ wz: 'add-theme', ws: '1', wb: 'html_ai', wm: null });
     };
 
     window.closeAddThemeWizard = function() {
@@ -11753,7 +12447,18 @@ function cora_get_sparkline_points( $history, $type ) {
         _wizBuilder = type;
         wizardResetCards();
 
-        if (type === 'nextjs') {
+        if (type === 'html_ai') {
+            var cardH = document.getElementById('wizard-card-html-ai');
+            if (cardH) { cardH.classList.add('atw-sel-h'); }
+            var ovH = document.getElementById('atw-ov-h');
+            if (ovH) ovH.style.display = 'flex';
+            var rH = document.getElementById('wiz-radio-html-ai');
+            if (rH) { 
+                rH.style.borderColor = '#18181b'; 
+                var dotH = rH.querySelector('div');
+                if (dotH) dotH.style.background = '#18181b'; 
+            }
+        } else if (type === 'nextjs') {
             var cardN = document.getElementById('wizard-card-nextjs');
             if (cardN) { cardN.classList.add('atw-sel-n'); }
             var ovN = document.getElementById('atw-ov-n');
@@ -11794,6 +12499,17 @@ function cora_get_sparkline_points( $history, $type ) {
     };
 
     function wizardResetCards() {
+        var ch = document.getElementById('wizard-card-html-ai');
+        if (ch) { ch.classList.remove('atw-sel-h'); }
+        var oh = document.getElementById('atw-ov-h');
+        if (oh) oh.style.display = 'none';
+        var rh = document.getElementById('wiz-radio-html-ai');
+        if (rh) { 
+            rh.style.borderColor = '#d4d4d8'; 
+            var dotH = rh.querySelector('div');
+            if (dotH) dotH.style.background = 'transparent'; 
+        }
+
         var cn = document.getElementById('wizard-card-nextjs');
         if (cn) { cn.classList.remove('atw-sel-n'); }
         var on = document.getElementById('atw-ov-n');
@@ -12189,7 +12905,24 @@ function cora_get_sparkline_points( $history, $type ) {
             if (!_wizBuilder) { showToast('Please select a builder type first.', 'error'); return; }
             wizardGoToStep(2);
         } else if (_wizStep === 2) {
-            if (_wizBuilder === 'nextjs') {
+            if (_wizBuilder === 'html_ai') {
+                if (_wizSubMode === 'github') {
+                    var repoH = (document.getElementById('wiz-html-repo') || {}).value || '';
+                    if (!repoH.trim()) { showToast('Please enter your GitHub repository URL.', 'error'); return; }
+                }
+                // Auto-fill theme name if empty
+                var nameInput = document.getElementById('wiz-theme-name');
+                if (nameInput && !nameInput.value.trim()) {
+                    var templateNames = {
+                        agency: 'Creative Agency & Video Studio',
+                        saas: 'AI SaaS & Software Landing',
+                        consulting: 'B2B Advisory & Management Consulting',
+                        photography: 'Photography Studio & Production House',
+                        custom: 'Custom Business Studio'
+                    };
+                    nameInput.value = templateNames[_wizSelectedTemplateKey] || 'Custom AI Theme';
+                }
+            } else if (_wizBuilder === 'nextjs') {
                 var repoN = (document.getElementById('wiz-nextjs-repo') || {}).value || '';
                 var patN  = (document.getElementById('wiz-nextjs-token') || {}).value || '';
                 if (!repoN.trim()) { showToast('Please enter your Next.js GitHub repository URL.', 'error'); return; }
@@ -12230,7 +12963,7 @@ function cora_get_sparkline_points( $history, $type ) {
     window.wizardBack = wizardBack;
 
     function wizardGoToStep(step) {
-        ['wizard-step-1','wizard-step-2-nextjs','wizard-step-2a','wizard-step-2b','wizard-step-3'].forEach(function(id) {
+        ['wizard-step-1','wizard-step-2-html','wizard-step-2-nextjs','wizard-step-2a','wizard-step-2b','wizard-step-3'].forEach(function(id) {
             var el = document.getElementById(id);
             if (el) { el.style.display = 'none'; el.style.flex = ''; }
         });
@@ -12240,7 +12973,9 @@ function cora_get_sparkline_points( $history, $type ) {
         if (step === 1) {
             showId = 'wizard-step-1';
         } else if (step === 2) {
-            if (_wizBuilder === 'nextjs') {
+            if (_wizBuilder === 'html_ai') {
+                showId = 'wizard-step-2-html';
+            } else if (_wizBuilder === 'nextjs') {
                 showId = 'wizard-step-2-nextjs';
             } else if (_wizBuilder === 'lovable') {
                 showId = 'wizard-step-2b';
@@ -12270,7 +13005,7 @@ function cora_get_sparkline_points( $history, $type ) {
             nextBtn.style.opacity = '1';
             nextBtn.style.cursor = 'pointer';
             if (step === 3) {
-                var ctaLabel = (_wizBuilder === 'nextjs') ? '⚡ Create & Build Theme' : 'Save Theme';
+                var ctaLabel = (_wizBuilder === 'html_ai') ? '⚡ Launch Theme Live & Go to /site/' : ((_wizBuilder === 'nextjs') ? '⚡ Create & Build Theme' : 'Save Theme');
                 nextBtn.innerHTML = ctaLabel + ' <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>';
             } else {
                 nextBtn.innerHTML = 'Continue <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>';
@@ -12345,12 +13080,31 @@ function cora_get_sparkline_points( $history, $type ) {
         var bEl = document.getElementById('wiz-summary-builder');
         var sEl = document.getElementById('wiz-summary-source');
         if (bEl) {
-            if (_wizBuilder === 'nextjs') bEl.textContent = 'Next.js Native (Git)';
+            if (_wizBuilder === 'html_ai') bEl.textContent = 'AI HTML & Tailwind (Claude / ChatGPT)';
+            else if (_wizBuilder === 'nextjs') bEl.textContent = 'Next.js Native (Git)';
             else if (_wizBuilder === 'lovable') bEl.textContent = 'Lovable Studio';
             else bEl.textContent = 'Elementor';
         }
         if (sEl) {
-            if (_wizBuilder === 'nextjs') {
+            if (_wizBuilder === 'html_ai') {
+                var rawHtml = ((document.getElementById('wiz-html-raw-code') || {}).value || '').trim();
+                var lines = rawHtml ? rawHtml.split('\n').length : 0;
+                if (_wizSubMode === 'github') {
+                    var repoH = ((document.getElementById('wiz-html-repo') || {}).value || '').trim() || '—';
+                    var branchH = ((document.getElementById('wiz-html-branch') || {}).value || '').trim() || 'main';
+                    sEl.textContent = repoH + ' (Branch: ' + branchH + ')';
+                } else {
+                    var templateNames = {
+                        agency: 'Agency & Studio Prompt',
+                        saas: 'AI SaaS Prompt',
+                        consulting: 'B2B Consulting Prompt',
+                        photography: 'Photo Studio Prompt',
+                        custom: 'Custom Business Prompt'
+                    };
+                    var tLabel = templateNames[_wizSelectedTemplateKey] || 'Creative Agency Prompt';
+                    sEl.textContent = tLabel + (rawHtml ? ' · ' + lines + ' lines custom HTML' : ' · Instant AI Generation');
+                }
+            } else if (_wizBuilder === 'nextjs') {
                 var r = (document.getElementById('wiz-nextjs-repo') || {}).value || '—';
                 var l = (document.getElementById('wiz-nextjs-live-url') || {}).value || '';
                 sEl.textContent = r + (l ? ' (Live: ' + l + ')' : '');
@@ -12655,8 +13409,15 @@ function cora_get_sparkline_points( $history, $type ) {
         var githubBranch = 'main';
         var nextjsLiveUrl = '';
         var nextjsSecret = '';
+        var rawHtml = '';
 
-        if (_wizBuilder === 'nextjs') {
+        if (_wizBuilder === 'html_ai') {
+            rawHtml = ((document.getElementById('wiz-html-raw-code') || {}).value || '').trim();
+            if (_wizSubMode === 'github') {
+                githubRepo = ((document.getElementById('wiz-html-repo') || {}).value || '').trim();
+                githubBranch = ((document.getElementById('wiz-html-branch') || {}).value || '').trim() || 'main';
+            }
+        } else if (_wizBuilder === 'nextjs') {
             githubRepo = ((document.getElementById('wiz-nextjs-repo') || {}).value || '').trim();
             githubToken = ((document.getElementById('wiz-nextjs-token') || {}).value || '').trim();
             githubBranch = ((document.getElementById('wiz-nextjs-branch') || {}).value || '').trim() || 'main';
@@ -12682,6 +13443,9 @@ function cora_get_sparkline_points( $history, $type ) {
             name:          name,
             start_from:    _wizBuilder,
             builder:       _wizBuilder,
+            raw_html:      rawHtml,
+            template_key:  _wizSelectedTemplateKey || 'agency',
+            activate_live: '1',
             lovable_url:   lovUrl,
             live_url:      liveUrl || nextjsLiveUrl,
             nextjs_live_url: nextjsLiveUrl,
@@ -12740,11 +13504,11 @@ function cora_get_sparkline_points( $history, $type ) {
         }
 
         // For Next.js / GitHub repository imports, transition directly to the Real-Time Build Terminal!
-        if (_wizBuilder === 'nextjs' || githubRepo) {
+        if (_wizBuilder === 'nextjs' || (_wizBuilder !== 'html_ai' && githubRepo)) {
             wizardStartLiveBuildUI(name);
         } else {
-            if (nextBtn) { nextBtn.innerHTML = 'Saving…'; nextBtn.disabled = true; nextBtn.style.opacity = '0.6'; }
-            showToast('Creating theme workspace…', 'info');
+            if (nextBtn) { nextBtn.innerHTML = 'Launching…'; nextBtn.disabled = true; nextBtn.style.opacity = '0.6'; }
+            showToast('Creating theme workspace & activating live homepage…', 'info');
         }
 
         jQuery.ajax({
@@ -12757,6 +13521,16 @@ function cora_get_sparkline_points( $history, $type ) {
                 if (res.success) {
                     var data = res.data || {};
                     if (data.theme_id) _wizCurrentThemeId = data.theme_id;
+
+                    if (_wizBuilder === 'html_ai') {
+                        showToast('⚡ AI HTML Theme "' + name + '" created and live at /site/!', 'success');
+                        closeAddThemeWizard();
+                        var targetSiteUrl = (typeof coraREData !== 'undefined' && coraREData.siteUrl) ? (coraREData.siteUrl + '/site/') : '/site/';
+                        setTimeout(function() {
+                            window.location.href = targetSiteUrl;
+                        }, 900);
+                        return;
+                    }
 
                     if (_wizBuilder === 'nextjs' || githubRepo) {
                         if (data.build_success === false) {
@@ -12777,21 +13551,23 @@ function cora_get_sparkline_points( $history, $type ) {
                     var logs = (res.data && res.data.logs) ? res.data.logs : '';
                     var themeId = (res.data && res.data.theme_id) ? res.data.theme_id : 0;
 
-                    if (_wizBuilder === 'nextjs' || githubRepo) {
+                    if (_wizBuilder === 'nextjs' || (_wizBuilder !== 'html_ai' && githubRepo)) {
                         wizardShowBuildError(errMsg, logs, themeId);
                     } else {
                         var nextStep = (res.data && res.data.next_step) ? res.data.next_step : 'Verify your configuration and try again.';
                         showToast(errMsg + ' — Next Step: ' + nextStep, 'error');
-                        if (nextBtn) { nextBtn.innerHTML = '⚡ Create & Build Theme <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>'; nextBtn.disabled = false; nextBtn.style.opacity = '1'; }
+                        var ctaLabel = (_wizBuilder === 'html_ai') ? '⚡ Launch Theme Live & Go to /site/' : ((_wizBuilder === 'nextjs') ? '⚡ Create & Build Theme' : 'Save Theme');
+                        if (nextBtn) { nextBtn.innerHTML = ctaLabel + ' <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>'; nextBtn.disabled = false; nextBtn.style.opacity = '1'; }
                     }
                 }
             },
             error: function(xhr) {
-                if (_wizBuilder === 'nextjs' || githubRepo) {
+                if (_wizBuilder === 'nextjs' || (_wizBuilder !== 'html_ai' && githubRepo)) {
                     wizardShowBuildError('Connection failed while communicating with the workspace server.', xhr.responseText || '', _wizCurrentThemeId);
                 } else {
                     showToast('Connection failed. Please check your network and try again.', 'error');
-                    if (nextBtn) { nextBtn.innerHTML = '⚡ Create & Build Theme <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>'; nextBtn.disabled = false; nextBtn.style.opacity = '1'; }
+                    var ctaLabel = (_wizBuilder === 'html_ai') ? '⚡ Launch Theme Live & Go to /site/' : ((_wizBuilder === 'nextjs') ? '⚡ Create & Build Theme' : 'Save Theme');
+                    if (nextBtn) { nextBtn.innerHTML = ctaLabel + ' <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>'; nextBtn.disabled = false; nextBtn.style.opacity = '1'; }
                 }
             }
         });

@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.334
+ * Version:           4.9.335
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.333' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.335' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -39637,6 +39637,252 @@ function cora_duplicate_wp_post( $post_id, $new_title = '' ) {
 }
 }
 
+if ( ! function_exists( 'cora_canvas_get_default_starter_html' ) ) {
+/**
+ * Generates a clean, modern, Tailwind CSS + Inter landing page starter based on template key.
+ */
+function cora_canvas_get_default_starter_html( $template_key = 'agency', $theme_name = 'My Studio' ) {
+    $title = esc_html( ! empty( $theme_name ) ? $theme_name : 'Modern Studio' );
+    
+    switch ( $template_key ) {
+        case 'saas':
+            $hero_badge = '● v2.4 Platform Live · Intelligent Autonomous Agent Engine';
+            $hero_title = 'The Autonomous AI Workspace for Modern Teams';
+            $hero_sub = 'Streamline operations, automate client workflows, and sync digital assets in real time with high-performance infrastructure.';
+            $cta_primary = 'Start Free 14-Day Trial';
+            $cta_sec = 'Explore Live Demo';
+            break;
+            
+        case 'consulting':
+            $hero_badge = 'Strategic Enterprise Advisory & Valuation Practice';
+            $hero_title = 'Capital Strategy & Advisory for High-Growth Enterprises';
+            $hero_sub = 'Navigating market expansion, operational restructuring, and private capital transactions with data-driven institutional rigour.';
+            $cta_primary = 'Schedule Executive Audit';
+            $cta_sec = 'View Case Studies';
+            break;
+            
+        case 'photography':
+            $hero_badge = 'Premium Commercial & Editorial Photography';
+            $hero_title = 'Visual Storytelling for Brands & Global Campaigns';
+            $hero_sub = 'Capturing cinematic depth, brand identity, and editorial architecture with signature lighting and meticulous post-production.';
+            $cta_primary = 'Book Studio Session';
+            $cta_sec = 'View Portfolio Reel';
+            break;
+            
+        case 'custom':
+            $hero_badge = 'Tailored Digital Experience Platform';
+            $hero_title = 'Built for Performance, Conversion & Brand Authority';
+            $hero_sub = 'Delivering tailored digital experiences, responsive design, and seamless customer capture engineered for rapid growth.';
+            $cta_primary = 'Get Started Today';
+            $cta_sec = 'Learn More';
+            break;
+            
+        case 'agency':
+        default:
+            $hero_badge = 'Creative Agency of the Year 2026';
+            $hero_title = 'We Craft Iconic Brands & Cinematic Digital Experiences';
+            $hero_sub = 'Award-winning creative direction, high-converting web architecture, and video production engineered to scale modern enterprises.';
+            $cta_primary = 'Book Consultation';
+            $cta_sec = 'Explore Showcase';
+            break;
+    }
+
+    return '<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>' . $title . ' · High-Performance Web Presence</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: [\'Inter\', \'-apple-system\', \'BlinkMacSystemFont\', \'sans-serif\'],
+                        mono: [\'JetBrains Mono\', \'monospace\']
+                    },
+                    colors: {
+                        brand: {
+                            50: \'#fafafa\',
+                            100: \'#f4f4f5\',
+                            800: \'#27272a\',
+                            900: \'#18181b\',
+                            950: \'#09090b\'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-[#09090b] text-zinc-100 font-sans antialiased selection:bg-zinc-800 selection:text-white">
+
+    <!-- Top Announcement Bar -->
+    <div class="bg-zinc-900 border-b border-zinc-800/80 py-2 px-4 text-center text-xs text-zinc-400 font-medium">
+        <span>' . $hero_badge . '</span>
+    </div>
+
+    <!-- Navigation Bar -->
+    <header class="sticky top-0 z-50 bg-[#09090b]/90 backdrop-blur-md border-b border-zinc-800/80">
+        <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-zinc-950 font-black text-sm">
+                    ▲
+                </div>
+                <span class="font-extrabold text-base tracking-tight text-white">' . $title . '</span>
+            </div>
+            <nav class="hidden md:flex items-center gap-8 text-xs font-semibold text-zinc-400">
+                <a href="#services" class="hover:text-white transition-colors">Services</a>
+                <a href="#showcase" class="hover:text-white transition-colors">Showcase</a>
+                <a href="#metrics" class="hover:text-white transition-colors">Performance</a>
+                <a href="#contact" class="hover:text-white transition-colors">Contact</a>
+            </nav>
+            <div class="flex items-center gap-3">
+                <a href="#contact" class="px-4 py-2 bg-white hover:bg-zinc-200 text-zinc-950 text-xs font-bold rounded-lg transition-all shadow-xs">
+                    ' . $cta_primary . '
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="relative pt-24 pb-20 px-6 border-b border-zinc-800/60 overflow-hidden">
+        <div class="max-w-4xl mx-auto text-center">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-[11px] font-semibold text-zinc-300 mb-6">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>' . $hero_badge . '</span>
+            </div>
+            <h1 class="text-4xl sm:text-6xl font-black tracking-tight text-white leading-[1.08] mb-6">
+                ' . $hero_title . '
+            </h1>
+            <p class="text-base sm:text-lg text-zinc-400 max-w-2xl mx-auto leading-relaxed mb-10 font-normal">
+                ' . $hero_sub . '
+            </p>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a href="#contact" class="w-full sm:w-auto px-6 py-3.5 bg-white hover:bg-zinc-200 text-zinc-950 text-xs font-extrabold rounded-xl transition-all shadow-lg">
+                    ' . $cta_primary . ' →
+                </a>
+                <a href="#services" class="w-full sm:w-auto px-6 py-3.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 text-xs font-bold rounded-xl border border-zinc-800 transition-all">
+                    ' . $cta_sec . '
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Key Metrics Ticker -->
+    <section id="metrics" class="py-12 px-6 border-b border-zinc-800/60 bg-zinc-950/50">
+        <div class="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            <div class="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800/60">
+                <div class="text-3xl font-black text-white font-mono mb-1">99.9%</div>
+                <div class="text-xs text-zinc-400 font-medium">Uptime & Reliability</div>
+            </div>
+            <div class="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800/60">
+                <div class="text-3xl font-black text-white font-mono mb-1">&lt;50ms</div>
+                <div class="text-xs text-zinc-400 font-medium">Global Edge Latency</div>
+            </div>
+            <div class="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800/60">
+                <div class="text-3xl font-black text-white font-mono mb-1">500+</div>
+                <div class="text-xs text-zinc-400 font-medium">Projects Delivered</div>
+            </div>
+            <div class="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800/60">
+                <div class="text-3xl font-black text-white font-mono mb-1">4.9/5</div>
+                <div class="text-xs text-zinc-400 font-medium">Client Satisfaction</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Core Services Grid -->
+    <section id="services" class="py-20 px-6 border-b border-zinc-800/60">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center max-w-xl mx-auto mb-16">
+                <h2 class="text-xs font-bold tracking-widest text-zinc-500 uppercase mb-3 font-mono">Our Capabilities</h2>
+                <h3 class="text-3xl font-black text-white tracking-tight">Engineered for Exponential Results</h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="p-8 rounded-2xl bg-zinc-900/50 border border-zinc-800/80 hover:border-zinc-700 transition-all">
+                    <div class="w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-white mb-6">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    </div>
+                    <h4 class="text-lg font-bold text-white mb-2">Strategy & Brand Identity</h4>
+                    <p class="text-xs text-zinc-400 leading-relaxed">Comprehensive positioning, visual systems, and narrative architecture that elevate market value.</p>
+                </div>
+                <div class="p-8 rounded-2xl bg-zinc-900/50 border border-zinc-800/80 hover:border-zinc-700 transition-all">
+                    <div class="w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-white mb-6">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+                    </div>
+                    <h4 class="text-lg font-bold text-white mb-2">Next-Gen Web Architecture</h4>
+                    <p class="text-xs text-zinc-400 leading-relaxed">Zero-lag, mobile-first responsive interfaces optimized for Core Web Vitals and peak search conversion.</p>
+                </div>
+                <div class="p-8 rounded-2xl bg-zinc-900/50 border border-zinc-800/80 hover:border-zinc-700 transition-all">
+                    <div class="w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-white mb-6">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                    </div>
+                    <h4 class="text-lg font-bold text-white mb-2">Automated Growth & CRM</h4>
+                    <p class="text-xs text-zinc-400 leading-relaxed">Built-in lead capture directly synchronized with client pipelines and instant notification funnels.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Native Lead Consultation Form -->
+    <section id="contact" class="py-20 px-6 bg-[#0c0c0e]">
+        <div class="max-w-xl mx-auto">
+            <div class="text-center mb-10">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-[11px] font-semibold text-zinc-300 mb-3">
+                    <span>⚡ Instant CRM Sync</span>
+                </div>
+                <h3 class="text-3xl font-black text-white tracking-tight mb-2">Request a Consultation</h3>
+                <p class="text-xs text-zinc-400">Fill in your requirements below and our team will get in touch within 24 hours.</p>
+            </div>
+            
+            <form method="POST" class="p-8 rounded-2xl bg-zinc-900 border border-zinc-800 shadow-2xl flex flex-col gap-4">
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[11px] font-bold text-zinc-300 uppercase tracking-wider">Full Name *</label>
+                    <input type="text" name="name" required placeholder="Aarav Mehta" class="w-full px-3.5 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500 transition-all">
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[11px] font-bold text-zinc-300 uppercase tracking-wider">Email Address *</label>
+                        <input type="email" name="email" required placeholder="aarav@company.com" class="w-full px-3.5 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500 transition-all">
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[11px] font-bold text-zinc-300 uppercase tracking-wider">Phone Number</label>
+                        <input type="tel" name="phone" placeholder="+91 98765 43210" class="w-full px-3.5 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500 transition-all">
+                    </div>
+                </div>
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[11px] font-bold text-zinc-300 uppercase tracking-wider">Project Details / Message</label>
+                    <textarea name="message" rows="4" placeholder="Briefly describe your goals, budget, or timeline..." class="w-full px-3.5 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500 transition-all resize-none"></textarea>
+                </div>
+                <button type="submit" class="w-full py-3.5 bg-white hover:bg-zinc-200 text-zinc-950 text-xs font-extrabold rounded-xl transition-all shadow-md mt-2 cursor-pointer">
+                    Submit Inquiry →
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-10 px-6 border-t border-zinc-800/80 text-center text-xs text-zinc-500">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+                <span class="font-bold text-zinc-300">' . $title . '</span>
+                <span>· High-Performance Website</span>
+            </div>
+            <div>
+                <span>© ' . date('Y') . ' ' . $title . '. All rights reserved. Powered by Cora Canvas.</span>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>';
+}
+}
+
 if ( ! function_exists( 'cora_canvas_get_draft_theme_limit' ) ) {
 /**
  * Dynamic draft theme quota limit:
@@ -39742,6 +39988,13 @@ function cora_ajax_canvas_create_theme() {
             } else {
                 $settings['github_branch'] = 'main';
             }
+        } elseif ( $_POST['builder'] === 'html_ai' ) {
+            $settings['source'] = 'html_ai';
+            $settings['template_key'] = sanitize_text_field( $_POST['template_key'] ?? 'agency' );
+            if ( ! empty( $_POST['github_repo'] ) ) {
+                $settings['github_repo'] = esc_url_raw( $_POST['github_repo'] );
+                $settings['github_branch'] = sanitize_text_field( ! empty( $_POST['github_branch'] ) ? $_POST['github_branch'] : 'main' );
+            }
         } elseif ( $_POST['builder'] === 'nextjs' ) {
             $settings['source'] = 'nextjs';
             $settings['nextjs_live_url'] = esc_url_raw( ! empty( $_POST['live_url'] ) ? $_POST['live_url'] : ( ! empty( $_POST['nextjs_live_url'] ) ? $_POST['nextjs_live_url'] : '' ) );
@@ -39794,6 +40047,62 @@ function cora_ajax_canvas_create_theme() {
     );
     
     $new_id = $wpdb->insert_id;
+
+    if ( isset( $_POST['builder'] ) && $_POST['builder'] === 'html_ai' ) {
+        $raw_html = isset( $_POST['raw_html'] ) ? wp_unslash( $_POST['raw_html'] ) : '';
+        $template_key = sanitize_text_field( $_POST['template_key'] ?? 'agency' );
+        if ( empty( trim( $raw_html ) ) && function_exists( 'cora_canvas_get_default_starter_html' ) ) {
+            $raw_html = cora_canvas_get_default_starter_html( $template_key, $name );
+        }
+
+        $wp_post_id = wp_insert_post( array(
+            'post_title'    => 'Home',
+            'post_name'     => 'home',
+            'post_type'     => 'page',
+            'post_status'   => 'publish',
+            'post_content'  => $raw_html,
+            'page_template' => 'cora_canvas_standalone'
+        ) );
+
+        if ( ! is_wp_error( $wp_post_id ) ) {
+            update_post_meta( $wp_post_id, '_cora_page_engine', 'html_canvas' );
+            update_post_meta( $wp_post_id, '_wp_page_template', 'cora_canvas_standalone' );
+            update_post_meta( $wp_post_id, '_cora_canvas_theme_id', $new_id );
+            update_post_meta( $wp_post_id, '_cora_canvas_html_compiled', wp_slash( $raw_html ) );
+
+            $wpdb->insert(
+                $wpdb->prefix . 'cora_canvas_pages',
+                array(
+                    'agency_id'       => $agency_id,
+                    'theme_id'        => $new_id,
+                    'wp_post_id'      => $wp_post_id,
+                    'title'           => 'Home',
+                    'slug'            => 'home',
+                    'status'          => 'publish',
+                    'is_homepage'     => 1,
+                    'template'        => 'cora_canvas_standalone',
+                    'seo_title'       => $name . ' · Home',
+                    'seo_description' => 'Modern high-converting web presence built with Cora Canvas AI.',
+                    'seo_og_image'    => '',
+                    'created_by'      => get_current_user_id(),
+                    'created_at'      => current_time( 'mysql' ),
+                    'updated_at'      => current_time( 'mysql' )
+                ),
+                array( '%d', '%d', '%d', '%s', '%s', '%s', '%d', '%s', '%s', '%s', '%s', '%d', '%s', '%s' )
+            );
+        }
+
+        $activate_live = isset( $_POST['activate_live'] ) && ( $_POST['activate_live'] === '1' || $_POST['activate_live'] === 1 );
+        if ( $activate_live ) {
+            $wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->prefix}cora_canvas_themes SET status = 'draft' WHERE agency_id = %d", $agency_id ) );
+            $wpdb->update(
+                $wpdb->prefix . 'cora_canvas_themes',
+                array( 'status' => 'live', 'updated_at' => current_time( 'mysql' ) ),
+                array( 'id' => $new_id )
+            );
+            cora_canvas_sync_homepage_options( $agency_id );
+        }
+    }
 
     if ( isset( $_POST['builder'] ) && $_POST['builder'] === 'nextjs' ) {
         // Register Next.js routes into pages table
