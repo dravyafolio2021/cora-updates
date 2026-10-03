@@ -12042,7 +12042,7 @@ function cora_get_sparkline_points( $history, $type ) {
 Create a complete, single-file, production-ready HTML5 landing page for a premier "Creative Agency & Video Studio" (named "Apex Studio").
 
 TECHNICAL REQUIREMENTS:
-1. Include Tailwind CSS CDN: <script src="https://cdn.tailwindcss.com"></script>
+1. Include Tailwind CSS CDN: <script src="https://cdn.tailwindcss.com"><\/script>
 2. Google Fonts: Inter and JetBrains Mono for numbers/tags.
 3. Clean modern monochromatic dark aesthetic (zinc-950 background, zinc-100 typography, subtle zinc-800 borders, smooth micro-interactions).
 4. Fully responsive on mobile, tablet, and desktop with a mobile navigation menu.
@@ -12068,7 +12068,7 @@ Return ONLY clean, complete, copy-pasteable HTML inside an <!DOCTYPE html> docum
 Create a complete, single-file, production-ready HTML5 landing page for an "AI SaaS & Workflow Automation Platform" (named "Pulse AI").
 
 TECHNICAL REQUIREMENTS:
-1. Include Tailwind CSS CDN: <script src="https://cdn.tailwindcss.com"></script>
+1. Include Tailwind CSS CDN: <script src="https://cdn.tailwindcss.com"><\/script>
 2. Google Fonts: Inter and JetBrains Mono.
 3. Modern high-tech monochromatic aesthetic (pure black/zinc-950, deep zinc-900 surfaces, zinc-800 borders, subtle purple/indigo highlights).
 4. Fully responsive mobile & desktop layout.
@@ -12094,7 +12094,7 @@ Return ONLY clean, valid, standalone HTML in an <!DOCTYPE html> document.`,
 Create a complete, single-file, production-ready HTML5 landing page for a "B2B Advisory & Management Consulting Firm" (named "Vanguard Strategy Group").
 
 TECHNICAL REQUIREMENTS:
-1. Include Tailwind CSS CDN: <script src="https://cdn.tailwindcss.com"></script>
+1. Include Tailwind CSS CDN: <script src="https://cdn.tailwindcss.com"><\/script>
 2. Google Fonts: Playfair Display for elegant headlines and Inter for UI body.
 3. Editorial luxury monochromatic palette (warm neutral ivory/zinc-50 background, deep obsidian zinc-900 typography, subtle amber/bronze accent borders).
 4. Fully responsive layout.
@@ -12119,7 +12119,7 @@ Return ONLY clean, standalone HTML in an <!DOCTYPE html> document.`,
 Create a complete, single-file, production-ready HTML5 landing page for a "Luxury Photography Studio & Production House" (named "Lumina Studio").
 
 TECHNICAL REQUIREMENTS:
-1. Include Tailwind CSS CDN: <script src="https://cdn.tailwindcss.com"></script>
+1. Include Tailwind CSS CDN: <script src="https://cdn.tailwindcss.com"><\/script>
 2. Google Fonts: Space Grotesk and Inter.
 3. High-fashion minimalist monochromatic dark layout (black #09090b, charcoal surfaces, white typography, subtle glassmorphism overlays).
 4. Fully responsive gallery layout with masonry-style grid.
@@ -12144,7 +12144,7 @@ Return ONLY clean, standalone HTML in an <!DOCTYPE html> document.`,
 Create a complete, single-file, production-ready HTML5 landing page with Tailwind CSS CDN for any custom business niche.
 
 TECHNICAL REQUIREMENTS:
-1. Include Tailwind CSS CDN: <script src="https://cdn.tailwindcss.com"></script>
+1. Include Tailwind CSS CDN: <script src="https://cdn.tailwindcss.com"><\/script>
 2. Google Fonts: Inter and JetBrains Mono.
 3. Clean modern monochromatic design system matching the Shopify/Notion aesthetic.
 4. Mobile-first 100% responsive design with mobile drawer navigation.
