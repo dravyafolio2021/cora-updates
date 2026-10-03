@@ -41780,14 +41780,31 @@ function cora_ajax_canvas_create_html_page() {
         if ( in_array( $file_ext, array( 'html', 'htm', 'txt' ), true ) ) {
             $raw_html = file_get_contents( $_FILES['html_file']['tmp_name'] );
         } elseif ( $file_ext === 'zip' ) {
-            // Unpack ZIP archive to extract index.html and assets
+            // Unpack ZIP archive to extract index.html and assets safely
             if ( class_exists( 'ZipArchive' ) ) {
                 $zip = new ZipArchive();
                 if ( $zip->open( $_FILES['html_file']['tmp_name'] ) === true ) {
                     $upload_dir = wp_upload_dir();
-                    $target_dir = $upload_dir['basedir'] . '/cora-canvas/' . $theme_id . '/' . time();
+                    $target_dir = $upload_dir['basedir'] . '/cora-canvas/' . intval( $theme_id ) . '/' . time();
                     wp_mkdir_p( $target_dir );
-                    $zip->extractTo( $target_dir );
+                    $real_target_dir = realpath( $target_dir );
+
+                    if ( $real_target_dir ) {
+                        for ( $i = 0; $i < $zip->numFiles; $i++ ) {
+                            $filename = $zip->getNameIndex( $i );
+                            // Skip dangerous/traversal entries
+                            if ( strpos( $filename, '../' ) !== false || strpos( $filename, '..\\' ) !== false ) {
+                                continue;
+                            }
+                            $destination = $real_target_dir . '/' . ltrim( $filename, '/' );
+                            if ( substr( $filename, -1 ) === '/' ) {
+                                wp_mkdir_p( $destination );
+                            } else {
+                                wp_mkdir_p( dirname( $destination ) );
+                                copy( "zip://" . $_FILES['html_file']['tmp_name'] . "#" . $filename, $destination );
+                            }
+                        }
+                    }
                     $zip->close();
 
                     // Find primary HTML file
@@ -41795,7 +41812,7 @@ function cora_ajax_canvas_create_html_page() {
                     if ( empty( $files ) ) {
                         $files = glob( $target_dir . '/**/*.html' );
                     }
-                    if ( ! empty( $files[0] ) ) {
+                    if ( ! empty( $files[0] ) && file_exists( $files[0] ) ) {
                         $raw_html = file_get_contents( $files[0] );
                     }
                 }

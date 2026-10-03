@@ -751,6 +751,10 @@ class Cora_NextJS_Integration {
     public function cora_nextjs_scan_routes() {
         check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
 
+        if ( ! current_user_can( 'edit_theme_options' ) && ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( array( 'message' => 'Unauthorized capability.' ) );
+        }
+
         $repo_raw = isset( $_POST['repo'] ) ? sanitize_text_field( wp_unslash( $_POST['repo'] ) ) : '';
         $branch   = isset( $_POST['branch'] ) ? sanitize_text_field( wp_unslash( $_POST['branch'] ) ) : 'main';
         $pat      = isset( $_POST['pat'] ) ? sanitize_text_field( wp_unslash( $_POST['pat'] ) ) : '';
@@ -782,6 +786,10 @@ class Cora_NextJS_Integration {
      */
     public function cora_nextjs_trigger_isr() {
         check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+
+        if ( ! current_user_can( 'edit_theme_options' ) && ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( array( 'message' => 'Unauthorized capability.' ) );
+        }
 
         $theme_id = intval( $_POST['theme_id'] ?? 0 );
         $path     = sanitize_text_field( $_POST['path'] ?? '/' );
@@ -858,6 +866,10 @@ class Cora_NextJS_Integration {
      */
     public function cora_nextjs_save_page_props() {
         check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+
+        if ( ! current_user_can( 'edit_theme_options' ) && ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( array( 'message' => 'Unauthorized capability.' ) );
+        }
 
         $page_id  = intval( $_POST['page_id'] ?? 0 );
         $theme_id = intval( $_POST['theme_id'] ?? 0 );
