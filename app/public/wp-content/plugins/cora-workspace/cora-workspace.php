@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.319
+ * Version:           4.9.320
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.319' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.320' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -1567,6 +1567,22 @@ function cora_workspace_handle_workspace_route() {
     }
     if ( in_array( 'wp-json', $path_parts, true ) || in_array( 'wp-admin', $path_parts, true ) || in_array( 'admin-ajax.php', $path_parts, true ) ) {
         return;
+    }
+
+    // Intercept Next.js / Static Assets early on init (/ _next/*, /_expo/*, /brand/*, or static extensions)
+    $path_ext = strtolower( pathinfo( $path, PATHINFO_EXTENSION ) );
+    $first_part_check = $path_parts[0] ?? '';
+    $is_static_asset_req = ( $first_part_check === '_next' || $first_part_check === '_expo' || $first_part_check === 'brand' || in_array( $path_ext, array( 'css', 'js', 'png', 'svg', 'jpg', 'jpeg', 'webp', 'ico', 'woff', 'woff2', 'ttf', 'json', 'map' ), true ) );
+    if ( $is_static_asset_req && ! in_array( $first_part_check, array( 'wp-content', 'wp-includes', 'assets', 'core', 'wp-admin' ), true ) ) {
+        global $wpdb;
+        $static_theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE settings LIKE '%is_static_built%' ORDER BY status = 'live' DESC, updated_at DESC, id DESC LIMIT 1", ARRAY_A );
+        if ( $static_theme ) {
+            $st_settings = json_decode( $static_theme['settings'] ?? '{}', true ) ?: array();
+            if ( ! empty( $st_settings['static_build_path'] ) && is_dir( $st_settings['static_build_path'] ) ) {
+                cora_render_nextjs_static_build( $st_settings['static_build_path'], $path, $static_theme, null, false );
+                exit;
+            }
+        }
     }
 
     // Bypass standalone router for Universal MCP, OAuth 2.1, and Well-Known Discovery
@@ -10116,22 +10132,33 @@ function cora_canvas_theme_frontend_router() {
         if ( ! empty( $cand_agency_ids ) ) {
             $in_sql = implode( ',', array_map( 'intval', $cand_agency_ids ) );
             $live_theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE agency_id IN ($in_sql) AND status = 'live' ORDER BY updated_at DESC, id DESC LIMIT 1", ARRAY_A );
-            if ( ! $live_theme ) {
-                $live_theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE agency_id IN ($in_sql) ORDER BY updated_at DESC, id DESC LIMIT 1", ARRAY_A );
-            }
             if ( $live_theme ) {
                 $active_theme_id = intval( $live_theme['id'] );
             }
         }
 
-        // Global fallback: If still no theme found by agency, fetch latest live theme globally!
+        // Global fallback 1: If no live theme found for candidate agency IDs, fetch any live theme globally
         if ( ! $active_theme_id ) {
             $live_theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live' ORDER BY updated_at DESC, id DESC LIMIT 1", ARRAY_A );
-            if ( ! $live_theme ) {
-                $live_theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes ORDER BY updated_at DESC, id DESC LIMIT 1", ARRAY_A );
-            }
             if ( $live_theme ) {
                 $active_theme_id = intval( $live_theme['id'] );
+            }
+        }
+
+        // Fallback 2: If no live theme exists anywhere, fallback to agency draft theme
+        if ( ! $active_theme_id && ! empty( $cand_agency_ids ) ) {
+            $in_sql = implode( ',', array_map( 'intval', $cand_agency_ids ) );
+            $draft_theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE agency_id IN ($in_sql) ORDER BY updated_at DESC, id DESC LIMIT 1", ARRAY_A );
+            if ( $draft_theme ) {
+                $active_theme_id = intval( $draft_theme['id'] );
+            }
+        }
+
+        // Fallback 3: Global latest theme
+        if ( ! $active_theme_id ) {
+            $draft_theme = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes ORDER BY updated_at DESC, id DESC LIMIT 1", ARRAY_A );
+            if ( $draft_theme ) {
+                $active_theme_id = intval( $draft_theme['id'] );
             }
         }
     }
