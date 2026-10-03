@@ -1,12 +1,13 @@
-# Cora Platform — Canvas & Frontend Module Documentation (v4.9.209)
+# Cora Platform — Canvas & Frontend Module Documentation (v4.9.316)
 
 ## Section 1: Overview & Multi-Engine Architecture
 
-Cora Canvas is a unified frontend website and theme creation engine providing a 100% white-labeled builder experience for agencies and workspace owners. Hardened through **v4.9.209**, Canvas operates across three core architectural engines:
+Cora Canvas is a unified frontend website and theme creation engine providing a 100% white-labeled builder experience for agencies and workspace owners. Hardened through **v4.9.316**, Canvas operates across four core architectural engines:
 
 1. **Engine A: Elementor White-Labeled Engine**: Wraps native Elementor in a sandboxed, two-row monochromatic toolbar (`cora-elementor-reskin.js` and `.css`), stripping out all WordPress headers, admin bars, upsell notices, and third-party references.
 2. **Engine B: Visual HTML Canvas Engine (Lovable-Compatible)**: In-browser visual HTML editor rendering semantic HTML5/Tailwind inside an isolated sandboxed iframe (`#cora-html-canvas-iframe`) with inline `contenteditable` editing, media inventory scanning, 1-click image swapping, code-split editing, URL edit state persistence, and AI rewriting.
 3. **Engine C: Universal Website Multi-Page Migrator Engine**: 1-click ingestion and crawler engine (`class-cora-html-website-migrator.php`) that scrapes external HTML/CSS/JS websites, downloads/isolates assets, sanitizes DOM code, and provisions editable draft themes.
+4. **Engine D: Next.js Headless Git Repository Integration & Route Scanner Engine**: Seamless headless connection between modern Next.js repositories (App Router / Pages Router) and the Cora Workspace (`class-cora-nextjs-integration.php`), providing dynamic GitHub tree scanning, public/private PAT authorization with dual-header fallback, automated route ingestion, dynamic page props management, headless REST APIs, on-demand ISR webhook triggers, sub-150ms dev server probe detection, and cookie-isolated live preview proxies.
 
 ---
 
@@ -18,34 +19,42 @@ graph TD
     B -->|Elementor Route| C[Elementor Reskinned Sandbox]
     B -->|Visual HTML Route| D[In-Browser Visual HTML Editor]
     B -->|Website Migration| E[Universal Multi-Page Crawler]
+    B -->|Next.js Git Connect| F[Next.js Headless Engine]
     
-    C -->|Injected Reskin| F[cora-elementor-reskin.js/css]
-    C -->|Renders Layout| G[view-canvas-render.php]
-    C -->|Saves Post Data| H[(wp_posts)]
+    C -->|Injected Reskin| G[cora-elementor-reskin.js/css]
+    C -->|Renders Layout| H[view-canvas-render.php]
+    C -->|Saves Post Data| I[(wp_posts)]
     
-    D -->|Iframe Preview| I[#cora-html-canvas-iframe]
-    D -->|Inline Text Edit| J[contenteditable & outline]
-    D -->|Code-Split View| K[Code Editor & Live DOM Sync]
-    D -->|Asset Scanner| L[renderHtmlInventoryList]
-    D -->|AI Rewrite & SEO| M[cora_ajax_canvas_ai_*]
-    D -->|getCleanIframeHtml| N[Clean HTML Extraction]
-    N -->|cora_ajax_save_html_visual| O[(wp_cora_canvas_pages)]
+    D -->|Iframe Preview| J[#cora-html-canvas-iframe]
+    D -->|Inline Text Edit| K[contenteditable & outline]
+    D -->|Code-Split View| L[Code Editor & Live DOM Sync]
+    D -->|Asset Scanner| M[renderHtmlInventoryList]
+    D -->|AI Rewrite & SEO| N[cora_ajax_canvas_ai_*]
+    D -->|getCleanIframeHtml| O[Clean HTML Extraction]
+    O -->|cora_ajax_save_html_visual| P[(wp_cora_canvas_pages)]
     
-    E -->|Scrapes Domain| P[class-cora-html-website-migrator.php]
-    P -->|Downloads Assets| Q[Isolated Media Storage]
-    P -->|Sanitizes DOM| R[Strips Trackers / Ads]
-    P -->|Provisions Theme| S[(wp_cora_canvas_themes)]
-    P -->|Scaffolds Pages| O
+    E -->|Scrapes Domain| Q[class-cora-html-website-migrator.php]
+    Q -->|Downloads Assets| R[Isolated Media Storage]
+    Q -->|Sanitizes DOM| S[Strips Trackers / Ads]
+    Q -->|Provisions Theme| T[(wp_cora_canvas_themes)]
+    Q -->|Scaffolds Pages| P
+
+    F -->|Scans Git Tree| U[GitHub REST API / PAT]
+    F -->|Discovers Routes| V[App Router & Pages Router]
+    F -->|Provisions Pages| P
+    F -->|Headless REST| W[/wp-json/cora-canvas/v1/*]
+    F -->|On-Demand ISR| X[Next.js /api/revalidate Webhook]
+    F -->|Dev Server Probe| Y[Sub-150ms Ping & Proxy Frame]
     
-    A -->|Manages| S
-    A -->|Syncs Menus| T[WordPress Nav Menus]
+    A -->|Manages| T
+    A -->|Syncs Menus| Z[WordPress Nav Menus]
 ```
 
 ---
 
-## Section 2: Canvas Theme Builder & Lifecycle (v4.9.199)
+## Section 2: Canvas Theme Builder & Lifecycle (v4.9.199 - v4.9.316)
 
-The Theme Builder allows agencies to manage multiple design themes per workspace with complete tenant isolation (`agency_id = %d`). In **v4.9.199**, the Theme Builder underwent a comprehensive UX revamp into a unified single-stream interface.
+The Theme Builder allows agencies to manage multiple design themes per workspace with complete tenant isolation (`agency_id = %d`). In **v4.9.199**, the Theme Builder underwent a comprehensive UX revamp into a unified single-stream interface, followed by Next.js app preview cards and level 2 routing in **v4.9.307 - v4.9.316**.
 
 ### 2.1 Single-Stream Theme Library (`#tab-canvas-overview`)
 * **Unified Theme Stream**: Consolidates both draft templates and active production themes into a single continuous stream, eliminating awkward sub-view navigation and modal jumps.
@@ -69,12 +78,27 @@ A dedicated diagnostic strip provides real-time telemetry on the active theme's 
 * **Desktop-First Builder**: Full visual iframe layout editing and split-code editing require precision mouse and keyboard control.
 * **Mobile Guard (<768px)**: On mobile viewports, the canvas transitions to a read-only telemetry and status inspection mode. An elegant prompt encourages users to open on desktop screens for full canvas drag-and-drop manipulation.
 
-### 2.5 Add Theme Wizard
-The creation wizard provides triple visual cards:
+### 2.5 Add Theme Wizard & Next.js Git Connector (v4.9.310)
+The creation wizard provides quadruple visual cards:
+* **Next.js Git Connector Card**: Connects GitHub repositories directly, discovering App Router pages and provisioning headless themes.
 * **Elementor Builder Card**: Provisions Elementor container templates and theme parts.
 * **Lovable / Visual HTML Builder Card**: Provisions lightweight, zero-dependency HTML5 templates with instantaneous render speeds.
 * **Universal Website Migrator Card**: Ingests external websites directly into draft themes.
 * **Wizard Reset Engine**: `window.wizardResetCards()` cleanly resets card active states upon closing or reopening the modal.
+
+### 2.6 Next.js App Preview Card in Canvas Level 1 (v4.9.316)
+When an active theme uses the Next.js engine (`source = 'nextjs'`), the Canvas overview Level 1 renders an ultra-modern, high-density Next.js App Preview Mockup card:
+* **Browser Top Chrome**: 3-dot window buttons, Next.js brand pill, monospace URL preview, and external tab launcher.
+* **Status & Router Badges**: Active emerald status indicator (`Active 🟢`) with animated pulse alongside an `App Router` framework tag.
+* **Connected Repository Details**: Displays GitHub repository path and active branch chip (`main`).
+* **Scanned Route Chips**: Displays primary scanned routes (`/`, `/about`, `/contact`, `+N more`) extracted by the Git scanner.
+* **Direct Quick-Actions**: "Open Live Site" and "Dev SDK & Ops" buttons for 1-tap workflow acceleration.
+
+### 2.7 Level 2 Live Theme Customizer & Sidebar Hover Quick-Actions (v4.9.305 - v4.9.307)
+* **Sidebar Hover Quick-Actions**: Hovering over the Canvas navigation item in the sidebar reveals instant action triggers:
+  - **Pen Icon (`Edit Live Theme`)**: Invokes `window.coraOpenLiveThemeCustomizer()` to immediately launch the Level 2 Live Theme Customizer for the active live theme, eliminating multi-click navigation through Level 1.
+  - **External Link Icon (`View Live Site`)**: Launches the live site in a new tab.
+* **Event Scoping**: Click handlers prevent event bubbling (`e.stopPropagation()`) to maintain seamless sidebar navigation.
 
 ---
 
@@ -238,7 +262,9 @@ CREATE TABLE wp_cora_canvas_pages (
 
 ---
 
-## Section 8: AJAX API Reference
+## Section 8: AJAX & Headless REST API Reference
+
+### 8.1 AJAX Actions Registry
 
 | Action | Endpoint / Hook | Parameters | Description |
 | :--- | :--- | :--- | :--- |
@@ -254,27 +280,236 @@ CREATE TABLE wp_cora_canvas_pages (
 | **AI Element Rewrite**| `cora_ajax_canvas_ai_rewrite_element`| `element_text`, `tone`, `prompt` | Returns AI rewritten copy variants. |
 | **AI SEO / CWV Optimize**| `cora_ajax_canvas_ai_optimize_page`| `page_id`, `html_content` | Performs automated Core Web Vitals optimizations. |
 | **Create Nav Menu** | `cora_ajax_create_nav_menu` | `menu_name`, `items_json`, `nonce` | Synchronizes menu with WordPress `nav_menu`. |
+| **Scan Next.js Routes** | `cora_nextjs_scan_routes` | `repo`, `branch`, `pat`, `nonce` | Scans GitHub repo tree for App/Pages Router routes. |
+| **Trigger ISR Revalidation** | `cora_nextjs_trigger_isr` | `theme_id`, `path`, `nonce` | Calls remote Next.js ISR revalidation webhook with secret. |
+| **Save Page Props** | `cora_nextjs_save_page_props` | `page_id`, `theme_id`, `props`, `auto_revalidate`, `nonce` | Commits headless props JSON and optionally triggers live ISR. |
+| **Sync Git Repo** | `cora_nextjs_sync_repo` | `theme_id`, `nonce` | Resyncs linked GitHub repo tree and updates Canvas pages. |
+| **Save Next.js Live URL** | `cora_nextjs_save_live_url` | `theme_id`, `live_url`, `nonce` | Updates local development server or production deployment URL. |
+
+### 8.2 Headless REST API Endpoints (`/wp-json/cora-canvas/v1/`)
+
+| Method | Endpoint | Query / Body Parameters | Description |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/cora-canvas/v1/nextjs/manifest` | `theme_id` (optional) | Returns site tokens, theme configuration, navigation, and all registered routes. |
+| `GET` | `/cora-canvas/v1/nextjs/page` | `slug` / `route` / `id`, `theme_id` | Returns props JSON, SEO tags, OpenGraph metadata, and canonical URLs for a single route. |
+| `POST` \| `GET` | `/cora-canvas/v1/nextjs/revalidate` | `secret`, `path`, `theme_id` | Dispatches on-demand ISR revalidation trigger to live Next.js deployment `/api/revalidate`. |
+| `POST` | `/cora-canvas/v1/nextjs/forms/submit` | `name`, `email`, `phone`, `message`, `source`, `form_id` | Ingests frontend lead inquiry directly into Cora Leads CRM (`wp_cora_leads`). |
 
 ---
 
-## Section 9: Next.js Frontend Integration & Optimization (`cora-frontend`)
+## Section 9: Next.js Headless Integration Engine & GitHub App Router Scanner (v4.9.308 - v4.9.316)
+
+The Next.js Native & Headless Integration Engine (`class-cora-nextjs-integration.php`) establishes a bi-directional bridge between modern Next.js frontends (Next.js 14/15 App Router and Pages Router) and the Cora SaaS Workspace.
+
+```
++-----------------------------------------------------------------------------------+
+|                     CORA NEXT.JS HEADLESS INTEGRATION LIFECYCLE                   |
++-----------------------------------------------------------------------------------+
+|  [ 1. GitHub PAT Auth & Dual Fallback ] ---> Connects repository with Bearer/token |
+|  [ 2. Branch & Recursive Tree Scan ]   ---> Scans app/**/page.tsx excluding groups |
+|  [ 3. Route Ingestion & Props Storage] ---> Auto-registers pages in Canvas DB      |
+|  [ 4. Headless REST Manifest Stream ]  ---> Supplies tokens, routes & props to app|
+|  [ 5. On-Demand ISR Webhook Hook ]     ---> POST /api/revalidate on content save   |
+|  [ 6. Sub-150ms Dev Probe & Proxy ]    ---> Fast localhost:3000 offline detection  |
++-----------------------------------------------------------------------------------+
+```
+
+### 9.1 Headless Architecture & Class Structure (`class-cora-nextjs-integration.php`)
+* **Singleton Lifecycle**: Instantiated via `Cora_NextJS_Integration::get_instance()`, hooking into WordPress `rest_api_init` and registering administrative AJAX actions.
+* **Namespace Standardization**: Standardized on REST namespace `cora-canvas/v1`, exposing dedicated headless endpoints for theme manifests, page props, ISR revalidation, and CRM form submission.
+
+### 9.2 GitHub App Router Tree Scanner & Dynamic Branch Discovery
+The GitHub tree scanner (`Cora_NextJS_Integration::scan_repository_routes`) automatically maps Next.js application routes directly from remote Git repositories:
+1. **Repository Slug Resolution**: Accepts standard formats (`owner/repo`, `https://github.com/owner/repo`, or `.git` URLs).
+2. **Dynamic Branch Discovery**:
+   - Queries `https://api.github.com/repos/{owner}/{repo}/branches?per_page=100`.
+   - Discovers all active branches and automatically selects the repository's default branch (`main` or `master`) when no specific branch is requested.
+3. **Recursive Tree Inspection**:
+   - Fetches the full repository tree via `https://api.github.com/repos/{owner}/{repo}/git/trees/{branch}?recursive=1`.
+4. **App Router Route Extraction**:
+   - Inspects file paths with regex: `#^(?:.+/)?(?:src/)?app/(.+/)?page\.(tsx|jsx|js|ts)$#i`.
+   - **Route Group Filtering**: Automatically detects and strips route group folder segments (e.g. `(marketing)`, `(auth)`, `(dashboard)`) to ensure clean canonical routing:
+     - Input path: `app/(marketing)/about/page.tsx`
+     - Output clean route: `/about`
+     - Output slug: `about`
+   - **Dynamic Route Detection**: Flags dynamic routes containing brackets (e.g. `[slug]`, `[id]`, `[...catchall]`).
+5. **Pages Router Fallback**:
+   - Inspects legacy paths via regex: `#^(?:.+/)?(?:src/)?pages/(.+)\.(tsx|jsx|js|ts)$#i`.
+   - Automatically excludes framework internals (`_app`, `_document`, `_error`, and `api/`).
+6. **Homepage Guarantee**:
+   - Automatically designates `/` as `is_homepage = 1`, ensuring root URL resolution always maps to the primary landing page.
+
+### 9.3 Public & Private Repository Support via Dual Authorization Header Fallback
+To support both public repositories and secured private agency codebases:
+* **PAT Secure Storage**: Accepts GitHub Personal Access Tokens (Classic or Fine-Grained), storing them securely in `cora_git_sync_token` options and user meta.
+* **Dual Header Fallback Strategy**:
+  - GitHub Classic PATs require `token <pat>`, whereas GitHub Fine-Grained PATs prefer `Bearer <pat>`.
+  - On dispatching requests to `api.github.com`, if an HTTP 401 (Unauthorized) or HTTP 404 (Not Found on private repos) is encountered, the scanner automatically toggles between `Bearer ` and `token ` headers before reporting failure:
+    ```php
+    // Automatic retry with alternative header format
+    $alt_headers = $headers;
+    $alt_headers['Authorization'] = ( str_starts_with( $headers['Authorization'], 'Bearer ' ) ? 'token ' : 'Bearer ' ) . $pat;
+    $alt_resp = wp_remote_get( $url, array( 'headers' => $alt_headers, 'timeout' => 15 ) );
+    ```
+* **Graceful Permission Diagnostics**: Returns clear, actionable guidance if the PAT lacks required scopes (`repo` for Classic PATs or `Contents: Read-only` for Fine-Grained PATs).
+
+### 9.4 Route Metadata Extraction & Page Props Editing
+* **Database Ingestion**: Discovered routes are synchronized directly into `wp_cora_canvas_pages` linked to the active theme ID.
+* **Structured Props Storage (`_cora_nextjs_props`)**:
+  - Custom props, hero copy, feature lists, pricing data, and configuration blocks are persisted in post meta under `_cora_nextjs_props`.
+  - Level 2 Theme Customizer provides an interactive visual JSON inspector and props editor.
+* **Automatic Cache Invalidation**: When props are updated with `auto_revalidate = 1`, the editor automatically initiates an on-demand ISR revalidation for that route.
+
+### 9.5 Headless REST API Suite Contracts
+
+#### 1. Theme Manifest Endpoint (`GET /wp-json/cora-canvas/v1/nextjs/manifest`)
+Supplies design tokens, global branding, and the full page index to Next.js clients:
+```json
+{
+  "success": true,
+  "theme": {
+    "id": 1,
+    "name": "Studio Production Next.js",
+    "status": "live",
+    "source": "nextjs",
+    "repo": "cora/studio-starter",
+    "branch": "main",
+    "live_url": "http://localhost:3000"
+  },
+  "site": {
+    "title": "Cora Studio Workspace",
+    "tagline": "Modern Creative Production SaaS",
+    "logo": "https://assets.cora.local/logo.svg",
+    "favicon": "https://assets.cora.local/favicon.ico",
+    "copyright": "© 2026 Cora. All rights reserved."
+  },
+  "tokens": {
+    "primary": "#18181b",
+    "secondary": "#27272a",
+    "accent": "#10b981",
+    "text": "#09090b",
+    "bg": "#ffffff",
+    "heading_font": "Inter",
+    "body_font": "Inter"
+  },
+  "pages": [
+    {
+      "id": 101,
+      "title": "Home",
+      "slug": "home",
+      "route": "/",
+      "is_homepage": true,
+      "status": "publish",
+      "seo": {
+        "title": "Home — Cora Studio",
+        "description": "Creative agency workspace platform.",
+        "og_image": "https://assets.cora.local/og-cover.png"
+      },
+      "props": {
+        "hero_title": "Scale Your Studio Operations",
+        "cta_label": "Explore Platform"
+      },
+      "updated_at": "2026-10-02 18:30:00"
+    }
+  ],
+  "api_version": "1.0.0",
+  "generated_at": "2026-10-02T18:30:00+00:00"
+}
+```
+
+#### 2. Single Page Props & SEO Endpoint (`GET /wp-json/cora-canvas/v1/nextjs/page`)
+Accepts `?route=/about` or `?slug=about` or `?id=102`, returning exact route props and OpenGraph metadata.
+
+#### 3. Lead Form Submission Endpoint (`POST /wp-json/cora-canvas/v1/nextjs/forms/submit`)
+Allows Next.js client forms (`<ContactForm />`, lead capture modals) to submit directly into Cora CRM:
+* **Payload**: `{ "name": "Rohan Verma", "email": "rohan@example.com", "phone": "+91 98765 43210", "message": "Inquiry regarding studio booking.", "source": "Next.js Frontend" }`.
+* **CRM Ingestion**: Inserts record into `wp_cora_leads` with `status='new'`, records tenant activity logs, and dispatches in-app notifications.
+
+### 9.6 On-Demand Incremental Static Regeneration (ISR) Webhook Trigger
+To ensure instant edge CDN cache invalidation without triggering full Next.js project rebuilds:
+1. **Webhook Contract**: Dispatches POST requests to `{live_url}/api/revalidate?secret={secret}&path={path}`.
+2. **Next.js Route Handler Implementation**:
+   ```typescript
+   // Next.js app/api/revalidate/route.ts
+   import { revalidatePath } from 'next/cache';
+   import { NextRequest, NextResponse } from 'next/server';
+
+   export async function POST(request: NextRequest) {
+     const secret = request.nextUrl.searchParams.get('secret');
+     const path   = request.nextUrl.searchParams.get('path') || '/';
+
+     if (secret !== process.env.CORA_REVALIDATE_SECRET) {
+       return NextResponse.json({ message: 'Invalid token' }, { status: 401 });
+     }
+
+     revalidatePath(path);
+     return NextResponse.json({ revalidated: true, path, now: Date.now() });
+   }
+   ```
+3. **Execution Diagnostics**: Cora Canvas records roundtrip latency (`duration_ms`), HTTP response status, and diagnostic error output directly in the editor notification stream.
+
+### 9.7 Live Dev Server Detection & Preview Proxy Engine
+When running local development environments (`http://localhost:3000` or `http://127.0.0.1:3000`):
+1. **Fast Sub-150ms Probe Detection**:
+   - Rather than letting browser iframes hang on connection timeouts, `cora_render_nextjs_live_frame` runs an instantaneous probe via `fetch`:
+     ```javascript
+     if (window.fetch && window.CORA_NEXTJS_LIVE_URL) {
+         fetch(window.CORA_NEXTJS_LIVE_URL, { mode: 'no-cors', cache: 'no-store' })
+             .then(function() { /* Dev server reachable */ })
+             .catch(function(err) { showOffline(); });
+     }
+     ```
+2. **Local Dev Server Offline Card Overlay (`#cora-error-overlay`)**:
+   - When the dev server is unreachable, `showOffline()` activates within 150ms.
+   - Renders a focused dark blurred modal card featuring:
+     - Headline: `Local Dev Server Offline`
+     - Terminal Instruction Block: `$ npm run dev` with 1-click clipboard copy.
+     - Presets Switcher: Quick chips for `localhost:3000`, `127.0.0.1:3000`, and `localhost:3001`.
+     - Direct external launcher: `Open localhost:3000 ↗`.
+3. **Next.js Proxy Router (`cora_canvas_theme_frontend_router`)**:
+   - In `cora-workspace.php`, the frontend router inspects active and preview themes.
+   - If the theme source is `nextjs`, it renders `cora_render_nextjs_live_frame()` or `cora_render_nextjs_connector_screen()` immediately, completely eliminating random WordPress default template fallbacks.
+4. **Bidirectional PostMessage Bridge**:
+   - The host workspace communicates with the child Next.js iframe using `postMessage`:
+     - `CORA_INIT`: Transmits API URL, REST nonces, theme ID, and initial route.
+     - `CORA_ROUTE_CHANGE`: Child frame informs host workspace of internal client navigation, seamlessly updating the browser address bar.
+     - `CORA_GET_CONFIG` / `CORA_CONFIG_RESPONSE`: Provides dynamic runtime workspace variables to the frontend.
+
+### 9.8 Preview Cookie Isolation Architecture (`cora_preview_theme_id` / `cora_canvas_preview`)
+To prevent development preview sessions from interfering with production workspace traffic:
+1. **Explicit Parameter Scoping**:
+   - Preview mode is strictly activated when an explicit query parameter is provided (`?preview_canvas=...` or `?preview=1` or `?cv_preview_theme=...`).
+2. **Cookie Purge on Normal Traffic**:
+   - In `cora_get_preview_theme_id()`, if a request arrives on `/site/` without explicit preview query parameters, and a live production theme exists, the system automatically deletes the preview cookie:
+     ```php
+     if ( ! headers_sent() ) {
+         setcookie( 'cora_preview_theme_id', '', time() - 3600, '/' );
+     }
+     unset( $_COOKIE['cora_preview_theme_id'] );
+     $raw_theme_id = 0;
+     ```
+   - Guarantees that public users and regular workspace visitors always view the active live theme without state leakage.
+
+---
+
+## Section 10: Next.js Frontend Integration & Optimization (`cora-frontend`)
 
 Cora maintains an independent, high-performance marketing and client frontend (`cora-frontend`) powered by Next.js and Tailwind CSS:
 
-### 9.1 3-Tier Interactive Pricing Alignment
+### 10.1 3-Tier Interactive Pricing Alignment
 * Matches the SaaS monetization structure across Starter, Growth, and Enterprise tiers.
 * Real-time billing toggle (Monthly / Annual with 20% discount badge).
 * Clear feature entitlement breakdown (AI Runes, Workspace seats, custom domains, CRM contacts).
 
-### 9.2 Image Optimization & WebP Asset Compression
+### 10.2 Image Optimization & WebP Asset Compression
 * Next.js Image Component (`next/image`) integration with native Sharp (`sharp@0.35.4`) optimization.
 * Dynamic WebP transcoding on ingestion, reducing asset payload size by up to 68%.
 * Responsive `srcset` generation and automatic placeholder blurs (`blurDataURL`).
 
-### 9.3 Security & Dependency Hardening (v4.9.209)
+### 10.3 Security & Dependency Hardening (v4.9.209 - v4.9.316)
 * Upgraded to Next.js `16.3.3` to remediate upstream CVE advisories in dev server routing and image optimization endpoints.
 * Isolated environment variable loading (`.env.local`) strictly preventing API secret exposure to client browser bundles.
 
 ---
 
-*Cora Canvas Documentation v4.9.209 — Last updated: September 2026.*
+*Cora Canvas Documentation v4.9.316 — Last updated: October 2026.*

@@ -1,6 +1,6 @@
 # Cora Platform — Comprehensive Platform Documentation
 
-This document serves as the master technical specification and architectural manual for the Cora Workspace Platform (v4.9.209).
+This document serves as the master technical specification and architectural manual for the Cora Workspace Platform (v4.9.316).
 
 ---
 
@@ -242,6 +242,28 @@ High-contrast bounding boxes and heavy outline borders create visual fatigue and
   - **RFC1918 Private Subnet Blocking**: Blocks `10.0.0.0/8`, `172.16.0.0/12`, and `192.168.0.0/16`.
   - **Link-Local & Cloud Metadata Blocking**: Blocks `169.254.0.0/16` and explicit cloud metadata endpoints (`169.254.169.254` for AWS, GCP, Azure, and DigitalOcean metadata services).
   - **DNS Rebinding Guard**: Enforces post-resolution IP checking on the actual resolved destination IP address prior to dispatching `wp_remote_get()` or `wp_remote_post()`.
+
+---
+
+### 1.18 Rule 13: Zero-Outline Tonal Surface Selection & Zero-Dark-Overlay Strict Standard (v4.9.255 - v4.9.300)
+* **Zero Heavy Outline Strokes**: High-contrast, solid black/dark bounding outline borders (such as `border-zinc-900`, `border-black`, `border-white`, `border-2`, or `ring-2` on selected cards, lists, or containers) are **strictly forbidden** across the Cora Design System.
+* **Tonal Surface Selection Architecture**: Card selection, active states, and focus elements MUST use soft, monochromatic tonal background fills (`bg-zinc-100/90 dark:bg-zinc-800/80` or `bg-zinc-100 dark:bg-zinc-800`) combined with uniform, subtle structural borders (`border-zinc-200/80 dark:border-zinc-800`).
+* **Zero Dark Overlay Enclosure**: Modals, slide drawers, and floating panels must eliminate heavy, trapped dark backdrops (`rgba(0,0,0,0.85)`). All dialogs employ clean transparent backdrops or subtle frosted glass blur (`backdrop-blur-sm bg-black/20`), preserving visual connection with the underlying workspace view and preventing trapped mobile overlays.
+
+---
+
+### 1.19 Live Next.js Dev Server Detection & Preview Cookie Isolation Engine (v4.9.316)
+* **Local Dev Server Auto-Detection**: When previewing Next.js themes, the system executes a rapid sub-150ms timeout ping to local development ports (`http://localhost:3000`). If the dev server is offline or unreachable, the UI immediately presents a clean offline banner with startup instructions (`npm run dev`) rather than hanging or failing silently.
+* **Preview Cookie Isolation (`cora_canvas_preview`)**: The theme preview cookie is strictly scoped to explicit preview query requests (`?preview_canvas=...` or `?cora_preview_theme=...`). Under normal navigation, the cookie is not evaluated, eliminating accidental theme overrides or leaking preview templates onto production customer routes.
+* **Next.js Build Proxy Router**: The core router in `cora-workspace.php` intercepts live Next.js build previews, proxying rendered assets and HTML streams directly into the iframe sandbox while eliminating fallback screens or generic welcome pages.
+
+---
+
+### 1.20 Universal Remote MCP Server & OAuth 2.1 PKCE Architecture (RFC 7591 / RFC 9728) (v4.9.220 - v4.9.233)
+* **RFC 7591 Dynamic Client Registration**: AI assistants (ChatGPT, Claude Web/Desktop, Google Gemini) can dynamically register client credentials against `/wp-json/cora-oauth/v1/register` without manual developer portal provisioning.
+* **OAuth 2.1 PKCE Handshake**: Implements Proof Key for Code Exchange (RFC 7636) with SHA-256 code challenges (`code_challenge_method: S256`), authorization code redemption, and secure refresh token rotation.
+* **RFC 9728 Protected Resource Metadata**: Advertises canonical OAuth discovery metadata at `/.well-known/oauth-protected-resource` and returns standards-compliant `WWW-Authenticate` challenge headers on unauthenticated 401 requests.
+* **JSON-RPC 2.0 Tool Execution Gateway**: Exposes all platform capabilities (Leads, Deals, Financials, Content, Inventory, Invoicing) via a single unified endpoint (`/wp-json/cora-mcp/v1/rpc`) following the official Model Context Protocol (MCP 2026-07-28 specification) with strict tenant isolation and object-level permissions.
 
 ---
 
@@ -848,25 +870,126 @@ Located in `views/view-emails.php` and connected to the Hostinger SMTP relay:
 
 ---
 
-## Section 3: Canvas Theme Builder, Dual-Engine Architecture & Universal Website Migrator (v4.9.38 - v4.9.59)
+### 2.26 Van Dispatch Wizard, Weight Allocation & Spot Billing Engine (v4.9.314 - v4.9.316)
+The **Inventory & Mobile Van Sales Engine** (`includes/class-cora-inventory-engine.php` and `views/view-inventory-management.php`) was substantially upgraded with an advanced field distribution and spot billing subsystem:
+* **3-Step Guided Dispatch Wizard**:
+  1. *Step 1: Driver & Route Selection*: Select from verified active workspace drivers (scoped to role `cora_field_vendor`) or provision new field members on-the-fly with automated email dispatch. Configure vehicle registration numbers and target delivery routes with quick city chips.
+  2. *Step 2: Inventory & Weight Allocation*: Select catalog items with support for both piece-count and weighted bulk goods. Implements dynamic weight rate allocation (standard base: ₹401.25/kg) and calculates total dispatch weights and expected gross valuations in real time.
+  3. *Step 3: Review & Dispatch Confirmation*: Displays comprehensive consignment summary, generates the initial cargo manifest, and triggers transactional dispatch emails with real-time tracking pixels.
+* **Real-Time Spot Billing & Field Point-of-Sale (POS)**:
+  - Mobile drivers execute counter billing at retail shops directly from allocated in-van stock.
+  - Automatically calculates applicable GST splits (CGST + SGST for intra-state, IGST for inter-state), converts bill amounts into official Indian currency words via `Cora_Inventory_Engine::convert_number_to_indian_words()`, and formats bills with standardized 4-digit numeric identifiers (e.g. `#0001`, `#0015`).
+  - **Auto-Print GST Invoice**: Once confirmed, spot sales can immediately trigger `ajax_render_sale_invoice()` which streams a clean printable tax invoice with automated client-side print execution (`window.print()`).
+  - **Safe Stock Restoration Protocol**: Deleting or modifying a spot invoice safely rolls back stock debits, returning items atomically to active van stock without orphaned units.
 
-Canvas is a **Dual Builder Engine & Universal Website Migration Platform**, supporting Elementor white-labeled editing, modern Visual HTML Canvas, and 1-click site ingestion:
+---
+
+### 2.27 Itemized Sales Register, CSV Export & Dispatch Manifest Auto-Print (v4.9.314 - v4.9.315)
+To satisfy rigorous accounting and statutory audit standards for wholesale distribution:
+* **Canonical Sales Register Table (`#sales-register-table`)**:
+  - Central ledger tracking every field transaction with 4-digit bill numbers, sale date, customer/firm name, itemized products sold, payment modes (Cash, UPI, Retailer Credit), and total net amount.
+  - Interactive search bar, date range filtering, driver selector, and payment mode breakdown cards.
+* **Itemized CSV Export (`ajax_export_sales_csv`)**:
+  - Exports a comprehensive, auditor-ready spreadsheet breakdown containing Bill #, Date, Customer Name, Contact, Product Name, SKU, Quantity, Unit/Weight Rate, Subtotal, GST, and Grand Total.
+* **Printable Sales Ledger (`ajax_render_sales_register_pdf`)**:
+  - Clean, monochrome-formatted printable HTML ledger formatted for statutory accountant packs and physical filing.
+* **Van Stock Sheet & Dispatch Manifest Print (`ajax_render_van_stock_sheet`, `ajax_export_van_stock_csv`)**:
+  - Generates official warehouse dispatch manifests formatted in strict 4-column (Inventory Report) and 5-column (Dispatch Manifest) structures:
+    - *Dispatch Columns*: `Sr No`, `Item Name`, `Pages per Unit / Spec`, `Weight (kg)`, `Total Price (₹)`.
+  - Includes warehouse supervisor signature lines, vehicle verification blocks, and driver acceptance acknowledgments.
+
+---
+
+### 2.28 Edge-to-Edge Draggable Lead Drawer & Bi-Directional Synchronizer (v4.9.300 - v4.9.302)
+Located in `views/view-leads.php` and `assets/js/admin-script.js`:
+* **Edge-to-Edge Full-Height Drawer Layout**:
+  - The Lead Details Drawer is auto-portaled directly to `document.body`, eliminating parent container clipping and CSS stacking context issues.
+  - Operates with a clean transparent backdrop or subtle frosted blur, keeping the underlying Kanban pipeline context visible.
+* **Left-Edge Draggable Width Resizer**:
+  - Users can smoothly resize the drawer by dragging its left edge (`.cora-drawer-resize-handle`).
+  - Drawer width preference is automatically persisted to `localStorage` (`cora_lead_drawer_width`), restoring the user's preferred layout instantly on subsequent openings.
+* **Decluttered Collapsible Accordion Anatomy**:
+  - Detailed lead information is organized into clean, monochromatic accordion sections: *Lead Details*, *Contact Information*, *AI Intent Score & Call Briefing*, *Deal Valuation & Stage*, and *Activity Timeline*.
+* **Team Assignee Roster Sanitization & Bi-Directional Sync**:
+  - Restricts lead assignment dropdowns strictly to valid, verified agency team members, filtering out system accounts and inactive users.
+  - Updates made inside the drawer (status progression, stage change, notes, deal value) immediately synchronize bi-directionally with the corresponding Kanban board card and top KPI scorecards without requiring a full page refresh.
+
+---
+
+### 2.29 GST Invoicing Multi-Step Validation & Automated Document Vault Linkage (v4.9.303 - v4.9.304)
+Located in `views/view-financials.php` and `cora-workspace.php`:
+* **Multi-Step Creator Validation Engine**:
+  - Enforces rigorous field validation across client selection, 15-character GSTIN regex validation (`^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-Z]{1}Z[0-9A-Z]{1}$`), invoice date, due date, SAC/HSN codes, and positive line item quantities.
+  - Structured line items are safely serialized as JSON arrays with itemized rates, tax rates (9% CGST + 9% SGST or 18% IGST), and automated discount computations.
+* **Automated Document Vault Synchronization**:
+  - When a GST invoice is created or published, the system automatically registers a corresponding legal record in the Document Vault (`wp_cora_vault_documents`).
+  - Computes a tamper-evident SHA-256 cryptographic checksum of the invoice payload, tags the document with e-sign and payment readiness metadata, and links the vault document ID directly to the financial invoice record for end-to-end statutory audit trails.
+
+---
+
+### 2.30 Media Manager Centered Modals & Curated Color Tag Presets (v4.9.295 - v4.9.298)
+Located in `views/view-media.php`:
+* **Centered Pop-Up Modal Architecture**:
+  - Quick management actions (such as *New Folder Creation* and *Folder Settings & Renaming*) are engineered as centered pop-up modals (`#cora-media-folder-modal`) rather than heavy side drawers, aligning with natural mental models for modal dialogs.
+  - Features transparent blurred backdrops, keyboard escape dismissal, and automatic focus management.
+* **Curated Color Tag Presets & Custom Hex Color Picker**:
+  - Folders support visual categorization via a palette of curated monochromatic and subtle pastel color tags (`zinc`, `slate`, `neutral`, `emerald`, `sky`, `amber`, `rose`).
+  - Includes an integrated native hex color picker for custom brand alignment, persisting color preferences in `wp_cora_media_folders`.
+* **Edge-to-Edge Asset Inspector Drawer**:
+  - High-resolution asset inspection, EXIF metadata review, and public proofing link generation operate within edge-to-edge side drawers with zero dark backdrop overlays.
+
+---
+
+### 2.31 Tokenized Administration Email Verification & Security State Machine (v4.9.269 - v4.9.273)
+Located in `views/view-settings-suite.php` and `cora-workspace.php`:
+* **Dynamic Administration Email Status Badges**:
+  - Displays dynamic visual state badges: 🟢 **Verified Administration Email** vs. 🟡 **Verification Pending** with relative timestamp expiration indicators.
+* **Locked Security State Machine**:
+  - Administration email inputs remain in a locked read-only state to prevent accidental modifications or unauthorized account takeovers.
+  - Clicking "Change Email" reveals an expanded input flow with cancel/confirm safeguards.
+* **Tokenized Verification Dispatch & Authenticated Sender Relay**:
+  - Triggers a secure 24-hour expiration token dispatched via the authenticated sender address (`heycora@claraverse.in`).
+  - Verification links safely intercept via `/workspace/verify?token=...` or AJAX validation handlers, completing identity verification without cross-subdomain authentication failures.
+* **100 Daily AI Credits Quota Matrix**:
+  - Automatically provisions new signups with a Free Workspace tier enforcing an official quota limit of 100 daily AI credits, synchronized in real time with the topbar quota badge and admin popover.
+
+---
+
+### 2.32 Universal Remote MCP Server & AI Connected Tools (v4.9.220 - v4.9.233)
+Located in `includes/mcp/class-cora-universal-mcp-server.php`, `class-cora-oauth-server.php`, and `views/view-mcp.php`:
+* **Universal Remote MCP Endpoint**:
+  - Connects external AI assistants (ChatGPT Custom GPTs, Claude Web & Desktop, Google Gemini, Cursor IDE) directly to the agency's live Cora Workspace via JSON-RPC 2.0 at `/wp-json/cora-mcp/v1/rpc`.
+* **OAuth 2.1 PKCE Authentication**:
+  - Provides a complete RFC 7591 dynamic client registration endpoint (`/wp-json/cora-oauth/v1/register`) and interactive authorization consent screen (`/workspace/oauth/authorize`).
+* **Canonical Tool Registry Across Workspace Domains**:
+  - Exposes 25+ structured tools spanning CRM Leads (`cora_crm_create_lead`, `cora_crm_get_leads`), Finance & Invoicing (`cora_finance_create_invoice`, `cora_finance_get_financials`), Inventory (`cora_inventory_get_catalog`, `cora_inventory_create_consignment`), and Content Marketing (`cora_content_create_article`).
+* **1-Click Assistant Setup Matrix**:
+  - The AI Tools MCP view provides ready-to-copy setup instructions, prompt directives, and live connection test buttons for ChatGPT, Claude, and Gemini.
+
+---
+
+## Section 3: Canvas Theme Builder, Multi-Engine Architecture & Next.js Headless System (v4.9.38 - v4.9.316)
+
+Canvas is a **Multi-Engine Website & Theme Engineering Platform**, supporting Elementor white-labeled editing, modern Visual HTML Canvas, 1-click site ingestion, and high-performance headless Next.js Git repository integration:
 
 ```
-+-----------------------------------------------------------------------------------+
-|                            CORA CANVAS THEME BUILDER                              |
-+----------------------+-----------------------------+------------------------------+
-| Engine A: Elementor  | Engine B: Visual HTML Canvas| Engine C: Universal Migrator |
-| • Reskinned Sandbox  | • Live Sandboxed Iframe     | • Multi-Page URL Crawler     |
-| • Strips WP Branding | • Inline contenteditable    | • CSS/JS/Asset Localizer     |
-| • 2-Row Top Toolbar  | • Code-Split Visual Editor  | • DOM Sanitizer & Cleaner    |
-| • Git Commit / Sync  | • Media Swap & Scanner      | • Auto Draft Theme Generator |
-+----------------------+-----------------------------+------------------------------+
++---------------------------------------------------------------------------------------------------+
+|                                    CORA CANVAS THEME BUILDER                                      |
++----------------------+-----------------------------+------------------------------+---------------+
+| Engine A: Elementor  | Engine B: Visual HTML Canvas| Engine C: Universal Migrator | Engine D:     |
+| • Reskinned Sandbox  | • Live Sandboxed Iframe     | • Multi-Page URL Crawler     | Next.js Git   |
+| • Strips WP Branding | • Inline contenteditable    | • CSS/JS/Asset Localizer     | • App Router  |
+| • 2-Row Top Toolbar  | • Code-Split Visual Editor  | • DOM Sanitizer & Cleaner    | • Route Scan  |
+| • Git Commit / Sync  | • Media Swap & Scanner      | • Auto Draft Theme Generator | • On-Demand   |
+|                      | • Clean HTML Export         |                              |   ISR & Proxy |
++----------------------+-----------------------------+------------------------------+---------------+
 ```
 
-### 3.1 Dual-Engine Theme Architecture
+### 3.1 Multi-Engine Theme Architecture
 1. **Elementor Engine**: Wraps Elementor in a sandboxed, white-labeled two-row toolbar (`cora-elementor-reskin.js` and `.css`), completely hiding native headers, admin bars, upsells, and promo banners.
 2. **Visual HTML Canvas Engine**: Directly renders clean, semantic HTML inside `#cora-html-canvas-iframe`, providing instant client-side editing without heavy builder overhead.
+3. **Universal Website Migrator Engine**: Ingests, cleanses, and converts existing external sites into customizable workspace themes.
+4. **Next.js Headless Engine (`class-cora-nextjs-integration.php`)**: Connects production Next.js repositories via Git, ingests discovered App Router routes, and coordinates on-demand ISR revalidations and live dev server previews.
 
 ### 3.2 In-Browser Visual HTML Editor & Code Split Engine
 * **Inline `contenteditable` Editing**: Click any heading, paragraph, or label inside the iframe to edit text in-place with real-time focus outline highlights (`.cora-editing-active`).
@@ -886,12 +1009,32 @@ The Universal Website Migrator (`class-cora-html-website-migrator.php`) allows a
 * **Instant Visual Canvas Editing**: Migrated pages immediately open in the In-Browser Visual HTML Editor for live inline text modifications, image replacements, and AI copy adjustments.
 * **Streamlined Monochromatic Migration Modal**: Provides URL input, scan depth controls, page limit sliders, live crawling progress indicators, and atomic error handling.
 
-### 3.4 AI-Powered Canvas Tools
+### 3.4 Next.js Headless Git Repository Integration, Route Scanner & Build Preview Proxy (v4.9.308 - v4.9.316)
+Engineered in `includes/class-cora-nextjs-integration.php` and `cora-workspace.php`:
+* **GitHub Git Connector Wizard**:
+  - Connects Next.js web repositories via GitHub Personal Access Tokens (PAT) supporting both public and private repositories.
+  - Implements dual authorization header fallbacks (`token <pat>` and `Bearer <pat>`) with dynamic branch discovery.
+* **App Router Route Scanner (`cora_nextjs_scan_routes`)**:
+  - Recursively scans the GitHub tree for Next.js App Router entry points (`app/**/page.tsx`, `page.jsx`, `page.js`).
+  - Automatically formats clean route titles, slugs, and HTTP paths, ingesting discovered pages directly into Canvas theme page registries.
+* **Headless REST API Layer**:
+  - `/wp-json/cora-canvas/v1/manifest`: Delivers active theme metadata, navigation trees, and site-wide branding tokens.
+  - `/wp-json/cora-canvas/v1/page`: Returns page-specific props, SEO meta titles, descriptions, and dynamic section blocks.
+  - `/wp-json/cora-canvas/v1/revalidate`: Webhook triggering on-demand Incremental Static Regeneration (ISR) with secret handshake tokens.
+  - `/wp-json/cora-canvas/v1/form-submit`: Ingests frontend lead submissions directly into the Cora CRM Kanban pipeline.
+* **Live Next.js Dev Server Detection & Preview Proxy**:
+  - Sub-150ms timeout ping detects local development servers (`http://localhost:3000`). If inactive, presents clean troubleshooting directives.
+  - Dedicated proxy router in `cora-workspace.php` delivers live Next.js build previews, eliminating random welcome screen fallbacks.
+  - Scopes theme preview cookies (`cora_canvas_preview`) strictly to explicit preview query parameters (`?preview_canvas=...`), preventing cookie leaks on production routes.
+* **Level 2 Live Customizer Integration**:
+  - Quick-action pen icon in the sidebar and hover menus open the Level 2 live theme customizer editor directly, complete with live iframe reloads and page props management.
+
+### 3.5 AI-Powered Canvas Tools
 * **AI Element Rewriting (`cora_ajax_canvas_ai_rewrite_element`)**: Context-aware re-drafting of headlines, body paragraphs, and CTAs across various tones (*Punchy*, *Professional*, *High-Converting*, *Minimal*).
 * **AI Core Web Vitals & SEO Optimizer (`cora_ajax_canvas_ai_optimize_page`)**: Automated page audit diagnosing LCP, CLS, and FID metrics, injecting optimized image tags, meta tags, and structured data.
 
-### 3.5 Add Theme Wizard
-Features triple-choice selection cards (*Elementor Builder*, *Lovable Visual HTML Builder*, *Universal Website Migrator*) with dedicated reset handlers (`window.wizardResetCards`) and automated page scaffolding.
+### 3.6 Add Theme Wizard
+Features 4 selection cards (*Elementor Builder*, *Lovable Visual HTML Builder*, *Universal Website Migrator*, and *Next.js Git Repository Connector*) with dedicated reset handlers (`window.wizardResetCards`) and automated route ingestion.
 
 ---
 
@@ -1174,6 +1317,47 @@ When authenticated as Super Admin (`cora_admin` / `admin@cora.local`), the platf
 
 | Version | Release Date | Key Features & Enhancements |
 | :--- | :--- | :--- |
+| **v4.9.316** | Oct 2026 | Live Next.js Build Preview & Proxy Router in `cora-workspace.php`, offline dev server detection (sub-150ms timeout ping), preview cookie isolation (`cora_canvas_preview`) scoped strictly to explicit `?preview_canvas=...` requests, and elimination of random welcome screen fallbacks |
+| **v4.9.315** | Oct 2026 | Van Stock & Manifest Print Engine: 5-column dispatch manifest and 4-column inventory reports (`ajax_render_van_stock_sheet`), itemized CSV export (`ajax_export_van_stock_csv`), 4-digit numeric bill numbers, and warehouse supervisor sign-offs |
+| **v4.9.314** | Oct 2026 | 3-step van dispatch wizard, weight-based allocation & spot billing at ₹401.25/kg, GST invoice auto-print, spot invoices card, export CSV, print table controls, sales register table, itemized breakdown, CSV export, and printable ledger |
+| **v4.9.313** | Oct 2026 | Canvas Next.js theme badge and route ingestion pipeline from scanned GitHub repositories |
+| **v4.9.312** | Oct 2026 | Save GitHub token action and dual auth header fallbacks (`token <pat>` and `Bearer <pat>`) |
+| **v4.9.311** | Oct 2026 | Private repository support and dynamic GitHub branch discovery for App Router scanner |
+| **v4.9.310** | Oct 2026 | Route Add Theme wizard button directly to Next.js Git Connector Wizard |
+| **v4.9.309** | Oct 2026 | Unified sidebar bottom notifications bell with canonical header notification drawer |
+| **v4.9.308** | Oct 2026 | Canvas Next.js Git repository integration, route scanner (`app/**/page.tsx`), headless REST APIs (`/wp-json/cora-canvas/v1/*`), and on-demand ISR revalidation webhooks |
+| **v4.9.307** | Oct 2026 | Pen icon routing to Level 2 live theme customizer editor with direct page props management |
+| **v4.9.306** | Oct 2026 | Normalized sidebar navigation group item rendering and vertical spacing below Canvas |
+| **v4.9.305** | Oct 2026 | Canvas hover quick-actions for live theme editor and new-tab live site view |
+| **v4.9.304** | Oct 2026 | GST invoice publishing and automated Document Vault synchronization with SHA-256 hash linkage |
+| **v4.9.303** | Oct 2026 | GST invoice multi-step creator validation, line items JSON serialization, and legal vault linking |
+| **v4.9.302** | Oct 2026 | Sanitized team assignee roster in CRM leads and bi-directional drawer sync with Kanban cards |
+| **v4.9.301** | Oct 2026 | Left-edge draggable resize on lead drawer, localStorage width persistence, and decluttered accordion groups |
+| **v4.9.300** | Oct 2026 | Edge-to-edge full-height lead drawer, auto-portaling to `document.body`, transparent backdrop, and lead data sanitization |
+| **v4.9.299** | Oct 2026 | Hardened Affiliate & Partner Network sub-tab routing, normalization, and click switching |
+| **v4.9.298** | Oct 2026 | Curated color tag presets and custom hex color picker for Media Manager folders |
+| **v4.9.296** | Oct 2026 | Centered pop-up modals for Media Manager folder creation and settings dialogs |
+| **v4.9.295** | Oct 2026 | Edge-to-edge side drawers with zero dark overlays across Media Manager asset dialogs |
+| **v4.9.294** | Oct 2026 | Permissions Matrix sticky column and monochromatic badge styling in team management |
+| **v4.9.290** | Oct 2026 | AI Team Migration Hub converted to right-sliding side drawer with hardened state machine |
+| **v4.9.285** | Sep 2026 | Content AI Suite: Autonomous article writing, editing, state management, and rich card previews |
+| **v4.9.282** | Sep 2026 | Content AI Suite: Compact sleek KPI cards, authentic workspace authors with avatar placeholders, and table column consolidation |
+| **v4.9.281** | Sep 2026 | Persistent mobile island navigation state and zero-flicker rendering |
+| **v4.9.280** | Sep 2026 | Dynamic task notification alerts and modernized search icon SVGs |
+| **v4.9.279** | Sep 2026 | Streamlined sidebar admin profile popover with AI Connected status badge |
+| **v4.9.276** | Sep 2026 | Real-time client SPA navigation router (`cora-ai-router`) for direct AI action execution |
+| **v4.9.274** | Sep 2026 | Continuous RAG self-learning, ultra-concise guided responses, and 1-click CTA action pills |
+| **v4.9.269** | Sep 2026 | Administration Email verification with dynamic badges, locked state, token dispatch, and authenticated sender `heycora@claraverse.in` |
+| **v4.9.266** | Sep 2026 | Web Push notification subsystem overhaul, VAPID key sync, and Super Admin push device telemetry |
+| **v4.9.262** | Sep 2026 | Custom app icon branding & 1-click broadcast push updates in PWA engine |
+| **v4.9.258** | Sep 2026 | Free Workspace tier default on signup with 100 daily AI credits quota matrix enforcement |
+| **v4.9.255** | Sep 2026 | Eradicated trapped dark backdrop overlays across all modals, drawers, and sheets |
+| **v4.9.247** | Sep 2026 | Single-tenant clean URLs without workspace slug, and Claraverse global control center support |
+| **v4.9.234** | Sep 2026 | Super Admin Danger Zone, delete workspace confirmation modal, god-level access and universal onboarding bypass |
+| **v4.9.232** | Sep 2026 | Transition to unified single-domain routing architecture |
+| **v4.9.229** | Sep 2026 | RFC 7591 dynamic client registration for Google Gemini & MCP connected apps, underscore tool schemas |
+| **v4.9.220** | Sep 2026 | MCP 2026-07-28 upgrade, RFC 9728 protected resource metadata, WWW-Authenticate headers, universal token extraction for ChatGPT/Claude |
+| **v4.9.210** | Sep 2026 | Cora Universal MCP Server & OAuth 2.1 PKCE authorization server implementation |
 | **v4.9.209** | Sep 2026 | Comprehensive Security Hardening & Remediation (SEC-001 - SEC-023): central tenant authorization policy gatekeeper (`Cora_Authorization`), outbound HTTP SSRF filter (`Cora_SSRF_Filter`), WordPress capability scoping (SEC-012), WhatsApp Cloud API HMAC-SHA256 signature verification (SEC-005), 32-byte CSPRNG token entropy, Next.js 16.3.3 and Sharp 0.35.4 dependencies |
 | **v4.9.208** | Sep 2026 | Dedicated Early Route Interception for Email Verification (`/workspace/verify`), direct template mounting via `views/verify.php` bypassing WordPress template-redirect delays, auto-login state hydration, and monochromatic welcome redirection |
 | **v4.9.207** | Sep 2026 | Mobile GPU hardware acceleration (`transform: translateZ(0); will-change: transform;`) and universal 0ms instant-tap responsiveness (`touch-action: manipulation; -webkit-tap-highlight-color: transparent;`) across mobile drawers, islands, and action controls |
@@ -1330,4 +1514,4 @@ When authenticated as Super Admin (`cora_admin` / `admin@cora.local`), the platf
 
 ---
 
-*Cora Platform v4.9.209 — Master Architectural Manual. Last updated: September 2026.*
+*Cora Platform v4.9.316 — Master Architectural Manual. Last updated: October 2026.*

@@ -1,7 +1,7 @@
 # Cora Platform — Comprehensive Platform & Onboarding Strategic Brief
 > **Target Audience for this Document**: AI Product & Growth Strategist Agent  
 > **Objective**: Comprehensive platform architectural overview, feature breakdown, and onboarding evaluation brief to formulate optimal user onboarding, product activation, and launch strategies for Cora.  
-> **Platform Version**: `v4.9.189` | **Date**: September 2026
+> **Platform Version**: `v4.9.316` | **Date**: October 2026
 
 ---
 
@@ -33,13 +33,16 @@ Cora consolidates the entire agency lifecycle into a single, unified, white-labe
 10. **Enterprise AI Safety Guardrails**: Built-in automated policy enforcement across 6 violation categories (`explosives_weapons`, `terrorism_violence`, `nudity_explicit`, `religious_defamation_conflict`, `self_harm`, `jailbreak_injection`), security audit logging in `wp_cora_security_incidents`, real-time automated dual escalation to Platform Super Admins AND Workspace Owners, and RBAC action execution capability checks.
 11. **Content AI Suite & Bulk Operations Engine**: Notion-styled Content Library with multi-row checkboxes, floating docked bulk toolbar (`#content-bulk-actions-bar`), bulk stage progression/category/export/delete, fixed-width dropdown architecture, 3-column mobile Opportunities grid, flush sticky sub-tabs with `pan-x` touch swipe, and Quill WYSIWYG editor.
 12. **Form AI Architect & Funnel Analytics**: Full CRUD lifecycle engine supporting 15 native field types, multi-step wizards, sandboxed full-height live preview modal, 3-stage funnel analytics (*Views*, *Started*, *Leads Captured*), AI Conversion Doctor recommendations with estimated lift, and question completion breakdown.
-13. **Dual-Engine Canvas Builder & Migrator**: White-labeled Elementor + In-browser Visual HTML Editor + 1-Click Universal Website Migrator scraping external sites into editable draft themes.
+13. **Multi-Engine Canvas Website & Theme Engineering Platform**: White-labeled Elementor + In-browser Visual HTML Editor + 1-Click Universal Website Migrator + Next.js Headless Git Repository Integration (`class-cora-nextjs-integration.php`) with GitHub App Router route scanner, headless REST endpoints (`/wp-json/cora-canvas/v1/*`), on-demand ISR revalidation, live dev server detection, and build preview proxy router.
 14. **Affiliate & Referral Ecosystem**: Dual-reward growth engine (+100 AI credits on free signup, 40% recurring commission on paid plans), 3-step partner enrollment screener, 6-plan pricing & commission matrix, and official vector share marks.
-15. **Stationery Manufacturing & Van Sales Dual Engine**: Central plant command center, 3-step SKU studio drawer, margin telemetry cards, van dispatch with city chips, branded Hostinger emails with 1x1 tracking pixel, and 100% full-width driver POS terminal with total chrome stripping.
+15. **Stationery Manufacturing & Van Sales Dual Engine**: Central plant command center, 3-step SKU studio drawer, margin telemetry cards, 3-step van dispatch wizard with weight-based allocation (standard base: ₹401.25/kg), real-time spot billing with auto-print GST tax invoices, itemized Sales Register table, printable ledger, and warehouse dispatch manifest print with 4-digit numeric bill numbers.
 16. **Single 24-Hour Executive PDF Reporting & Anti-Spam Policy**: Strips email dispatch from ephemeral micro-events (routing 100% to in-app bell & PWA push) and delivers a single, consolidated 24-Hour Executive PDF Report strictly once per 24 hours per owner.
 17. **Desktop Centered KPI Analytics Container & Guaranteed 4 Scorecards**: Centered dashboard analytics container constrained to max 60% viewport width with a guaranteed 4-metric scorecard layout (2x2 mobile grid, 1x4 desktop row) and dynamic user name resolution.
 18. **App Modules (Feature Hub 24-Module Directory) & Core Foundation Lock**: 24 Core Foundation and Domain modules across 5 categories with immutable foundation module locks (`blogs`, `forms`, `team-roles`, `media`, `vault`), Rule 13 zero-outline tonal surface styling, unified search/status filters, reactive toggles, and route decoupling.
-19. **God-Level Super Admin Console**: 11-tab administrative control center with real-time MRR telemetry, global AI token pool, tenant capability matrix, security incident logs, and emergency controls.
+19. **God-Level Super Admin Console**: 11-tab administrative control center with real-time MRR telemetry, global AI token pool, tenant capability matrix, security incident logs, emergency controls, 1-click industry switcher, and Web Push device telemetry.
+20. **Universal Remote MCP Server & OAuth 2.1 PKCE Gateway**: Connects external AI assistants (ChatGPT, Claude, Google Gemini) via Model Context Protocol JSON-RPC 2.0 (`/wp-json/cora-mcp/v1/rpc`) with RFC 7591 dynamic client registration and 25+ domain-specific tools.
+21. **Edge-to-Edge Draggable Lead Drawer & Bi-Directional Sync**: CRM leads inspector auto-portaled to `document.body` with transparent backdrop, left-edge draggable resizer (persisted to localStorage), collapsible accordion groups, and sanitized team assignee dropdowns.
+22. **Tokenized Administration Email Verification & Locked Security State**: Dynamic status badges (Verified 🟢 / Pending 🟡), read-only locked state, 24-hour expiration token dispatch via authenticated sender `heycora@claraverse.in`, and 100 daily AI credits quota matrix.
 
 ---
 
@@ -142,6 +145,12 @@ Cora consolidates the entire agency lifecycle into a single, unified, white-labe
 | • 3-Step Partner Enrollment Screener Flow before unlocking personalized partner dashboard          |
 | • Geolocation annual pricing matrix & official SVG vector share suite (WhatsApp, LinkedIn, X, QR)  |
 +----------------------------------------------------------------------------------------------------+
+| 22. Universal Remote MCP Gateway  | 23. Next.js Git Connector    | 24. Van Sales & Register        |
+| • RFC 7591 Dynamic Registration   | • App Router Route Scanner   | • 3-Step Dispatch Wizard        |
+| • OAuth 2.1 PKCE Server           | • Headless REST API Suite    | • Rate per kg Allocation        |
+| • RFC 9728 Protected Metadata     | • On-Demand ISR Revalidation | • Spot Billing & GST Print      |
+| • 25+ Canonical Workspace Tools   | • Build Preview Proxy Router | • Itemized Sales Register & CSV |
++-----------------------------------+------------------------------+---------------------------------+
 ```
 
 ---
@@ -161,4 +170,4 @@ Cora consolidates the entire agency lifecycle into a single, unified, white-labe
 
 ---
 
-*Cora Strategic Onboarding Brief v4.9.189 — Architecture & Growth Team.*
+*Cora Strategic Onboarding Brief v4.9.316 — Architecture & Growth Team. Last updated: October 2026.*
