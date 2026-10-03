@@ -243,13 +243,30 @@ if ( ! function_exists( 'cora_is_staging_env' ) ) {
 }
 
 if ( ! function_exists( 'cora_get_site_icon_asset_url' ) ) {
-    function cora_get_site_icon_asset_url( $type = 'favicon' ) {
+    function cora_get_site_icon_asset_url( $type = 'favicon', $is_admin = null ) {
         $custom_icon = get_option( 'cora_custom_app_icon_url', '' );
         $icon_ver    = get_option( 'cora_pwa_icon_version', '1' );
         if ( ! empty( $custom_icon ) ) {
             return add_query_arg( 'v', $icon_ver, $custom_icon );
         }
         $is_stg = cora_is_staging_env();
+        if ( $is_admin === null ) {
+            $is_admin = ( isset( $_GET['admin'] ) && $_GET['admin'] === '1' ) || ( function_exists( 'is_user_logged_in' ) && is_user_logged_in() && ( current_user_can( 'manage_options' ) || ( function_exists( 'is_super_admin' ) && is_super_admin() ) ) );
+        }
+
+        if ( $is_admin && ! $is_stg ) {
+            if ( $type === '512' ) {
+                return CORA_WORKSPACE_URL . 'assets/pwa/icon_512_admin.png?v=' . CORA_WORKSPACE_VERSION;
+            }
+            if ( $type === '192' ) {
+                return CORA_WORKSPACE_URL . 'assets/pwa/icon_192_admin.png?v=' . CORA_WORKSPACE_VERSION;
+            }
+            if ( $type === 'apple' ) {
+                return CORA_WORKSPACE_URL . 'assets/images/apple-touch-icon-admin.png?v=' . CORA_WORKSPACE_VERSION;
+            }
+            return CORA_WORKSPACE_URL . 'assets/images/cora-favicon-admin.png?v=' . CORA_WORKSPACE_VERSION;
+        }
+
         if ( $type === '512' ) {
             $file = $is_stg ? 'assets/pwa/icon_512_staging.png' : 'assets/pwa/icon_512.png';
             return CORA_WORKSPACE_URL . $file . '?v=' . CORA_WORKSPACE_VERSION;
@@ -1640,12 +1657,13 @@ function cora_workspace_handle_workspace_route() {
         }
         
         $is_stg   = cora_is_staging_env();
-        $icon_192 = cora_get_site_icon_asset_url( '192' );
-        $icon_512 = cora_get_site_icon_asset_url( '512' );
+        $is_admin = ( isset( $_GET['admin'] ) && $_GET['admin'] === '1' ) || ( function_exists( 'is_user_logged_in' ) && is_user_logged_in() && ( current_user_can( 'manage_options' ) || ( function_exists( 'is_super_admin' ) && is_super_admin() ) ) );
+        $icon_192 = cora_get_site_icon_asset_url( '192', $is_admin );
+        $icon_512 = cora_get_site_icon_asset_url( '512', $is_admin );
         
-        $manifest_data['id']                = '/workspace/dashboard';
-        $manifest_data['name']              = $is_stg ? 'CORA Staging' : 'CORA Workspace';
-        $manifest_data['short_name']         = $is_stg ? 'CORA (STG)' : 'CORA';
+        $manifest_data['id']                = '/workspace/dashboard' . ( $is_admin ? '?role=admin' : '' );
+        $manifest_data['name']              = $is_stg ? 'CORA Staging' : ( $is_admin ? 'CORA Workspace (Admin)' : 'CORA Workspace' );
+        $manifest_data['short_name']         = $is_stg ? 'CORA (STG)' : ( $is_admin ? 'CORA Admin' : 'CORA' );
         $manifest_data['start_url']          = '/workspace/dashboard';
         $manifest_data['scope']              = '/';
         $manifest_data['display']           = 'standalone';

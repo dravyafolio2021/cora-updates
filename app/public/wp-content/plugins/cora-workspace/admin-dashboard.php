@@ -454,7 +454,11 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
     <link rel="stylesheet" href="<?php echo CORA_WORKSPACE_URL . 'assets/css/admin-style.css?v=' . CORA_WORKSPACE_VERSION; ?>" />
     
     <!-- PWA Manifest & Mobile App Capabilities -->
-    <link rel="manifest" href="<?php echo home_url('/cora-manifest.json?v=' . CORA_WORKSPACE_VERSION); ?>">
+    <?php 
+    $is_superadmin_user = ( current_user_can( 'manage_options' ) || ( function_exists('is_super_admin') && is_super_admin() ) );
+    $manifest_url = home_url( '/cora-manifest.json?v=' . CORA_WORKSPACE_VERSION . ( $is_superadmin_user ? '&admin=1' : '' ) );
+    ?>
+    <link rel="manifest" href="<?php echo esc_url( $manifest_url ); ?>">
     <meta name="theme-color" content="#ffffff">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
