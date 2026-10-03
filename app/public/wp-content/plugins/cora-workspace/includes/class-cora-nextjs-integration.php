@@ -1044,10 +1044,8 @@ class Cora_NextJS_Integration {
         $git_bin = null;
         $possible_gits = array( 'git', '/usr/bin/git', '/usr/local/bin/git', '/opt/homebrew/bin/git' );
         foreach ( $possible_gits as $g ) {
-            $test_out = array();
-            $test_ret = 0;
-            @exec( "$g --version 2>&1", $test_out, $test_ret );
-            if ( $test_ret === 0 ) {
+            $git_res = self::run_command_process( "$g --version 2>&1" );
+            if ( $git_res['exit_code'] === 0 ) {
                 $git_bin = $g;
                 break;
             }
@@ -1058,10 +1056,12 @@ class Cora_NextJS_Integration {
         if ( $git_bin ) {
             if ( is_dir( $repo_dir . '/.git' ) ) {
                 $fetch_cmd = "cd " . escapeshellarg( $repo_dir ) . " && {$git_bin} remote set-url origin " . escapeshellarg( $auth_repo_url ) . " 2>&1 && {$git_bin} fetch origin " . escapeshellarg( $branch ) . " --depth 1 2>&1 && {$git_bin} reset --hard origin/" . escapeshellarg( $branch ) . " 2>&1";
-                @exec( $fetch_cmd, $git_log, $git_ret );
+                $git_fetch_res = self::run_command_process( $fetch_cmd );
+                $git_log = $git_fetch_res['output'];
             } else {
                 $clone_cmd = "{$git_bin} clone --depth 1 -b " . escapeshellarg( $branch ) . " " . escapeshellarg( $auth_repo_url ) . " " . escapeshellarg( $repo_dir ) . " 2>&1";
-                @exec( $clone_cmd, $git_log, $git_ret );
+                $git_clone_res = self::run_command_process( $clone_cmd );
+                $git_log = $git_clone_res['output'];
             }
         }
 
@@ -1145,16 +1145,16 @@ class Cora_NextJS_Integration {
         $path_env = 'export PATH=$HOME/.local/bin:$HOME/.local/share/node-v22.14.0-linux-x64/bin:$HOME/.local/share/node-v20.18.0-linux-x64/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:$PATH; export RAYON_NUM_THREADS=1; export UV_THREADPOOL_SIZE=1;';
 
         // Verify Node.js / npm existence
-        $node_check = array();
-        $node_ret = 0;
-        @exec( "{$path_env} && node -v 2>&1 && npm -v 2>&1", $node_check, $node_ret );
+        $node_check_res = self::run_command_process( "{$path_env} && node -v 2>&1 && npm -v 2>&1" );
+        $node_ret = $node_check_res['exit_code'];
+        $node_check = $node_check_res['output'];
 
         if ( $node_ret !== 0 ) {
             // Auto-install portable node if missing
-            $inst_out = array();
-            $inst_code = 0;
-            @exec( "mkdir -p ~/.local/share ~/.local/bin && curl -fsSL https://nodejs.org/dist/v22.14.0/node-v22.14.0-linux-x64.tar.gz | tar -xz -C ~/.local/share/ && ln -sf ~/.local/share/node-v22.14.0-linux-x64/bin/node ~/.local/bin/node && ln -sf ~/.local/share/node-v22.14.0-linux-x64/bin/npm ~/.local/bin/npm && ln -sf ~/.local/share/node-v22.14.0-linux-x64/bin/npx ~/.local/bin/npx", $inst_out, $inst_code );
-            @exec( "{$path_env} && node -v 2>&1 && npm -v 2>&1", $node_check, $node_ret );
+            self::run_command_process( "mkdir -p ~/.local/share ~/.local/bin && curl -fsSL https://nodejs.org/dist/v22.14.0/node-v22.14.0-linux-x64.tar.gz | tar -xz -C ~/.local/share/ && ln -sf ~/.local/share/node-v22.14.0-linux-x64/bin/node ~/.local/bin/node && ln -sf ~/.local/share/node-v22.14.0-linux-x64/bin/npm ~/.local/bin/npm && ln -sf ~/.local/share/node-v22.14.0-linux-x64/bin/npx ~/.local/bin/npx" );
+            $node_check_res = self::run_command_process( "{$path_env} && node -v 2>&1 && npm -v 2>&1" );
+            $node_ret = $node_check_res['exit_code'];
+            $node_check = $node_check_res['output'];
         }
 
         if ( $node_ret !== 0 ) {
@@ -1168,9 +1168,9 @@ class Cora_NextJS_Integration {
 
         // Execute build
         $exec_cmd = "{$path_env} && cd " . escapeshellarg( $working_dir ) . " && " . $build_cmd;
-        $build_output = array();
-        $build_exit_code = 0;
-        @exec( $exec_cmd, $build_output, $build_exit_code );
+        $build_exec_res = self::run_command_process( $exec_cmd );
+        $build_output = $build_exec_res['output'];
+        $build_exit_code = $build_exec_res['exit_code'];
 
         // If Vinext / Next.js SSR server worker exists (dist/server/index.js), prerender all scanned routes into static HTML!
         $server_worker = $working_dir . '/dist/server/index.js';
@@ -1215,11 +1215,9 @@ import('./dist/server/index.js').then(async ({ default: worker }) => {
 ";
             $prerender_file = $working_dir . '/cora_prerender_temp.mjs';
             @file_put_contents( $prerender_file, $prerender_script );
-            $prerender_out = array();
-            $prerender_ret = 0;
-            @exec( "{$path_env} && cd " . escapeshellarg( $working_dir ) . " && node cora_prerender_temp.mjs 2>&1", $prerender_out, $prerender_ret );
+            $prerender_res = self::run_command_process( "{$path_env} && cd " . escapeshellarg( $working_dir ) . " && node cora_prerender_temp.mjs 2>&1" );
             @unlink( $prerender_file );
-            $build_output = array_merge( $build_output, $prerender_out );
+            $build_output = array_merge( $build_output, $prerender_res['output'] );
         }
 
         $build_logs_str = implode( "\n", array_merge( $git_log, $build_output ) );
@@ -1329,6 +1327,55 @@ import('./dist/server/index.js').then(async ({ default: worker }) => {
             ( is_dir( "$dir/$file" ) ) ? self::delete_dir_recursive( "$dir/$file" ) : @unlink( "$dir/$file" );
         }
         return @rmdir( $dir );
+    }
+
+    /**
+     * Universal process execution helper (supports proc_open and exec)
+     */
+    public static function run_command_process( $cmd, $cwd = null, $env = null ) {
+        $output_lines = array();
+        $exit_code = 1;
+
+        if ( function_exists( 'proc_open' ) ) {
+            $descriptors = array(
+                0 => array( 'pipe', 'r' ),
+                1 => array( 'pipe', 'w' ),
+                2 => array( 'pipe', 'w' )
+            );
+            $process = @proc_open( $cmd, $descriptors, $pipes, $cwd, $env );
+            if ( is_resource( $process ) ) {
+                @fclose( $pipes[0] );
+                $stdout = stream_get_contents( $pipes[1] );
+                @fclose( $pipes[1] );
+                $stderr = stream_get_contents( $pipes[2] );
+                @fclose( $pipes[2] );
+                $exit_code = @proc_close( $process );
+                $merged = trim( $stdout . ( ! empty( $stderr ) ? "\n" . $stderr : '' ) );
+                if ( ! empty( $merged ) ) {
+                    $output_lines = explode( "\n", $merged );
+                }
+                return array(
+                    'exit_code' => $exit_code,
+                    'output'    => $output_lines,
+                    'raw'       => $merged
+                );
+            }
+        }
+
+        if ( function_exists( 'exec' ) ) {
+            @exec( $cmd, $output_lines, $exit_code );
+            return array(
+                'exit_code' => $exit_code,
+                'output'    => $output_lines,
+                'raw'       => implode( "\n", $output_lines )
+            );
+        }
+
+        return array(
+            'exit_code' => 127,
+            'output'    => array( 'No command execution functions (proc_open or exec) available on server.' ),
+            'raw'       => 'No command execution functions available on server.'
+        );
     }
 }
 
