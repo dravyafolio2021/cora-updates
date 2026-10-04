@@ -14,7 +14,7 @@ if ( empty( $mcp_token ) ) {
     $mcp_token = bin2hex( wp_generate_password( 32, false ) );
     update_option( 'cora_mcp_access_token', $mcp_token );
 }
-$mcp_url = home_url( '/wp-json/cora/v1/mcp' );
+$mcp_url = home_url( '/mcp' );
 
 // User Personalization & Dynamic Greeting Context
 $current_user = wp_get_current_user();

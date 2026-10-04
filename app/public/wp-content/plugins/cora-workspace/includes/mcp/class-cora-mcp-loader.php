@@ -28,6 +28,7 @@ class Cora_MCP_Loader {
         add_action( 'wp_loaded', array( __CLASS__, 'handle_pretty_endpoints' ), 1 );
         add_action( 'template_redirect', array( __CLASS__, 'handle_pretty_endpoints' ), 0 );
         add_action( 'wp_ajax_cora_get_active_mcp_connections', array( __CLASS__, 'ajax_get_connections' ) );
+        add_action( 'wp_ajax_cora_get_mcp_connections', array( __CLASS__, 'ajax_get_connections' ) );
         add_action( 'wp_ajax_cora_revoke_mcp_connection', array( __CLASS__, 'ajax_revoke_connection' ) );
     }
 
