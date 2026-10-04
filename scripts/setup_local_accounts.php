@@ -104,8 +104,8 @@ $accounts = array(
         'avatar'   => 'http://cora.local/wp-content/uploads/2026/07/image-560.png'
     ),
     array(
-        'username' => 'shruti',
-        'email'    => 'shruti.bansal@claraverse.in',
+        'username' => 'dravya_claraverse',
+        'email'    => 'dravya.bansal@claraverse.in',
         'password' => 'Dravya@2026SHRUTIHAASAN',
         'display'  => 'Platform Super Admin',
         'role'     => 'administrator',
