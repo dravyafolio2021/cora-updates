@@ -3896,12 +3896,12 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
                                         <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-amber-50 text-amber-700 border border-amber-200">Partial</span>
                                     </div>
                                     <div class="flex flex-col items-center gap-1.5 p-3 border border-zinc-200 rounded-xl bg-zinc-50/60">
-                                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-800"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/><circle cx="11" cy="11" r="3"/></svg>
+                                        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" class="text-zinc-800"><path d="M12 0c-.23 0-.45.06-.64.18L3.62 5.02A1.25 1.25 0 0 0 3 6.09v11.82c0 .44.23.84.62 1.07l7.74 4.84c.19.12.41.18.64.18s.45-.06.64-.18l7.74-4.84c.39-.23.62-.63.62-1.07V6.09c0-.44-.23-.84-.62-1.07L12.64.18A1.25 1.25 0 0 0 12 0zm-1.25 3.03v4.61L5.5 10.9V7.12l5.25-4.09zm2.5 0l5.25 4.09v3.78l-5.25-3.26V3.03zM5.5 13.1l5.25 3.26v4.61L5.5 16.88V13.1zm13 0v3.78l-5.25 4.09v-4.61l5.25-3.26zM12 9.27l3.75 2.33L12 13.93l-3.75-2.33L12 9.27z"/></svg>
                                         <span class="text-[10px] font-bold text-zinc-800">Perplexity</span>
                                         <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-zinc-100 text-zinc-600 border border-zinc-200">Low</span>
                                     </div>
                                     <div class="flex flex-col items-center gap-1.5 p-3 border border-zinc-200 rounded-xl bg-zinc-50/60">
-                                        <svg viewBox="0 0 24 24" width="18" height="18"><defs><linearGradient id="gem-grad2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#4285F4"/><stop offset="100%" stop-color="#34A853"/></linearGradient></defs><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z" fill="url(#gem-grad2)"/></svg>
+                                        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" class="text-zinc-800"><path d="M12 24C12 17.373 6.627 12 0 12C6.627 12 12 6.627 12 0C12 6.627 17.373 12 24 12C17.373 12 12 17.373 12 24Z"/></svg>
                                         <span class="text-[10px] font-bold text-zinc-800">Gemini</span>
                                         <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">Good</span>
                                     </div>

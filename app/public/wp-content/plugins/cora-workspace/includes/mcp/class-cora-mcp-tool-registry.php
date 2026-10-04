@@ -756,6 +756,60 @@ class Cora_MCP_Tool_Registry {
                 ),
                 'handler'       => array( __CLASS__, 'handle_list_team_members' ),
             ),
+
+            // ── 11. Canvas Website & Landing Page CMS ─────────────────────────
+            'cora_canvas_get_active_theme' => array(
+                'name'          => 'cora_canvas_get_active_theme',
+                'description'   => 'Retrieve active Canvas website theme information, builder type (HTML AI / Next.js / Elementor / Lovable), live site preview URL, and static build status for the authenticated workspace.',
+                'readOnly'      => true,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'workspace:read',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'theme_id' => array( 'type' => 'integer', 'description' => 'Optional theme ID (defaults to active live theme).' ),
+                    ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_canvas_get_active_theme' ),
+            ),
+
+            'cora_canvas_get_page_html' => array(
+                'name'          => 'cora_canvas_get_page_html',
+                'description'   => 'Get the full HTML source code of the active landing page or a specific Canvas page.',
+                'readOnly'      => true,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'workspace:read',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'page_slug' => array( 'type' => 'string', 'description' => 'Page slug to retrieve (default: home).' ),
+                        'theme_id'  => array( 'type' => 'integer', 'description' => 'Optional theme ID (defaults to active live theme).' ),
+                    ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_canvas_get_page_html' ),
+            ),
+
+            'cora_canvas_update_page_html' => array(
+                'name'          => 'cora_canvas_update_page_html',
+                'description'   => 'Update and publish live HTML markup for the active landing page or static website. Immediately replaces index.html in the static build folder and updates the live site instantly without manual redeployment.',
+                'readOnly'      => false,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'workspace:write',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'html'           => array( 'type' => 'string', 'description' => 'Complete, valid HTML document source markup to publish live.' ),
+                        'page_slug'      => array( 'type' => 'string', 'description' => 'Page slug to update (default: home).' ),
+                        'theme_id'       => array( 'type' => 'integer', 'description' => 'Optional theme ID (defaults to active live theme).' ),
+                        'change_summary' => array( 'type' => 'string', 'description' => 'Brief description of the changes made (e.g. Updated hero banner and contact form).' ),
+                    ),
+                    'required'   => array( 'html' ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_canvas_update_page_html' ),
+            ),
         );
     }
 
@@ -947,6 +1001,27 @@ class Cora_MCP_Tool_Registry {
             'list_team_members'                 => 'cora_list_team_members',
             'get_team'                          => 'cora_list_team_members',
             'list_team'                         => 'cora_list_team_members',
+
+            'cora_canvas_get_active_theme'      => 'cora_canvas_get_active_theme',
+            'get_active_theme'                  => 'cora_canvas_get_active_theme',
+            'canvas_get_active_theme'           => 'cora_canvas_get_active_theme',
+            'cora_get_active_theme'             => 'cora_canvas_get_active_theme',
+            'get_active_site'                   => 'cora_canvas_get_active_theme',
+
+            'cora_canvas_get_page_html'         => 'cora_canvas_get_page_html',
+            'get_page_html'                     => 'cora_canvas_get_page_html',
+            'canvas_get_page_html'              => 'cora_canvas_get_page_html',
+            'cora_get_page_html'                => 'cora_canvas_get_page_html',
+            'get_site_html'                     => 'cora_canvas_get_page_html',
+            'read_page_html'                    => 'cora_canvas_get_page_html',
+
+            'cora_canvas_update_page_html'      => 'cora_canvas_update_page_html',
+            'update_page_html'                  => 'cora_canvas_update_page_html',
+            'canvas_update_page_html'           => 'cora_canvas_update_page_html',
+            'cora_update_page_html'             => 'cora_canvas_update_page_html',
+            'update_site_html'                  => 'cora_canvas_update_page_html',
+            'publish_page_html'                 => 'cora_canvas_update_page_html',
+            'save_page_html'                    => 'cora_canvas_update_page_html',
         );
 
         if ( isset( $map[ $normalized ] ) ) {
@@ -2379,5 +2454,249 @@ class Cora_MCP_Tool_Registry {
         }
 
         return array( 'total' => count( $team ), 'team' => $team );
+    }
+
+    /**
+     * 11. Canvas Website & Landing Page CMS Handlers
+     */
+
+    /**
+     * Get Active Canvas Theme & Settings
+     */
+    public static function handle_canvas_get_active_theme( $args, $auth ) {
+        $agency_id = self::get_agency_id( $auth, $args );
+        global $wpdb;
+
+        $live_theme = $wpdb->get_row( $wpdb->prepare(
+            "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE agency_id = %d AND status = 'live' LIMIT 1",
+            $agency_id
+        ), ARRAY_A );
+
+        if ( ! $live_theme ) {
+            $live_theme = $wpdb->get_row( $wpdb->prepare(
+                "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE agency_id = %d ORDER BY id DESC LIMIT 1",
+                $agency_id
+            ), ARRAY_A );
+        }
+
+        if ( ! $live_theme ) {
+            return array(
+                'error'  => 'No Canvas themes found for this workspace.',
+                'status' => 'none',
+            );
+        }
+
+        $settings = json_decode( $live_theme['settings'], true ) ?: array();
+        $source = strtolower( $settings['source'] ?? 'elementor' );
+        $framework = strtolower( $settings['framework'] ?? '' );
+        $builder = ( $framework === 'html_tailwind' || ( $settings['builder'] ?? '' ) === 'html_ai' || ! empty( $settings['template_key'] ) )
+            ? 'html_ai'
+            : ( $source === 'nextjs' ? 'nextjs' : ( $source === 'lovable' ? 'lovable' : 'elementor' ) );
+
+        $is_static_built = ! empty( $settings['is_static_built'] );
+
+        return array(
+            'theme_id'        => intval( $live_theme['id'] ),
+            'theme_name'      => $live_theme['name'],
+            'status'          => $live_theme['status'],
+            'builder'         => $builder,
+            'framework'       => $framework,
+            'is_static_built' => $is_static_built,
+            'live_url'        => home_url( '/site/' ),
+            'preview_url'     => home_url( '/site/?cv_preview_theme=' . $live_theme['id'] ),
+            'updated_at'      => $live_theme['updated_at'],
+            'template_key'    => $settings['template_key'] ?? '',
+        );
+    }
+
+    /**
+     * Get HTML Source Code of Active Landing Page
+     */
+    public static function handle_canvas_get_page_html( $args, $auth ) {
+        $agency_id = self::get_agency_id( $auth, $args );
+        global $wpdb;
+
+        $theme_id = intval( $args['theme_id'] ?? 0 );
+        if ( $theme_id <= 0 ) {
+            $live_theme = $wpdb->get_row( $wpdb->prepare(
+                "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE agency_id = %d AND status = 'live' LIMIT 1",
+                $agency_id
+            ), ARRAY_A );
+            $theme_id = $live_theme ? intval( $live_theme['id'] ) : 0;
+        } else {
+            $live_theme = $wpdb->get_row( $wpdb->prepare(
+                "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d",
+                $theme_id
+            ), ARRAY_A );
+        }
+
+        if ( ! $theme_id ) {
+            return array( 'error' => 'Active theme not found.' );
+        }
+
+        $page_slug = sanitize_title( $args['page_slug'] ?? 'home' );
+        if ( empty( $page_slug ) || $page_slug === 'index' ) {
+            $page_slug = 'home';
+        }
+
+        $upload_dir = wp_get_upload_dir();
+        $theme_dir  = $upload_dir['basedir'] . '/cora-nextjs-builds/theme_' . $theme_id;
+        $out_dir    = $theme_dir . '/out';
+
+        $html_file = '';
+        if ( $page_slug === 'home' || $page_slug === 'index' ) {
+            if ( file_exists( $out_dir . '/index.html' ) ) {
+                $html_file = $out_dir . '/index.html';
+            } elseif ( file_exists( $theme_dir . '/index.html' ) ) {
+                $html_file = $theme_dir . '/index.html';
+            }
+        } else {
+            if ( file_exists( $out_dir . '/' . $page_slug . '.html' ) ) {
+                $html_file = $out_dir . '/' . $page_slug . '.html';
+            } elseif ( file_exists( $out_dir . '/' . $page_slug . '/index.html' ) ) {
+                $html_file = $out_dir . '/' . $page_slug . '/index.html';
+            } elseif ( file_exists( $theme_dir . '/' . $page_slug . '.html' ) ) {
+                $html_file = $theme_dir . '/' . $page_slug . '.html';
+            }
+        }
+
+        if ( ! $html_file || ! file_exists( $html_file ) ) {
+            $page_record = $wpdb->get_row( $wpdb->prepare(
+                "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d AND slug = %s LIMIT 1",
+                $theme_id,
+                $page_slug
+            ), ARRAY_A );
+
+            if ( $page_record && ! empty( $page_record['content'] ) ) {
+                return array(
+                    'success'    => true,
+                    'theme_id'   => $theme_id,
+                    'theme_name' => $live_theme['name'] ?? '',
+                    'page_slug'  => $page_slug,
+                    'html'       => $page_record['content'],
+                    'source'     => 'database',
+                    'live_url'   => home_url( '/site/' ),
+                );
+            }
+
+            return array(
+                'success'   => false,
+                'error'     => 'HTML source file not found for theme #' . $theme_id . ' and page ' . $page_slug,
+                'theme_id'  => $theme_id,
+                'page_slug' => $page_slug,
+            );
+        }
+
+        $content = file_get_contents( $html_file );
+        return array(
+            'success'    => true,
+            'theme_id'   => $theme_id,
+            'theme_name' => $live_theme['name'] ?? '',
+            'page_slug'  => $page_slug,
+            'html'       => $content,
+            'file_path'  => $html_file,
+            'live_url'   => home_url( '/site/' ),
+        );
+    }
+
+    /**
+     * Update & Publish Landing Page HTML Directly to Static Build
+     */
+    public static function handle_canvas_update_page_html( $args, $auth ) {
+        $agency_id = self::get_agency_id( $auth, $args );
+        global $wpdb;
+
+        $html = isset( $args['html'] ) ? trim( $args['html'] ) : '';
+        if ( empty( $html ) ) {
+            return array( 'error' => 'Parameter "html" is required and cannot be empty.' );
+        }
+
+        $theme_id = intval( $args['theme_id'] ?? 0 );
+        if ( $theme_id <= 0 ) {
+            $live_theme = $wpdb->get_row( $wpdb->prepare(
+                "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE agency_id = %d AND status = 'live' LIMIT 1",
+                $agency_id
+            ), ARRAY_A );
+            $theme_id = $live_theme ? intval( $live_theme['id'] ) : 0;
+        } else {
+            $live_theme = $wpdb->get_row( $wpdb->prepare(
+                "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d",
+                $theme_id
+            ), ARRAY_A );
+        }
+
+        if ( ! $theme_id || ! $live_theme ) {
+            return array( 'error' => 'Target theme not found.' );
+        }
+
+        $page_slug = sanitize_title( $args['page_slug'] ?? 'home' );
+        if ( empty( $page_slug ) || $page_slug === 'index' ) {
+            $page_slug = 'home';
+        }
+
+        $upload_dir = wp_get_upload_dir();
+        $theme_dir  = $upload_dir['basedir'] . '/cora-nextjs-builds/theme_' . $theme_id;
+        $out_dir    = $theme_dir . '/out';
+        wp_mkdir_p( $out_dir );
+
+        if ( $page_slug === 'home' || $page_slug === 'index' ) {
+            file_put_contents( $theme_dir . '/index.html', $html );
+            file_put_contents( $out_dir . '/index.html', $html );
+        } else {
+            file_put_contents( $out_dir . '/' . $page_slug . '.html', $html );
+            wp_mkdir_p( $out_dir . '/' . $page_slug );
+            file_put_contents( $out_dir . '/' . $page_slug . '/index.html', $html );
+        }
+
+        // Update settings in database
+        $settings = json_decode( $live_theme['settings'], true ) ?: array();
+        $settings['is_static_built']   = true;
+        $settings['static_build_path'] = $out_dir;
+        $settings['static_built_at']   = current_time( 'mysql' );
+        $settings['source']            = 'nextjs';
+        if ( empty( $settings['framework'] ) ) {
+            $settings['framework'] = 'html_tailwind';
+        }
+
+        $wpdb->update(
+            $wpdb->prefix . 'cora_canvas_themes',
+            array(
+                'settings'   => json_encode( $settings ),
+                'updated_at' => current_time( 'mysql' ),
+            ),
+            array( 'id' => $theme_id ),
+            array( '%s', '%s' ),
+            array( '%d' )
+        );
+
+        // Sync to Canvas Page record if exists
+        $page_row = $wpdb->get_row( $wpdb->prepare(
+            "SELECT id FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d AND slug = %s LIMIT 1",
+            $theme_id,
+            $page_slug
+        ) );
+        if ( $page_row ) {
+            $wpdb->update(
+                $wpdb->prefix . 'cora_canvas_pages',
+                array(
+                    'content'    => $html,
+                    'updated_at' => current_time( 'mysql' ),
+                ),
+                array( 'id' => $page_row->id )
+            );
+        }
+
+        $change_summary = sanitize_text_field( $args['change_summary'] ?? 'Updated via MCP AI Assistant' );
+
+        return array(
+            'success'        => true,
+            'message'        => 'Landing page HTML updated successfully and live immediately at ' . home_url( '/site/' ),
+            'theme_id'       => $theme_id,
+            'theme_name'     => $live_theme['name'],
+            'page_slug'      => $page_slug,
+            'live_url'       => home_url( '/site/' ),
+            'change_summary' => $change_summary,
+            'updated_at'     => current_time( 'mysql' ),
+        );
     }
 }

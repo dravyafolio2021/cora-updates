@@ -39,6 +39,29 @@ if ( ! $live_theme ) {
 }
 $live_settings = $live_theme ? (json_decode($live_theme['settings'], true) ?: array()) : array();
 
+// ── MCP & OAuth Client Connections ──────────────────────────────────────────
+$is_chatgpt_connected = false;
+$is_claude_connected  = false;
+$is_gemini_connected  = false;
+$tokens_table = $wpdb->prefix . 'cora_oauth_tokens';
+if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $tokens_table ) ) {
+    $token_rows = $wpdb->get_results(
+        "SELECT client_name FROM {$tokens_table} WHERE revoked = 0"
+    );
+    if ( ! empty( $token_rows ) ) {
+        $connected_names = array_map( function( $tr ) { return strtolower( $tr->client_name ); }, $token_rows );
+        $is_chatgpt_connected = in_array( 'chatgpt', $connected_names, true );
+        $is_claude_connected  = in_array( 'claude', $connected_names, true );
+        $is_gemini_connected  = in_array( 'gemini', $connected_names, true );
+    }
+}
+$mcp_direct_token = get_option( 'cora_mcp_access_token' );
+if ( empty( $mcp_direct_token ) ) {
+    $mcp_direct_token = bin2hex( wp_generate_password( 32, false ) );
+    update_option( 'cora_mcp_access_token', $mcp_direct_token );
+}
+$mcp_endpoint_url = home_url( '/mcp' );
+
 // ── Editor Resume Fast-Path ──────────────────────────────────────────────
 // When the user refreshes the browser while inside an Elementor editor session,
 // the URL still contains cv_page=X. Detect this at PHP render time so we can
@@ -458,39 +481,36 @@ function cora_get_sparkline_points( $history, $type ) {
             <?php if ( $live_theme ) : 
                 $live_theme_settings = json_decode($live_theme['settings'], true) ?: array();
                 $live_source = strtolower($live_theme_settings['source'] ?? '');
-                $is_nextjs = ($live_source === 'nextjs');
-                $is_lovable = ($live_source === 'lovable');
+                $live_framework = strtolower($live_theme_settings['framework'] ?? '');
+                $is_html_ai = ( $live_framework === 'html_tailwind' || ( $live_theme_settings['builder'] ?? '' ) === 'html_ai' || ! empty( $live_theme_settings['template_key'] ) || ! empty( $live_theme_settings['is_html_ai'] ) );
+                $is_nextjs = ( $live_source === 'nextjs' && ! $is_html_ai );
+                $is_lovable = ( $live_source === 'lovable' );
+                $is_elementor = ( ! $is_nextjs && ! $is_lovable && ! $is_html_ai );
 
-                if ( $is_nextjs ) {
-                    $is_static_built = ! empty( $live_theme_settings['is_static_built'] );
-                    $static_built_at = ! empty( $live_theme_settings['static_built_at'] ) ? $live_theme_settings['static_built_at'] : '';
-                    $static_file_count = ! empty( $live_theme_settings['static_file_count'] ) ? intval( $live_theme_settings['static_file_count'] ) : 0;
-                    $nextjs_live_url = ! empty( $live_theme_settings['nextjs_live_url'] ) ? $live_theme_settings['nextjs_live_url'] : ( ! empty( $live_theme_settings['live_url'] ) ? $live_theme_settings['live_url'] : '' );
-                    
-                    if ( empty( $nextjs_live_url ) || $nextjs_live_url === 'http://localhost:3000' || $is_static_built ) {
-                        $nextjs_display_url = preg_replace( '#^https?://#', '', rtrim( $canvas_preview_url, '/' ) );
-                    } else {
-                        $nextjs_display_url = preg_replace( '#^https?://#', '', rtrim( $nextjs_live_url, '/' ) );
-                    }
+                $is_static_built = ! empty( $live_theme_settings['is_static_built'] );
+                $static_built_at = ! empty( $live_theme_settings['static_built_at'] ) ? $live_theme_settings['static_built_at'] : '';
+                $static_file_count = ! empty( $live_theme_settings['static_file_count'] ) ? intval( $live_theme_settings['static_file_count'] ) : 0;
+                $nextjs_live_url = ! empty( $live_theme_settings['nextjs_live_url'] ) ? $live_theme_settings['nextjs_live_url'] : ( ! empty( $live_theme_settings['live_url'] ) ? $live_theme_settings['live_url'] : '' );
+                
+                if ( empty( $nextjs_live_url ) || $nextjs_live_url === 'http://localhost:3000' || $is_static_built || $is_html_ai ) {
+                    $nextjs_display_url = preg_replace( '#^https?://#', '', rtrim( $canvas_preview_url, '/' ) );
+                } else {
+                    $nextjs_display_url = preg_replace( '#^https?://#', '', rtrim( $nextjs_live_url, '/' ) );
+                }
 
-                    $nextjs_repo = ! empty( $live_theme_settings['github_repo'] ) ? $live_theme_settings['github_repo'] : ( ! empty( $live_theme_settings['repo'] ) ? $live_theme_settings['repo'] : 'cora/nextjs-starter' );
-                    $nextjs_branch = ! empty( $live_theme_settings['github_branch'] ) ? $live_theme_settings['github_branch'] : ( ! empty( $live_theme_settings['branch'] ) ? $live_theme_settings['branch'] : 'main' );
+                $nextjs_repo = ! empty( $live_theme_settings['github_repo'] ) ? $live_theme_settings['github_repo'] : ( ! empty( $live_theme_settings['repo'] ) ? $live_theme_settings['repo'] : 'cora/nextjs-starter' );
+                $nextjs_branch = ! empty( $live_theme_settings['github_branch'] ) ? $live_theme_settings['github_branch'] : ( ! empty( $live_theme_settings['branch'] ) ? $live_theme_settings['branch'] : 'main' );
 
-                    // Scanned routes
-                    $nextjs_routes = array();
-                    if ( ! empty( $live_stats ) ) {
-                        foreach ( $live_stats as $st_page ) {
-                            $p_slug = $st_page['slug'] ?? '';
-                            if ( ! empty( $st_page['is_homepage'] ) || $p_slug === 'home' || $p_slug === 'index' || $p_slug === '' ) {
-                                $nextjs_routes[] = '/';
-                            } else {
-                                $nextjs_routes[] = '/' . ltrim( $p_slug, '/' );
+                // Resolve Elementor Home Page Edit URL if applicable
+                $home_page_edit_url = '';
+                if ( ! empty( $live_stats ) ) {
+                    foreach ( $live_stats as $lp ) {
+                        if ( ! empty( $lp['is_homepage'] ) || ( $lp['slug'] ?? '' ) === 'home' || ( $lp['slug'] ?? '' ) === 'index' ) {
+                            if ( ! empty( $lp['wp_post_id'] ) ) {
+                                $home_page_edit_url = admin_url( 'post.php?post=' . intval( $lp['wp_post_id'] ) . '&action=elementor' );
+                                break;
                             }
                         }
-                        $nextjs_routes = array_values( array_unique( $nextjs_routes ) );
-                    }
-                    if ( empty( $nextjs_routes ) ) {
-                        $nextjs_routes = array( '/', '/about', '/contact' );
                     }
                 }
             ?>
@@ -505,7 +525,12 @@ function cora_get_sparkline_points( $history, $type ) {
                                 <span class="w-1.5 h-1.5 rounded-full bg-zinc-700"></span>
                                 <span class="w-1.5 h-1.5 rounded-full bg-zinc-700"></span>
                                 <span class="w-1.5 h-1.5 rounded-full bg-zinc-700"></span>
-                                <?php if ( $is_nextjs && ! empty( $is_static_built ) ) : ?>
+                                <?php if ( $is_html_ai ) : ?>
+                                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-zinc-900 border border-zinc-700 text-[8px] font-mono font-bold text-zinc-100">
+                                    <svg viewBox="0 0 24 24" width="7" height="7" fill="currentColor"><path d="M12 2L15 9L22 12L15 15L12 22L9 15L2 12L9 9Z"/></svg>
+                                    AI Static
+                                </span>
+                                <?php elseif ( $is_nextjs && ! empty( $is_static_built ) ) : ?>
                                 <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-950 border border-emerald-800 text-[8px] font-mono font-bold text-emerald-400">
                                     <svg viewBox="0 0 24 24" width="7" height="7" fill="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
                                     Static Site
@@ -538,8 +563,25 @@ function cora_get_sparkline_points( $history, $type ) {
                                     tabindex="-1"
                                     aria-hidden="true">
                                 </iframe>
-                                <?php if ( $is_nextjs ) : ?>
-                                <!-- Bottom Monochromatic Quick Strip -->
+                                <?php if ( $is_html_ai ) : ?>
+                                <!-- Bottom Quick Strip for HTML AI -->
+                                <div class="absolute inset-x-0 bottom-0 py-1.5 px-2.5 bg-gradient-to-t from-zinc-950 via-zinc-950/90 to-transparent flex items-center justify-between gap-2 z-10 opacity-90 group-hover:opacity-100 transition-opacity">
+                                    <div class="flex items-center gap-1.5 min-w-0">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
+                                        <span class="text-[9px] font-mono font-medium text-zinc-300 truncate">Claude &amp; ChatGPT MCP Ready</span>
+                                    </div>
+                                    <div class="flex items-center gap-1 shrink-0">
+                                        <a href="<?php echo esc_url( $canvas_preview_url ); ?>" target="_blank" class="px-1.5 py-0.5 bg-white hover:bg-zinc-100 text-zinc-950 font-bold text-[8.5px] rounded flex items-center gap-0.5 no-underline shadow-3xs cursor-pointer select-none">
+                                            <span>Open ↗</span>
+                                        </a>
+                                        <button type="button" onclick="window.openAiMcpEditor(<?php echo $live_theme['id']; ?>, '<?php echo esc_js($live_theme['name']); ?>')" class="px-1.5 py-0.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 font-medium text-[8.5px] rounded flex items-center gap-1 cursor-pointer select-none" title="Edit with Claude / ChatGPT">
+                                            <svg viewBox="0 0 24 24" width="8" height="8" fill="currentColor"><path d="M12 2L15 9L22 12L15 15L12 22L9 15L2 12L9 9Z"/></svg>
+                                            <span>AI Edit</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <?php elseif ( $is_nextjs ) : ?>
+                                <!-- Bottom Quick Strip for Next.js -->
                                 <div class="absolute inset-x-0 bottom-0 py-1.5 px-2.5 bg-gradient-to-t from-zinc-950 via-zinc-950/90 to-transparent flex items-center justify-between gap-2 z-10 opacity-90 group-hover:opacity-100 transition-opacity">
                                     <div class="flex items-center gap-1.5 min-w-0">
                                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
@@ -549,8 +591,9 @@ function cora_get_sparkline_points( $history, $type ) {
                                         <a href="<?php echo esc_url( $canvas_preview_url ); ?>" target="_blank" class="px-1.5 py-0.5 bg-white hover:bg-zinc-100 text-zinc-950 font-bold text-[8.5px] rounded flex items-center gap-0.5 no-underline shadow-3xs cursor-pointer select-none">
                                             <span>Open ↗</span>
                                         </a>
-                                        <button type="button" onclick="window.buildNextJSRepo(<?php echo $live_theme['id']; ?>)" class="px-1.5 py-0.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 font-medium text-[8.5px] rounded flex items-center gap-0.5 cursor-pointer select-none" title="Build static site">
-                                            <span>⚡ Build</span>
+                                        <button type="button" onclick="window.buildNextJSRepo(<?php echo $live_theme['id']; ?>)" class="px-1.5 py-0.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 font-medium text-[8.5px] rounded flex items-center gap-1 cursor-pointer select-none" title="Build static site">
+                                            <svg viewBox="0 0 24 24" width="8" height="8" fill="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                                            <span>Build</span>
                                         </button>
                                     </div>
                                 </div>
@@ -571,7 +614,23 @@ function cora_get_sparkline_points( $history, $type ) {
                                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                                     Active Theme
                                 </span>
-                                <?php if ( $is_nextjs ) : ?>
+                                <?php if ( $is_html_ai ) : ?>
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-zinc-950 text-[9.5px] font-bold text-white">
+                                    <svg viewBox="0 0 24 24" width="8" height="8" fill="currentColor"><path d="M12 2L15 9L22 12L15 15L12 22L9 15L2 12L9 9Z"/></svg>
+                                    AI HTML &amp; Tailwind
+                                </span>
+                                <?php if ( $is_claude_connected || $is_chatgpt_connected ) : ?>
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200/60 text-[9.5px] font-bold text-emerald-700">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                    MCP Connected
+                                </span>
+                                <?php else : ?>
+                                <button type="button" onclick="window.coraShowClientConnectModal('claude')" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-zinc-100 hover:bg-zinc-200 text-[9.5px] font-semibold text-zinc-700 cursor-pointer border-none transition-colors" title="Connect Claude / ChatGPT via MCP for 1-click updates">
+                                    <svg viewBox="0 0 24 24" width="8" height="8" fill="currentColor"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                                    <span>Connect MCP</span>
+                                </button>
+                                <?php endif; ?>
+                                <?php elseif ( $is_nextjs ) : ?>
                                 <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-zinc-950 text-[9.5px] font-bold text-white">
                                     Next.js Native
                                 </span>
@@ -592,6 +651,24 @@ function cora_get_sparkline_points( $history, $type ) {
 
                             <!-- Feature Tags Row -->
                             <div class="flex flex-wrap gap-1.5 pt-0.5">
+                                <?php if ( $is_html_ai ) : ?>
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-100/80 text-[10px] font-medium text-zinc-600">
+                                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                                    Claude &amp; GPT MCP
+                                </span>
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-100/80 text-[10px] font-medium text-zinc-600">
+                                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                    Tailwind CDN
+                                </span>
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-100/80 text-[10px] font-medium text-zinc-600">
+                                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path></svg>
+                                    Zero Build Delay
+                                </span>
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-100/80 text-[10px] font-medium text-zinc-600">
+                                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                    Built-in CRM Form
+                                </span>
+                                <?php else : ?>
                                 <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-100/80 text-[10px] font-medium text-zinc-600">
                                     <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><polyline points="20 6 9 17 4 12"></polyline></svg>
                                     Optimized Core
@@ -608,6 +685,7 @@ function cora_get_sparkline_points( $history, $type ) {
                                     <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-500"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                                     Fast INP/LCP
                                 </span>
+                                <?php endif; ?>
                             </div>
 
                             <!-- Version Row -->
@@ -621,23 +699,24 @@ function cora_get_sparkline_points( $history, $type ) {
                             </div>
                         </div>
 
-                        <!-- Action Buttons Group (Primary + Secondary) -->
+                        <!-- Action Buttons Group (Framework-Aware Architecture) -->
                         <div class="flex items-center gap-2 pt-3 border-t border-zinc-100 flex-wrap">
-                            <!-- Primary Customize CTA -->
-                            <button type="button" onclick="editTheme(<?php echo $live_theme['id']; ?>, '<?php echo esc_js($live_theme['name']); ?>', true)"
-                                    class="h-8 px-4 bg-zinc-950 hover:bg-zinc-900 text-white rounded-lg text-xs font-bold cursor-pointer transition-all flex items-center gap-1.5 border-none shadow-xs shrink-0 select-none">
-                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-                                <span>Customize Theme</span>
+                            <?php if ( $is_html_ai ) : ?>
+                            <!-- HTML AI (Claude / ChatGPT MCP) Action Suite -->
+                            <button type="button" onclick="window.openAiMcpEditor(<?php echo $live_theme['id']; ?>, '<?php echo esc_js($live_theme['name']); ?>')"
+                                    class="h-8 px-4 bg-zinc-950 hover:bg-zinc-900 text-white rounded-lg text-xs font-bold cursor-pointer transition-all flex items-center gap-1.5 border-none shadow-xs shrink-0 select-none"
+                                    title="Edit and live-update landing page with Claude or ChatGPT via MCP">
+                                <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><path d="M12 2L15 9L22 12L15 15L12 22L9 15L2 12L9 9Z"/></svg>
+                                <span>Edit with Claude / ChatGPT</span>
                             </button>
 
-                            <?php if ( $is_nextjs ) : ?>
-                            <!-- Static Build Action -->
-                            <button type="button" onclick="window.buildNextJSRepo(<?php echo $live_theme['id']; ?>)"
-                                    class="h-8 px-3.5 bg-white hover:bg-zinc-50 border border-zinc-200/80 text-zinc-900 rounded-lg text-xs font-semibold cursor-pointer transition-all flex items-center gap-1.5 shadow-3xs shrink-0" title="Build &amp; sync static distribution from GitHub">
-                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                                <span>Build Static</span>
+                            <!-- Direct Code Editor -->
+                            <button type="button" onclick="window.openHtmlCodeEditor(<?php echo $live_theme['id']; ?>, '<?php echo esc_js($live_theme['name']); ?>')"
+                                    class="h-8 px-3.5 bg-white hover:bg-zinc-50 border border-zinc-200/80 text-zinc-800 rounded-lg text-xs font-semibold cursor-pointer transition-all flex items-center gap-1.5 shadow-3xs shrink-0"
+                                    title="Directly view and edit index.html code">
+                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                                <span>Edit Code</span>
                             </button>
-                            <?php endif; ?>
 
                             <!-- Secondary Settings -->
                             <button type="button" onclick="editTheme(<?php echo $live_theme['id']; ?>, '<?php echo esc_js($live_theme['name']); ?>', true); switchTab('settings');"
@@ -660,6 +739,8 @@ function cora_get_sparkline_points( $history, $type ) {
                                 <span>Duplicate</span>
                             </button>
 
+                            <?php endif; ?>
+
                             <!-- Actions Dropdown Trigger -->
                             <div class="relative inline-block sm:ml-auto">
                                 <button type="button" onclick="toggleActiveThemeDropdown(event)"
@@ -673,6 +754,16 @@ function cora_get_sparkline_points( $history, $type ) {
                                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                                         <span>View Live Site</span>
                                     </a>
+                                    <?php if ( $is_html_ai ) : ?>
+                                    <button onclick="window.openAiMcpEditor(<?php echo $live_theme['id']; ?>, '<?php echo esc_js($live_theme['name']); ?>')" class="w-full px-3 py-2 text-xs text-zinc-900 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-bold text-left bg-transparent transition-colors">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" class="text-zinc-900 shrink-0"><path d="M12 2L15 9L22 12L15 15L12 22L9 15L2 12L9 9Z"/></svg>
+                                        <span>Edit with Claude / ChatGPT</span>
+                                    </button>
+                                    <button onclick="window.openHtmlCodeEditor(<?php echo $live_theme['id']; ?>, '<?php echo esc_js($live_theme['name']); ?>')" class="w-full px-3 py-2 text-xs text-zinc-800 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold text-left bg-transparent transition-colors">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                                        <span>Edit HTML Code</span>
+                                    </button>
+                                    <?php endif; ?>
                                     <button onclick="triggerRenameTheme(<?php echo $live_theme['id']; ?>, '<?php echo esc_js($live_theme['name']); ?>')" class="w-full px-3 py-2 text-xs text-zinc-800 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold text-left bg-transparent transition-colors">
                                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                                         <span>Rename Theme</span>
@@ -690,11 +781,13 @@ function cora_get_sparkline_points( $history, $type ) {
                                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                                         <span>Download Theme ZIP File</span>
                                     </button>
+                                    <?php if ( ! $is_html_ai && ! $is_nextjs ) : ?>
                                     <div class="border-t border-zinc-100 my-1"></div>
                                     <button onclick="openElementorMigrationDrawer()" class="w-full px-3 py-2 text-xs text-zinc-950 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-bold text-left bg-transparent transition-colors">
                                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-900 shrink-0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                                         <span>Migrate Elementor Pages</span>
                                     </button>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>
@@ -783,11 +876,19 @@ function cora_get_sparkline_points( $history, $type ) {
                                     <h4 class="text-xs font-bold text-zinc-900 leading-none truncate"><?php echo esc_html($th['name']); ?></h4>
                                     <?php
                                     $th_settings = json_decode( $th['settings'], true ) ?: array();
-                                    $th_source = isset( $th_settings['source'] ) ? $th_settings['source'] : 'elementor';
-                                    if ( strtolower($th_source) === 'nextjs' ) :
+                                    $th_source = strtolower( $th_settings['source'] ?? 'elementor' );
+                                    $th_framework = strtolower( $th_settings['framework'] ?? '' );
+                                    $th_is_html_ai = ( $th_framework === 'html_tailwind' || ( $th_settings['builder'] ?? '' ) === 'html_ai' || ! empty( $th_settings['template_key'] ) || ! empty( $th_settings['is_html_ai'] ) );
+                                    
+                                    if ( $th_is_html_ai ) :
                                     ?>
+                                        <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[8.5px] font-bold bg-zinc-950 text-white">
+                                            <svg viewBox="0 0 24 24" width="7" height="7" fill="currentColor"><path d="M12 2L15 9L22 12L15 15L12 22L9 15L2 12L9 9Z"/></svg>
+                                            AI HTML
+                                        </span>
+                                    <?php elseif ( $th_source === 'nextjs' ) : ?>
                                         <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[8.5px] font-bold bg-zinc-950 text-white">Next.js</span>
-                                    <?php elseif ( strtolower($th_source) === 'lovable' ) : ?>
+                                    <?php elseif ( $th_source === 'lovable' ) : ?>
                                         <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[8.5px] font-bold bg-zinc-100 text-zinc-800">Lovable</span>
                                     <?php else: ?>
                                         <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[8.5px] font-bold bg-zinc-100 text-zinc-700">Elementor</span>
@@ -800,7 +901,16 @@ function cora_get_sparkline_points( $history, $type ) {
                         <!-- Right Side Action Row -->
                         <div class="flex items-center gap-2 shrink-0 w-full md:w-auto justify-end">
                             <button onclick="triggerActivateTheme(<?php echo $th['id']; ?>, '<?php echo esc_js($th['name']); ?>')" class="h-7 px-3 bg-zinc-950 hover:bg-zinc-900 text-white rounded-lg text-[11px] font-bold cursor-pointer transition-all border-none shadow-xs">Publish</button>
+                            
+                            <?php if ( $th_is_html_ai ) : ?>
+                            <button onclick="window.openAiMcpEditor(<?php echo $th['id']; ?>, '<?php echo esc_js($th['name']); ?>')" class="h-7 px-2.5 border border-zinc-200/80 hover:bg-zinc-50 rounded-lg text-[11px] font-semibold text-zinc-800 bg-white cursor-pointer transition-all shadow-3xs flex items-center gap-1" title="Edit with Claude / ChatGPT via MCP">
+                                <svg viewBox="0 0 24 24" width="9" height="9" fill="currentColor"><path d="M12 2L15 9L22 12L15 15L12 22L9 15L2 12L9 9Z"/></svg>
+                                <span>AI Edit</span>
+                            </button>
+                            <button onclick="window.openHtmlCodeEditor(<?php echo $th['id']; ?>, '<?php echo esc_js($th['name']); ?>')" class="h-7 px-2.5 border border-zinc-200/80 hover:bg-zinc-50 rounded-lg text-[11px] font-semibold text-zinc-700 bg-white cursor-pointer transition-all shadow-3xs" title="Edit HTML Code">Edit Code</button>
+                            <?php else : ?>
                             <button onclick="editTheme(<?php echo $th['id']; ?>, '<?php echo esc_js($th['name']); ?>', false)" class="h-7 px-3 border border-zinc-200/80 hover:bg-zinc-50 rounded-lg text-[11px] font-semibold text-zinc-700 bg-white cursor-pointer transition-all shadow-3xs">Edit Theme</button>
+                            <?php endif; ?>
                             
                             <!-- Dropdown Menu -->
                             <div class="relative">
@@ -808,6 +918,17 @@ function cora_get_sparkline_points( $history, $type ) {
                                     <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="1.2"></circle><circle cx="19" cy="12" r="1.2"></circle><circle cx="5" cy="12" r="1.2"></circle></svg>
                                 </button>
                                 <div id="draft-actions-menu-<?php echo $th['id']; ?>" class="hidden absolute right-0 w-52 bg-white border border-zinc-200 rounded-xl shadow-xl py-1 z-[9999] text-left font-sans select-none">
+                                    <?php if ( $th_is_html_ai ) : ?>
+                                    <button onclick="window.openAiMcpEditor(<?php echo $th['id']; ?>, '<?php echo esc_js($th['name']); ?>')" class="w-full px-3 py-2 text-xs text-zinc-900 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-bold text-left bg-transparent transition-colors">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" class="text-zinc-900 shrink-0"><path d="M12 2L15 9L22 12L15 15L12 22L9 15L2 12L9 9Z"/></svg>
+                                        <span>Edit with Claude / ChatGPT</span>
+                                    </button>
+                                    <button onclick="window.openHtmlCodeEditor(<?php echo $th['id']; ?>, '<?php echo esc_js($th['name']); ?>')" class="w-full px-3 py-2 text-xs text-zinc-800 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold text-left bg-transparent transition-colors">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                                        <span>Edit HTML Code</span>
+                                    </button>
+                                    <div class="border-t border-zinc-100 my-1"></div>
+                                    <?php endif; ?>
                                     <button onclick="triggerRenameTheme(<?php echo $th['id']; ?>, '<?php echo esc_js($th['name']); ?>')" class="w-full px-3 py-2 text-xs text-zinc-800 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold text-left bg-transparent transition-colors">
                                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                                         <span>Rename</span>
@@ -5803,6 +5924,453 @@ function cora_get_sparkline_points( $history, $type ) {
 </div>
 <!-- Backdrop for Drawer -->
 <div id="theme-version-drawer-backdrop" class="hidden fixed inset-0 z-40 bg-black/15 backdrop-blur-xs transition-opacity duration-300 ease-in-out" onclick="toggleThemeVersionDrawer(event)"></div>
+
+<!-- CodeMirror Core Stylesheet & Custom Dark Theme for Cora -->
+<link rel="stylesheet" href="<?php echo esc_url( CORA_WORKSPACE_URL . 'assets/css/codemirror.min.css' ); ?>">
+<style>
+/* Custom Modern High-Contrast Dark CodeMirror Theme for Cora */
+.cm-s-cora-dark.CodeMirror {
+    font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+    font-size: 12px !important;
+    line-height: 1.65 !important;
+    background-color: #0c0c0e !important;
+    color: #e4e4e7 !important;
+    height: 100% !important;
+    width: 100% !important;
+}
+.cm-s-cora-dark .CodeMirror-gutters {
+    background-color: #09090b !important;
+    border-right: 1px solid #27272a !important;
+    padding-right: 2px !important;
+}
+.cm-s-cora-dark .CodeMirror-linenumber {
+    color: #52525b !important;
+    padding: 0 8px 0 4px !important;
+    font-size: 11px !important;
+    font-family: 'JetBrains Mono', monospace !important;
+}
+.cm-s-cora-dark .CodeMirror-lines {
+    padding: 8px 0 !important;
+}
+.cm-s-cora-dark .CodeMirror-cursor {
+    border-left: 2px solid #ffffff !important;
+}
+.cm-s-cora-dark .CodeMirror-selected {
+    background: rgba(255, 255, 255, 0.15) !important;
+}
+.cm-s-cora-dark.CodeMirror-focused .CodeMirror-selected {
+    background: rgba(255, 255, 255, 0.22) !important;
+}
+.cm-s-cora-dark .CodeMirror-matchingtag {
+    background: rgba(255, 255, 255, 0.15) !important;
+    border-bottom: 1px solid #71717a !important;
+}
+.cm-s-cora-dark .CodeMirror-matchingbracket {
+    color: #ffffff !important;
+    font-weight: bold !important;
+    text-decoration: underline !important;
+}
+
+/* --- High-Contrast Vibrant In-Editor Search Highlighting --- */
+.cora-search-match {
+    background-color: rgba(234, 179, 8, 0.45) !important;
+    border-bottom: 2px solid #eab308 !important;
+    border-radius: 2px !important;
+    color: #ffffff !important;
+}
+.cora-search-match-active {
+    background-color: #facc15 !important;
+    color: #09090b !important;
+    font-weight: 800 !important;
+    border-radius: 3px !important;
+    box-shadow: 0 0 14px rgba(250, 204, 21, 0.95), inset 0 0 0 1px #ca8a04 !important;
+    text-shadow: none !important;
+    outline: 2px solid #ffffff !important;
+    outline-offset: 1px !important;
+}
+.cm-searching {
+    background-color: rgba(234, 179, 8, 0.45) !important;
+    border-bottom: 2px solid #eab308 !important;
+}
+
+/* Syntax Highlighting Colors - Clear, Vibrant & Aesthetic */
+.cm-s-cora-dark .cm-tag {
+    color: #60a5fa !important; /* Tailwind Blue for HTML tags: <html>, <head>, <meta>, <title>, <script>, <style>, <body>, <div>, <header>, etc. */
+    font-weight: 600 !important;
+}
+.cm-s-cora-dark .cm-bracket {
+    color: #94a3b8 !important; /* Slate brackets: <, >, </, /> */
+}
+.cm-s-cora-dark .cm-attribute {
+    color: #6ee7b7 !important; /* Soft Emerald/Mint for HTML attributes: lang, class, charset, name, content, rel, href, src, id */
+    font-weight: 500 !important;
+}
+.cm-s-cora-dark .cm-string,
+.cm-s-cora-dark .cm-string-2 {
+    color: #fde047 !important; /* Warm Amber for string literals: "UTF-8", "viewport", "scroll-smooth" */
+}
+.cm-s-cora-dark .cm-meta {
+    color: #c084fc !important; /* Purple for <!DOCTYPE html>, <?php ?> */
+    font-weight: 600 !important;
+}
+.cm-s-cora-dark .cm-comment {
+    color: #71717a !important; /* Muted slate gray for <!-- comments --> */
+    font-style: italic !important;
+}
+.cm-s-cora-dark .cm-keyword {
+    color: #f472b6 !important; /* Pink for JS/CSS keywords: const, let, function, return, @keyframes, @media */
+    font-weight: 600 !important;
+}
+.cm-s-cora-dark .cm-def {
+    color: #38bdf8 !important; /* Cyan for function definitions */
+}
+.cm-s-cora-dark .cm-variable {
+    color: #e4e4e7 !important;
+}
+.cm-s-cora-dark .cm-variable-2 {
+    color: #93c5fd !important;
+}
+.cm-s-cora-dark .cm-property {
+    color: #7dd3fc !important; /* Sky Blue for CSS properties: background, color, font-size, margin, padding, border */
+}
+.cm-s-cora-dark .cm-qualifier {
+    color: #facc15 !important; /* Yellow for CSS class selectors: .glass, .reveal, .acc */
+}
+.cm-s-cora-dark .cm-builtin {
+    color: #38bdf8 !important;
+}
+.cm-s-cora-dark .cm-atom {
+    color: #f87171 !important; /* Red-orange for atoms: true, false, null */
+}
+.cm-s-cora-dark .cm-number {
+    color: #fb923c !important; /* Orange for numbers and values: 100%, 14px, #022c22 */
+}
+.cm-s-cora-dark .cm-operator {
+    color: #cbd5e1 !important;
+}
+.cm-s-cora-dark .cm-error {
+    color: #f87171 !important;
+    text-decoration: underline wavy #ef4444 !important;
+}
+</style>
+
+<!-- CodeMirror Scripts -->
+<script src="<?php echo esc_url( CORA_WORKSPACE_URL . 'assets/js/codemirror.min.js' ); ?>"></script>
+<script src="<?php echo esc_url( CORA_WORKSPACE_URL . 'assets/js/codemirror-mode-xml.min.js' ); ?>"></script>
+<script src="<?php echo esc_url( CORA_WORKSPACE_URL . 'assets/js/codemirror-mode-javascript.min.js' ); ?>"></script>
+<script src="<?php echo esc_url( CORA_WORKSPACE_URL . 'assets/js/codemirror-mode-css.min.js' ); ?>"></script>
+<script src="<?php echo esc_url( CORA_WORKSPACE_URL . 'assets/js/codemirror-mode-htmlmixed.min.js' ); ?>"></script>
+
+<!-- ==========================================
+     Full-Page AI & Live HTML Editor (Edge-to-Edge)
+     ========================================== -->
+<div id="cora-ai-mcp-editor-drawer" class="hidden fixed inset-0 z-[100000] bg-zinc-950 text-zinc-100 flex flex-col overflow-hidden font-sans select-none" style="position:fixed;inset:0;width:100vw;height:100vh;margin:0;padding:0;">
+    <!-- Top Minimal Toolbar -->
+    <div class="h-12 px-4 bg-[#09090b] border-b border-zinc-800/80 flex items-center justify-between shrink-0 z-30">
+        <!-- Left: File Indicator & Theme Badge -->
+        <div class="flex items-center gap-2.5 min-w-0">
+            <div class="w-6 h-6 rounded-md bg-zinc-800 border border-zinc-700 flex items-center justify-center text-zinc-300 shrink-0">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+            </div>
+            <span class="text-xs font-semibold text-white font-mono tracking-tight">index.html</span>
+            <span class="text-zinc-600 select-none">·</span>
+            <span id="cora-ai-mcp-theme-title" class="text-xs font-medium text-zinc-400 truncate max-w-[160px] sm:max-w-xs">Landing Page</span>
+            <span id="cora-editor-draft-pill" class="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-zinc-900 text-zinc-400 border border-zinc-800">
+                <span id="cora-editor-draft-dot" class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span>
+                <span id="cora-editor-draft-text">Draft Saved</span>
+            </span>
+        </div>
+
+        <!-- Center: Segmented Modes & Viewports -->
+        <div class="flex items-center gap-2">
+            <!-- Mode Segmented Control -->
+            <div class="flex items-center bg-zinc-900 p-0.5 rounded-lg border border-zinc-800">
+                <button type="button" id="cora-ai-mcp-tab-btn-code" onclick="window.switchAiMcpTab('code')" class="px-2.5 py-1 text-xs font-semibold rounded-md bg-zinc-800 text-white border-none cursor-pointer transition-colors flex items-center gap-1.5">
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                    <span>Editor &amp; Preview</span>
+                </button>
+                <button type="button" id="cora-ai-mcp-tab-btn-ai" onclick="window.switchAiMcpTab('ai')" class="px-2.5 py-1 text-xs font-semibold rounded-md bg-transparent text-zinc-400 hover:text-zinc-200 border-none cursor-pointer transition-colors flex items-center gap-1.5">
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                    <span>MCP Connect</span>
+                </button>
+            </div>
+
+            <!-- Viewport Switcher -->
+            <div id="cora-editor-viewport-group" class="hidden md:flex items-center bg-zinc-900 p-0.5 rounded-lg border border-zinc-800">
+                <button type="button" onclick="window.setLiveEditorViewport('desktop')" id="cora-vp-btn-desktop" class="p-1 rounded bg-zinc-800 text-white hover:text-white transition-colors cursor-pointer border-none" title="Desktop View (100%)">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                </button>
+                <button type="button" onclick="window.setLiveEditorViewport('tablet')" id="cora-vp-btn-tablet" class="p-1 rounded bg-transparent text-zinc-400 hover:text-white transition-colors cursor-pointer border-none" title="Tablet View (768px)">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+                </button>
+                <button type="button" onclick="window.setLiveEditorViewport('mobile')" id="cora-vp-btn-mobile" class="p-1 rounded bg-transparent text-zinc-400 hover:text-white transition-colors cursor-pointer border-none" title="Mobile View (375px)">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Right: Actions Toolbar -->
+        <div class="flex items-center gap-1.5 shrink-0">
+            <!-- Find Shortcut Button -->
+            <button type="button" onclick="window.toggleCodeEditorSearch()" class="h-7 px-2.5 rounded-md border border-zinc-800 bg-zinc-900 hover:bg-zinc-800 text-[11px] font-mono text-zinc-300 flex items-center gap-1 transition-colors cursor-pointer" title="Find in code (⌘F / Ctrl+F)">
+                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <span>Find <kbd class="text-[9.5px] text-zinc-500 font-sans">⌘F</kbd></span>
+            </button>
+
+            <!-- Format Code Button -->
+            <button type="button" onclick="window.formatLiveHtmlCode()" class="h-7 px-2.5 rounded-md border border-zinc-800 bg-zinc-900 hover:bg-zinc-800 text-[11px] font-medium text-zinc-300 flex items-center gap-1 transition-colors cursor-pointer" title="Format & Prettify Code (Shift+Alt+F / ⇧⌥F)">
+                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><line x1="21" y1="10" x2="3" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="21" y1="18" x2="3" y2="18"></line></svg>
+                <span>Format <kbd class="text-[9.5px] text-zinc-500 font-sans">⇧⌥F</kbd></span>
+            </button>
+
+            <!-- Save & Publish Button -->
+            <button type="button" id="cora-live-html-save-btn" onclick="window.saveLiveHtmlFromEditor()" class="h-7 px-3 rounded-md bg-white hover:bg-zinc-100 text-zinc-950 text-[11px] font-bold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer border-none" title="Save & Publish Live (⌘S / Ctrl+S)">
+                <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline></svg>
+                <span>Save &amp; Publish <kbd class="text-[9.5px] text-zinc-600 font-sans font-normal">⌘S</kbd></span>
+            </button>
+
+            <!-- Live Site Link -->
+            <a id="cora-ai-mcp-live-site-link" href="<?php echo esc_url( home_url('/site/') ); ?>" target="_blank" class="h-7 px-2.5 rounded-md border border-zinc-800 bg-zinc-900 hover:bg-zinc-800 text-[11px] font-medium text-zinc-300 flex items-center gap-1 transition-colors no-underline">
+                <span>Site ↗</span>
+            </a>
+
+            <!-- Close Drawer -->
+            <button type="button" onclick="window.closeAiMcpEditor()" class="h-7 w-7 rounded-md text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors cursor-pointer border-none bg-transparent flex items-center justify-center" title="Close Editor (Esc)">
+                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Workspace (Edge-to-Edge Split View) -->
+    <div class="flex-1 min-h-0 flex flex-col relative overflow-hidden">
+        <!-- Panel 1: Code & Live Preview Split Screen -->
+        <div id="cora-ai-mcp-panel-code" class="flex-1 min-h-0 flex flex-col">
+            <!-- Split Pane Container (50% Code / 50% Live Preview) -->
+            <div class="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-zinc-800 overflow-hidden">
+                <!-- Left: Formatted Monospace Code Editor -->
+                <div class="flex flex-col bg-[#121214] min-h-0 overflow-hidden relative">
+                    <!-- Code Top Bar -->
+                    <div class="h-8 px-3 bg-[#18181b] border-b border-zinc-800 flex items-center justify-between text-[11px] font-mono text-zinc-400 shrink-0">
+                        <div class="flex items-center gap-2">
+                            <span class="text-zinc-200 font-semibold">HTML Editor</span>
+                            <span id="cora-live-code-stat-chars" class="text-zinc-500">0 chars</span>
+                            <span id="cora-live-code-stat-lines" class="text-zinc-500">· 0 lines</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button type="button" id="cora-revert-btn" onclick="window.revertLiveCodeBuffer()" class="hidden text-zinc-300 hover:text-white text-[10.5px] font-mono font-medium cursor-pointer border-none bg-transparent flex items-center gap-1">
+                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+                                <span>Revert</span>
+                            </button>
+                            <button type="button" onclick="window.copyLiveCodeBuffer()" class="text-zinc-400 hover:text-zinc-200 text-[10.5px] font-mono cursor-pointer border-none bg-transparent">
+                                Copy
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- In-Editor Find & Replace Overlay Bar -->
+                    <div id="cora-editor-find-bar" class="hidden absolute top-10 right-4 z-40 bg-zinc-900/95 backdrop-blur-md border border-zinc-700/80 rounded-xl p-2.5 shadow-2xl flex flex-col gap-2 min-w-[320px] text-xs font-sans">
+                        <div class="flex items-center gap-1.5">
+                            <input type="text" id="cora-find-input" placeholder="Find in code..." class="flex-1 px-2.5 py-1 bg-zinc-950 border border-zinc-800 rounded-lg text-xs font-mono text-zinc-200 outline-none focus:border-zinc-500" oninput="window.updateCodeSearchMatches()" onkeydown="if(event.key==='Enter'&&event.shiftKey){window.findPrevCodeMatch();event.preventDefault();}else if(event.key==='Enter'){window.findNextCodeMatch();event.preventDefault();}else if(event.key==='Escape'){window.toggleCodeEditorSearch(false);}" />
+                            <span id="cora-find-match-count" class="text-[10px] font-mono text-zinc-400 px-1 select-none whitespace-nowrap">0/0</span>
+                            <button type="button" onclick="window.findPrevCodeMatch()" class="p-1 rounded hover:bg-zinc-800 text-zinc-400 hover:text-white border-none cursor-pointer" title="Previous match (Shift+Enter)">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                            </button>
+                            <button type="button" onclick="window.findNextCodeMatch()" class="p-1 rounded hover:bg-zinc-800 text-zinc-400 hover:text-white border-none cursor-pointer" title="Next match (Enter)">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </button>
+                            <button type="button" onclick="window.toggleCodeEditorSearch(false)" class="p-1 rounded hover:bg-zinc-800 text-zinc-400 hover:text-white border-none cursor-pointer" title="Close (Esc)">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            </button>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <input type="text" id="cora-replace-input" placeholder="Replace with..." class="flex-1 px-2.5 py-1 bg-zinc-950 border border-zinc-800 rounded-lg text-xs font-mono text-zinc-200 outline-none focus:border-zinc-500" onkeydown="if(event.key==='Enter'){window.replaceCurrentCodeMatch();event.preventDefault();}" />
+                            <button type="button" onclick="window.replaceCurrentCodeMatch()" class="px-2 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded-md text-[10.5px] font-medium border-none cursor-pointer">Replace</button>
+                            <button type="button" onclick="window.replaceAllCodeMatches()" class="px-2 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded-md text-[10.5px] font-medium border-none cursor-pointer">All</button>
+                        </div>
+                    </div>
+
+                    <!-- CodeMirror Container -->
+                    <div id="cora-codemirror-wrapper" class="flex-1 min-h-0 relative overflow-hidden bg-[#0c0c0e]">
+                        <textarea id="cora-live-html-code-textarea" oninput="window.handleLiveCodeInput()" class="w-full h-full p-4 bg-transparent text-zinc-200 font-mono text-xs leading-relaxed outline-none resize-none border-none selection:bg-zinc-700 selection:text-white" spellcheck="false" placeholder="<!-- Paste or edit HTML code here -->"></textarea>
+                    </div>
+                </div>
+
+                <!-- Right: Interactive Sandboxed Live Preview -->
+                <div class="flex flex-col bg-zinc-900 min-h-0 overflow-hidden">
+                    <!-- Preview Bar -->
+                    <div class="h-8 px-3 bg-[#18181b] border-b border-zinc-800 flex items-center justify-between text-[11px] text-zinc-400 shrink-0">
+                        <div class="flex items-center gap-2 min-w-0">
+                            <span class="w-1.5 h-1.5 rounded-full bg-zinc-300 shrink-0"></span>
+                            <span class="text-zinc-300 font-mono text-[10.5px] truncate">http://cora.local/site/</span>
+                        </div>
+                        <div class="flex items-center gap-2 shrink-0">
+                            <span id="cora-preview-loading-indicator" class="hidden text-zinc-500 text-[10px] font-mono">Rendering...</span>
+                            <button type="button" onclick="window.previewLiveHtmlEditor()" class="text-zinc-400 hover:text-white text-[10.5px] font-mono bg-transparent border-none cursor-pointer flex items-center gap-1">
+                                <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><path d="M23 4v6h-6"></path><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                                <span>Reload</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Preview Frame Container -->
+                    <div id="cora-live-preview-container" class="flex-1 min-h-0 bg-white flex items-center justify-center overflow-auto relative transition-all duration-200">
+                        <iframe id="cora-live-html-preview-frame" src="about:blank" class="w-full h-full border-none transition-all duration-200"></iframe>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sticky Bottom AI Chat Input & Prompt Composer Dock -->
+            <div id="cora-ai-composer-dock" class="bg-[#09090b] border-t border-zinc-800/80 shrink-0 z-20 font-sans">
+                <!-- AI Suggestion & Modification Review Banner -->
+                <div id="cora-ai-suggestion-bar" class="hidden px-4 py-2 bg-zinc-900 border-b border-zinc-800 flex flex-wrap items-center justify-between gap-2 text-xs">
+                    <div class="flex items-center gap-2 text-zinc-200 min-w-0">
+                        <div class="w-2 h-2 rounded-full bg-zinc-100"></div>
+                        <span id="cora-ai-suggestion-text" class="font-medium truncate">AI modifications generated. Reviewing live in preview pane.</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <button type="button" onclick="window.acceptAiChanges()" class="px-2.5 py-1 bg-white hover:bg-zinc-200 text-zinc-950 rounded-md text-xs font-bold transition-colors cursor-pointer border-none flex items-center gap-1">
+                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            <span>Apply &amp; Keep</span>
+                        </button>
+                        <button type="button" onclick="window.saveLiveHtmlFromEditor()" class="px-2.5 py-1 bg-zinc-800 hover:bg-zinc-700 text-white rounded-md text-xs font-bold transition-colors cursor-pointer border-none flex items-center gap-1">
+                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path></svg>
+                            <span>Save &amp; Publish</span>
+                        </button>
+                        <button type="button" onclick="window.discardAiChanges()" class="px-2.5 py-1 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-800 rounded-md text-xs font-medium transition-colors cursor-pointer">
+                            Discard
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Input Row -->
+                <div class="p-3 space-y-2">
+                    <div class="flex items-center gap-2 bg-zinc-900/90 border border-zinc-800 focus-within:border-zinc-600 rounded-xl p-1.5 transition-all">
+                        <!-- Model Selector Pill -->
+                        <div class="flex items-center gap-1.5 px-2.5 py-1 bg-zinc-800/80 rounded-lg text-[11px] font-semibold text-zinc-300 shrink-0 select-none border border-zinc-700/50">
+                            <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><path d="M12 2L15 9L22 12L15 15L12 22L9 15L2 12L9 9Z"/></svg>
+                            <span>Cora AI</span>
+                        </div>
+
+                        <!-- Prompt Input -->
+                        <input type="text" id="cora-ai-composer-input" onkeydown="if(event.key==='Enter') window.submitAiComposerPrompt()" placeholder="Ask AI to modify design, add sections, update copy, or adjust styling (e.g. 'Add a testimonial carousel after hero section')..." class="flex-1 bg-transparent text-white text-xs sm:text-sm px-2 py-1 outline-none border-none placeholder:text-zinc-500 font-sans" />
+
+                        <!-- Submit Button -->
+                        <button type="button" id="cora-ai-composer-send-btn" onclick="window.submitAiComposerPrompt()" class="h-7 px-3 bg-white hover:bg-zinc-100 text-zinc-950 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer border-none shrink-0 shadow-xs">
+                            <span>Send</span>
+                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                        </button>
+                    </div>
+
+                    <!-- Quick Suggestions -->
+                    <div class="flex flex-wrap items-center gap-1.5">
+                        <span class="text-[10px] text-zinc-500 font-mono">Suggestions:</span>
+                        <button type="button" onclick="window.setComposerPrompt('Add a modern customer testimonials grid with 3 client cards, quote avatars, and rating stars')" class="px-2 py-0.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-800 rounded text-[10.5px] font-medium cursor-pointer transition-colors">+ Testimonials</button>
+                        <button type="button" onclick="window.setComposerPrompt('Add an interactive 3-tier pricing matrix with monthly/annual toggle and feature checklists')" class="px-2 py-0.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-800 rounded text-[10.5px] font-medium cursor-pointer transition-colors">+ Pricing Matrix</button>
+                        <button type="button" onclick="window.setComposerPrompt('Add a responsive FAQ accordion section with 5 common questions and smooth collapse animation')" class="px-2 py-0.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-800 rounded text-[10.5px] font-medium cursor-pointer transition-colors">+ FAQ Accordion</button>
+                        <button type="button" onclick="window.setComposerPrompt('Convert theme to modern dark mode with deep black background #09090b, slate border strokes, and white typography')" class="px-2 py-0.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-800 rounded text-[10.5px] font-medium cursor-pointer transition-colors">+ Dark Theme</button>
+                        <button type="button" onclick="window.setComposerPrompt('Add a lead consultation inquiry form with Name, Email, Phone, Company, and Message fields')" class="px-2 py-0.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-800 rounded text-[10.5px] font-medium cursor-pointer transition-colors">+ Lead Form</button>
+                        <button type="button" onclick="window.setComposerPrompt('Make the header sticky at top with modern glassmorphism blur and smooth shadow on scroll')" class="px-2 py-0.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-800 rounded text-[10.5px] font-medium cursor-pointer transition-colors">+ Sticky Header</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel 2: Model Context Protocol (MCP) Setup Guide -->
+        <div id="cora-ai-mcp-panel-ai" class="hidden flex-1 overflow-y-auto p-6 max-w-4xl mx-auto space-y-6">
+            <!-- MCP Header Banner -->
+            <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 space-y-3">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h4 class="text-sm font-bold text-white">Model Context Protocol (MCP) Connection</h4>
+                        <p class="text-xs text-zinc-400 mt-0.5">Connect Claude Desktop, ChatGPT, or Cursor to edit your live website directly.</p>
+                    </div>
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10.5px] font-mono font-medium bg-zinc-800 text-zinc-300 border border-zinc-700">
+                        <span class="w-1.5 h-1.5 rounded-full bg-zinc-200"></span>
+                        MCP Live Server Active
+                    </span>
+                </div>
+
+                <!-- Credential Box -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                    <div class="bg-zinc-950 p-3 rounded-xl border border-zinc-800">
+                        <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block mb-1">MCP Endpoint URL</label>
+                        <div class="flex items-center gap-1.5">
+                            <input type="text" id="cora-mcp-panel-endpoint" readonly value="<?php echo esc_attr( $mcp_endpoint_url ); ?>" class="w-full px-2.5 py-1 bg-zinc-900 border border-zinc-800 rounded-lg text-xs font-mono text-zinc-200 outline-none select-all" />
+                            <button type="button" onclick="window.copyMcpDirectUrl()" class="h-7 px-2.5 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-semibold rounded-lg shrink-0 border-none cursor-pointer">Copy</button>
+                        </div>
+                    </div>
+                    <div class="bg-zinc-950 p-3 rounded-xl border border-zinc-800">
+                        <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block mb-1">MCP Direct Access Key</label>
+                        <div class="flex items-center gap-1.5">
+                            <input type="password" id="cora-mcp-panel-token" readonly value="<?php echo esc_attr( $mcp_direct_token ); ?>" class="w-full px-2.5 py-1 bg-zinc-900 border border-zinc-800 rounded-lg text-xs font-mono text-zinc-200 outline-none select-all" />
+                            <button type="button" onclick="window.toggleMcpTokenVisibility()" class="h-7 px-2 bg-zinc-900 border border-zinc-800 text-zinc-400 text-xs font-semibold rounded-lg shrink-0 cursor-pointer">Show</button>
+                            <button type="button" onclick="window.copyMcpAuthToken()" class="h-7 px-2.5 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-semibold rounded-lg shrink-0 border-none cursor-pointer">Copy</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Client Cards Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- Claude Desktop -->
+                <div class="p-4 bg-zinc-900 border border-zinc-800 rounded-2xl space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-7 h-7 rounded-lg bg-zinc-800 border border-zinc-700 flex items-center justify-center text-zinc-200">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M13.5 2C13.5 2 13.3 5.4 12 7C10.7 8.6 7.4 9 7.4 9C7.4 9 10.7 9.4 12 11C13.3 12.6 13.5 16 13.5 16C13.5 16 13.7 12.6 15 11C16.3 9.4 19.6 9 19.6 9C19.6 9 16.3 8.6 15 7C13.7 5.4 13.5 2 13.5 2Z"/><circle cx="6" cy="18" r="2.5"/></svg>
+                            </div>
+                            <div>
+                                <h5 class="text-xs font-bold text-white">Claude Desktop</h5>
+                                <span class="text-[10px] text-zinc-400">Model Context Protocol</span>
+                            </div>
+                        </div>
+                        <a href="https://claude.ai/new" target="_blank" class="px-2.5 py-1 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg text-[11px] font-semibold no-underline">Open Claude ↗</a>
+                    </div>
+                    <p class="text-[11px] text-zinc-400">Add to <code class="px-1 py-0.5 bg-zinc-950 rounded text-zinc-300 font-mono text-[10px]">claude_desktop_config.json</code>:</p>
+                    <div class="p-2.5 bg-zinc-950 rounded-xl font-mono text-[10px] text-zinc-300 overflow-x-auto border border-zinc-800">
+<pre>{
+  "mcpServers": {
+    "cora-canvas": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-fetch", "<?php echo esc_js( $mcp_endpoint_url ); ?>"],
+      "env": { "CORA_MCP_TOKEN": "<?php echo esc_js( $mcp_direct_token ); ?>" }
+    }
+  }
+}</pre>
+                    </div>
+                    <button type="button" onclick="window.copyClaudeJsonConfig()" class="w-full py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg text-xs font-semibold cursor-pointer border-none transition-colors">
+                        Copy Claude Config JSON
+                    </button>
+                </div>
+
+                <!-- ChatGPT Plugin & Tools -->
+                <div class="p-4 bg-zinc-900 border border-zinc-800 rounded-2xl space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-7 h-7 rounded-lg bg-zinc-800 border border-zinc-700 flex items-center justify-center text-zinc-200">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M20.5 10.2a4.8 4.8 0 0 0-.4-3.7 4.9 4.9 0 0 0-4.6-2.5 4.8 4.8 0 0 0-3.3-1.4 4.9 4.9 0 0 0-4.7 3.4 4.8 4.8 0 0 0-3.5 1.7 4.9 4.9 0 0 0-.7 5.1 4.8 4.8 0 0 0 .4 3.7 4.9 4.9 0 0 0 4.6 2.5 4.8 4.8 0 0 0 3.3 1.4 4.9 4.9 0 0 0 4.7-3.4 4.8 4.8 0 0 0 3.5-1.7 4.9 4.9 0 0 0 .7-5.1zm-8.5 9.8a3.5 3.5 0 0 1-2.3-.9l.1-.1 3.9-2.3a.7.7 0 0 0 .4-.6v-5.4l1.6.9v4.5a3.5 3.5 0 0 1-3.7 3.9zm-7-4.1a3.5 3.5 0 0 1-.5-2.4c.2-.8.6-1.5 1.3-2l.1.1 3.9 2.3a.7.7 0 0 0 .7 0l4.7-2.7v1.8l-3.9 2.3a3.5 3.5 0 0 1-6.3.6zm-1-7.5a3.5 3.5 0 0 1 1.8-1.5 3.5 3.5 0 0 1 2.5 0l-.1.1-3.9 2.3a.7.7 0 0 0-.4.6v5.4l-1.6-.9V8.4h1.7zm11.2-1.6l-3.9-2.3a3.5 3.5 0 0 1 4.7.9 3.5 3.5 0 0 1 .5 2.4l-.1-.1-3.9-2.3a.7.7 0 0 0-.7 0l-4.7 2.7V6.8l3.9-2.3c1.3-.8 2.9-.8 4.2.3zm4.2 4.4a3.5 3.5 0 0 1 .5 2.4 3.5 3.5 0 0 1-1.3 2l-.1-.1-3.9-2.3a.7.7 0 0 0-.7 0l-4.7 2.7V10.2l3.9-2.3a3.5 3.5 0 0 1 6.3-.6z"/></svg>
+                            </div>
+                            <div>
+                                <h5 class="text-xs font-bold text-white">ChatGPT Plugin &amp; Tools</h5>
+                                <span class="text-[10px] text-zinc-400">OpenAI Plugin &amp; MCP</span>
+                            </div>
+                        </div>
+                        <a href="https://chatgpt.com/" target="_blank" class="px-2.5 py-1 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg text-[11px] font-semibold no-underline">Open ChatGPT ↗</a>
+                    </div>
+                    <p class="text-[11px] text-zinc-400">In ChatGPT &gt; <strong>Create plugin</strong> (or <em>Develop your own plugin</em>), enter domain:</p>
+                    <div class="p-2.5 bg-zinc-950 rounded-xl font-mono text-[10px] text-zinc-300 break-all border border-zinc-800 flex items-center justify-between gap-2">
+                        <span id="cora-chatgpt-plugin-domain"><?php echo esc_html( home_url() ); ?></span>
+                        <button type="button" onclick="window.copyChatGptPluginUrl()" class="px-2 py-1 bg-zinc-800 hover:bg-zinc-700 text-white rounded text-[10px] font-medium border-none cursor-pointer shrink-0">Copy</button>
+                    </div>
+                    <div class="text-[10.5px] text-zinc-400 space-y-0.5">
+                        <p>• Manifest at <code class="px-1 py-0.5 bg-zinc-950 rounded font-mono text-[9.5px]">/.well-known/ai-plugin.json</code></p>
+                        <p>• Auth: <strong>Bearer Token</strong> (paste your MCP Direct Access Key)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script src="<?php echo esc_url( CORA_WORKSPACE_URL . 'assets/js/lovable-prompts.js' ); ?>"></script>
 <script>
@@ -14925,12 +15493,1079 @@ Please provide the complete, un-truncated index.html file ready to save and publ
         }
     };
 
+    // --- HTML Prettifier & Auto-Indentation Engine ---
+    function coraFormatHtml(html) {
+        if (!html || typeof html !== 'string') return '';
+
+        // 1. Preserve style and script blocks with formatted contents
+        const placeholders = [];
+        html = html.replace(/<style\b([^>]*)>([\s\S]*?)<\/style>/gi, function(match, attrs, content) {
+            let css = content
+                .replace(/\s+/g, ' ')
+                .replace(/\s*([{}:;,])\s*/g, '$1 ')
+                .replace(/;\s*/g, ';\n  ')
+                .replace(/\{\s*/g, ' {\n  ')
+                .replace(/\s*\}\s*/g, '\n}\n')
+                .replace(/\n\s*;\n/g, '\n')
+                .replace(/\n\s*\n/g, '\n')
+                .trim();
+            placeholders.push({ type: 'style', attrs: attrs || '', content: css });
+            return '___CORA_PH_' + (placeholders.length - 1) + '___';
+        });
+
+        html = html.replace(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi, function(match, attrs, content) {
+            if (!content.trim()) {
+                return '<script' + attrs + '><' + '/script>';
+            }
+            placeholders.push({ type: 'script', attrs: attrs || '', content: content.trim() });
+            return '___CORA_PH_' + (placeholders.length - 1) + '___';
+        });
+
+        // 2. Collapse simple inline tags that contain only text: <tag>text</tag>
+        const inlineTags = 'title|h1|h2|h3|h4|h5|h6|p|span|b|strong|em|i|a|small|kbd|code|label';
+        const inlineRegex = new RegExp('<(' + inlineTags + ')\\b([^>]*)>([^<\\n]+)<\\/\\1>', 'gi');
+        html = html.replace(inlineRegex, '<$1$2>$3</$1>');
+
+        // 3. Tokenize by HTML tags
+        html = html.replace(/>\s*</g, '><');
+        const tokens = html.replace(/(<(?:\/?[a-zA-Z0-9:-]+(?:\s+[^>]*?)?|\!--[\s\S]*?--)\s*>)/g, '\n$1\n').split('\n');
+        const voidTags = new Set(['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr', '!doctype']);
+
+        let formatted = '';
+        let pad = 0;
+        const tab = '  ';
+
+        for (let i = 0; i < tokens.length; i++) {
+            let token = tokens[i].trim();
+            if (!token) continue;
+
+            const phMatch = token.match(/^___CORA_PH_(\d+)___$/);
+            if (phMatch) {
+                const ph = placeholders[parseInt(phMatch[1], 10)];
+                if (ph.type === 'style') {
+                    const indentedCss = ph.content.split('\n').map(l => l ? tab.repeat(pad + 1) + l : '').join('\n');
+                    formatted += tab.repeat(pad) + '<style' + ph.attrs + '>\n' + indentedCss + '\n' + tab.repeat(pad) + '<' + '/style>\n';
+                } else if (ph.type === 'script') {
+                    const indentedJs = ph.content.split('\n').map(l => l ? tab.repeat(pad + 1) + l : '').join('\n');
+                    formatted += tab.repeat(pad) + '<script' + ph.attrs + '>\n' + indentedJs + '\n' + tab.repeat(pad) + '<' + '/script>\n';
+                }
+                continue;
+            }
+
+            // Closing tag
+            if (/^<\/[a-zA-Z0-9:-]+>/.test(token)) {
+                pad = Math.max(0, pad - 1);
+                formatted += tab.repeat(pad) + token + '\n';
+            }
+            // Self-closing tag or void tag
+            else if (
+                /^<[a-zA-Z0-9:-]+[^>]*\/>/.test(token) ||
+                (function(t) {
+                    const m = t.match(/^<([a-zA-Z0-9:-]+)/);
+                    if (m) {
+                        const tag = m[1].toLowerCase();
+                        return voidTags.has(tag) || tag.startsWith('!--');
+                    }
+                    return false;
+                })(token)
+            ) {
+                formatted += tab.repeat(pad) + token + '\n';
+            }
+            // Opening tag
+            else if (/^<[a-zA-Z0-9:-]+[^>]*>/.test(token)) {
+                formatted += tab.repeat(pad) + token + '\n';
+                pad++;
+            }
+            // Text node
+            else {
+                formatted += tab.repeat(pad) + token + '\n';
+            }
+        }
+
+        return formatted.trim();
+    }
+
+    // --- Full-Page AI & Live Code Editor Controller ---
+    let activeMcpThemeId = 0;
+    let activeMcpThemeName = '';
+    let activeMcpPageHtml = '';
+    let originalHtmlBuffer = '';
+    let proposedAiHtmlBuffer = '';
+    let codeSearchMatches = [];
+    let currentSearchMatchIndex = -1;
+    let coraLiveCodeEditor = null;
+    let livePreviewDebounceTimer = null;
+    let draftSaveDebounceTimer = null;
+
+    function updateDraftStatusPill(statusText, state) {
+        const pill = document.getElementById('cora-editor-draft-pill');
+        const dot = document.getElementById('cora-editor-draft-dot');
+        const text = document.getElementById('cora-editor-draft-text');
+        if (!pill || !dot || !text) return;
+
+        text.textContent = statusText;
+        if (state === 'saved') {
+            dot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400';
+            pill.className = 'hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-zinc-900 text-zinc-300 border border-zinc-800';
+        } else if (state === 'saving') {
+            dot.className = 'w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse';
+            pill.className = 'hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-zinc-900 text-amber-300 border border-zinc-800';
+        } else {
+            dot.className = 'w-1.5 h-1.5 rounded-full bg-zinc-400';
+            pill.className = 'hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-zinc-900 text-zinc-400 border border-zinc-800';
+        }
+    }
+
+    function autoSaveEditorDraft(val) {
+        if (!activeMcpThemeId || !val) return;
+        updateDraftStatusPill('Saving draft...', 'saving');
+        clearTimeout(draftSaveDebounceTimer);
+        draftSaveDebounceTimer = setTimeout(function() {
+            try {
+                const draftKey = 'cora_draft_html_' + activeMcpThemeId;
+                const draftTimeKey = 'cora_draft_html_time_' + activeMcpThemeId;
+                localStorage.setItem(draftKey, val);
+                localStorage.setItem(draftTimeKey, Date.now().toString());
+                updateDraftStatusPill('Draft saved (Local)', 'saved');
+            } catch(e) {
+                console.warn('LocalStorage draft save error:', e);
+            }
+        }, 500);
+    }
+
+    function initCoraCodeMirror() {
+        const textarea = document.getElementById('cora-live-html-code-textarea');
+        if (!textarea) return;
+
+        if (coraLiveCodeEditor) {
+            coraLiveCodeEditor.refresh();
+            return;
+        }
+
+        if (typeof CodeMirror === 'undefined') {
+            console.warn('CodeMirror library not loaded.');
+            return;
+        }
+
+        coraLiveCodeEditor = CodeMirror.fromTextArea(textarea, {
+            mode: 'htmlmixed',
+            theme: 'cora-dark',
+            lineNumbers: true,
+            lineWrapping: true,
+            tabSize: 2,
+            indentUnit: 2,
+            indentWithTabs: false,
+            matchTags: { bothTags: true },
+            matchBrackets: true,
+            autoCloseTags: true,
+            autoCloseBrackets: true,
+            cursorBlinkRate: 530,
+            extraKeys: {
+                "Cmd-S": function() { window.saveLiveHtmlFromEditor(); },
+                "Ctrl-S": function() { window.saveLiveHtmlFromEditor(); },
+                "Cmd-F": function() { window.toggleCodeEditorSearch(true); },
+                "Ctrl-F": function() { window.toggleCodeEditorSearch(true); },
+                "Shift-Alt-F": function() { window.formatLiveHtmlCode(); },
+                "Shift-Cmd-F": function() { window.formatLiveHtmlCode(); },
+                "Cmd-K": function() {
+                    const comp = document.getElementById('cora-ai-composer-input');
+                    if (comp) comp.focus();
+                },
+                "Ctrl-K": function() {
+                    const comp = document.getElementById('cora-ai-composer-input');
+                    if (comp) comp.focus();
+                },
+                "Esc": function() {
+                    const findBar = document.getElementById('cora-editor-find-bar');
+                    if (findBar && !findBar.classList.contains('hidden')) {
+                        window.toggleCodeEditorSearch(false);
+                    } else {
+                        window.closeAiMcpEditor();
+                    }
+                }
+            }
+        });
+
+        window.coraLiveCodeEditor = coraLiveCodeEditor;
+
+        coraLiveCodeEditor.on('change', function(cm) {
+            const val = cm.getValue();
+            textarea.value = val;
+            window.handleLiveCodeInput();
+            autoSaveEditorDraft(val);
+            clearTimeout(livePreviewDebounceTimer);
+            livePreviewDebounceTimer = setTimeout(function() {
+                window.previewLiveHtmlEditor();
+            }, 300);
+        });
+    }
+
+    window.openAiMcpEditor = function(themeId, themeName) {
+        activeMcpThemeId = themeId || (canvasState && canvasState.activeThemeId) || 0;
+        activeMcpThemeName = themeName || 'Landing Page';
+        
+        const titleEl = document.getElementById('cora-ai-mcp-theme-title');
+        if (titleEl) titleEl.textContent = activeMcpThemeName;
+
+        const drawer = document.getElementById('cora-ai-mcp-editor-drawer');
+        if (drawer) {
+            if (drawer.parentElement !== document.body) {
+                document.body.appendChild(drawer);
+            }
+            drawer.classList.remove('hidden');
+            drawer.style.cssText = 'position:fixed!important;inset:0!important;top:0!important;left:0!important;right:0!important;bottom:0!important;width:100vw!important;height:100vh!important;margin:0!important;padding:0!important;border:none!important;z-index:999999!important;display:flex!important;';
+        }
+
+        // Sync URL with editor state
+        try {
+            const url = new URL(window.location.href);
+            url.searchParams.set('cv_ai_editor', '1');
+            url.searchParams.set('theme_id', activeMcpThemeId);
+            window.history.replaceState({ cv_ai_editor: 1, theme_id: activeMcpThemeId }, '', url.toString());
+        } catch(e) {}
+
+        fetchLiveThemeHtml(activeMcpThemeId);
+        window.switchAiMcpTab('code');
+
+        setTimeout(function() {
+            initCoraCodeMirror();
+            if (coraLiveCodeEditor) coraLiveCodeEditor.refresh();
+        }, 150);
+    };
+
+    window.openHtmlCodeEditor = function(themeId, themeName) {
+        window.openAiMcpEditor(themeId, themeName);
+        window.switchAiMcpTab('code');
+    };
+
+    window.closeAiMcpEditor = function() {
+        const drawer = document.getElementById('cora-ai-mcp-editor-drawer');
+        if (drawer) {
+            drawer.classList.add('hidden');
+            drawer.style.display = 'none';
+        }
+        window.toggleCodeEditorSearch(false);
+
+        // Remove URL editing state
+        try {
+            const url = new URL(window.location.href);
+            url.searchParams.delete('cv_ai_editor');
+            url.searchParams.delete('theme_id');
+            window.history.replaceState({}, '', url.toString());
+        } catch(e) {}
+    };
+    window.closeHtmlCodeEditor = window.closeAiMcpEditor;
+
+    window.switchAiMcpTab = function(tab) {
+        const btnAi = document.getElementById('cora-ai-mcp-tab-btn-ai');
+        const btnCode = document.getElementById('cora-ai-mcp-tab-btn-code');
+        const panelAi = document.getElementById('cora-ai-mcp-panel-ai');
+        const panelCode = document.getElementById('cora-ai-mcp-panel-code');
+
+        if (tab === 'ai') {
+            if (btnAi) btnAi.className = 'px-2.5 py-1 text-xs font-semibold rounded-md bg-zinc-800 text-white border-none cursor-pointer transition-colors flex items-center gap-1.5';
+            if (btnCode) btnCode.className = 'px-2.5 py-1 text-xs font-semibold rounded-md bg-transparent text-zinc-400 hover:text-zinc-200 border-none cursor-pointer transition-colors flex items-center gap-1.5';
+            if (panelAi) panelAi.classList.remove('hidden');
+            if (panelCode) panelCode.classList.add('hidden');
+        } else {
+            if (btnCode) btnCode.className = 'px-2.5 py-1 text-xs font-semibold rounded-md bg-zinc-800 text-white border-none cursor-pointer transition-colors flex items-center gap-1.5';
+            if (btnAi) btnAi.className = 'px-2.5 py-1 text-xs font-semibold rounded-md bg-transparent text-zinc-400 hover:text-zinc-200 border-none cursor-pointer transition-colors flex items-center gap-1.5';
+            if (panelCode) panelCode.classList.remove('hidden');
+            if (panelAi) panelAi.classList.add('hidden');
+            window.previewLiveHtmlEditor();
+            setTimeout(function() {
+                if (coraLiveCodeEditor) coraLiveCodeEditor.refresh();
+            }, 50);
+        }
+    };
+
+    function fetchLiveThemeHtml(themeId) {
+        const textarea = document.getElementById('cora-live-html-code-textarea');
+
+        jQuery.post(coraREData.ajaxUrl, {
+            action: 'cora_canvas_get_page_html',
+            nonce: coraREData.ajaxNonce,
+            theme_id: themeId,
+            page_slug: 'home'
+        }, function(res) {
+            let rawHtml = '';
+            if (res.success && res.data && res.data.html) {
+                rawHtml = res.data.html;
+            } else {
+                rawHtml = '<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1">\n  <script src="https://cdn.tailwindcss.com"><' + '/script>\n  <title>' + (activeMcpThemeName || 'Website') + '</title>\n</head>\n<body class="bg-white text-zinc-900 font-sans">\n  <header class="p-6 border-b border-zinc-200"><h1>' + (activeMcpThemeName || 'Website') + '</h1></header>\n</body>\n</html>';
+            }
+
+            // Auto format and indent
+            const serverFormatted = coraFormatHtml(rawHtml);
+            originalHtmlBuffer = serverFormatted;
+
+            // Check if there is an uncommitted local draft
+            const draftKey = 'cora_draft_html_' + themeId;
+            let localDraft = null;
+            try {
+                localDraft = localStorage.getItem(draftKey);
+            } catch(e) {}
+
+            let finalHtml = serverFormatted;
+            if (localDraft && localDraft.trim() && localDraft.trim() !== serverFormatted.trim()) {
+                finalHtml = localDraft;
+                updateDraftStatusPill('Draft restored (Local)', 'saved');
+                window.coraShowToast('Restored unsaved draft from local storage.', 'info');
+            } else {
+                updateDraftStatusPill('Synced with live', 'saved');
+            }
+
+            activeMcpPageHtml = finalHtml;
+
+            if (textarea) textarea.value = finalHtml;
+            initCoraCodeMirror();
+            if (coraLiveCodeEditor) {
+                coraLiveCodeEditor.setValue(finalHtml);
+                setTimeout(function() { coraLiveCodeEditor.refresh(); }, 50);
+            }
+
+            window.handleLiveCodeInput();
+            window.previewLiveHtmlEditor();
+        }).fail(function() {
+            const draftKey = 'cora_draft_html_' + themeId;
+            let localDraft = null;
+            try {
+                localDraft = localStorage.getItem(draftKey);
+            } catch(e) {}
+
+            if (localDraft && localDraft.trim()) {
+                if (textarea) textarea.value = localDraft;
+                initCoraCodeMirror();
+                if (coraLiveCodeEditor) {
+                    coraLiveCodeEditor.setValue(localDraft);
+                }
+                updateDraftStatusPill('Draft loaded (Offline)', 'saved');
+            } else {
+                initCoraCodeMirror();
+            }
+            window.previewLiveHtmlEditor();
+        });
+    }
+
+    // Viewport Mode Switcher (Desktop 100% / Tablet 768px / Mobile 375px)
+    window.setLiveEditorViewport = function(mode) {
+        const container = document.getElementById('cora-live-preview-container');
+        const btnDesktop = document.getElementById('cora-vp-btn-desktop');
+        const btnTablet = document.getElementById('cora-vp-btn-tablet');
+        const btnMobile = document.getElementById('cora-vp-btn-mobile');
+        if (!container) return;
+
+        [btnDesktop, btnTablet, btnMobile].forEach(btn => {
+            if (btn) btn.className = 'p-1 rounded bg-transparent text-zinc-400 hover:text-white transition-colors cursor-pointer border-none';
+        });
+
+        if (mode === 'desktop') {
+            container.className = 'flex-1 min-h-0 bg-white flex items-center justify-center overflow-auto relative transition-all duration-200';
+            const frame = document.getElementById('cora-live-html-preview-frame');
+            if (frame) frame.style.maxWidth = '100%';
+            if (btnDesktop) btnDesktop.className = 'p-1 rounded bg-zinc-800 text-white transition-colors cursor-pointer border-none';
+        } else if (mode === 'tablet') {
+            container.className = 'flex-1 min-h-0 bg-zinc-950 p-4 flex items-center justify-center overflow-auto relative transition-all duration-200';
+            const frame = document.getElementById('cora-live-html-preview-frame');
+            if (frame) frame.style.maxWidth = '768px';
+            if (btnTablet) btnTablet.className = 'p-1 rounded bg-zinc-800 text-white transition-colors cursor-pointer border-none';
+        } else if (mode === 'mobile') {
+            container.className = 'flex-1 min-h-0 bg-zinc-950 p-4 flex items-center justify-center overflow-auto relative transition-all duration-200';
+            const frame = document.getElementById('cora-live-html-preview-frame');
+            if (frame) frame.style.maxWidth = '375px';
+            if (btnMobile) btnMobile.className = 'p-1 rounded bg-zinc-800 text-white transition-colors cursor-pointer border-none';
+        }
+    };
+
+    let codeSearchMarkers = [];
+
+    // --- In-Editor Find & Replace Controller ---
+    window.toggleCodeEditorSearch = function(forceShow) {
+        const bar = document.getElementById('cora-editor-find-bar');
+        const findInput = document.getElementById('cora-find-input');
+        if (!bar) return;
+
+        const isCurrentlyHidden = bar.classList.contains('hidden');
+        const shouldShow = typeof forceShow === 'boolean' ? forceShow : isCurrentlyHidden;
+
+        if (shouldShow) {
+            bar.classList.remove('hidden');
+            if (findInput) {
+                findInput.focus();
+                findInput.select();
+                window.updateCodeSearchMatches();
+            }
+        } else {
+            bar.classList.add('hidden');
+            codeSearchMatches = [];
+            currentSearchMatchIndex = -1;
+            if (codeSearchMarkers && codeSearchMarkers.length > 0) {
+                codeSearchMarkers.forEach(m => { if (m && m.clear) m.clear(); });
+                codeSearchMarkers = [];
+            }
+            if (coraLiveCodeEditor) {
+                coraLiveCodeEditor.focus();
+            } else {
+                const textarea = document.getElementById('cora-live-html-code-textarea');
+                if (textarea) textarea.focus();
+            }
+        }
+    };
+
+    window.updateCodeSearchMatches = function() {
+        const findInput = document.getElementById('cora-find-input');
+        const countEl = document.getElementById('cora-find-match-count');
+        if (!findInput) return;
+
+        const query = findInput.value;
+        codeSearchMatches = [];
+        currentSearchMatchIndex = -1;
+
+        if (codeSearchMarkers && codeSearchMarkers.length > 0) {
+            codeSearchMarkers.forEach(m => { if (m && m.clear) m.clear(); });
+            codeSearchMarkers = [];
+        }
+
+        if (!query) {
+            if (countEl) countEl.textContent = '0/0';
+            return;
+        }
+
+        const text = coraLiveCodeEditor ? coraLiveCodeEditor.getValue() : (document.getElementById('cora-live-html-code-textarea')?.value || '');
+        const queryLower = query.toLowerCase();
+        const textLower = text.toLowerCase();
+        let pos = 0;
+
+        while ((pos = textLower.indexOf(queryLower, pos)) !== -1) {
+            codeSearchMatches.push({ start: pos, end: pos + query.length });
+            pos += query.length;
+        }
+
+        if (codeSearchMatches.length > 0) {
+            currentSearchMatchIndex = 0;
+            if (countEl) countEl.textContent = '1/' + codeSearchMatches.length;
+            highlightCurrentCodeMatch();
+        } else {
+            if (countEl) countEl.textContent = '0/0';
+        }
+    };
+
+    function highlightCurrentCodeMatch() {
+        const countEl = document.getElementById('cora-find-match-count');
+        if (currentSearchMatchIndex < 0 || currentSearchMatchIndex >= codeSearchMatches.length) return;
+
+        const match = codeSearchMatches[currentSearchMatchIndex];
+        if (countEl) countEl.textContent = (currentSearchMatchIndex + 1) + '/' + codeSearchMatches.length;
+
+        if (coraLiveCodeEditor) {
+            // Clear all previous markers and re-apply so current is highlighted with active class
+            if (codeSearchMarkers && codeSearchMarkers.length > 0) {
+                codeSearchMarkers.forEach(m => { if (m && m.clear) m.clear(); });
+                codeSearchMarkers = [];
+            }
+
+            for (let i = 0; i < codeSearchMatches.length; i++) {
+                const m = codeSearchMatches[i];
+                const from = coraLiveCodeEditor.posFromIndex(m.start);
+                const to = coraLiveCodeEditor.posFromIndex(m.end);
+                const isCur = (i === currentSearchMatchIndex);
+                const marker = coraLiveCodeEditor.markText(from, to, {
+                    className: isCur ? 'cora-search-match-active' : 'cora-search-match'
+                });
+                codeSearchMarkers.push(marker);
+            }
+
+            const curFrom = coraLiveCodeEditor.posFromIndex(match.start);
+            const curTo = coraLiveCodeEditor.posFromIndex(match.end);
+            coraLiveCodeEditor.setSelection(curFrom, curTo);
+            coraLiveCodeEditor.scrollIntoView({ from: curFrom, to: curTo }, 180);
+        } else {
+            const textarea = document.getElementById('cora-live-html-code-textarea');
+            if (textarea) {
+                textarea.focus();
+                textarea.setSelectionRange(match.start, match.end);
+                const linesBefore = textarea.value.substring(0, match.start).split('\n').length;
+                const totalLines = textarea.value.split('\n').length;
+                if (totalLines > 0) {
+                    textarea.scrollTop = (linesBefore / totalLines) * textarea.scrollHeight - (textarea.clientHeight / 2);
+                }
+            }
+        }
+    }
+
+    window.findNextCodeMatch = function() {
+        if (codeSearchMatches.length === 0) {
+            window.updateCodeSearchMatches();
+            return;
+        }
+        currentSearchMatchIndex = (currentSearchMatchIndex + 1) % codeSearchMatches.length;
+        highlightCurrentCodeMatch();
+    };
+
+    window.findPrevCodeMatch = function() {
+        if (codeSearchMatches.length === 0) {
+            window.updateCodeSearchMatches();
+            return;
+        }
+        currentSearchMatchIndex = (currentSearchMatchIndex - 1 + codeSearchMatches.length) % codeSearchMatches.length;
+        highlightCurrentCodeMatch();
+    };
+
+    window.replaceCurrentCodeMatch = function() {
+        const findInput = document.getElementById('cora-find-input');
+        const replaceInput = document.getElementById('cora-replace-input');
+        if (!findInput || !replaceInput || currentSearchMatchIndex < 0 || currentSearchMatchIndex >= codeSearchMatches.length) return;
+
+        const match = codeSearchMatches[currentSearchMatchIndex];
+        const replacement = replaceInput.value;
+
+        if (coraLiveCodeEditor) {
+            const from = coraLiveCodeEditor.posFromIndex(match.start);
+            const to = coraLiveCodeEditor.posFromIndex(match.end);
+            coraLiveCodeEditor.replaceRange(replacement, from, to);
+        } else {
+            const textarea = document.getElementById('cora-live-html-code-textarea');
+            if (textarea) {
+                const text = textarea.value;
+                textarea.value = text.substring(0, match.start) + replacement + text.substring(match.end);
+            }
+        }
+
+        window.handleLiveCodeInput();
+        window.previewLiveHtmlEditor();
+        window.updateCodeSearchMatches();
+    };
+
+    window.replaceAllCodeMatches = function() {
+        const findInput = document.getElementById('cora-find-input');
+        const replaceInput = document.getElementById('cora-replace-input');
+        if (!findInput || !replaceInput) return;
+
+        const query = findInput.value;
+        if (!query) return;
+
+        const replacement = replaceInput.value;
+        const text = coraLiveCodeEditor ? coraLiveCodeEditor.getValue() : (document.getElementById('cora-live-html-code-textarea')?.value || '');
+        const regex = new RegExp(query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+        const matchCount = (text.match(regex) || []).length;
+
+        if (matchCount === 0) {
+            window.coraShowToast('No occurrences found to replace.', 'info');
+            return;
+        }
+
+        const newText = text.replace(regex, replacement);
+        if (coraLiveCodeEditor) {
+            coraLiveCodeEditor.setValue(newText);
+        } else {
+            const textarea = document.getElementById('cora-live-html-code-textarea');
+            if (textarea) textarea.value = newText;
+        }
+
+        window.handleLiveCodeInput();
+        window.previewLiveHtmlEditor();
+        window.updateCodeSearchMatches();
+        window.coraShowToast('Replaced ' + matchCount + ' occurrences.', 'success');
+    };
+
+    // Global Key Listener for Shortcuts inside Editor Drawer
+    document.addEventListener('keydown', function(e) {
+        const drawer = document.getElementById('cora-ai-mcp-editor-drawer');
+        if (!drawer || drawer.classList.contains('hidden')) return;
+
+        // Cmd+S / Ctrl+S => Save & Publish
+        if ((e.metaKey || e.ctrlKey) && (e.key === 's' || e.key === 'S')) {
+            e.preventDefault();
+            window.saveLiveHtmlFromEditor();
+        }
+        // Cmd+F / Ctrl+F => Find & Replace
+        else if ((e.metaKey || e.ctrlKey) && (e.key === 'f' || e.key === 'F')) {
+            e.preventDefault();
+            window.toggleCodeEditorSearch(true);
+        }
+        // Cmd+K / Ctrl+K => Focus AI Prompt Composer
+        else if ((e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'K')) {
+            e.preventDefault();
+            const comp = document.getElementById('cora-ai-composer-input');
+            if (comp) comp.focus();
+        }
+        // Shift+Alt+F / Shift+Option+F / Cmd+Option+L => Format Code
+        else if ((e.shiftKey && (e.altKey || e.metaKey) && (e.key === 'f' || e.key === 'F')) || ((e.metaKey || e.ctrlKey) && e.altKey && (e.key === 'l' || e.key === 'L'))) {
+            e.preventDefault();
+            window.formatLiveHtmlCode();
+        }
+        // Escape
+        else if (e.key === 'Escape') {
+            const findBar = document.getElementById('cora-editor-find-bar');
+            if (findBar && !findBar.classList.contains('hidden')) {
+                e.preventDefault();
+                window.toggleCodeEditorSearch(false);
+            } else {
+                window.closeAiMcpEditor();
+            }
+        }
+    });
+
+    // AI Prompt Composer Controller
+    window.setComposerPrompt = function(text) {
+        const input = document.getElementById('cora-ai-composer-input');
+        if (input) {
+            input.value = text;
+            input.focus();
+        }
+    };
+
+    window.submitAiComposerPrompt = function() {
+        const input = document.getElementById('cora-ai-composer-input');
+        const sendBtn = document.getElementById('cora-ai-composer-send-btn');
+        if (!input) return;
+
+        const prompt = input.value.trim();
+        if (!prompt) {
+            window.coraShowToast('Please enter an instruction for AI modification.', 'error');
+            return;
+        }
+
+        const currentHtml = coraLiveCodeEditor ? coraLiveCodeEditor.getValue() : (document.getElementById('cora-live-html-code-textarea')?.value || '');
+        if (!originalHtmlBuffer) {
+            originalHtmlBuffer = currentHtml;
+        }
+
+        if (sendBtn) {
+            sendBtn.disabled = true;
+            sendBtn.innerHTML = '<div class="animate-spin rounded-full h-3 w-3 border-2 border-zinc-900 border-t-transparent"></div> <span>Generating...</span>';
+        }
+
+        const loader = document.getElementById('cora-preview-loading-indicator');
+        if (loader) loader.classList.remove('hidden');
+
+        jQuery.post(coraREData.ajaxUrl, {
+            action: 'cora_ajax_ai_modify_html',
+            nonce: coraREData.ajaxNonce,
+            theme_id: activeMcpThemeId || 0,
+            user_instruction: prompt,
+            html_content: currentHtml
+        }, function(res) {
+            if (sendBtn) {
+                sendBtn.disabled = false;
+                sendBtn.innerHTML = '<span>Send</span> <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>';
+            }
+            if (loader) loader.classList.add('hidden');
+
+            if (res.success && res.data && res.data.modified_html) {
+                const formatted = coraFormatHtml(res.data.modified_html);
+                proposedAiHtmlBuffer = formatted;
+
+                if (coraLiveCodeEditor) {
+                    coraLiveCodeEditor.setValue(formatted);
+                    setTimeout(function() { coraLiveCodeEditor.refresh(); }, 50);
+                } else {
+                    const textarea = document.getElementById('cora-live-html-code-textarea');
+                    if (textarea) textarea.value = formatted;
+                }
+
+                window.handleLiveCodeInput();
+                window.previewLiveHtmlEditor();
+
+                // Show suggestion review bar
+                const bar = document.getElementById('cora-ai-suggestion-bar');
+                const revertBtn = document.getElementById('cora-revert-btn');
+                if (bar) bar.classList.remove('hidden');
+                if (revertBtn) revertBtn.classList.remove('hidden');
+
+                input.value = '';
+                window.coraShowToast('AI modifications generated with color coding & indentation!', 'success');
+            } else {
+                window.coraShowToast(res.data?.message || 'Failed to modify HTML with AI.', 'error');
+            }
+        }).fail(function() {
+            if (sendBtn) {
+                sendBtn.disabled = false;
+                sendBtn.innerHTML = '<span>Send</span>';
+            }
+            if (loader) loader.classList.add('hidden');
+            window.coraShowToast('Network error while requesting AI modifications.', 'error');
+        });
+    };
+
+    window.acceptAiChanges = function() {
+        originalHtmlBuffer = proposedAiHtmlBuffer;
+        const bar = document.getElementById('cora-ai-suggestion-bar');
+        const revertBtn = document.getElementById('cora-revert-btn');
+        if (bar) bar.classList.add('hidden');
+        if (revertBtn) revertBtn.classList.add('hidden');
+        window.coraShowToast('AI modifications accepted into active code buffer.', 'success');
+    };
+
+    window.discardAiChanges = function() {
+        if (originalHtmlBuffer) {
+            if (coraLiveCodeEditor) {
+                coraLiveCodeEditor.setValue(originalHtmlBuffer);
+                setTimeout(function() { coraLiveCodeEditor.refresh(); }, 50);
+            } else {
+                const textarea = document.getElementById('cora-live-html-code-textarea');
+                if (textarea) textarea.value = originalHtmlBuffer;
+            }
+            window.handleLiveCodeInput();
+            window.previewLiveHtmlEditor();
+        }
+        const bar = document.getElementById('cora-ai-suggestion-bar');
+        const revertBtn = document.getElementById('cora-revert-btn');
+        if (bar) bar.classList.add('hidden');
+        if (revertBtn) revertBtn.classList.add('hidden');
+        window.coraShowToast('AI modifications discarded.', 'info');
+    };
+
+    window.revertLiveCodeBuffer = window.discardAiChanges;
+
+    window.copyLiveCodeBuffer = function() {
+        const val = coraLiveCodeEditor ? coraLiveCodeEditor.getValue() : (document.getElementById('cora-live-html-code-textarea')?.value || '');
+        if (val) {
+            navigator.clipboard ? navigator.clipboard.writeText(val) : null;
+            window.coraShowToast('HTML code copied to clipboard!', 'success');
+        }
+    };
+
+    window.handleLiveCodeInput = function() {
+        const val = coraLiveCodeEditor ? coraLiveCodeEditor.getValue() : (document.getElementById('cora-live-html-code-textarea')?.value || '');
+        const statChars = document.getElementById('cora-live-code-stat-chars');
+        const statLines = document.getElementById('cora-live-code-stat-lines');
+
+        if (statChars) statChars.textContent = val.length.toLocaleString() + ' chars';
+        if (statLines) statLines.textContent = '· ' + (val.split('\n').length).toLocaleString() + ' lines';
+    };
+
+    // --- Visual Click-to-Code Sync (Click Preview -> Jump to Line) ---
+    window.jumpToPreviewElementInCode = function(info) {
+        if (!info || !info.tag) return;
+        const cm = coraLiveCodeEditor;
+        if (!cm) return;
+
+        const totalLines = cm.lineCount();
+        let targetLine = -1;
+        let matchLength = 0;
+        let matchStartCol = 0;
+
+        // 1. First priority: match by element ID
+        if (info.id) {
+            const idRegex = new RegExp('<' + info.tag + '[^>]*id=["\']' + info.id + '["\']', 'i');
+            for (let i = 0; i < totalLines; i++) {
+                const line = cm.getLine(i);
+                const match = line.match(idRegex);
+                if (match) {
+                    targetLine = i;
+                    matchStartCol = match.index || 0;
+                    matchLength = match[0].length;
+                    break;
+                }
+            }
+        }
+
+        // 2. Second priority: match by text snippet
+        if (targetLine === -1 && info.textSnippet && info.textSnippet.length >= 4) {
+            const cleanText = info.textSnippet.substring(0, 30);
+            for (let i = 0; i < totalLines; i++) {
+                const line = cm.getLine(i);
+                const idx = line.indexOf(cleanText);
+                if (idx !== -1) {
+                    targetLine = i;
+                    matchStartCol = idx;
+                    matchLength = cleanText.length;
+                    break;
+                }
+            }
+        }
+
+        // 3. Third priority: match by class name
+        if (targetLine === -1 && info.firstClass) {
+            const classRegex = new RegExp('<' + info.tag + '[^>]*class=["\'][^"\']*' + info.firstClass, 'i');
+            for (let i = 0; i < totalLines; i++) {
+                const line = cm.getLine(i);
+                const match = line.match(classRegex);
+                if (match) {
+                    targetLine = i;
+                    matchStartCol = match.index || 0;
+                    matchLength = match[0].length;
+                    break;
+                }
+            }
+        }
+
+        // 4. Fourth priority: match by tag
+        if (targetLine === -1) {
+            const tagRegex = new RegExp('<' + info.tag + '[\\s>]', 'i');
+            for (let i = 0; i < totalLines; i++) {
+                const line = cm.getLine(i);
+                const match = line.match(tagRegex);
+                if (match) {
+                    targetLine = i;
+                    matchStartCol = match.index || 0;
+                    matchLength = match[0].length;
+                    break;
+                }
+            }
+        }
+
+        if (targetLine !== -1) {
+            const from = { line: targetLine, ch: matchStartCol };
+            const to = { line: targetLine, ch: matchStartCol + Math.max(matchLength, 1) };
+            cm.setSelection(from, to);
+            cm.scrollIntoView({ from: from, to: to }, 180);
+            
+            const marker = cm.markText(from, to, { className: 'cora-search-match-active' });
+            setTimeout(function() {
+                if (marker && marker.clear) marker.clear();
+            }, 1800);
+
+            window.coraShowToast('Jumped to <' + info.tag + (info.id ? ' #' + info.id : '') + '> in code.', 'info');
+        }
+    };
+
+    window.addEventListener('message', function(e) {
+        if (e.data && e.data.type === 'cora_preview_element_click') {
+            window.jumpToPreviewElementInCode(e.data);
+        }
+    });
+
+    window.previewLiveHtmlEditor = function() {
+        const html = coraLiveCodeEditor ? coraLiveCodeEditor.getValue() : (document.getElementById('cora-live-html-code-textarea')?.value || '');
+        const frame = document.getElementById('cora-live-html-preview-frame');
+        if (!frame) return;
+
+        let previewContent = html || '<!DOCTYPE html><html><body class="p-6 text-zinc-500 font-sans">No HTML content provided.</body></html>';
+
+        // Inject click-to-code inspector bridge into iframe
+        const clickBridge = '<' + 'script>' + `
+          (function() {
+            let lastHovered = null;
+            document.addEventListener('mouseover', function(e) {
+              if (e.target && e.target !== document.body && e.target !== document.documentElement) {
+                if (lastHovered && lastHovered !== e.target) {
+                  lastHovered.style.outline = '';
+                  lastHovered.style.outlineOffset = '';
+                }
+                lastHovered = e.target;
+                e.target.style.outline = '2px dashed rgba(96, 165, 250, 0.7)';
+                e.target.style.outlineOffset = '-2px';
+                e.target.style.cursor = 'crosshair';
+              }
+            }, true);
+            document.addEventListener('mouseout', function(e) {
+              if (e.target) {
+                e.target.style.outline = '';
+                e.target.style.outlineOffset = '';
+                e.target.style.cursor = '';
+              }
+            }, true);
+            document.addEventListener('click', function(e) {
+              const target = e.target.closest('section, header, footer, nav, article, aside, form, div[id], [id], h1, h2, h3, h4, h5, h6, p, button, a, img') || e.target;
+              if (!target || target === document.body || target === document.documentElement) return;
+              
+              e.preventDefault();
+              e.stopPropagation();
+
+              const textSnippet = (target.textContent || '').trim().replace(/\\s+/g, ' ').substring(0, 45);
+              const tag = target.tagName ? target.tagName.toLowerCase() : '';
+              const id = target.id || '';
+              const className = typeof target.className === 'string' ? target.className : '';
+              const firstClass = className.split(' ').filter(function(c) { return c && !c.includes(':') && !c.startsWith('hover') && c.length > 3; })[0] || '';
+
+              window.parent.postMessage({
+                type: 'cora_preview_element_click',
+                tag: tag,
+                id: id,
+                firstClass: firstClass,
+                textSnippet: textSnippet
+              }, '*');
+            }, true);
+          })();
+        ` + '<' + '/script>';
+
+        if (previewContent.includes('</body>')) {
+            previewContent = previewContent.replace('</body>', clickBridge + '</body>');
+        } else {
+            previewContent += clickBridge;
+        }
+
+        const doc = frame.contentDocument || (frame.contentWindow ? frame.contentWindow.document : null);
+        if (doc) {
+            doc.open();
+            doc.write(previewContent);
+            doc.close();
+        }
+    };
+
+    window.formatLiveHtmlCode = function() {
+        let code = coraLiveCodeEditor ? coraLiveCodeEditor.getValue() : (document.getElementById('cora-live-html-code-textarea')?.value || '');
+        if (!code.trim()) return;
+        
+        const formatted = coraFormatHtml(code);
+        if (coraLiveCodeEditor) {
+            const cursor = coraLiveCodeEditor.getCursor();
+            coraLiveCodeEditor.setValue(formatted);
+            coraLiveCodeEditor.setCursor(cursor);
+            coraLiveCodeEditor.refresh();
+        } else {
+            const textarea = document.getElementById('cora-live-html-code-textarea');
+            if (textarea) textarea.value = formatted;
+        }
+
+        window.handleLiveCodeInput();
+        autoSaveEditorDraft(formatted);
+        window.previewLiveHtmlEditor();
+        window.coraShowToast('HTML formatted with color coding & indentation.', 'success');
+    };
+
+    window.saveLiveHtmlFromEditor = function() {
+        const rawHtml = coraLiveCodeEditor ? coraLiveCodeEditor.getValue().trim() : (document.getElementById('cora-live-html-code-textarea')?.value.trim() || '');
+        const saveBtn = document.getElementById('cora-live-html-save-btn');
+
+        if (!rawHtml) {
+            window.coraShowToast('HTML content cannot be empty.', 'error');
+            return;
+        }
+
+        if (saveBtn) {
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<div class="animate-spin rounded-full h-3 w-3 border-2 border-zinc-900 border-t-transparent"></div> <span>Publishing...</span>';
+        }
+
+        jQuery.post(coraREData.ajaxUrl, {
+            action: 'cora_canvas_save_page_html',
+            nonce: coraREData.ajaxNonce,
+            theme_id: activeMcpThemeId || 0,
+            page_slug: 'home',
+            raw_html: rawHtml
+        }, function(res) {
+            if (saveBtn) {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline></svg> <span>Save &amp; Publish</span>';
+            }
+
+            if (res.success) {
+                originalHtmlBuffer = rawHtml;
+                try {
+                    localStorage.setItem('cora_draft_html_' + activeMcpThemeId, rawHtml);
+                } catch(e) {}
+                updateDraftStatusPill('Published & Synced', 'saved');
+
+                const bar = document.getElementById('cora-ai-suggestion-bar');
+                if (bar) bar.classList.add('hidden');
+                
+                window.coraShowToast(res.data.message || 'Landing page published live successfully!', 'success');
+                window.previewLiveHtmlEditor();
+                
+                const mainIframe = document.querySelector('#canvas-preview-box iframe');
+                if (mainIframe) mainIframe.src = mainIframe.src;
+            } else {
+                window.coraShowToast(res.data.message || 'Failed to save HTML.', 'error');
+            }
+        }).fail(function() {
+            if (saveBtn) {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '<span>Save &amp; Publish</span>';
+            }
+            window.coraShowToast('Network error while saving HTML.', 'error');
+        });
+    };
+
+    // --- MCP Client Connect Helpers ---
+    window.coraShowClientConnectModal = function(clientId) {
+        window.openAiMcpEditor();
+        window.switchAiMcpTab('ai');
+    };
+
+    window.coraCloseClientConnectModal = function() {
+        window.switchAiMcpTab('code');
+    };
+
+    window.copyMcpDirectUrl = function() {
+        const el = document.getElementById('cora-mcp-panel-endpoint');
+        if (el && el.value) {
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(el.value);
+            } else {
+                el.select();
+                document.execCommand('copy');
+            }
+            window.coraShowToast('MCP Endpoint URL copied to clipboard!', 'success');
+        }
+    };
+
+    window.copyMcpAuthToken = function() {
+        const el = document.getElementById('cora-mcp-panel-token');
+        if (el && el.value) {
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(el.value);
+            } else {
+                el.select();
+                document.execCommand('copy');
+            }
+            window.coraShowToast('MCP Direct Access Token copied to clipboard!', 'success');
+        }
+    };
+
+    window.toggleMcpTokenVisibility = function() {
+        const el = document.getElementById('cora-mcp-panel-token');
+        if (el) {
+            el.type = el.type === 'password' ? 'text' : 'password';
+        }
+    };
+
+    window.copyClaudeJsonConfig = function() {
+        const configText = JSON.stringify({
+            "mcpServers": {
+                "cora-canvas": {
+                    "command": "npx",
+                    "args": ["-y", "@modelcontextprotocol/server-fetch", "<?php echo esc_js( $mcp_endpoint_url ); ?>"],
+                    "env": { "CORA_MCP_TOKEN": "<?php echo esc_js( $mcp_direct_token ); ?>" }
+                }
+            }
+        }, null, 2);
+
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(configText).then(function() {
+                window.coraShowToast('Claude Desktop JSON config copied to clipboard!', 'success');
+            });
+        }
+    };
+
+    window.copyChatGptPluginUrl = function() {
+        const url = '<?php echo esc_js( home_url() ); ?>';
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(url).then(function() {
+                window.coraShowToast('ChatGPT Plugin domain URL copied to clipboard!', 'success');
+            });
+        } else {
+            window.coraShowToast('Domain: ' + url, 'info');
+        }
+    };
+
+    // Auto-Resume AI Editor if URL param cv_ai_editor=1
+    document.addEventListener('DOMContentLoaded', function() {
+        try {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('cv_ai_editor') === '1') {
+                const themeId = parseInt(params.get('theme_id'), 10) || 0;
+                setTimeout(function() {
+                    window.openAiMcpEditor(themeId);
+                }, 350);
+            }
+        } catch(e) {}
+    });
+
     // Expose functions to window for Command Palette usage
     window.triggerRenamePage = triggerRenamePage;
     window.triggerChangePageSlug = triggerChangePageSlug;
     window.triggerSetHomepage = triggerSetHomepage;
     window.openSEODrawer = openSEODrawer;
     window.openRevisionsDrawer = openRevisionsDrawer;
+    window.openAiMcpEditor = window.openAiMcpEditor;
+    window.openHtmlCodeEditor = window.openHtmlCodeEditor;
+    window.closeAiMcpEditor = window.closeAiMcpEditor;
+    window.closeHtmlCodeEditor = window.closeHtmlCodeEditor;
+    window.coraShowClientConnectModal = window.coraShowClientConnectModal;
+    window.coraCloseClientConnectModal = window.coraCloseClientConnectModal;
     window.triggerDuplicatePage = triggerDuplicatePage;
     window.triggerDeletePage = triggerDeletePage;
     window.switchTab = switchTab;
