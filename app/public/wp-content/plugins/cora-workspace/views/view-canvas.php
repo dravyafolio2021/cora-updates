@@ -413,8 +413,8 @@ function cora_get_sparkline_points( $history, $type ) {
             <div class="bg-white border border-zinc-200/80 rounded-xl p-3 shadow-3xs flex items-center justify-between min-w-0 cursor-pointer hover:bg-zinc-50/80 transition-all" onclick="coraSwitchCanvasSubTab('tab-canvas-overview'); document.getElementById('draft-themes-library-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' });">
                 <div class="min-w-0 pr-2">
                     <span class="text-[10px] font-bold tracking-wider text-zinc-400 uppercase block truncate">Themes Library</span>
-                    <div class="text-base sm:text-lg font-bold text-zinc-900 mt-0.5 truncate">1 Live · <?php echo esc_html($total_drafts); ?> Drafts</div>
-                    <span class="text-[10px] text-zinc-500 font-medium block truncate mt-0.5"><?php echo esc_html($total_drafts); ?> / <?php echo esc_html($draft_limit); ?> Draft Quota</span>
+                    <div id="canvas-kpi-themes-count" class="text-base sm:text-lg font-bold text-zinc-900 mt-0.5 truncate">1 Live · <?php echo esc_html($total_drafts); ?> Drafts</div>
+                    <span id="canvas-kpi-draft-quota" class="text-[10px] text-zinc-500 font-medium block truncate mt-0.5"><?php echo esc_html($total_drafts); ?> / <?php echo esc_html($draft_limit); ?> Draft Quota</span>
                 </div>
                 <div class="w-7 h-7 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-700 shrink-0">
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
@@ -712,7 +712,7 @@ function cora_get_sparkline_points( $history, $type ) {
                         <div>
                             <div class="flex items-center gap-2">
                                 <h3 class="text-xs font-bold text-zinc-900 leading-tight">Draft Themes</h3>
-                                <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-600">
+                                <span id="canvas-draft-themes-badge" class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-600">
                                     <?php echo esc_html( $total_drafts ); ?> / <?php echo esc_html( $draft_limit ); ?> Drafts
                                 </span>
                             </div>
@@ -747,7 +747,7 @@ function cora_get_sparkline_points( $history, $type ) {
                     </div>
                 </div>
 
-                <div class="divide-y divide-zinc-100 rounded-b-xl">
+                <div id="canvas-draft-themes-list" class="divide-y divide-zinc-100 rounded-b-xl">
                     <?php 
                     $draft_index = 0;
                     foreach ( $draft_themes as $th ) {
@@ -834,12 +834,10 @@ function cora_get_sparkline_points( $history, $type ) {
                             </div>
                         </div>
                     </div>
-                    <?php } 
-                    if ( ! $has_drafts ) : ?>
-                        <div class="p-8 text-center text-xs text-zinc-400">
-                            No inactive draft themes registered yet. Click "Import Theme" or "Add Theme" above to create one.
-                        </div>
-                    <?php endif; ?>
+                    <?php } ?>
+                    <div id="canvas-no-drafts-notice" class="p-8 text-center text-xs text-zinc-400 <?php echo $has_drafts ? 'hidden' : ''; ?>">
+                        No inactive draft themes registered yet. Click "Import Theme" or "Add Theme" above to create one.
+                    </div>
                 </div>
 
                 <?php if ( $total_drafts > 4 ) : ?>
@@ -6426,36 +6424,59 @@ function cora_get_sparkline_points( $history, $type ) {
 
         const doDelete = function() {
             window.coraShowToast('Removing theme workspace...');
+            const card = document.querySelector('[data-draft-theme-id="' + id + '"]');
+            if (card) {
+                card.classList.add('cora-deleting');
+            }
+
             jQuery.post(coraREData.ajaxUrl, {
                 action: 'cora_ajax_delete_theme',
                 theme_id: id,
                 nonce: coraREData.ajaxNonce
             }, function(res) {
                 if (res.success) {
-                    // Remove the card from the DOM — no page refresh
-                    const card = document.querySelector('[data-draft-theme-id="' + id + '"]');
+                    // Remove the card from the DOM with smooth animation
                     if (card) {
-                        card.style.transition = 'opacity 0.25s ease, max-height 0.35s ease, margin 0.35s ease';
+                        card.style.transition = 'opacity 0.25s ease, max-height 0.35s ease, margin 0.35s ease, padding 0.35s ease';
                         card.style.overflow = 'hidden';
                         card.style.opacity = '0';
                         card.style.maxHeight = card.offsetHeight + 'px';
                         setTimeout(function() {
                             card.style.maxHeight = '0';
                             card.style.marginTop = '0';
+                            card.style.marginBottom = '0';
                             card.style.paddingTop = '0';
                             card.style.paddingBottom = '0';
                         }, 50);
-                        setTimeout(function() { card.remove(); }, 400);
+                        setTimeout(function() {
+                            card.remove();
+                            if (typeof window.coraSyncDraftThemesUI === 'function') {
+                                window.coraSyncDraftThemesUI();
+                            }
+                        }, 400);
                     } else {
-                        setTimeout(function() { window.location.reload(); }, 600);
+                        if (typeof window.coraSyncDraftThemesUI === 'function') {
+                            window.coraSyncDraftThemesUI();
+                        }
+                    }
+                    if (typeof window.coraSyncDraftThemesUI === 'function') {
+                        window.coraSyncDraftThemesUI();
                     }
                     const msg = (res.data && res.data.message) ? res.data.message : 'Draft theme deleted successfully.';
                     window.coraShowToast(msg, 'success');
                 } else {
+                    if (card) card.classList.remove('cora-deleting');
+                    if (typeof window.coraSyncDraftThemesUI === 'function') {
+                        window.coraSyncDraftThemesUI();
+                    }
                     const msg = (res.data && res.data.message) ? res.data.message : (typeof res.data === 'string' ? res.data : 'Failed to delete theme.');
                     window.coraShowToast(msg, 'error');
                 }
             }).fail(function() {
+                if (card) card.classList.remove('cora-deleting');
+                if (typeof window.coraSyncDraftThemesUI === 'function') {
+                    window.coraSyncDraftThemesUI();
+                }
                 window.coraShowToast('Network error while deleting theme.', 'error');
             });
         };
@@ -11718,7 +11739,84 @@ function cora_get_sparkline_points( $history, $type ) {
         }, 1500);
     };
 
-    // --- Draft Themes Interactive Handlers ---
+    // --- Draft Themes Interactive Handlers & Real-Time Sync ---
+    window.coraSyncDraftThemesUI = function() {
+        const list = document.getElementById('canvas-draft-themes-list');
+        if (!list) return;
+
+        // Find all draft cards that are NOT marked for deletion or removed
+        const draftCards = Array.from(list.querySelectorAll('[data-draft-theme-id]')).filter(function(card) {
+            return !card.classList.contains('cora-deleting') && card.style.opacity !== '0' && card.style.maxHeight !== '0px';
+        });
+
+        const count = draftCards.length;
+        const limit = (window.canvasState && window.canvasState.draftLimit) ? window.canvasState.draftLimit : 20;
+
+        // 1. Update the header badge
+        const badge = document.getElementById('canvas-draft-themes-badge');
+        if (badge) {
+            badge.textContent = count + ' / ' + limit + ' Drafts';
+        }
+
+        // 2. Update KPI Cards
+        const kpiCount = document.getElementById('canvas-kpi-themes-count');
+        if (kpiCount) {
+            kpiCount.textContent = '1 Live · ' + count + ' Drafts';
+        }
+        const kpiQuota = document.getElementById('canvas-kpi-draft-quota');
+        if (kpiQuota) {
+            kpiQuota.textContent = count + ' / ' + limit + ' Draft Quota';
+        }
+
+        // 3. Update Empty State notice
+        const noDraftsNotice = document.getElementById('canvas-no-drafts-notice');
+        if (noDraftsNotice) {
+            if (count === 0) {
+                noDraftsNotice.classList.remove('hidden');
+            } else {
+                noDraftsNotice.classList.add('hidden');
+            }
+        }
+
+        // 4. Update Show All button & collapsed items
+        const showAllWrap = document.getElementById('cora-show-all-drafts-wrap');
+        if (count <= 4) {
+            if (showAllWrap) showAllWrap.classList.add('hidden');
+            // Unhide remaining cards so no empty gaps exist
+            draftCards.forEach(function(card) {
+                card.classList.remove('hidden', 'draft-theme-collapsed');
+            });
+        } else {
+            const hasHiddenCards = draftCards.some(function(card) {
+                return card.classList.contains('draft-theme-collapsed') && card.classList.contains('hidden');
+            });
+            if (showAllWrap) {
+                if (hasHiddenCards) {
+                    showAllWrap.classList.remove('hidden');
+                } else {
+                    showAllWrap.classList.add('hidden');
+                }
+            }
+        }
+
+        // 5. Sync canvasState.themes if loaded
+        if (window.canvasState && Array.isArray(window.canvasState.themes)) {
+            const activeIds = draftCards.map(function(card) {
+                return parseInt(card.getAttribute('data-draft-theme-id'), 10);
+            }).filter(Boolean);
+            window.canvasState.themes = window.canvasState.themes.filter(function(th) {
+                return th.status === 'live' || activeIds.includes(parseInt(th.id, 10));
+            });
+        }
+    };
+
+    // Auto-sync count on DOMContentLoaded
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', window.coraSyncDraftThemesUI);
+    } else {
+        setTimeout(window.coraSyncDraftThemesUI, 50);
+    }
+
     window.toggleDraftActionsMenu = function(id, e) {
         e.stopPropagation();
         // Close all other open menus
