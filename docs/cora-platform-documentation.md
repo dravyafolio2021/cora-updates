@@ -1,6 +1,6 @@
 # Cora Platform — Comprehensive Platform Documentation
 
-This document serves as the master technical specification and architectural manual for the Cora Workspace Platform (v4.9.338).
+This document serves as the master technical specification and architectural manual for the Cora Workspace Platform (v4.9.357).
 
 ---
 
@@ -984,7 +984,7 @@ Located in `includes/mcp/class-cora-universal-mcp-server.php`, `class-cora-oauth
 
 ---
 
-## Section 3: Canvas Theme Builder, Multi-Engine Architecture & Next.js Headless System (v4.9.38 - v4.9.338)
+## Section 3: Canvas Theme Builder, Multi-Engine Architecture & Next.js Headless System (v4.9.38 - v4.9.357)
 
 Canvas is a **Multi-Engine Website & Theme Engineering Platform**, supporting Elementor white-labeled editing, modern Visual HTML Canvas, 1-click site ingestion, high-performance headless Next.js Git repository integration, and AI-assisted prompt template code generation:
 
@@ -994,7 +994,7 @@ Canvas is a **Multi-Engine Website & Theme Engineering Platform**, supporting El
 +----------------------+-----------------------------+------------------------------+---------------+-------------------+
 | Engine A: Elementor  | Engine B: Visual HTML Canvas| Engine C: Universal Migrator | Engine D:     | Engine E: AI HTML |
 | • Reskinned Sandbox  | • Live Sandboxed Iframe     | • Multi-Page URL Crawler     | Next.js Git   | & Tailwind Grid   |
-| • Strips WP Branding | • Inline contenteditable    | • CSS/JS/Asset Localizer     | • App Router  | • 5 Pro Prompts   |
+| • Strips WP Branding | • Inline contenteditable    | • CSS/JS/Asset Localizer     | • App Router  | • 6 Pro Prompts   |
 | • 2-Row Top Toolbar  | • Code-Split Visual Editor  | • DOM Sanitizer & Cleaner    | • Route Scan  | • 1-Click Claude  |
 | • Git Commit / Sync  | • Media Swap & Scanner      | • Auto Draft Theme Generator | • Static Site |   & GPT Copy      |
 |                      | • Clean HTML Export         |                              |   Compiler    | • 10-Min Live POS |
@@ -1038,8 +1038,23 @@ Engineered in `includes/class-cora-nextjs-integration.php` and `cora-workspace.p
 * **AI Element Rewriting (`cora_ajax_canvas_ai_rewrite_element`)**: Context-aware re-drafting of headlines, body paragraphs, and CTAs across various tones (*Punchy*, *Professional*, *High-Converting*, *Minimal*).
 * **AI Core Web Vitals & SEO Optimizer (`cora_ajax_canvas_ai_optimize_page`)**: Automated page audit diagnosing LCP, CLS, and FID metrics, injecting optimized image tags, meta tags, and structured data.
 
-### 3.6 Add Theme Wizard Selection Matrix
-Features 4 selection cards (*AI HTML & Tailwind Builder*, *Next.js Git Repository Connector*, *Lovable Visual HTML Builder*, and *Universal Website Migrator*) with dedicated reset handlers (`window.wizardResetCards`) and automated route ingestion.
+### 3.6 Add Theme Wizard UI Overhaul: Active-Voice 2x2 Grid & Production Templates (v4.9.344 - v4.9.345)
+Overhauled to deliver a frictionless, high-velocity onboarding experience for agency websites:
+* **Active-Voice 2x2 Selection Grid**: Replaces passive cards with four explicit, action-oriented engineering paths:
+  1. **Build with AI Prompts**: Generate instantaneous HTML/Tailwind landing pages with calibrated AI prompts for Claude & ChatGPT, dual-mode code connector, and 1-click live launch.
+  2. **Connect Headless Code**: Link production Next.js and Expo React Native Web Git repositories with dynamic route discovery and automated static site compilation.
+  3. **Scrape & Migrate Website**: 1-click multi-page crawler that ingests any live URL, downloads and isolates assets, sanitizes DOM code, and provisions editable draft themes.
+  4. **White-Labeled Visual Builder**: Launch sandboxed Elementor in an isolated workspace with a custom two-row monochromatic toolbar and zero WordPress admin chrome.
+* **Edge-to-Edge Sticky Bottom Bar**: Modal actions anchor permanently to the bottom of the viewport (`sticky bottom-0 bg-white border-t border-zinc-200`) with high-contrast `Cancel` and `Continue` buttons, preventing layout shifts or obscured CTA triggers on smaller laptop screens.
+* **Real-Time Template Search Filter**: In Step 2, a responsive search input dynamically filters template cards by name and description without reloading or DOM destruction.
+* **6 Production Template Presets with Realistic Preview Assets**: Step 2 includes 6 pre-built, production-calibrated industry layouts accompanied by high-fidelity screenshot assets (`assets/img/tmpl_*`):
+  - **Creative Agency & Video Production Studio** (`tmpl_agency_preview.jpg`): High-contrast portfolio, showreel banner, client proofing links, and brief request intake.
+  - **Management Consulting & Advisory** (`tmpl_consulting_preview.jpg`): Editorial corporate layout, practice areas, partner credentials, and executive advisory booking.
+  - **E-Commerce Direct-to-Consumer Store** (`tmpl_ecommerce_preview.jpg`): High-converting product showcase, feature callouts, customer reviews, and cart hooks.
+  - **Commercial Photography Studio & Production House** (`tmpl_photography_preview.jpg`): Masonry visual gallery, shoot package comparison, and booking intake screener.
+  - **Luxury Real Estate Brokerage** (`tmpl_realestate_preview.jpg`): Property showcase cards, neighborhood highlights, agent roster, and showing request forms.
+  - **Modern B2B AI SaaS Platform** (`tmpl_saas_preview.jpg`): Interactive product UI preview card, feature grid, 3-tier pricing matrix, and lead capture.
+* **Zero-Emoji Policy Compliance**: Purged all emojis from labels, descriptions, and wizard cards, strictly utilizing thin-lined vector SVGs (`stroke-width: 1.8`) to uphold the Cora Design System.
 
 ### 3.7 AI HTML & Tailwind Starter Prompts Grid & 10-Min Zero-Build Launch (v4.9.334 - v4.9.337)
 * **Curated 5-Template Production Prompts Grid**: Add Theme Wizard Step 2 provides 5 industry-calibrated master prompts engineered for maximum aesthetic fidelity and conversion:
@@ -1086,6 +1101,35 @@ To ensure reliable Next.js builds on constrained CloudLinux and shared cPanel/Ho
 * **Turnkey Distribution Package (`cora-chatgpt-plugin/`)**: Provides official deployment assets for OpenAI ChatGPT Plugins, Custom GPT Actions, and Remote MCP 2.0 servers.
 * **OpenAPI 3.1.0 Specification (`openapi.json`)**: Formulates strict schema definitions for 25+ agency tools across CRM, Invoicing, Bookings, Inventory, and Media management.
 * **Authentication Standards**: Supports Bearer API token authorization and OAuth 2.1 PKCE authorization code grant with multi-tenant workspace scoping.
+
+### 3.13 Standardized Canvas Drawers & Overflow Locking Standard (v4.9.352 - v4.9.353)
+* **Unified Right-Sliding Drawer Architecture (`.cora-drawer`)**: Abrupt, floating modal dialogs for template configuration, custom HTML code editing, and AI prompt copying are replaced with full-height, right-sliding side drawer sheets.
+* **Body Scroll Jump Prevention**: Opening any Canvas drawer adds the `.cora-canvas-drawer-open` class to `document.body` (`body.cora-canvas-drawer-open { overflow: hidden !important; }`). This eliminates viewport jumping, locks background scroll chaining, and guarantees a smooth entrance animation without layout destabilization.
+* **Resilient Event Delegation & Syntax Recovery (v4.9.353)**: Completely repaired JavaScript syntax parsing blocks in `view-canvas.php`, re-binding click event handlers to all primary action buttons (`window.coraOpenAddThemeWizard`, `window.coraApplyPlaygroundCodeToEditor`, and theme switcher controls).
+
+### 3.14 AI Tools MCP Gateway & Live Action Playground in Template Editor (v4.9.351)
+Directly integrated into the visual Template Editor view in `views/view-canvas.php`:
+* **Tri-Mode Operational Switcher**:
+  1. **Natural Language Mode**: Allows developers and workspace users to formulate instructions in plain English (e.g. "Change the hero headline to award-winning studio and set package pricing to 50,000 INR"), dispatching to the underlying AI tool execution loop.
+  2. **Guided Actions Mode**: Presents an interactive dropdown of all 28 registered operational tools with dynamic form fields corresponding to each tool's JSON input schema.
+  3. **Raw JSON Mode**: Provides a CodeMirror-powered raw JSON-RPC 2.0 interface for low-level protocol inspection and debugging.
+* **Live Response Inspector**: Displays formatted tool outputs, server response headers, and generated HTML code in real-time.
+* **Instant Code Reflection (`window.coraApplyPlaygroundCodeToEditor`)**: Clicking `📥 Apply to Live Editor` immediately pipes tool-generated HTML into the CodeMirror editor buffer and triggers zero-copy static distribution updates.
+
+### 3.15 Universal Remote MCP Server & OpenAPI 3.0.1 Specification (v4.9.354 - v4.9.357)
+Engineered in `includes/mcp/class-cora-universal-mcp-server.php` and `cora-workspace.php`:
+* **OpenAPI 3.0.1 Standard Upgrade**: Upgraded live schema generation (`/wp-json/cora/v1/mcp/openapi.json`) from 3.1.0 to 3.0.1 to guarantee 100% compatibility with OpenAI Custom GPT Actions importer, which strictly validates against OpenAPI 3.0.x.
+* **Curated 28 Core Actions Ceiling**: OpenAI Custom GPT imposes an undocumented 30-action ceiling per GPT. Cora dynamically caps default action exposure to 28 prioritized operational tools (Workspace Overview, Active Theme, Leads, Clients, Projects, Tasks, Financials, Content, RAG, and Forms), ensuring instant action discovery without schema import truncation. Pass `?all=1` or `limit=all` to retrieve the entire registry.
+* **Schema Hardening & Emoji Purging**: Stripped all emojis from tool descriptions and summaries, sanitized input schema parameter types to valid objects, and omitted empty `required` arrays to prevent ChatGPT validation failures.
+* **ChatGPT Developer Plugin Handshake Support**: Supports native ChatGPT plugin handshakes, session tool discovery (`tools/list`, `tools/call`, `initialize`), and unified REST routing.
+
+### 3.16 Interactive OAuth 2.1 Consent Panel Architecture (v4.9.354)
+Engineered in `includes/mcp/class-cora-oauth-server.php`:
+* **Master Full-Access Toggle**: Includes an interactive "Universal Full Access (Read + Write)" master switch that toggles all 20 scopes in a single click.
+* **Categorized Scope Architecture**: Groups permissions across 10 functional business domains (Core Workspace, Website & Themes, CRM & Leads, Directory, Operations & Bookings, Tasks, Finance & Ledger, Content & SEO, Living Memory RAG, Automations).
+* **1-Tap Quick Presets**: Provides one-click permission presets: `All Tools`, `Read-Only`, and `Website & CMS Only`.
+* **Dynamic Scope Selection Counter**: Displays live granted counts (`X of 20 granted`) before authorization.
+* **Multi-Tenant Security Guarantee**: OAuth tokens are cryptographically generated (32-byte CSPRNG) and bound strictly to authenticated tenant agencies (`agency_id`). Any request attempting parameter-level tenant spoofing is overridden server-side.
 
 ---
 
@@ -1368,6 +1412,20 @@ When authenticated as Super Admin (`cora_admin` / `admin@cora.local`), the platf
 
 | Version | Release Date | Key Features & Enhancements |
 | :--- | :--- | :--- |
+| **v4.9.357** | Oct 2026 | ChatGPT action discovery resolved with 28 curated tools ceiling, OpenAPI 3.0.1 schema hardening, empty property sanitization, and session discovery |
+| **v4.9.356** | Oct 2026 | ChatGPT MCP server plugin handshake support, session tool discovery, and unified REST handler |
+| **v4.9.355** | Oct 2026 | Upgraded OpenAPI to 3.0.1, curated 28 core actions ceiling for ChatGPT Custom GPT compliance, and purged emojis from action descriptions |
+| **v4.9.354** | Oct 2026 | Universal read/write access and interactive OAuth 2.1 consent panel with master toggle, granular category permissions, and quick presets (`all`, `readonly`, `website`) |
+| **v4.9.353** | Oct 2026 | Resolved JavaScript syntax parsing errors and restored canvas button click handlers across all editor toolbars |
+| **v4.9.352** | Oct 2026 | Standardized canvas side drawer sheets (`.cora-drawer`), eliminated popup scroll jumps, locked body overflow (`body.cora-canvas-drawer-open`) |
+| **v4.9.351** | Oct 2026 | Synchronized global MCP token and endpoint architecture (`/wp-json/cora-mcp/v1/openapi.json`), unified AI tools MCP gateway and live action playground directly into Canvas Template Editor |
+| **v4.9.349** | Oct 2026 | OpenAI Developer Plugin deployment and zero-copy native MCP file management across all domains (`cora_canvas_update_page_html`, `cora_canvas_get_page_html`, `cora_canvas_create_theme`) |
+| **v4.9.345** | Oct 2026 | High-fidelity realistic screenshot preview assets (`assets/img/tmpl_*`), edge-to-edge sticky bottom bar, zero emojis in Add Theme Wizard |
+| **v4.9.344** | Oct 2026 | Add Theme Wizard UI Overhaul: active-voice 2x2 grid, sticky bottom bar, marketing link, template search filter, and 6 production templates (Agency, Consulting, E-Commerce, Photography, Real Estate, SaaS) |
+| **v4.9.343** | Oct 2026 | Restored Super Admin workspace action buttons, direct launch routing (`/workspace/dashboard?agency_id={id}&industry={type}`), and modal portaling to `document.body` |
+| **v4.9.342** | Oct 2026 | Universal in-app PWA install suite, settings trigger card in System Settings Suite, and sticky sidebar admin popover trigger |
+| **v4.9.341** | Oct 2026 | Official Cora Super Admin PWA app icon suite with dynamic ADMIN badging (512x512, 192x192, Apple touch icons, favicons) |
+| **v4.9.339** | Oct 2026 | Eliminated artificial 6-hour session limit and bypassed rate limits for admin users (`manage_options`) |
 | **v4.9.338** | Oct 2026 | Dynamic Super Admin PWA Badging: dynamic `ADMIN`-badged app icons (512x512, 192x192, Apple touch, favicon), role-scoped Web App Manifest (`CORA Workspace (Admin)`), standalone link retention, and local admin provisioning script updates |
 | **v4.9.337** | Oct 2026 | Security & Performance Hardening: Master prompt script tag sanitization (`<\/script>`) preventing premature script termination, strict `realpath` containment preventing path traversal, ZipArchive extraction sanitization against `../` directory escapes, HTTP 304 Not Modified ETag caching, immutable asset headers, and admin capability enforcement on Next.js endpoints |
 | **v4.9.336** | Oct 2026 | Restored DOM hierarchy and pointer events across Add Theme Wizard and Canvas, polished monochromatic AI shortcuts and popover contrast |
@@ -1584,4 +1642,4 @@ When authenticated as Super Admin (`cora_admin` / `admin@cora.local`), the platf
 
 ---
 
-*Cora Platform v4.9.338 — Master Architectural Manual. Last updated: October 2026.*
+*Cora Platform v4.9.357 — Master Architectural Manual. Last updated: October 2026.*

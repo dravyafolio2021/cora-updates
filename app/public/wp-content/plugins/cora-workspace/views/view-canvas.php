@@ -13189,26 +13189,28 @@ Return ONLY clean, standalone HTML in an <!DOCTYPE html> document.`,
         ecommerce: `You are an elite DTC e-commerce designer. 
 Create a complete, single-file, production-ready HTML5 landing page for a modern "Direct-to-Consumer (DTC) Brand & Online Shop" (named "Velox Goods").
 
-TECHNICAL REQUIREMENTS:
+TECHNICAL & DESIGN REQUIREMENTS:
 1. Include Tailwind CSS CDN: <script src="https://cdn.tailwindcss.com"><\/script>
 2. Google Fonts: Inter and JetBrains Mono.
-3. Clean modern minimalist product aesthetic (pure white & zinc-950 contrast, soft shadow elevations, high-converting product showcases).
-4. Mobile-first 100% responsive layout.
+3. Clean modern minimalist product aesthetic (pure white #ffffff and deep obsidian #09090b contrast, soft shadow elevations, high-converting product showcases).
+4. COMPLETE SELF-CONTAINED ASSETS: Never output empty placeholder divs (e.g. <div id="heroArt"></div>). Always provide complete, self-contained visual elements with high-res Unsplash product photography (e.g. https://images.unsplash.com/photo-1602143407151-7111542de6e8?auto=format&fit=crop&w=800&q=80) or clean vector SVGs.
+5. ALL SECTIONS VISIBLE & STYLED: Ensure every section has complete markup, full copy, and is 100% visible without scroll-delayed opacity-0 locks.
+6. Mobile-first 100% responsive layout.
 
 SECTIONS TO INCLUDE:
 1. Announcement Bar & Header: "Free express shipping over ₹999", brand logo, category navigation, cart icon badge (3 items), and "Shop Best Sellers" button.
-2. Hero: High-converting headline ("Engineered for Everyday Excellence"), subheadline, primary product render card, ratings badge (4.9/5 from 4,800+ reviews), and "Shop Collection" CTA.
-3. Featured Products Grid: 4 product cards with high-res photos, color swatches, price tags with strike-through discounts, and "Quick Add to Cart" buttons.
-4. Product Benefits / Materials: 3 highlight cards showing sustainable craftsmanship, aerospace-grade alloy, and lifetime warranty.
-5. Customer Reviews Ticker: 3 verified buyer photo reviews with 5-star ratings.
+2. Hero Section: High-converting headline ("Engineered for Everyday Excellence"), subheadline, ratings badge (4.9/5 from 4,800+ reviews), dual CTAs ("Shop Collection", "Watch Film"), and a stunning product showcase card with high-res image and price tag.
+3. Featured Products Grid: 4 product cards (Aero Flask 750ml, Nomad Tech Pack, Apex Minimalist Wallet, Chrono Titanium Watch) with high-res photos, color swatches, price tags with strike-through discounts, and "Quick Add to Cart" buttons.
+4. Product Craftsmanship & Benefits: 3 highlight cards showing sustainable engineering, aerospace-grade alloy, and lifetime warranty.
+5. Customer Reviews & Social Proof: 3 verified buyer photo review cards with 5-star ratings and customer tags.
 6. Native Order / Inquiries Form:
    - Form markup: <form method="POST" action="/wp-admin/admin-ajax.php" onsubmit="event.preventDefault(); window.coraSubmitLeadForm ? window.coraSubmitLeadForm(this) : alert('Inquiry placed!');">
    - Hidden inputs: <input type="hidden" name="action" value="cora_ajax_submit_lead"><input type="hidden" name="form_name" value="DTC Order Inquiry Form">
    - Fields: Name, Email, Phone, Order Inquiry / Size preference, and Delivery Pincode.
    - High-converting submit button.
-7. Footer: Guarantees (30-day money-back, 24/7 support), payment icons, and legal links.
+7. Footer: Brand philosophy, guarantees (30-day money-back, 24/7 support), payment icons, and legal links.
 
-Return ONLY clean, standalone HTML in an <!DOCTYPE html> document.`
+Return ONLY clean, complete, standalone HTML inside an <!DOCTYPE html> document.`
     };
 
     // ── Prompt Copy & Template Selection ────────────────────────
@@ -16619,6 +16621,72 @@ Please provide the complete, un-truncated index.html file ready to save and publ
 
         let previewContent = html || '<!DOCTYPE html><html><body class="p-6 text-zinc-500 font-sans">No HTML content provided.</body></html>';
 
+        // Auto-inject Tailwind CSS CDN if not already present
+        const tailwindScript = '<script src="https://cdn.tailwindcss.com"><\/script>';
+        const fontStyles = '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">';
+        
+        // Resilience CSS & Error Boundary
+        const resilienceStyles = '<style id="cora-preview-resilience">' + `
+            html, body {
+                overflow-y: auto !important;
+                overflow-x: hidden !important;
+                height: auto !important;
+                min-height: 100% !important;
+                max-height: none !important;
+            }
+            [data-aos], .reveal, .animate-on-scroll, .fade-in, .scroll-reveal, [class*="opacity-0"], .invisible {
+                opacity: 1 !important;
+                visibility: visible !important;
+                transform: none !important;
+                transition: none !important;
+            }
+            .hero-art:empty, #heroArt:empty, .hero-image:empty, .hero-visual:empty {
+                min-height: 320px !important;
+                background: radial-gradient(circle at center, rgba(255,255,255,0.06) 0%, rgba(9,9,11,0.95) 100%), #18181b !important;
+                border: 1px dashed rgba(255,255,255,0.18) !important;
+                border-radius: 1.25rem !important;
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: center !important;
+                justify-content: center !important;
+                gap: 8px !important;
+                padding: 24px !important;
+                color: #a1a1aa !important;
+                font-family: ui-sans-serif, system-ui, sans-serif !important;
+                text-align: center !important;
+            }
+            .hero-art:empty::before, #heroArt:empty::before, .hero-image:empty::before, .hero-visual:empty::before {
+                content: '✦';
+                font-size: 26px;
+                color: #71717a;
+            }
+            .hero-art:empty::after, #heroArt:empty::after, .hero-image:empty::after, .hero-visual:empty::after {
+                content: 'Product Visual & 3D Interactive Showcase';
+                font-size: 12.5px;
+                font-weight: 600;
+            }
+            section {
+                min-height: 60px;
+                position: relative;
+                display: block;
+                clear: both;
+            }
+            #preloader, .preloader, .page-loader, .loading-screen {
+                display: none !important;
+            }
+        ` + '</style>';
+
+        const errorBoundaryScript = '<' + 'script>' + `
+            window.onerror = function(msg, url, line) {
+                console.warn('[Cora Preview Shield] Handled script error:', msg);
+                return true;
+            };
+            window.addEventListener('unhandledrejection', function(e) {
+                console.warn('[Cora Preview Shield] Handled unhandled rejection:', e.reason);
+                e.preventDefault();
+            });
+        ` + '<' + '/script>';
+
         // Inject click-to-code inspector bridge into iframe
         const clickBridge = '<' + 'script>' + `
           (function() {
@@ -16665,6 +16733,22 @@ Please provide the complete, un-truncated index.html file ready to save and publ
             }, true);
           })();
         ` + '<' + '/script>';
+
+        // Assemble injected head bundle
+        let headBundle = errorBoundaryScript + resilienceStyles + fontStyles;
+        if (!previewContent.includes('cdn.tailwindcss.com')) {
+            headBundle += tailwindScript;
+        }
+
+        if (previewContent.includes('<head>')) {
+            previewContent = previewContent.replace('<head>', '<head>' + headBundle);
+        } else if (previewContent.includes('<head ')) {
+            previewContent = previewContent.replace(/(<head[^>]*>)/i, '$1' + headBundle);
+        } else if (previewContent.includes('<html>') || previewContent.includes('<html ')) {
+            previewContent = previewContent.replace(/(<html[^>]*>)/i, '$1<head>' + headBundle + '</head>');
+        } else {
+            previewContent = '<!DOCTYPE html><html><head>' + headBundle + '</head><body>' + previewContent + '</body></html>';
+        }
 
         if (previewContent.includes('</body>')) {
             previewContent = previewContent.replace('</body>', clickBridge + '</body>');

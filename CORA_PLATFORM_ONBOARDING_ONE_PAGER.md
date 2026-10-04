@@ -1,7 +1,7 @@
 # Cora Platform — Comprehensive Platform & Onboarding Strategic Brief
 > **Target Audience for this Document**: AI Product & Growth Strategist Agent  
 > **Objective**: Comprehensive platform architectural overview, feature breakdown, and onboarding evaluation brief to formulate optimal user onboarding, product activation, and launch strategies for Cora.  
-> **Platform Version**: `v4.9.338` | **Date**: October 2026
+> **Platform Version**: `v4.9.357` | **Date**: October 2026
 
 ---
 
@@ -40,12 +40,13 @@ Cora consolidates the entire agency lifecycle into a single, unified, white-labe
 17. **Desktop Centered KPI Analytics Container & Guaranteed 4 Scorecards**: Centered dashboard analytics container constrained to max 60% viewport width with a guaranteed 4-metric scorecard layout (2x2 mobile grid, 1x4 desktop row) and dynamic user name resolution.
 18. **App Modules (Feature Hub 24-Module Directory) & Core Foundation Lock**: 24 Core Foundation and Domain modules across 5 categories with immutable foundation module locks (`blogs`, `forms`, `team-roles`, `media`, `vault`), Rule 13 zero-outline tonal surface styling, unified search/status filters, reactive toggles, and route decoupling.
 19. **God-Level Super Admin Console**: 11-tab administrative control center with real-time MRR telemetry, global AI token pool, tenant capability matrix, security incident logs, emergency controls, 1-click industry switcher, and Web Push device telemetry.
-20. **Universal Remote MCP Server & OAuth 2.1 PKCE Gateway**: Connects external AI assistants (ChatGPT, Claude, Google Gemini) via Model Context Protocol JSON-RPC 2.0 (`/wp-json/cora-mcp/v1/rpc`) with RFC 7591 dynamic client registration and 25+ domain-specific tools.
+20. **Universal Remote MCP Server & OAuth 2.1 Gateway**: Connects external AI assistants (ChatGPT, Claude, Google Gemini) via Model Context Protocol JSON-RPC 2.0 (`/wp-json/cora-mcp/v1/rpc`) and OpenAPI 3.0.1 (`/wp-json/cora-mcp/v1/openapi.json`) with RFC 7591 dynamic client registration, interactive Read/Write OAuth 2.1 consent panel, and a curated 28 Core Actions ceiling for ChatGPT Custom GPTs.
 21. **Edge-to-Edge Draggable Lead Drawer & Bi-Directional Sync**: CRM leads inspector auto-portaled to `document.body` with transparent backdrop, left-edge draggable resizer (persisted to localStorage), collapsible accordion groups, and sanitized team assignee dropdowns.
 22. **Tokenized Administration Email Verification & Locked Security State**: Dynamic status badges (Verified 🟢 / Pending 🟡), read-only locked state, 24-hour expiration token dispatch via authenticated sender `heycora@claraverse.in`, and 100 daily AI credits quota matrix.
-23. **Canvas AI Starter Prompts & 10-Min Zero-Build Launch**: Add Theme Wizard Step 2 with 5 production template prompts (Agency, SaaS, Consulting, Photography, Custom), 1-click prompt extraction for Claude & ChatGPT, dual-mode code connector (HTML paste / file dropzone), and native lead form ingestion into `wp_cora_leads`.
-24. **Turnkey Official ChatGPT Plugin & Remote MCP 2.0 Package**: `cora-chatgpt-plugin/` distribution containing `manifest.json`, OpenAPI 3.1.0 specifications for 25+ studio tools, and prompt definitions.
-25. **Super Admin Dynamic PWA Badging & Role-Scoped Manifest**: Dynamic `ADMIN` badge rendering across 512/192/Apple/Favicon icons for Super Admins and role-scoped Web App Manifest (`CORA Workspace (Admin)`).
+23. **Canvas Add Theme Wizard 2x2 Overhaul & Starter Prompts**: Add Theme Wizard with active-voice 2x2 grid layout, live search filtering, sticky bottom action bar, 6 production template presets (Agency, SaaS, Consulting, Photography Studio, Stationery & Van Sales, Real Estate Brokerage) with realistic preview screenshots (`assets/img/tmpl_*`), 1-click prompt extraction for Claude & ChatGPT, dual-mode code connector (HTML paste / file dropzone), and native lead form ingestion into `wp_cora_leads`.
+24. **Turnkey Official ChatGPT Plugin & Remote MCP 3.0.1 Package**: `cora-chatgpt-plugin/` distribution containing `ai-plugin.json`, hardened OpenAPI 3.0.1 specifications for 28 curated tools adhering strictly to ChatGPT Custom GPT Actions parameter validation (zero emojis in descriptions, non-empty properties objects, omitted empty required arrays), and prompt definitions.
+25. **Super Admin Dynamic PWA Badging & Action Restoration**: Dynamic `ADMIN` badge rendering across 512/192/Apple/Favicon icons for Super Admins, role-scoped Web App Manifest (`CORA Workspace (Admin)`), and Super Admin workspace action button portaling to `document.body` with seamless launch routing restoration.
+26. **Standardized Canvas Drawers & Live Action Playground**: Unified `.cora-drawer` slide-in sheets across the Canvas Template Editor with background scroll lock (`body.cora-canvas-drawer-open`), event listener recovery, and an integrated AI Tools MCP Gateway & Live Action Playground (`nl`, `guided`, `dev` modes) for live tool testing and 1-click code reflection.
 
 ---
 
@@ -117,8 +118,8 @@ Cora consolidates the entire agency lifecycle into a single, unified, white-labe
 | 1. Dynamic AI Panel  | 2. Content AI Suite  | 3. Lead CRM Pipeline | 4. Dual Canvas & Migrator     |
 | • Dual Chat & Voice  | • Myra AI Copilot    | • Ultra-Compact 3-Lvl| • Elementor White-Label       |
 | • 1-Click New Chat   | • 7 Lifecycle Tabs   | • In-Column Sort/Find| • Visual HTML Lovable Engine  |
-| • 3px Quota Bars     | • Quill WYSIWYG      | • 1-Tap Quick Outreach| • Universal Website Migrator  |
-| • Generative Cards   | • GSC / IndexNow     | • Multi-Filter Popover| • AI Core Web Vitals Optimizer|
+| • 3px Quota Bars     | • Quill WYSIWYG      | • 1-Tap Quick Outreach| • Add Theme Wizard 2x2 Grid   |
+| • Generative Cards   | • GSC / IndexNow     | • Multi-Filter Popover| • Standardized Drawer Engine  |
 +----------------------+----------------------+----------------------+-------------------------------+
 | 5. Team & Governance | 6. Form AI Architect | 7. Document Vault    | 8. Studio Media Hub           |
 | • Multimodal Vision  | • 15 Field Types     | • 5-Step Doc Wizard  | • 1:1, 4:3, 16:9 crop         |
@@ -149,10 +150,10 @@ Cora consolidates the entire agency lifecycle into a single, unified, white-labe
 | • Geolocation annual pricing matrix & official SVG vector share suite (WhatsApp, LinkedIn, X, QR)  |
 +----------------------------------------------------------------------------------------------------+
 | 22. Universal Remote MCP Gateway  | 23. Next.js Git Connector    | 24. Van Sales & Register        |
-| • RFC 7591 Dynamic Registration   | • App Router Route Scanner   | • 3-Step Dispatch Wizard        |
-| • OAuth 2.1 PKCE Server           | • Headless REST API Suite    | • Rate per kg Allocation        |
-| • RFC 9728 Protected Metadata     | • On-Demand ISR Revalidation | • Spot Billing & GST Print      |
-| • 25+ Canonical Workspace Tools   | • Build Preview Proxy Router | • Itemized Sales Register & CSV |
+| • OpenAPI 3.0.1 & JSON-RPC 2.0    | • App Router Route Scanner   | • 3-Step Dispatch Wizard        |
+| • Curated 28 Core Actions Ceiling | • Headless REST API Suite    | • Rate per kg Allocation        |
+| • Interactive OAuth Consent Panel | • On-Demand ISR Revalidation | • Spot Billing & GST Print      |
+| • Template Action Playground      | • Build Preview Proxy Router | • Itemized Sales Register & CSV |
 +-----------------------------------+------------------------------+---------------------------------+
 ```
 
@@ -173,4 +174,4 @@ Cora consolidates the entire agency lifecycle into a single, unified, white-labe
 
 ---
 
-*Cora Strategic Onboarding Brief v4.9.316 — Architecture & Growth Team. Last updated: October 2026.*
+*Cora Strategic Onboarding Brief v4.9.357 — Architecture & Growth Team. Last updated: October 2026.*

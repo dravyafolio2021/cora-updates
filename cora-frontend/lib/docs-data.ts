@@ -587,13 +587,15 @@ Starting in **v4.9.300–v4.9.302**, lead inspection features:
     category: 'sales',
     categoryLabel: 'Sales & CRM',
     description: 'Create high-converting landing pages, portfolio showreels, and booking funnels with clean monochromatic styling.',
-    readTime: '5 min read',
-    lastUpdated: 'August 2026',
+    readTime: '6 min read',
+    lastUpdated: 'October 2026',
     toc: [
-      { id: 'visual-editor', title: '1. Visual Editor Toolbar' },
-      { id: 'white-labeling', title: '2. Zero Third-Party Branding' },
-      { id: 'git-sync', title: '3. Next.js Git Connector & Route Scanner' },
-      { id: 'headless-preview', title: '4. Headless REST APIs & Preview Proxy' },
+      { id: 'visual-editor', title: '1. Multi-Engine Website Creation' },
+      { id: 'theme-wizard', title: '2. Add Theme Wizard 2x2 Grid' },
+      { id: 'drawer-standards', title: '3. Standardized Canvas Drawers & Overflow Locking' },
+      { id: 'mcp-playground', title: '4. AI Tools MCP Gateway & Live Action Playground' },
+      { id: 'git-sync', title: '5. Next.js Git Connector & Route Scanner' },
+      { id: 'headless-preview', title: '6. Headless REST APIs & Preview Proxy' },
     ],
     content: `
 The **Canvas Builder** enables creative agencies to design and publish lightning-fast client landing pages, portfolio showcases, and lead-capture funnels directly inside the Cora workspace across Elementor, Visual HTML, and Next.js engines.
@@ -608,7 +610,44 @@ The **Canvas Builder** enables creative agencies to design and publish lightning
 
 ---
 
-## 3. Next.js Git Connector & Route Scanner (v4.9.308–v4.9.316)
+## 2. Add Theme Wizard 2x2 Grid (v4.9.349+)
+
+The Add Theme Wizard features an active-voice, responsive 2x2 template selection grid:
+- **6 Production Templates**:
+  - \`creative-agency\`: Minimalist typography, portfolio showcase, case study metrics.
+  - \`saas-dark\`: Modern product cards, feature matrix, interactive pricing tables.
+  - \`consulting-minimal\`: Corporate advisory, appointment booking, credibility scorecards.
+  - \`photography-studio\`: Full-bleed visual masonry, shoot booking flow, client proofing portal.
+  - \`stationery-inventory\`: Product catalog, wholesale tier pricing, distributor intake form.
+  - \`real-estate\`: Property listings, virtual tour embeds, scheduled showing requests.
+- **Realistic Screenshot Previews**: High-fidelity visual cards in \`assets/img/tmpl_*\` with fallback state badges.
+- **Instant Search Filter**: Live input filtering across template titles, categories, and tags.
+- **Sticky Bottom Action Bar**: Pinned CTA bar providing responsive back/proceed controls across viewport sizes.
+
+---
+
+## 3. Standardized Canvas Drawers & Overflow Locking (v4.9.351+)
+
+All slide-out panels across the Canvas editor are unified under the standardized \`.cora-drawer\` architecture:
+- **Zero Layout Jumps**: Opening drawers applies \`body.cora-canvas-drawer-open { overflow: hidden !important; }\`, locking background page scrolling and preserving exact scroll coordinates.
+- **Event Listener Resilience**: Standardized drawer open/close lifecycle restores click event listeners cleanly upon drawer termination.
+- **Full Viewport Containment**: Fixed-position z-index overlays with smooth horizontal hardware-accelerated transitions.
+
+---
+
+## 4. AI Tools MCP Gateway & Live Action Playground (v4.9.344+)
+
+The Canvas Template Editor includes a built-in AI Tools MCP Gateway and Live Action Playground:
+- **Interactive Three-Tier Testing**:
+  - **Natural Language Mode (\`nl\`)**: Plain-English prompts translated into validated MCP tool payloads.
+  - **Guided Form Mode (\`guided\`)**: Form-based field inputs with dynamic validation and type checks.
+  - **Developer Mode (\`dev\`)**: Raw JSON payload editing with syntax highlighting and schema validation.
+- **Live MCP Tool Execution**: Executes canonical workspace tools against live workspace data with instant response rendering.
+- **1-Click Code Reflection**: Direct insertion of generated HTML/CSS/JS or tool payloads straight into the Template Editor buffer.
+
+---
+
+## 5. Next.js Git Connector & Route Scanner (v4.9.308–v4.9.316)
 
 Connect your production Next.js repositories directly via GitHub Personal Access Tokens (PAT):
 - **App Router Scanner**: Recursively scans \`app/**/page.tsx\` files and automatically registers discovered routes and page titles.
@@ -617,7 +656,7 @@ Connect your production Next.js repositories directly via GitHub Personal Access
 
 ---
 
-## 4. Headless REST APIs & Live Dev Server Preview Proxy
+## 6. Headless REST APIs & Live Dev Server Preview Proxy
 
 - **Clean REST Endpoints**: \`/wp-json/cora-canvas/v1/manifest\`, \`/wp-json/cora-canvas/v1/page\`, and \`/wp-json/cora-canvas/v1/form-submit\`.
 - **Offline Dev Server Ping**: Automatically tests \`localhost:3000\` within 150ms and provides clear instructions if offline.
@@ -912,13 +951,14 @@ The Financials module provides complete visibility into tax obligations and stre
     categoryLabel: 'Developer APIs & PWA',
     description: 'Progressive Web App specifications, dynamic manifest configuration, sub-50ms cache lifecycle, and VAPID push.',
     readTime: '6 min read',
-    lastUpdated: 'August 2026',
+    lastUpdated: 'October 2026',
     badge: 'Mobile Protocol',
     toc: [
       { id: 'manifest-config', title: '1. Dynamic PWA Manifest' },
       { id: 'service-worker', title: '2. Service Worker Lifecycle' },
       { id: 'vapid-push', title: '3. VAPID Push Implementation' },
       { id: 'admin-badging', title: '4. Super Admin Dynamic Badging' },
+      { id: 'universal-install', title: '5. Universal PWA Install Suite' },
     ],
     content: `
 Cora ships with native Progressive Web App (PWA) capabilities, offering sub-50ms screen painting and native-like offline reliability.
@@ -955,6 +995,15 @@ Registered at root scope (\`/\`):
 
 - Super admin sessions dynamically render badged home screen icons (\`ADMIN\` pill badge across 512x512, 192x192, and Apple Touch icons via \`scripts/generate_admin_pwa_icons.php\`).
 - Prevents visual confusion between client workspace and master control plane on mobile home screens.
+
+---
+
+## 5. Universal PWA Install Suite (v4.9.356+)
+
+Cora provides persistent, frictionless PWA installation triggers across desktop and mobile devices:
+- **Settings Suite Trigger**: \`#cora-settings-install-pwa-btn\` inside Settings Suite enables 1-tap installation directly from workspace preferences.
+- **Sidebar Admin Popover Trigger**: \`#cora-sidebar-install-pwa-btn\` inside the sticky sidebar bottom popover allows instant access from any screen.
+- **Unified \`window.coraPromptPwaInstall()\` Engine**: Gracefully handles the native \`beforeinstallprompt\` browser prompt event, while rendering contextual monochromatic platform guidance on iOS Safari (Share → Add to Home Screen).
     `,
   },
   {
@@ -1029,16 +1078,17 @@ The background compiler (\`cora_nextjs_build_repo\`) supports Next.js, Expo, Vit
     categoryLabel: 'Developer APIs & PWA',
     description: 'Complete API reference for bookings, leads, invoices, e-sign contracts, and PWA push subscriptions.',
     readTime: '8 min read',
-    lastUpdated: 'August 2026',
+    lastUpdated: 'October 2026',
     badge: 'API Spec',
     toc: [
       { id: 'auth', title: '1. Authentication & Nonces' },
       { id: 'crm-endpoints', title: '2. CRM & Lead Endpoints' },
       { id: 'invoicing-endpoints', title: '3. Invoicing & GST Endpoints' },
       { id: 'pwa-endpoints', title: '4. PWA Push Endpoints' },
+      { id: 'mcp-endpoints', title: '5. Universal MCP & OAuth Endpoints' },
     ],
     content: `
-All endpoints are accessible via WordPress REST API (\`/wp-json/cora/v1/\` or \`/wp-json/cora-pwa/v1/\`) and standard AJAX actions.
+All endpoints are accessible via WordPress REST API (\`/wp-json/cora/v1/\` or \`/wp-json/cora-pwa/v1/\` or \`/wp-json/cora-mcp/v1/\`) and standard AJAX actions.
 
 ---
 
@@ -1046,6 +1096,7 @@ All endpoints are accessible via WordPress REST API (\`/wp-json/cora/v1/\` or \`
 
 - **REST Requests**: Require \`X-WP-Nonce\` header or Bearer API token.
 - **AJAX Requests**: Require \`nonce: coraREWPData.ajaxNonce\` in POST body.
+- **MCP & OAuth Requests**: Require \`Authorization: Bearer <token>\` issued via OAuth 2.1 PKCE.
 
 ---
 
@@ -1059,6 +1110,10 @@ All endpoints are accessible via WordPress REST API (\`/wp-json/cora/v1/\` or \`
 | \`POST\` | \`/wp-json/cora/v1/contracts/sign\` | Public (Token-Based) | Submit SHA-256 e-signature |
 | \`POST\` | \`/wp-json/cora-pwa/v1/save-subscription\` | Authenticated User | Store VAPID Web Push subscription |
 | \`GET\` | \`/wp-json/cora-pwa/v1/version-check\` | Public | Query active workspace version & changelog |
+| \`GET\` | \`/wp-json/cora-mcp/v1/openapi.json\` | Public | OpenAPI 3.0.1 schema (curated 28 tools ceiling; \`?all=1\` for full registry) |
+| \`POST\` | \`/wp-json/cora-mcp/v1/rpc\` | Bearer Token (OAuth 2.1) | MCP JSON-RPC 2.0 tool execution gateway |
+| \`GET\` | \`/wp-json/cora-mcp/v1/tools\` | Bearer Token (OAuth 2.1) | Canonical tool registry and capabilities |
+| \`GET\` | \`/.well-known/oauth-authorization-server\` | Public | RFC 8414 & RFC 9728 OAuth 2.1 server metadata |
     `,
   },
   {
@@ -1068,57 +1123,89 @@ All endpoints are accessible via WordPress REST API (\`/wp-json/cora/v1/\` or \`
     category: 'developers',
     categoryLabel: 'Developer APIs & PWA',
     description: 'Connect any MCP-compatible AI assistant (ChatGPT, Claude, Gemini, Cursor, VS Code, Windsurf) to your Cora workspace via standards-compliant OAuth 2.1.',
-    readTime: '6 min read',
-    lastUpdated: 'September 2026',
-    badge: 'Universal MCP 2024-11-05',
+    readTime: '8 min read',
+    lastUpdated: 'October 2026',
+    badge: 'Universal MCP & OpenAPI 3.0.1',
     toc: [
       { id: 'universal-architecture', title: '1. Universal Architecture' },
-      { id: 'oauth-authentication', title: '2. OAuth 2.1 Authentication' },
-      { id: 'client-configuration', title: '3. Connecting AI Clients (ChatGPT, Claude, Cursor)' },
-      { id: 'tools-catalog', title: '4. Canonical Tool Registry & Safety' },
-      { id: 'multi-tenancy', title: '5. Multi-Tenant Security & Isolation' },
+      { id: 'oauth-authentication', title: '2. OAuth 2.1 & Interactive Consent Panel' },
+      { id: 'openapi-chatgpt', title: '3. ChatGPT Custom GPT Actions & OpenAPI 3.0.1' },
+      { id: 'client-configuration', title: '4. Connecting AI Clients (ChatGPT, Claude, Cursor)' },
+      { id: 'tools-catalog', title: '5. Curated 28 Core Tools Registry' },
+      { id: 'canvas-playground', title: '6. Template Editor Live Action Playground' },
+      { id: 'multi-tenancy', title: '7. Multi-Tenant Security & Isolation' },
     ],
     content: `
-The **Cora Universal MCP Server** provides a single, standards-compliant remote endpoint (\`https://app.heycora.in/mcp\`) allowing any Model Context Protocol (MCP) compatible AI client to securely interact with your workspace.
+The **Cora Universal MCP Server** provides a single, standards-compliant remote endpoint (\`https://app.heycora.in/mcp\`) and OpenAPI 3.0.1 schema (\`/wp-json/cora-mcp/v1/openapi.json\`) allowing any Model Context Protocol (MCP) or OpenAI Custom Action client to securely interact with your workspace.
 
 ---
 
 ## 1. Universal Architecture
 
 \`\`\`
-                      ANY MCP CLIENT
- (ChatGPT • Claude • Gemini • Cursor • VS Code • Windsurf • Desktop AI)
-                            ↕
-                 CORA REMOTE MCP ENDPOINT
-               (https://app.heycora.in/mcp)
-                            ↕
-               OAUTH 2.1 AUTHENTICATION
-            (RFC 6749, RFC 7636 PKCE, RFC 7009)
-                            ↕
-               CORA WORKSPACE MULTI-TENANCY
-             (Zero-Trust Server-Side Scoping)
+                      ANY MCP / LLM CLIENT
+  (ChatGPT Actions • Claude Desktop • Gemini • Cursor • VS Code • Windsurf)
+                             ↕
+                  CORA REMOTE MCP ENDPOINTS
+            JSON-RPC 2.0: https://app.heycora.in/mcp
+            OpenAPI 3.0.1: https://app.heycora.in/wp-json/cora-mcp/v1/openapi.json
+                             ↕
+             OAUTH 2.1 & CONSENT PRESETS
+          (RFC 6749, RFC 7636 PKCE, RFC 7591 Dynamic Registration)
+                             ↕
+                CORA WORKSPACE MULTI-TENANCY
+              (Zero-Trust Server-Side Scoping)
 \`\`\`
 
-- **Production Endpoint**: \`https://app.heycora.in/mcp\`
-- **Protocol Version**: \`2024-11-05\` (JSON-RPC 2.0 over HTTP and Server-Sent Events)
+- **Production JSON-RPC Endpoint**: \`https://app.heycora.in/mcp\` (or \`/wp-json/cora-mcp/v1/rpc\`)
+- **OpenAPI 3.0.1 Endpoint**: \`https://app.heycora.in/wp-json/cora-mcp/v1/openapi.json\` (curated 28 tools ceiling; \`?all=1\` for full registry)
 - **OAuth Discovery**: \`https://app.heycora.in/.well-known/oauth-authorization-server\`
 
 ---
 
-## 2. OAuth 2.1 Authentication
+## 2. OAuth 2.1 & Interactive Consent Panel (v4.9.345+)
 
-Cora implements standard OAuth 2.1 with PKCE (\`S256\`) authorization code grant:
+Cora implements standard OAuth 2.1 with PKCE (\`S256\`) authorization code grant and an interactive granular consent panel:
 
 1. **Authorize Endpoint**: \`https://app.heycora.in/oauth/authorize\`
 2. **Token Exchange Endpoint**: \`https://app.heycora.in/oauth/token\`
 3. **Revocation Endpoint**: \`https://app.heycora.in/oauth/revoke\`
 4. **User Info Endpoint**: \`https://app.heycora.in/oauth/userinfo\`
 
-Users review and approve workspace permissions via an interactive consent screen. Tokens are bound strictly to the authorized workspace and automatically expire after 30 days.
+### Interactive Granular Consent Screen
+When an external AI client requests permissions, the workspace owner reviews an interactive consent screen:
+- **Master Authorization Toggle**: Instantly grant or revoke all requested permissions in a single tap.
+- **Category-Level Grouping**: Scopes are neatly organized into logical categories (*Workspace & General*, *CRM & Deals*, *Projects & Tasks*, *Finance & GST*, *Content & Canvas*, *System & Config*).
+- **One-Tap Quick Presets**:
+  - \`all\`: Selects all available read and write scopes.
+  - \`readonly\`: Enforces a strict read-only boundary across all modules.
+  - \`website\`: Grants access limited to Canvas themes and Content CMS.
+- **Cryptographic Binding**: Issued access tokens are bound strictly to the authorized \`agency_id\` and automatically expire after 30 days.
 
 ---
 
-## 3. Client Configuration
+## 3. ChatGPT Custom GPT Actions & OpenAPI 3.0.1 (v4.9.343+)
+
+To ensure seamless, zero-error integration with OpenAI's Custom GPT Actions importer:
+- **OpenAPI 3.0.1 Specification**: Upgraded from 3.1.0 to 3.0.1 to avoid undocumented OpenAI Custom GPT schema parser rejections.
+- **28 Core Actions Ceiling**: OpenAI enforces an undocumented limit of ~30 actions per Custom GPT. Cora caps default discovery at 28 prioritized operational tools. Developers requiring the complete unconstrained tool registry can pass \`?all=1\` or \`limit=all\`.
+- **Strict Schema Hardening**:
+  - Zero emojis in operation summaries, tool names, and parameter descriptions.
+  - All input schemas declare explicit \`type: object\` with valid, non-empty \`properties\` objects.
+  - Empty \`required: []\` arrays are omitted to satisfy OpenAI JSON schema validators.
+
+---
+
+## 4. Connecting AI Clients (ChatGPT, Claude, Cursor)
+
+### ChatGPT Custom GPT Action
+1. In the GPT Builder, select **Configure → Create new action**.
+2. Set **Authentication**: \`OAuth\`.
+3. Set **Client ID** & **Client Secret** (from Cora Settings → AI Assistants).
+4. Set **Authorization URL**: \`https://app.heycora.in/oauth/authorize\`
+5. Set **Token URL**: \`https://app.heycora.in/oauth/token\`
+6. Set **Scope**: \`workspace:read leads:read leads:write tasks:read tasks:write finance:read\`
+7. Import Schema from URL: \`https://app.heycora.in/wp-json/cora-mcp/v1/openapi.json\`
 
 ### Claude Desktop (\`claude_desktop_config.json\`)
 \`\`\`json
@@ -1136,18 +1223,9 @@ In **Settings → Features → MCP**, add a new server:
 - **Type**: \`SSE / Remote\`
 - **URL**: \`https://app.heycora.in/mcp\`
 
-### Generic MCP Client (JSON-RPC 2.0)
-\`\`\`json
-{
-  "server": "https://app.heycora.in/mcp",
-  "protocolVersion": "2024-11-05",
-  "auth": "OAuth 2.1"
-}
-\`\`\`
-
 ---
 
-## 4. Canonical Tool Registry & Safety Metadata
+## 5. Curated 28 Core Tools Registry
 
 Every Cora tool exposes explicit model-independent safety annotations:
 
@@ -1164,17 +1242,39 @@ Every Cora tool exposes explicit model-independent safety annotations:
 | \`cora.create_project\` | \`projects:write\` | Write | Schedule a new shoot project |
 | \`cora.list_tasks\` | \`tasks:read\` | Read-Only | Inspect Kanban task boards |
 | \`cora.create_task\` | \`tasks:write\` | Write | Create and assign operational action items |
+| \`cora.update_task_status\` | \`tasks:write\` | Write | Move task across Kanban columns |
 | \`cora.query_financials\` | \`finance:read\` | Read-Only | Query GST tax breakdown, invoices, receivables |
 | \`cora.record_financial_transaction\` | \`finance:write\` | Write | Record payment receipt or expense |
+| \`cora.list_invoices\` | \`finance:read\` | Read-Only | Fetch invoice records with tax breakdown |
 | \`cora.search_content\` | \`content:read\` | Read-Only | Search Growth CMS articles & guides |
 | \`cora.create_article\` | \`content:write\` | Write | Draft structured article with quick_answer |
 | \`cora.create_guide\` | \`content:write\` | Write | Draft flagship multi-chapter guide |
 | \`cora.publish_content\` | \`content:write\` | Destructive | Validate, publish live, and verify public URL |
 | \`cora.rollback_content\` | \`content:write\` | Destructive | Roll back to previous revision snapshot |
+| \`cora.list_canvas_themes\` | \`canvas:read\` | Read-Only | List active and draft Canvas website themes |
+| \`cora.get_canvas_theme_files\` | \`canvas:read\` | Read-Only | Inspect template HTML, CSS, and JS files |
+| \`cora.save_canvas_theme_file\` | \`canvas:write\` | Write | Save or update Canvas template code assets |
+| \`cora.list_inventory\` | \`inventory:read\` | Read-Only | Query warehouse stock and van consignments |
+| \`cora.record_stock_movement\` | \`inventory:write\` | Write | Record stock transfer, dispatch, or spot sale |
+| \`cora.list_team_members\` | \`team:read\` | Read-Only | Query team roster, roles, and status |
+| \`cora.get_audit_log\` | \`system:read\` | Read-Only | Retrieve platform security and audit logs |
+| \`cora.get_system_health\` | \`system:read\` | Read-Only | Query uptime, queue latency, and storage quota |
 
 ---
 
-## 5. Multi-Tenant Security & Isolation
+## 6. Template Editor Live Action Playground (v4.9.344+)
+
+The Canvas Template Editor includes a native AI Tools MCP Gateway & Live Action Playground:
+- **Interactive Three-Tier Testing**:
+  - **Natural Language Mode (\`nl\`)**: Plain-English prompts translated into validated MCP tool payloads.
+  - **Guided Form Mode (\`guided\`)**: Form-based field inputs with dynamic validation and type checks.
+  - **Developer Mode (\`dev\`)**: Raw JSON payload editing with syntax highlighting and schema validation.
+- **Live Tool Execution**: Calls the MCP gateway against real workspace records and displays response JSON.
+- **1-Click Code Reflection**: Directly copies generated payloads or templates into the Template Editor code pane.
+
+---
+
+## 7. Multi-Tenant Security & Isolation
 
 - **Server-Side Enforcement**: All operations are scoped by \`agency_id\` extracted from the cryptographically verified token.
 - **Audit Logging**: Every AI tool execution is permanently logged in \`wp_cora_mcp_audit_log\`.

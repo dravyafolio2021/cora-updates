@@ -1,560 +1,2145 @@
 {
-  "openapi": "3.1.0",
-  "info": {
-    "title": "Cora Workspace AI Actions Gateway",
-    "description": "Universal Model Context Protocol & OpenAI Actions API allowing ChatGPT Custom GPTs, Claude, and external AI agents to query and operate the Cora Workspace.",
-    "version": "1.0.0"
-  },
-  "servers": [
-    {
-      "url": "https://stagging.heycora.in",
-      "description": "Cora Production Gateway"
-    }
-  ],
-  "paths": {
-    "/wp-json/cora/v1/mcp/tool/cora_get_workspace_overview": {
-      "post": {
-        "operationId": "cora_get_workspace_overview",
-        "summary": "Retrieve high-level business pulse, key performance metrics, pipeline deal value, collected revenue, outstanding receivables, active bookings/shoots, and pending tasks for the authenticated workspace.",
-        "description": "Retrieve high-level business pulse, key performance metrics, pipeline deal value, collected revenue, outstanding receivables, active bookings/shoots, and pending tasks for the authenticated workspace.",
-        "requestBody": {
-          "required": false,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {}
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Overview retrieved successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": { "type": "boolean" },
-                    "data": { "type": "object" }
-                  }
-                }
-              }
-            }
-          },
-          "401": { "description": "Unauthorized / Invalid Bearer token" }
-        },
-        "security": [
-          { "BearerAuth": [] },
-          { "OAuth2": ["workspace:read"] }
-        ]
-      }
+    "openapi": "3.0.1",
+    "info": {
+        "title": "Cora Workspace AI Actions Gateway",
+        "description": "Universal Model Context Protocol & OpenAI Actions API allowing ChatGPT Custom GPTs, Claude, and external AI agents to query and operate the Cora Workspace.",
+        "version": "4.9.357"
     },
-    "/wp-json/cora/v1/mcp/tool/cora_search_knowledge_base": {
-      "post": {
-        "operationId": "cora_search_knowledge_base",
-        "summary": "Semantic & keyword search across workspace living memory and operational documents.",
-        "description": "Semantic & keyword search across the workspace living memory, ingested operational history, policy guidelines, client records, and documents.",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "query": { "type": "string", "description": "Search query or question." },
-                  "category": { "type": "string", "description": "Optional category filter: financials, crm, operations, vault, reviews, activity, clients." },
-                  "limit": { "type": "integer", "description": "Max fragments (default: 5)." }
-                },
-                "required": ["query"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": { "description": "Search results retrieved" }
-        },
-        "security": [
-          { "BearerAuth": [] },
-          { "OAuth2": ["knowledge:read"] }
-        ]
-      }
-    },
-    "/wp-json/cora/v1/mcp/tool/cora_list_clients": {
-      "post": {
-        "operationId": "cora_list_clients",
-        "summary": "List client profiles and contact records.",
-        "description": "List client profiles, company names, contact phone/emails, and records in the workspace.",
-        "requestBody": {
-          "required": false,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "search": { "type": "string", "description": "Search query by name, email, phone, or company." },
-                  "type": { "type": "string", "description": "Filter by client type: client, buyer, seller, commercial, vip, or all." },
-                  "limit": { "type": "integer", "description": "Max records (default: 20)." }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": { "description": "Clients listed successfully" }
-        },
-        "security": [
-          { "BearerAuth": [] },
-          { "OAuth2": ["clients:read"] }
-        ]
-      }
-    },
-    "/wp-json/cora/v1/mcp/tool/cora_get_client": {
-      "post": {
-        "operationId": "cora_get_client",
-        "summary": "Retrieve complete profile details for a specific client.",
-        "description": "Retrieve complete profile details, active bookings, transactions, and notes for a specific client.",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "client_id": { "type": "integer", "description": "Unique ID of the client." }
-                },
-                "required": ["client_id"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": { "description": "Client profile details" }
-        },
-        "security": [
-          { "BearerAuth": [] },
-          { "OAuth2": ["clients:read"] }
-        ]
-      }
-    },
-    "/wp-json/cora/v1/mcp/tool/cora_create_client": {
-      "post": {
-        "operationId": "cora_create_client",
-        "summary": "Create a new client record in CRM.",
-        "description": "Create a new client record in the workspace CRM.",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "name": { "type": "string", "description": "Full name of the client or representative." },
-                  "email": { "type": "string", "description": "Email address." },
-                  "phone": { "type": "string", "description": "Phone number." },
-                  "company": { "type": "string", "description": "Company or organization name." },
-                  "type": { "type": "string", "description": "Type: client, commercial, buyer, seller, vip (default: client)." },
-                  "notes": { "type": "string", "description": "Initial notes or background." }
-                },
-                "required": ["name"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": { "description": "Client created successfully" }
-        },
-        "security": [
-          { "BearerAuth": [] },
-          { "OAuth2": ["clients:write"] }
-        ]
-      }
-    },
-    "/wp-json/cora/v1/mcp/tool/cora_list_leads": {
-      "post": {
-        "operationId": "cora_list_leads",
-        "summary": "List sales inquiries and deals across the CRM funnel.",
-        "description": "List inquiries, prospect leads, and deals across the CRM funnel with status and estimated deal values.",
-        "requestBody": {
-          "required": false,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "status": { "type": "string", "description": "Filter by status: new, contacted, qualified, proposal_sent, won, lost, or all." },
-                  "search": { "type": "string", "description": "Search by lead name, email, phone, or requirement." },
-                  "limit": { "type": "integer", "description": "Max records (default: 20)." }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": { "description": "Leads retrieved successfully" }
-        },
-        "security": [
-          { "BearerAuth": [] },
-          { "OAuth2": ["leads:read"] }
-        ]
-      }
-    },
-    "/wp-json/cora/v1/mcp/tool/cora_create_lead": {
-      "post": {
-        "operationId": "cora_create_lead",
-        "summary": "Capture a new incoming inquiry or sales opportunity.",
-        "description": "Capture a new incoming inquiry, project lead, or sales opportunity into the pipeline.",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "name": { "type": "string", "description": "Full name of the prospect." },
-                  "email": { "type": "string", "description": "Email address." },
-                  "phone": { "type": "string", "description": "Phone number." },
-                  "requirement": { "type": "string", "description": "Service needed or project description." },
-                  "estimated_value": { "type": "number", "description": "Estimated deal value in INR/currency." },
-                  "source": { "type": "string", "description": "Lead source: website, instagram, referral, phone, walk_in, ai_chat." }
-                },
-                "required": ["name"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": { "description": "Lead captured successfully" }
-        },
-        "security": [
-          { "BearerAuth": [] },
-          { "OAuth2": ["leads:write"] }
-        ]
-      }
-    },
-    "/wp-json/cora/v1/mcp/tool/cora_update_lead_status": {
-      "post": {
-        "operationId": "cora_update_lead_status",
-        "summary": "Update the pipeline stage or details of a lead.",
-        "description": "Update the pipeline stage, estimated value, or notes of a CRM lead.",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "lead_id": { "type": "integer", "description": "ID of the lead." },
-                  "status": { "type": "string", "description": "New status: new, contacted, qualified, proposal_sent, won, lost." },
-                  "notes": { "type": "string", "description": "Optional status update notes." },
-                  "estimated_value": { "type": "number", "description": "Updated deal value." }
-                },
-                "required": ["lead_id", "status"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": { "description": "Lead status updated" }
-        },
-        "security": [
-          { "BearerAuth": [] },
-          { "OAuth2": ["leads:write"] }
-        ]
-      }
-    },
-    "/wp-json/cora/v1/mcp/tool/cora_list_bookings": {
-      "post": {
-        "operationId": "cora_list_bookings",
-        "summary": "List calendar schedule and booking sessions.",
-        "description": "List calendar schedule, photo shoots, client appointments, and project dates.",
-        "requestBody": {
-          "required": false,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "start_date": { "type": "string", "description": "Start date filter (YYYY-MM-DD)." },
-                  "end_date": { "type": "string", "description": "End date filter (YYYY-MM-DD)." },
-                  "status": { "type": "string", "description": "Filter: confirmed, tentative, completed, cancelled, or all." },
-                  "limit": { "type": "integer", "description": "Max records (default: 20)." }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": { "description": "Bookings listed successfully" }
-        },
-        "security": [
-          { "BearerAuth": [] },
-          { "OAuth2": ["bookings:read"] }
-        ]
-      }
-    },
-    "/wp-json/cora/v1/mcp/tool/cora_create_booking": {
-      "post": {
-        "operationId": "cora_create_booking",
-        "summary": "Schedule a new photo shoot or client appointment.",
-        "description": "Schedule a new photo shoot, client appointment, or project session on the studio calendar.",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "title": { "type": "string", "description": "Title of the session or shoot." },
-                  "client_id": { "type": "integer", "description": "Optional linked client ID." },
-                  "client_name": { "type": "string", "description": "Client name if not linked to client_id." },
-                  "shoot_date": { "type": "string", "description": "Date of the shoot (YYYY-MM-DD)." },
-                  "start_time": { "type": "string", "description": "Start time (HH:MM or HH:MM:SS)." },
-                  "end_time": { "type": "string", "description": "End time (HH:MM or HH:MM:SS)." },
-                  "location": { "type": "string", "description": "Location or studio bay." },
-                  "package_name": { "type": "string", "description": "Service package name." },
-                  "total_amount": { "type": "number", "description": "Total session booking amount." }
-                },
-                "required": ["title", "shoot_date"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": { "description": "Booking scheduled" }
-        },
-        "security": [
-          { "BearerAuth": [] },
-          { "OAuth2": ["bookings:write"] }
-        ]
-      }
-    },
-    "/wp-json/cora/v1/mcp/tool/cora_calculate_gst": {
-      "post": {
-        "operationId": "cora_calculate_gst",
-        "summary": "Calculate statutory GST tax breakdowns.",
-        "description": "Calculate exact Indian statutory GST tax breakdowns, CGST, SGST, IGST, and total invoice amounts given a base amount and state parameters.",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "base_amount": { "type": "number", "description": "Net taxable base amount in INR." },
-                  "gst_rate": { "type": "number", "description": "GST rate percentage (e.g. 18 for 18%). Default: 18." },
-                  "is_interstate": { "type": "boolean", "description": "Set true if client is located in a different state (applies IGST). Default: false (applies CGST + SGST)." },
-                  "is_inclusive": { "type": "boolean", "description": "Set true if the base_amount already includes GST (reverse calculation). Default: false." }
-                },
-                "required": ["base_amount"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": { "description": "GST breakdown calculation" }
-        },
-        "security": [
-          { "BearerAuth": [] },
-          { "OAuth2": ["invoices:read"] }
-        ]
-      }
-    },
-    "/wp-json/cora/v1/mcp/tool/cora_list_invoices": {
-      "post": {
-        "operationId": "cora_list_invoices",
-        "summary": "List client invoices and receivables.",
-        "description": "List client invoices, quotations, paid amounts, and outstanding receivables.",
-        "requestBody": {
-          "required": false,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "status": { "type": "string", "description": "Filter: paid, unpaid, partially_paid, overdue, draft, or all." },
-                  "client_id": { "type": "integer", "description": "Filter by client ID." },
-                  "search": { "type": "string", "description": "Search by invoice number or client name." },
-                  "limit": { "type": "integer", "description": "Max records (default: 20)." }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": { "description": "Invoices listed" }
-        },
-        "security": [
-          { "BearerAuth": [] },
-          { "OAuth2": ["invoices:read"] }
-        ]
-      }
-    },
-    "/wp-json/cora/v1/mcp/tool/cora_create_invoice": {
-      "post": {
-        "operationId": "cora_create_invoice",
-        "summary": "Generate a compliant tax invoice or quotation.",
-        "description": "Generate a compliant tax invoice or quotation with line items and GST calculation.",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "client_id": { "type": "integer", "description": "Optional linked client ID." },
-                  "client_name": { "type": "string", "description": "Client full name or company." },
-                  "client_gstin": { "type": "string", "description": "Optional Client 15-digit GSTIN." },
-                  "line_items": {
-                    "type": "array",
-                    "description": "List of line items with description, quantity, rate, and amount.",
-                    "items": { "type": "object" }
-                  },
-                  "gst_rate": { "type": "number", "description": "GST percentage rate (default: 18)." },
-                  "is_interstate": { "type": "boolean", "description": "True for IGST, false for CGST+SGST." },
-                  "due_date": { "type": "string", "description": "Payment due date (YYYY-MM-DD)." },
-                  "notes": { "type": "string", "description": "Terms, bank account details, or payment notes." }
-                },
-                "required": ["client_name", "line_items"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": { "description": "Invoice generated" }
-        },
-        "security": [
-          { "BearerAuth": [] },
-          { "OAuth2": ["invoices:write"] }
-        ]
-      }
-    },
-    "/wp-json/cora/v1/mcp/tool/cora_list_tasks": {
-      "post": {
-        "operationId": "cora_list_tasks",
-        "summary": "List operational tasks and crew assignments.",
-        "description": "List operational tasks, team assignments, shoot prep checklists, and deadlines.",
-        "requestBody": {
-          "required": false,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "status": { "type": "string", "description": "Filter: pending, in_progress, completed, cancelled, or all." },
-                  "priority": { "type": "string", "description": "Filter: low, medium, high, urgent." },
-                  "assigned_to": { "type": "integer", "description": "Filter by assigned user ID." },
-                  "limit": { "type": "integer", "description": "Max records (default: 20)." }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": { "description": "Tasks listed" }
-        },
-        "security": [
-          { "BearerAuth": [] },
-          { "OAuth2": ["tasks:read"] }
-        ]
-      }
-    },
-    "/wp-json/cora/v1/mcp/tool/cora_create_task": {
-      "post": {
-        "operationId": "cora_create_task",
-        "summary": "Create an operational task or assignment.",
-        "description": "Create an operational task, shoot checklist item, or team assignment.",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "title": { "type": "string", "description": "Task title or instruction." },
-                  "description": { "type": "string", "description": "Detailed description or checklist." },
-                  "priority": { "type": "string", "description": "Priority: low, medium, high, urgent (default: medium)." },
-                  "due_date": { "type": "string", "description": "Due date (YYYY-MM-DD)." },
-                  "assigned_to": { "type": "integer", "description": "User ID to assign task to." }
-                },
-                "required": ["title"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": { "description": "Task created" }
-        },
-        "security": [
-          { "BearerAuth": [] },
-          { "OAuth2": ["tasks:write"] }
-        ]
-      }
-    },
-    "/wp-json/cora/v1/mcp/tool/cora_list_vault_documents": {
-      "post": {
-        "operationId": "cora_list_vault_documents",
-        "summary": "List client contracts and e-sign records.",
-        "description": "List client contracts, agreements, model releases, and e-sign registry records in the document vault.",
-        "requestBody": {
-          "required": false,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "client_id": { "type": "integer", "description": "Filter by client ID." },
-                  "status": { "type": "string", "description": "Filter: signed, pending, expired, draft, or all." },
-                  "search": { "type": "string", "description": "Search by document title or reference number." },
-                  "limit": { "type": "integer", "description": "Max records (default: 20)." }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": { "description": "Vault documents listed" }
-        },
-        "security": [
-          { "BearerAuth": [] },
-          { "OAuth2": ["workspace:read"] }
-        ]
-      }
-    }
-  },
-  "components": {
-    "securitySchemes": {
-      "BearerAuth": {
-        "type": "http",
-        "scheme": "bearer",
-        "description": "Enter your Cora Workspace MCP Access Token (found in Cora Workspace -> AI Tools / MCP)"
-      },
-      "OAuth2": {
-        "type": "oauth2",
-        "description": "Cora Workspace OAuth 2.1 Authorization Code Flow",
-        "flows": {
-          "authorizationCode": {
-            "authorizationUrl": "https://stagging.heycora.in/oauth/authorize",
-            "tokenUrl": "https://stagging.heycora.in/oauth/token",
-            "scopes": {
-              "workspace:read": "Read workspace pulse and metrics",
-              "leads:read": "Read CRM leads and deal pipeline",
-              "leads:write": "Create and update CRM leads",
-              "clients:read": "Read client profiles and contacts",
-              "clients:write": "Create and edit client profiles",
-              "bookings:read": "Read calendar bookings and shoot schedules",
-              "bookings:write": "Create and update shoot bookings",
-              "invoices:read": "Read invoices and GST tax math",
-              "invoices:write": "Generate compliant tax invoices",
-              "tasks:read": "Read operational tasks and attendance",
-              "tasks:write": "Create and assign team tasks",
-              "knowledge:read": "Search living memory and documents",
-              "knowledge:write": "Store new operational memory fragments"
-            }
-          }
+    "servers": [
+        {
+            "url": "https://stagging.heycora.in",
+            "description": "Cora Live Server"
         }
-      }
-    }
-  }
+    ],
+    "paths": {
+        "/wp-json/cora/v1/mcp/tool/cora_get_workspace_overview": {
+            "post": {
+                "operationId": "cora_get_workspace_overview",
+                "summary": "Retrieve high-level business pulse, key performance metrics, pipeline deal value, collected revenue, outstanding receivables, active bookings/shoots, and pending tasks for the authenticated workspace.",
+                "description": "Retrieve high-level business pulse, key performance metrics, pipeline deal value, collected revenue, outstanding receivables, active bookings/shoots, and pending tasks for the authenticated workspace.",
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {}
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Tool execution successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "result": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters"
+                    },
+                    "401": {
+                        "description": "Unauthorized / Invalid Bearer token"
+                    }
+                },
+                "security": [
+                    {
+                        "OAuth2": [
+                            "workspace:read"
+                        ]
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/wp-json/cora/v1/mcp/tool/cora_canvas_get_active_theme": {
+            "post": {
+                "operationId": "cora_canvas_get_active_theme",
+                "summary": "Retrieve active Canvas website theme information, builder type (HTML AI / Next.js / Elementor / Lovable), live site preview URL, and static build status for the authenticated workspace.",
+                "description": "Retrieve active Canvas website theme information, builder type (HTML AI / Next.js / Elementor / Lovable), live site preview URL, and static build status for the authenticated workspace.",
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "theme_id": {
+                                        "type": "integer",
+                                        "description": "Optional theme ID (defaults to active live theme)."
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Tool execution successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "result": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters"
+                    },
+                    "401": {
+                        "description": "Unauthorized / Invalid Bearer token"
+                    }
+                },
+                "security": [
+                    {
+                        "OAuth2": [
+                            "canvas:read"
+                        ]
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/wp-json/cora/v1/mcp/tool/cora_canvas_list_themes": {
+            "post": {
+                "operationId": "cora_canvas_list_themes",
+                "summary": "List all Canvas website themes, builders (HTML AI / Next.js / Elementor), live/draft statuses, and preview links for the workspace.",
+                "description": "List all Canvas website themes, builders (HTML AI / Next.js / Elementor), live/draft statuses, and preview links for the workspace.",
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {}
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Tool execution successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "result": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters"
+                    },
+                    "401": {
+                        "description": "Unauthorized / Invalid Bearer token"
+                    }
+                },
+                "security": [
+                    {
+                        "OAuth2": [
+                            "canvas:read"
+                        ]
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/wp-json/cora/v1/mcp/tool/cora_canvas_get_page_html": {
+            "post": {
+                "operationId": "cora_canvas_get_page_html",
+                "summary": "Get the full HTML source code of the active landing page or a specific Canvas page.",
+                "description": "Get the full HTML source code of the active landing page or a specific Canvas page.",
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "page_slug": {
+                                        "type": "string",
+                                        "description": "Page slug to retrieve (default: home)."
+                                    },
+                                    "theme_id": {
+                                        "type": "integer",
+                                        "description": "Optional theme ID (defaults to active live theme)."
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Tool execution successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "result": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters"
+                    },
+                    "401": {
+                        "description": "Unauthorized / Invalid Bearer token"
+                    }
+                },
+                "security": [
+                    {
+                        "OAuth2": [
+                            "canvas:read"
+                        ]
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/wp-json/cora/v1/mcp/tool/cora_canvas_update_page_html": {
+            "post": {
+                "operationId": "cora_canvas_update_page_html",
+                "summary": "Update and publish live HTML markup for the active landing page or static website. Immediately replaces index.html in the static build folder and updates the live site instantly without manual redeployment.",
+                "description": "Update and publish live HTML markup for the active landing page or static website. Immediately replaces index.html in the static build folder and updates the live site instantly without manual redeployment.",
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "html": {
+                                        "type": "string",
+                                        "description": "Complete, valid HTML document source markup to publish live."
+                                    },
+                                    "page_slug": {
+                                        "type": "string",
+                                        "description": "Page slug to update (default: home)."
+                                    },
+                                    "theme_id": {
+                                        "type": "integer",
+                                        "description": "Optional theme ID (defaults to active live theme)."
+                                    },
+                                    "change_summary": {
+                                        "type": "string",
+                                        "description": "Brief description of the changes made (e.g. Updated hero banner and contact form)."
+                                    }
+                                },
+                                "required": [
+                                    "html"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Tool execution successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "result": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters"
+                    },
+                    "401": {
+                        "description": "Unauthorized / Invalid Bearer token"
+                    }
+                },
+                "security": [
+                    {
+                        "OAuth2": [
+                            "canvas:write"
+                        ]
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/wp-json/cora/v1/mcp/tool/cora_canvas_create_theme": {
+            "post": {
+                "operationId": "cora_canvas_create_theme",
+                "summary": "Create a brand new website theme / project with custom HTML code and optionally set it live immediately.",
+                "description": "Create a brand new website theme / project with custom HTML code and optionally set it live immediately.",
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "description": "Name of the new theme (e.g. Minimalist Agency)."
+                                    },
+                                    "html": {
+                                        "type": "string",
+                                        "description": "Initial HTML/Tailwind landing page code."
+                                    },
+                                    "template_key": {
+                                        "type": "string",
+                                        "description": "Template category: agency, saas, consulting, photography, or custom."
+                                    },
+                                    "activate_live": {
+                                        "type": "boolean",
+                                        "description": "Whether to set this new theme as the live production site immediately (default: true)."
+                                    }
+                                },
+                                "required": [
+                                    "name"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Tool execution successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "result": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters"
+                    },
+                    "401": {
+                        "description": "Unauthorized / Invalid Bearer token"
+                    }
+                },
+                "security": [
+                    {
+                        "OAuth2": [
+                            "canvas:write"
+                        ]
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/wp-json/cora/v1/mcp/tool/cora_canvas_activate_theme": {
+            "post": {
+                "operationId": "cora_canvas_activate_theme",
+                "summary": "Switch and activate a specific theme ID to be the live production website for the workspace.",
+                "description": "Switch and activate a specific theme ID to be the live production website for the workspace.",
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "theme_id": {
+                                        "type": "integer",
+                                        "description": "ID of the theme to activate live."
+                                    }
+                                },
+                                "required": [
+                                    "theme_id"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Tool execution successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "result": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters"
+                    },
+                    "401": {
+                        "description": "Unauthorized / Invalid Bearer token"
+                    }
+                },
+                "security": [
+                    {
+                        "OAuth2": [
+                            "canvas:write"
+                        ]
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/wp-json/cora/v1/mcp/tool/cora_get_website_settings": {
+            "post": {
+                "operationId": "cora_get_website_settings",
+                "summary": "Get website branding, business name, tagline, address, contact email/phone, and SEO settings.",
+                "description": "Get website branding, business name, tagline, address, contact email/phone, and SEO settings.",
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {}
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Tool execution successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "result": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters"
+                    },
+                    "401": {
+                        "description": "Unauthorized / Invalid Bearer token"
+                    }
+                },
+                "security": [
+                    {
+                        "OAuth2": [
+                            "workspace:read"
+                        ]
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/wp-json/cora/v1/mcp/tool/cora_update_website_settings": {
+            "post": {
+                "operationId": "cora_update_website_settings",
+                "summary": "Update website branding, business name, address, contact information, and meta descriptions.",
+                "description": "Update website branding, business name, address, contact information, and meta descriptions.",
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "business_name": {
+                                        "type": "string",
+                                        "description": "Business / Studio name."
+                                    },
+                                    "tagline": {
+                                        "type": "string",
+                                        "description": "Hero tagline or slogan."
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "description": "Public contact email."
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "description": "Public contact phone / WhatsApp."
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "description": "Studio or office address."
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Tool execution successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "result": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters"
+                    },
+                    "401": {
+                        "description": "Unauthorized / Invalid Bearer token"
+                    }
+                },
+                "security": [
+                    {
+                        "OAuth2": [
+                            "workspace:write"
+                        ]
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/wp-json/cora/v1/mcp/tool/cora_list_leads": {
+            "post": {
+                "operationId": "cora_list_leads",
+                "summary": "List sales inquiries and deals from the CRM funnel with status, budget, location, and deal values.",
+                "description": "List sales inquiries and deals from the CRM funnel with status, budget, location, and deal values.",
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "status": {
+                                        "type": "string",
+                                        "description": "Filter by stage: new, contacted, qualified, proposal_sent, won, lost, or all."
+                                    },
+                                    "search": {
+                                        "type": "string",
+                                        "description": "Search by lead name, phone, email, or city."
+                                    },
+                                    "limit": {
+                                        "type": "integer",
+                                        "description": "Max records (default: 20)."
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Tool execution successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "result": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters"
+                    },
+                    "401": {
+                        "description": "Unauthorized / Invalid Bearer token"
+                    }
+                },
+                "security": [
+                    {
+                        "OAuth2": [
+                            "leads:read"
+                        ]
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/wp-json/cora/v1/mcp/tool/cora_get_lead": {
+            "post": {
+                "operationId": "cora_get_lead",
+                "summary": "Get detailed lead inquiry, deal stage, budget requirements, and communication notes.",
+                "description": "Get detailed lead inquiry, deal stage, budget requirements, and communication notes.",
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "lead_id": {
+                                        "type": "integer",
+                                        "description": "ID of the lead."
+                                    }
+                                },
+                                "required": [
+                                    "lead_id"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Tool execution successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "result": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters"
+                    },
+                    "401": {
+                        "description": "Unauthorized / Invalid Bearer token"
+                    }
+                },
+                "security": [
+                    {
+                        "OAuth2": [
+                            "leads:read"
+                        ]
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/wp-json/cora/v1/mcp/tool/cora_create_lead": {
+            "post": {
+                "operationId": "cora_create_lead",
+                "summary": "Create a new CRM inquiry or prospective client lead with estimated project value and requirements.",
+                "description": "Create a new CRM inquiry or prospective client lead with estimated project value and requirements.",
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "description": "Lead full name or contact person."
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "description": "Email address."
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "description": "Phone or WhatsApp number."
+                                    },
+                                    "city": {
+                                        "type": "string",
+                                        "description": "City, location, or area."
+                                    },
+                                    "property_type": {
+                                        "type": "string",
+                                        "description": "Service/Property type (e.g. Wedding, Commercial, Studio, Villa, 3BHK)."
+                                    },
+                                    "deal_value": {
+                                        "type": "number",
+                                        "description": "Estimated budget or deal value in INR (\u20b9)."
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "description": "Initial deal status: new, contacted, qualified (default: new)."
+                                    },
+                                    "notes": {
+                                        "type": "string",
+                                        "description": "Inquiry details, project requirements, or notes."
+                                    }
+                                },
+                                "required": [
+                                    "name"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Tool execution successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "result": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters"
+                    },
+                    "401": {
+                        "description": "Unauthorized / Invalid Bearer token"
+                    }
+                },
+                "security": [
+                    {
+                        "OAuth2": [
+                            "leads:write"
+                        ]
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/wp-json/cora/v1/mcp/tool/cora_update_lead": {
+            "post": {
+                "operationId": "cora_update_lead",
+                "summary": "Update lead contact details, deal value, status, or notes.",
+                "description": "Update lead contact details, deal value, status, or notes.",
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "lead_id": {
+                                        "type": "integer",
+                                        "description": "ID of the lead to update."
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "description": "Lead name."
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "description": "Email address."
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "description": "Phone number."
+                                    },
+                                    "city": {
+                                        "type": "string",
+                                        "description": "City / location."
+                                    },
+                                    "deal_value": {
+                                        "type": "number",
+                                        "description": "Deal value / budget in INR."
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "description": "Stage: new, contacted, qualified, won, lost."
+                                    },
+                                    "notes": {
+                                        "type": "string",
+                                        "description": "Updated notes."
+                                    }
+                                },
+                                "required": [
+                                    "lead_id"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Tool execution successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "result": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters"
+                    },
+                    "401": {
+                        "description": "Unauthorized / Invalid Bearer token"
+                    }
+                },
+                "security": [
+                    {
+                        "OAuth2": [
+                            "leads:write"
+                        ]
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/wp-json/cora/v1/mcp/tool/cora_list_clients": {
+            "post": {
+                "operationId": "cora_list_clients",
+                "summary": "List client profiles, company names, contact phone/emails, and records in the workspace.",
+                "description": "List client profiles, company names, contact phone/emails, and records in the workspace.",
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "search": {
+                                        "type": "string",
+                                        "description": "Optional search query by name, email, phone, or company."
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "description": "Filter by client type: client, buyer, seller, commercial, vip, or all."
+                                    },
+                                    "limit": {
+                                        "type": "integer",
+                                        "description": "Max records (default: 20)."
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Tool execution successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "result": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters"
+                    },
+                    "401": {
+                        "description": "Unauthorized / Invalid Bearer token"
+                    }
+                },
+                "security": [
+                    {
+                        "OAuth2": [
+                            "clients:read"
+                        ]
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/wp-json/cora/v1/mcp/tool/cora_create_client": {
+            "post": {
+                "operationId": "cora_create_client",
+                "summary": "Create a new client record in the workspace CRM.",
+                "description": "Create a new client record in the workspace CRM.",
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "description": "Client full name or primary contact."
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "description": "Client email address."
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "description": "Client phone number."
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "description": "Client classification: client, buyer, seller, commercial, vip (default: client)."
+                                    },
+                                    "company_name": {
+                                        "type": "string",
+                                        "description": "Company or brand name."
+                                    },
+                                    "notes": {
+                                        "type": "string",
+                                        "description": "Initial notes, background, or requirements."
+                                    }
+                                },
+                                "required": [
+                                    "name"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Tool execution successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "result": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters"
+                    },
+                    "401": {
+                        "description": "Unauthorized / Invalid Bearer token"
+                    }
+                },
+                "security": [
+                    {
+                        "OAuth2": [
+                            "clients:write"
+                        ]
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/wp-json/cora/v1/mcp/tool/cora_list_projects": {
+            "post": {
+                "operationId": "cora_list_projects",
+                "summary": "List studio bookings, shoot dates, project milestones, package amounts, and delivery statuses.",
+                "description": "List studio bookings, shoot dates, project milestones, package amounts, and delivery statuses.",
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "status": {
+                                        "type": "string",
+                                        "description": "Filter by status: confirmed, completed, cancelled, or all."
+                                    },
+                                    "limit": {
+                                        "type": "integer",
+                                        "description": "Max records (default: 20)."
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Tool execution successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "result": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters"
+                    },
+                    "401": {
+                        "description": "Unauthorized / Invalid Bearer token"
+                    }
+                },
+                "security": [
+                    {
+                        "OAuth2": [
+                            "projects:read"
+                        ]
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/wp-json/cora/v1/mcp/tool/cora_create_project": {
+            "post": {
+                "operationId": "cora_create_project",
+                "summary": "Schedule a new shoot booking or create an operational project with package value and crew.",
+                "description": "Schedule a new shoot booking or create an operational project with package value and crew.",
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "client_name": {
+                                        "type": "string",
+                                        "description": "Client or brand name."
+                                    },
+                                    "event_type": {
+                                        "type": "string",
+                                        "description": "Event/shoot type: wedding, fashion, commercial, product, portrait, etc."
+                                    },
+                                    "start_date": {
+                                        "type": "string",
+                                        "description": "Shoot/booking date (YYYY-MM-DD or datetime)."
+                                    },
+                                    "location": {
+                                        "type": "string",
+                                        "description": "Location or studio bay."
+                                    },
+                                    "amount": {
+                                        "type": "number",
+                                        "description": "Total package amount in INR (\u20b9)."
+                                    },
+                                    "crew": {
+                                        "type": "string",
+                                        "description": "Assigned crew, photographers, or team members."
+                                    },
+                                    "notes": {
+                                        "type": "string",
+                                        "description": "Deliverables and equipment notes."
+                                    }
+                                },
+                                "required": [
+                                    "client_name",
+                                    "start_date"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Tool execution successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "result": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters"
+                    },
+                    "401": {
+                        "description": "Unauthorized / Invalid Bearer token"
+                    }
+                },
+                "security": [
+                    {
+                        "OAuth2": [
+                            "projects:write"
+                        ]
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/wp-json/cora/v1/mcp/tool/cora_list_tasks": {
+            "post": {
+                "operationId": "cora_list_tasks",
+                "summary": "List workspace tasks across Kanban columns (todo, in_progress, review, done).",
+                "description": "List workspace tasks across Kanban columns (todo, in_progress, review, done).",
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "status": {
+                                        "type": "string",
+                                        "description": "Filter by status: todo, in_progress, review, done, or all."
+                                    },
+                                    "priority": {
+                                        "type": "string",
+                                        "description": "Filter by priority: low, medium, high, critical."
+                                    },
+                                    "limit": {
+                                        "type": "integer",
+                                        "description": "Max tasks to return (default: 30)."
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Tool execution successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "result": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters"
+                    },
+                    "401": {
+                        "description": "Unauthorized / Invalid Bearer token"
+                    }
+                },
+                "security": [
+                    {
+                        "OAuth2": [
+                            "tasks:read"
+                        ]
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/wp-json/cora/v1/mcp/tool/cora_create_task": {
+            "post": {
+                "operationId": "cora_create_task",
+                "summary": "Create and assign a new operational task in the workspace Kanban board.",
+                "description": "Create and assign a new operational task in the workspace Kanban board.",
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "description": "Task title or action item."
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "description": "Task description and acceptance criteria."
+                                    },
+                                    "due_date": {
+                                        "type": "string",
+                                        "description": "Due date (YYYY-MM-DD)."
+                                    },
+                                    "priority": {
+                                        "type": "string",
+                                        "description": "Priority: low, medium, high, critical (default: medium)."
+                                    },
+                                    "category": {
+                                        "type": "string",
+                                        "description": "Category: General, Shoots, Post-Production, CRM, Sales (default: General)."
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "description": "Initial status: todo, in_progress, review, done (default: todo)."
+                                    },
+                                    "assignee_id": {
+                                        "type": "integer",
+                                        "description": "Optional assigned user ID."
+                                    }
+                                },
+                                "required": [
+                                    "title"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Tool execution successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "result": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters"
+                    },
+                    "401": {
+                        "description": "Unauthorized / Invalid Bearer token"
+                    }
+                },
+                "security": [
+                    {
+                        "OAuth2": [
+                            "tasks:write"
+                        ]
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/wp-json/cora/v1/mcp/tool/cora_update_task": {
+            "post": {
+                "operationId": "cora_update_task",
+                "summary": "Update task title, description, priority, due date, or status.",
+                "description": "Update task title, description, priority, due date, or status.",
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "task_id": {
+                                        "type": "string",
+                                        "description": "Numeric ID or UID of the task."
+                                    },
+                                    "title": {
+                                        "type": "string",
+                                        "description": "Updated title."
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "description": "Updated description."
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "description": "Status: todo, in_progress, review, done."
+                                    },
+                                    "priority": {
+                                        "type": "string",
+                                        "description": "Priority: low, medium, high, critical."
+                                    },
+                                    "due_date": {
+                                        "type": "string",
+                                        "description": "Due date (YYYY-MM-DD)."
+                                    }
+                                },
+                                "required": [
+                                    "task_id"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Tool execution successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "result": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters"
+                    },
+                    "401": {
+                        "description": "Unauthorized / Invalid Bearer token"
+                    }
+                },
+                "security": [
+                    {
+                        "OAuth2": [
+                            "tasks:write"
+                        ]
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/wp-json/cora/v1/mcp/tool/cora_query_financials": {
+            "post": {
+                "operationId": "cora_query_financials",
+                "summary": "Query financial ledger, collected revenue, outstanding receivables, expenses, and transaction records.",
+                "description": "Query financial ledger, collected revenue, outstanding receivables, expenses, and transaction records.",
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "type": {
+                                        "type": "string",
+                                        "description": "Filter by transaction type: all, invoice, payment, income, expense (default: all)."
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "description": "Filter by status: all, paid, pending, unpaid, overdue (default: all)."
+                                    },
+                                    "limit": {
+                                        "type": "integer",
+                                        "description": "Max records (default: 20)."
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Tool execution successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "result": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters"
+                    },
+                    "401": {
+                        "description": "Unauthorized / Invalid Bearer token"
+                    }
+                },
+                "security": [
+                    {
+                        "OAuth2": [
+                            "finance:read"
+                        ]
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/wp-json/cora/v1/mcp/tool/cora_record_financial_transaction": {
+            "post": {
+                "operationId": "cora_record_financial_transaction",
+                "summary": "Record a new payment collection, client invoice, retainer, or studio expense into the ledger.",
+                "description": "Record a new payment collection, client invoice, retainer, or studio expense into the ledger.",
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "type": {
+                                        "type": "string",
+                                        "description": "Transaction type: invoice, payment, income, expense, retainer (default: payment)."
+                                    },
+                                    "amount": {
+                                        "type": "number",
+                                        "description": "Amount in INR (\u20b9)."
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "description": "Transaction description or memo."
+                                    },
+                                    "category": {
+                                        "type": "string",
+                                        "description": "Category (e.g. Shoot Retainer, Gear Rental, Editing Fee, Operations)."
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "description": "Status: paid, pending, unpaid (default: paid)."
+                                    },
+                                    "client_name": {
+                                        "type": "string",
+                                        "description": "Client or vendor party name."
+                                    },
+                                    "date": {
+                                        "type": "string",
+                                        "description": "Transaction date (YYYY-MM-DD)."
+                                    }
+                                },
+                                "required": [
+                                    "amount",
+                                    "description"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Tool execution successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "result": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters"
+                    },
+                    "401": {
+                        "description": "Unauthorized / Invalid Bearer token"
+                    }
+                },
+                "security": [
+                    {
+                        "OAuth2": [
+                            "finance:write"
+                        ]
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/wp-json/cora/v1/mcp/tool/cora_search_content": {
+            "post": {
+                "operationId": "cora_search_content",
+                "summary": "Search articles and guides across the Growth CMS repository by title, keyword, status, category, or ICP.",
+                "description": "Search articles and guides across the Growth CMS repository by title, keyword, status, category, or ICP.",
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "type": {
+                                        "type": "string",
+                                        "description": "Content type: article, guide, or all."
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "description": "Status: draft, review, published, or all."
+                                    },
+                                    "search": {
+                                        "type": "string",
+                                        "description": "Search term."
+                                    },
+                                    "category": {
+                                        "type": "string",
+                                        "description": "Canonical category (operations, client-management, sales-proposals, growth, finance, ai-automation)."
+                                    },
+                                    "limit": {
+                                        "type": "integer",
+                                        "description": "Max records (default: 20)."
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Tool execution successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "result": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters"
+                    },
+                    "401": {
+                        "description": "Unauthorized / Invalid Bearer token"
+                    }
+                },
+                "security": [
+                    {
+                        "OAuth2": [
+                            "content:read"
+                        ]
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/wp-json/cora/v1/mcp/tool/cora_create_article": {
+            "post": {
+                "operationId": "cora_create_article",
+                "summary": "Create or draft a new structured editorial article with quick_answer, key takeaways, content blocks, sources, and SEO metadata.",
+                "description": "Create or draft a new structured editorial article with quick_answer, key takeaways, content blocks, sources, and SEO metadata.",
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "description": "Article title."
+                                    },
+                                    "slug": {
+                                        "type": "string",
+                                        "description": "URL slug."
+                                    },
+                                    "primary_category": {
+                                        "type": "string",
+                                        "description": "Canonical category (e.g. operations, client-management, sales-proposals, growth, finance, ai-automation)."
+                                    },
+                                    "excerpt": {
+                                        "type": "string",
+                                        "description": "Meta description / summary."
+                                    },
+                                    "quick_answer": {
+                                        "type": "string",
+                                        "description": "45-second direct answer."
+                                    },
+                                    "key_takeaways": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "description": "List of 3-5 core takeaways."
+                                    },
+                                    "content_blocks": {
+                                        "type": "array",
+                                        "description": "Structured block objects."
+                                    },
+                                    "sources": {
+                                        "type": "array",
+                                        "description": "Structured source references."
+                                    },
+                                    "seo": {
+                                        "type": "object",
+                                        "description": "SEO metadata (canonical, keywords, search intent)."
+                                    }
+                                },
+                                "required": [
+                                    "title"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Tool execution successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "result": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters"
+                    },
+                    "401": {
+                        "description": "Unauthorized / Invalid Bearer token"
+                    }
+                },
+                "security": [
+                    {
+                        "OAuth2": [
+                            "content:write"
+                        ]
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/wp-json/cora/v1/mcp/tool/cora_publish_content": {
+            "post": {
+                "operationId": "cora_publish_content",
+                "summary": "Validate and publish a content entry live, trigger Next.js ISR cache revalidation, and verify the live public URL.",
+                "description": "Validate and publish a content entry live, trigger Next.js ISR cache revalidation, and verify the live public URL.",
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": "string",
+                                        "description": "ID or slug of the content entry to publish."
+                                    }
+                                },
+                                "required": [
+                                    "id"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Tool execution successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "result": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters"
+                    },
+                    "401": {
+                        "description": "Unauthorized / Invalid Bearer token"
+                    }
+                },
+                "security": [
+                    {
+                        "OAuth2": [
+                            "content:write"
+                        ]
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/wp-json/cora/v1/mcp/tool/cora_search_knowledge_base": {
+            "post": {
+                "operationId": "cora_search_knowledge_base",
+                "summary": "Semantic & keyword search across the workspace living memory, ingested operational history, policy guidelines, client records, and documents.",
+                "description": "Semantic & keyword search across the workspace living memory, ingested operational history, policy guidelines, client records, and documents.",
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "query": {
+                                        "type": "string",
+                                        "description": "Search query, question, or keyword to retrieve contextual intelligence for."
+                                    },
+                                    "category": {
+                                        "type": "string",
+                                        "description": "Optional filter: financials, crm, operations, vault, reviews, activity, clients."
+                                    },
+                                    "limit": {
+                                        "type": "integer",
+                                        "description": "Max fragments to return (default: 5, max: 20)."
+                                    }
+                                },
+                                "required": [
+                                    "query"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Tool execution successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "result": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters"
+                    },
+                    "401": {
+                        "description": "Unauthorized / Invalid Bearer token"
+                    }
+                },
+                "security": [
+                    {
+                        "OAuth2": [
+                            "knowledge:read"
+                        ]
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/wp-json/cora/v1/mcp/tool/cora_add_knowledge_fragment": {
+            "post": {
+                "operationId": "cora_add_knowledge_fragment",
+                "summary": "Store a new living memory fragment, client preference, operational SOP, or meeting summary into the workspace RAG vector memory.",
+                "description": "Store a new living memory fragment, client preference, operational SOP, or meeting summary into the workspace RAG vector memory.",
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "description": "Title or summary headline of the knowledge fragment."
+                                    },
+                                    "content": {
+                                        "type": "string",
+                                        "description": "Full memory text or detailed intelligence note."
+                                    },
+                                    "category": {
+                                        "type": "string",
+                                        "description": "Category: operations, crm, financials, clients, general (default: general)."
+                                    }
+                                },
+                                "required": [
+                                    "title",
+                                    "content"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Tool execution successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "result": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters"
+                    },
+                    "401": {
+                        "description": "Unauthorized / Invalid Bearer token"
+                    }
+                },
+                "security": [
+                    {
+                        "OAuth2": [
+                            "knowledge:read"
+                        ]
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/wp-json/cora/v1/mcp/tool/cora_list_forms": {
+            "post": {
+                "operationId": "cora_list_forms",
+                "summary": "List workspace intake forms, contact screeners, and active booking forms with response counts.",
+                "description": "List workspace intake forms, contact screeners, and active booking forms with response counts.",
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {}
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Tool execution successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "result": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters"
+                    },
+                    "401": {
+                        "description": "Unauthorized / Invalid Bearer token"
+                    }
+                },
+                "security": [
+                    {
+                        "OAuth2": [
+                            "workspace:read"
+                        ]
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "OAuth2": {
+                "type": "oauth2",
+                "description": "Cora Workspace OAuth 2.1 Authorization Code Flow",
+                "flows": {
+                    "authorizationCode": {
+                        "authorizationUrl": "http://cora.local/oauth/authorize",
+                        "tokenUrl": "http://cora.local/oauth/token",
+                        "scopes": {
+                            "workspace:read": "View workspace profile, team members, status metrics, and intake forms.",
+                            "workspace:write": "Update workspace branding, business profile, and platform settings.",
+                            "canvas:read": "Inspect active themes, landing page templates, route maps, and source HTML.",
+                            "canvas:write": "Create themes, edit page markup, and publish landing page code live instantly.",
+                            "leads:read": "Access incoming client inquiries, deal values, and funnel pipeline stages.",
+                            "leads:write": "Create new leads, update deal values, advance funnel stages, and log notes.",
+                            "clients:read": "Read client accounts, contact profiles, and historical interactions.",
+                            "clients:write": "Create, update, and manage client records and preferences.",
+                            "projects:read": "Read shoot schedules, booking packages, deliverables, and event milestones.",
+                            "projects:write": "Schedule bookings, assign shoot crews, update package amounts, and track delivery.",
+                            "tasks:read": "Read workspace task boards, assignments, priorities, and deadlines.",
+                            "tasks:write": "Create, assign, prioritize, update, and move tasks across Kanban stages.",
+                            "finance:read": "Read revenue metrics, client invoices, outstanding receivables, and ledgers.",
+                            "finance:write": "Create invoices, record client payments, and track expense transactions.",
+                            "content:read": "Search editorial articles, guides, knowledge documents, and SEO metrics.",
+                            "content:write": "Create structured articles/guides, optimize keywords, and publish live.",
+                            "knowledge:read": "Semantic query across living memory, past shoots, SOPs, and intelligence.",
+                            "knowledge:write": "Store new context fragments, client preferences, and operational memory.",
+                            "workflows:read": "Inspect automated rule configurations, triggers, and notification flows.",
+                            "workflows:write": "Configure and trigger automated actions, webhooks, and alerts."
+                        }
+                    }
+                }
+            },
+            "BearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "token",
+                "description": "Enter your Cora Workspace MCP Bearer Token"
+            }
+        }
+    },
+    "security": [
+        {
+            "OAuth2": []
+        },
+        {
+            "BearerAuth": []
+        }
+    ]
 }

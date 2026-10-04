@@ -1,14 +1,14 @@
-# Cora Platform — Canvas & Frontend Module Documentation (v4.9.338)
+# Cora Platform — Canvas & Frontend Module Documentation (v4.9.357)
 
 ## Section 1: Overview & Multi-Engine Architecture
 
-Cora Canvas is a unified frontend website and theme creation engine providing a 100% white-labeled builder experience for agencies and workspace owners. Hardened through **v4.9.338**, Canvas operates across five core architectural engines:
+Cora Canvas is a unified frontend website and theme creation engine providing a 100% white-labeled builder experience for agencies and workspace owners. Hardened through **v4.9.357**, Canvas operates across five core architectural engines:
 
 1. **Engine A: Elementor White-Labeled Engine**: Wraps native Elementor in a sandboxed, two-row monochromatic toolbar (`cora-elementor-reskin.js` and `.css`), stripping out all WordPress headers, admin bars, upsell notices, and third-party references.
 2. **Engine B: Visual HTML Canvas Engine (Lovable-Compatible)**: In-browser visual HTML editor rendering semantic HTML5/Tailwind inside an isolated sandboxed iframe (`#cora-html-canvas-iframe`) with inline `contenteditable` editing, media inventory scanning, 1-click image swapping, code-split editing, URL edit state persistence, and AI rewriting.
 3. **Engine C: Universal Website Multi-Page Migrator Engine**: 1-click ingestion and crawler engine (`class-cora-html-website-migrator.php`) that scrapes external HTML/CSS/JS websites, downloads/isolates assets, sanitizes DOM code, and provisions editable draft themes.
 4. **Engine D: Next.js & Expo Headless Static Build Engine (`class-cora-nextjs-integration.php`)**: Connects modern Next.js (App/Pages Router) and Expo React Native Web repositories via Git, providing dynamic GitHub tree scanning, public/private PAT authorization with dual-header fallback, automated static compilation into standalone distributions (`out/`, `dist/`), on-demand ISR webhooks, sub-150ms dev server probe detection, and cookie-isolated live preview proxies.
-5. **Engine E: AI HTML & Tailwind Starter Engine (`cora_canvas_get_default_starter_html`)**: Delivers 5 production-calibrated industry landing page templates with 1-click prompt export for Claude & ChatGPT, dual-mode code connector (HTML paste / file dropzone), sandboxed live previews, and instant live launch with automatic CRM lead capture.
+5. **Engine E: AI HTML & Tailwind Starter Engine (`cora_canvas_get_default_starter_html`)**: Delivers 6 production-calibrated industry landing page templates with 1-click prompt export for Claude & ChatGPT, dual-mode code connector (HTML paste / file dropzone), sandboxed live previews, and instant live launch with automatic CRM lead capture.
 
 ---
 
@@ -600,10 +600,81 @@ Static websites hosted on Cora automatically bridge to the workspace CRM (`wp_co
 
 ### 15.1 Package Overview (`cora-chatgpt-plugin/`)
 * **`manifest.json` / `ai-plugin.json`**: Official OpenAI plugin manifest.
-* **`openapi.json`**: Complete OpenAPI 3.1.0 specification defining 25+ agency tools.
+* **`openapi.json`**: Complete OpenAPI 3.0.1 specification defining 28 curated tools.
 * **`mcp.json`**: Remote Model Context Protocol 2.0 server configuration.
 * **`skills/`**: Core workflow prompts for CRM Leads, GST Invoicing, Bookings, and Operations Copilot.
 
 ---
 
-*Cora Canvas Documentation v4.9.338 — Last updated: October 2026.*
+## Section 16: Add Theme Wizard UI Overhaul (Active-Voice 2x2 Grid & Production Templates, v4.9.344 - v4.9.345)
+
+### 16.1 Active-Voice 2x2 Engineering Grid
+Replaces passive, ambiguous options with four explicit, action-driven paths:
+1. **Build with AI Prompts**: Calibrated HTML/Tailwind starter prompts with 1-click clipboard copying for Claude and ChatGPT, dual-mode code connector, and 1-click live launch.
+2. **Connect Headless Code**: Link production Next.js and Expo React Native Web Git repositories with dynamic route discovery and automated static site compilation.
+3. **Scrape & Migrate Website**: 1-click multi-page crawler that ingests any live URL, downloads and isolates assets, sanitizes DOM code, and provisions editable draft themes.
+4. **White-Labeled Visual Builder**: Launch sandboxed Elementor in an isolated workspace with a custom two-row monochromatic toolbar and zero WordPress admin chrome.
+
+### 16.2 Edge-to-Edge Sticky Bottom Bar
+Modal action controls anchor permanently to the bottom of the viewport (`sticky bottom-0 bg-white border-t border-zinc-200`) with high-contrast `Cancel` and `Continue` buttons, preventing layout shifts or obscured CTA triggers on smaller laptop screens.
+
+### 16.3 Real-Time Template Search Filter
+In Step 2, a responsive search input dynamically filters template cards by name and description without reloading or DOM destruction.
+
+### 16.4 6 Production Template Presets with Realistic Preview Assets
+Step 2 includes 6 pre-built, production-calibrated industry layouts accompanied by high-fidelity screenshot assets (`assets/img/tmpl_*`):
+* **Creative Agency & Video Production Studio** (`tmpl_agency_preview.jpg`): High-contrast portfolio, showreel banner, client proofing links, and brief request intake.
+* **Management Consulting & Advisory** (`tmpl_consulting_preview.jpg`): Editorial corporate layout, practice areas, partner credentials, and executive advisory booking.
+* **E-Commerce Direct-to-Consumer Store** (`tmpl_ecommerce_preview.jpg`): High-converting product showcase, feature callouts, customer reviews, and cart hooks.
+* **Commercial Photography Studio & Production House** (`tmpl_photography_preview.jpg`): Masonry visual gallery, shoot package comparison, and booking intake screener.
+* **Luxury Real Estate Brokerage** (`tmpl_realestate_preview.jpg`): Property showcase cards, neighborhood highlights, agent roster, and showing request forms.
+* **Modern B2B AI SaaS Platform** (`tmpl_saas_preview.jpg`): Interactive product UI preview card, feature grid, 3-tier pricing matrix, and lead capture.
+
+### 16.5 Zero-Emoji Standard
+All labels, descriptions, and wizard cards strictly utilize thin-lined vector SVGs (`stroke-width: 1.8`) to uphold the Cora Design System.
+
+---
+
+## Section 17: Standardized Canvas Drawers & Overflow Locking Standard (v4.9.352 - v4.9.353)
+
+### 17.1 Unified Side Drawer Architecture (`.cora-drawer`)
+All modal dialogs for template configuration, custom HTML code editing, and AI prompt copying are replaced with full-height, right-sliding side drawer sheets.
+
+### 17.2 Body Scroll Locking Standard
+Opening any Canvas drawer automatically mounts `.cora-canvas-drawer-open` onto `document.body` (`body.cora-canvas-drawer-open { overflow: hidden !important; }`). This eliminates background scroll chaining, prevents layout jumps on desktop, and smoothly restores the user's scroll position on drawer close.
+
+### 17.3 Click Event Delegation & Syntax Recovery (v4.9.353)
+Repaired JavaScript syntax parsing blocks in `view-canvas.php`, re-binding click event handlers to all primary action buttons (`window.coraOpenAddThemeWizard`, `window.coraApplyPlaygroundCodeToEditor`, and theme switcher controls).
+
+---
+
+## Section 18: AI Tools MCP Gateway & Live Action Playground in Template Editor (v4.9.351)
+
+### 18.1 Tri-Mode Operational Switcher
+Directly integrated into the visual Template Editor view in `views/view-canvas.php`:
+1. **Natural Language Mode**: Formulate instructions in plain English (e.g. "Change the hero headline to award-winning studio and set package pricing to 50,000 INR"), dispatching to the underlying AI tool execution loop.
+2. **Guided Actions Mode**: Select canonical tools from a dropdown of all 28 registered operational tools with dynamic form fields corresponding to each tool's JSON input schema.
+3. **Raw JSON Mode**: CodeMirror-powered raw JSON-RPC 2.0 interface for low-level protocol inspection and debugging.
+
+### 18.2 Live Response Inspector
+Displays formatted tool outputs, server response headers, and generated HTML code in real-time.
+
+### 18.3 1-Click Code Reflection (`window.coraApplyPlaygroundCodeToEditor`)
+Clicking `📥 Apply to Live Editor` immediately pipes tool-generated HTML into the CodeMirror editor buffer and triggers zero-copy static distribution updates.
+
+---
+
+## Section 19: Zero-Copy Native MCP File Management & Page Publishing (v4.9.349 - v4.9.357)
+
+### 19.1 Canonical Tool Implementations
+* **`cora_canvas_get_active_theme`**: Retrieves active theme metadata, builder type, live preview URL, and static build status.
+* **`cora_canvas_list_themes`**: Enumerates all installed themes with live/draft status.
+* **`cora_canvas_get_page_html`**: Reads HTML markup directly from the static distribution file (`theme_{id}/out/index.html`) with database fallback.
+* **`cora_canvas_update_page_html`**: Directly writes updated HTML to the static build distribution directory and synchronizes `wp_cora_canvas_pages` and theme settings atomically. Changes take effect on the live website immediately without recompilation.
+* **`cora_canvas_create_theme`**: Scaffolds a new theme record, initializes localized storage, and optionally marks it live.
+* **`cora_canvas_activate_theme`**: Performs zero-downtime routing activation for a selected theme ID.
+* **`cora_get_website_settings` / `cora_update_website_settings`**: Synchronizes business name, tagline, email, phone, and address metadata.
+
+---
+
+*Cora Canvas Documentation v4.9.357 — Last updated: October 2026.*

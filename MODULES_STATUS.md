@@ -9,8 +9,18 @@
 
 | Module Name | Branch Name | Status | Main Touchpoint Files | Assigned Agent / Chat |
 |---|---|---|---|---|
-| **Core Platform** | `feat/workspace-v4.9.338` (`main`) | 🟢 Stable (v4.9.338) | `cora-workspace.php`, `admin-dashboard.php` | Main Orchestrator |
+| **Core Platform** | `main` | 🟢 Stable (v4.9.357) | `cora-workspace.php`, `admin-dashboard.php` | Main Orchestrator |
 <!-- MODULE_ROWS_START -->
+| **ChatGPT Action Discovery & 28 Tools Ceiling** | `main` | 🟢 Complete & Active (v4.9.355 - v4.9.357) | `cora-workspace.php`, `includes/mcp/class-cora-universal-mcp-server.php`, `includes/mcp/class-cora-mcp-tool-registry.php` | AI Architecture Agent |
+| **Interactive OAuth 2.1 Consent Panel** | `main` | 🟢 Complete & Active (v4.9.354) | `includes/mcp/class-cora-oauth-server.php`, `scripts/test_mcp_full_access.php` | Identity & Security Agent |
+| **Canvas Drawers Standard & Overflow Locking** | `main` | 🟢 Complete & Active (v4.9.352 - v4.9.353) | `views/view-canvas.php`, `cora-workspace.php` | Canvas Visual Engine Agent |
+| **AI Tools MCP Gateway & Live Action Playground** | `main` | 🟢 Complete & Active (v4.9.351) | `views/view-canvas.php`, `cora-workspace.php` | AI Architecture Agent |
+| **Zero-Copy MCP File Management & Page Publishing** | `main` | 🟢 Complete & Active (v4.9.349) | `includes/mcp/class-cora-mcp-tool-registry.php`, `cora-workspace.php` | Canvas Integration Agent |
+| **Add Theme Wizard 2x2 Grid & Production Previews** | `main` | 🟢 Complete & Active (v4.9.344 - v4.9.345) | `views/view-canvas.php`, `assets/img/*` | Canvas Visual Engine Agent |
+| **Super Admin Action Restoration & Portaling** | `main` | 🟢 Complete & Active (v4.9.343) | `views/view-super-admin.php`, `cora-workspace.php` | Super Admin Agent |
+| **Universal PWA Install Suite & Admin Popover** | `feat/admin-pwa-install-trigger` | 🟢 Complete & Active (v4.9.342) | `admin-dashboard.php`, `views/view-settings-suite.php` | Mobile & PWA Agent |
+| **Super Admin PWA Badging & Icon Suite** | `feat/workspace-v4.9.340` | 🟢 Complete & Active (v4.9.341) | `assets/pwa/*`, `scripts/generate_admin_pwa_icons.php`, `admin-dashboard.php` | Mobile & PWA Agent |
+| **Admin Quota Rate-Limit Bypass & Session Timeout** | `main` | 🟢 Complete & Active (v4.9.339) | `cora-workspace.php` | Super Admin Agent |
 | **Super Admin PWA Badging & Role Manifest** | `feat/workspace-v4.9.338` | 🟢 Complete & Active (v4.9.338) | `admin-dashboard.php`, `cora-workspace.php`, `scripts/generate_admin_pwa_icons.php` | Mobile & PWA Agent |
 | **Security Path Containment & 304 Caching** | `feat/workspace-v4.9.338` | 🟢 Complete & Active (v4.9.337) | `cora-workspace.php`, `includes/class-cora-nextjs-integration.php` | Security Architecture Agent |
 | **Canvas AI Starter Prompts & Form Interception** | `feat/workspace-v4.9.338` | 🟢 Complete & Active (v4.9.334 - v4.9.336) | `views/view-canvas.php`, `cora-workspace.php` | Canvas Visual Engine Agent |
@@ -286,6 +296,25 @@
 
 | Version | Date | Key Changes |
 | :--- | :--- | :--- |
+| **v4.9.357** | Oct 2026 | ChatGPT action discovery resolved with 28 curated tools ceiling, OpenAPI 3.0.1 schema hardening, empty property sanitization, and session discovery |
+| **v4.9.356** | Oct 2026 | ChatGPT MCP server plugin handshake support, session tool discovery, and unified REST handler |
+| **v4.9.355** | Oct 2026 | Upgraded OpenAPI to 3.0.1, curated 28 core actions ceiling for ChatGPT Custom GPT compliance, and purged emojis from action descriptions |
+| **v4.9.354** | Oct 2026 | Universal read/write access and interactive OAuth 2.1 consent panel with master toggle, granular category permissions, and quick presets (`all`, `readonly`, `website`) |
+| **v4.9.353** | Oct 2026 | Resolved JavaScript syntax parsing errors and restored canvas button click handlers across all editor toolbars |
+| **v4.9.352** | Oct 2026 | Standardized canvas side drawer sheets (`.cora-drawer`), eliminated popup scroll jumps, locked body overflow (`body.cora-canvas-drawer-open`) |
+| **v4.9.351** | Oct 2026 | Synchronized global MCP token and endpoint architecture (`/wp-json/cora-mcp/v1/openapi.json`), unified AI tools MCP gateway and live action playground directly into Canvas Template Editor |
+| **v4.9.349** | Oct 2026 | OpenAI Developer Plugin deployment and zero-copy native MCP file management across all domains (`cora_canvas_update_page_html`, `cora_canvas_get_page_html`, `cora_canvas_create_theme`) |
+| **v4.9.345** | Oct 2026 | High-fidelity realistic screenshot preview assets (`assets/img/tmpl_*`), edge-to-edge sticky bottom bar, zero emojis in Add Theme Wizard |
+| **v4.9.344** | Oct 2026 | Add Theme Wizard UI Overhaul: active-voice 2x2 grid, sticky bottom bar, marketing link, template search filter, and 6 production templates (Agency, Consulting, E-Commerce, Photography, Real Estate, SaaS) |
+| **v4.9.343** | Oct 2026 | Restored Super Admin workspace action buttons, direct launch routing (`/workspace/dashboard?agency_id={id}&industry={type}`), and modal portaling to `document.body` |
+| **v4.9.342** | Oct 2026 | Universal in-app PWA install suite, settings trigger card in System Settings Suite, and sticky sidebar admin popover trigger |
+| **v4.9.341** | Oct 2026 | Official Cora Super Admin PWA app icon suite with dynamic ADMIN badging (512x512, 192x192, Apple touch icons, favicons) |
+| **v4.9.339** | Oct 2026 | Eliminated artificial 6-hour session limit and bypassed rate limits for admin users (`manage_options`) |
+| **v4.9.338** | Oct 2026 | Super Admin dynamic PWA badging release packaging and version synchronization |
+| **v4.9.337** | Oct 2026 | Security path containment with strict `realpath` checks, ZipArchive extraction traversal sanitization, and conditional HTTP 304 ETag caching |
+| **v4.9.334 - v4.9.336** | Oct 2026 | Canvas AI Starter Prompts Grid (5 production template prompts: Agency, SaaS, Consulting, Photography, Custom) and native lead form ingestion bridge into `wp_cora_leads` |
+| **v4.9.333** | Oct 2026 | Unbreakable 10-min website launch with instant HTML static mode and universal lead CRM bridge |
+| **v4.9.317 - v4.9.331** | Oct 2026 | Automated Static Site Compiler & Exporter Pipeline (Next.js, Expo React Native Web, Vite) with CloudLinux Inode recovery, low-memory limits (`NODE_OPTIONS="--max-old-space-size=768"`), and asset stream router |
 | **v4.9.316** | Oct 2026 | Canvas live Next.js build preview & proxy router, fast offline dev server detection (`http://localhost:3000`), preview cookie isolation (`cora_canvas_preview`) scoped to explicit query parameters, Level 2 live theme customizer routing, and theme activation scoping |
 | **v4.9.315** | Oct 2026 | Exact 4-column plant inventory layout (`SKU/Product`, `Category/Type`, `Available Stock`, `Valuation/Rate`) and 5-column dispatch report reordering (`Manifest #`, `Driver / Van`, `Firm / Route`, `Weight Allocated`, `Status / Date`), itemized CSV export, printable van stock manifests, smart cargo fallback, sold item weights and unit counts |
 | **v4.9.314** | Oct 2026 | 3-Step Van Dispatch Wizard (`Driver & Van` -> `Cargo & Weight` -> `Review & Dispatch`), standardized weight-based allocation (@ ₹401.25/kg), 4-digit numeric bill numbers (`#1001`), spot billing ledger, sales register with itemized breakdown, and browser-native GST tax invoice auto-print |
@@ -357,4 +386,4 @@
 
 ---
 
-*Cora Platform Release Manifest v4.9.316 — Architecture & Engineering Team.*
+*Cora Platform Release Manifest v4.9.357 — Architecture & Engineering Team.*

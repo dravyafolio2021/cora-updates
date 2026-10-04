@@ -1,4 +1,4 @@
-# Cora Platform — Developer Feature & Optimization Guide (v4.9.338)
+# Cora Platform — Developer Feature & Optimization Guide (v4.9.357)
 
 This guide defines the standardized architectural patterns, blueprints, and performance guidelines for engineering new modules and extending features across the Cora SaaS Workspace (`app/public/wp-content/plugins/cora-workspace`) and Marketing Frontend (`cora-frontend`).
 
@@ -74,6 +74,15 @@ This guide defines the standardized architectural patterns, blueprints, and perf
 63. **Security Path Containment, ZipArchive Sanitization & HTTP 304 Caching (v4.9.337)**: Static asset streaming implements strict `realpath` containment to prevent path traversal attacks, sanitizes ZipArchive file extractions against `../` directory escapes, issues HTTP 304 Not Modified responses on matching ETags, and enforces administrator capabilities on all Next.js endpoints.
 64. **Super Admin Dynamic PWA Badging & Role-Scoped Web App Manifest (v4.9.338)**: Automatically serves dynamic `ADMIN`-badged icons (512x512, 192x192, Apple touch icons, favicons) for super administrators with role-scoped Web App Manifest (`CORA Workspace (Admin)`), emerald active status dots, and separate standalone home screen identities.
 65. **Official ChatGPT Plugin & Remote MCP 2.0 Integration Package (v4.9.334)**: Distribution package (`cora-chatgpt-plugin/`) providing `manifest.json`, OpenAPI 3.1.0 specifications for 25+ studio tools, remote MCP 2.0 configuration (`mcp.json`), and turnkey skills for ChatGPT, Claude, and Google Gemini integration.
+66. **OpenAPI 3.0.1 Specification & Curated 28 Core Actions Ceiling (v4.9.355 - v4.9.357)**: When generating live OpenAPI documentation for ChatGPT Custom GPT Actions (`cora_rest_mcp_openapi_handler`), output OpenAPI version 3.0.1 rather than 3.1.0 to comply with OpenAI's validation engine. Cap exposed operations to a curated 28-tool ceiling to prevent import failures against OpenAI's ~30 action limitation. Strip all emojis and non-conforming parameters from summaries and descriptions.
+67. **Universal Read/Write OAuth 2.1 Consent Screen Architecture (v4.9.354)**: Consent screens must offer an interactive "Universal Full Access (Read + Write)" master toggle, categorized scope groups with descriptive badges, quick presets (`All Tools`, `Read-Only`, `Website Only`), and live selection counters (`X of 20 granted`). Multi-tenant workspace binding must be enforced cryptographically on token issue.
+68. **AI Tools MCP Gateway & Live Action Playground in Template Editor (v4.9.351)**: Canvas Template Editor embeds an action playground supporting Natural Language, Guided Actions, and Raw JSON modes. Actions execute live against active themes and workspace tables, providing live formatted responses and a 1-click `📥 Apply to Live Editor` trigger (`coraApplyPlaygroundCodeToEditor`) that reflects HTML directly into the CodeMirror editor and writes to static distribution storage.
+69. **Zero-Copy Native MCP File Management & Page Publishing (v4.9.349)**: MCP tool implementations for website editing (`cora_canvas_update_page_html`, `cora_canvas_get_page_html`, `cora_canvas_create_theme`) must write directly into the localized static distribution directory (`theme_{id}/out/index.html` and `theme_{id}/index.html`), updating database metadata simultaneously to achieve instant live production publishing without recompilation overhead.
+70. **Active-Voice 2x2 Add Theme Wizard & Realistic Preview Assets (v4.9.344 - v4.9.345)**: The theme creation wizard must utilize an active-voice 2x2 grid (Build with AI Prompts, Connect Headless Code, Scrape & Migrate, White-Labeled Visual Builder), edge-to-edge sticky bottom bar, client-side template search filtering, and 6 production templates with realistic screenshot previews (Agency, Consulting, E-Commerce, Photography, Real Estate, SaaS). Emojis are strictly purged in favor of 1.8px vector SVGs.
+71. **Standardized Canvas Drawers & Overflow Locking Standard (v4.9.352 - v4.9.353)**: Canvas drawers must implement full-height right-sliding drawer sheets (`.cora-drawer`) replacing floating popup modals. Opening drawers must apply `body.cora-canvas-drawer-open { overflow: hidden !important; }` to lock body overflow and eliminate scroll jumping, restoring scroll positions upon close.
+72. **Super Admin Multi-Tenancy Action Button Portaling & Launch Routing (v4.9.343)**: Multi-tenant action buttons in Super Admin tables must portal dialogs to `document.body` to avoid container clipping and z-index traps, pairing with clean URL routing (`/workspace/dashboard?agency_id={id}&industry={type}`) for launching specific tenant workspaces.
+73. **Universal In-App PWA Install Trigger Architecture (v4.9.342)**: PWA installation prompts must be exposed programmatically in two strategic touchpoints: the System Settings Suite install card and the sticky sidebar admin popover. Prompts must hook the `beforeinstallprompt` event and support manual fallback guides for iOS Safari WebClips.
+74. **Admin Role Quota & Session Timeout Exemption Standard (v4.9.339)**: Administrative accounts (`current_user_can('manage_options')`) are exempt from artificial 6-hour session timeouts and rate limit throttles, ensuring continuous access during deep administrative configuration and tenant maintenance.
 
 ---
 ---
@@ -867,4 +876,54 @@ When rendering PWA icons and manifests for privileged administrators:
 
 ---
 
-*Cora Developer Feature Guide v4.9.338 — Last updated: October 2026.*
+## 39. OpenAPI 3.0.1 Specification & Curated Action Generator (`cora-workspace.php`)
+
+When serving OpenAPI documentation for ChatGPT Custom Actions:
+1. **Strict 3.0.1 Compatibility**:
+   - Outputs `'openapi' => '3.0.1'` to guarantee seamless ingestion by OpenAI Custom GPT action validators.
+2. **28-Tool Priority Ceiling**:
+   - Default discovery filters tools to 28 priority operations (Canvas, Leads, Clients, Projects, Tasks, Financials, Content, RAG, Overview).
+   - Allows opt-in full exposure via `?all=1` or `limit=all`.
+3. **Schema Sanitization**:
+   - Forces input schemas to `type: object` with non-empty properties objects.
+   - Omits empty `required` arrays and purges emojis from summaries and descriptions.
+
+---
+
+## 40. Interactive OAuth 2.1 PKCE Consent Architecture (`class-cora-oauth-server.php`)
+
+When authenticating third-party AI assistants via OAuth 2.1:
+1. **Master Full-Access Control**:
+   - Provides an interactive master toggle that selects or deselects all 20 scopes instantaneously.
+2. **Preset Categorization**:
+   - Exposes quick preset triggers: `All Tools`, `Read-Only`, and `Website & Themes Only`.
+   - Displays real-time granted scope counts before authorization.
+3. **Cryptographic Binding**:
+   - Issues 32-byte CSPRNG authorization codes and access tokens strictly bound to the authenticated workspace tenant (`agency_id`).
+
+---
+
+## 41. Template Editor Live Action Playground & MCP Code Reflection (`view-canvas.php`)
+
+When testing and applying AI actions within the Canvas Template Editor:
+1. **Tri-Mode Operational Interface**:
+   - Supports Natural Language, Guided Tool Selection, and Raw JSON-RPC 2.0 modes.
+2. **Live Tool Execution**:
+   - Dispatches requests directly to `/wp-json/cora/v1/mcp` or localized REST tool routes.
+3. **1-Click Code Reflection**:
+   - `window.coraApplyPlaygroundCodeToEditor()` automatically injects returned HTML into the CodeMirror editor and commits updates directly to the static build distribution (`out/index.html`).
+
+---
+
+## 42. Canvas Drawer Standard & Body Overflow Lock State Machine (`view-canvas.php`)
+
+When presenting editor drawers and template settings:
+1. **Right-Sliding Side Drawer Architecture**:
+   - All drawers use full-height slide-in sheets (`.cora-drawer`) instead of floating modal dialogs.
+2. **Body Overflow Lock**:
+   - Adds `body.cora-canvas-drawer-open` on drawer mount (`overflow: hidden !important`).
+   - Removes class on drawer unmount, completely eliminating background page scroll jumping and layout jitter.
+
+---
+
+*Cora Developer Feature Guide v4.9.357 — Last updated: October 2026.*

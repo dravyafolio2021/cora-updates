@@ -1,65 +1,99 @@
-# Walkthrough — Platform Analysis & Comprehensive Documentation Synchronization (v4.9.209 → v4.9.316)
+# Walkthrough — Platform Analysis & Comprehensive Documentation Synchronization (v4.9.342 → v4.9.357)
 
-This document provides a complete walkthrough of the platform-wide architectural analysis and documentation update across the Cora Workspace and Marketing platforms, reflecting all recent developments from version `v4.9.209` through `v4.9.316`.
+This document provides a complete walkthrough of the platform-wide architectural analysis and documentation synchronization across the Cora Workspace and Marketing platforms, reflecting all developments from version `v4.9.342` through `v4.9.357` (latest git `HEAD: 18d26895a`).
 
 ---
 
-## 1. Executive Summary & Audit Overview
+## 1. Executive Summary & Audit Trajectory
 
-Between **v4.9.209** and **v4.9.316**, over 107 version increments and several foundational subsystems were engineered across the Cora platform. The documentation suite has been updated to reflect these developments:
+Between **v4.9.342** and **v4.9.357**, 15 version increments across 13 major commits were engineered into the Cora platform. The documentation suite across internal developer guides, architecture manuals, module rosters, marketing frontend documentation, and external AI connector packages has been synchronized to reflect these developments:
 
-1. **Inventory & Mobile Van Sales Dual Engine (`class-cora-inventory-engine.php`)**:
-   - **3-Step Guided Dispatch Wizard**: Driver and route selection, bulk weight allocation (@ standard ₹401.25/kg base rate) alongside unit-based SKUs, and cargo review.
-   - **Real-Time Spot Billing & Field POS**: Standardized 4-digit numeric bill numbers (e.g. `#0001`), official Indian currency word conversion, auto-print GST tax invoices (`window.print()`), and atomic safe stock restocking rollback on invoice edits/deletions.
-   - **Statutory Sales Register & Manifest Print**: Itemized Sales Register table (`#sales-register-table`), auditor-ready CSV export (`ajax_export_sales_csv`), printable ledger view (`ajax_render_sales_register_pdf`), and 5-column warehouse dispatch manifest (`ajax_render_van_stock_sheet`).
+1. **OpenAPI 3.0.1 Specification Upgrade & Parameter Hardening**:
+   - Upgraded OpenAPI discovery output from 3.1.0 to **OpenAPI 3.0.1** (`cora_rest_mcp_openapi_handler` at `/wp-json/cora-mcp/v1/openapi.json` and `/mcp/openapi.json`).
+   - OpenAI Custom GPT Actions importer rejects OpenAPI 3.1.0 with silent/unhelpful schema parsing errors; OpenAPI 3.0.1 guarantees 100% compatibility.
+   - Enforced strict parameter validation: zero emojis in summaries, descriptions, and tool names; all input schemas declare explicit `type: object` with non-empty `properties` objects; empty `required: []` arrays are cleanly omitted.
 
-2. **Canvas Next.js Headless Git Integration & Live Dev Server Preview Engine (`class-cora-nextjs-integration.php`)**:
-   - **Git Repository Route Scanner**: App Router recursive tree scanner (`app/**/page.tsx`), dynamic branch discovery, and private repository Personal Access Token (PAT) support with dual auth headers (`Bearer` and `token`).
-   - **Headless REST API Layer**: `/wp-json/cora-canvas/v1/manifest`, `/wp-json/cora-canvas/v1/page`, `/wp-json/cora-canvas/v1/revalidate` (on-demand ISR webhook with secret token), and `/wp-json/cora-canvas/v1/form-submit`.
-   - **Live Dev Server Detection & Preview Proxy**: Sub-150ms timeout ping to `localhost:3000` with instant offline troubleshooting banner; cookie-isolated preview router (`cora_canvas_preview`) scoped strictly to explicit `?preview_canvas=...` requests, preventing unintended template activation on production routes.
-   - **Level 2 Live Customizer Integration**: Direct pen icon routing and hover quick-actions.
+2. **Curated 28 Core Actions Ceiling**:
+   - Solved OpenAI Custom GPT Actions undocumented 30-action importer limit by curating the top 28 prioritized operational tools across CRM, Canvas, Content, Finance, Tasks, Inventory, and Living Knowledge Base.
+   - Retained full unconstrained tool registry discovery via explicit query parameters (`?all=1` or `limit=all`).
 
-3. **Universal Remote MCP Server & OAuth 2.1 PKCE Architecture (`class-cora-universal-mcp-server.php`, `class-cora-oauth-server.php`)**:
-   - **RFC 7591 Dynamic Client Registration**: Automatic client onboarding for AI assistants (ChatGPT, Claude, Google Gemini) via `/wp-json/cora-oauth/v1/register`.
-   - **OAuth 2.1 PKCE Handshake**: SHA-256 code challenges (`S256`), refresh token rotation, and consent screen flow.
-   - **RFC 9728 Protected Resource Metadata**: Discovery endpoint at `/.well-known/oauth-protected-resource` and standards-compliant `WWW-Authenticate` response headers.
-   - **JSON-RPC 2.0 Tool Execution Gateway**: 25+ canonical tools spanning CRM, Leads, Finance, Invoicing, Inventory, and CMS.
+3. **Interactive Granular OAuth 2.1 Consent Panel**:
+   - Upgraded OAuth 2.1 authorization code flow with an interactive consent panel.
+   - Features a Master Authorization Toggle, category-level scope cards, and 1-tap quick presets:
+     - `all`: Authorizes all read and write capabilities.
+     - `readonly`: Enforces strict read-only boundary across all workspace modules.
+     - `website`: Restricts access strictly to Canvas themes and Content CMS.
 
-4. **CRM & Leads High-Velocity Pipeline (`view-leads.php`, `admin-script.js`)**:
-   - **Edge-to-Edge Full-Height Drawer**: Auto-portaled directly to `document.body` with transparent backdrop.
-   - **Left-Edge Draggable Resizer**: Smooth mouse drag handle with `localStorage` width persistence.
-   - **Sanitized Assignee Roster & Bi-Directional Sync**: Filters out invalid/system users, with real-time bi-directional synchronization between drawer updates and Kanban cards without full page reload.
+4. **AI Tools MCP Gateway & Live Action Playground in Canvas Template Editor**:
+   - Integrated live tool testing directly into the Canvas Template Editor (`view-canvas.php`).
+   - Supports three interaction tiers:
+     - **Natural Language Mode (`nl`)**: Translates plain-English prompts into validated MCP tool payloads.
+     - **Guided Form Mode (`guided`)**: Interactive form fields with input type checks.
+     - **Developer Mode (`dev`)**: Raw JSON payload editing with syntax highlighting.
+   - Live execution against real workspace records with 1-click code reflection into the template editor buffer.
 
-5. **Finance & GST Invoicing Suite (`view-financials.php`, `cora-workspace.php`)**:
-   - **Multi-Step Creator Validation**: Rigorous client GSTIN regex validation, HSN/SAC code registry, structured line items JSON serialization.
-   - **Automated Document Vault Linkage**: Auto-creates document record upon invoice publishing with cryptographic SHA-256 checksum and legal audit linkage.
+5. **Canvas Add Theme Wizard 2x2 Grid Overhaul**:
+   - Overhauled Add Theme Wizard into an active-voice, responsive 2x2 template selection grid.
+   - Added 6 production template presets: `creative-agency`, `saas-dark`, `consulting-minimal`, `photography-studio`, `stationery-inventory`, and `real-estate`.
+   - Realistic screenshot preview cards stored in `assets/img/tmpl_*` with subtle fallback state badges.
+   - Added instant search filter and sticky bottom action bar for frictionless navigation across all viewports.
 
-6. **Media Manager & Asset Hub (`view-media.php`)**:
-   - **Centered Pop-Up Modals**: Replaced heavy side drawers with centered modals for quick folder creation and settings.
-   - **Curated Color Tag Presets & Hex Picker**: Visual folder tagging with curated palette and native color picker.
+6. **Standardized Canvas Drawers & Overflow Locking**:
+   - Standardized all slide-in drawers across Canvas under `.cora-drawer`.
+   - Eliminated page jitter and layout jumps on drawer open by applying `body.cora-canvas-drawer-open { overflow: hidden !important; }`, cleanly locking body scrolling while preserving exact scroll coordinates.
+   - Hardened event delegation to reliably restore click listeners upon drawer close.
 
-7. **Settings Suite & Identity Security (`view-settings-suite.php`, `cora-workspace.php`)**:
-   - **Tokenized Admin Email Verification**: Dynamic status badges (Verified 🟢 / Pending 🟡), read-only locked state, 24h expiration token dispatch via `heycora@claraverse.in`.
-   - **100 Daily AI Credits Quota**: Enforces official daily credit quota matrix for Free Workspace signups.
+7. **Super Admin Workspace Action Restoration & Portaling**:
+   - Auto-portaled workspace launch and action modals in Super Admin console (`view-super-admin.php`) directly to `document.body` to eliminate clipping within nested containers.
+   - Restored direct workspace launch routing.
+
+8. **Universal PWA Install Suite & Dynamic Admin Badging**:
+   - Implemented persistent PWA install triggers in Settings Suite (`#cora-settings-install-pwa-btn`) and sidebar bottom popover (`#cora-sidebar-install-pwa-btn`) via `window.coraPromptPwaInstall()`.
+   - Dynamic `ADMIN` badge rendering across 512, 192, and Apple Touch icons for Super Admin sessions (`scripts/generate_admin_pwa_icons.php`).
+
+9. **Admin Quota & Session Timeout Bypass Engine**:
+   - Granted Super Admins permanent bypass of daily AI credit quotas and idle session expirations, ensuring uninterrupted operational administration.
 
 ---
 
 ## 2. Updated Documentation Artifacts
 
-| Documentation File | Target Version | Key Updates Applied |
-| :--- | :--- | :--- |
-| [`README.md`](file:///Users/shrutian/Desktop/cora/README.md) | `v4.9.316` | Platform version bump, updated architecture tree, new module capabilities matrix, core architectural principles summary |
-| [`MODULES_STATUS.md`](file:///Users/shrutian/Desktop/cora/MODULES_STATUS.md) | `v4.9.316` | Branch index sync, module capability table, branch progress logs, release manifest archive through v4.9.316 |
-| [`docs/cora-platform-documentation.md`](file:///Users/shrutian/Desktop/cora/docs/cora-platform-documentation.md) | `v4.9.316` | Sections 1.18–1.20, Sections 2.26–2.32, Section 3.4 (Next.js Headless Engine), Section 16 release manifest (v4.9.210–v4.9.316) |
-| [`docs/DEVELOPER_FEATURE_GUIDE.md`](file:///Users/shrutian/Desktop/cora/docs/DEVELOPER_FEATURE_GUIDE.md) | `v4.9.316` | Principles 47–58, Architectural Blueprints 26–33 |
-| [`docs/canvas-frontend-module.md`](file:///Users/shrutian/Desktop/cora/docs/canvas-frontend-module.md) | `v4.9.316` | Engine D (Next.js Git Connector & Route Scanner), headless REST endpoints, ISR webhook, preview proxy router, Level 2 live customizer |
-| [`CORA_PLATFORM_ONBOARDING_ONE_PAGER.md`](file:///Users/shrutian/Desktop/cora/CORA_PLATFORM_ONBOARDING_ONE_PAGER.md) | `v4.9.316` | Executive summary, updated capabilities roster (24 modules), technology stack details |
-| [`cora-frontend/lib/docs-data.ts`](file:///Users/shrutian/Desktop/cora/cora-frontend/lib/docs-data.ts) | `v4.9.316` | Public docs articles for Canvas Builder, Inventory & Van Sales, Lead CRM, and GST Invoicing |
+The following 10 documentation files and distribution packages were systematically updated:
+
+| # | Documentation File | Target Version | Key Updates Applied |
+| :-: | :--- | :---: | :--- |
+| 1 | [`README.md`](file:///Users/shrutian/Desktop/cora/README.md) | `v4.9.357` | Bumped version; updated architecture tree; added Principles 66–74 covering OpenAPI 3.0.1, 28-tool ceiling, OAuth consent presets, Action Playground, Add Theme Wizard 2x2 grid, standardized Canvas drawers, and PWA install triggers. |
+| 2 | [`MODULES_STATUS.md`](file:///Users/shrutian/Desktop/cora/MODULES_STATUS.md) | `v4.9.357` | Updated single source of truth manifest; added active feature rows for MCP OpenAPI 3.0.1, OAuth consent panel, Canvas drawers, Live action playground, and Add Theme Wizard 2x2 grid; appended complete release manifest history (v4.9.317 through v4.9.357). |
+| 3 | [`docs/cora-platform-documentation.md`](file:///Users/shrutian/Desktop/cora/docs/cora-platform-documentation.md) | `v4.9.357` | Added Sections 3.6 (Add Theme Wizard 2x2 Overhaul), 3.13 (Standardized Canvas Drawers & Overflow Locking), 3.14 (Canvas Live Action Playground), 3.15 (Universal Remote MCP Server & OpenAPI 3.0.1), and 3.16 (Interactive OAuth 2.1 Consent Panel); updated Section 16 release manifest through v4.9.357. |
+| 4 | [`docs/DEVELOPER_FEATURE_GUIDE.md`](file:///Users/shrutian/Desktop/cora/docs/DEVELOPER_FEATURE_GUIDE.md) | `v4.9.357` | Added Developer Principles 66–74; added Architectural Blueprints 39–42 detailing OpenAPI 3.0.1 schema generation, OAuth consent presets, Canvas drawer scroll locking, and Template Editor Action Playground. |
+| 5 | [`docs/canvas-frontend-module.md`](file:///Users/shrutian/Desktop/cora/docs/canvas-frontend-module.md) | `v4.9.357` | Updated 6 production templates; added Section 16 (Add Theme Wizard 2x2 Grid Overhaul), Section 17 (Standardized Canvas Drawers & Overflow Locking), Section 18 (AI Tools MCP Gateway & Live Action Playground), and Section 19 (Zero-Copy Native MCP File Management). |
+| 6 | [`docs/mcp/compatibility.md`](file:///Users/shrutian/Desktop/cora/docs/mcp/compatibility.md) | `v4.9.357` | Added OpenAPI 3.0.1 upgrade guide; documented curated 28 core actions ceiling for ChatGPT Custom GPT Actions; updated scopes hierarchy (added `canvas:read` & `canvas:write`); documented 28 tools canonical mapping, Section 6 (OAuth Consent Panel), and Section 7 (Action Playground). |
+| 7 | [`CORA_PLATFORM_ONBOARDING_ONE_PAGER.md`](file:///Users/shrutian/Desktop/cora/CORA_PLATFORM_ONBOARDING_ONE_PAGER.md) | `v4.9.357` | Updated Executive Summary items 20, 23, 24, 25; added item 26 (Standardized Canvas Drawers & Live Action Playground); updated 24-module capabilities ASCII table and footer metadata. |
+| 8 | [`cora-frontend/lib/docs-data.ts`](file:///Users/shrutian/Desktop/cora/cora-frontend/lib/docs-data.ts) | `v4.9.357` | Synchronized public docs articles for Next.js website: `canvas-builder` (2x2 grid, 6 templates, standardized drawers, action playground), `pwa-architecture` (Universal PWA install suite), `rest-api-reference` (OpenAPI 3.0.1 & MCP endpoints), and `mcp-gateway` (OpenAPI 3.0.1, 28 tools ceiling, OAuth consent presets, action playground). |
+| 9 | [`cora-chatgpt-plugin/README.md`](file:///Users/shrutian/Desktop/cora/cora-chatgpt-plugin/README.md) | `v4.9.357` | Updated to reference OpenAPI 3.0.1, the 28 curated tools ceiling, OAuth 2.1 consent panel, and parameters validation requirements; updated package installation instructions. |
+| 10 | [`cora-chatgpt-plugin/openapi.json`](file:///Users/shrutian/Desktop/cora/cora-chatgpt-plugin/openapi.json) | `v4.9.357` | Regenerated complete specification using OpenAPI 3.0.1 with curated 28 core tools matching the live WordPress handler; rebuilt `cora-chatgpt-plugin.zip` bundle. |
 
 ---
 
-## 3. Strict Compliance & Verification
+## 3. Automated Verification & Test Results
 
-- **Rule 3 Identity Privacy**: Zero occurrences of personal owner names across all updated documentation files; all examples strictly use generic fictitious placeholders (`Rohan Verma`, `Kavya Patel`, `Aarav Mehta`, `Studio Admin`, `Workspace Owner`).
-- **Rule 13 Zero-Outline Tonal Surface Selection**: Monochromatic design tokens, soft tonal background fills (`bg-zinc-100`), subtle uniform structural borders (`border-zinc-200`), and zero harsh dark outlines.
-- **Automated Test Validation**: Verified test suite executions for van stock rendering and CSV endpoints (`tests/test_van_stock_endpoints.php`).
+1. **MCP Full Access & OAuth Verification (`scripts/test_mcp_full_access.php`)**:
+   - Verified with LocalWP PHP 8.2 runtime:
+     - 20 supported scopes loaded and validated.
+     - Auth code generation and token exchange executed successfully.
+     - Authenticated context verified with full capabilities (`cora_manage_options`).
+     - Live execution tests for `cora.get_workspace_overview` and `cora.canvas_get_active_theme` passed with 100% success.
+2. **OpenAPI 3.0.1 Generation Verification**:
+   - Executed `cora_rest_mcp_openapi_handler()` via LocalWP PHP CLI.
+   - Result: Exactly 28 curated tools generated, `version: 4.9.357`, `openapi: 3.0.1`.
+3. **ChatGPT Plugin Distribution Archive**:
+   - Executed `./package.sh` in `cora-chatgpt-plugin/`.
+   - Successfully generated clean `cora-chatgpt-plugin.zip` (105 KB) containing updated `openapi.json`, `ai-plugin.json`, `manifest.json`, `mcp.json`, skills, and monochromatic assets.
+
+---
+
+## 4. Strict Compliance & Governance Checks
+
+- **Rule 3 (Strict Name & Identity Privacy)**: Verified across all 10 modified documentation files. Zero occurrences of the owner's real name; all examples, mockups, and placeholders strictly use fictitious names (`Rohan Verma`, `Kavya Patel`, `Aarav Mehta`, `Studio Admin`, `Workspace Owner`).
+- **Rules 4 & 13 (Monochromatic Design Tokens & Tonal Surfaces)**: Verified that all newly documented UI patterns adhere to the Notion/Shopify monochromatic palette (`zinc-50` through `zinc-950`), soft tonal background fills (`bg-zinc-100/90`), subtle uniform structural borders (`border-zinc-200`), and zero harsh dark outlines (`border-zinc-900`, `ring-2`).
+- **Rule 8 (Module Isolation & Scoping)**: Verified that all CSS selectors, JavaScript event listeners, and API endpoints are strictly scoped to their respective modules, preventing regressions across neighboring views.
