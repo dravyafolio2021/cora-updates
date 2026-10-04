@@ -209,38 +209,91 @@ class Cora_Universal_MCP_Server {
      */
     private static function handle_list_tools( $params, $id, $auth ) {
         $all_tools = Cora_MCP_Tool_Registry::get_tools();
-        $formatted_tools = array();
 
-        foreach ( $all_tools as $tool_key => $tool ) {
-            // Check if token has scope for this tool (if authenticated)
-            if ( ! empty( $auth['valid'] ) ) {
-                $has_scope = Cora_OAuth_Server::has_scope( $auth, $tool['requiredScope'] );
-                if ( ! $has_scope ) {
-                    continue;
+        $all_requested = false;
+        if ( ! empty( $params['all'] ) || ( isset( $params['limit'] ) && $params['limit'] === 'all' ) || ( isset( $_GET['all'] ) && $_GET['all'] == '1' ) ) {
+            $all_requested = true;
+        }
+
+        // Top 28 core high-priority operational actions to stay within ChatGPT 30-tools ceiling
+        $curated_priority_names = array(
+            'cora_get_workspace_overview',
+            'cora_canvas_get_active_theme',
+            'cora_canvas_list_themes',
+            'cora_canvas_get_page_html',
+            'cora_canvas_update_page_html',
+            'cora_canvas_create_theme',
+            'cora_canvas_activate_theme',
+            'cora_get_website_settings',
+            'cora_update_website_settings',
+            'cora_list_leads',
+            'cora_get_lead',
+            'cora_create_lead',
+            'cora_update_lead',
+            'cora_list_clients',
+            'cora_create_client',
+            'cora_list_projects',
+            'cora_create_project',
+            'cora_list_tasks',
+            'cora_create_task',
+            'cora_update_task',
+            'cora_query_financials',
+            'cora_record_financial_transaction',
+            'cora_search_content',
+            'cora_create_article',
+            'cora_publish_content',
+            'cora_search_knowledge_base',
+            'cora_add_knowledge_fragment',
+            'cora_list_forms',
+        );
+
+        $selected_tools = array();
+        if ( ! $all_requested ) {
+            foreach ( $curated_priority_names as $pname ) {
+                if ( isset( $all_tools[ $pname ] ) ) {
+                    $selected_tools[ $pname ] = $all_tools[ $pname ];
                 }
             }
+            if ( count( $selected_tools ) < 28 ) {
+                foreach ( $all_tools as $tk => $tv ) {
+                    if ( ! isset( $selected_tools[ $tk ] ) && count( $selected_tools ) < 28 ) {
+                        $selected_tools[ $tk ] = $tv;
+                    }
+                }
+            }
+        } else {
+            $selected_tools = $all_tools;
+        }
 
+        $formatted_tools = array();
+        foreach ( $selected_tools as $tool_key => $tool ) {
             $read_only   = ! empty( $tool['readOnlyHint'] ) || ! empty( $tool['readOnly'] );
             $destructive = ! empty( $tool['destructiveHint'] ) || ! empty( $tool['destructive'] );
             $open_world  = ! empty( $tool['openWorldHint'] ) || ! empty( $tool['openWorld'] );
             $idempotent  = ! empty( $tool['idempotentHint'] ) || ! empty( $tool['idempotent'] ) || $read_only;
 
-            $tool_name   = str_replace( '.', '_', $tool['name'] );
+            $tool_name = str_replace( '.', '_', $tool['name'] );
+            $schema    = $tool['inputSchema'] ?? array( 'type' => 'object', 'properties' => (object) array() );
+            if ( ! isset( $schema['type'] ) ) {
+                $schema['type'] = 'object';
+            }
+            if ( ! isset( $schema['properties'] ) || empty( $schema['properties'] ) ) {
+                $schema['properties'] = (object) array();
+            }
+            if ( isset( $schema['required'] ) && empty( $schema['required'] ) ) {
+                unset( $schema['required'] );
+            }
+
             $formatted_tools[] = array(
-                'name'            => $tool_name,
-                'description'     => $tool['description'],
-                'inputSchema'     => $tool['inputSchema'],
-                'annotations'     => array(
+                'name'        => $tool_name,
+                'description' => $tool['description'],
+                'inputSchema' => $schema,
+                'annotations' => array(
                     'readOnlyHint'    => (bool) $read_only,
                     'destructiveHint' => (bool) $destructive,
                     'openWorldHint'   => (bool) $open_world,
                     'idempotentHint'  => (bool) $idempotent,
                 ),
-                'readOnlyHint'    => (bool) $read_only,
-                'destructiveHint' => (bool) $destructive,
-                'openWorldHint'   => (bool) $open_world,
-                'idempotentHint'  => (bool) $idempotent,
-                'requiredScope'   => $tool['requiredScope'],
             );
         }
 
