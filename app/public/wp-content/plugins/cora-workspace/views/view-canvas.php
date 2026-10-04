@@ -4597,26 +4597,26 @@ function cora_get_sparkline_points( $history, $type ) {
 <style>
 #atw{font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',system-ui,sans-serif;}
 #atw *{box-sizing:border-box;margin:0;padding:0;}
-.atw-card{transition:transform .2s cubic-bezier(.4,0,.2,1),box-shadow .2s cubic-bezier(.4,0,.2,1),border-color .15s;will-change:transform;}
-.atw-card:hover{transform:translateY(-4px);box-shadow:0 16px 48px rgba(0,0,0,.11),0 4px 16px rgba(0,0,0,.07)!important;}
-.atw-card:hover .atw-thumb{transform:scale(1.04);}
+.atw-card{transition:transform .2s cubic-bezier(.4,0,.2,1),box-shadow .2s cubic-bezier(.4,0,.2,1),border-color .15s,background-color .15s;will-change:transform;}
+.atw-card:hover{transform:translateY(-3px);box-shadow:0 12px 36px rgba(0,0,0,.09),0 4px 12px rgba(0,0,0,.05)!important;}
+.atw-card:hover .atw-thumb{transform:scale(1.03);}
 .atw-thumb{transition:transform .5s cubic-bezier(.4,0,.2,1);display:block;width:100%;height:100%;object-fit:cover;}
-.atw-card.atw-sel-h{background:#ffffff!important;border-color:#18181b!important;box-shadow:0 0 0 3px rgba(24,24,27,.18),0 8px 32px rgba(0,0,0,.12)!important;}
-.atw-card.atw-sel-e{border-color:#18181b!important;box-shadow:0 0 0 3px rgba(24,24,27,.15),0 8px 32px rgba(0,0,0,.1)!important;}
-.atw-card.atw-sel-n{border-color:#18181b!important;box-shadow:0 0 0 3px rgba(24,24,27,.18),0 8px 32px rgba(0,0,0,.12)!important;}
-.atw-card.atw-sel-l{border-color:#7c3aed!important;box-shadow:0 0 0 3px rgba(124,58,237,.18),0 8px 32px rgba(124,58,237,.1)!important;}
+.atw-card.atw-sel-h{background:#f4f4f5!important;border-color:#18181b!important;box-shadow:0 0 0 2px rgba(24,24,27,.12),0 6px 24px rgba(0,0,0,.08)!important;}
+.atw-card.atw-sel-e{background:#f4f4f5!important;border-color:#18181b!important;box-shadow:0 0 0 2px rgba(24,24,27,.12),0 6px 24px rgba(0,0,0,.08)!important;}
+.atw-card.atw-sel-n{background:#f4f4f5!important;border-color:#18181b!important;box-shadow:0 0 0 2px rgba(24,24,27,.12),0 6px 24px rgba(0,0,0,.08)!important;}
+.atw-card.atw-sel-l{background:#faf5ff!important;border-color:#7c3aed!important;box-shadow:0 0 0 2px rgba(124,58,237,.15),0 6px 24px rgba(124,58,237,.08)!important;}
 .atw-template-card{background:#ffffff;border:1.5px solid #e4e4e7;border-radius:16px;transition:all .2s cubic-bezier(.4,0,.2,1);cursor:pointer;overflow:hidden;}
 .atw-template-card:hover{border-color:#a1a1aa!important;transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.06)!important;}
 .atw-template-card.atw-sel-t{background:#fafafa!important;border-color:#18181b!important;box-shadow:0 0 0 2px rgba(24,24,27,.12),0 8px 28px rgba(0,0,0,.08)!important;}
-.atw-tab{transition:all .15s;border:none;cursor:pointer;font-size:11px;font-weight:700;font-family:inherit;}
-.atw-tab.atw-tab-on{background:white;color:#18181b;border:1px solid #e4e4e7!important;box-shadow:0 1px 3px rgba(0,0,0,.08);border-radius:10px;}
-.atw-tab.atw-tab-off{background:transparent;color:#71717a;border:1px solid transparent!important;border-radius:10px;}
+.atw-tab{transition:all .15s;border:none;cursor:pointer;font-size:11.5px;font-weight:700;font-family:inherit;}
+.atw-tab.atw-tab-on{background:white;color:#18181b;border:1px solid #e4e4e7!important;box-shadow:0 1px 3px rgba(0,0,0,.08);border-radius:9px;}
+.atw-tab.atw-tab-off{background:transparent;color:#71717a;border:1px solid transparent!important;border-radius:9px;}
 .atw-tab.atw-tab-off:hover{color:#18181b;background:rgba(255,255,255,.6);}
 .atw-input{width:100%!important;height:38px!important;padding:8px 12px!important;border:1.5px solid #e4e4e7!important;border-radius:8px!important;font-size:12.5px!important;font-weight:500!important;color:#18181b!important;background:white!important;transition:border-color .15s,box-shadow .15s!important;outline:none!important;font-family:inherit!important;box-sizing:border-box!important;line-height:normal!important;}
 .atw-input:focus{border-color:#18181b!important;box-shadow:0 0 0 3px rgba(24,24,27,.07)!important;}
 .atw-input.atw-lov:focus{border-color:#7c3aed!important;box-shadow:0 0 0 3px rgba(124,58,237,.08)!important;}
-@keyframes atw-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-.atw-anim{animation:atw-in .22s cubic-bezier(.4,0,.2,1) both;}
+@keyframes atw-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.atw-anim{animation:atw-in .2s cubic-bezier(.4,0,.2,1) both;}
 .atw-drop-zone{border:2px dashed #d4d4d8;border-radius:14px;background:#fafafa;transition:border-color .15s,background .15s;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:52px 32px;}
 .atw-drop-zone:hover{border-color:#71717a;background:#f5f5f5;}
 @keyframes wizSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
@@ -4628,7 +4628,7 @@ function cora_get_sparkline_points( $history, $type ) {
 .atw-title-text { display: inline !important; }
 .atw-lbl-text { display: inline !important; }
 .atw-line-connector { width: 44px !important; margin: 0 6px !important; }
-.atw-builder-grid { display: grid !important; grid-template-columns: repeat(4, 1fr) !important; gap: 16px !important; width: 100% !important; max-width: 1160px !important; }
+.atw-builder-grid { display: grid !important; grid-template-columns: repeat(2, 1fr) !important; gap: 16px !important; width: 100% !important; max-width: 980px !important; }
 .atw-prompts-grid { display: grid !important; grid-template-columns: repeat(3, 1fr) !important; gap: 16px !important; width: 100% !important; }
 .atw-token-branch-row { display: grid !important; grid-template-columns: 1fr 120px !important; gap: 12px !important; }
 .atw-template-grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 12px !important; }
@@ -4694,404 +4694,449 @@ function cora_get_sparkline_points( $history, $type ) {
     <div id="atw-body" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;">
 
         <!-- STEP 1: Choose Builder -->
-        <div id="wizard-step-1" class="atw-anim" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 28px 36px;">
-            <div style="text-align:center;margin-bottom:38px;max-width:580px;">
-                <p style="font-size:10px;font-weight:900;letter-spacing:.18em;text-transform:uppercase;color:#a1a1aa;margin-bottom:12px;">Step 1 of 3</p>
-                <h2 style="font-size:32px;font-weight:900;color:#18181b;letter-spacing:-.045em;line-height:1.1;margin-bottom:12px;">What are you<br>building with?</h2>
-                <p style="font-size:13.5px;color:#71717a;line-height:1.6;">Choose your frontend technology. Launch with instant AI Tailwind templates, connect Next.js Git repositories, or import Elementor kits.</p>
+        <div id="wizard-step-1" class="atw-anim" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px 20px;max-width:960px;margin:0 auto;width:100%;">
+            <div style="text-align:center;margin-bottom:24px;max-width:560px;">
+                <p style="font-size:9.5px;font-weight:900;letter-spacing:.18em;text-transform:uppercase;color:#a1a1aa;margin-bottom:8px;">Step 1 of 3</p>
+                <h2 style="font-size:26px;font-weight:900;color:#18181b;letter-spacing:-.04em;line-height:1.15;margin-bottom:8px;">Deploy New Website</h2>
+                <p style="font-size:13px;color:#71717a;line-height:1.5;">Choose your frontend framework to deploy instantly with AI, connect Git repositories, or import Elementor kits.</p>
             </div>
             <div class="atw-builder-grid">
 
-                <!-- 1. AI HTML & Tailwind Card (Featured / Default - html_ai) -->
-                <button onclick="wizardSelectBuilder('html_ai')" id="wizard-card-html-ai" class="atw-card atw-sel-h" style="text-align:left;background:white;border:2px solid #18181b;border-radius:20px;overflow:hidden;cursor:pointer;padding:0;box-shadow:0 1px 4px rgba(0,0,0,.06);display:flex;flex-direction:column;justify-content:space-between;">
+                <!-- 1. Quick Launch HTML (AI) (Featured / Default - html_ai) -->
+                <button onclick="wizardSelectBuilder('html_ai')" id="wizard-card-html-ai" class="atw-card atw-sel-h" style="text-align:left;background:#f4f4f5;border:2px solid #18181b;border-radius:18px;overflow:hidden;cursor:pointer;padding:0;box-shadow:0 1px 4px rgba(0,0,0,.06);display:flex;flex-direction:column;justify-content:space-between;">
                     <div style="position:relative;overflow:hidden;background:#09090b;">
-                        <div style="width:100%;padding-bottom:56.25%;position:relative;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 40%, #27272a 0%, #09090b 100%);">
+                        <div style="width:100%;padding-bottom:44%;position:relative;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 40%, #27272a 0%, #09090b 100%);">
                             <!-- Minimalist AI Visual -->
-                            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;">
-                                <div style="width:44px;height:44px;background:white;border-radius:12px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,0,0,.4);">
-                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#09090b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;">
+                                <div style="width:38px;height:38px;background:white;border-radius:10px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(0,0,0,.4);">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#09090b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
                                 </div>
-                                <span style="font-size:10px;font-weight:800;color:#e4e4e7;letter-spacing:0.04em;font-family:monospace;">HTML + TAILWIND AI</span>
+                                <span style="font-size:9.5px;font-weight:800;color:#e4e4e7;letter-spacing:0.04em;font-family:monospace;">AI HTML + TAILWIND</span>
                             </div>
-                            <div id="atw-ov-h" style="display:flex;position:absolute;inset:0;background:rgba(24,24,27,.48);align-items:center;justify-content:center;">
-                                <div style="width:44px;height:44px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 24px rgba(0,0,0,.2);">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#18181b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            <div id="atw-ov-h" style="display:flex;position:absolute;inset:0;background:rgba(24,24,27,.45);align-items:center;justify-content:center;">
+                                <div style="width:38px;height:38px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 18px rgba(0,0,0,.2);">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#18181b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                                 </div>
                             </div>
                         </div>
                         <!-- Top left badge -->
-                        <div style="position:absolute;top:11px;left:11px;display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.95);backdrop-filter:blur(8px);border-radius:100px;padding:4px 9px 4px 6px;box-shadow:0 1px 6px rgba(0,0,0,.14);">
+                        <div style="position:absolute;top:10px;left:10px;display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.95);backdrop-filter:blur(8px);border-radius:100px;padding:3px 8px 3px 5px;box-shadow:0 1px 4px rgba(0,0,0,.12);">
                             <span style="width:6px;height:6px;background:#10b981;border-radius:50%;"></span>
-                            <span style="font-size:10px;font-weight:800;color:#18181b;letter-spacing:-.01em;">⚡ 10-Min AI Launch</span>
+                            <span style="font-size:9.5px;font-weight:800;color:#18181b;letter-spacing:-.01em;">⚡ 10-Min Live Launch</span>
                         </div>
                     </div>
-                    <div style="padding:16px 18px 18px;display:flex;flex-direction:column;flex:1;justify-content:space-between;">
+                    <div style="padding:14px 16px 16px;display:flex;flex-direction:column;flex:1;justify-content:space-between;">
                         <div>
                             <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:4px;">
                                 <div>
-                                    <h3 style="font-size:14px;font-weight:800;color:#18181b;letter-spacing:-.02em;margin-bottom:4px;line-height:1.2;">AI HTML & Tailwind (Claude / ChatGPT)</h3>
-                                    <p style="font-size:11.5px;color:#71717a;line-height:1.45;">Prompt-driven templates · Instant Zero-Build live launch · Built-in Lead CRM.</p>
+                                    <h3 style="font-size:14px;font-weight:800;color:#18181b;letter-spacing:-.02em;margin-bottom:3px;line-height:1.2;">Quick Launch HTML (AI)</h3>
+                                    <p style="font-size:11.5px;color:#71717a;line-height:1.4;">Zero-build instant live deployment with Claude & ChatGPT prompts.</p>
                                 </div>
                                 <div id="wiz-radio-html-ai" style="width:18px;height:18px;min-width:18px;border-radius:50%;border:2px solid #18181b;display:flex;align-items:center;justify-content:center;margin-top:2px;transition:all .18s;flex-shrink:0;">
                                     <div style="width:8px;height:8px;border-radius:50%;background:#18181b;transition:all .18s;"></div>
                                 </div>
                             </div>
                         </div>
-                        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:12px;">
-                            <span style="font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:3px 7px;background:#18181b;color:white;border-radius:6px;">Claude Prompt Matrix</span>
-                            <span style="font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:3px 7px;background:#f4f4f5;color:#71717a;border-radius:6px;">Tailwind CSS</span>
-                            <span style="font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:3px 7px;background:#f4f4f5;color:#71717a;border-radius:6px;">Auto CRM Lead Capture</span>
+                        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:10px;">
+                            <span style="font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:2px 6px;background:#18181b;color:white;border-radius:5px;">Claude Prompt Matrix</span>
+                            <span style="font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:2px 6px;background:#e4e4e7;color:#52525b;border-radius:5px;">Tailwind CDN</span>
+                            <span style="font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:2px 6px;background:#e4e4e7;color:#52525b;border-radius:5px;">Native Lead CRM</span>
                         </div>
                     </div>
                 </button>
 
-                <!-- 2. Next.js Native Card (Git) -->
-                <button onclick="wizardSelectBuilder('nextjs')" id="wizard-card-nextjs" class="atw-card" style="text-align:left;background:white;border:2px solid #e4e4e7;border-radius:20px;overflow:hidden;cursor:pointer;padding:0;box-shadow:0 1px 4px rgba(0,0,0,.06);display:flex;flex-direction:column;justify-content:space-between;">
+                <!-- 2. Deploy Next.js (Git) -->
+                <button onclick="wizardSelectBuilder('nextjs')" id="wizard-card-nextjs" class="atw-card" style="text-align:left;background:white;border:2px solid #e4e4e7;border-radius:18px;overflow:hidden;cursor:pointer;padding:0;box-shadow:0 1px 4px rgba(0,0,0,.06);display:flex;flex-direction:column;justify-content:space-between;">
                     <div style="position:relative;overflow:hidden;background:#09090b;">
-                        <div style="width:100%;padding-bottom:56.25%;position:relative;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 40%, #27272a 0%, #09090b 100%);">
+                        <div style="width:100%;padding-bottom:44%;position:relative;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 40%, #27272a 0%, #09090b 100%);">
                             <!-- Next.js Dark Minimalist Visual -->
-                            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;">
-                                <div style="width:44px;height:44px;background:white;border-radius:12px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,0,0,.4);">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="#09090b"><path d="M12 2L2 19.7778H22L12 2Z"/></svg>
+                            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;">
+                                <div style="width:38px;height:38px;background:white;border-radius:10px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(0,0,0,.4);">
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="#09090b"><path d="M12 2L2 19.7778H22L12 2Z"/></svg>
                                 </div>
-                                <span style="font-size:10px;font-weight:800;color:#e4e4e7;letter-spacing:0.04em;font-family:monospace;">NEXT.JS APP ROUTER</span>
+                                <span style="font-size:9.5px;font-weight:800;color:#e4e4e7;letter-spacing:0.04em;font-family:monospace;">NEXT.JS APP ROUTER</span>
                             </div>
-                            <div id="atw-ov-n" style="display:none;position:absolute;inset:0;background:rgba(24,24,27,.48);align-items:center;justify-content:center;">
-                                <div style="width:44px;height:44px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 24px rgba(0,0,0,.2);">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#18181b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            <div id="atw-ov-n" style="display:none;position:absolute;inset:0;background:rgba(24,24,27,.45);align-items:center;justify-content:center;">
+                                <div style="width:38px;height:38px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 18px rgba(0,0,0,.2);">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#18181b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                                 </div>
                             </div>
                         </div>
                         <!-- Top left badge -->
-                        <div style="position:absolute;top:11px;left:11px;display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.95);backdrop-filter:blur(8px);border-radius:100px;padding:4px 9px 4px 6px;box-shadow:0 1px 6px rgba(0,0,0,.14);">
+                        <div style="position:absolute;top:10px;left:10px;display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.95);backdrop-filter:blur(8px);border-radius:100px;padding:3px 8px 3px 5px;box-shadow:0 1px 4px rgba(0,0,0,.12);">
                             <span style="width:6px;height:6px;background:#10b981;border-radius:50%;"></span>
-                            <span style="font-size:10px;font-weight:800;color:#18181b;letter-spacing:-.01em;">Native Next.js</span>
+                            <span style="font-size:9.5px;font-weight:800;color:#18181b;letter-spacing:-.01em;">Native Next.js</span>
                         </div>
                     </div>
-                    <div style="padding:16px 18px 18px;display:flex;flex-direction:column;flex:1;justify-content:space-between;">
+                    <div style="padding:14px 16px 16px;display:flex;flex-direction:column;flex:1;justify-content:space-between;">
                         <div>
                             <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:4px;">
                                 <div>
-                                    <h3 style="font-size:14px;font-weight:800;color:#18181b;letter-spacing:-.02em;margin-bottom:4px;line-height:1.2;">Next.js Native (Git)</h3>
-                                    <p style="font-size:11.5px;color:#71717a;line-height:1.45;">Connect GitHub repo · Headless React App Router · Full operational control.</p>
+                                    <h3 style="font-size:14px;font-weight:800;color:#18181b;letter-spacing:-.02em;margin-bottom:3px;line-height:1.2;">Deploy Next.js (Git)</h3>
+                                    <p style="font-size:11.5px;color:#71717a;line-height:1.4;">Connect GitHub repository for headless App Router & automated builds.</p>
                                 </div>
                                 <div id="wiz-radio-nextjs" style="width:18px;height:18px;min-width:18px;border-radius:50%;border:2px solid #d4d4d8;display:flex;align-items:center;justify-content:center;margin-top:2px;transition:all .18s;flex-shrink:0;">
                                     <div style="width:8px;height:8px;border-radius:50%;background:transparent;transition:all .18s;"></div>
                                 </div>
                             </div>
                         </div>
-                        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:12px;">
-                            <span style="font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:3px 7px;background:#f4f4f5;color:#71717a;border-radius:6px;">App Router</span>
-                            <span style="font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:3px 7px;background:#f4f4f5;color:#71717a;border-radius:6px;">GitHub Sync</span>
-                            <span style="font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:3px 7px;background:#f4f4f5;color:#71717a;border-radius:6px;">ISR Rebuild</span>
+                        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:10px;">
+                            <span style="font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:2px 6px;background:#f4f4f5;color:#71717a;border-radius:5px;">App Router</span>
+                            <span style="font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:2px 6px;background:#f4f4f5;color:#71717a;border-radius:5px;">GitHub Auto-Sync</span>
+                            <span style="font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:2px 6px;background:#f4f4f5;color:#71717a;border-radius:5px;">Static Build</span>
                         </div>
                     </div>
                 </button>
 
-                <!-- 3. Elementor Card -->
-                <button onclick="wizardSelectBuilder('elementor')" id="wizard-card-elementor" class="atw-card" style="text-align:left;background:white;border:2px solid #e4e4e7;border-radius:20px;overflow:hidden;cursor:pointer;padding:0;box-shadow:0 1px 4px rgba(0,0,0,.06);display:flex;flex-direction:column;justify-content:space-between;">
+                <!-- 3. Import Elementor Kit -->
+                <button onclick="wizardSelectBuilder('elementor')" id="wizard-card-elementor" class="atw-card" style="text-align:left;background:white;border:2px solid #e4e4e7;border-radius:18px;overflow:hidden;cursor:pointer;padding:0;box-shadow:0 1px 4px rgba(0,0,0,.06);display:flex;flex-direction:column;justify-content:space-between;">
                     <div style="position:relative;overflow:hidden;background:#f0f0ef;">
-                        <div style="width:100%;padding-bottom:56.25%;position:relative;">
+                        <div style="width:100%;padding-bottom:44%;position:relative;">
                             <img src="<?php echo esc_url( plugin_dir_url(dirname(__FILE__)) . 'assets/img/wizard-elementor-thumb.jpg' ); ?>" alt="Elementor editor" class="atw-thumb" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;" loading="lazy">
-                            <div id="atw-ov-e" style="display:none;position:absolute;inset:0;background:rgba(24,24,27,.48);align-items:center;justify-content:center;">
-                                <div style="width:44px;height:44px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 24px rgba(0,0,0,.2);">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#18181b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            <div id="atw-ov-e" style="display:none;position:absolute;inset:0;background:rgba(24,24,27,.45);align-items:center;justify-content:center;">
+                                <div style="width:38px;height:38px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 18px rgba(0,0,0,.2);">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#18181b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                                 </div>
                             </div>
                         </div>
-                        <div style="position:absolute;top:11px;left:11px;display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border-radius:100px;padding:4px 9px 4px 5px;box-shadow:0 1px 6px rgba(0,0,0,.14);">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="5" fill="#92003B"/><path d="M7 7h10M7 12h10M7 17h6" stroke="white" stroke-width="2.2" stroke-linecap="round"/></svg>
-                            <span style="font-size:10px;font-weight:800;color:#18181b;letter-spacing:-.01em;">Elementor</span>
+                        <div style="position:absolute;top:10px;left:10px;display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border-radius:100px;padding:3px 8px 3px 5px;box-shadow:0 1px 4px rgba(0,0,0,.12);">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="5" fill="#92003B"/><path d="M7 7h10M7 12h10M7 17h6" stroke="white" stroke-width="2.2" stroke-linecap="round"/></svg>
+                            <span style="font-size:9.5px;font-weight:800;color:#18181b;letter-spacing:-.01em;">Elementor</span>
                         </div>
                     </div>
-                    <div style="padding:16px 18px 18px;display:flex;flex-direction:column;flex:1;justify-content:space-between;">
+                    <div style="padding:14px 16px 16px;display:flex;flex-direction:column;flex:1;justify-content:space-between;">
                         <div>
                             <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:4px;">
                                 <div>
-                                    <h3 style="font-size:14px;font-weight:800;color:#18181b;letter-spacing:-.02em;margin-bottom:4px;line-height:1.2;">Elementor Builder / Kit</h3>
-                                    <p style="font-size:11.5px;color:#71717a;line-height:1.45;">Upload Elementor Kit (.zip) or manage Elementor pages.</p>
+                                    <h3 style="font-size:14px;font-weight:800;color:#18181b;letter-spacing:-.02em;margin-bottom:3px;line-height:1.2;">Import Elementor Kit</h3>
+                                    <p style="font-size:11.5px;color:#71717a;line-height:1.4;">Upload Elementor template kit (.zip) with live visual canvas editing.</p>
                                 </div>
                                 <div id="wiz-radio-elementor" style="width:18px;height:18px;min-width:18px;border-radius:50%;border:2px solid #d4d4d8;display:flex;align-items:center;justify-content:center;margin-top:2px;transition:all .18s;flex-shrink:0;">
                                     <div style="width:8px;height:8px;border-radius:50%;background:transparent;transition:all .18s;"></div>
                                 </div>
                             </div>
                         </div>
-                        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:12px;">
-                            <span style="font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:3px 7px;background:#f4f4f5;color:#71717a;border-radius:6px;">Upload Kit</span>
-                            <span style="font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:3px 7px;background:#f4f4f5;color:#71717a;border-radius:6px;">Visual Editor</span>
+                        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:10px;">
+                            <span style="font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:2px 6px;background:#f4f4f5;color:#71717a;border-radius:5px;">Kit Upload (.zip)</span>
+                            <span style="font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:2px 6px;background:#f4f4f5;color:#71717a;border-radius:5px;">Visual Canvas Editor</span>
                         </div>
                     </div>
                 </button>
 
-                <!-- 4. Lovable Card — LOCKED / Coming Soon -->
-                <div id="wizard-card-lovable" onclick="if(typeof window.coraShowToast==='function'){window.coraShowToast('Lovable integration is coming soon!','info');}else{console.log('Lovable coming soon');}" class="atw-card" style="text-align:left;background:#fafafa;border:2px solid #e4e4e7;border-radius:20px;overflow:hidden;cursor:not-allowed;padding:0;box-shadow:0 1px 4px rgba(0,0,0,.04);opacity:.55;filter:grayscale(.35);position:relative;transition:opacity .2s,filter .2s;user-select:none;display:flex;flex-direction:column;justify-content:space-between;" onmouseover="this.style.opacity='.62';" onmouseout="this.style.opacity='.55';">
+                <!-- 4. Connect Lovable Project — LOCKED / Coming Soon -->
+                <div id="wizard-card-lovable" onclick="if(typeof window.coraShowToast==='function'){window.coraShowToast('Lovable integration is coming soon!','info');}else{console.log('Lovable coming soon');}" class="atw-card" style="text-align:left;background:#fafafa;border:2px solid #e4e4e7;border-radius:18px;overflow:hidden;cursor:not-allowed;padding:0;box-shadow:0 1px 4px rgba(0,0,0,.04);opacity:.55;filter:grayscale(.35);position:relative;transition:opacity .2s,filter .2s;user-select:none;display:flex;flex-direction:column;justify-content:space-between;" onmouseover="this.style.opacity='.62';" onmouseout="this.style.opacity='.55';">
                     <div style="position:relative;overflow:hidden;background:#f0eef5;">
-                        <div style="width:100%;padding-bottom:56.25%;position:relative;">
+                        <div style="width:100%;padding-bottom:44%;position:relative;">
                             <img src="<?php echo esc_url( plugin_dir_url(dirname(__FILE__)) . 'assets/img/wizard-lovable-thumb.jpg' ); ?>" alt="Lovable Studio" class="atw-thumb" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;filter:grayscale(.3);" loading="lazy">
                             <!-- Permanent lock overlay -->
                             <div style="position:absolute;inset:0;background:rgba(24,24,27,.32);display:flex;align-items:center;justify-content:center;">
-                                <div style="width:44px;height:44px;background:rgba(255,255,255,.92);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.12);">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                <div style="width:38px;height:38px;background:rgba(255,255,255,.92);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.12);">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                                 </div>
                             </div>
                         </div>
                         <!-- Lovable pill badge (left) -->
-                        <div style="position:absolute;top:11px;left:11px;display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border-radius:100px;padding:4px 9px 4px 6px;box-shadow:0 1px 6px rgba(0,0,0,.14);">
+                        <div style="position:absolute;top:10px;left:10px;display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border-radius:100px;padding:3px 8px 3px 5px;box-shadow:0 1px 4px rgba(0,0,0,.12);">
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#a1a1aa" stroke-width="2.2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-                            <span style="font-size:10px;font-weight:800;color:#a1a1aa;letter-spacing:-.01em;">Lovable</span>
+                            <span style="font-size:9.5px;font-weight:800;color:#a1a1aa;letter-spacing:-.01em;">Lovable</span>
                         </div>
                         <!-- Coming Soon badge (right) -->
-                        <div style="position:absolute;top:11px;right:11px;display:flex;align-items:center;gap:4px;background:rgba(24,24,27,.82);backdrop-filter:blur(8px);border-radius:100px;padding:5px 10px 5px 7px;box-shadow:0 2px 8px rgba(0,0,0,.18);">
-                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#e4e4e7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                            <span style="font-size:9px;font-weight:800;color:#e4e4e7;letter-spacing:.04em;text-transform:uppercase;">Coming Soon</span>
+                        <div style="position:absolute;top:10px;right:10px;display:flex;align-items:center;gap:4px;background:rgba(24,24,27,.82);backdrop-filter:blur(8px);border-radius:100px;padding:4px 8px;box-shadow:0 2px 6px rgba(0,0,0,.18);">
+                            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#e4e4e7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                            <span style="font-size:8.5px;font-weight:800;color:#e4e4e7;letter-spacing:.04em;text-transform:uppercase;">Coming Soon</span>
                         </div>
                     </div>
-                    <div style="padding:16px 18px 18px;display:flex;flex-direction:column;flex:1;justify-content:space-between;">
+                    <div style="padding:14px 16px 16px;display:flex;flex-direction:column;flex:1;justify-content:space-between;">
                         <div>
                             <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:4px;">
                                 <div>
-                                    <h3 style="font-size:14px;font-weight:800;color:#a1a1aa;letter-spacing:-.02em;margin-bottom:4px;line-height:1.2;">Lovable Studio (Locked / Coming Soon)</h3>
-                                    <p style="font-size:11.5px;color:#a1a1aa;line-height:1.45;">Connect a live AI-built Lovable.dev project.</p>
+                                    <h3 style="font-size:14px;font-weight:800;color:#a1a1aa;letter-spacing:-.02em;margin-bottom:3px;line-height:1.2;">Connect Lovable Project</h3>
+                                    <p style="font-size:11.5px;color:#a1a1aa;line-height:1.4;">Sync AI web applications from Lovable Studio with live updates.</p>
                                 </div>
                                 <div style="width:18px;height:18px;min-width:18px;display:flex;align-items:center;justify-content:center;margin-top:2px;flex-shrink:0;">
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d4d4d8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                                 </div>
                             </div>
                         </div>
-                        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:12px;">
-                            <span style="font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:3px 7px;background:#f4f4f5;color:#a1a1aa;border-radius:6px;border:1px solid #e4e4e7;">Lovable API</span>
-                            <span style="font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:3px 7px;background:#f4f4f5;color:#a1a1aa;border-radius:6px;border:1px solid #e4e4e7;">Live Sync</span>
+                        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:10px;">
+                            <span style="font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:2px 6px;background:#f4f4f5;color:#a1a1aa;border-radius:5px;border:1px solid #e4e4e7;">Lovable API</span>
+                            <span style="font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:2px 6px;background:#f4f4f5;color:#a1a1aa;border-radius:5px;border:1px solid #e4e4e7;">Live Sync</span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- STEP 2-HTML: AI HTML & Tailwind Starter Prompts Matrix -->
-        <div id="wizard-step-2-html" class="atw-anim" style="display:none;flex:1;flex-direction:column;align-items:center;justify-content:flex-start;padding:36px 28px;max-width:1160px;margin:0 auto;width:100%;">
-            <!-- Header -->
-            <div style="text-align:center;margin-bottom:28px;max-width:680px;">
-                <div style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;background:#18181b;border-radius:100px;margin-bottom:12px;">
-                    <span style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:white;">⚡ Claude & ChatGPT Master Prompts</span>
+        <!-- STEP 2-HTML: AI HTML & Tailwind Starter Prompts Matrix & Code Connector -->
+        <div id="wizard-step-2-html" class="atw-anim" style="display:none;flex:1;flex-direction:column;align-items:center;justify-content:flex-start;padding:20px 24px 24px;max-width:1160px;margin:0 auto;width:100%;">
+            
+            <!-- Header with Marketing Site Redirect & Title -->
+            <div style="width:100%;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid #e4e4e7;">
+                <div>
+                    <div style="display:inline-flex;align-items:center;gap:6px;padding:3px 10px;background:#18181b;border-radius:100px;margin-bottom:6px;">
+                        <span style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:white;">⚡ Claude & ChatGPT Master Prompts</span>
+                    </div>
+                    <h2 style="font-size:22px;font-weight:900;color:#18181b;letter-spacing:-.03em;line-height:1.2;">Choose a Business Template Prompt or Connect Code</h2>
+                    <p style="font-size:12px;color:#71717a;margin-top:2px;">Select from 6 curated master prompts, or switch tabs to paste your custom HTML code directly.</p>
                 </div>
-                <h2 style="font-size:26px;font-weight:900;color:#18181b;letter-spacing:-.04em;line-height:1.15;margin-bottom:8px;">Choose a Business Template Prompt</h2>
-                <p style="font-size:13px;color:#71717a;line-height:1.55;">Select a template below to copy its tailored master prompt for Claude or ChatGPT, or paste your generated HTML code directly.</p>
+                <!-- Marketing Site Redirect Banner/Link -->
+                <a href="https://heycora.in/templates" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:#f4f4f5;border:1.5px solid #e4e4e7;border-radius:10px;font-size:11.5px;font-weight:700;color:#18181b;text-decoration:none;transition:all .15s;box-shadow:0 1px 3px rgba(0,0,0,.04);" onmouseover="this.style.background='#e4e4e7'" onmouseout="this.style.background='#f4f4f5'">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    <span>Explore all 20+ templates on heycora.in</span>
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+                </a>
             </div>
 
-            <!-- Template Prompts Grid (High-Density Responsive Cards) -->
-            <div class="atw-prompts-grid" style="margin-bottom:24px;">
-
-                <!-- 1. Creative Agency & Video Studio -->
-                <div onclick="window.selectHtmlTemplate('agency', 'Creative Agency & Video Studio')" id="wiz-tcard-agency" class="atw-template-card atw-sel-t" style="display:flex;flex-direction:column;justify-content:space-between;padding:18px;">
-                    <div>
-                        <!-- Thumbnail Illustration Preview -->
-                        <div style="height:110px;border-radius:12px;background:radial-gradient(circle at 50% 30%, #27272a 0%, #09090b 100%);display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:14px;overflow:hidden;border:1px solid #27272a;">
-                            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
-                                <div style="width:36px;height:36px;background:rgba(255,255,255,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.15);">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                                </div>
-                                <span style="font-size:9.5px;font-weight:800;color:#e4e4e7;letter-spacing:0.04em;font-family:monospace;">CREATIVE AGENCY</span>
-                            </div>
-                            <span style="position:absolute;top:8px;right:8px;font-size:8.5px;font-weight:800;color:#10b981;background:rgba(16,185,129,0.15);padding:2px 6px;border-radius:4px;border:1px solid rgba(16,185,129,0.3);">Dark Minimal</span>
-                        </div>
-
-                        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;">
-                            <h3 style="font-size:14px;font-weight:800;color:#18181b;letter-spacing:-0.02em;">🎨 Creative Agency & Video Studio</h3>
-                        </div>
-                        <p style="font-size:11.5px;color:#71717a;line-height:1.45;margin-bottom:12px;">Tailwind CDN, dark modern minimalist aesthetic, video reel hero, portfolio showcase cards, services grid, testimonial ticker, and a native lead consultation &lt;form&gt;.</p>
-                        
-                        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px;">
-                            <span style="font-size:8.5px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 7px;border-radius:5px;">Tailwind CDN</span>
-                            <span style="font-size:8.5px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 7px;border-radius:5px;">Native Lead Form</span>
-                            <span style="font-size:8.5px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 7px;border-radius:5px;">Mobile 100%</span>
-                        </div>
-                    </div>
-
-                    <div style="display:flex;flex-direction:column;gap:6px;border-top:1px solid #f4f4f5;padding-top:12px;">
-                        <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('agency');" style="width:100%;padding:8px 12px;background:#f4f4f5;border:1px solid #e4e4e7;border-radius:8px;font-size:11px;font-weight:700;color:#18181b;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;">
-                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                            <span>📋 Copy Prompt for Claude / ChatGPT</span>
-                        </button>
-                        <button type="button" onclick="window.selectHtmlTemplate('agency', 'Creative Agency & Video Studio')" style="width:100%;padding:8px 12px;background:#18181b;border:none;border-radius:8px;font-size:11px;font-weight:700;color:white;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;">
-                            <span>Select & Connect Code →</span>
-                        </button>
-                    </div>
+            <!-- Filter & Mode Tab Switcher Bar -->
+            <div style="width:100%;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;">
+                <!-- Real-Time Template Search Input -->
+                <div style="position:relative;flex:1;min-width:260px;max-width:380px;">
+                    <svg style="position:absolute;left:10px;top:11px;width:13px;height:13px;color:#a1a1aa;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="text" id="wiz-template-search-input" oninput="window.filterWizTemplates(this.value)" placeholder="Search templates (agency, saas, photo, real estate)..." class="atw-input" style="padding-left:30px!important;height:36px!important;font-size:12px!important;">
                 </div>
 
-                <!-- 2. AI SaaS & Software Landing -->
-                <div onclick="window.selectHtmlTemplate('saas', 'AI SaaS & Software Landing')" id="wiz-tcard-saas" class="atw-template-card" style="display:flex;flex-direction:column;justify-content:space-between;padding:18px;">
-                    <div>
-                        <!-- Thumbnail Illustration Preview -->
-                        <div style="height:110px;border-radius:12px;background:radial-gradient(circle at 50% 30%, #1e1b4b 0%, #09090b 100%);display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:14px;overflow:hidden;border:1px solid #2e1065;">
-                            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
-                                <div style="width:36px;height:36px;background:rgba(255,255,255,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.15);">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-                                </div>
-                                <span style="font-size:9.5px;font-weight:800;color:#c4b5fd;letter-spacing:0.04em;font-family:monospace;">AI SAAS PLATFORM</span>
-                            </div>
-                            <span style="position:absolute;top:8px;right:8px;font-size:8.5px;font-weight:800;color:#a78bfa;background:rgba(167,139,250,0.15);padding:2px 6px;border-radius:4px;border:1px solid rgba(167,139,250,0.3);">High Tech</span>
-                        </div>
-
-                        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;">
-                            <h3 style="font-size:14px;font-weight:800;color:#18181b;letter-spacing:-0.02em;">⚡ AI SaaS & Software Landing</h3>
-                        </div>
-                        <p style="font-size:11.5px;color:#71717a;line-height:1.45;margin-bottom:12px;">Modern software company layout, live status pill, interactive feature cards, pricing tiers with toggle, and native product demo/waitlist &lt;form&gt;.</p>
-                        
-                        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px;">
-                            <span style="font-size:8.5px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 7px;border-radius:5px;">Tailwind CDN</span>
-                            <span style="font-size:8.5px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 7px;border-radius:5px;">Native Lead Form</span>
-                            <span style="font-size:8.5px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 7px;border-radius:5px;">Mobile 100%</span>
-                        </div>
-                    </div>
-
-                    <div style="display:flex;flex-direction:column;gap:6px;border-top:1px solid #f4f4f5;padding-top:12px;">
-                        <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('saas');" style="width:100%;padding:8px 12px;background:#f4f4f5;border:1px solid #e4e4e7;border-radius:8px;font-size:11px;font-weight:700;color:#18181b;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;">
-                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                            <span>📋 Copy Prompt for Claude / ChatGPT</span>
-                        </button>
-                        <button type="button" onclick="window.selectHtmlTemplate('saas', 'AI SaaS & Software Landing')" style="width:100%;padding:8px 12px;background:#18181b;border:none;border-radius:8px;font-size:11px;font-weight:700;color:white;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;">
-                            <span>Select & Connect Code →</span>
-                        </button>
-                    </div>
+                <!-- Tab Switcher -->
+                <div style="display:inline-flex;background:#e4e4e7;border-radius:10px;padding:3px;gap:3px;">
+                    <button type="button" onclick="window.wizardSetHtmlStepTab('templates')" id="wiz-step2-tab-templates" class="atw-tab atw-tab-on" style="padding:6px 14px;font-size:11.5px;font-weight:700;display:inline-flex;align-items:center;gap:6px;">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        <span>⚡ 1. Pick AI Template Prompt (6)</span>
+                    </button>
+                    <button type="button" onclick="window.wizardSetHtmlStepTab('paste')" id="wiz-step2-tab-paste" class="atw-tab atw-tab-off" style="padding:6px 14px;font-size:11.5px;font-weight:700;display:inline-flex;align-items:center;gap:6px;">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                        <span>📝 2. Paste Custom HTML / Drop File</span>
+                    </button>
+                    <button type="button" onclick="window.wizardSetHtmlStepTab('github')" id="wiz-step2-tab-github" class="atw-tab atw-tab-off" style="padding:6px 14px;font-size:11.5px;font-weight:700;display:inline-flex;align-items:center;gap:6px;">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        <span>🐙 3. Connect GitHub Repo</span>
+                    </button>
                 </div>
-
-                <!-- 3. B2B Advisory & Management Consulting -->
-                <div onclick="window.selectHtmlTemplate('consulting', 'B2B Advisory & Management Consulting')" id="wiz-tcard-consulting" class="atw-template-card" style="display:flex;flex-direction:column;justify-content:space-between;padding:18px;">
-                    <div>
-                        <!-- Thumbnail Illustration Preview -->
-                        <div style="height:110px;border-radius:12px;background:radial-gradient(circle at 50% 30%, #1c1917 0%, #09090b 100%);display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:14px;overflow:hidden;border:1px solid #292524;">
-                            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
-                                <div style="width:36px;height:36px;background:rgba(255,255,255,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.15);">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d6d3d1" stroke-width="2"><path d="M20 7h-7L10 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg>
-                                </div>
-                                <span style="font-size:9.5px;font-weight:800;color:#e7e5e4;letter-spacing:0.04em;font-family:monospace;">EXECUTIVE ADVISORY</span>
-                            </div>
-                            <span style="position:absolute;top:8px;right:8px;font-size:8.5px;font-weight:800;color:#fbbf24;background:rgba(251,191,36,0.15);padding:2px 6px;border-radius:4px;border:1px solid rgba(251,191,36,0.3);">Editorial Luxury</span>
-                        </div>
-
-                        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;">
-                            <h3 style="font-size:14px;font-weight:800;color:#18181b;letter-spacing:-0.02em;">💼 B2B Advisory & Consulting</h3>
-                        </div>
-                        <p style="font-size:11.5px;color:#71717a;line-height:1.45;margin-bottom:12px;">Editorial layout, client partner logos, strategic services breakdown, case study metrics, and native audit inquiry &lt;form&gt;.</p>
-                        
-                        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px;">
-                            <span style="font-size:8.5px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 7px;border-radius:5px;">Tailwind CDN</span>
-                            <span style="font-size:8.5px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 7px;border-radius:5px;">Native Lead Form</span>
-                            <span style="font-size:8.5px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 7px;border-radius:5px;">Mobile 100%</span>
-                        </div>
-                    </div>
-
-                    <div style="display:flex;flex-direction:column;gap:6px;border-top:1px solid #f4f4f5;padding-top:12px;">
-                        <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('consulting');" style="width:100%;padding:8px 12px;background:#f4f4f5;border:1px solid #e4e4e7;border-radius:8px;font-size:11px;font-weight:700;color:#18181b;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;">
-                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                            <span>📋 Copy Prompt for Claude / ChatGPT</span>
-                        </button>
-                        <button type="button" onclick="window.selectHtmlTemplate('consulting', 'B2B Advisory & Management Consulting')" style="width:100%;padding:8px 12px;background:#18181b;border:none;border-radius:8px;font-size:11px;font-weight:700;color:white;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;">
-                            <span>Select & Connect Code →</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- 4. Photography Studio & Production House -->
-                <div onclick="window.selectHtmlTemplate('photography', 'Photography Studio & Production House')" id="wiz-tcard-photography" class="atw-template-card" style="display:flex;flex-direction:column;justify-content:space-between;padding:18px;">
-                    <div>
-                        <!-- Thumbnail Illustration Preview -->
-                        <div style="height:110px;border-radius:12px;background:radial-gradient(circle at 50% 30%, #18181b 0%, #09090b 100%);display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:14px;overflow:hidden;border:1px solid #27272a;">
-                            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
-                                <div style="width:36px;height:36px;background:rgba(255,255,255,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.15);">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                                </div>
-                                <span style="font-size:9.5px;font-weight:800;color:#bae6fd;letter-spacing:0.04em;font-family:monospace;">PHOTO STUDIO</span>
-                            </div>
-                            <span style="position:absolute;top:8px;right:8px;font-size:8.5px;font-weight:800;color:#38bdf8;background:rgba(56,189,248,0.15);padding:2px 6px;border-radius:4px;border:1px solid rgba(56,189,248,0.3);">Visual Gallery</span>
-                        </div>
-
-                        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;">
-                            <h3 style="font-size:14px;font-weight:800;color:#18181b;letter-spacing:-0.02em;">📸 Photography Studio & Production</h3>
-                        </div>
-                        <p style="font-size:11.5px;color:#71717a;line-height:1.45;margin-bottom:12px;">High-end image gallery, package cards with GST breakdown, client reviews, and native booking inquiry &lt;form&gt;.</p>
-                        
-                        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px;">
-                            <span style="font-size:8.5px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 7px;border-radius:5px;">Tailwind CDN</span>
-                            <span style="font-size:8.5px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 7px;border-radius:5px;">Native Lead Form</span>
-                            <span style="font-size:8.5px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 7px;border-radius:5px;">Mobile 100%</span>
-                        </div>
-                    </div>
-
-                    <div style="display:flex;flex-direction:column;gap:6px;border-top:1px solid #f4f4f5;padding-top:12px;">
-                        <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('photography');" style="width:100%;padding:8px 12px;background:#f4f4f5;border:1px solid #e4e4e7;border-radius:8px;font-size:11px;font-weight:700;color:#18181b;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;">
-                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                            <span>📋 Copy Prompt for Claude / ChatGPT</span>
-                        </button>
-                        <button type="button" onclick="window.selectHtmlTemplate('photography', 'Photography Studio & Production House')" style="width:100%;padding:8px 12px;background:#18181b;border:none;border-radius:8px;font-size:11px;font-weight:700;color:white;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;">
-                            <span>Select & Connect Code →</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- 5. Custom Prompt Studio (Any Niche) -->
-                <div onclick="window.selectHtmlTemplate('custom', 'Custom Business Studio')" id="wiz-tcard-custom" class="atw-template-card" style="display:flex;flex-direction:column;justify-content:space-between;padding:18px;">
-                    <div>
-                        <!-- Thumbnail Illustration Preview -->
-                        <div style="height:110px;border-radius:12px;background:radial-gradient(circle at 50% 30%, #27272a 0%, #09090b 100%);display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:14px;overflow:hidden;border:1px solid #3f3f46;">
-                            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
-                                <div style="width:36px;height:36px;background:rgba(255,255,255,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.15);">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-                                </div>
-                                <span style="font-size:9.5px;font-weight:800;color:#fda4af;letter-spacing:0.04em;font-family:monospace;">CUSTOM NICHE</span>
-                            </div>
-                            <span style="position:absolute;top:8px;right:8px;font-size:8.5px;font-weight:800;color:#f43f5e;background:rgba(244,63,94,0.15);padding:2px 6px;border-radius:4px;border:1px solid rgba(244,63,94,0.3);">Universal</span>
-                        </div>
-
-                        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;">
-                            <h3 style="font-size:14px;font-weight:800;color:#18181b;letter-spacing:-0.02em;">✨ Custom Prompt Studio (Any Niche)</h3>
-                        </div>
-                        <p style="font-size:11.5px;color:#71717a;line-height:1.45;margin-bottom:12px;">Customizable prompt template with business name & services inputs for real estate, e-commerce, fitness, hospitality, or local service businesses.</p>
-                        
-                        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px;">
-                            <span style="font-size:8.5px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 7px;border-radius:5px;">Tailwind CDN</span>
-                            <span style="font-size:8.5px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 7px;border-radius:5px;">Native Lead Form</span>
-                            <span style="font-size:8.5px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 7px;border-radius:5px;">Universal Niche</span>
-                        </div>
-                    </div>
-
-                    <div style="display:flex;flex-direction:column;gap:6px;border-top:1px solid #f4f4f5;padding-top:12px;">
-                        <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('custom');" style="width:100%;padding:8px 12px;background:#f4f4f5;border:1px solid #e4e4e7;border-radius:8px;font-size:11px;font-weight:700;color:#18181b;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;">
-                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                            <span>📋 Copy Prompt for Claude / ChatGPT</span>
-                        </button>
-                        <button type="button" onclick="window.selectHtmlTemplate('custom', 'Custom Business Studio')" style="width:100%;padding:8px 12px;background:#18181b;border:none;border-radius:8px;font-size:11px;font-weight:700;color:white;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;">
-                            <span>Select & Connect Code →</span>
-                        </button>
-                    </div>
-                </div>
-
             </div>
 
-            <!-- Code Connection Section below the grid -->
-            <div id="wiz-html-code-section" style="width:100%;background:white;border:1.5px solid #e4e4e7;border-radius:18px;padding:24px;box-shadow:0 1px 4px rgba(0,0,0,.04);">
-                
-                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #f4f4f5;">
-                    <div>
-                        <h4 style="font-size:14px;font-weight:800;color:#18181b;margin-bottom:2px;">Connect & Deploy Code</h4>
-                        <p style="font-size:11.5px;color:#71717a;">Paste your generated HTML from Claude / ChatGPT, drop an index.html file, or sync a Git repository.</p>
-                    </div>
-                    <!-- Tab Switcher -->
-                    <div style="display:inline-flex;background:#f4f4f5;border-radius:10px;padding:3px;gap:2px;">
-                        <button type="button" onclick="window.wizardSetHtmlCodeMode('paste')" id="wiz-html-tab-paste" class="atw-tab atw-tab-on" style="padding:6px 12px;font-size:11px;font-weight:700;display:inline-flex;align-items:center;gap:5px;">
-                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-                            <span>Paste HTML Code / Drop index.html</span>
-                        </button>
-                        <button type="button" onclick="window.wizardSetHtmlCodeMode('github')" id="wiz-html-tab-github" class="atw-tab atw-tab-off" style="padding:6px 12px;font-size:11px;font-weight:700;display:inline-flex;align-items:center;gap:5px;">
-                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                            <span>Connect GitHub Repo</span>
-                        </button>
-                    </div>
-                </div>
+            <!-- ════════════════════════════════════════════════════════════════
+                 TAB 1: 6 Curated Production Template Prompts Matrix
+                 ════════════════════════════════════════════════════════════════ -->
+            <div id="wiz-step2-templates-view" style="width:100%;">
+                <div class="atw-prompts-grid" id="wiz-templates-container">
 
-                <!-- 1. Paste HTML Tab -->
-                <div id="wiz-html-paste-area" style="display:flex;flex-direction:column;gap:14px;">
-                    <div style="display:flex;align-items:center;justify-content:space-between;">
+                    <!-- 1. Creative Agency & Video Studio -->
+                    <div onclick="window.selectHtmlTemplate('agency', 'Creative Agency & Video Studio')" id="wiz-tcard-agency" data-template-name="Creative Agency & Video Studio agency video portfolio production" class="atw-template-card atw-sel-t" style="display:flex;flex-direction:column;justify-content:space-between;padding:16px;">
+                        <div>
+                            <!-- Visual Preview Thumbnail -->
+                            <div style="height:100px;border-radius:10px;background:radial-gradient(circle at 50% 30%, #27272a 0%, #09090b 100%);display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:12px;overflow:hidden;border:1px solid #27272a;">
+                                <div style="display:flex;flex-direction:column;align-items:center;gap:5px;">
+                                    <div style="width:32px;height:32px;background:rgba(255,255,255,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.15);">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                    </div>
+                                    <span style="font-size:9px;font-weight:800;color:#e4e4e7;letter-spacing:0.04em;font-family:monospace;">CREATIVE AGENCY</span>
+                                </div>
+                                <span style="position:absolute;top:6px;right:6px;font-size:8px;font-weight:800;color:#10b981;background:rgba(16,185,129,0.15);padding:2px 6px;border-radius:4px;border:1px solid rgba(16,185,129,0.3);">Dark Minimal</span>
+                            </div>
+
+                            <h3 style="font-size:13.5px;font-weight:800;color:#18181b;letter-spacing:-0.02em;margin-bottom:4px;">🎨 Creative Agency & Video Studio</h3>
+                            <p style="font-size:11px;color:#71717a;line-height:1.4;margin-bottom:10px;">Tailwind CDN, dark minimalist aesthetic, video reel hero, portfolio showcase, services matrix, and native lead consultation form.</p>
+                            
+                            <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px;">
+                                <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Tailwind CDN</span>
+                                <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Native Lead Form</span>
+                                <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Mobile 100%</span>
+                            </div>
+                        </div>
+
+                        <div style="display:flex;flex-direction:column;gap:5px;border-top:1px solid #f4f4f5;padding-top:10px;">
+                            <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('agency');" style="width:100%;padding:7px 10px;background:#f4f4f5;border:1px solid #e4e4e7;border-radius:7px;font-size:10.5px;font-weight:700;color:#18181b;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;">
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                <span>📋 Copy Prompt for Claude / ChatGPT</span>
+                            </button>
+                            <button type="button" onclick="event.stopPropagation(); window.useTemplateAndSwitchToCode('agency', 'Creative Agency & Video Studio');" style="width:100%;padding:7px 10px;background:#18181b;border:none;border-radius:7px;font-size:10.5px;font-weight:700;color:white;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;">
+                                <span>⚡ Use Template & Connect Code →</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 2. AI SaaS & Software Landing -->
+                    <div onclick="window.selectHtmlTemplate('saas', 'AI SaaS & Software Landing')" id="wiz-tcard-saas" data-template-name="AI SaaS & Software Landing saas software platform app tech" class="atw-template-card" style="display:flex;flex-direction:column;justify-content:space-between;padding:16px;">
+                        <div>
+                            <!-- Visual Preview Thumbnail -->
+                            <div style="height:100px;border-radius:10px;background:radial-gradient(circle at 50% 30%, #1e1b4b 0%, #09090b 100%);display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:12px;overflow:hidden;border:1px solid #2e1065;">
+                                <div style="display:flex;flex-direction:column;align-items:center;gap:5px;">
+                                    <div style="width:32px;height:32px;background:rgba(255,255,255,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.15);">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                                    </div>
+                                    <span style="font-size:9px;font-weight:800;color:#c4b5fd;letter-spacing:0.04em;font-family:monospace;">AI SAAS PLATFORM</span>
+                                </div>
+                                <span style="position:absolute;top:6px;right:6px;font-size:8px;font-weight:800;color:#a78bfa;background:rgba(167,139,250,0.15);padding:2px 6px;border-radius:4px;border:1px solid rgba(167,139,250,0.3);">High Tech</span>
+                            </div>
+
+                            <h3 style="font-size:13.5px;font-weight:800;color:#18181b;letter-spacing:-0.02em;margin-bottom:4px;">⚡ AI SaaS & Software Landing</h3>
+                            <p style="font-size:11px;color:#71717a;line-height:1.4;margin-bottom:10px;">Modern tech layout, live status pill, interactive feature grid, pricing tiers with toggle, and native product demo form.</p>
+                            
+                            <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px;">
+                                <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Tailwind CDN</span>
+                                <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Native Lead Form</span>
+                                <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Pricing Toggle</span>
+                            </div>
+                        </div>
+
+                        <div style="display:flex;flex-direction:column;gap:5px;border-top:1px solid #f4f4f5;padding-top:10px;">
+                            <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('saas');" style="width:100%;padding:7px 10px;background:#f4f4f5;border:1px solid #e4e4e7;border-radius:7px;font-size:10.5px;font-weight:700;color:#18181b;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;">
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                <span>📋 Copy Prompt for Claude / ChatGPT</span>
+                            </button>
+                            <button type="button" onclick="event.stopPropagation(); window.useTemplateAndSwitchToCode('saas', 'AI SaaS & Software Landing');" style="width:100%;padding:7px 10px;background:#18181b;border:none;border-radius:7px;font-size:10.5px;font-weight:700;color:white;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;">
+                                <span>⚡ Use Template & Connect Code →</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 3. B2B Advisory & Management Consulting -->
+                    <div onclick="window.selectHtmlTemplate('consulting', 'B2B Advisory & Management Consulting')" id="wiz-tcard-consulting" data-template-name="B2B Advisory & Management Consulting consulting b2b corporate finance executive" class="atw-template-card" style="display:flex;flex-direction:column;justify-content:space-between;padding:16px;">
+                        <div>
+                            <!-- Visual Preview Thumbnail -->
+                            <div style="height:100px;border-radius:10px;background:radial-gradient(circle at 50% 30%, #1c1917 0%, #09090b 100%);display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:12px;overflow:hidden;border:1px solid #292524;">
+                                <div style="display:flex;flex-direction:column;align-items:center;gap:5px;">
+                                    <div style="width:32px;height:32px;background:rgba(255,255,255,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.15);">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d6d3d1" stroke-width="2"><path d="M20 7h-7L10 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg>
+                                    </div>
+                                    <span style="font-size:9px;font-weight:800;color:#e7e5e4;letter-spacing:0.04em;font-family:monospace;">EXECUTIVE ADVISORY</span>
+                                </div>
+                                <span style="position:absolute;top:6px;right:6px;font-size:8px;font-weight:800;color:#fbbf24;background:rgba(251,191,36,0.15);padding:2px 6px;border-radius:4px;border:1px solid rgba(251,191,36,0.3);">Editorial Luxury</span>
+                            </div>
+
+                            <h3 style="font-size:13.5px;font-weight:800;color:#18181b;letter-spacing:-0.02em;margin-bottom:4px;">💼 B2B Advisory & Consulting</h3>
+                            <p style="font-size:11px;color:#71717a;line-height:1.4;margin-bottom:10px;">Editorial layout, client partner logos, strategic services breakdown, case study metrics, and native executive audit form.</p>
+                            
+                            <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px;">
+                                <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Tailwind CDN</span>
+                                <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Native Lead Form</span>
+                                <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Case Studies</span>
+                            </div>
+                        </div>
+
+                        <div style="display:flex;flex-direction:column;gap:5px;border-top:1px solid #f4f4f5;padding-top:10px;">
+                            <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('consulting');" style="width:100%;padding:7px 10px;background:#f4f4f5;border:1px solid #e4e4e7;border-radius:7px;font-size:10.5px;font-weight:700;color:#18181b;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;">
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                <span>📋 Copy Prompt for Claude / ChatGPT</span>
+                            </button>
+                            <button type="button" onclick="event.stopPropagation(); window.useTemplateAndSwitchToCode('consulting', 'B2B Advisory & Management Consulting');" style="width:100%;padding:7px 10px;background:#18181b;border:none;border-radius:7px;font-size:10.5px;font-weight:700;color:white;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;">
+                                <span>⚡ Use Template & Connect Code →</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 4. Photography Studio & Production House -->
+                    <div onclick="window.selectHtmlTemplate('photography', 'Photography Studio & Production House')" id="wiz-tcard-photography" data-template-name="Photography Studio & Production House photo studio photography gallery creative" class="atw-template-card" style="display:flex;flex-direction:column;justify-content:space-between;padding:16px;">
+                        <div>
+                            <!-- Visual Preview Thumbnail -->
+                            <div style="height:100px;border-radius:10px;background:radial-gradient(circle at 50% 30%, #18181b 0%, #09090b 100%);display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:12px;overflow:hidden;border:1px solid #27272a;">
+                                <div style="display:flex;flex-direction:column;align-items:center;gap:5px;">
+                                    <div style="width:32px;height:32px;background:rgba(255,255,255,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.15);">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                                    </div>
+                                    <span style="font-size:9px;font-weight:800;color:#bae6fd;letter-spacing:0.04em;font-family:monospace;">PHOTO STUDIO</span>
+                                </div>
+                                <span style="position:absolute;top:6px;right:6px;font-size:8px;font-weight:800;color:#38bdf8;background:rgba(56,189,248,0.15);padding:2px 6px;border-radius:4px;border:1px solid rgba(56,189,248,0.3);">Visual Gallery</span>
+                            </div>
+
+                            <h3 style="font-size:13.5px;font-weight:800;color:#18181b;letter-spacing:-0.02em;margin-bottom:4px;">📸 Photography Studio & Production</h3>
+                            <p style="font-size:11px;color:#71717a;line-height:1.4;margin-bottom:10px;">High-end visual gallery, package cards with GST breakdown, studio space specs, and native booking inquiry form.</p>
+                            
+                            <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px;">
+                                <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Tailwind CDN</span>
+                                <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Native Lead Form</span>
+                                <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Photo Gallery</span>
+                            </div>
+                        </div>
+
+                        <div style="display:flex;flex-direction:column;gap:5px;border-top:1px solid #f4f4f5;padding-top:10px;">
+                            <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('photography');" style="width:100%;padding:7px 10px;background:#f4f4f5;border:1px solid #e4e4e7;border-radius:7px;font-size:10.5px;font-weight:700;color:#18181b;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;">
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                <span>📋 Copy Prompt for Claude / ChatGPT</span>
+                            </button>
+                            <button type="button" onclick="event.stopPropagation(); window.useTemplateAndSwitchToCode('photography', 'Photography Studio & Production House');" style="width:100%;padding:7px 10px;background:#18181b;border:none;border-radius:7px;font-size:10.5px;font-weight:700;color:white;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;">
+                                <span>⚡ Use Template & Connect Code →</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 5. Luxury Real Estate & Property Showcase -->
+                    <div onclick="window.selectHtmlTemplate('realestate', 'Luxury Real Estate & Property Showcase')" id="wiz-tcard-realestate" data-template-name="Luxury Real Estate & Property Showcase real estate property architecture luxury home" class="atw-template-card" style="display:flex;flex-direction:column;justify-content:space-between;padding:16px;">
+                        <div>
+                            <!-- Visual Preview Thumbnail -->
+                            <div style="height:100px;border-radius:10px;background:radial-gradient(circle at 50% 30%, #064e3b 0%, #09090b 100%);display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:12px;overflow:hidden;border:1px solid #065f46;">
+                                <div style="display:flex;flex-direction:column;align-items:center;gap:5px;">
+                                    <div style="width:32px;height:32px;background:rgba(255,255,255,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.15);">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                                    </div>
+                                    <span style="font-size:9px;font-weight:800;color:#a7f3d0;letter-spacing:0.04em;font-family:monospace;">REAL ESTATE</span>
+                                </div>
+                                <span style="position:absolute;top:6px;right:6px;font-size:8px;font-weight:800;color:#34d399;background:rgba(52,211,153,0.15);padding:2px 6px;border-radius:4px;border:1px solid rgba(52,211,153,0.3);">Luxury Estates</span>
+                            </div>
+
+                            <h3 style="font-size:13.5px;font-weight:800;color:#18181b;letter-spacing:-0.02em;margin-bottom:4px;">🏡 Luxury Real Estate Showcase</h3>
+                            <p style="font-size:11px;color:#71717a;line-height:1.4;margin-bottom:10px;">Architectural luxury layout, property grid with filters, interactive neighborhood map specs, and VIP tour scheduling form.</p>
+                            
+                            <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px;">
+                                <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Tailwind CDN</span>
+                                <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Native Lead Form</span>
+                                <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Property Grid</span>
+                            </div>
+                        </div>
+
+                        <div style="display:flex;flex-direction:column;gap:5px;border-top:1px solid #f4f4f5;padding-top:10px;">
+                            <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('realestate');" style="width:100%;padding:7px 10px;background:#f4f4f5;border:1px solid #e4e4e7;border-radius:7px;font-size:10.5px;font-weight:700;color:#18181b;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;">
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                <span>📋 Copy Prompt for Claude / ChatGPT</span>
+                            </button>
+                            <button type="button" onclick="event.stopPropagation(); window.useTemplateAndSwitchToCode('realestate', 'Luxury Real Estate & Property Showcase');" style="width:100%;padding:7px 10px;background:#18181b;border:none;border-radius:7px;font-size:10.5px;font-weight:700;color:white;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;">
+                                <span>⚡ Use Template & Connect Code →</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 6. Modern E-Commerce & DTC Brand -->
+                    <div onclick="window.selectHtmlTemplate('ecommerce', 'Modern E-Commerce & DTC Brand')" id="wiz-tcard-ecommerce" data-template-name="Modern E-Commerce & DTC Brand ecommerce store dtc shop product brand" class="atw-template-card" style="display:flex;flex-direction:column;justify-content:space-between;padding:16px;">
+                        <div>
+                            <!-- Visual Preview Thumbnail -->
+                            <div style="height:100px;border-radius:10px;background:radial-gradient(circle at 50% 30%, #701a75 0%, #09090b 100%);display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:12px;overflow:hidden;border:1px solid #86198f;">
+                                <div style="display:flex;flex-direction:column;align-items:center;gap:5px;">
+                                    <div style="width:32px;height:32px;background:rgba(255,255,255,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.15);">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f472b6" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                                    </div>
+                                    <span style="font-size:9px;font-weight:800;color:#fbcfe8;letter-spacing:0.04em;font-family:monospace;">DTC BRAND STORE</span>
+                                </div>
+                                <span style="position:absolute;top:6px;right:6px;font-size:8px;font-weight:800;color:#f472b6;background:rgba(244,114,182,0.15);padding:2px 6px;border-radius:4px;border:1px solid rgba(244,114,182,0.3);">DTC Shop</span>
+                            </div>
+
+                            <h3 style="font-size:13.5px;font-weight:800;color:#18181b;letter-spacing:-0.02em;margin-bottom:4px;">🛍️ Modern E-Commerce & DTC Brand</h3>
+                            <p style="font-size:11px;color:#71717a;line-height:1.4;margin-bottom:10px;">High-converting product showcase, feature highlights, customer review rating, and direct order / checkout inquiry form.</p>
+                            
+                            <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px;">
+                                <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Tailwind CDN</span>
+                                <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Native Lead Form</span>
+                                <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Product Showcase</span>
+                            </div>
+                        </div>
+
+                        <div style="display:flex;flex-direction:column;gap:5px;border-top:1px solid #f4f4f5;padding-top:10px;">
+                            <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('ecommerce');" style="width:100%;padding:7px 10px;background:#f4f4f5;border:1px solid #e4e4e7;border-radius:7px;font-size:10.5px;font-weight:700;color:#18181b;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;">
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                <span>📋 Copy Prompt for Claude / ChatGPT</span>
+                            </button>
+                            <button type="button" onclick="event.stopPropagation(); window.useTemplateAndSwitchToCode('ecommerce', 'Modern E-Commerce & DTC Brand');" style="width:100%;padding:7px 10px;background:#18181b;border:none;border-radius:7px;font-size:10.5px;font-weight:700;color:white;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;">
+                                <span>⚡ Use Template & Connect Code →</span>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ════════════════════════════════════════════════════════════════
+                 TAB 2: Paste HTML Code / Drop index.html
+                 ════════════════════════════════════════════════════════════════ -->
+            <div id="wiz-step2-paste-view" style="display:none;width:100%;background:white;border:1.5px solid #e4e4e7;border-radius:18px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.04);">
+                <div style="display:flex;flex-direction:column;gap:14px;">
+                    <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;">
                         <div style="display:flex;align-items:center;gap:8px;">
                             <span style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#71717a;">HTML Source Code</span>
                             <span id="wiz-html-stats" style="font-size:10px;font-family:monospace;background:#f4f4f5;color:#71717a;padding:2px 8px;border-radius:6px;">0 lines · 0.0 KB</span>
@@ -5110,7 +5155,7 @@ function cora_get_sparkline_points( $history, $type ) {
                         <textarea id="wiz-html-raw-code" 
                             oninput="window.updateWizHtmlStats()" 
                             placeholder="<!DOCTYPE html>&#10;<html lang=&quot;en&quot;>&#10;<head>&#10;    <script src=&quot;https://cdn.tailwindcss.com&quot;></script>&#10;    <title>My Website</title>&#10;</head>&#10;<body>&#10;    <!-- Paste complete HTML from Claude / ChatGPT here -->&#10;</body>&#10;</html>" 
-                            style="width:100%;height:180px;padding:12px 14px;background:#09090b;color:#f4f4f5;font-family:'JetBrains Mono',monospace;font-size:11.5px;line-height:1.5;border:none;outline:none;resize:vertical;"></textarea>
+                            style="width:100%;height:220px;padding:12px 14px;background:#09090b;color:#f4f4f5;font-family:'JetBrains Mono',monospace;font-size:11.5px;line-height:1.5;border:none;outline:none;resize:vertical;"></textarea>
                     </div>
 
                     <!-- Dropzone -->
@@ -5125,9 +5170,13 @@ function cora_get_sparkline_points( $history, $type ) {
                         <input type="file" id="wiz-html-file-input" accept=".html,.htm" style="display:none;" onchange="window.wizardHtmlFileSelected(this)">
                     </label>
                 </div>
+            </div>
 
-                <!-- 2. GitHub Repo Tab -->
-                <div id="wiz-html-github-area" style="display:none;flex-direction:column;gap:14px;">
+            <!-- ════════════════════════════════════════════════════════════════
+                 TAB 3: Connect GitHub Repo
+                 ════════════════════════════════════════════════════════════════ -->
+            <div id="wiz-step2-github-view" style="display:none;width:100%;background:white;border:1.5px solid #e4e4e7;border-radius:18px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.04);">
+                <div style="display:flex;flex-direction:column;gap:14px;">
                     <div style="display:flex;flex-direction:column;gap:6px;">
                         <label style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#71717a;">Repository URL *</label>
                         <input type="text" id="wiz-html-repo" class="atw-input" placeholder="https://github.com/username/my-html-theme" value="">
@@ -5144,8 +5193,8 @@ function cora_get_sparkline_points( $history, $type ) {
                         </div>
                     </div>
                 </div>
-
             </div>
+
         </div>
 
         <!-- STEP 2-NEXTJS: Next.js Setup -->
@@ -5622,13 +5671,16 @@ function cora_get_sparkline_points( $history, $type ) {
     </div><!-- /body -->
 
     <!-- STICKY FOOTER -->
-    <div style="flex-shrink:0;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;background:rgba(248,248,247,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(0,0,0,.07);">
-        <button id="wiz-back-btn" onclick="wizardBack()" style="display:none;align-items:center;gap:6px;padding:9px 18px;background:white;border:1.5px solid #e4e4e7;border-radius:10px;font-size:12px;font-weight:700;color:#52525b;cursor:pointer;transition:all .15s;font-family:inherit;" onmouseover="this.style.background='#f4f4f5'" onmouseout="this.style.background='white'">
+    <div style="flex-shrink:0;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;background:rgba(248,248,247,.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(0,0,0,.08);position:sticky;bottom:0;z-index:100;">
+        <button id="wiz-back-btn" onclick="wizardBack()" style="display:none;align-items:center;gap:6px;padding:9px 18px;background:white;border:1.5px solid #e4e4e7;border-radius:10px;font-size:12px;font-weight:700;color:#52525b;cursor:pointer;transition:all .15s;font-family:inherit;box-shadow:0 1px 2px rgba(0,0,0,.04);" onmouseover="this.style.background='#f4f4f5'" onmouseout="this.style.background='white'">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
             Back
         </button>
-        <div></div>
-        <button id="wiz-next-btn" onclick="wizardNext()" style="display:flex;align-items:center;gap:7px;padding:10px 24px;background:#18181b;color:white;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:not-allowed;opacity:.4;transition:all .18s;letter-spacing:-.01em;font-family:inherit;" disabled>
+        <div id="wiz-footer-status" style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:#71717a;font-weight:600;">
+            <span id="wiz-footer-status-dot" style="width:6px;height:6px;border-radius:50%;background:#10b981;"></span>
+            <span id="wiz-footer-status-text">Builder: Quick Launch HTML (AI)</span>
+        </div>
+        <button id="wiz-next-btn" onclick="wizardNext()" style="display:flex;align-items:center;gap:7px;padding:10px 24px;background:#18181b;color:white;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;opacity:1;transition:all .18s;letter-spacing:-.01em;font-family:inherit;box-shadow:0 2px 8px rgba(0,0,0,.15);">
             Continue
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
@@ -12238,30 +12290,53 @@ SECTIONS TO INCLUDE:
 
 Return ONLY clean, standalone HTML in an <!DOCTYPE html> document.`,
 
-        custom: `You are an elite full-stack web developer and UI designer. 
-Create a complete, single-file, production-ready HTML5 landing page with Tailwind CSS CDN for any custom business niche.
+        realestate: `You are an elite real estate web architect. 
+Create a complete, single-file, production-ready HTML5 landing page for a premier "Luxury Real Estate & Architectural Properties Showcase" (named "Aura Estates").
+
+TECHNICAL REQUIREMENTS:
+1. Include Tailwind CSS CDN: <script src="https://cdn.tailwindcss.com"><\/script>
+2. Google Fonts: Plus Jakarta Sans and Playfair Display.
+3. Modern architectural aesthetic (emerald-950/zinc-900 dark theme with emerald-500 accents and subtle frosted glass).
+4. Fully responsive on mobile, tablet, and desktop.
+
+SECTIONS TO INCLUDE:
+1. Sticky Header: Modern logo, navigation (Properties, Developments, Private Client Services, About), and "Schedule Private Tour" CTA.
+2. Hero: Fullscreen architectural visuals with headline ("Extraordinary Residences for Discerning Curators"), search filter bar (Location, Price, Bed/Bath), and VIP consultation CTA.
+3. Curated Property Showcase: 4 luxury property cards with high-res photos, specs (Sq Ft, Beds, Baths, Price), neighborhood tags, and "View Brochure" buttons.
+4. Development Highlights: Interactive luxury amenities grid (Private Helipad, Infinity Pools, Concierge, Smart Home Automation).
+5. Neighborhood Guide: Featured prime residential districts with price appreciation metrics.
+6. Native VIP Tour & Acquisition Inquiry Form:
+   - Form markup: <form method="POST" action="/wp-admin/admin-ajax.php" onsubmit="event.preventDefault(); window.coraSubmitLeadForm ? window.coraSubmitLeadForm(this) : alert('Tour requested!');">
+   - Hidden inputs: <input type="hidden" name="action" value="cora_ajax_submit_lead"><input type="hidden" name="form_name" value="Real Estate VIP Tour Form">
+   - Fields: Full Name, Email, Phone, Investment Range ($1M-$3M, $3M-$10M, $10M+), and Preferred Property Type.
+   - High-contrast VIP submit button.
+7. Footer: Office locations, license disclosures, and copyright.
+
+Return ONLY clean, standalone HTML in an <!DOCTYPE html> document.`,
+
+        ecommerce: `You are an elite DTC e-commerce designer. 
+Create a complete, single-file, production-ready HTML5 landing page for a modern "Direct-to-Consumer (DTC) Brand & Online Shop" (named "Velox Goods").
 
 TECHNICAL REQUIREMENTS:
 1. Include Tailwind CSS CDN: <script src="https://cdn.tailwindcss.com"><\/script>
 2. Google Fonts: Inter and JetBrains Mono.
-3. Clean modern monochromatic design system matching the Shopify/Notion aesthetic.
-4. Mobile-first 100% responsive design with mobile drawer navigation.
+3. Clean modern minimalist product aesthetic (pure white & zinc-950 contrast, soft shadow elevations, high-converting product showcases).
+4. Mobile-first 100% responsive layout.
 
 SECTIONS TO INCLUDE:
-1. Navigation Bar: Logo, menu anchors, contact quick-link, and primary CTA.
-2. High-Converting Hero: Catchy headline, benefit-driven subheadline, primary & secondary action buttons, social proof stars, and a hero media card.
-3. Trust / Partner Bar: Customer brand ticker or security trust badges.
-4. Value Proposition / Feature Grid: 4-6 benefit cards with clean SVG icons and clear copy.
-5. Interactive Pricing / Packages: 3 tier cards with feature bullets and highlighted popular tier.
-6. Testimonial Social Proof: 3 authentic customer reviews with avatars and verified badges.
-7. Native Lead Capture Form:
-   - Form markup: <form method="POST" action="/wp-admin/admin-ajax.php" onsubmit="event.preventDefault(); window.coraSubmitLeadForm ? window.coraSubmitLeadForm(this) : alert('Form submitted!');">
-   - Hidden inputs: <input type="hidden" name="action" value="cora_ajax_submit_lead"><input type="hidden" name="form_name" value="Website Lead Form">
-   - Fields: Name, Email, Phone, Message.
-   - High-contrast submit button.
-8. Modern Footer: Quick links, legal links, and copyright.
+1. Announcement Bar & Header: "Free express shipping over ₹999", brand logo, category navigation, cart icon badge (3 items), and "Shop Best Sellers" button.
+2. Hero: High-converting headline ("Engineered for Everyday Excellence"), subheadline, primary product render card, ratings badge (4.9/5 from 4,800+ reviews), and "Shop Collection" CTA.
+3. Featured Products Grid: 4 product cards with high-res photos, color swatches, price tags with strike-through discounts, and "Quick Add to Cart" buttons.
+4. Product Benefits / Materials: 3 highlight cards showing sustainable craftsmanship, aerospace-grade alloy, and lifetime warranty.
+5. Customer Reviews Ticker: 3 verified buyer photo reviews with 5-star ratings.
+6. Native Order / Inquiries Form:
+   - Form markup: <form method="POST" action="/wp-admin/admin-ajax.php" onsubmit="event.preventDefault(); window.coraSubmitLeadForm ? window.coraSubmitLeadForm(this) : alert('Inquiry placed!');">
+   - Hidden inputs: <input type="hidden" name="action" value="cora_ajax_submit_lead"><input type="hidden" name="form_name" value="DTC Order Inquiry Form">
+   - Fields: Name, Email, Phone, Order Inquiry / Size preference, and Delivery Pincode.
+   - High-converting submit button.
+7. Footer: Guarantees (30-day money-back, 24/7 support), payment icons, and legal links.
 
-Return ONLY valid, standalone HTML in an <!DOCTYPE html> document.`
+Return ONLY clean, standalone HTML in an <!DOCTYPE html> document.`
     };
 
     // ── Prompt Copy & Template Selection ────────────────────────
@@ -12272,7 +12347,8 @@ Return ONLY valid, standalone HTML in an <!DOCTYPE html> document.`
             saas: 'AI SaaS & Software Landing',
             consulting: 'B2B Advisory & Consulting',
             photography: 'Photography Studio & Production',
-            custom: 'Custom Prompt Studio'
+            realestate: 'Luxury Real Estate Showcase',
+            ecommerce: 'Modern E-Commerce & DTC Brand'
         };
         var name = templateNames[templateKey] || 'Template';
 
@@ -12308,7 +12384,7 @@ Return ONLY valid, standalone HTML in an <!DOCTYPE html> document.`
         _wizSelectedTemplateKey = templateKey;
 
         // Update card active states
-        ['agency', 'saas', 'consulting', 'photography', 'custom'].forEach(function(k) {
+        ['agency', 'saas', 'consulting', 'photography', 'realestate', 'ecommerce'].forEach(function(k) {
             var el = document.getElementById('wiz-tcard-' + k);
             if (el) {
                 if (k === templateKey) {
@@ -12322,41 +12398,92 @@ Return ONLY valid, standalone HTML in an <!DOCTYPE html> document.`
         // Auto-fill theme name if default or empty
         var nameInput = document.getElementById('wiz-theme-name');
         if (nameInput) {
-            if (!nameInput.value || nameInput.value === 'Creative Agency & Video Studio' || nameInput.value === 'AI SaaS & Software Landing' || nameInput.value === 'B2B Advisory & Management Consulting' || nameInput.value === 'Photography Studio & Production House' || nameInput.value === 'Custom Business Studio') {
+            var defaultNames = [
+                '', 'Creative Agency & Video Studio', 'AI SaaS & Software Landing', 
+                'B2B Advisory & Management Consulting', 'Photography Studio & Production House', 
+                'Luxury Real Estate & Property Showcase', 'Modern E-Commerce & DTC Brand', 'Custom AI Theme'
+            ];
+            if (defaultNames.includes(nameInput.value.trim())) {
                 nameInput.value = title || 'Custom AI Theme';
             }
         }
 
-        // Smooth scroll to code connection area
-        var codeSec = document.getElementById('wiz-html-code-section');
-        if (codeSec) {
-            codeSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Update sticky footer status text
+        var footerStatusText = document.getElementById('wiz-footer-status-text');
+        if (footerStatusText) {
+            footerStatusText.textContent = 'Template: ' + (title || templateKey);
         }
 
-        showToast('Selected ' + (title || templateKey) + ' template. Paste your code below or proceed to launch!', 'info');
+        showToast('Selected ' + (title || templateKey) + ' template. Paste your code or click Continue to launch live!', 'info');
     };
 
-    // ── HTML Code Mode Tabs & Live Preview ─────────────────────
-    window.wizardSetHtmlCodeMode = function(mode) {
-        var tabP = document.getElementById('wiz-html-tab-paste');
-        var tabG = document.getElementById('wiz-html-tab-github');
-        var areaP = document.getElementById('wiz-html-paste-area');
-        var areaG = document.getElementById('wiz-html-github-area');
+    window.useTemplateAndSwitchToCode = function(templateKey, title) {
+        window.copyTemplatePrompt(templateKey);
+        window.selectHtmlTemplate(templateKey, title);
+        window.wizardSetHtmlStepTab('paste');
+        setTimeout(function() {
+            var ta = document.getElementById('wiz-html-raw-code');
+            if (ta) ta.focus();
+        }, 100);
+        showToast('⚡ ' + (title || templateKey) + ' selected & prompt copied! Paste your HTML code here.', 'success');
+    };
 
-        if (mode === 'paste') {
+    // ── Template Search & Filter ──────────────────────────────
+    window.filterWizTemplates = function(query) {
+        query = (query || '').toLowerCase().trim();
+        var cards = document.querySelectorAll('#wiz-templates-container .atw-template-card');
+        var matched = 0;
+        cards.forEach(function(card) {
+            var nameAttr = (card.getAttribute('data-template-name') || '').toLowerCase();
+            var text = card.textContent.toLowerCase();
+            if (!query || nameAttr.includes(query) || text.includes(query)) {
+                card.style.display = 'flex';
+                matched++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    };
+
+    // ── Step 2 Mode Switcher (Templates / Paste / GitHub) ──────
+    window.wizardSetHtmlStepTab = function(tab) {
+        var viewT = document.getElementById('wiz-step2-templates-view');
+        var viewP = document.getElementById('wiz-step2-paste-view');
+        var viewG = document.getElementById('wiz-step2-github-view');
+
+        var tabT = document.getElementById('wiz-step2-tab-templates');
+        var tabP = document.getElementById('wiz-step2-tab-paste');
+        var tabG = document.getElementById('wiz-step2-tab-github');
+
+        [tabT, tabP, tabG].forEach(function(btn) {
+            if (btn) { btn.className = 'atw-tab atw-tab-off'; }
+        });
+
+        if (tab === 'templates') {
             _wizSubMode = 'upload';
+            if (viewT) viewT.style.display = 'block';
+            if (viewP) viewP.style.display = 'none';
+            if (viewG) viewG.style.display = 'none';
+            if (tabT) tabT.className = 'atw-tab atw-tab-on';
+        } else if (tab === 'paste') {
+            _wizSubMode = 'upload';
+            if (viewT) viewT.style.display = 'none';
+            if (viewP) viewP.style.display = 'block';
+            if (viewG) viewG.style.display = 'none';
             if (tabP) tabP.className = 'atw-tab atw-tab-on';
-            if (tabG) tabG.className = 'atw-tab atw-tab-off';
-            if (areaP) areaP.style.display = 'flex';
-            if (areaG) areaG.style.display = 'none';
-        } else {
+        } else if (tab === 'github') {
             _wizSubMode = 'github';
+            if (viewT) viewT.style.display = 'none';
+            if (viewP) viewP.style.display = 'none';
+            if (viewG) viewG.style.display = 'block';
             if (tabG) tabG.className = 'atw-tab atw-tab-on';
-            if (tabP) tabP.className = 'atw-tab atw-tab-off';
-            if (areaG) areaG.style.display = 'flex';
-            if (areaP) areaP.style.display = 'none';
         }
-        wizPushUrl({ wm: mode });
+        wizPushUrl({ wm: tab });
+    };
+
+    // Legacy alias
+    window.wizardSetHtmlCodeMode = function(mode) {
+        window.wizardSetHtmlStepTab(mode === 'github' ? 'github' : 'paste');
     };
 
     window.updateWizHtmlStats = function() {
@@ -12554,6 +12681,8 @@ Return ONLY valid, standalone HTML in an <!DOCTYPE html> document.`
                 var dotH = rH.querySelector('div');
                 if (dotH) dotH.style.background = '#18181b'; 
             }
+            var fsH = document.getElementById('wiz-footer-status-text');
+            if (fsH) fsH.textContent = 'Selected: Quick Launch HTML (AI)';
         } else if (type === 'nextjs') {
             var cardN = document.getElementById('wizard-card-nextjs');
             if (cardN) { cardN.classList.add('atw-sel-n'); }
@@ -12565,6 +12694,8 @@ Return ONLY valid, standalone HTML in an <!DOCTYPE html> document.`
                 var dotN = rN.querySelector('div');
                 if (dotN) dotN.style.background = '#18181b'; 
             }
+            var fsN = document.getElementById('wiz-footer-status-text');
+            if (fsN) fsN.textContent = 'Selected: Deploy Next.js (Git)';
         } else if (type === 'elementor') {
             var card = document.getElementById('wizard-card-elementor');
             if (card) { card.classList.add('atw-sel-e'); }
@@ -12576,6 +12707,8 @@ Return ONLY valid, standalone HTML in an <!DOCTYPE html> document.`
                 var dotE = r.querySelector('div');
                 if (dotE) dotE.style.background = '#18181b'; 
             }
+            var fsE = document.getElementById('wiz-footer-status-text');
+            if (fsE) fsE.textContent = 'Selected: Import Elementor Kit';
         } else {
             var card2 = document.getElementById('wizard-card-lovable');
             if (card2) { card2.classList.add('atw-sel-l'); }
@@ -12587,6 +12720,8 @@ Return ONLY valid, standalone HTML in an <!DOCTYPE html> document.`
                 var dotL = r2.querySelector('div');
                 if (dotL) dotL.style.background = '#7c3aed'; 
             }
+            var fsL = document.getElementById('wiz-footer-status-text');
+            if (fsL) fsL.textContent = 'Selected: Lovable Project';
         }
 
         var nextBtn = document.getElementById('wiz-next-btn');
@@ -13014,6 +13149,8 @@ Return ONLY valid, standalone HTML in an <!DOCTYPE html> document.`
                         saas: 'AI SaaS & Software Landing',
                         consulting: 'B2B Advisory & Management Consulting',
                         photography: 'Photography Studio & Production House',
+                        realestate: 'Luxury Real Estate Showcase',
+                        ecommerce: 'Modern E-Commerce & DTC Brand',
                         custom: 'Custom Business Studio'
                     };
                     nameInput.value = templateNames[_wizSelectedTemplateKey] || 'Custom AI Theme';
@@ -13191,10 +13328,12 @@ Return ONLY valid, standalone HTML in an <!DOCTYPE html> document.`
                     sEl.textContent = repoH + ' (Branch: ' + branchH + ')';
                 } else {
                     var templateNames = {
-                        agency: 'Agency & Studio Prompt',
-                        saas: 'AI SaaS Prompt',
-                        consulting: 'B2B Consulting Prompt',
-                        photography: 'Photo Studio Prompt',
+                        agency: 'Creative Agency & Video Studio',
+                        saas: 'AI SaaS & Software Landing',
+                        consulting: 'B2B Advisory & Management Consulting',
+                        photography: 'Photography Studio & Production House',
+                        realestate: 'Luxury Real Estate Showcase',
+                        ecommerce: 'Modern E-Commerce & DTC Brand',
                         custom: 'Custom Business Prompt'
                     };
                     var tLabel = templateNames[_wizSelectedTemplateKey] || 'Creative Agency Prompt';
