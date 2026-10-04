@@ -1,13 +1,14 @@
-# Cora Platform — Canvas & Frontend Module Documentation (v4.9.316)
+# Cora Platform — Canvas & Frontend Module Documentation (v4.9.338)
 
 ## Section 1: Overview & Multi-Engine Architecture
 
-Cora Canvas is a unified frontend website and theme creation engine providing a 100% white-labeled builder experience for agencies and workspace owners. Hardened through **v4.9.316**, Canvas operates across four core architectural engines:
+Cora Canvas is a unified frontend website and theme creation engine providing a 100% white-labeled builder experience for agencies and workspace owners. Hardened through **v4.9.338**, Canvas operates across five core architectural engines:
 
 1. **Engine A: Elementor White-Labeled Engine**: Wraps native Elementor in a sandboxed, two-row monochromatic toolbar (`cora-elementor-reskin.js` and `.css`), stripping out all WordPress headers, admin bars, upsell notices, and third-party references.
 2. **Engine B: Visual HTML Canvas Engine (Lovable-Compatible)**: In-browser visual HTML editor rendering semantic HTML5/Tailwind inside an isolated sandboxed iframe (`#cora-html-canvas-iframe`) with inline `contenteditable` editing, media inventory scanning, 1-click image swapping, code-split editing, URL edit state persistence, and AI rewriting.
 3. **Engine C: Universal Website Multi-Page Migrator Engine**: 1-click ingestion and crawler engine (`class-cora-html-website-migrator.php`) that scrapes external HTML/CSS/JS websites, downloads/isolates assets, sanitizes DOM code, and provisions editable draft themes.
-4. **Engine D: Next.js Headless Git Repository Integration & Route Scanner Engine**: Seamless headless connection between modern Next.js repositories (App Router / Pages Router) and the Cora Workspace (`class-cora-nextjs-integration.php`), providing dynamic GitHub tree scanning, public/private PAT authorization with dual-header fallback, automated route ingestion, dynamic page props management, headless REST APIs, on-demand ISR webhook triggers, sub-150ms dev server probe detection, and cookie-isolated live preview proxies.
+4. **Engine D: Next.js & Expo Headless Static Build Engine (`class-cora-nextjs-integration.php`)**: Connects modern Next.js (App/Pages Router) and Expo React Native Web repositories via Git, providing dynamic GitHub tree scanning, public/private PAT authorization with dual-header fallback, automated static compilation into standalone distributions (`out/`, `dist/`), on-demand ISR webhooks, sub-150ms dev server probe detection, and cookie-isolated live preview proxies.
+5. **Engine E: AI HTML & Tailwind Starter Engine (`cora_canvas_get_default_starter_html`)**: Delivers 5 production-calibrated industry landing page templates with 1-click prompt export for Claude & ChatGPT, dual-mode code connector (HTML paste / file dropzone), sandboxed live previews, and instant live launch with automatic CRM lead capture.
 
 ---
 
@@ -512,4 +513,97 @@ Cora maintains an independent, high-performance marketing and client frontend (`
 
 ---
 
-*Cora Canvas Documentation v4.9.316 — Last updated: October 2026.*
+## Section 11: AI HTML & Tailwind Starter Prompts Grid & 10-Min Zero-Build Launch (v4.9.334 - v4.9.337)
+
+The Add Theme Wizard (Step 2: Architecture & Template Selection) prioritizes modern **AI HTML & Tailwind** workflows:
+
+### 11.1 Curated 5-Template Production Prompts Grid
+1. **Creative Agency & Video Production Studio (`agency`)**:
+   - Monochromatic design language, cinematic full-viewport hero section, marquee client logo ticker, 3-column project showcase with hover video previews, dynamic testimonials, and project brief request form.
+2. **AI SaaS & Software Landing (`saas`)**:
+   - Modern dark hero background (`#09090b`), interactive product mockup preview box, 6-card feature grid, live pricing toggle (Monthly / Annual with 20% discount), and instant trial lead capture.
+3. **B2B Advisory & Management Consulting (`consulting`)**:
+   - Institutional editorial typography, strategic practice areas (M&A, Restructuring, Private Capital), partner credentials matrix, downloadable industry whitepaper CTA, and confidential advisory audit booking form.
+4. **Commercial Photography Studio & Production House (`photography`)**:
+   - High-density masonry gallery layout, client proofing portal spotlight, interactive photoshoot booking date/slot selector, and equipment gear inventory showcase.
+5. **Custom Niche Enterprise Studio (`custom`)**:
+   - Clean, modular component architecture adaptable to specialized local business verticals.
+
+### 11.2 1-Click Prompt Extraction for Claude & ChatGPT
+* Each prompt template card features a 1-click `📋 Copy Prompt for Claude / ChatGPT` button.
+* Formulates a specialized master system prompt instructing LLMs to generate:
+  - Single-file pure HTML5 markup.
+  - Tailwind CSS via CDN (`https://cdn.tailwindcss.com`).
+  - Lucide vector SVG icons.
+  - Native Cora lead form hooks (`action="/wp-json/cora-canvas/v1/nextjs/forms/submit"`).
+* **Script Tag Escape Sanitization (v4.9.337)**: All prompt templates dynamically escape closing script tags (`<\/script>`) in PHP rendering, preventing HTML parser syntax collisions.
+
+### 11.3 Dual-Mode Code Connector & Live Sandboxed Launch
+* **Direct Code Paste / Dropzone**: Users can paste raw HTML directly into a textarea or drag-and-drop `.html` or `.zip` bundles.
+* **Instant Sandboxed Preview**: Renders the pasted code inside a scaled 1280x760 iframe sandbox for immediate visual verification before committing.
+* **10-Minute Launch**: Theme creation, page scaffolding, and live route provisioning execute atomically without requiring build servers or terminal setups.
+
+---
+
+## Section 12: Automated Static Site Compiler, Exporter Pipeline & Shared Hosting Resilience (v4.9.317 - v4.9.331)
+
+### 12.1 Automated Repository Build Engine (`cora_nextjs_build_repo`)
+* Connects to GitHub repositories and compiles modern JavaScript frameworks directly on the hosting server using a dedicated runner process (`proc_open`).
+* Auto-detects frameworks: Next.js (App & Pages Router), Expo React Native Web, Vite, and React SPA.
+* Produces clean, zero-dependency static distributions (`out/`, `dist/`, `build/`).
+
+### 12.2 Static Asset Streaming Router (`cora_render_nextjs_static_build`)
+* Intercepts incoming web requests on `init` (priority 1) in `cora-workspace.php`.
+* Streams static JS/CSS assets (`/_next/*`, `/_expo/*`, `/brand/*`) directly with correct Content-Type headers, HTTP 304 ETag validation, and immutable cache lifecycles (`Cache-Control: public, max-age=31536000, immutable`).
+
+### 12.3 CloudLinux & Shared Hosting Hardening
+* **Inode Quota Auto-Recovery (`-122 EDQUOT`)**: Proactively purges stale npm caches (`~/.npm/_cacache`) and inactive build directories.
+* **Directory Rename Lock Self-Healing (`ENOTEMPTY`)**: Automatic retry fallback: `npm install --no-audit || (rm -rf node_modules package-lock.json && npm install)`.
+* **Low-Memory Webpack Optimization**: Passes `NODE_OPTIONS="--max-old-space-size=768"` and `RAYON_NUM_THREADS=1` to prevent `SIGKILL` termination.
+* **WebAssembly Memory Trap Flags**: `--no-wasm-code-gc` and `--disable-wasm-trap-handler` prevent Undici/llhttp allocation crashes.
+* **Real-Time 5-Step Build Terminal**: Streams live compilation logs in Step 3 of the Add Theme Wizard with root-cause diagnostic cards and 1-click `⚡ Retry Build`.
+
+---
+
+## Section 13: Universal Lead Form Ingestion & Live Site CRM Interception Engine (v4.9.333 - v4.9.335)
+
+### 13.1 Lead CRM Bridge Architecture
+Static websites hosted on Cora automatically bridge to the workspace CRM (`wp_cora_leads`):
+* **Automatic Script Injection**: When serving static pages via `cora_render_nextjs_static_build()`, Cora injects a lightweight client-side form interception script.
+* **Intercepted Form Selectors**:
+  - Any standard HTML form targeting `/wp-json/cora-canvas/v1/nextjs/forms/submit` or `#cora-contact-form`.
+  - Embedded Cora Form widgets (`.cora-form-embed`).
+* **Instant Feedback**: Submissions display an in-place monochromatic confirmation toast and card without reloading or breaking static site navigation.
+
+---
+
+## Section 14: Security Hardening, Path Containment & HTTP Asset Caching Pipeline (v4.9.337)
+
+### 14.1 Strict `realpath` Path Containment
+* Validates every requested static asset path against the real root directory (`realpath($static_dir)`).
+* Rejects any path traversing outside the directory boundaries, preventing directory traversal attacks.
+
+### 14.2 ZipArchive Extraction Sanitization
+* Unpacking `.zip` theme uploads iterates over archive indices, rejecting entries containing `../` or `..\`.
+* Validates destination paths before file creation.
+
+### 14.3 HTTP 304 Not Modified Caching
+* Generates deterministic ETags (`md5($path . $filemtime)`).
+* Responds with HTTP 304 Not Modified when matching `HTTP_IF_NONE_MATCH` headers are received.
+
+### 14.4 Capability Gatekeeping
+* Enforces `edit_theme_options` and `manage_options` across all Next.js route scanning, ISR triggering, and page property mutations.
+
+---
+
+## Section 15: Turnkey Official ChatGPT Plugin & Remote MCP 2.0 Ecosystem (v4.9.334)
+
+### 15.1 Package Overview (`cora-chatgpt-plugin/`)
+* **`manifest.json` / `ai-plugin.json`**: Official OpenAI plugin manifest.
+* **`openapi.json`**: Complete OpenAPI 3.1.0 specification defining 25+ agency tools.
+* **`mcp.json`**: Remote Model Context Protocol 2.0 server configuration.
+* **`skills/`**: Core workflow prompts for CRM Leads, GST Invoicing, Bookings, and Operations Copilot.
+
+---
+
+*Cora Canvas Documentation v4.9.338 — Last updated: October 2026.*

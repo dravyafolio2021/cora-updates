@@ -1,4 +1,4 @@
-# Cora Platform — Developer Feature & Optimization Guide (v4.9.316)
+# Cora Platform — Developer Feature & Optimization Guide (v4.9.338)
 
 This guide defines the standardized architectural patterns, blueprints, and performance guidelines for engineering new modules and extending features across the Cora SaaS Workspace (`app/public/wp-content/plugins/cora-workspace`) and Marketing Frontend (`cora-frontend`).
 
@@ -67,6 +67,13 @@ This guide defines the standardized architectural patterns, blueprints, and perf
 56. **Centered Pop-Up Modal & Curated Color Tag Presets Architecture (v4.9.296 - v4.9.298)**: Modal dialogs (such as Media Manager folder creation and property editors) use centered, floating cards with transparent backdrops (`bg-zinc-950/20 backdrop-blur-xs`), flex-centered header alignments, curated monochromatic and muted pastel color tag presets, and real-time custom color input pickers, adhering to atomic design standards.
 57. **Tokenized Administration Email Verification & Locked Security Workflow (v4.9.269 - v4.9.273)**: Updating sensitive administration email addresses triggers a secure dual-stage verification workflow. The existing verified email remains locked with an active shield badge until a 32-byte CSPRNG token sent to the new email address is verified via `/workspace/verify?admin_email_token=...`, preventing accidental lockout or unauthorized account redirection across multi-domain tenants.
 58. **Rule 13 Tonal Surface Selection & Zero-Dark-Overlay Strict Enforcement Standard (v4.9.255 - v4.9.300)**: All UI inspection panels, team migration tools, drawer backdrops, and active cards must strictly eliminate high-contrast dark overlay backdrops (`rgba(0,0,0,0.8)` or heavy dark borders). Visual selection is achieved exclusively through soft monochromatic tonal fills (`bg-zinc-100/90 dark:bg-zinc-800/80`) and subtle structural borders (`border-zinc-200/80 dark:border-zinc-800`), ensuring full underlying workspace context remains visible.
+59. **AI HTML & Tailwind Starter Prompts Grid & Master Prompt Engineering (v4.9.334 - v4.9.337)**: Add Theme Wizard Step 2 provides 5 production template prompts (Creative Agency, AI SaaS, B2B Advisory, Photography Studio, Custom Niche) with 1-click clipboard extraction for Claude & ChatGPT. Prompts instruct models to output single-file HTML5 with Tailwind CSS CDN, Lucide vector icons, and native Cora lead form hooks. Master prompt PHP strings must escape closing script tags (`<\/script>`) to prevent browser parsing collisions.
+60. **Automated Static Site Compiler & Exporter Pipeline (v4.9.317 - v4.9.331)**: Built-in compilation runner (`cora_nextjs_build_repo`) auto-detecting Next.js, Expo React Native Web, and Vite, compiling to standalone static distributions (`out/`, `dist/`), streaming static assets (`/_next/*`, `/_expo/*`) directly with zero external server dependencies, and supporting GitHub CI/CD webhooks.
+61. **Shared Hosting Node.js Resilience & Inode Quota Recovery (v4.9.323 - v4.9.331)**: Low-memory Webpack configuration (`NODE_OPTIONS="--max-old-space-size=768"`, `RAYON_NUM_THREADS=1`), single-CPU thread isolation (`UV_THREADPOOL_SIZE=1`), WebAssembly memory flags (`--no-wasm-code-gc`), automated stale npm cache purging (`~/.npm/_cacache`), and self-healing npm fallbacks to prevent `ENOTEMPTY` directory rename locks and CloudLinux `-122 EDQUOT` crashes.
+62. **Universal Lead Form Ingestion & Live Site CRM Interception Bridge (v4.9.333 - v4.9.335)**: Direct CRM bridge automatically intercepting standard HTML `<form>` submissions and `.cora-form-embed` widgets across static builds, persisting lead records into `wp_cora_leads` with instant monochromatic toast feedback and tenant activity logging.
+63. **Security Path Containment, ZipArchive Sanitization & HTTP 304 Caching (v4.9.337)**: Static asset streaming implements strict `realpath` containment to prevent path traversal attacks, sanitizes ZipArchive file extractions against `../` directory escapes, issues HTTP 304 Not Modified responses on matching ETags, and enforces administrator capabilities on all Next.js endpoints.
+64. **Super Admin Dynamic PWA Badging & Role-Scoped Web App Manifest (v4.9.338)**: Automatically serves dynamic `ADMIN`-badged icons (512x512, 192x192, Apple touch icons, favicons) for super administrators with role-scoped Web App Manifest (`CORA Workspace (Admin)`), emerald active status dots, and separate standalone home screen identities.
+65. **Official ChatGPT Plugin & Remote MCP 2.0 Integration Package (v4.9.334)**: Distribution package (`cora-chatgpt-plugin/`) providing `manifest.json`, OpenAPI 3.1.0 specifications for 25+ studio tools, remote MCP 2.0 configuration (`mcp.json`), and turnkey skills for ChatGPT, Claude, and Google Gemini integration.
 
 ---
 ---
@@ -792,4 +799,72 @@ When updating primary administration email addresses across workspace tenants:
 
 ---
 
-*Cora Developer Feature Guide v4.9.316 — Last updated: October 2026.*
+## 34. Canvas AI Starter Prompt Generator & Master Prompt Template Architecture (`view-canvas.php`, `cora-workspace.php`)
+
+When generating turnkey prompt-driven frontend templates for Claude & ChatGPT:
+1. **Curated Template Factory (`cora_canvas_get_default_starter_html`)**:
+   - Returns production-ready, fully responsive HTML5 landing pages themed for target business verticals (`agency`, `saas`, `consulting`, `photography`, `custom`).
+   - Includes semantic metadata, hero section, interactive components, customer proof, and lead capture forms.
+2. **Script Tag Sanitization Standard**:
+   - When injecting prompt template strings or inline JavaScript, all closing `</script>` tags must be escaped as `<\/script>`.
+   - Prevents premature script parser termination in modern browser HTML engines.
+3. **1-Click Extraction & Clipboard Integration**:
+   - Add Theme Wizard Step 2 provides dedicated `📋 Copy Prompt for Claude / ChatGPT` buttons.
+   - Formats a comprehensive system prompt enforcing Tailwind CSS via CDN, Lucide vector icons, single-file HTML structure, and native Cora lead form hooks.
+
+---
+
+## 35. Automated Static Site Compiler & Exporter Pipeline (`class-cora-nextjs-integration.php`, `cora-workspace.php`)
+
+When executing native static compilation of modern web frameworks on Cora hosting:
+1. **Runner Process Isolation (`proc_open`)**:
+   - Executes Node.js builds via `proc_open` with isolated process pipes and environment variables, bypassing disabled `exec()` functions on hardened PHP environments.
+2. **Shared Hosting Resource Limits**:
+   - Sets `NODE_OPTIONS="--max-old-space-size=768"` and `RAYON_NUM_THREADS=1` to remain within CloudLinux memory ceilings.
+   - Automatically cleans stale npm caches (`~/.npm/_cacache`) before compilation to prevent Inode quota exhaustion (`-122 EDQUOT`).
+3. **Static Distribution Extraction**:
+   - Bundles compiled static files (`out/`, `dist/`, `build/`) directly into localized workspace storage (`wp-content/uploads/cora-canvas/{theme_id}/dist`).
+   - Streams static JS/CSS assets (`/_next/*`, `/_expo/*`) directly on `init` priority 1 with zero WordPress template overhead.
+
+---
+
+## 36. Universal Lead Form Ingestion & Live Site CRM Interception Bridge (`cora-workspace.php`, `views/view-canvas.php`)
+
+When connecting static website forms to the Cora CRM pipeline:
+1. **Client-Side Form Interception**:
+   - Auto-injects lightweight JavaScript into served static HTML pages.
+   - Intercepts form submit events targeting `/wp-json/cora-canvas/v1/nextjs/forms/submit` or `.cora-form-embed`.
+2. **Lead Database Persistence**:
+   - Extracts and sanitizes input fields (Name, Email, Phone, Budget, Message).
+   - Inserts record into `wp_cora_leads` with `status = 'new'` and tags the active workspace tenant.
+3. **In-Place Feedback**:
+   - Renders a clean monochromatic confirmation card in-place without page reloads or layout shifts.
+
+---
+
+## 37. Security Path Containment, ZipArchive Sanitization & HTTP 304 Caching (`cora-workspace.php`)
+
+When serving static theme assets and processing user archive uploads:
+1. **Strict `realpath` Containment**:
+   - Resolves real canonical paths and ensures target files strictly reside within `$real_static_dir`.
+   - Rejects traversal attempts (`../`) before file access.
+2. **ZipArchive Security Scrutiny**:
+   - Iterates through zip entries and skips any filename containing directory traversal sequences.
+3. **Conditional HTTP 304 ETag Caching**:
+   - Computes deterministic MD5 ETags from file path and timestamp.
+   - Evaluates `HTTP_IF_NONE_MATCH` and returns instant 304 Not Modified headers.
+
+---
+
+## 38. Super Admin Dynamic PWA Badging & Role-Scoped Web App Manifest (`cora-workspace.php`, `admin-dashboard.php`)
+
+When rendering PWA icons and manifests for privileged administrators:
+1. **Dynamic Icon Generation (`scripts/generate_admin_pwa_icons.php`)**:
+   - Overlays high-contrast `#09090b` badge with `#10b981` emerald dot and bold white `ADMIN` text across 512x512, 192x192, Apple touch, and favicon assets.
+2. **Role-Scoped Manifest Scoping**:
+   - Dynamically checks `current_user_can('manage_options')` or `?admin=1`.
+   - Outputs `CORA Workspace (Admin)` name and `/workspace/dashboard?role=admin` start URL to guarantee independent home screen app instances.
+
+---
+
+*Cora Developer Feature Guide v4.9.338 — Last updated: October 2026.*

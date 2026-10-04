@@ -9,8 +9,13 @@
 
 | Module Name | Branch Name | Status | Main Touchpoint Files | Assigned Agent / Chat |
 |---|---|---|---|---|
-| **Core Platform** | `feat/workspace-v4.9.316` (`main`) | 🟢 Stable (v4.9.316) | `cora-workspace.php`, `admin-dashboard.php` | Main Orchestrator |
+| **Core Platform** | `feat/workspace-v4.9.338` (`main`) | 🟢 Stable (v4.9.338) | `cora-workspace.php`, `admin-dashboard.php` | Main Orchestrator |
 <!-- MODULE_ROWS_START -->
+| **Super Admin PWA Badging & Role Manifest** | `feat/workspace-v4.9.338` | 🟢 Complete & Active (v4.9.338) | `admin-dashboard.php`, `cora-workspace.php`, `scripts/generate_admin_pwa_icons.php` | Mobile & PWA Agent |
+| **Security Path Containment & 304 Caching** | `feat/workspace-v4.9.338` | 🟢 Complete & Active (v4.9.337) | `cora-workspace.php`, `includes/class-cora-nextjs-integration.php` | Security Architecture Agent |
+| **Canvas AI Starter Prompts & Form Interception** | `feat/workspace-v4.9.338` | 🟢 Complete & Active (v4.9.334 - v4.9.336) | `views/view-canvas.php`, `cora-workspace.php` | Canvas Visual Engine Agent |
+| **Official ChatGPT Plugin & Remote MCP 2.0** | `feat/workspace-v4.9.338` | 🟢 Complete & Active (v4.9.334) | `cora-chatgpt-plugin/*`, `includes/mcp/*` | AI Architecture Agent |
+| **Automated Static Site Compiler & Exporter** | `feat/workspace-v4.9.338` | 🟢 Complete & Active (v4.9.317 - v4.9.331) | `includes/class-cora-nextjs-integration.php`, `cora-workspace.php` | Canvas Integration Agent |
 | **Canvas Next.js Live Preview & Dev Proxy** | `feat/workspace-v4.9.316` | 🟢 Complete & Active (v4.9.316) | `views/view-canvas.php`, `includes/class-cora-nextjs-integration.php`, `cora-workspace.php` | Canvas Visual Engine Agent |
 | **Inventory & Field Van Sales Engine** | `feat/sales-items-registry-and-print`, `feat/inventory-and-van-sales` | 🟢 Complete & Active (v4.9.314 - v4.9.315) | `includes/class-cora-inventory-engine.php`, `views/view-inventory-management.php`, `cora-workspace.php` | Supply Chain & Inventory Agent |
 | **Canvas Git Integration & ISR Revalidation** | `feat/canvas-theme-integrations` | 🟢 Complete & Active (v4.9.308 - v4.9.313) | `includes/class-cora-nextjs-integration.php`, `views/view-canvas.php`, `cora-workspace.php` | Canvas Integration Agent |

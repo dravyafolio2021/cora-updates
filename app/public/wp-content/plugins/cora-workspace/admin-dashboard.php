@@ -5788,6 +5788,14 @@ textarea,
                         <span class="text-[10px] text-zinc-400 font-mono px-1 py-0.2 rounded bg-zinc-100 dark:bg-zinc-800">⌘.</span>
                     </button>
 
+                    <button type="button" class="w-full text-left px-2.5 py-1.5 text-xs text-zinc-700 dark:text-zinc-300 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100 font-medium flex items-center justify-between cursor-pointer transition-colors" onclick="$('#cora-profile-popover').addClass('hidden'); window.coraTriggerPwaInstall();">
+                        <div class="flex items-center gap-2.5">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400 shrink-0"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+                            <span>Install Cora App</span>
+                        </div>
+                        <span id="cora-profile-popover-pwa-badge" class="text-[9px] font-semibold text-emerald-600 dark:text-emerald-400 px-1.5 py-0.2 bg-emerald-50 dark:bg-emerald-950/40 rounded border border-emerald-200/50 dark:border-emerald-800/50">PWA</span>
+                    </button>
+
                     <button type="button" class="w-full text-left px-2.5 py-1.5 text-xs text-zinc-700 dark:text-zinc-300 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100 font-medium flex items-center justify-between cursor-pointer transition-colors" onclick="$('#cora-profile-popover').addClass('hidden'); coraStartProductTour();">
                         <div class="flex items-center gap-2.5">
                             <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400 shrink-0"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
@@ -21653,63 +21661,142 @@ jQuery(document).ready(function($) {
 <?php endif; ?>
 
 <!-- Modern Cora PWA Install Bottom Sheet Modal -->
+<?php
+$cora_modal_icon_url = CORA_WORKSPACE_URL . 'assets/pwa/icon_512_admin.png?v=' . CORA_WORKSPACE_VERSION;
+?>
 <div id="cora-pwa-install-modal" class="hidden">
     <div id="cora-pwa-install-backdrop" onclick="coraHidePwaPrompt()"></div>
-    <div id="cora-pwa-install-sheet">
+    <div id="cora-pwa-install-sheet" class="font-sans">
         <!-- Drag Handle for Mobile -->
         <div class="flex sm:hidden items-center justify-center -mt-2 -mb-1 cursor-pointer" onclick="coraHidePwaPrompt()">
-            <div class="w-10 h-1 rounded-full bg-zinc-300"></div>
+            <div class="w-10 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700"></div>
         </div>
 
         <div class="flex items-start gap-4">
-            <!-- App Icon with Sleek Modern Border -->
-            <div class="w-13 h-13 rounded-2xl bg-zinc-950 text-white flex items-center justify-center shrink-0 border border-zinc-800 shadow-md">
-                <svg viewBox="0 0 24 24" width="26" height="26" stroke="#ffffff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
-                    <line x1="8" y1="21" x2="16" y2="21"></line>
-                    <line x1="12" y1="17" x2="12" y2="21"></line>
-                </svg>
+            <!-- Official Admin App Icon -->
+            <div class="w-14 h-14 rounded-2xl bg-zinc-950 text-white flex items-center justify-center shrink-0 border border-zinc-200 dark:border-zinc-800 shadow-md overflow-hidden">
+                <img src="<?php echo esc_url( $cora_modal_icon_url ); ?>" alt="Cora Admin" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="w-full h-full items-center justify-center bg-zinc-950 hidden">
+                    <svg viewBox="0 0 24 24" width="26" height="26" stroke="#ffffff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                        <line x1="8" y1="21" x2="16" y2="21"></line>
+                        <line x1="12" y1="17" x2="12" y2="21"></line>
+                    </svg>
+                </div>
             </div>
             <div class="flex-1 min-w-0">
                 <div class="flex items-center justify-between gap-2">
-                    <h3 class="text-base font-bold text-zinc-950 tracking-tight m-0">Install Cora Workspace</h3>
-                    <button type="button" onclick="coraHidePwaPrompt()" class="text-zinc-400 hover:text-zinc-800 p-1 rounded-lg transition-colors border-none bg-transparent cursor-pointer">
+                    <div class="flex items-center gap-2">
+                        <h3 class="text-base font-bold text-zinc-950 dark:text-white tracking-tight m-0">Install Cora Workspace</h3>
+                        <span class="text-[10px] font-mono font-bold px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 rounded border border-zinc-200 dark:border-zinc-700">PWA</span>
+                    </div>
+                    <button type="button" onclick="coraHidePwaPrompt()" class="text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 p-1 rounded-lg transition-colors border-none bg-transparent cursor-pointer">
                         <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                     </button>
                 </div>
-                <p class="text-xs text-zinc-500 mt-1 leading-relaxed m-0">Fast standalone app experience with sub-50ms instant launch, real-time push alerts, and offline caching.</p>
+                <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1 leading-relaxed m-0">Fast standalone application with instant zero-lag launch, offline sync, and real-time push alerts.</p>
             </div>
         </div>
 
         <!-- Value Proposition Badges -->
-        <div class="grid grid-cols-3 gap-2 pt-1 select-none">
-            <div class="flex flex-col items-center justify-center text-center p-2 rounded-xl bg-zinc-50 border border-zinc-200/80">
-                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-900 mb-1"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                <span class="text-[10px] font-bold text-zinc-800 tracking-tight">Fast Launch</span>
+        <div class="grid grid-cols-3 gap-2 select-none">
+            <div class="flex flex-col items-center justify-center text-center p-2 rounded-xl bg-zinc-50 dark:bg-zinc-850 border border-zinc-200/80 dark:border-zinc-750">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-900 dark:text-zinc-100 mb-1"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                <span class="text-[10px] font-bold text-zinc-800 dark:text-zinc-200 tracking-tight">Fast Launch</span>
             </div>
-            <div class="flex flex-col items-center justify-center text-center p-2 rounded-xl bg-zinc-50 border border-zinc-200/80">
-                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-900 mb-1"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-                <span class="text-[10px] font-bold text-zinc-800 tracking-tight">Push Alerts</span>
+            <div class="flex flex-col items-center justify-center text-center p-2 rounded-xl bg-zinc-50 dark:bg-zinc-850 border border-zinc-200/80 dark:border-zinc-750">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-900 dark:text-zinc-100 mb-1"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                <span class="text-[10px] font-bold text-zinc-800 dark:text-zinc-200 tracking-tight">Push Alerts</span>
             </div>
-            <div class="flex flex-col items-center justify-center text-center p-2 rounded-xl bg-zinc-50 border border-zinc-200/80">
-                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-900 mb-1"><path d="M1 1l22 22"></path><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"></path><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"></path><path d="M10.71 5.05A16 16 0 0 1 22.58 9"></path><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>
-                <span class="text-[10px] font-bold text-zinc-800 tracking-tight">Offline Sync</span>
+            <div class="flex flex-col items-center justify-center text-center p-2 rounded-xl bg-zinc-50 dark:bg-zinc-850 border border-zinc-200/80 dark:border-zinc-750">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-900 dark:text-zinc-100 mb-1"><path d="M1 1l22 22"></path><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"></path><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"></path><path d="M10.71 5.05A16 16 0 0 1 22.58 9"></path><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>
+                <span class="text-[10px] font-bold text-zinc-800 dark:text-zinc-200 tracking-tight">Offline Sync</span>
+            </div>
+        </div>
+
+        <!-- Dynamic Platform-Specific Installation Steps Guide -->
+        <div id="cora-pwa-platform-guides" class="space-y-2">
+            <!-- iOS Safari Guide -->
+            <div id="cora-guide-ios" class="hidden p-3.5 bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-700/80 rounded-2xl text-left space-y-2">
+                <div class="flex items-center gap-2 text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                    <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-900 dark:text-white shrink-0"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
+                    <span>How to Install on iPhone / iPad (Safari)</span>
+                </div>
+                <ol class="text-[11px] text-zinc-600 dark:text-zinc-300 space-y-1.5 pl-4 m-0 list-decimal leading-relaxed">
+                    <li>Tap the <strong>Share</strong> button <span class="inline-block px-1 py-0.2 bg-zinc-200 dark:bg-zinc-700 rounded text-[10px] font-bold">⎋</span> at the bottom or top of Safari.</li>
+                    <li>Scroll down and tap <strong>Add to Home Screen</strong> <span class="font-bold text-zinc-800 dark:text-white">[+]</span>.</li>
+                    <li>Tap <strong>Add</strong> in the top-right corner to launch Cora directly from your home screen.</li>
+                </ol>
+            </div>
+
+            <!-- macOS Safari Guide -->
+            <div id="cora-guide-mac-safari" class="hidden p-3.5 bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-700/80 rounded-2xl text-left space-y-2">
+                <div class="flex items-center gap-2 text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                    <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-900 dark:text-white shrink-0"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                    <span>How to Install on Mac Dock (Safari)</span>
+                </div>
+                <ol class="text-[11px] text-zinc-600 dark:text-zinc-300 space-y-1.5 pl-4 m-0 list-decimal leading-relaxed">
+                    <li>In the top macOS menu bar, click <strong>File</strong>.</li>
+                    <li>Select <strong>Add to Dock...</strong>.</li>
+                    <li>Click <strong>Add</strong> to run Cora as an independent Mac desktop application.</li>
+                </ol>
+            </div>
+
+            <!-- Desktop Chrome / Edge / Brave Guide -->
+            <div id="cora-guide-desktop-chrome" class="hidden p-3.5 bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-700/80 rounded-2xl text-left space-y-2">
+                <div class="flex items-center gap-2 text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                    <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-900 dark:text-white shrink-0"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                    <span>How to Install via Address Bar or Browser Menu</span>
+                </div>
+                <ol class="text-[11px] text-zinc-600 dark:text-zinc-300 space-y-1.5 pl-4 m-0 list-decimal leading-relaxed">
+                    <li>Look at your browser address bar (top-right) and click the <strong>Install</strong> icon <strong>(⊕)</strong>.</li>
+                    <li>Or click the 3-dots menu <strong>(⋮)</strong> &rarr; <strong>Cast, save, and share</strong> &rarr; <strong>Install Cora Workspace</strong>.</li>
+                    <li>Click <strong>Install</strong> to launch in a standalone desktop window.</li>
+                </ol>
+            </div>
+
+            <!-- Android Guide -->
+            <div id="cora-guide-android" class="hidden p-3.5 bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-700/80 rounded-2xl text-left space-y-2">
+                <div class="flex items-center gap-2 text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                    <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-900 dark:text-white shrink-0"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+                    <span>How to Install on Android (Chrome)</span>
+                </div>
+                <ol class="text-[11px] text-zinc-600 dark:text-zinc-300 space-y-1.5 pl-4 m-0 list-decimal leading-relaxed">
+                    <li>Tap the <strong>3 dots (⋮)</strong> menu in the top-right of Chrome.</li>
+                    <li>Tap <strong>Install app</strong> or <strong>Add to Home screen</strong>.</li>
+                    <li>Confirm installation to add the official WebAPK to your home screen.</li>
+                </ol>
+            </div>
+
+            <!-- Generic Guide Fallback -->
+            <div id="cora-guide-generic" class="hidden p-3.5 bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-700/80 rounded-2xl text-left space-y-2">
+                <div class="flex items-center gap-2 text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                    <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-900 dark:text-white shrink-0"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+                    <span>Install via Browser Menu</span>
+                </div>
+                <p class="text-[11px] text-zinc-600 dark:text-zinc-300 m-0 leading-relaxed">
+                    Open your browser's options or settings menu and look for <strong>Install Cora Workspace</strong> or <strong>Add to Home Screen</strong> to run as a standalone app.
+                </p>
             </div>
         </div>
 
         <!-- Action Buttons -->
-        <div class="flex flex-col sm:flex-row items-center gap-2.5 pt-1">
-            <button type="button" id="cora-pwa-prompt-install" class="w-full sm:flex-1 py-3 px-4 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer border-none active:scale-[0.98]">
+        <div class="flex flex-col sm:flex-row items-center gap-2 pt-1">
+            <button type="button" id="cora-pwa-prompt-install" onclick="window.coraTriggerNativeInstallPrompt()" class="w-full sm:flex-1 py-3 px-4 bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 text-xs font-bold rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer border-none active:scale-[0.98]">
                 <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2.4" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                Install Cora App
+                <span>Install Cora App (1-Click)</span>
             </button>
-            <button type="button" id="cora-pwa-prompt-dismiss" onclick="coraHidePwaPrompt()" class="w-full sm:w-auto py-2.5 px-4 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-xs font-semibold rounded-xl transition-colors cursor-pointer border-none">
-                Maybe Later
+            <button type="button" onclick="window.coraCopyAppUrl()" class="w-full sm:w-auto py-2.5 px-3.5 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-750 dark:text-zinc-200 text-xs font-semibold rounded-xl transition-colors cursor-pointer border-none flex items-center justify-center gap-1.5">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                <span>Copy Link</span>
+            </button>
+            <button type="button" id="cora-pwa-prompt-dismiss" onclick="coraHidePwaPrompt()" class="w-full sm:w-auto py-2.5 px-4 bg-transparent text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 text-xs font-semibold rounded-xl transition-colors cursor-pointer border-none">
+                Close
             </button>
         </div>
         <div class="text-center">
-            <button type="button" id="cora-pwa-prompt-never" class="text-[11px] font-medium text-zinc-400 hover:text-zinc-700 transition-colors underline cursor-pointer border-none bg-transparent">
-                Don't ask again on this device
+            <button type="button" id="cora-pwa-prompt-never" class="text-[11px] font-medium text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors underline cursor-pointer border-none bg-transparent">
+                Don't show this sheet automatically
             </button>
         </div>
     </div>
@@ -21891,8 +21978,114 @@ jQuery(document).ready(function($) {
 </div>
 
 <script>
-// PWA Installation & Push Subscription Logic
-let coraPwaDeferredPrompt;
+// PWA Installation & Platform Detection Engine
+let coraPwaDeferredPrompt = null;
+window.coraPwaDeferredPrompt = null;
+
+window.coraDetectPwaPlatform = function() {
+    const ua = navigator.userAgent || '';
+    const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+    const isMac = /Macintosh|MacIntel|MacPPC|Mac68K/.test(ua);
+    const isSafari = /^((?!chrome|android).)*safari/i.test(ua);
+    const isAndroid = /android/i.test(ua);
+    const isChromium = !!window.chrome || /Chrome|Chromium|Edg|OPR/.test(ua);
+
+    if (isIOS) return 'ios';
+    if (isMac && isSafari) return 'mac-safari';
+    if (isAndroid) return 'android';
+    if (isChromium) return 'desktop-chrome';
+    return 'generic';
+};
+
+window.coraShowPwaInstallSheet = function(forceShow = true) {
+    const modal = document.getElementById('cora-pwa-install-modal');
+    if (!modal) return;
+    
+    // Hide all guide variants first
+    ['ios', 'mac-safari', 'desktop-chrome', 'android', 'generic'].forEach(function(p) {
+        const el = document.getElementById('cora-guide-' + p);
+        if (el) el.classList.add('hidden');
+    });
+    
+    const platform = window.coraDetectPwaPlatform();
+    const activeGuide = document.getElementById('cora-guide-' + platform) || document.getElementById('cora-guide-desktop-chrome') || document.getElementById('cora-guide-generic');
+    if (activeGuide) {
+        activeGuide.classList.remove('hidden');
+    }
+
+    const promptBtn = document.getElementById('cora-pwa-prompt-install');
+    const prompt = window.coraPwaDeferredPrompt || (window.parent && window.parent.coraPwaDeferredPrompt);
+    if (promptBtn) {
+        if (prompt) {
+            promptBtn.classList.remove('hidden');
+        } else {
+            promptBtn.classList.add('hidden');
+        }
+    }
+
+    modal.classList.remove('hidden');
+    requestAnimationFrame(function() {
+        modal.classList.add('cora-pwa-sheet-active');
+    });
+};
+
+window.coraTriggerNativeInstallPrompt = function() {
+    const prompt = window.coraPwaDeferredPrompt || (window.parent && window.parent.coraPwaDeferredPrompt);
+    if (prompt && typeof prompt.prompt === 'function') {
+        prompt.prompt();
+        prompt.userChoice.then(function(choiceResult) {
+            if (choiceResult && choiceResult.outcome === 'accepted') {
+                if (window.coraShowToast) {
+                    window.coraShowToast('Thank you for installing Cora Workspace!', 'success');
+                }
+                coraHidePwaPrompt();
+                const installBtn = document.getElementById('cora-pwa-install-btn');
+                if (installBtn) installBtn.classList.add('hidden');
+            }
+            window.coraPwaDeferredPrompt = null;
+        }).catch(function(err) {
+            console.warn('Native PWA prompt non-fatal:', err);
+        });
+    } else {
+        window.coraShowPwaInstallSheet(true);
+    }
+};
+
+window.coraTriggerPwaInstall = function() {
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    if (isStandalone) {
+        if (window.coraShowToast) {
+            window.coraShowToast('Cora Admin App is already installed and running in standalone mode.', 'info');
+        }
+        return;
+    }
+
+    const prompt = window.coraPwaDeferredPrompt || (window.parent && window.parent.coraPwaDeferredPrompt);
+    if (prompt && typeof prompt.prompt === 'function') {
+        window.coraTriggerNativeInstallPrompt();
+    } else {
+        window.coraShowPwaInstallSheet(true);
+    }
+};
+
+window.coraCopyAppUrl = function() {
+    const url = window.location.origin + '/workspace/dashboard';
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(function() {
+            if (window.coraShowToast) {
+                window.coraShowToast('App URL copied to clipboard: ' + url, 'success');
+            }
+        }).catch(function() {
+            if (window.coraShowToast) {
+                window.coraShowToast('Workspace URL: ' + url, 'info');
+            }
+        });
+    } else {
+        if (window.coraShowToast) {
+            window.coraShowToast('Workspace URL: ' + url, 'info');
+        }
+    }
+};
 
 function coraShowPwaPrompt() {
     const neverPrompt = localStorage.getItem('cora_pwa_never_prompt') === 'true';
@@ -21900,27 +22093,25 @@ function coraShowPwaPrompt() {
     
     if (neverPrompt || isStandalone) return;
     
-    setTimeout(() => {
-        const modal = document.getElementById('cora-pwa-install-modal');
-        if (modal) {
-            modal.classList.remove('hidden');
-            modal.classList.add('cora-pwa-sheet-active');
-        }
-    }, 1800);
+    setTimeout(function() {
+        window.coraShowPwaInstallSheet(false);
+    }, 2800);
 }
 
 function coraHidePwaPrompt() {
     const modal = document.getElementById('cora-pwa-install-modal');
     if (modal) {
         modal.classList.remove('cora-pwa-sheet-active');
-        setTimeout(() => modal.classList.add('hidden'), 300);
+        setTimeout(function() {
+            modal.classList.add('hidden');
+        }, 300);
     }
 }
 
-window.addEventListener('beforeinstallprompt', (e) => {
+window.addEventListener('beforeinstallprompt', function(e) {
     e.preventDefault();
     coraPwaDeferredPrompt = e;
-    window.coraPwaDeferredPrompt = e; // Expose globally for manual PWA install button in Settings
+    window.coraPwaDeferredPrompt = e;
     const installBtn = document.getElementById('cora-pwa-install-btn');
     if (installBtn) {
         installBtn.classList.remove('hidden');
@@ -21951,7 +22142,7 @@ function coraRequestPushSubscription() {
         return;
     }
     
-    Notification.requestPermission().then(permission => {
+    Notification.requestPermission().then(function(permission) {
         if (permission !== 'granted') {
             if (window.coraShowToast) {
                 window.coraShowToast('Notification permission denied.', 'error');
@@ -21959,7 +22150,7 @@ function coraRequestPushSubscription() {
             return;
         }
         
-        navigator.serviceWorker.ready.then(registration => {
+        navigator.serviceWorker.ready.then(function(registration) {
             if (!window.coraPwaVapidPublicKey) {
                 if (window.coraShowToast) {
                     window.coraShowToast('Push services not configured yet. Try reloading.', 'error');
@@ -21972,7 +22163,7 @@ function coraRequestPushSubscription() {
                 userVisibleOnly: true,
                 applicationServerKey: applicationServerKey
             })
-            .then(subscription => {
+            .then(function(subscription) {
                 fetch('/wp-json/cora-pwa/v1/save-subscription', {
                     method: 'POST',
                     headers: {
@@ -21981,15 +22172,15 @@ function coraRequestPushSubscription() {
                     },
                     body: JSON.stringify(subscription)
                 })
-                .then(res => res.json())
-                .then(resData => {
+                .then(function(res) { return res.json(); })
+                .then(function(resData) {
                     if (resData.success) {
                         const token = resData.data && resData.data.token ? resData.data.token : '';
                         const swTokenUrl = '<?php echo esc_url_raw( home_url('/cora-service-worker.js') ); ?>?v=<?php echo CORA_WORKSPACE_VERSION; ?>' + (token ? '&token=' + encodeURIComponent(token) : '');
                         navigator.serviceWorker.register(swTokenUrl, { scope: '/' })
-                            .then(reg => {
+                            .then(function(reg) {
                                 if (reg && typeof reg.update === 'function') {
-                                    reg.update().catch(err => console.warn('PWA update non-fatal:', err));
+                                    reg.update().catch(function(err) { console.warn('PWA update non-fatal:', err); });
                                 }
                                 const badge = document.getElementById('cora-pwa-badge');
                                 if (badge) {
@@ -22002,8 +22193,11 @@ function coraRequestPushSubscription() {
                                 if (testBtn) testBtn.classList.remove('hidden');
                                 const statusText = document.getElementById('cora-pwa-status-text');
                                 if (statusText) statusText.innerText = 'Notifications are active on this device.';
+                                if (window.coraShowToast) {
+                                    window.coraShowToast('Push notifications successfully enabled!', 'success');
+                                }
                             })
-                            .catch(err => {
+                            .catch(function(err) {
                                 console.warn('PWA SW register token non-fatal:', err);
                             });
                     } else {
@@ -22012,14 +22206,14 @@ function coraRequestPushSubscription() {
                         }
                     }
                 })
-                .catch(err => {
+                .catch(function(err) {
                     console.error('Subscription save error:', err);
                     if (window.coraShowToast) {
                         window.coraShowToast('Error connecting to notification server.', 'error');
                     }
                 });
             })
-            .catch(err => {
+            .catch(function(err) {
                 console.error('Push registration error:', err);
                 if (window.coraShowToast) {
                     window.coraShowToast('Failed to subscribe to browser push notifications.', 'error');
@@ -22059,60 +22253,46 @@ function coraSendTestPushNotification() {
 document.addEventListener('DOMContentLoaded', function() {
     const installBtn = document.getElementById('cora-pwa-install-btn');
     if (installBtn) {
-        installBtn.addEventListener('click', (e) => {
-            if (!coraPwaDeferredPrompt) return;
-            coraPwaDeferredPrompt.prompt();
-            coraPwaDeferredPrompt.userChoice.then((choiceResult) => {
-                if (choiceResult.outcome === 'accepted') {
-                    installBtn.classList.add('hidden');
-                }
-                coraPwaDeferredPrompt = null;
-            });
-        });
-    }
-
-    // Prompt banner buttons
-    const promptInstall = document.getElementById('cora-pwa-prompt-install');
-    if (promptInstall) {
-        promptInstall.addEventListener('click', () => {
-            if (!coraPwaDeferredPrompt) return;
-            coraPwaDeferredPrompt.prompt();
-            coraPwaDeferredPrompt.userChoice.then((choiceResult) => {
-                if (choiceResult.outcome === 'accepted') {
-                    if (installBtn) installBtn.classList.add('hidden');
-                }
-                coraHidePwaPrompt();
-                coraPwaDeferredPrompt = null;
-            });
+        installBtn.addEventListener('click', function(e) {
+            window.coraTriggerPwaInstall();
         });
     }
 
     const promptDismiss = document.getElementById('cora-pwa-prompt-dismiss');
     if (promptDismiss) {
-        promptDismiss.addEventListener('click', () => {
+        promptDismiss.addEventListener('click', function() {
             coraHidePwaPrompt();
         });
     }
 
     const promptNever = document.getElementById('cora-pwa-prompt-never');
     if (promptNever) {
-        promptNever.addEventListener('click', () => {
+        promptNever.addEventListener('click', function() {
             localStorage.setItem('cora_pwa_never_prompt', 'true');
             coraHidePwaPrompt();
+            if (window.coraShowToast) {
+                window.coraShowToast('Automatic prompt dismissed. You can install anytime from Settings or Admin Popover.', 'info');
+            }
         });
     }
     
     // Auto check if running inside standalone PWA
-    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    if (isStandalone) {
         if (installBtn) installBtn.classList.add('hidden');
         const statusText = document.getElementById('cora-pwa-status-text');
         if (statusText) statusText.innerText = 'App is installed and running.';
+        const pwaBadge = document.getElementById('cora-profile-popover-pwa-badge');
+        if (pwaBadge) {
+            pwaBadge.innerText = 'Installed';
+            pwaBadge.className = 'text-[9px] font-semibold text-emerald-600 dark:text-emerald-400 px-1.5 py-0.2 bg-emerald-50 dark:bg-emerald-950/40 rounded border border-emerald-200/50 dark:border-emerald-800/50';
+        }
     }
     
     // Auto check push status
     if ('serviceWorker' in navigator && 'PushManager' in window) {
-        navigator.serviceWorker.ready.then(registration => {
-            registration.pushManager.getSubscription().then(subscription => {
+        navigator.serviceWorker.ready.then(function(registration) {
+            registration.pushManager.getSubscription().then(function(subscription) {
                 if (subscription) {
                     const badge = document.getElementById('cora-pwa-badge');
                     if (badge) {
@@ -22124,9 +22304,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     const testBtn = document.getElementById('cora-pwa-test-btn');
                     if (testBtn) testBtn.classList.remove('hidden');
                     const statusText = document.getElementById('cora-pwa-status-text');
-                    if (statusText) statusText.innerText = 'Notifications are active on this device.';
+                    if (statusText) statusText.innerText = 'Push notifications active.';
                 }
+            }).catch(function(err) {
+                console.warn('Subscription check non-fatal:', err);
             });
+        }).catch(function(err) {
+            console.warn('SW ready non-fatal:', err);
         });
     }
 });

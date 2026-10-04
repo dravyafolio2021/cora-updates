@@ -8,9 +8,9 @@
 
 Cora is a full-stack, enterprise-grade WordPress-based SaaS platform that provides white-labeled, multi-tenant workspace dashboards. Each workspace operates as an isolated business environment equipped with Lead CRM & Pipeline Kanban, Content AI Suite with Bulk Operations, Financial Intelligence, Team Governance & Dynamic Custom Roles, Active-Only Equal AI Token Allocation, Field Ops & Geolocation Live Tracking with Beacon-backed telemetry, Universal Foundation Modules Locking (6 core modules + dashboard), Media Proofing Portal with route interception and client telemetry, Multi-Dimensional Workspace Storage Footprint, Form AI Architect with 15 field types and live preview, Stationery Manufacturing & Field Van Sales POS, Single Consolidated 24-Hour Executive PDF Reporting, Visual Website Canvas with 4-metric diagnostic strip, Universal Website Migrator, Continuous Hands-Free Voice AI, Multimodal Team Migration, Enterprise AI Safety Guardrails, Central Tenant Authorization Engine, Outbound Request SSRF Filters, AI Tools MCP Developer Gateway with Live Voice Canvas, Gamified Affiliate & Referral Ecosystem, Cryptographic Email Verification Link System with early route interception, Mobile GPU Hardware Acceleration, and per-tenant module customization.
 
-* **Current Version**: `v4.9.316`
+* **Current Version**: `v4.9.338`
 * **Supported Verticals**: Photography Studio (`photography_studio`), Real Estate Brokerage (`real_estate`), Marketing Agency (`marketing_agency`), Stationery Manufacturing & Van Sales (`stationery_inventory` / `manufacturing`), Professional Services & Consulting Agency (`professional_services`), Custom Workspace (`custom-workspace`)
-* **Tech Stack**: WordPress 6.x (Locked Down Backend), PHP 8.2+, Tailwind CSS (Monochromatic Zinc Ramp), JavaScript (ES6+), Leaflet.js, Next.js 16.3+, Quill.js, Elementor, Sandboxed Visual HTML Engine
+* **Tech Stack**: WordPress 6.x (Locked Down Backend), PHP 8.2+, Tailwind CSS (Monochromatic Zinc Ramp), JavaScript (ES6+), Leaflet.js, Next.js 16.3+, Expo React Native Web, Quill.js, Elementor, Sandboxed Visual HTML Engine
 * **AI Providers**: Google Gemini 3.5 Flash / Pro Multimodal, Anthropic Claude 3.5 Sonnet, OpenAI GPT-4o, Groq Ultra-Fast
 
 ---
@@ -20,16 +20,16 @@ Cora is a full-stack, enterprise-grade WordPress-based SaaS platform that provid
 ```
 cora/
 ├── app/public/wp-content/plugins/
-│   ├── cora-workspace/          # Core platform plugin (v4.9.316)
-│   │   ├── admin-dashboard.php  # Main dashboard controller, navigation & dynamic routing
-│   │   ├── cora-workspace.php   # Core AJAX handlers, hooks, DB schema, micro-cache, RAG & AI Safety
+│   ├── cora-workspace/          # Core platform plugin (v4.9.338)
+│   │   ├── admin-dashboard.php  # Main dashboard controller, navigation, PWA manifest & dynamic routing
+│   │   ├── cora-workspace.php   # Core AJAX handlers, hooks, static site streaming, micro-cache, RAG & AI Safety
 │   │   ├── share-media.php      # Public media proofing portal with route interception & telemetry
 │   │   ├── public-client-portal.php # Public white-labeled client portal with Claude aesthetic
 │   │   ├── includes/            # Backend engines (auth, ssrf, affiliates, inventory, docs, RAG, MCP, PWA, tour, Next.js)
 │   │   │   ├── class-cora-authorization.php # Central tenant authorization & policy gatekeeper (SEC-002)
 │   │   │   ├── class-cora-ssrf-filter.php   # Outbound HTTP SSRF protection filter (SEC-009)
 │   │   │   ├── class-cora-whatsapp-gateway.php # WhatsApp Cloud API with HMAC-SHA256 verification (SEC-005)
-│   │   │   ├── class-cora-nextjs-integration.php # Next.js Git Connector, Route Scanner, Headless REST APIs & ISR Revalidation
+│   │   │   ├── class-cora-nextjs-integration.php # Next.js/Expo Git Connector, Static Exporter Pipeline, REST APIs & ISR Revalidation
 │   │   │   ├── class-cora-inventory-engine.php # Extended 3-step Van Dispatch Wizard, Weight Allocation @ ₹401.25/kg, Spot Billing, Sales Register, Van Stock Print & Itemized CSV Export
 │   │   │   ├── mcp/                         # Universal Remote MCP Server & OAuth 2.1 Engine (RFC 7591 / RFC 9728)
 │   │   │   │   ├── class-cora-universal-mcp-server.php # Remote MCP Server (SSE & JSON-RPC)
@@ -40,13 +40,18 @@ cora/
 │   │   ├── modules/             # Modular industry domain engines & permanent foundation definitions
 │   │   ├── views/               # 50+ modular PHP view files (Clients, Forms, Media, Tasks, Users, Verify, Inventory, Canvas, etc.)
 │   │   │   └── verify.php       # Early route interception view for email verification & auto-login
-│   │   └── assets/              # JS (Field Ops, Voice AI, Admin UI), CSS, PWA service worker, versioned icons
+│   │   └── assets/              # JS (Field Ops, Voice AI, Admin UI), CSS, PWA service worker, versioned & admin-badged icons
 │   ├── cora-real-estate/        # Real estate industry extension
 │   ├── cora-studio-ai/          # Photography studio extension
 │   └── cora-frontend/           # Marketing frontend module (Next.js 16.3+, Sharp 0.35+)
+├── cora-chatgpt-plugin/         # Official ChatGPT Plugin & Remote MCP 2.0 distribution package
+│   ├── manifest.json            # OpenAI plugin manifest
+│   ├── openapi.json             # Complete OpenAPI 3.1.0 specification (25+ tools)
+│   ├── mcp.json                 # Remote MCP 2.0 server configuration
+│   └── skills/                  # Core workflow definitions for AI assistants
 ├── docs/                        # Master technical documentation suite
 ├── tests/                       # Playwright E2E test suites (Tier 1-4, Canvas, Affiliates, Emails)
-├── scripts/                     # Build, deploy, account provisioning & security audit test scripts
+├── scripts/                     # Build, deploy, PWA icon generation, account provisioning & security test scripts
 ├── updates/                     # Release artifacts (.zip + .json manifests)
 └── .agents/                     # AI agent configuration & workspace rules
 ```
@@ -74,8 +79,14 @@ cora/
 | **Field Driver Isolated POS** | `view-inventory-management.php` | 100% full-width dedicated Van POS terminal with total chrome stripping (`.cora-driver-mode-active`) and grounded driver AI |
 | **AI Co-Founder & Continuous RAG** | `admin-dashboard.php`, `cora-workspace.php` | Standardized Cora AI executive co-founder with continuous RAG living memory self-learning, ultra-concise 1-2 line responses, 1-click CTA action pills, and automated real-time client SPA navigation router executing direct UI actions |
 | **Universal Remote MCP Server & OAuth 2.1 PKCE Server** | `views/view-mcp.php`, `includes/mcp/*` | Universal Remote MCP Server (`/wp-json/cora-mcp/v1/sse`, `/wp-json/cora-mcp/v1/messages`), RFC 7591 Dynamic Client Registration, RFC 9728 Protected Resource Metadata, `WWW-Authenticate` challenge headers, universal token extraction, and 1-click effortless AI prompts for ChatGPT, Claude, and Google Gemini |
+| **Official ChatGPT Plugin & Remote MCP Gateway** | `cora-chatgpt-plugin/*` | Turnkey OpenAI ChatGPT Plugin package with `manifest.json`, OpenAPI 3.1.0 specification (25+ tools), MCP 2.0 configuration, and standardized assistant prompts |
 | **Enterprise AI Safety Guardrails** | `cora-workspace.php` | Enterprise policy enforcement engine (`wp_cora_security_incidents`) scanning for 6 violation categories (weapons, violence, nudity, religious defamation, self-harm, jailbreaks) with automated dual-escalation to Platform Super Admins and Workspace Owners, plus RBAC action execution validation |
 | **Voice AI Discussion & Mode Switch** | `admin-dashboard.php` | Real-time continuous duplex voice engine with footer mic Voice Mode switch, integrated Voice Settings tab, auto-suppressed mobile keyboard, and 9 regional Indian dialects |
+| **Canvas AI Starter Prompts Grid & 10-Min Launch** | `views/view-canvas.php`, `cora-workspace.php` | Add Theme Wizard Step 2 featuring 5 production template prompts (Creative Agency, AI SaaS, B2B Consulting, Photography Studio, Custom Niche), 1-click prompt copying for Claude/ChatGPT, dual-mode code connector (HTML paste / file dropzone), and instant live launch |
+| **Automated Static Site Compiler & Stream Router** | `includes/class-cora-nextjs-integration.php`, `cora-workspace.php` | Automated static site builder (Next.js App/Pages Router, Expo React Native Web, Vite) compiling to zero-dependency static bundles with direct asset streaming (`/_next/*`, `/_expo/*`), CloudLinux Inode recovery, and single-CPU thread isolation |
+| **Universal Lead Form Ingestion & Live Site Bridge** | `cora-workspace.php`, `views/view-canvas.php` | Native form submission bridge across static themes and `.cora-form-embed` widgets, auto-routing inquiries into `wp_cora_leads` with instant in-place monochromatic toast feedback |
+| **Security Hardening & HTTP Asset Caching** | `cora-workspace.php`, `includes/class-cora-nextjs-integration.php` | Strict `realpath` containment preventing path traversal, ZipArchive extraction sanitization, 304 Not Modified HTTP ETag caching, immutable asset headers, and admin capability enforcement |
+| **Super Admin Dynamic PWA Badging** | `admin-dashboard.php`, `cora-workspace.php`, `scripts/generate_admin_pwa_icons.php` | Dynamic `ADMIN` badge overlays for 512/192/Apple/Favicon icons for Super Admins, role-scoped Web App Manifest (`CORA Workspace (Admin)`), and standalone link retention |
 | **Multimodal Team Migration**| `view-users.php` | AI-powered roster OCR ingestion (PDF/PNG/JPG), automatic role mapping, and 1-click batch team provisioning |
 | **Field Ops & Live Tracking**| `views/view-users.php`, `cora-field-ops-tracker.js` | Live GPS tracking with auto-start on login session detection, heartbeat pings, auto-stop with `navigator.sendBeacon` flush on logout, stop/rest detection, velocity telemetry, route replay, and free HD multi-layer maps |
 | **Content AI Suite** | `view-content-suite.php`| 7-dashboard content lifecycle engine with bulk actions engine (floating selection toolbar for bulk status, category, export, delete), fixed-width dropdowns, responsive 3-column mobile Opportunities grid, sticky flush sub-tabs, and 1-click blog draft generator |
@@ -144,7 +155,7 @@ cora/
 42. **High-Speed Micro-Cache Layer (v4.9.150)**: In-memory and transient caching via `cora_cache_get()` and `cora_cache_set()` ensures sub-millisecond query execution across high-velocity database lookups.
 43. **Safe Restocking Rollback Protocol (v4.9.103)**: Any deletion or editing of field transactions (consignments or spot invoices) atomically reverses stock debits and restores unallocated units back to parent inventory balances.
 44. **Dynamic Custom Role Governance & Module Scoping (v4.9.184 - v4.9.186)**: Custom roles are scoped strictly to active tenant modules with human-readable titles, preventing privilege escalation while protecting Workspace Owner permissions immutably.
-45. **Tab Customization Engine Architecture (v4.9.147)**: Desktop and mobile tab reordering drawers feature drag-and-drop handles, toggleable visibility, and dual-layer persistence (localStorage for instant 0ms painting + asynchronous user meta AJAX updates).
+45: 45. **Tab Customization Engine Architecture (v4.9.147)**: Desktop and mobile tab reordering drawers feature drag-and-drop handles, toggleable visibility, and dual-layer persistence (localStorage for instant 0ms painting + asynchronous user meta AJAX updates).
 46. **Phone Input Validation & Sanitization Standard**: Enforce strict numeric regex checks (`/^[0-9+ -]{7,15}$/`) across all contact forms, checkout flows, and lead captures.
 47. **Universal Remote MCP & OAuth 2.1 PKCE Architecture (v4.9.220 - v4.9.230)**: Remote Model Context Protocol server (`/wp-json/cora-mcp/v1/sse`, `/wp-json/cora-mcp/v1/messages`) integrated with OAuth 2.1 PKCE authorization code grant, RFC 7591 Dynamic Client Registration, RFC 9728 Protected Resource Metadata, `WWW-Authenticate` challenge headers, and 1-click effortless AI prompts for ChatGPT, Claude, and Google Gemini.
 48. **Unified Single-Domain Routing & Clean Slug URL Architecture (v4.9.232 - v4.9.247)**: Centralized multi-tenancy URL routing consolidating multi-tenant operations into clean single-domain paths (`/workspace/{subpage}`, `/site`, `/`) with skeleton mutual exclusion, single-tenant clean URLs, and immutable preservation of archive virtual subdomain refs.
@@ -158,6 +169,13 @@ cora/
 56. **Headless Next.js Integration & On-Demand ISR Revalidation Pipeline (v4.9.308 - v4.9.313)**: Decoupled CMS integration via `Cora_Nextjs_Integration` supporting Next.js Git Connector Wizard, dynamic GitHub branch discovery, dual-header PAT authentication fallback (`Authorization: Bearer` & `token`), headless REST APIs, scanned routes ingestion, and on-demand ISR revalidation.
 57. **Stationery & Field Van Dispatch Dual-Tier Inventory Allocation Engine (v4.9.314 - v4.9.315)**: Dual-tier plant and van sales inventory engine featuring a 3-step Van Dispatch Wizard, weight-based allocation (@ ₹401.25/kg), 4-digit numeric bill numbers, spot invoice ledger, sales register with itemized breakdown, printable van stock manifests, itemized CSV exports, and exact 4-column inventory & 5-column dispatch reports.
 58. **Next.js Live Dev Server Detection & Isolated Preview Cookie Sandbox (v4.9.316)**: Canvas live Next.js build preview & proxy router with fast offline dev server detection (`http://localhost:3000`), preview cookie isolation to explicit preview parameters (`cora_canvas_preview`), Level 2 live theme customizer routing, and hover quick-actions.
+59. **AI HTML & Tailwind Starter Prompts Grid & 10-Min Launch (v4.9.334 - v4.9.337)**: Add Theme Wizard Step 2 provides 5 production template prompts (Creative Agency, AI SaaS, B2B Consulting, Photography Studio, Custom Niche) with 1-click clipboard prompt extraction for Claude & ChatGPT, dual-mode code connector (HTML paste / file dropzone), and instant live launch with automatic script tag sanitization (`<\/script>`).
+60. **Automated Static Site Compiler & Exporter Pipeline (v4.9.317 - v4.9.331)**: Built-in compilation runner (`cora_nextjs_build_repo`) auto-detecting Next.js, Expo React Native Web, and Vite, compiling to standalone static distributions (`out/`, `dist/`), streaming static assets (`/_next/*`, `/_expo/*`) directly with zero external server dependencies, and supporting GitHub CI/CD webhooks.
+61. **Shared Hosting Resilience & Inode Quota Recovery (v4.9.323 - v4.9.331)**: Low-memory Webpack configuration (`NODE_OPTIONS="--max-old-space-size=768"`, `RAYON_NUM_THREADS=1`), single-CPU thread isolation (`UV_THREADPOOL_SIZE=1`), WebAssembly memory flags (`--no-wasm-code-gc`), automated stale npm cache purging (`~/.npm/_cacache`), and self-healing npm fallbacks to prevent `ENOTEMPTY` and CloudLinux `-122 EDQUOT` crashes.
+62. **Universal Lead Form Ingestion & Live Site Interception (v4.9.333 - v4.9.335)**: Direct CRM bridge automatically intercepting standard HTML `<form>` submissions and `.cora-form-embed` widgets across static builds, persisting lead records into `wp_cora_leads` with instant monochromatic toast feedback and tenant activity logging.
+63. **Security Path Containment & 304 Not Modified Caching (v4.9.337)**: Static asset streaming implements strict `realpath` containment to prevent path traversal attacks, sanitizes ZipArchive file extractions against `../` escapes, issues HTTP 304 Not Modified responses on matching ETags, and enforces administrator capabilities on all Next.js endpoints.
+64. **Super Admin Dynamic PWA Badging & Role-Scoped Manifest (v4.9.338)**: Automatically serves dynamic `ADMIN`-badged icons (512x512, 192x192, Apple touch icons, favicons) for super administrators with role-scoped Web App Manifest (`CORA Workspace (Admin)`), emerald active status dots, and separate standalone home screen identities.
+65. **Turnkey ChatGPT Plugin & OpenAI Actions Distribution (v4.9.334)**: Distribution package (`cora-chatgpt-plugin/`) providing `manifest.json`, OpenAPI 3.1.0 specifications for 25+ studio tools, remote MCP 2.0 configuration (`mcp.json`), and turnkey skills for ChatGPT, Claude, and Google Gemini integration.
 
 ---
 
@@ -218,4 +236,4 @@ php scripts/test_sec_audit_all.php
 
 ---
 
-*Cora Platform v4.9.316 — Architecture & Development Team.*
+*Cora Platform v4.9.338 — Architecture & Development Team.*

@@ -1,7 +1,7 @@
 # Cora Platform — Comprehensive Platform & Onboarding Strategic Brief
 > **Target Audience for this Document**: AI Product & Growth Strategist Agent  
 > **Objective**: Comprehensive platform architectural overview, feature breakdown, and onboarding evaluation brief to formulate optimal user onboarding, product activation, and launch strategies for Cora.  
-> **Platform Version**: `v4.9.316` | **Date**: October 2026
+> **Platform Version**: `v4.9.338` | **Date**: October 2026
 
 ---
 
@@ -43,6 +43,9 @@ Cora consolidates the entire agency lifecycle into a single, unified, white-labe
 20. **Universal Remote MCP Server & OAuth 2.1 PKCE Gateway**: Connects external AI assistants (ChatGPT, Claude, Google Gemini) via Model Context Protocol JSON-RPC 2.0 (`/wp-json/cora-mcp/v1/rpc`) with RFC 7591 dynamic client registration and 25+ domain-specific tools.
 21. **Edge-to-Edge Draggable Lead Drawer & Bi-Directional Sync**: CRM leads inspector auto-portaled to `document.body` with transparent backdrop, left-edge draggable resizer (persisted to localStorage), collapsible accordion groups, and sanitized team assignee dropdowns.
 22. **Tokenized Administration Email Verification & Locked Security State**: Dynamic status badges (Verified 🟢 / Pending 🟡), read-only locked state, 24-hour expiration token dispatch via authenticated sender `heycora@claraverse.in`, and 100 daily AI credits quota matrix.
+23. **Canvas AI Starter Prompts & 10-Min Zero-Build Launch**: Add Theme Wizard Step 2 with 5 production template prompts (Agency, SaaS, Consulting, Photography, Custom), 1-click prompt extraction for Claude & ChatGPT, dual-mode code connector (HTML paste / file dropzone), and native lead form ingestion into `wp_cora_leads`.
+24. **Turnkey Official ChatGPT Plugin & Remote MCP 2.0 Package**: `cora-chatgpt-plugin/` distribution containing `manifest.json`, OpenAPI 3.1.0 specifications for 25+ studio tools, and prompt definitions.
+25. **Super Admin Dynamic PWA Badging & Role-Scoped Manifest**: Dynamic `ADMIN` badge rendering across 512/192/Apple/Favicon icons for Super Admins and role-scoped Web App Manifest (`CORA Workspace (Admin)`).
 
 ---
 
