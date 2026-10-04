@@ -1179,14 +1179,17 @@ class Cora_OAuth_Server {
                     <div class="flex items-center justify-between pt-1">
                         <span class="text-[11px] font-medium text-zinc-500">Quick Presets:</span>
                         <div class="flex items-center gap-1.5">
-                            <button type="button" onclick="applyPreset('all')" class="px-2.5 py-1 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-800 text-[10px] font-semibold transition-colors">
-                                ⚡ All (Read & Write)
+                            <button type="button" onclick="applyPreset('all')" class="px-2.5 py-1 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-800 text-[10px] font-semibold transition-colors flex items-center gap-1">
+                                <svg class="w-3 h-3 text-zinc-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                <span>All (Read & Write)</span>
                             </button>
-                            <button type="button" onclick="applyPreset('readonly')" class="px-2.5 py-1 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[10px] font-medium transition-colors">
-                                👁 Read-Only
+                            <button type="button" onclick="applyPreset('readonly')" class="px-2.5 py-1 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[10px] font-medium transition-colors flex items-center gap-1">
+                                <svg class="w-3 h-3 text-zinc-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                <span>Read-Only</span>
                             </button>
-                            <button type="button" onclick="applyPreset('website')" class="px-2.5 py-1 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[10px] font-medium transition-colors">
-                                🌐 Website Only
+                            <button type="button" onclick="applyPreset('website')" class="px-2.5 py-1 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[10px] font-medium transition-colors flex items-center gap-1">
+                                <svg class="w-3 h-3 text-zinc-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
+                                <span>Website Only</span>
                             </button>
                         </div>
                     </div>

@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.354
+ * Version:           4.9.355
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.354' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.355' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -7691,7 +7691,7 @@ function cora_rest_mcp_direct_tool_handler( $request ) {
 }
 
 /**
- * Callback: Generates live OpenAPI 3.1.0 Schema for ChatGPT Custom GPT Actions
+ * Callback: Generates live OpenAPI 3.0.1 Schema for ChatGPT Custom GPT Actions
  */
 if ( ! function_exists( 'cora_rest_mcp_openapi_handler' ) ) {
 function cora_rest_mcp_openapi_handler( $request = null ) {
@@ -7702,11 +7702,80 @@ function cora_rest_mcp_openapi_handler( $request = null ) {
         $tools = $tools_data['result']['tools'] ?? array();
     }
 
+    $all_requested = false;
+    if ( $request instanceof WP_REST_Request ) {
+        $param_all   = $request->get_param( 'all' );
+        $param_limit = $request->get_param( 'limit' );
+        if ( ! empty( $param_all ) || $param_limit === 'all' || intval( $param_limit ) > 30 ) {
+            $all_requested = true;
+        }
+    } elseif ( isset( $_GET['all'] ) || ( isset( $_GET['limit'] ) && $_GET['limit'] === 'all' ) ) {
+        $all_requested = true;
+    }
+
+    // Top 28 core high-priority operational actions for OpenAI Custom GPT 30-action limit compliance
+    $curated_priority_names = array(
+        'cora_get_workspace_overview',
+        'cora_canvas_get_active_theme',
+        'cora_canvas_list_themes',
+        'cora_canvas_get_page_html',
+        'cora_canvas_update_page_html',
+        'cora_canvas_create_theme',
+        'cora_canvas_activate_theme',
+        'cora_get_website_settings',
+        'cora_update_website_settings',
+        'cora_list_leads',
+        'cora_get_lead',
+        'cora_create_lead',
+        'cora_update_lead',
+        'cora_list_clients',
+        'cora_create_client',
+        'cora_list_projects',
+        'cora_create_project',
+        'cora_list_tasks',
+        'cora_create_task',
+        'cora_update_task',
+        'cora_query_financials',
+        'cora_record_financial_transaction',
+        'cora_search_content',
+        'cora_create_article',
+        'cora_publish_content',
+        'cora_search_knowledge_base',
+        'cora_add_knowledge_fragment',
+        'cora_list_forms',
+    );
+
+    $filtered_tools = array();
+    if ( ! $all_requested ) {
+        foreach ( $curated_priority_names as $pname ) {
+            if ( isset( $tools[ $pname ] ) ) {
+                $filtered_tools[ $pname ] = $tools[ $pname ];
+            }
+        }
+        // If some are missing, fill up to 28 from remaining tools
+        if ( count( $filtered_tools ) < 28 ) {
+            foreach ( $tools as $tk => $tv ) {
+                if ( ! isset( $filtered_tools[ $tk ] ) && count( $filtered_tools ) < 28 ) {
+                    $filtered_tools[ $tk ] = $tv;
+                }
+            }
+        }
+    } else {
+        $filtered_tools = $tools;
+    }
+
     $paths = array();
-    foreach ( $tools as $t ) {
+    foreach ( $filtered_tools as $t ) {
         $op_id = str_replace( '.', '_', $t['name'] );
         $summary = $t['description'] ?? $op_id;
         $schema = $t['inputSchema'] ?? array( 'type' => 'object', 'properties' => (object) array() );
+
+        if ( ! isset( $schema['type'] ) ) {
+            $schema['type'] = 'object';
+        }
+        if ( ! isset( $schema['properties'] ) || empty( $schema['properties'] ) ) {
+            $schema['properties'] = (object) array();
+        }
 
         $paths[ '/wp-json/cora/v1/mcp/tool/' . $op_id ] = array(
             'post' => array(
@@ -7756,7 +7825,7 @@ function cora_rest_mcp_openapi_handler( $request = null ) {
     }
 
     $openapi = array(
-        'openapi' => '3.1.0',
+        'openapi' => '3.0.1',
         'info'    => array(
             'title'       => 'Cora Workspace AI Actions Gateway',
             'description' => 'Universal Model Context Protocol & OpenAI Actions API allowing ChatGPT Custom GPTs, Claude, and external AI agents to query and operate the Cora Workspace.',
