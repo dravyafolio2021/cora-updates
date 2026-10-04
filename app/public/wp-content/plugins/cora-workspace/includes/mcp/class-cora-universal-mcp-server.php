@@ -28,55 +28,44 @@ class Cora_Universal_MCP_Server {
      * @return WP_REST_Response
      */
     public static function handle_request( $request ) {
-        // 1. Authenticate Token
+        // 1. Authenticate Token (OAuth 2.1 or Direct API Token)
         $auth = Cora_OAuth_Server::authenticate_token( $request );
 
-        if ( ! $auth['valid'] ) {
-            $meta_url = home_url( '/.well-known/oauth-protected-resource' );
-            $response = new WP_REST_Response( array(
-                'jsonrpc' => '2.0',
-                'error'   => array(
-                    'code'    => -32001,
-                    'message' => 'Unauthorized: ' . ( $auth['error'] ?? 'Missing or invalid Bearer token.' ),
-                    'data'    => array(
-                        'resource_metadata' => $meta_url,
+        // Hydrate WordPress User & Tenant Context if authenticated
+        if ( ! empty( $auth['valid'] ) ) {
+            if ( ! empty( $auth['user_id'] ) ) {
+                wp_set_current_user( intval( $auth['user_id'] ) );
+            }
+            $agency_id = intval( $auth['workspace_id'] ?? 1 ) ?: 1;
+            if ( function_exists( 'cora_set_current_tenant_agency_id' ) ) {
+                cora_set_current_tenant_agency_id( $agency_id );
+            }
+            $_REQUEST['cora_agency_id'] = $agency_id;
+            $_REQUEST['workspace_id']   = $agency_id;
+
+            // Enforce Rate Limiting
+            if ( ! self::check_rate_limit( $auth ) ) {
+                return new WP_REST_Response( array(
+                    'jsonrpc' => '2.0',
+                    'error'   => array(
+                        'code'    => -32000,
+                        'message' => 'Rate limit exceeded. Max 120 requests per minute allowed.',
                     ),
-                ),
-                'id'      => null,
-            ), 401 );
-            $response->header( 'WWW-Authenticate', 'Bearer resource_metadata="' . $meta_url . '", realm="cora-mcp", error="invalid_token", error_description="Missing or invalid bearer token"' );
-            return $response;
+                    'id'      => null,
+                ), 429 );
+            }
         }
 
-        // Hydrate WordPress User & Tenant Context for Authenticated Client
-        if ( ! empty( $auth['user_id'] ) ) {
-            wp_set_current_user( intval( $auth['user_id'] ) );
-        }
-        $agency_id = intval( $auth['workspace_id'] ?? 1 ) ?: 1;
-        if ( function_exists( 'cora_set_current_tenant_agency_id' ) ) {
-            cora_set_current_tenant_agency_id( $agency_id );
-        }
-        $_REQUEST['cora_agency_id'] = $agency_id;
-        $_REQUEST['workspace_id']   = $agency_id;
-
-        // 2. Enforce Rate Limiting
-        if ( ! self::check_rate_limit( $auth ) ) {
-            return new WP_REST_Response( array(
-                'jsonrpc' => '2.0',
-                'error'   => array(
-                    'code'    => -32000,
-                    'message' => 'Rate limit exceeded. Max 120 requests per minute allowed.',
-                ),
-                'id'      => null,
-            ), 429 );
-        }
-
-        // 3. Handle GET / SSE Streaming Transport
+        // 2. Handle GET / SSE Streaming Transport or Discovery
         if ( $request->get_method() === 'GET' ) {
-            return self::handle_sse_stream( $request, $auth );
+            if ( ! empty( $auth['valid'] ) ) {
+                return self::handle_sse_stream( $request, $auth );
+            }
+            // Return public MCP Discovery for HTTP GET
+            return self::handle_discover( array(), 1, $auth );
         }
 
-        // 4. Handle POST / JSON-RPC Request
+        // 3. Handle POST / JSON-RPC Request
         $body = $request->get_json_params();
         if ( empty( $body ) || ! is_array( $body ) ) {
             $raw_body = $request->get_body();
@@ -223,10 +212,12 @@ class Cora_Universal_MCP_Server {
         $formatted_tools = array();
 
         foreach ( $all_tools as $tool_key => $tool ) {
-            // Check if token has scope for this tool
-            $has_scope = Cora_OAuth_Server::has_scope( $auth, $tool['requiredScope'] );
-            if ( ! $has_scope ) {
-                continue;
+            // Check if token has scope for this tool (if authenticated)
+            if ( ! empty( $auth['valid'] ) ) {
+                $has_scope = Cora_OAuth_Server::has_scope( $auth, $tool['requiredScope'] );
+                if ( ! $has_scope ) {
+                    continue;
+                }
             }
 
             $read_only   = ! empty( $tool['readOnlyHint'] ) || ! empty( $tool['readOnly'] );
@@ -262,6 +253,13 @@ class Cora_Universal_MCP_Server {
      * Handle tools/call method
      */
     private static function handle_call_tool( $params, $id, $auth ) {
+        if ( empty( $auth['valid'] ) ) {
+            $meta_url = home_url( '/.well-known/oauth-protected-resource' );
+            $response = self::error_response( -32001, 'Unauthorized: ' . ( $auth['error'] ?? 'Missing or invalid Bearer token.' ), $id, 401 );
+            $response->header( 'WWW-Authenticate', 'Bearer resource_metadata="' . $meta_url . '", realm="cora-mcp", error="invalid_token", error_description="Missing or invalid bearer token"' );
+            return $response;
+        }
+
         $tool_name = isset( $params['name'] ) ? sanitize_text_field( $params['name'] ) : '';
         $arguments = isset( $params['arguments'] ) && is_array( $params['arguments'] ) ? $params['arguments'] : array();
 

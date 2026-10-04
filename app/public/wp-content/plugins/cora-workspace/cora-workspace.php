@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.355
+ * Version:           4.9.356
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.355' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.356' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -6583,147 +6583,10 @@ function cora_ajax_advanced_search() {
  */
 if ( ! function_exists( 'cora_rest_mcp_handler' ) ) {
 function cora_rest_mcp_handler( $request ) {
-    $token = get_option( 'cora_mcp_access_token' );
-    if ( empty( $token ) ) {
-        $token = bin2hex( wp_generate_password( 32, false ) );
-        update_option( 'cora_mcp_access_token', $token );
+    if ( class_exists( 'Cora_Universal_MCP_Server' ) ) {
+        return Cora_Universal_MCP_Server::handle_request( $request );
     }
-
-    $provided_token = '';
-    $auth_header = is_object( $request ) && method_exists( $request, 'get_header' ) ? $request->get_header( 'Authorization' ) : ( $_SERVER['HTTP_AUTHORIZATION'] ?? '' );
-    if ( ! empty( $auth_header ) && preg_match( '/Bearer\s+(.*)$/i', $auth_header, $matches ) ) {
-        $provided_token = trim( $matches[1] );
-    }
-
-    $authorized = false;
-    $mcp_user_id = 0;
-
-    if ( ! empty( $provided_token ) ) {
-        $provided_hash = hash( 'sha256', $provided_token );
-        $saved_hash = get_option( 'cora_mcp_access_token_hash', '' );
-        if ( empty( $saved_hash ) && ! empty( $token ) ) {
-            $saved_hash = hash( 'sha256', $token );
-            update_option( 'cora_mcp_access_token_hash', $saved_hash );
-        }
-
-        if ( ! empty( $saved_hash ) && hash_equals( $saved_hash, $provided_hash ) ) {
-            $authorized = true;
-        } elseif ( ! empty( $token ) && hash_equals( $token, $provided_token ) ) {
-            $authorized = true;
-        } else {
-            // Check user-specific tokens
-            $user_query = new WP_User_Query( array(
-                'meta_key'   => 'cora_mcp_access_token_hash',
-                'meta_value' => $provided_hash,
-                'number'     => 1
-            ) );
-            $users = $user_query->get_results();
-            if ( ! empty( $users ) ) {
-                $mcp_user = $users[0];
-                $mcp_user_id = $mcp_user->ID;
-                $u_status = get_user_meta( $mcp_user_id, 'cora_user_status', true ) ?: 'active';
-                if ( $u_status === 'active' ) {
-                    wp_set_current_user( $mcp_user_id );
-                    $authorized = true;
-                }
-            }
-        }
-    }
-
-    if ( ! $authorized ) {
-        if ( function_exists( 'cora_log_security_event' ) ) {
-            cora_log_security_event( 'MCP_AUTHENTICATION_FAILED', array( 'endpoint' => '/cora/v1/mcp' ) );
-        }
-        return new WP_REST_Response( array(
-            'jsonrpc' => '2.0',
-            'error'   => array(
-                'code'    => -32001,
-                'message' => 'Unauthorized: Invalid or missing Bearer MCP token in Authorization header.'
-            ),
-            'id'      => null
-        ), 401 );
-    }
-
-    // Handle GET request - Establish Server-Sent Events (SSE) Stream Connection
-    if ( $request->get_method() === 'GET' ) {
-        header( 'Content-Type: text/event-stream' );
-        header( 'Cache-Control: no-cache' );
-        header( 'Connection: keep-alive' );
-        header( 'X-Accel-Buffering: no' );
-
-        $session_id = bin2hex( wp_generate_password( 16, false ) );
-        $post_url = home_url( '/wp-json/cora/v1/mcp?session_id=' . $session_id );
-        if ( ! empty( $provided_token ) ) {
-            $post_url = add_query_arg( 'token', $provided_token, $post_url );
-        }
-
-        echo "event: endpoint\n";
-        echo "data: " . esc_url_raw( $post_url ) . "\n\n";
-        ob_flush();
-        flush();
-
-        // Loop to poll for message transients sent by POST client requests
-        $start_time = time();
-        while ( time() - $start_time < 35 ) {
-            if ( connection_aborted() ) {
-                break;
-            }
-            $sse_message = get_transient( 'cora_mcp_sse_' . $session_id );
-            if ( $sse_message ) {
-                delete_transient( 'cora_mcp_sse_' . $session_id );
-                echo "event: message\n";
-                echo "data: " . wp_json_encode( $sse_message ) . "\n\n";
-                ob_flush();
-                flush();
-            }
-            // Send heartbeat pulse comment to prevent timeouts
-            echo ": heartbeat\n\n";
-            ob_flush();
-            flush();
-            sleep( 1 );
-        }
-        exit;
-    }
-
-    // Process incoming JSON-RPC POST request
-    $params = $request->get_json_params();
-    $method = isset( $params['method'] ) ? sanitize_text_field( $params['method'] ) : '';
-    $id     = isset( $params['id'] ) ? $params['id'] : null;
-
-    if ( ! $method ) {
-        $error_response = array(
-            'jsonrpc' => '2.0',
-            'error'   => array(
-                'code'    => -32600,
-                'message' => 'Invalid Request: Missing method.'
-            ),
-            'id'      => $id
-        );
-        return cora_rest_mcp_respond( $error_response, 400, $request );
-    }
-
-    switch ( $method ) {
-        case 'tools/list':
-            $response = cora_mcp_handle_list_tools( $id );
-            break;
-        case 'tools/call':
-            $tool_name = isset( $params['params']['name'] ) ? sanitize_text_field( $params['params']['name'] ) : '';
-            $tool_args = isset( $params['params']['arguments'] ) ? $params['params']['arguments'] : array();
-            $response = cora_mcp_handle_call_tool( $tool_name, $tool_args, $id );
-            break;
-        default:
-            $response = new WP_REST_Response( array(
-                'jsonrpc' => '2.0',
-                'error'   => array(
-                    'code'    => -32601,
-                    'message' => 'Method not found: ' . $method
-                ),
-                'id'      => $id
-            ), 404 );
-            break;
-    }
-
-    return cora_rest_mcp_respond( $response, 200, $request );
+    return new WP_REST_Response( array( 'error' => 'MCP server not loaded.' ), 500 );
 }
 }
 
