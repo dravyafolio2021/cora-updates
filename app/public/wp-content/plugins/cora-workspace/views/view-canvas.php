@@ -43,16 +43,33 @@ $live_settings = $live_theme ? (json_decode($live_theme['settings'], true) ?: ar
 $is_chatgpt_connected = false;
 $is_claude_connected  = false;
 $is_gemini_connected  = false;
+$active_canvas_oauth_connections = array();
 $tokens_table = $wpdb->prefix . 'cora_oauth_tokens';
 if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $tokens_table ) ) {
     $token_rows = $wpdb->get_results(
-        "SELECT client_name FROM {$tokens_table} WHERE revoked = 0"
+        "SELECT id, client_id, client_name, workspace_id, scopes, expires_at, last_used_at, created_at, revoked
+         FROM {$tokens_table}
+         WHERE revoked = 0
+         ORDER BY id DESC"
     );
     if ( ! empty( $token_rows ) ) {
-        $connected_names = array_map( function( $tr ) { return strtolower( $tr->client_name ); }, $token_rows );
-        $is_chatgpt_connected = in_array( 'chatgpt', $connected_names, true );
-        $is_claude_connected  = in_array( 'claude', $connected_names, true );
-        $is_gemini_connected  = in_array( 'gemini', $connected_names, true );
+        foreach ( $token_rows as $tr ) {
+            $c_name = strtolower( $tr->client_name );
+            if ( $c_name === 'chatgpt' ) $is_chatgpt_connected = true;
+            if ( $c_name === 'claude' )  $is_claude_connected  = true;
+            if ( $c_name === 'gemini' )  $is_gemini_connected  = true;
+
+            $active_canvas_oauth_connections[] = array(
+                'id'           => intval( $tr->id ),
+                'client_id'    => $tr->client_id,
+                'client_name'  => $tr->client_name,
+                'workspace_id' => $tr->workspace_id,
+                'scopes'       => array_filter( array_map( 'trim', explode( ' ', $tr->scopes ) ) ),
+                'expires_at'   => $tr->expires_at,
+                'last_used_at' => $tr->last_used_at,
+                'created_at'   => $tr->created_at,
+            );
+        }
     }
 }
 $mcp_direct_token = get_option( 'cora_mcp_access_token' );
@@ -61,6 +78,7 @@ if ( empty( $mcp_direct_token ) ) {
     update_option( 'cora_mcp_access_token', $mcp_direct_token );
 }
 $mcp_endpoint_url = home_url( '/mcp' );
+$oauth_discovery_url = home_url( '/.well-known/oauth-authorization-server' );
 
 // ── Editor Resume Fast-Path ──────────────────────────────────────────────
 // When the user refreshes the browser while inside an Elementor editor session,
@@ -6275,99 +6293,365 @@ function cora_get_sparkline_points( $history, $type ) {
             </div>
         </div>
 
-        <!-- Panel 2: Model Context Protocol (MCP) Setup Guide -->
-        <div id="cora-ai-mcp-panel-ai" class="hidden flex-1 overflow-y-auto p-6 max-w-4xl mx-auto space-y-6">
-            <!-- MCP Header Banner -->
-            <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 space-y-3">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h4 class="text-sm font-bold text-white">Model Context Protocol (MCP) Connection</h4>
-                        <p class="text-xs text-zinc-400 mt-0.5">Connect Claude Desktop, ChatGPT, or Cursor to edit your live website directly.</p>
-                    </div>
-                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10.5px] font-mono font-medium bg-zinc-800 text-zinc-300 border border-zinc-700">
-                        <span class="w-1.5 h-1.5 rounded-full bg-zinc-200"></span>
-                        MCP Live Server Active
-                    </span>
-                </div>
+        <!-- Panel 2: Universal Model Context Protocol (MCP) Developer Gateway & Control Center -->
+        <div id="cora-ai-mcp-panel-ai" class="hidden flex-1 overflow-y-auto p-4 sm:p-6 max-w-5xl mx-auto space-y-6">
 
-                <!-- Credential Box -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                    <div class="bg-zinc-950 p-3 rounded-xl border border-zinc-800">
-                        <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block mb-1">MCP Endpoint URL</label>
-                        <div class="flex items-center gap-1.5">
-                            <input type="text" id="cora-mcp-panel-endpoint" readonly value="<?php echo esc_attr( $mcp_endpoint_url ); ?>" class="w-full px-2.5 py-1 bg-zinc-900 border border-zinc-800 rounded-lg text-xs font-mono text-zinc-200 outline-none select-all" />
-                            <button type="button" onclick="window.copyMcpDirectUrl()" class="h-7 px-2.5 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-semibold rounded-lg shrink-0 border-none cursor-pointer">Copy</button>
+            <!-- 1. Universal MCP Remote Endpoint & Discovery Header Card -->
+            <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-5 sm:p-6 shadow-xs space-y-4">
+                <div class="border-b border-zinc-800/80 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-2xl bg-white text-zinc-950 flex items-center justify-center font-bold text-xs shadow-sm shrink-0">
+                            MCP
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-semibold text-white flex items-center gap-2">
+                                <span>Cora Universal MCP Endpoint</span>
+                                <span class="px-2 py-0.5 rounded-full bg-emerald-950/60 text-emerald-400 text-[10px] font-bold uppercase tracking-wider border border-emerald-800/50">Active • 2026-10-04</span>
+                            </h3>
+                            <p class="text-xs text-zinc-400 mt-0.5">Single standard remote endpoint for any MCP-compatible AI assistant (ChatGPT, Claude, Gemini, Cursor, Windsurf, VS Code).</p>
                         </div>
                     </div>
-                    <div class="bg-zinc-950 p-3 rounded-xl border border-zinc-800">
+                    <div class="flex items-center gap-2 self-start sm:self-center">
+                        <a href="https://heycora.in/docs/mcp" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-medium rounded-xl transition-colors no-underline">
+                            <span>Documentation</span>
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Credential Input Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
+                    <!-- Server URL -->
+                    <div class="bg-zinc-950 p-3 rounded-2xl border border-zinc-800/80">
+                        <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block mb-1">Universal MCP Server URL</label>
+                        <div class="flex items-center gap-1.5">
+                            <input type="text" id="cora-mcp-panel-endpoint" readonly value="<?php echo esc_attr( $mcp_endpoint_url ); ?>" class="w-full px-2.5 py-1.5 bg-zinc-900 border border-zinc-800 rounded-xl text-xs font-mono text-zinc-200 outline-none select-all" />
+                            <button type="button" onclick="window.copyMcpDirectUrl()" class="h-8 px-3 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-semibold rounded-xl shrink-0 border-none cursor-pointer transition-colors">Copy</button>
+                        </div>
+                    </div>
+
+                    <!-- OAuth Discovery URL -->
+                    <div class="bg-zinc-950 p-3 rounded-2xl border border-zinc-800/80">
+                        <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block mb-1">OAuth 2.1 Discovery URL</label>
+                        <div class="flex items-center gap-1.5">
+                            <input type="text" id="cora-mcp-panel-discovery" readonly value="<?php echo esc_attr( $oauth_discovery_url ); ?>" class="w-full px-2.5 py-1.5 bg-zinc-900 border border-zinc-800 rounded-xl text-xs font-mono text-zinc-200 outline-none select-all" />
+                            <button type="button" onclick="window.copyMcpDiscoveryUrl()" class="h-8 px-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-semibold rounded-xl shrink-0 border-none cursor-pointer transition-colors">Copy</button>
+                        </div>
+                    </div>
+
+                    <!-- Direct Access Token -->
+                    <div class="bg-zinc-950 p-3 rounded-2xl border border-zinc-800/80">
                         <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block mb-1">MCP Direct Access Key</label>
                         <div class="flex items-center gap-1.5">
-                            <input type="password" id="cora-mcp-panel-token" readonly value="<?php echo esc_attr( $mcp_direct_token ); ?>" class="w-full px-2.5 py-1 bg-zinc-900 border border-zinc-800 rounded-lg text-xs font-mono text-zinc-200 outline-none select-all" />
-                            <button type="button" onclick="window.toggleMcpTokenVisibility()" class="h-7 px-2 bg-zinc-900 border border-zinc-800 text-zinc-400 text-xs font-semibold rounded-lg shrink-0 cursor-pointer">Show</button>
-                            <button type="button" onclick="window.copyMcpAuthToken()" class="h-7 px-2.5 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-semibold rounded-lg shrink-0 border-none cursor-pointer">Copy</button>
+                            <input type="password" id="cora-mcp-panel-token" readonly value="<?php echo esc_attr( $mcp_direct_token ); ?>" class="w-full px-2.5 py-1.5 bg-zinc-900 border border-zinc-800 rounded-xl text-xs font-mono text-zinc-200 outline-none select-all" />
+                            <button type="button" onclick="window.toggleMcpTokenVisibility()" class="h-8 px-2.5 bg-zinc-900 border border-zinc-800 text-zinc-400 text-xs font-semibold rounded-xl shrink-0 cursor-pointer hover:text-zinc-200">Show</button>
+                            <button type="button" onclick="window.copyMcpAuthToken()" class="h-8 px-3 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-semibold rounded-xl shrink-0 border-none cursor-pointer transition-colors">Copy</button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Client Cards Grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <!-- Claude Desktop -->
-                <div class="p-4 bg-zinc-900 border border-zinc-800 rounded-2xl space-y-3">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2.5">
-                            <div class="w-7 h-7 rounded-lg bg-zinc-800 border border-zinc-700 flex items-center justify-center text-zinc-200">
-                                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M13.5 2C13.5 2 13.3 5.4 12 7C10.7 8.6 7.4 9 7.4 9C7.4 9 10.7 9.4 12 11C13.3 12.6 13.5 16 13.5 16C13.5 16 13.7 12.6 15 11C16.3 9.4 19.6 9 19.6 9C19.6 9 16.3 8.6 15 7C13.7 5.4 13.5 2 13.5 2Z"/><circle cx="6" cy="18" r="2.5"/></svg>
-                            </div>
-                            <div>
-                                <h5 class="text-xs font-bold text-white">Claude Desktop</h5>
-                                <span class="text-[10px] text-zinc-400">Model Context Protocol</span>
-                            </div>
-                        </div>
-                        <a href="https://claude.ai/new" target="_blank" class="px-2.5 py-1 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg text-[11px] font-semibold no-underline">Open Claude ↗</a>
-                    </div>
-                    <p class="text-[11px] text-zinc-400">Add to <code class="px-1 py-0.5 bg-zinc-950 rounded text-zinc-300 font-mono text-[10px]">claude_desktop_config.json</code>:</p>
-                    <div class="p-2.5 bg-zinc-950 rounded-xl font-mono text-[10px] text-zinc-300 overflow-x-auto border border-zinc-800">
-<pre>{
-  "mcpServers": {
-    "cora-canvas": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-fetch", "<?php echo esc_js( $mcp_endpoint_url ); ?>"],
-      "env": { "CORA_MCP_TOKEN": "<?php echo esc_js( $mcp_direct_token ); ?>" }
-    }
-  }
-}</pre>
-                    </div>
-                    <button type="button" onclick="window.copyClaudeJsonConfig()" class="w-full py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg text-xs font-semibold cursor-pointer border-none transition-colors">
-                        Copy Claude Config JSON
-                    </button>
+            <!-- 2. Connect AI Assistant Provider Matrix (3 Cards: ChatGPT, Claude, Gemini) -->
+            <div>
+                <div class="flex items-center justify-between mb-3 px-1">
+                    <h4 class="text-xs font-semibold text-zinc-200 uppercase tracking-wider">Connect AI Assistant</h4>
+                    <span class="text-[11px] text-zinc-500 font-mono">Universal MCP Compliant</span>
                 </div>
-
-                <!-- ChatGPT Plugin & Tools -->
-                <div class="p-4 bg-zinc-900 border border-zinc-800 rounded-2xl space-y-3">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2.5">
-                            <div class="w-7 h-7 rounded-lg bg-zinc-800 border border-zinc-700 flex items-center justify-center text-zinc-200">
-                                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M20.5 10.2a4.8 4.8 0 0 0-.4-3.7 4.9 4.9 0 0 0-4.6-2.5 4.8 4.8 0 0 0-3.3-1.4 4.9 4.9 0 0 0-4.7 3.4 4.8 4.8 0 0 0-3.5 1.7 4.9 4.9 0 0 0-.7 5.1 4.8 4.8 0 0 0 .4 3.7 4.9 4.9 0 0 0 4.6 2.5 4.8 4.8 0 0 0 3.3 1.4 4.9 4.9 0 0 0 4.7-3.4 4.8 4.8 0 0 0 3.5-1.7 4.9 4.9 0 0 0 .7-5.1zm-8.5 9.8a3.5 3.5 0 0 1-2.3-.9l.1-.1 3.9-2.3a.7.7 0 0 0 .4-.6v-5.4l1.6.9v4.5a3.5 3.5 0 0 1-3.7 3.9zm-7-4.1a3.5 3.5 0 0 1-.5-2.4c.2-.8.6-1.5 1.3-2l.1.1 3.9 2.3a.7.7 0 0 0 .7 0l4.7-2.7v1.8l-3.9 2.3a3.5 3.5 0 0 1-6.3.6zm-1-7.5a3.5 3.5 0 0 1 1.8-1.5 3.5 3.5 0 0 1 2.5 0l-.1.1-3.9 2.3a.7.7 0 0 0-.4.6v5.4l-1.6-.9V8.4h1.7zm11.2-1.6l-3.9-2.3a3.5 3.5 0 0 1 4.7.9 3.5 3.5 0 0 1 .5 2.4l-.1-.1-3.9-2.3a.7.7 0 0 0-.7 0l-4.7 2.7V6.8l3.9-2.3c1.3-.8 2.9-.8 4.2.3zm4.2 4.4a3.5 3.5 0 0 1 .5 2.4 3.5 3.5 0 0 1-1.3 2l-.1-.1-3.9-2.3a.7.7 0 0 0-.7 0l-4.7 2.7V10.2l3.9-2.3a3.5 3.5 0 0 1 6.3-.6z"/></svg>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- ChatGPT -->
+                    <div id="cora-canvas-provider-chatgpt" class="p-4 bg-zinc-900 border <?php echo $is_chatgpt_connected ? 'border-emerald-500/40' : 'border-zinc-800'; ?> rounded-2xl flex flex-col justify-between space-y-3">
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-8 h-8 rounded-xl bg-zinc-800 border border-zinc-700 flex items-center justify-center text-zinc-200 shrink-0">
+                                        <svg viewBox="0 0 24 24" class="w-4 h-4 fill-current"><path d="M20.5 10.2a4.8 4.8 0 0 0-.4-3.7 4.9 4.9 0 0 0-4.6-2.5 4.8 4.8 0 0 0-3.3-1.4 4.9 4.9 0 0 0-4.7 3.4 4.8 4.8 0 0 0-3.5 1.7 4.9 4.9 0 0 0-.7 5.1 4.8 4.8 0 0 0 .4 3.7 4.9 4.9 0 0 0 4.6 2.5 4.8 4.8 0 0 0 3.3 1.4 4.9 4.9 0 0 0 4.7-3.4 4.8 4.8 0 0 0 3.5-1.7 4.9 4.9 0 0 0 .7-5.1zm-8.5 9.8a3.5 3.5 0 0 1-2.3-.9l.1-.1 3.9-2.3a.7.7 0 0 0 .4-.6v-5.4l1.6.9v4.5a3.5 3.5 0 0 1-3.7 3.9zm-7-4.1a3.5 3.5 0 0 1-.5-2.4c.2-.8.6-1.5 1.3-2l.1.1 3.9 2.3a.7.7 0 0 0 .7 0l4.7-2.7v1.8l-3.9 2.3a3.5 3.5 0 0 1-6.3.6zm-1-7.5a3.5 3.5 0 0 1 1.8-1.5 3.5 3.5 0 0 1 2.5 0l-.1.1-3.9 2.3a.7.7 0 0 0-.4.6v5.4l-1.6-.9V8.4h1.7zm11.2-1.6l-3.9-2.3a3.5 3.5 0 0 1 4.7.9 3.5 3.5 0 0 1 .5 2.4l-.1-.1-3.9-2.3a.7.7 0 0 0-.7 0l-4.7 2.7V6.8l3.9-2.3c1.3-.8 2.9-.8 4.2.3zm4.2 4.4a3.5 3.5 0 0 1 .5 2.4 3.5 3.5 0 0 1-1.3 2l-.1-.1-3.9-2.3a.7.7 0 0 0-.7 0l-4.7 2.7V10.2l3.9-2.3a3.5 3.5 0 0 1 6.3-.6z"/></svg>
+                                    </div>
+                                    <div>
+                                        <h5 class="text-xs font-bold text-white">ChatGPT</h5>
+                                        <span class="text-[10px] text-zinc-400">Developer Plugin &amp; MCP</span>
+                                    </div>
+                                </div>
+                                <?php if ( $is_chatgpt_connected ) : ?>
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-950/60 text-emerald-400 text-[9px] font-bold uppercase tracking-wider border border-emerald-800/50">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Connected
+                                    </span>
+                                <?php else : ?>
+                                    <a href="https://chatgpt.com/" target="_blank" class="text-zinc-400 hover:text-white text-[11px] font-medium no-underline">Open ↗</a>
+                                <?php endif; ?>
                             </div>
-                            <div>
-                                <h5 class="text-xs font-bold text-white">ChatGPT Plugin &amp; Tools</h5>
-                                <span class="text-[10px] text-zinc-400">OpenAI Plugin &amp; MCP</span>
+                            <div class="text-[11px] text-zinc-400">In ChatGPT &gt; <strong>Create plugin</strong>, enter domain:</div>
+                            <div class="p-2 bg-zinc-950 rounded-xl font-mono text-[10px] text-zinc-300 border border-zinc-800 flex items-center justify-between gap-1.5">
+                                <span class="truncate"><?php echo esc_html( home_url() ); ?></span>
+                                <button type="button" onclick="window.copyChatGptPluginUrl()" class="px-2 py-1 bg-zinc-800 hover:bg-zinc-700 text-white rounded text-[10px] font-medium border-none cursor-pointer shrink-0">Copy</button>
+                            </div>
+                            <div class="text-[10px] text-zinc-500 space-y-0.5 font-mono">
+                                <div>• Manifest: /.well-known/ai-plugin.json</div>
+                                <div>• Auth: Bearer Token</div>
                             </div>
                         </div>
-                        <a href="https://chatgpt.com/" target="_blank" class="px-2.5 py-1 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg text-[11px] font-semibold no-underline">Open ChatGPT ↗</a>
+                        <button type="button" onclick="window.coraShowClientConnectModal('chatgpt')" class="w-full mt-2 py-2 px-3 bg-zinc-800 hover:bg-zinc-750 text-zinc-200 rounded-xl text-xs font-semibold transition-colors border border-zinc-700/60 cursor-pointer">
+                            <?php echo $is_chatgpt_connected ? 'Connected • Setup Guide' : 'Setup Guide &amp; Prompts'; ?>
+                        </button>
                     </div>
-                    <p class="text-[11px] text-zinc-400">In ChatGPT &gt; <strong>Create plugin</strong> (or <em>Develop your own plugin</em>), enter domain:</p>
-                    <div class="p-2.5 bg-zinc-950 rounded-xl font-mono text-[10px] text-zinc-300 break-all border border-zinc-800 flex items-center justify-between gap-2">
-                        <span id="cora-chatgpt-plugin-domain"><?php echo esc_html( home_url() ); ?></span>
-                        <button type="button" onclick="window.copyChatGptPluginUrl()" class="px-2 py-1 bg-zinc-800 hover:bg-zinc-700 text-white rounded text-[10px] font-medium border-none cursor-pointer shrink-0">Copy</button>
+
+                    <!-- Claude -->
+                    <div id="cora-canvas-provider-claude" class="p-4 bg-zinc-900 border <?php echo $is_claude_connected ? 'border-emerald-500/40' : 'border-zinc-800'; ?> rounded-2xl flex flex-col justify-between space-y-3">
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-8 h-8 rounded-xl bg-zinc-800 border border-zinc-700 flex items-center justify-center text-zinc-200 shrink-0">
+                                        <svg viewBox="0 0 24 24" class="w-4 h-4 fill-current"><path d="m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z"/></svg>
+                                    </div>
+                                    <div>
+                                        <h5 class="text-xs font-bold text-white">Claude</h5>
+                                        <span class="text-[10px] text-zinc-400">Desktop &amp; Web MCP</span>
+                                    </div>
+                                </div>
+                                <?php if ( $is_claude_connected ) : ?>
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-950/60 text-emerald-400 text-[9px] font-bold uppercase tracking-wider border border-emerald-800/50">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Connected
+                                    </span>
+                                <?php else : ?>
+                                    <a href="https://claude.ai/new" target="_blank" class="text-zinc-400 hover:text-white text-[11px] font-medium no-underline">Open ↗</a>
+                                <?php endif; ?>
+                            </div>
+                            <div class="text-[11px] text-zinc-400">Add to <code class="px-1 py-0.5 bg-zinc-950 rounded text-zinc-300 font-mono text-[9.5px]">claude_desktop_config.json</code>:</div>
+                            <div class="p-2 bg-zinc-950 rounded-xl font-mono text-[9.5px] text-zinc-300 border border-zinc-800 flex items-center justify-between gap-1.5">
+                                <span class="truncate text-zinc-400">"cora": { "url": "<?php echo esc_js( $mcp_endpoint_url ); ?>" }</span>
+                                <button type="button" onclick="window.copyClaudeJsonConfig()" class="px-2 py-1 bg-zinc-800 hover:bg-zinc-700 text-white rounded text-[10px] font-medium border-none cursor-pointer shrink-0">Copy</button>
+                            </div>
+                            <div class="text-[10px] text-zinc-500 space-y-0.5 font-mono">
+                                <div>• Protocol: JSON-RPC 2.0 / SSE</div>
+                                <div>• Direct zero-copy live updates</div>
+                            </div>
+                        </div>
+                        <button type="button" onclick="window.coraShowClientConnectModal('claude')" class="w-full mt-2 py-2 px-3 bg-zinc-800 hover:bg-zinc-750 text-zinc-200 rounded-xl text-xs font-semibold transition-colors border border-zinc-700/60 cursor-pointer">
+                            <?php echo $is_claude_connected ? 'Connected • Setup Guide' : 'Setup Guide &amp; Prompts'; ?>
+                        </button>
                     </div>
-                    <div class="text-[10.5px] text-zinc-400 space-y-0.5">
-                        <p>• Manifest at <code class="px-1 py-0.5 bg-zinc-950 rounded font-mono text-[9.5px]">/.well-known/ai-plugin.json</code></p>
-                        <p>• Auth: <strong>Bearer Token</strong> (paste your MCP Direct Access Key)</p>
+
+                    <!-- Gemini -->
+                    <div id="cora-canvas-provider-gemini" class="p-4 bg-zinc-900 border <?php echo $is_gemini_connected ? 'border-emerald-500/40' : 'border-zinc-800'; ?> rounded-2xl flex flex-col justify-between space-y-3">
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-8 h-8 rounded-xl bg-zinc-800 border border-zinc-700 flex items-center justify-center text-zinc-200 shrink-0">
+                                        <svg viewBox="0 0 24 24" class="w-4 h-4 fill-current"><path d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/></svg>
+                                    </div>
+                                    <div>
+                                        <h5 class="text-xs font-bold text-white">Gemini</h5>
+                                        <span class="text-[10px] text-zinc-400">Google AI &amp; Workspace CLI</span>
+                                    </div>
+                                </div>
+                                <?php if ( $is_gemini_connected ) : ?>
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-950/60 text-emerald-400 text-[9px] font-bold uppercase tracking-wider border border-emerald-800/50">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Connected
+                                    </span>
+                                <?php else : ?>
+                                    <a href="https://gemini.google.com/" target="_blank" class="text-zinc-400 hover:text-white text-[11px] font-medium no-underline">Open ↗</a>
+                                <?php endif; ?>
+                            </div>
+                            <div class="text-[11px] text-zinc-400">In Gemini Connected Apps &gt; Add Custom MCP Server:</div>
+                            <div class="p-2 bg-zinc-950 rounded-xl font-mono text-[10px] text-zinc-300 border border-zinc-800 flex items-center justify-between gap-1.5">
+                                <span class="truncate"><?php echo esc_html( $mcp_endpoint_url ); ?></span>
+                                <button type="button" onclick="window.copyMcpDirectUrl()" class="px-2 py-1 bg-zinc-800 hover:bg-zinc-700 text-white rounded text-[10px] font-medium border-none cursor-pointer shrink-0">Copy</button>
+                            </div>
+                            <div class="text-[10px] text-zinc-500 space-y-0.5 font-mono">
+                                <div>• RFC 7591 Dynamic Registration</div>
+                                <div>• Deep Reasoning &amp; Code Ops</div>
+                            </div>
+                        </div>
+                        <button type="button" onclick="window.coraShowClientConnectModal('gemini')" class="w-full mt-2 py-2 px-3 bg-zinc-800 hover:bg-zinc-750 text-zinc-200 rounded-xl text-xs font-semibold transition-colors border border-zinc-700/60 cursor-pointer">
+                            <?php echo $is_gemini_connected ? 'Connected • Setup Guide' : 'Setup Guide &amp; Prompts'; ?>
+                        </button>
                     </div>
                 </div>
             </div>
+
+            <!-- 3. Active AI Connections Live Manager -->
+            <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-5 sm:p-6 shadow-xs space-y-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h4 class="text-xs font-semibold text-zinc-200 uppercase tracking-wider">Active AI Connections</h4>
+                        <p class="text-xs text-zinc-400 mt-0.5">Manage granted scopes and revoke authorizations server-side.</p>
+                    </div>
+                    <button type="button" onclick="window.coraLoadActiveConnections()" class="px-3 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-medium transition-colors cursor-pointer border border-zinc-700/50">Refresh</button>
+                </div>
+
+                <div id="cora-canvas-active-connections-list" class="space-y-2">
+                    <?php if ( empty( $active_canvas_oauth_connections ) ) : ?>
+                        <div class="p-6 rounded-2xl bg-zinc-950/60 border border-zinc-800 text-center space-y-2">
+                            <div class="w-8 h-8 rounded-full bg-zinc-800 text-zinc-400 mx-auto flex items-center justify-center text-xs">✦</div>
+                            <div class="text-xs font-semibold text-zinc-300">No Active AI Connections</div>
+                            <p class="text-[11px] text-zinc-500 max-w-sm mx-auto">Connect ChatGPT, Claude, Gemini, Cursor, or any MCP client above to interact with your website template and workspace.</p>
+                        </div>
+                    <?php else : ?>
+                        <?php foreach ( $active_canvas_oauth_connections as $conn ) :
+                            $scopes = $conn['scopes'] ?? array();
+                            $date_str = ! empty( $conn['created_at'] ) ? date( 'M j, Y', strtotime( $conn['created_at'] ) ) : 'Recent';
+                            $last_used = ! empty( $conn['last_used_at'] ) ? date( 'M j, g:i a', strtotime( $conn['last_used_at'] ) ) : 'Never';
+                        ?>
+                            <div class="p-4 rounded-2xl bg-zinc-950/80 border border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                <div class="space-y-1">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs font-bold text-zinc-100"><?php echo esc_html( $conn['client_name'] ?: 'AI Client' ); ?></span>
+                                        <span class="px-2 py-0.5 rounded-full bg-emerald-950/60 text-emerald-400 text-[9px] font-bold uppercase tracking-wider border border-emerald-800/40">Connected</span>
+                                    </div>
+                                    <div class="flex flex-wrap gap-1 pt-0.5">
+                                        <?php foreach ( $scopes as $s ) : ?>
+                                            <span class="inline-block px-1.5 py-0.5 rounded bg-zinc-900 text-zinc-400 text-[10px] font-mono border border-zinc-800"><?php echo esc_html( $s ); ?></span>
+                                        <?php endforeach; ?>
+                                    </div>
+                                    <div class="text-[10px] text-zinc-500 pt-0.5">Connected: <?php echo esc_html( $date_str ); ?> • Last active: <?php echo esc_html( $last_used ); ?> • Workspace: #<?php echo esc_html( $conn['workspace_id'] ); ?></div>
+                                </div>
+                                <button type="button" onclick="window.coraRevokeConnection(<?php echo intval( $conn['id'] ); ?>)" class="self-start sm:self-center px-3 py-1.5 rounded-xl bg-zinc-850 hover:bg-red-950/60 hover:text-red-400 hover:border-red-800/60 text-zinc-300 text-xs font-medium transition-colors cursor-pointer border border-zinc-700/60">
+                                    Revoke
+                                </button>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <!-- 4. AI Command Center & Action Playground (Integrated Directly In Canvas Editor) -->
+            <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-5 sm:p-6 shadow-xs space-y-4">
+                <div class="border-b border-zinc-800 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <h3 class="text-sm font-bold text-white">AI Command Center &amp; Action Playground</h3>
+                        <p class="text-xs text-zinc-400 mt-0.5">Test, inspect, and execute MCP tools on your live template and workspace directly.</p>
+                    </div>
+                    
+                    <!-- Mode Switcher Tabs -->
+                    <div class="inline-flex p-1 bg-zinc-950 rounded-xl gap-1 text-xs font-semibold border border-zinc-800">
+                        <button type="button" id="cora-canvas-mcp-mode-nl-btn" onclick="window.coraSetCanvasPlaygroundMode('nl')" class="px-3 py-1 rounded-lg bg-zinc-800 text-white shadow-xs cursor-pointer transition-all flex items-center gap-1.5 border-none">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                            <span>Natural Language</span>
+                        </button>
+                        <button type="button" id="cora-canvas-mcp-mode-guided-btn" onclick="window.coraSetCanvasPlaygroundMode('guided')" class="px-3 py-1 rounded-lg text-zinc-400 hover:text-white cursor-pointer transition-all flex items-center gap-1.5 border-none bg-transparent">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+                            <span>Guided Actions</span>
+                        </button>
+                        <button type="button" id="cora-canvas-mcp-mode-dev-btn" onclick="window.coraSetCanvasPlaygroundMode('dev')" class="px-3 py-1 rounded-lg text-zinc-400 hover:text-white cursor-pointer transition-all flex items-center gap-1.5 border-none bg-transparent">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                            <span>Raw JSON</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Left Input Column -->
+                    <div class="space-y-4">
+                        
+                        <!-- MODE 1: Natural Language Commands -->
+                        <div id="cora-canvas-mcp-panel-nl" class="space-y-3">
+                            <div>
+                                <label class="block text-xs font-bold text-zinc-300 mb-1.5">Command Prompt</label>
+                                <div class="relative">
+                                    <textarea id="cora-canvas-mcp-nl-input" rows="3" class="w-full text-xs font-medium bg-zinc-950 border border-zinc-800 rounded-xl p-3 outline-none text-zinc-100 focus:border-zinc-500 transition-all placeholder:text-zinc-600" placeholder="Ask AI to read code, update sections, query CRM, or audit workspace (e.g. 'Read template HTML and add a sticky monochromatic navbar')..."></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Quick Suggestions -->
+                            <div class="space-y-1.5">
+                                <span class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Quick Suggestions:</span>
+                                <div class="flex flex-wrap gap-1.5">
+                                    <button type="button" onclick="window.coraSetCanvasNLPrompt('Read my active template HTML code and give me a summary of sections.')" class="px-2.5 py-1 bg-zinc-950 hover:bg-zinc-800 text-zinc-300 rounded-lg text-[11px] font-medium transition-colors cursor-pointer border border-zinc-800">
+                                        📋 Read Template Code
+                                    </button>
+                                    <button type="button" onclick="window.coraSetCanvasNLPrompt('Add a modern dark mode testimonial section with 3 cards.')" class="px-2.5 py-1 bg-zinc-950 hover:bg-zinc-800 text-zinc-300 rounded-lg text-[11px] font-medium transition-colors cursor-pointer border border-zinc-800">
+                                        ⭐ Add Testimonials Section
+                                    </button>
+                                    <button type="button" onclick="window.coraSetCanvasNLPrompt('Give me a full workspace health summary with total revenue, unpaid receivables, and active bookings.')" class="px-2.5 py-1 bg-zinc-950 hover:bg-zinc-800 text-zinc-300 rounded-lg text-[11px] font-medium transition-colors cursor-pointer border border-zinc-800">
+                                        📊 Revenue &amp; Health Snapshot
+                                    </button>
+                                    <button type="button" onclick="window.coraSetCanvasNLPrompt('List all active CRM deals and highlight hot leads.')" class="px-2.5 py-1 bg-zinc-950 hover:bg-zinc-800 text-zinc-300 rounded-lg text-[11px] font-medium transition-colors cursor-pointer border border-zinc-800">
+                                        🎯 CRM Hot Leads
+                                    </button>
+                                </div>
+                            </div>
+
+                            <button type="button" id="cora-canvas-mcp-run-nl-btn" onclick="window.coraExecuteCanvasNLCommand()" class="w-full py-2.5 bg-white hover:bg-zinc-100 text-zinc-950 font-bold text-xs rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 shadow-xs border-none">
+                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                                <span>Execute Command via MCP</span>
+                            </button>
+                        </div>
+
+                        <!-- MODE 2: Guided Action Presets -->
+                        <div id="cora-canvas-mcp-panel-guided" class="space-y-3" style="display: none;">
+                            <div>
+                                <label class="block text-xs font-bold text-zinc-300 mb-1">Select Tool / Action</label>
+                                <select id="cora-canvas-mcp-guided-tool-select" class="w-full text-xs font-semibold bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 outline-none cursor-pointer text-zinc-100" onchange="window.coraOnCanvasGuidedToolChange()">
+                                    <option value="cora_get_canvas_code">cora_get_canvas_code (Get Active Template HTML)</option>
+                                    <option value="cora_save_canvas_code">cora_save_canvas_code (Write &amp; Publish HTML Code)</option>
+                                    <option value="cora_list_canvas_pages">cora_list_canvas_pages (List Canvas Pages &amp; Routes)</option>
+                                    <option value="cora_get_workspace_overview">cora_get_workspace_overview (Workspace KPI Snapshot)</option>
+                                    <option value="cora_search_knowledge_base">cora_search_knowledge_base (Search Living Memory)</option>
+                                    <option value="cora_query_financials">cora_query_financials (Check Invoices &amp; Receivables)</option>
+                                    <option value="cora_manage_crm_leads">cora_manage_crm_leads (Manage Leads &amp; Deals)</option>
+                                    <option value="cora_ask_workspace_copilot">cora_ask_workspace_copilot (Ask AI Co-Founder)</option>
+                                </select>
+                            </div>
+
+                            <!-- Dynamic Guided Fields -->
+                            <div id="cora-canvas-mcp-guided-dynamic-fields" class="space-y-2 p-3 border border-zinc-800 rounded-xl bg-zinc-950 text-xs">
+                                <!-- Populated by JS -->
+                            </div>
+
+                            <button type="button" id="cora-canvas-mcp-run-guided-btn" onclick="window.coraExecuteCanvasGuidedAction()" class="w-full py-2.5 bg-white hover:bg-zinc-100 text-zinc-950 font-bold text-xs rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 shadow-xs border-none">
+                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                                <span>Execute Guided Action</span>
+                            </button>
+                        </div>
+
+                        <!-- MODE 3: Raw JSON Test Runner -->
+                        <div id="cora-canvas-mcp-panel-dev" class="space-y-3" style="display: none;">
+                            <div>
+                                <label class="block text-xs font-bold text-zinc-300 mb-1">Raw JSON-RPC Request Payload</label>
+                                <textarea id="cora-canvas-mcp-raw-input" rows="8" class="w-full text-xs font-mono bg-zinc-950 border border-zinc-800 rounded-xl p-3 outline-none text-zinc-100 font-mono" spellcheck="false"><?php
+echo esc_textarea( json_encode( array(
+    'jsonrpc' => '2.0',
+    'method'  => 'tools/call',
+    'params'  => array(
+        'name'      => 'cora_get_canvas_code',
+        'arguments' => array( 'theme_id' => $live_theme ? intval( $live_theme['id'] ) : 0 )
+    ),
+    'id'      => 1
+), JSON_PRETTY_PRINT ) );
+?></textarea>
+                            </div>
+                            <button type="button" id="cora-canvas-mcp-run-raw-btn" onclick="window.coraExecuteCanvasRawJson()" class="w-full py-2.5 bg-white hover:bg-zinc-100 text-zinc-950 font-bold text-xs rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 shadow-xs border-none">
+                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                                <span>Send JSON-RPC Request</span>
+                            </button>
+                        </div>
+
+                    </div>
+
+                    <!-- Right Output Column -->
+                    <div class="space-y-3 flex flex-col">
+                        <div class="flex items-center justify-between">
+                            <label class="block text-xs font-bold text-zinc-300">Live Execution Response</label>
+                            <button type="button" id="cora-canvas-apply-code-btn" onclick="window.coraApplyPlaygroundCodeToEditor()" class="hidden px-2.5 py-1 bg-emerald-950 text-emerald-300 border border-emerald-800 rounded-lg text-xs font-semibold hover:bg-emerald-900 transition-colors cursor-pointer flex items-center gap-1">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path></svg>
+                                <span>📥 Apply to Live Editor</span>
+                            </button>
+                        </div>
+
+                        <!-- Formatted Output Card -->
+                        <div id="cora-canvas-mcp-formatted-output" class="p-3.5 bg-zinc-950 rounded-2xl border border-zinc-800 min-h-[140px] text-xs text-zinc-300 leading-relaxed overflow-y-auto max-h-[220px]">
+                            <div class="text-zinc-600 italic">MCP output will render here after executing an action...</div>
+                        </div>
+
+                        <!-- Raw JSON Inspection -->
+                        <div>
+                            <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">Raw JSON Result</label>
+                            <pre id="cora-canvas-mcp-test-output" class="bg-zinc-950 border border-zinc-800 rounded-2xl p-3 text-[10px] font-mono text-zinc-400 overflow-x-auto min-h-[100px] max-h-[180px] leading-snug">Ready.</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
         </div>
     </div>
 </div>
@@ -16469,15 +16753,8 @@ Please provide the complete, un-truncated index.html file ready to save and publ
         });
     };
 
-    // --- MCP Client Connect Helpers ---
-    window.coraShowClientConnectModal = function(clientId) {
-        window.openAiMcpEditor();
-        window.switchAiMcpTab('ai');
-    };
-
-    window.coraCloseClientConnectModal = function() {
-        window.switchAiMcpTab('code');
-    };
+    // --- MCP Client Connect & Global Gateway Helpers ---
+    let lastMcpReturnedHtml = '';
 
     window.copyMcpDirectUrl = function() {
         const el = document.getElementById('cora-mcp-panel-endpoint');
@@ -16489,6 +16766,19 @@ Please provide the complete, un-truncated index.html file ready to save and publ
                 document.execCommand('copy');
             }
             window.coraShowToast('MCP Endpoint URL copied to clipboard!', 'success');
+        }
+    };
+
+    window.copyMcpDiscoveryUrl = function() {
+        const el = document.getElementById('cora-mcp-panel-discovery');
+        if (el && el.value) {
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(el.value);
+            } else {
+                el.select();
+                document.execCommand('copy');
+            }
+            window.coraShowToast('OAuth 2.1 Discovery URL copied!', 'success');
         }
     };
 
@@ -16540,6 +16830,498 @@ Please provide the complete, un-truncated index.html file ready to save and publ
             window.coraShowToast('Domain: ' + url, 'info');
         }
     };
+
+    // Universal 1-Click Client Connect Modal
+    window.coraShowClientConnectModal = function(clientId) {
+        const mcpUrl = '<?php echo esc_url( home_url( "/mcp" ) ); ?>';
+        const openApiUrl = '<?php echo esc_url( home_url( "/mcp/openapi.json" ) ); ?>';
+        const directToken = document.getElementById('cora-mcp-panel-token')?.value || '<?php echo esc_js( $mcp_direct_token ); ?>';
+        
+        let title = "Connect AI Assistant";
+        let providerBadgeSvg = '<svg viewBox="0 0 24 24" class="w-4 h-4 fill-current"><path d="M12 2L15 9L22 12L15 15L12 22L9 15L2 12L9 9Z"/></svg>';
+        let promptText = "";
+        let configSnippet = "";
+        let setupNotes = "";
+        let externalUrl = "";
+
+        if (clientId === 'chatgpt') {
+            title = "Connect ChatGPT (Developer Plugin & MCP)";
+            providerBadgeSvg = '<svg viewBox="0 0 24 24" class="w-4 h-4 fill-current"><path d="M9.205 8.658v-2.26c0-.19.072-.333.238-.428l4.543-2.616c.619-.357 1.356-.523 2.117-.523 2.854 0 4.662 2.212 4.662 4.566 0 .167 0 .357-.024.547l-4.71-2.759a.797.797 0 00-.856 0l-5.97 3.473zm10.609 8.8V12.06c0-.333-.143-.57-.429-.737l-5.97-3.473 1.95-1.118a.433.433 0 01.476 0l4.543 2.617c1.309.76 2.189 2.378 2.189 3.948 0 1.808-1.07 3.473-2.76 4.163zM7.802 12.703l-1.95-1.142c-.167-.095-.239-.238-.239-.428V5.899c0-2.545 1.95-4.472 4.591-4.472 1 0 1.927.333 2.712.928L8.23 5.067c-.285.166-.428.404-.428.737v6.898zM12 15.128l-2.795-1.57v-3.33L12 8.658l2.795 1.57v3.33L12 15.128zm1.796 7.23c-1 0-1.927-.332-2.712-.927l4.686-2.712c.285-.166.428-.404.428-.737v-6.898l1.974 1.142c.167.095.238.238.238.428v5.233c0 2.545-1.974 4.472-4.614 4.472zm-5.637-5.303l-4.544-2.617c-1.308-.761-2.188-2.378-2.188-3.948A4.482 4.482 0 014.21 6.327v5.423c0 .333.143.571.428.738l5.947 3.449-1.95 1.118a.432 4.432 0 01-.476 0zm-.262 3.9c-2.688 0-4.662-2.021-4.662-4.519 0-.19.024-.38.047-.57l4.686 2.71c.286.167.571.167.856 0l5.97-3.448v2.26c0 .19-.07.333-.237.428l-4.543 2.616c-.619.357-1.356.523-2.117.523z"/></svg>';
+            promptText = `You are my Cora Studio AI Co-Founder. Connect to my workspace remote MCP server and Developer Plugin at:\nEndpoint: ${mcpUrl}\nAuth Key: ${directToken}\n\nYou have direct tools to inspect, read, and live-update my website template code (cora_get_canvas_code, cora_save_canvas_code), manage CRM leads, and check invoices.`;
+            configSnippet = openApiUrl;
+            setupNotes = "In ChatGPT, go to <strong>Create plugin</strong> (or <em>Develop your own plugin</em>), enter your domain <code><?php echo esc_js( home_url() ); ?></code>. ChatGPT will auto-discover <code>/.well-known/ai-plugin.json</code>. Choose <strong>Bearer Token</strong> and paste your MCP Direct Access Key.";
+            externalUrl = "https://chatgpt.com";
+        } else if (clientId === 'claude') {
+            title = "Connect Claude (Desktop & Web MCP)";
+            providerBadgeSvg = '<svg viewBox="0 0 24 24" class="w-4 h-4 fill-current"><path d="m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z"/></svg>';
+            promptText = `You are my Cora Studio AI Co-Founder. Connect to my workspace remote MCP server at:\nEndpoint: ${mcpUrl}\nAuth Key: ${directToken}\n\nUse cora_get_canvas_code and cora_save_canvas_code to read and write live template code. Inspect active leads, invoices, and operations.`;
+            configSnippet = JSON.stringify({
+                "mcpServers": {
+                    "cora-canvas": {
+                        "command": "npx",
+                        "args": ["-y", "@modelcontextprotocol/server-fetch", mcpUrl],
+                        "env": { "CORA_MCP_TOKEN": directToken }
+                    }
+                }
+            }, null, 2);
+            setupNotes = "Copy the Claude Config JSON into your <code>claude_desktop_config.json</code> file, or paste the AI setup prompt into Claude Web.";
+            externalUrl = "https://claude.ai";
+        } else if (clientId === 'gemini') {
+            title = "Connect Google Gemini (Google AI & CLI)";
+            providerBadgeSvg = '<svg viewBox="0 0 24 24" class="w-4 h-4 fill-current"><path d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/></svg>';
+            promptText = `You are my Cora Studio AI Co-Founder. Connect to my workspace MCP endpoint at ${mcpUrl} with access key: ${directToken}. Manage template code and workspace operations.`;
+            configSnippet = JSON.stringify({
+                "mcpServerUrl": mcpUrl,
+                "clientId": "gemini",
+                "clientSecret": "cora_gemini_oauth_secret"
+            }, null, 2);
+            setupNotes = "In Gemini Connected Apps → Add Custom MCP Server, enter Server URL: <code>" + mcpUrl + "</code>. Gemini connects via RFC 7591 Dynamic Discovery.";
+            externalUrl = "https://gemini.google.com";
+        }
+
+        // Remove any existing modal
+        const oldModal = document.getElementById('cora-connect-sheet-backdrop');
+        if (oldModal) oldModal.remove();
+
+        const modalHtml = `
+            <div id="cora-connect-sheet-backdrop" class="fixed inset-0 bg-zinc-950/70 backdrop-blur-sm z-[9999] flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-200" onclick="if(event.target===this)window.coraCloseClientConnectModal()">
+                <div class="bg-zinc-900 border border-zinc-800 rounded-t-3xl sm:rounded-3xl p-6 sm:p-7 max-w-lg w-full shadow-2xl space-y-4 text-zinc-200">
+                    
+                    <!-- Header -->
+                    <div class="flex items-center justify-between border-b border-zinc-800 pb-3.5">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-xl bg-white text-zinc-950 flex items-center justify-center shadow-xs shrink-0">
+                                ${providerBadgeSvg}
+                            </div>
+                            <div>
+                                <div class="text-sm font-bold text-white">${title}</div>
+                                <div class="text-[11px] text-zinc-400">Universal MCP Zero-Copy Connection</div>
+                            </div>
+                        </div>
+                        <button type="button" onclick="window.coraCloseClientConnectModal()" class="p-1.5 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors border-none bg-transparent cursor-pointer">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+
+                    <p class="text-xs text-zinc-400 leading-relaxed">${setupNotes}</p>
+
+                    <!-- 1-Click AI Prompt Card -->
+                    <div class="space-y-1.5">
+                        <div class="flex items-center justify-between">
+                            <label class="text-xs font-semibold text-zinc-300 flex items-center gap-1.5">
+                                <span>⚡ 1-Click AI Setup Prompt</span>
+                            </label>
+                            <button type="button" onclick="navigator.clipboard.writeText(document.getElementById('cora-connect-prompt-box').value); window.coraShowToast('AI prompt copied!', 'success');" class="text-xs font-semibold text-white hover:underline flex items-center gap-1 bg-transparent border-none cursor-pointer">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                <span>Copy Prompt</span>
+                            </button>
+                        </div>
+                        <textarea id="cora-connect-prompt-box" rows="3" readonly class="w-full text-xs font-mono bg-zinc-950 border border-zinc-800 rounded-xl p-3 outline-none text-zinc-200 leading-relaxed resize-none">${promptText}</textarea>
+                    </div>
+
+                    <!-- Connection Credentials Row -->
+                    <div class="p-3 rounded-2xl bg-zinc-950 border border-zinc-800 space-y-2 text-xs">
+                        <div class="flex items-center justify-between">
+                            <span class="text-zinc-500 font-medium">Server URL:</span>
+                            <div class="flex items-center gap-1.5">
+                                <span class="font-mono text-zinc-200 text-[11px]">${mcpUrl}</span>
+                                <button type="button" onclick="navigator.clipboard.writeText('${mcpUrl}'); window.coraShowToast('URL copied!', 'success');" class="p-1 rounded text-zinc-400 hover:text-white bg-transparent border-none cursor-pointer">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between border-t border-zinc-800 pt-2">
+                            <span class="text-zinc-500 font-medium">Access Key:</span>
+                            <div class="flex items-center gap-1.5">
+                                <span class="font-mono text-zinc-200 text-[11px]">••••••••••••••••</span>
+                                <button type="button" onclick="navigator.clipboard.writeText('${directToken}'); window.coraShowToast('Access key copied!', 'success');" class="p-1 rounded text-zinc-400 hover:text-white bg-transparent border-none cursor-pointer">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer Action -->
+                    <div class="flex items-center justify-between pt-2">
+                        <button type="button" onclick="window.coraCloseClientConnectModal()" class="px-4 py-2 bg-zinc-800 hover:bg-zinc-750 text-zinc-300 rounded-xl text-xs font-semibold cursor-pointer border border-zinc-700/50">Close</button>
+                        ${externalUrl ? `<a href="${externalUrl}" target="_blank" class="px-4 py-2 bg-white hover:bg-zinc-100 text-zinc-950 rounded-xl text-xs font-bold no-underline flex items-center gap-1.5"><span>Open ${clientId === 'chatgpt' ? 'ChatGPT' : (clientId === 'claude' ? 'Claude' : 'Gemini')}</span> ↗</a>` : ''}
+                    </div>
+                </div>
+            </div>`;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+    };
+
+    window.coraCloseClientConnectModal = function() {
+        const modal = document.getElementById('cora-connect-sheet-backdrop');
+        if (modal) modal.remove();
+    };
+
+    // Load active connections dynamically
+    window.coraLoadActiveConnections = async function() {
+        const listContainers = [
+            document.getElementById('cora-canvas-active-connections-list'),
+            document.getElementById('cora-active-connections-list')
+        ].filter(Boolean);
+
+        if (!listContainers.length) return;
+
+        try {
+            const ajaxUrl = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : '/wp-admin/admin-ajax.php';
+            let res = await fetch(ajaxUrl + '?action=cora_get_active_mcp_connections', {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            let data = await res.json();
+            if (!data.success) {
+                const restRes = await fetch('/wp-json/cora/v1/mcp/connections');
+                data = await restRes.json();
+            }
+
+            const connections = (data && data.connections) ? data.connections : [];
+            let html = '';
+            if (!connections.length) {
+                html = `
+                    <div class="p-6 rounded-2xl bg-zinc-950/60 border border-zinc-800 text-center space-y-2">
+                        <div class="w-8 h-8 rounded-full bg-zinc-800 text-zinc-400 mx-auto flex items-center justify-center text-xs">✦</div>
+                        <div class="text-xs font-semibold text-zinc-300">No Active AI Connections</div>
+                        <p class="text-[11px] text-zinc-500 max-w-sm mx-auto">Connect ChatGPT, Claude, Gemini, Cursor, or any MCP client above to interact with your website template and workspace.</p>
+                    </div>`;
+            } else {
+                connections.forEach(conn => {
+                    const scopes = (conn.scopes || []).map(s => `<span class="inline-block px-1.5 py-0.5 rounded bg-zinc-900 text-zinc-400 text-[10px] font-mono border border-zinc-800">${s}</span>`).join(' ');
+                    const dateStr = conn.created_at ? new Date(conn.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recent';
+                    const lastUsed = conn.last_used_at ? new Date(conn.last_used_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Never';
+                    html += `
+                        <div class="p-4 rounded-2xl bg-zinc-950/80 border border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div class="space-y-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs font-bold text-zinc-100">${conn.client_name || 'AI Client'}</span>
+                                    <span class="px-2 py-0.5 rounded-full bg-emerald-950/60 text-emerald-400 text-[9px] font-bold uppercase tracking-wider border border-emerald-800/40">Connected</span>
+                                </div>
+                                <div class="flex flex-wrap gap-1 pt-0.5">${scopes}</div>
+                                <div class="text-[10px] text-zinc-500 pt-0.5">Connected: ${dateStr} • Last active: ${lastUsed} • Workspace: #${conn.workspace_id}</div>
+                            </div>
+                            <button type="button" onclick="window.coraRevokeConnection(${conn.id})" class="self-start sm:self-center px-3 py-1.5 rounded-xl bg-zinc-850 hover:bg-red-950/60 hover:text-red-400 hover:border-red-800/60 text-zinc-300 text-xs font-medium transition-colors cursor-pointer border border-zinc-700/60">
+                                Revoke
+                            </button>
+                        </div>`;
+                });
+            }
+
+            listContainers.forEach(el => el.innerHTML = html);
+        } catch(e) {
+            console.error('Failed to load active MCP connections:', e);
+        }
+    };
+
+    // Revoke connection
+    window.coraRevokeConnection = async function(tokenId) {
+        if (!tokenId) return;
+        try {
+            const ajaxUrl = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : '/wp-admin/admin-ajax.php';
+            let res = await fetch(ajaxUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({
+                    action: 'cora_revoke_mcp_connection',
+                    id: tokenId
+                })
+            });
+            let data = await res.json();
+            if (!data.success) {
+                const restRes = await fetch('/wp-json/cora/v1/mcp/connections/revoke', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: tokenId })
+                });
+                data = await restRes.json();
+            }
+
+            if (data.success) {
+                window.coraShowToast("Connection revoked successfully.", 'success');
+                window.coraLoadActiveConnections();
+            } else {
+                window.coraShowToast("Failed to revoke connection: " + (data.message || data.error || "Unknown error"), 'error');
+            }
+        } catch(e) {
+            window.coraShowToast("Revocation error: " + e.message, 'error');
+        }
+    };
+
+    // Action Playground Mode Switcher
+    window.coraSetCanvasPlaygroundMode = function(mode) {
+        const modes = ['nl', 'guided', 'dev'];
+        modes.forEach(m => {
+            const btn = document.getElementById('cora-canvas-mcp-mode-' + m + '-btn');
+            const panel = document.getElementById('cora-canvas-mcp-panel-' + m);
+            if (m === mode) {
+                if (btn) {
+                    btn.classList.add('bg-zinc-800', 'text-white');
+                    btn.classList.remove('text-zinc-400');
+                }
+                if (panel) panel.style.display = 'block';
+            } else {
+                if (btn) {
+                    btn.classList.remove('bg-zinc-800', 'text-white');
+                    btn.classList.add('text-zinc-400');
+                }
+                if (panel) panel.style.display = 'none';
+            }
+        });
+        if (mode === 'guided') {
+            window.coraOnCanvasGuidedToolChange();
+        }
+    };
+
+    window.coraSetCanvasNLPrompt = function(prompt) {
+        const input = document.getElementById('cora-canvas-mcp-nl-input');
+        if (input) {
+            input.value = prompt;
+            input.focus();
+        }
+    };
+
+    window.coraOnCanvasGuidedToolChange = function() {
+        const select = document.getElementById('cora-canvas-mcp-guided-tool-select');
+        const container = document.getElementById('cora-canvas-mcp-guided-dynamic-fields');
+        if (!select || !container) return;
+        const tool = select.value;
+        const currentThemeId = (typeof activeMcpThemeId !== 'undefined' && activeMcpThemeId) ? activeMcpThemeId : (window.canvasState?.activeThemeId || 0);
+
+        let fieldsHtml = '';
+        if (tool === 'cora_get_canvas_code') {
+            fieldsHtml = `
+                <div>
+                    <label class="block text-[11px] font-medium text-zinc-400 mb-1">Theme ID</label>
+                    <input type="number" id="cora-guided-arg-theme-id" value="${currentThemeId}" class="w-full px-2.5 py-1.5 bg-zinc-900 border border-zinc-800 rounded-lg text-xs font-mono text-zinc-200" />
+                </div>`;
+        } else if (tool === 'cora_save_canvas_code') {
+            fieldsHtml = `
+                <div class="space-y-2">
+                    <div>
+                        <label class="block text-[11px] font-medium text-zinc-400 mb-1">Theme ID</label>
+                        <input type="number" id="cora-guided-arg-theme-id" value="${currentThemeId}" class="w-full px-2.5 py-1.5 bg-zinc-900 border border-zinc-800 rounded-lg text-xs font-mono text-zinc-200" />
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-medium text-zinc-400 mb-1">HTML Code Payload</label>
+                        <textarea id="cora-guided-arg-raw-html" rows="3" class="w-full px-2.5 py-1.5 bg-zinc-900 border border-zinc-800 rounded-lg text-xs font-mono text-zinc-200" placeholder="<!DOCTYPE html>..."></textarea>
+                    </div>
+                </div>`;
+        } else if (tool === 'cora_ask_workspace_copilot') {
+            fieldsHtml = `
+                <div>
+                    <label class="block text-[11px] font-medium text-zinc-400 mb-1">Question / Prompt</label>
+                    <input type="text" id="cora-guided-arg-question" placeholder="Ask AI anything about your workspace..." class="w-full px-2.5 py-1.5 bg-zinc-900 border border-zinc-800 rounded-lg text-xs text-zinc-200" />
+                </div>`;
+        } else {
+            fieldsHtml = `<div class="text-[11px] text-zinc-500 italic">No extra parameters required for this tool.</div>`;
+        }
+        container.innerHTML = fieldsHtml;
+    };
+
+    // Execute NL Command
+    window.coraExecuteCanvasNLCommand = async function() {
+        const input = document.getElementById('cora-canvas-mcp-nl-input');
+        const query = (input?.value || '').trim();
+        if (!query) {
+            window.coraShowToast("Please enter a command prompt.", 'info');
+            return;
+        }
+
+        const runBtn = document.getElementById('cora-canvas-mcp-run-nl-btn');
+        const formattedBox = document.getElementById('cora-canvas-mcp-formatted-output');
+        const rawBox = document.getElementById('cora-canvas-mcp-test-output');
+        const applyBtn = document.getElementById('cora-canvas-apply-code-btn');
+        const token = document.getElementById('cora-mcp-panel-token')?.value || '<?php echo esc_js( $mcp_direct_token ); ?>';
+        const mcpUrl = '<?php echo esc_url( home_url( "/mcp" ) ); ?>';
+
+        if (runBtn) {
+            runBtn.disabled = true;
+            runBtn.innerHTML = '<span class="animate-spin inline-block mr-1">⟳</span> Executing via MCP...';
+        }
+        if (formattedBox) formattedBox.innerHTML = '<div class="flex items-center gap-2 text-zinc-400"><span class="animate-spin text-sm">⟳</span> Running workspace intelligence...</div>';
+        if (applyBtn) applyBtn.classList.add('hidden');
+        lastMcpReturnedHtml = '';
+
+        try {
+            const res = await fetch(mcpUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify({
+                    jsonrpc: '2.0',
+                    method: 'tools/call',
+                    params: {
+                        name: 'cora_ask_workspace_copilot',
+                        arguments: { question: query }
+                    },
+                    id: Date.now()
+                })
+            });
+
+            const data = await res.json();
+            if (rawBox) rawBox.innerText = JSON.stringify(data, null, 2);
+
+            let contentText = '';
+            if (data.result && data.result.content && data.result.content[0]) {
+                contentText = data.result.content[0].text || '';
+            } else if (data.error) {
+                contentText = '❌ Error: ' + (data.error.message || JSON.stringify(data.error));
+            } else {
+                contentText = JSON.stringify(data, null, 2);
+            }
+
+            if (formattedBox) {
+                formattedBox.innerHTML = '<div class="whitespace-pre-wrap font-sans text-xs text-zinc-200 leading-relaxed">' + escapeHtmlForDisplay(contentText) + '</div>';
+            }
+
+            // Check if returned text contains HTML code block
+            const htmlMatch = contentText.match(/```html([\s\S]*?)```/i);
+            if (htmlMatch && htmlMatch[1]) {
+                lastMcpReturnedHtml = htmlMatch[1].trim();
+                if (applyBtn) applyBtn.classList.remove('hidden');
+            } else if (contentText.trim().startsWith('<!DOCTYPE html>') || contentText.trim().startsWith('<html')) {
+                lastMcpReturnedHtml = contentText.trim();
+                if (applyBtn) applyBtn.classList.remove('hidden');
+            }
+        } catch(e) {
+            if (formattedBox) formattedBox.innerHTML = '<div class="text-red-400 text-xs">Execution error: ' + e.message + '</div>';
+        } finally {
+            if (runBtn) {
+                runBtn.disabled = false;
+                runBtn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> <span>Execute Command via MCP</span>';
+            }
+        }
+    };
+
+    // Execute Guided Action
+    window.coraExecuteCanvasGuidedAction = async function() {
+        const select = document.getElementById('cora-canvas-mcp-guided-tool-select');
+        const toolName = select ? select.value : 'cora_get_canvas_code';
+        const formattedBox = document.getElementById('cora-canvas-mcp-formatted-output');
+        const rawBox = document.getElementById('cora-canvas-mcp-test-output');
+        const applyBtn = document.getElementById('cora-canvas-apply-code-btn');
+        const token = document.getElementById('cora-mcp-panel-token')?.value || '<?php echo esc_js( $mcp_direct_token ); ?>';
+        const mcpUrl = '<?php echo esc_url( home_url( "/mcp" ) ); ?>';
+
+        const args = {};
+        if (toolName === 'cora_get_canvas_code') {
+            args.theme_id = parseInt(document.getElementById('cora-guided-arg-theme-id')?.value, 10) || 0;
+        } else if (toolName === 'cora_save_canvas_code') {
+            args.theme_id = parseInt(document.getElementById('cora-guided-arg-theme-id')?.value, 10) || 0;
+            args.raw_html = document.getElementById('cora-guided-arg-raw-html')?.value || '';
+        } else if (toolName === 'cora_ask_workspace_copilot') {
+            args.question = document.getElementById('cora-guided-arg-question')?.value || '';
+        }
+
+        if (formattedBox) formattedBox.innerHTML = '<div class="flex items-center gap-2 text-zinc-400"><span class="animate-spin text-sm">⟳</span> Executing ' + toolName + '...</div>';
+        if (applyBtn) applyBtn.classList.add('hidden');
+        lastMcpReturnedHtml = '';
+
+        try {
+            const res = await fetch(mcpUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify({
+                    jsonrpc: '2.0',
+                    method: 'tools/call',
+                    params: { name: toolName, arguments: args },
+                    id: Date.now()
+                })
+            });
+
+            const data = await res.json();
+            if (rawBox) rawBox.innerText = JSON.stringify(data, null, 2);
+
+            let contentText = '';
+            if (data.result && data.result.content && data.result.content[0]) {
+                contentText = data.result.content[0].text || '';
+            } else if (data.error) {
+                contentText = '❌ Error: ' + (data.error.message || JSON.stringify(data.error));
+            } else {
+                contentText = JSON.stringify(data, null, 2);
+            }
+
+            if (formattedBox) {
+                formattedBox.innerHTML = '<div class="whitespace-pre-wrap font-mono text-[11px] text-zinc-300 leading-relaxed">' + escapeHtmlForDisplay(contentText.slice(0, 1500)) + (contentText.length > 1500 ? '\n\n...[truncated]' : '') + '</div>';
+            }
+
+            if (toolName === 'cora_get_canvas_code' && contentText.trim().startsWith('<!DOCTYPE html>') || contentText.trim().startsWith('<html')) {
+                lastMcpReturnedHtml = contentText.trim();
+                if (applyBtn) applyBtn.classList.remove('hidden');
+            }
+        } catch(e) {
+            if (formattedBox) formattedBox.innerHTML = '<div class="text-red-400 text-xs">Error: ' + e.message + '</div>';
+        }
+    };
+
+    // Execute Raw JSON
+    window.coraExecuteCanvasRawJson = async function() {
+        const rawInput = document.getElementById('cora-canvas-mcp-raw-input')?.value || '';
+        const formattedBox = document.getElementById('cora-canvas-mcp-formatted-output');
+        const rawBox = document.getElementById('cora-canvas-mcp-test-output');
+        const token = document.getElementById('cora-mcp-panel-token')?.value || '<?php echo esc_js( $mcp_direct_token ); ?>';
+        const mcpUrl = '<?php echo esc_url( home_url( "/mcp" ) ); ?>';
+
+        let parsedBody;
+        try {
+            parsedBody = JSON.parse(rawInput);
+        } catch(e) {
+            window.coraShowToast("Invalid JSON syntax in payload: " + e.message, 'error');
+            return;
+        }
+
+        if (formattedBox) formattedBox.innerHTML = '<div class="flex items-center gap-2 text-zinc-400"><span class="animate-spin text-sm">⟳</span> Sending JSON-RPC payload...</div>';
+
+        try {
+            const res = await fetch(mcpUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify(parsedBody)
+            });
+
+            const data = await res.json();
+            if (rawBox) rawBox.innerText = JSON.stringify(data, null, 2);
+            if (formattedBox) formattedBox.innerHTML = '<div class="text-emerald-400 text-xs">Response received (Status: ' + res.status + ')</div>';
+        } catch(e) {
+            if (formattedBox) formattedBox.innerHTML = '<div class="text-red-400 text-xs">Request failed: ' + e.message + '</div>';
+        }
+    };
+
+    // Apply MCP Code to Editor
+    window.coraApplyPlaygroundCodeToEditor = function() {
+        if (!lastMcpReturnedHtml) {
+            window.coraShowToast("No HTML code available to apply.", 'info');
+            return;
+        }
+        if (coraCodeMirrorEditor) {
+            coraCodeMirrorEditor.setValue(lastMcpReturnedHtml);
+        } else {
+            const textarea = document.getElementById('cora-live-html-code-textarea');
+            if (textarea) textarea.value = lastMcpReturnedHtml;
+        }
+        window.switchAiMcpTab('code');
+        window.previewLiveHtmlEditor();
+        window.coraShowToast("HTML code applied to Live Editor & Preview!", 'success');
+    };
+
+    function escapeHtmlForDisplay(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
 
     // Auto-Resume AI Editor if URL param cv_ai_editor=1
     document.addEventListener('DOMContentLoaded', function() {
