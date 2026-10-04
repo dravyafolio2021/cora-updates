@@ -4624,6 +4624,47 @@ function cora_get_sparkline_points( $history, $type ) {
 .wiz-branch-pill:hover{background:#e4e4e7;border-color:#d4d4d8;color:#18181b;}
 .wiz-branch-selected{background:#18181b!important;border-color:#18181b!important;color:white!important;}
 
+#atw {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: 100vw !important;
+    max-height: 100vh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    z-index: 100050 !important;
+    box-sizing: border-box !important;
+    background: #F8F8F7 !important;
+}
+#atw-body {
+    flex: 1 1 auto !important;
+    overflow-y: auto !important;
+    padding-bottom: 84px !important;
+    box-sizing: border-box !important;
+}
+#wiz-footer-bar {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 64px !important;
+    z-index: 100060 !important;
+    width: 100vw !important;
+    background: rgba(248,248,247,.96) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border-top: 1px solid rgba(0,0,0,.08) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 0 28px !important;
+    box-sizing: border-box !important;
+}
+
 .atw-header-bar { padding: 0 28px !important; }
 .atw-title-text { display: inline !important; }
 .atw-lbl-text { display: inline !important; }
@@ -4641,6 +4682,7 @@ function cora_get_sparkline_points( $history, $type ) {
 
 @media (max-width: 640px) {
     .atw-header-bar { padding: 0 12px !important; }
+    #wiz-footer-bar { padding: 0 16px !important; }
     .atw-title-text { display: none !important; }
     .atw-lbl-text { display: none !important; }
     .atw-line-connector { width: 20px !important; margin: 0 3px !important; }
@@ -4652,7 +4694,7 @@ function cora_get_sparkline_points( $history, $type ) {
 }
 </style>
 
-<div id="atw" style="position:fixed;inset:0;z-index:999999;display:none;opacity:0;transition:opacity .22s ease;background:#F8F8F7;flex-direction:column;">
+<div id="atw" style="position:fixed;inset:0;z-index:100050;display:none;opacity:0;transition:opacity .22s ease;background:#F8F8F7;flex-direction:column;">
 
     <!-- TOP BAR -->
     <div style="flex-shrink:0;height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;background:rgba(248,248,247,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(0,0,0,.07);" class="atw-header-bar">
@@ -4705,14 +4747,8 @@ function cora_get_sparkline_points( $history, $type ) {
                 <!-- 1. Quick Launch HTML (AI) (Featured / Default - html_ai) -->
                 <button onclick="wizardSelectBuilder('html_ai')" id="wizard-card-html-ai" class="atw-card atw-sel-h" style="text-align:left;background:#f4f4f5;border:2px solid #18181b;border-radius:18px;overflow:hidden;cursor:pointer;padding:0;box-shadow:0 1px 4px rgba(0,0,0,.06);display:flex;flex-direction:column;justify-content:space-between;">
                     <div style="position:relative;overflow:hidden;background:#09090b;">
-                        <div style="width:100%;padding-bottom:44%;position:relative;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 40%, #27272a 0%, #09090b 100%);">
-                            <!-- Minimalist AI Visual -->
-                            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;">
-                                <div style="width:38px;height:38px;background:white;border-radius:10px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(0,0,0,.4);">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#09090b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                                </div>
-                                <span style="font-size:9.5px;font-weight:800;color:#e4e4e7;letter-spacing:0.04em;font-family:monospace;">AI HTML + TAILWIND</span>
-                            </div>
+                        <div style="width:100%;padding-bottom:44%;position:relative;">
+                            <img src="<?php echo esc_url( plugin_dir_url(dirname(__FILE__)) . 'assets/img/wizard-html-ai-thumb.jpg?v=' . (defined('CORA_WORKSPACE_VERSION') ? CORA_WORKSPACE_VERSION : time()) ); ?>" alt="AI HTML & Tailwind Live Builder" class="atw-thumb" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;" loading="lazy">
                             <div id="atw-ov-h" style="display:flex;position:absolute;inset:0;background:rgba(24,24,27,.45);align-items:center;justify-content:center;">
                                 <div style="width:38px;height:38px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 18px rgba(0,0,0,.2);">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#18181b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
@@ -4721,8 +4757,8 @@ function cora_get_sparkline_points( $history, $type ) {
                         </div>
                         <!-- Top left badge -->
                         <div style="position:absolute;top:10px;left:10px;display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.95);backdrop-filter:blur(8px);border-radius:100px;padding:3px 8px 3px 5px;box-shadow:0 1px 4px rgba(0,0,0,.12);">
-                            <span style="width:6px;height:6px;background:#10b981;border-radius:50%;"></span>
-                            <span style="font-size:9.5px;font-weight:800;color:#18181b;letter-spacing:-.01em;">⚡ 10-Min Live Launch</span>
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#18181b" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                            <span style="font-size:9.5px;font-weight:800;color:#18181b;letter-spacing:-.01em;">10-Min Live Launch</span>
                         </div>
                     </div>
                     <div style="padding:14px 16px 16px;display:flex;flex-direction:column;flex:1;justify-content:space-between;">
@@ -4748,14 +4784,8 @@ function cora_get_sparkline_points( $history, $type ) {
                 <!-- 2. Deploy Next.js (Git) -->
                 <button onclick="wizardSelectBuilder('nextjs')" id="wizard-card-nextjs" class="atw-card" style="text-align:left;background:white;border:2px solid #e4e4e7;border-radius:18px;overflow:hidden;cursor:pointer;padding:0;box-shadow:0 1px 4px rgba(0,0,0,.06);display:flex;flex-direction:column;justify-content:space-between;">
                     <div style="position:relative;overflow:hidden;background:#09090b;">
-                        <div style="width:100%;padding-bottom:44%;position:relative;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 40%, #27272a 0%, #09090b 100%);">
-                            <!-- Next.js Dark Minimalist Visual -->
-                            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;">
-                                <div style="width:38px;height:38px;background:white;border-radius:10px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(0,0,0,.4);">
-                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="#09090b"><path d="M12 2L2 19.7778H22L12 2Z"/></svg>
-                                </div>
-                                <span style="font-size:9.5px;font-weight:800;color:#e4e4e7;letter-spacing:0.04em;font-family:monospace;">NEXT.JS APP ROUTER</span>
-                            </div>
+                        <div style="width:100%;padding-bottom:44%;position:relative;">
+                            <img src="<?php echo esc_url( plugin_dir_url(dirname(__FILE__)) . 'assets/img/wizard-nextjs-thumb.jpg?v=' . (defined('CORA_WORKSPACE_VERSION') ? CORA_WORKSPACE_VERSION : time()) ); ?>" alt="Deploy Next.js (Git)" class="atw-thumb" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;" loading="lazy">
                             <div id="atw-ov-n" style="display:none;position:absolute;inset:0;background:rgba(24,24,27,.45);align-items:center;justify-content:center;">
                                 <div style="width:38px;height:38px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 18px rgba(0,0,0,.2);">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#18181b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
@@ -4874,7 +4904,8 @@ function cora_get_sparkline_points( $history, $type ) {
             <div style="width:100%;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid #e4e4e7;">
                 <div>
                     <div style="display:inline-flex;align-items:center;gap:6px;padding:3px 10px;background:#18181b;border-radius:100px;margin-bottom:6px;">
-                        <span style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:white;">⚡ Claude & ChatGPT Master Prompts</span>
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                        <span style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:white;">Claude & ChatGPT Master Prompts</span>
                     </div>
                     <h2 style="font-size:22px;font-weight:900;color:#18181b;letter-spacing:-.03em;line-height:1.2;">Choose a Business Template Prompt or Connect Code</h2>
                     <p style="font-size:12px;color:#71717a;margin-top:2px;">Select from 6 curated master prompts, or switch tabs to paste your custom HTML code directly.</p>
@@ -4899,15 +4930,15 @@ function cora_get_sparkline_points( $history, $type ) {
                 <div style="display:inline-flex;background:#e4e4e7;border-radius:10px;padding:3px;gap:3px;">
                     <button type="button" onclick="window.wizardSetHtmlStepTab('templates')" id="wiz-step2-tab-templates" class="atw-tab atw-tab-on" style="padding:6px 14px;font-size:11.5px;font-weight:700;display:inline-flex;align-items:center;gap:6px;">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                        <span>⚡ 1. Pick AI Template Prompt (6)</span>
+                        <span>1. Pick AI Template Prompt (6)</span>
                     </button>
                     <button type="button" onclick="window.wizardSetHtmlStepTab('paste')" id="wiz-step2-tab-paste" class="atw-tab atw-tab-off" style="padding:6px 14px;font-size:11.5px;font-weight:700;display:inline-flex;align-items:center;gap:6px;">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-                        <span>📝 2. Paste Custom HTML / Drop File</span>
+                        <span>2. Paste Custom HTML / Drop File</span>
                     </button>
                     <button type="button" onclick="window.wizardSetHtmlStepTab('github')" id="wiz-step2-tab-github" class="atw-tab atw-tab-off" style="padding:6px 14px;font-size:11.5px;font-weight:700;display:inline-flex;align-items:center;gap:6px;">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                        <span>🐙 3. Connect GitHub Repo</span>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                        <span>3. Connect GitHub Repo</span>
                     </button>
                 </div>
             </div>
@@ -4919,211 +4950,199 @@ function cora_get_sparkline_points( $history, $type ) {
                 <div class="atw-prompts-grid" id="wiz-templates-container">
 
                     <!-- 1. Creative Agency & Video Studio -->
-                    <div onclick="window.selectHtmlTemplate('agency', 'Creative Agency & Video Studio')" id="wiz-tcard-agency" data-template-name="Creative Agency & Video Studio agency video portfolio production" class="atw-template-card atw-sel-t" style="display:flex;flex-direction:column;justify-content:space-between;padding:16px;">
+                    <div onclick="window.selectHtmlTemplate('agency', 'Creative Agency & Video Studio')" id="wiz-tcard-agency" data-template-name="Creative Agency & Video Studio agency video portfolio production" class="atw-template-card atw-sel-t" style="display:flex;flex-direction:column;justify-content:space-between;padding:14px;border-radius:14px;background:white;border:1.5px solid #18181b;">
                         <div>
                             <!-- Visual Preview Thumbnail -->
-                            <div style="height:100px;border-radius:10px;background:radial-gradient(circle at 50% 30%, #27272a 0%, #09090b 100%);display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:12px;overflow:hidden;border:1px solid #27272a;">
-                                <div style="display:flex;flex-direction:column;align-items:center;gap:5px;">
-                                    <div style="width:32px;height:32px;background:rgba(255,255,255,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.15);">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                                    </div>
-                                    <span style="font-size:9px;font-weight:800;color:#e4e4e7;letter-spacing:0.04em;font-family:monospace;">CREATIVE AGENCY</span>
-                                </div>
-                                <span style="position:absolute;top:6px;right:6px;font-size:8px;font-weight:800;color:#10b981;background:rgba(16,185,129,0.15);padding:2px 6px;border-radius:4px;border:1px solid rgba(16,185,129,0.3);">Dark Minimal</span>
+                            <div style="height:108px;border-radius:10px;background:#18181b;display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:10px;overflow:hidden;border:1px solid #27272a;">
+                                <img src="<?php echo esc_url( plugin_dir_url(dirname(__FILE__)) . 'assets/img/tmpl_agency_preview.jpg?v=' . (defined('CORA_WORKSPACE_VERSION') ? CORA_WORKSPACE_VERSION : time()) ); ?>" alt="Creative Agency" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" loading="lazy">
+                                <span style="position:absolute;top:6px;right:6px;font-size:8px;font-weight:800;color:#10b981;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);padding:2px 6px;border-radius:4px;border:1px solid rgba(16,185,129,0.4);">Dark Minimal</span>
                             </div>
 
-                            <h3 style="font-size:13.5px;font-weight:800;color:#18181b;letter-spacing:-0.02em;margin-bottom:4px;">🎨 Creative Agency & Video Studio</h3>
-                            <p style="font-size:11px;color:#71717a;line-height:1.4;margin-bottom:10px;">Tailwind CDN, dark minimalist aesthetic, video reel hero, portfolio showcase, services matrix, and native lead consultation form.</p>
+                            <h3 style="font-size:13px;font-weight:800;color:#18181b;letter-spacing:-0.02em;margin-bottom:4px;display:flex;align-items:center;gap:5px;">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                <span>Creative Agency & Video Studio</span>
+                            </h3>
+                            <p style="font-size:11px;color:#71717a;line-height:1.4;margin-bottom:8px;">Tailwind CDN, dark minimalist aesthetic, video reel hero, portfolio showcase, services matrix, and native lead consultation form.</p>
                             
-                            <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px;">
+                            <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;">
                                 <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Tailwind CDN</span>
                                 <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Native Lead Form</span>
                                 <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Mobile 100%</span>
                             </div>
                         </div>
 
-                        <div style="display:flex;flex-direction:column;gap:5px;border-top:1px solid #f4f4f5;padding-top:10px;">
-                            <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('agency');" style="width:100%;padding:7px 10px;background:#f4f4f5;border:1px solid #e4e4e7;border-radius:7px;font-size:10.5px;font-weight:700;color:#18181b;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;">
+                        <div style="display:flex;flex-direction:column;gap:5px;border-top:1px solid #f4f4f5;padding-top:8px;">
+                            <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('agency');" style="width:100%;padding:6px 10px;background:#f4f4f5;border:1px solid #e4e4e7;border-radius:7px;font-size:10.5px;font-weight:700;color:#18181b;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;">
                                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                                <span>📋 Copy Prompt for Claude / ChatGPT</span>
+                                <span>Copy Prompt for Claude / ChatGPT</span>
                             </button>
-                            <button type="button" onclick="event.stopPropagation(); window.useTemplateAndSwitchToCode('agency', 'Creative Agency & Video Studio');" style="width:100%;padding:7px 10px;background:#18181b;border:none;border-radius:7px;font-size:10.5px;font-weight:700;color:white;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;">
-                                <span>⚡ Use Template & Connect Code →</span>
+                            <button type="button" onclick="event.stopPropagation(); window.useTemplateAndSwitchToCode('agency', 'Creative Agency & Video Studio');" style="width:100%;padding:6px 10px;background:#18181b;border:none;border-radius:7px;font-size:10.5px;font-weight:700;color:white;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;">
+                                <span>Use Template & Connect Code →</span>
                             </button>
                         </div>
                     </div>
 
                     <!-- 2. AI SaaS & Software Landing -->
-                    <div onclick="window.selectHtmlTemplate('saas', 'AI SaaS & Software Landing')" id="wiz-tcard-saas" data-template-name="AI SaaS & Software Landing saas software platform app tech" class="atw-template-card" style="display:flex;flex-direction:column;justify-content:space-between;padding:16px;">
+                    <div onclick="window.selectHtmlTemplate('saas', 'AI SaaS & Software Landing')" id="wiz-tcard-saas" data-template-name="AI SaaS & Software Landing saas software platform app tech" class="atw-template-card" style="display:flex;flex-direction:column;justify-content:space-between;padding:14px;border-radius:14px;background:white;border:1.5px solid #e4e4e7;">
                         <div>
                             <!-- Visual Preview Thumbnail -->
-                            <div style="height:100px;border-radius:10px;background:radial-gradient(circle at 50% 30%, #1e1b4b 0%, #09090b 100%);display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:12px;overflow:hidden;border:1px solid #2e1065;">
-                                <div style="display:flex;flex-direction:column;align-items:center;gap:5px;">
-                                    <div style="width:32px;height:32px;background:rgba(255,255,255,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.15);">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-                                    </div>
-                                    <span style="font-size:9px;font-weight:800;color:#c4b5fd;letter-spacing:0.04em;font-family:monospace;">AI SAAS PLATFORM</span>
-                                </div>
-                                <span style="position:absolute;top:6px;right:6px;font-size:8px;font-weight:800;color:#a78bfa;background:rgba(167,139,250,0.15);padding:2px 6px;border-radius:4px;border:1px solid rgba(167,139,250,0.3);">High Tech</span>
+                            <div style="height:108px;border-radius:10px;background:#18181b;display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:10px;overflow:hidden;border:1px solid #27272a;">
+                                <img src="<?php echo esc_url( plugin_dir_url(dirname(__FILE__)) . 'assets/img/tmpl_saas_preview.jpg?v=' . (defined('CORA_WORKSPACE_VERSION') ? CORA_WORKSPACE_VERSION : time()) ); ?>" alt="AI SaaS Platform" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" loading="lazy">
+                                <span style="position:absolute;top:6px;right:6px;font-size:8px;font-weight:800;color:#a78bfa;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);padding:2px 6px;border-radius:4px;border:1px solid rgba(167,139,250,0.4);">High Tech</span>
                             </div>
 
-                            <h3 style="font-size:13.5px;font-weight:800;color:#18181b;letter-spacing:-0.02em;margin-bottom:4px;">⚡ AI SaaS & Software Landing</h3>
-                            <p style="font-size:11px;color:#71717a;line-height:1.4;margin-bottom:10px;">Modern tech layout, live status pill, interactive feature grid, pricing tiers with toggle, and native product demo form.</p>
+                            <h3 style="font-size:13px;font-weight:800;color:#18181b;letter-spacing:-0.02em;margin-bottom:4px;display:flex;align-items:center;gap:5px;">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                                <span>AI SaaS & Software Landing</span>
+                            </h3>
+                            <p style="font-size:11px;color:#71717a;line-height:1.4;margin-bottom:8px;">Modern tech layout, live status pill, interactive feature grid, pricing tiers with toggle, and native product demo form.</p>
                             
-                            <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px;">
+                            <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;">
                                 <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Tailwind CDN</span>
                                 <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Native Lead Form</span>
                                 <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Pricing Toggle</span>
                             </div>
                         </div>
 
-                        <div style="display:flex;flex-direction:column;gap:5px;border-top:1px solid #f4f4f5;padding-top:10px;">
-                            <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('saas');" style="width:100%;padding:7px 10px;background:#f4f4f5;border:1px solid #e4e4e7;border-radius:7px;font-size:10.5px;font-weight:700;color:#18181b;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;">
+                        <div style="display:flex;flex-direction:column;gap:5px;border-top:1px solid #f4f4f5;padding-top:8px;">
+                            <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('saas');" style="width:100%;padding:6px 10px;background:#f4f4f5;border:1px solid #e4e4e7;border-radius:7px;font-size:10.5px;font-weight:700;color:#18181b;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;">
                                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                                <span>📋 Copy Prompt for Claude / ChatGPT</span>
+                                <span>Copy Prompt for Claude / ChatGPT</span>
                             </button>
-                            <button type="button" onclick="event.stopPropagation(); window.useTemplateAndSwitchToCode('saas', 'AI SaaS & Software Landing');" style="width:100%;padding:7px 10px;background:#18181b;border:none;border-radius:7px;font-size:10.5px;font-weight:700;color:white;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;">
-                                <span>⚡ Use Template & Connect Code →</span>
+                            <button type="button" onclick="event.stopPropagation(); window.useTemplateAndSwitchToCode('saas', 'AI SaaS & Software Landing');" style="width:100%;padding:6px 10px;background:#18181b;border:none;border-radius:7px;font-size:10.5px;font-weight:700;color:white;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;">
+                                <span>Use Template & Connect Code →</span>
                             </button>
                         </div>
                     </div>
 
                     <!-- 3. B2B Advisory & Management Consulting -->
-                    <div onclick="window.selectHtmlTemplate('consulting', 'B2B Advisory & Management Consulting')" id="wiz-tcard-consulting" data-template-name="B2B Advisory & Management Consulting consulting b2b corporate finance executive" class="atw-template-card" style="display:flex;flex-direction:column;justify-content:space-between;padding:16px;">
+                    <div onclick="window.selectHtmlTemplate('consulting', 'B2B Advisory & Management Consulting')" id="wiz-tcard-consulting" data-template-name="B2B Advisory & Management Consulting consulting b2b corporate finance executive" class="atw-template-card" style="display:flex;flex-direction:column;justify-content:space-between;padding:14px;border-radius:14px;background:white;border:1.5px solid #e4e4e7;">
                         <div>
                             <!-- Visual Preview Thumbnail -->
-                            <div style="height:100px;border-radius:10px;background:radial-gradient(circle at 50% 30%, #1c1917 0%, #09090b 100%);display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:12px;overflow:hidden;border:1px solid #292524;">
-                                <div style="display:flex;flex-direction:column;align-items:center;gap:5px;">
-                                    <div style="width:32px;height:32px;background:rgba(255,255,255,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.15);">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d6d3d1" stroke-width="2"><path d="M20 7h-7L10 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg>
-                                    </div>
-                                    <span style="font-size:9px;font-weight:800;color:#e7e5e4;letter-spacing:0.04em;font-family:monospace;">EXECUTIVE ADVISORY</span>
-                                </div>
-                                <span style="position:absolute;top:6px;right:6px;font-size:8px;font-weight:800;color:#fbbf24;background:rgba(251,191,36,0.15);padding:2px 6px;border-radius:4px;border:1px solid rgba(251,191,36,0.3);">Editorial Luxury</span>
+                            <div style="height:108px;border-radius:10px;background:#18181b;display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:10px;overflow:hidden;border:1px solid #27272a;">
+                                <img src="<?php echo esc_url( plugin_dir_url(dirname(__FILE__)) . 'assets/img/tmpl_consulting_preview.jpg?v=' . (defined('CORA_WORKSPACE_VERSION') ? CORA_WORKSPACE_VERSION : time()) ); ?>" alt="B2B Advisory" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" loading="lazy">
+                                <span style="position:absolute;top:6px;right:6px;font-size:8px;font-weight:800;color:#fbbf24;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);padding:2px 6px;border-radius:4px;border:1px solid rgba(251,191,36,0.4);">Editorial Luxury</span>
                             </div>
 
-                            <h3 style="font-size:13.5px;font-weight:800;color:#18181b;letter-spacing:-0.02em;margin-bottom:4px;">💼 B2B Advisory & Consulting</h3>
-                            <p style="font-size:11px;color:#71717a;line-height:1.4;margin-bottom:10px;">Editorial layout, client partner logos, strategic services breakdown, case study metrics, and native executive audit form.</p>
+                            <h3 style="font-size:13px;font-weight:800;color:#18181b;letter-spacing:-0.02em;margin-bottom:4px;display:flex;align-items:center;gap:5px;">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                                <span>B2B Advisory & Consulting</span>
+                            </h3>
+                            <p style="font-size:11px;color:#71717a;line-height:1.4;margin-bottom:8px;">Editorial layout, client partner logos, strategic services breakdown, case study metrics, and native executive audit form.</p>
                             
-                            <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px;">
+                            <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;">
                                 <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Tailwind CDN</span>
                                 <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Native Lead Form</span>
                                 <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Case Studies</span>
                             </div>
                         </div>
 
-                        <div style="display:flex;flex-direction:column;gap:5px;border-top:1px solid #f4f4f5;padding-top:10px;">
-                            <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('consulting');" style="width:100%;padding:7px 10px;background:#f4f4f5;border:1px solid #e4e4e7;border-radius:7px;font-size:10.5px;font-weight:700;color:#18181b;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;">
+                        <div style="display:flex;flex-direction:column;gap:5px;border-top:1px solid #f4f4f5;padding-top:8px;">
+                            <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('consulting');" style="width:100%;padding:6px 10px;background:#f4f4f5;border:1px solid #e4e4e7;border-radius:7px;font-size:10.5px;font-weight:700;color:#18181b;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;">
                                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                                <span>📋 Copy Prompt for Claude / ChatGPT</span>
+                                <span>Copy Prompt for Claude / ChatGPT</span>
                             </button>
-                            <button type="button" onclick="event.stopPropagation(); window.useTemplateAndSwitchToCode('consulting', 'B2B Advisory & Management Consulting');" style="width:100%;padding:7px 10px;background:#18181b;border:none;border-radius:7px;font-size:10.5px;font-weight:700;color:white;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;">
-                                <span>⚡ Use Template & Connect Code →</span>
+                            <button type="button" onclick="event.stopPropagation(); window.useTemplateAndSwitchToCode('consulting', 'B2B Advisory & Management Consulting');" style="width:100%;padding:6px 10px;background:#18181b;border:none;border-radius:7px;font-size:10.5px;font-weight:700;color:white;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;">
+                                <span>Use Template & Connect Code →</span>
                             </button>
                         </div>
                     </div>
 
                     <!-- 4. Photography Studio & Production House -->
-                    <div onclick="window.selectHtmlTemplate('photography', 'Photography Studio & Production House')" id="wiz-tcard-photography" data-template-name="Photography Studio & Production House photo studio photography gallery creative" class="atw-template-card" style="display:flex;flex-direction:column;justify-content:space-between;padding:16px;">
+                    <div onclick="window.selectHtmlTemplate('photography', 'Photography Studio & Production House')" id="wiz-tcard-photography" data-template-name="Photography Studio & Production House photo studio photography gallery creative" class="atw-template-card" style="display:flex;flex-direction:column;justify-content:space-between;padding:14px;border-radius:14px;background:white;border:1.5px solid #e4e4e7;">
                         <div>
                             <!-- Visual Preview Thumbnail -->
-                            <div style="height:100px;border-radius:10px;background:radial-gradient(circle at 50% 30%, #18181b 0%, #09090b 100%);display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:12px;overflow:hidden;border:1px solid #27272a;">
-                                <div style="display:flex;flex-direction:column;align-items:center;gap:5px;">
-                                    <div style="width:32px;height:32px;background:rgba(255,255,255,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.15);">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                                    </div>
-                                    <span style="font-size:9px;font-weight:800;color:#bae6fd;letter-spacing:0.04em;font-family:monospace;">PHOTO STUDIO</span>
-                                </div>
-                                <span style="position:absolute;top:6px;right:6px;font-size:8px;font-weight:800;color:#38bdf8;background:rgba(56,189,248,0.15);padding:2px 6px;border-radius:4px;border:1px solid rgba(56,189,248,0.3);">Visual Gallery</span>
+                            <div style="height:108px;border-radius:10px;background:#18181b;display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:10px;overflow:hidden;border:1px solid #27272a;">
+                                <img src="<?php echo esc_url( plugin_dir_url(dirname(__FILE__)) . 'assets/img/tmpl_photography_preview.jpg?v=' . (defined('CORA_WORKSPACE_VERSION') ? CORA_WORKSPACE_VERSION : time()) ); ?>" alt="Photography Studio" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" loading="lazy">
+                                <span style="position:absolute;top:6px;right:6px;font-size:8px;font-weight:800;color:#38bdf8;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);padding:2px 6px;border-radius:4px;border:1px solid rgba(56,189,248,0.4);">Visual Gallery</span>
                             </div>
 
-                            <h3 style="font-size:13.5px;font-weight:800;color:#18181b;letter-spacing:-0.02em;margin-bottom:4px;">📸 Photography Studio & Production</h3>
-                            <p style="font-size:11px;color:#71717a;line-height:1.4;margin-bottom:10px;">High-end visual gallery, package cards with GST breakdown, studio space specs, and native booking inquiry form.</p>
+                            <h3 style="font-size:13px;font-weight:800;color:#18181b;letter-spacing:-0.02em;margin-bottom:4px;display:flex;align-items:center;gap:5px;">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                                <span>Photography Studio & Production</span>
+                            </h3>
+                            <p style="font-size:11px;color:#71717a;line-height:1.4;margin-bottom:8px;">High-end visual gallery, package cards with GST breakdown, studio space specs, and native booking inquiry form.</p>
                             
-                            <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px;">
+                            <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;">
                                 <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Tailwind CDN</span>
                                 <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Native Lead Form</span>
                                 <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Photo Gallery</span>
                             </div>
                         </div>
 
-                        <div style="display:flex;flex-direction:column;gap:5px;border-top:1px solid #f4f4f5;padding-top:10px;">
-                            <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('photography');" style="width:100%;padding:7px 10px;background:#f4f4f5;border:1px solid #e4e4e7;border-radius:7px;font-size:10.5px;font-weight:700;color:#18181b;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;">
+                        <div style="display:flex;flex-direction:column;gap:5px;border-top:1px solid #f4f4f5;padding-top:8px;">
+                            <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('photography');" style="width:100%;padding:6px 10px;background:#f4f4f5;border:1px solid #e4e4e7;border-radius:7px;font-size:10.5px;font-weight:700;color:#18181b;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;">
                                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                                <span>📋 Copy Prompt for Claude / ChatGPT</span>
+                                <span>Copy Prompt for Claude / ChatGPT</span>
                             </button>
-                            <button type="button" onclick="event.stopPropagation(); window.useTemplateAndSwitchToCode('photography', 'Photography Studio & Production House');" style="width:100%;padding:7px 10px;background:#18181b;border:none;border-radius:7px;font-size:10.5px;font-weight:700;color:white;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;">
-                                <span>⚡ Use Template & Connect Code →</span>
+                            <button type="button" onclick="event.stopPropagation(); window.useTemplateAndSwitchToCode('photography', 'Photography Studio & Production House');" style="width:100%;padding:6px 10px;background:#18181b;border:none;border-radius:7px;font-size:10.5px;font-weight:700;color:white;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;">
+                                <span>Use Template & Connect Code →</span>
                             </button>
                         </div>
                     </div>
 
                     <!-- 5. Luxury Real Estate & Property Showcase -->
-                    <div onclick="window.selectHtmlTemplate('realestate', 'Luxury Real Estate & Property Showcase')" id="wiz-tcard-realestate" data-template-name="Luxury Real Estate & Property Showcase real estate property architecture luxury home" class="atw-template-card" style="display:flex;flex-direction:column;justify-content:space-between;padding:16px;">
+                    <div onclick="window.selectHtmlTemplate('realestate', 'Luxury Real Estate & Property Showcase')" id="wiz-tcard-realestate" data-template-name="Luxury Real Estate & Property Showcase real estate property architecture luxury home" class="atw-template-card" style="display:flex;flex-direction:column;justify-content:space-between;padding:14px;border-radius:14px;background:white;border:1.5px solid #e4e4e7;">
                         <div>
                             <!-- Visual Preview Thumbnail -->
-                            <div style="height:100px;border-radius:10px;background:radial-gradient(circle at 50% 30%, #064e3b 0%, #09090b 100%);display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:12px;overflow:hidden;border:1px solid #065f46;">
-                                <div style="display:flex;flex-direction:column;align-items:center;gap:5px;">
-                                    <div style="width:32px;height:32px;background:rgba(255,255,255,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.15);">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-                                    </div>
-                                    <span style="font-size:9px;font-weight:800;color:#a7f3d0;letter-spacing:0.04em;font-family:monospace;">REAL ESTATE</span>
-                                </div>
-                                <span style="position:absolute;top:6px;right:6px;font-size:8px;font-weight:800;color:#34d399;background:rgba(52,211,153,0.15);padding:2px 6px;border-radius:4px;border:1px solid rgba(52,211,153,0.3);">Luxury Estates</span>
+                            <div style="height:108px;border-radius:10px;background:#18181b;display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:10px;overflow:hidden;border:1px solid #27272a;">
+                                <img src="<?php echo esc_url( plugin_dir_url(dirname(__FILE__)) . 'assets/img/tmpl_realestate_preview.jpg?v=' . (defined('CORA_WORKSPACE_VERSION') ? CORA_WORKSPACE_VERSION : time()) ); ?>" alt="Luxury Real Estate" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" loading="lazy">
+                                <span style="position:absolute;top:6px;right:6px;font-size:8px;font-weight:800;color:#34d399;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);padding:2px 6px;border-radius:4px;border:1px solid rgba(52,211,153,0.4);">Luxury Estates</span>
                             </div>
 
-                            <h3 style="font-size:13.5px;font-weight:800;color:#18181b;letter-spacing:-0.02em;margin-bottom:4px;">🏡 Luxury Real Estate Showcase</h3>
-                            <p style="font-size:11px;color:#71717a;line-height:1.4;margin-bottom:10px;">Architectural luxury layout, property grid with filters, interactive neighborhood map specs, and VIP tour scheduling form.</p>
+                            <h3 style="font-size:13px;font-weight:800;color:#18181b;letter-spacing:-0.02em;margin-bottom:4px;display:flex;align-items:center;gap:5px;">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                                <span>Luxury Real Estate Showcase</span>
+                            </h3>
+                            <p style="font-size:11px;color:#71717a;line-height:1.4;margin-bottom:8px;">Architectural luxury layout, property grid with filters, interactive neighborhood map specs, and VIP tour scheduling form.</p>
                             
-                            <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px;">
+                            <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;">
                                 <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Tailwind CDN</span>
                                 <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Native Lead Form</span>
                                 <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Property Grid</span>
                             </div>
                         </div>
 
-                        <div style="display:flex;flex-direction:column;gap:5px;border-top:1px solid #f4f4f5;padding-top:10px;">
-                            <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('realestate');" style="width:100%;padding:7px 10px;background:#f4f4f5;border:1px solid #e4e4e7;border-radius:7px;font-size:10.5px;font-weight:700;color:#18181b;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;">
+                        <div style="display:flex;flex-direction:column;gap:5px;border-top:1px solid #f4f4f5;padding-top:8px;">
+                            <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('realestate');" style="width:100%;padding:6px 10px;background:#f4f4f5;border:1px solid #e4e4e7;border-radius:7px;font-size:10.5px;font-weight:700;color:#18181b;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;">
                                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                                <span>📋 Copy Prompt for Claude / ChatGPT</span>
+                                <span>Copy Prompt for Claude / ChatGPT</span>
                             </button>
-                            <button type="button" onclick="event.stopPropagation(); window.useTemplateAndSwitchToCode('realestate', 'Luxury Real Estate & Property Showcase');" style="width:100%;padding:7px 10px;background:#18181b;border:none;border-radius:7px;font-size:10.5px;font-weight:700;color:white;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;">
-                                <span>⚡ Use Template & Connect Code →</span>
+                            <button type="button" onclick="event.stopPropagation(); window.useTemplateAndSwitchToCode('realestate', 'Luxury Real Estate & Property Showcase');" style="width:100%;padding:6px 10px;background:#18181b;border:none;border-radius:7px;font-size:10.5px;font-weight:700;color:white;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;">
+                                <span>Use Template & Connect Code →</span>
                             </button>
                         </div>
                     </div>
 
                     <!-- 6. Modern E-Commerce & DTC Brand -->
-                    <div onclick="window.selectHtmlTemplate('ecommerce', 'Modern E-Commerce & DTC Brand')" id="wiz-tcard-ecommerce" data-template-name="Modern E-Commerce & DTC Brand ecommerce store dtc shop product brand" class="atw-template-card" style="display:flex;flex-direction:column;justify-content:space-between;padding:16px;">
+                    <div onclick="window.selectHtmlTemplate('ecommerce', 'Modern E-Commerce & DTC Brand')" id="wiz-tcard-ecommerce" data-template-name="Modern E-Commerce & DTC Brand ecommerce store dtc shop product brand" class="atw-template-card" style="display:flex;flex-direction:column;justify-content:space-between;padding:14px;border-radius:14px;background:white;border:1.5px solid #e4e4e7;">
                         <div>
                             <!-- Visual Preview Thumbnail -->
-                            <div style="height:100px;border-radius:10px;background:radial-gradient(circle at 50% 30%, #701a75 0%, #09090b 100%);display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:12px;overflow:hidden;border:1px solid #86198f;">
-                                <div style="display:flex;flex-direction:column;align-items:center;gap:5px;">
-                                    <div style="width:32px;height:32px;background:rgba(255,255,255,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.15);">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f472b6" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
-                                    </div>
-                                    <span style="font-size:9px;font-weight:800;color:#fbcfe8;letter-spacing:0.04em;font-family:monospace;">DTC BRAND STORE</span>
-                                </div>
-                                <span style="position:absolute;top:6px;right:6px;font-size:8px;font-weight:800;color:#f472b6;background:rgba(244,114,182,0.15);padding:2px 6px;border-radius:4px;border:1px solid rgba(244,114,182,0.3);">DTC Shop</span>
+                            <div style="height:108px;border-radius:10px;background:#18181b;display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:10px;overflow:hidden;border:1px solid #27272a;">
+                                <img src="<?php echo esc_url( plugin_dir_url(dirname(__FILE__)) . 'assets/img/tmpl_ecommerce_preview.jpg?v=' . (defined('CORA_WORKSPACE_VERSION') ? CORA_WORKSPACE_VERSION : time()) ); ?>" alt="Modern E-Commerce" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" loading="lazy">
+                                <span style="position:absolute;top:6px;right:6px;font-size:8px;font-weight:800;color:#f472b6;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);padding:2px 6px;border-radius:4px;border:1px solid rgba(244,114,182,0.4);">DTC Shop</span>
                             </div>
 
-                            <h3 style="font-size:13.5px;font-weight:800;color:#18181b;letter-spacing:-0.02em;margin-bottom:4px;">🛍️ Modern E-Commerce & DTC Brand</h3>
-                            <p style="font-size:11px;color:#71717a;line-height:1.4;margin-bottom:10px;">High-converting product showcase, feature highlights, customer review rating, and direct order / checkout inquiry form.</p>
+                            <h3 style="font-size:13px;font-weight:800;color:#18181b;letter-spacing:-0.02em;margin-bottom:4px;display:flex;align-items:center;gap:5px;">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                                <span>Modern E-Commerce & DTC Brand</span>
+                            </h3>
+                            <p style="font-size:11px;color:#71717a;line-height:1.4;margin-bottom:8px;">High-converting product showcase, feature highlights, customer review rating, and direct order / checkout inquiry form.</p>
                             
-                            <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px;">
+                            <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;">
                                 <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Tailwind CDN</span>
                                 <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Native Lead Form</span>
                                 <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Product Showcase</span>
                             </div>
                         </div>
 
-                        <div style="display:flex;flex-direction:column;gap:5px;border-top:1px solid #f4f4f5;padding-top:10px;">
-                            <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('ecommerce');" style="width:100%;padding:7px 10px;background:#f4f4f5;border:1px solid #e4e4e7;border-radius:7px;font-size:10.5px;font-weight:700;color:#18181b;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;">
+                        <div style="display:flex;flex-direction:column;gap:5px;border-top:1px solid #f4f4f5;padding-top:8px;">
+                            <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('ecommerce');" style="width:100%;padding:6px 10px;background:#f4f4f5;border:1px solid #e4e4e7;border-radius:7px;font-size:10.5px;font-weight:700;color:#18181b;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;">
                                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                                <span>📋 Copy Prompt for Claude / ChatGPT</span>
+                                <span>Copy Prompt for Claude / ChatGPT</span>
                             </button>
-                            <button type="button" onclick="event.stopPropagation(); window.useTemplateAndSwitchToCode('ecommerce', 'Modern E-Commerce & DTC Brand');" style="width:100%;padding:7px 10px;background:#18181b;border:none;border-radius:7px;font-size:10.5px;font-weight:700;color:white;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;">
-                                <span>⚡ Use Template & Connect Code →</span>
+                            <button type="button" onclick="event.stopPropagation(); window.useTemplateAndSwitchToCode('ecommerce', 'Modern E-Commerce & DTC Brand');" style="width:100%;padding:6px 10px;background:#18181b;border:none;border-radius:7px;font-size:10.5px;font-weight:700;color:white;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;">
+                                <span>Use Template & Connect Code →</span>
                             </button>
                         </div>
                     </div>
@@ -5143,7 +5162,7 @@ function cora_get_sparkline_points( $history, $type ) {
                         </div>
                         <button type="button" onclick="window.previewPastedHtml()" style="display:inline-flex;align-items:center;gap:5px;padding:6px 12px;background:#18181b;color:white;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;font-family:inherit;">
                             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
-                            <span>👁 Preview Render in Modal</span>
+                            <span>Preview Render in Modal</span>
                         </button>
                     </div>
 
@@ -5671,7 +5690,7 @@ function cora_get_sparkline_points( $history, $type ) {
     </div><!-- /body -->
 
     <!-- STICKY FOOTER -->
-    <div style="flex-shrink:0;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;background:rgba(248,248,247,.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(0,0,0,.08);position:sticky;bottom:0;z-index:100;">
+    <div id="wiz-footer-bar">
         <button id="wiz-back-btn" onclick="wizardBack()" style="display:none;align-items:center;gap:6px;padding:9px 18px;background:white;border:1.5px solid #e4e4e7;border-radius:10px;font-size:12px;font-weight:700;color:#52525b;cursor:pointer;transition:all .15s;font-family:inherit;box-shadow:0 1px 2px rgba(0,0,0,.04);" onmouseover="this.style.background='#f4f4f5'" onmouseout="this.style.background='white'">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
             Back
@@ -12354,7 +12373,7 @@ Return ONLY clean, standalone HTML in an <!DOCTYPE html> document.`
 
         if (navigator.clipboard && navigator.clipboard.writeText) {
             navigator.clipboard.writeText(prompt).then(function() {
-                showToast('📋 ' + name + ' prompt copied to clipboard! Paste into Claude or ChatGPT.', 'success');
+                showToast(name + ' prompt copied to clipboard! Paste into Claude or ChatGPT.', 'success');
             }).catch(function() {
                 wizFallbackCopyPrompt(prompt, name);
             });
@@ -12373,7 +12392,7 @@ Return ONLY clean, standalone HTML in an <!DOCTYPE html> document.`
         ta.select();
         try {
             document.execCommand('copy');
-            showToast('📋 ' + name + ' prompt copied to clipboard!', 'success');
+            showToast(name + ' prompt copied to clipboard!', 'success');
         } catch(e) {
             showToast('Could not copy automatically. Please select prompt manually.', 'warning');
         }
@@ -12425,7 +12444,7 @@ Return ONLY clean, standalone HTML in an <!DOCTYPE html> document.`
             var ta = document.getElementById('wiz-html-raw-code');
             if (ta) ta.focus();
         }, 100);
-        showToast('⚡ ' + (title || templateKey) + ' selected & prompt copied! Paste your HTML code here.', 'success');
+        showToast((title || templateKey) + ' selected & prompt copied! Paste your HTML code here.', 'success');
     };
 
     // ── Template Search & Filter ──────────────────────────────
@@ -12641,6 +12660,9 @@ Return ONLY clean, standalone HTML in an <!DOCTYPE html> document.`
 
         var wiz = document.getElementById('atw');
         if (wiz) {
+            if (wiz.parentElement !== document.body) {
+                document.body.appendChild(wiz);
+            }
             wiz.style.display = 'flex';
             requestAnimationFrame(function() { wiz.style.opacity = '1'; });
         }
@@ -13238,7 +13260,7 @@ Return ONLY clean, standalone HTML in an <!DOCTYPE html> document.`
             nextBtn.style.opacity = '1';
             nextBtn.style.cursor = 'pointer';
             if (step === 3) {
-                var ctaLabel = (_wizBuilder === 'html_ai') ? '⚡ Launch Theme Live & Go to /site/' : ((_wizBuilder === 'nextjs') ? '⚡ Create & Build Theme' : 'Save Theme');
+                var ctaLabel = (_wizBuilder === 'html_ai') ? 'Launch Theme Live & Go to /site/' : ((_wizBuilder === 'nextjs') ? 'Create & Build Theme' : 'Save Theme');
                 nextBtn.innerHTML = ctaLabel + ' <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>';
             } else {
                 nextBtn.innerHTML = 'Continue <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>';
@@ -13589,7 +13611,7 @@ Return ONLY clean, standalone HTML in an <!DOCTYPE html> document.`
         if (nextBtn) {
             nextBtn.disabled = false;
             nextBtn.style.opacity = '1';
-            nextBtn.innerHTML = '⚡ Create & Build Theme <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>';
+            nextBtn.innerHTML = 'Create & Build Theme <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>';
             nextBtn.onclick = function() { wizardNext(); };
         }
     };
@@ -13727,12 +13749,12 @@ Return ONLY clean, standalone HTML in an <!DOCTYPE html> document.`
                         var errMsg = (res.data && res.data.message) ? res.data.message : (typeof res.data === 'string' ? res.data : 'Failed to import Elementor Kit.');
                         var nextStep = (res.data && res.data.next_step) ? res.data.next_step : 'Ensure the ZIP is a valid Elementor Template Kit and try again.';
                         showToast(errMsg + ' — Next Step: ' + nextStep, 'error');
-                        if (nextBtn) { nextBtn.innerHTML = '⚡ Create & Build Theme <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>'; nextBtn.disabled = false; nextBtn.style.opacity = '1'; }
+                        if (nextBtn) { nextBtn.innerHTML = 'Create & Build Theme <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>'; nextBtn.disabled = false; nextBtn.style.opacity = '1'; }
                     }
                 },
                 error: function() {
                     showToast('Failed to upload Elementor Kit. Check network or file size.', 'error');
-                    if (nextBtn) { nextBtn.innerHTML = '⚡ Create & Build Theme <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>'; nextBtn.disabled = false; nextBtn.style.opacity = '1'; }
+                    if (nextBtn) { nextBtn.innerHTML = 'Create & Build Theme <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>'; nextBtn.disabled = false; nextBtn.style.opacity = '1'; }
                 }
             });
             return;
@@ -13758,7 +13780,7 @@ Return ONLY clean, standalone HTML in an <!DOCTYPE html> document.`
                     if (data.theme_id) _wizCurrentThemeId = data.theme_id;
 
                     if (_wizBuilder === 'html_ai') {
-                        showToast('⚡ AI HTML Theme "' + name + '" created and live at /site/!', 'success');
+                        showToast('AI HTML Theme "' + name + '" created and live at /site/!', 'success');
                         closeAddThemeWizard();
                         var targetSiteUrl = (typeof coraREData !== 'undefined' && coraREData.siteUrl) ? (coraREData.siteUrl + '/site/') : '/site/';
                         setTimeout(function() {
@@ -13791,7 +13813,7 @@ Return ONLY clean, standalone HTML in an <!DOCTYPE html> document.`
                     } else {
                         var nextStep = (res.data && res.data.next_step) ? res.data.next_step : 'Verify your configuration and try again.';
                         showToast(errMsg + ' — Next Step: ' + nextStep, 'error');
-                        var ctaLabel = (_wizBuilder === 'html_ai') ? '⚡ Launch Theme Live & Go to /site/' : ((_wizBuilder === 'nextjs') ? '⚡ Create & Build Theme' : 'Save Theme');
+                        var ctaLabel = (_wizBuilder === 'html_ai') ? 'Launch Theme Live & Go to /site/' : ((_wizBuilder === 'nextjs') ? 'Create & Build Theme' : 'Save Theme');
                         if (nextBtn) { nextBtn.innerHTML = ctaLabel + ' <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>'; nextBtn.disabled = false; nextBtn.style.opacity = '1'; }
                     }
                 }
@@ -13801,7 +13823,7 @@ Return ONLY clean, standalone HTML in an <!DOCTYPE html> document.`
                     wizardShowBuildError('Connection failed while communicating with the workspace server.', xhr.responseText || '', _wizCurrentThemeId);
                 } else {
                     showToast('Connection failed. Please check your network and try again.', 'error');
-                    var ctaLabel = (_wizBuilder === 'html_ai') ? '⚡ Launch Theme Live & Go to /site/' : ((_wizBuilder === 'nextjs') ? '⚡ Create & Build Theme' : 'Save Theme');
+                    var ctaLabel = (_wizBuilder === 'html_ai') ? 'Launch Theme Live & Go to /site/' : ((_wizBuilder === 'nextjs') ? 'Create & Build Theme' : 'Save Theme');
                     if (nextBtn) { nextBtn.innerHTML = ctaLabel + ' <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>'; nextBtn.disabled = false; nextBtn.style.opacity = '1'; }
                 }
             }
