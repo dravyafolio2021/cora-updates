@@ -1199,7 +1199,53 @@ window.rawUsers = [];
 window.rawAppeals = [];
 window.activeAppealId = null;
 
+// Ensure robust coraREData fallback across all pages
+if (typeof window.coraREData === 'undefined') {
+    window.coraREData = typeof coraREWPData !== 'undefined' ? coraREWPData : {};
+}
+if (!window.coraREData.ajaxUrl) {
+    window.coraREData.ajaxUrl = window.ajaxurl || '/wp-admin/admin-ajax.php';
+}
+if (!window.coraREData.ajaxNonce && window.coraREData.nonce) {
+    window.coraREData.ajaxNonce = window.coraREData.nonce;
+}
+var coraREData = window.coraREData;
+
+// Global workspace store finder
+window.findWorkspaceInStore = function(workspaceId) {
+    const list = (window.rawWorkspaces && Array.isArray(window.rawWorkspaces) && window.rawWorkspaces.length > 0)
+        ? window.rawWorkspaces
+        : ((typeof rawWorkspaces !== 'undefined' && Array.isArray(rawWorkspaces)) ? rawWorkspaces : []);
+    
+    return list.find(w => String(w.id) === String(workspaceId) || Number(w.id) === Number(workspaceId) || (w.slug && String(w.slug).toLowerCase() === String(workspaceId).toLowerCase()));
+};
+
+// Global launch workspace helper
+window.launchWorkspace = function(workspaceId) {
+    const ws = window.findWorkspaceInStore(workspaceId);
+    if (!ws) {
+        if (window.coraShowToast) window.coraShowToast('Workspace data not found.', 'error');
+        return;
+    }
+    if (ws.owner_user_id && Number(ws.owner_user_id) > 0 && typeof window.impersonateUser === 'function') {
+        window.impersonateUser(ws.owner_user_id);
+        return;
+    }
+    const origin = window.location.origin;
+    const cleanSlug = ws.slug ? encodeURIComponent(ws.slug) : 'workspace';
+    const dest = `${origin}/${cleanSlug}/dashboard?agency_id=${ws.id}&industry=${encodeURIComponent(ws.industry || 'real_estate')}`;
+    window.open(dest, '_blank');
+};
+
 jQuery(document).ready(function($) {
+    // Auto-portal all super-admin dialogs and drawers to document.body
+    ['cora-manage-workspace-drawer', 'cora-manage-workspace-overlay', 'cora-delete-workspace-modal', 'cora-delete-workspace-overlay', 'cora-add-workspace-drawer', 'cora-appeal-review-drawer'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el && el.parentNode !== document.body) {
+            document.body.appendChild(el);
+        }
+    });
+
     let rawWorkspaces = window.rawWorkspaces;
     let rawUsers = window.rawUsers;
     let rawAppeals = window.rawAppeals;
@@ -1715,7 +1761,7 @@ jQuery(document).ready(function($) {
                         <!-- Telemetry & Quota Gauges -->
                         <div class="space-y-2.5 pt-2 border-t border-zinc-100">
                             <!-- AI Credits Quota Meter -->
-                            <div class="space-y-1 cursor-pointer group/burn" onclick="openManageWorkspaceDrawer(${ws.id}, 'quota')" title="Click to adjust AI Credits & top-up quota">
+                            <div class="space-y-1 cursor-pointer group/burn" onclick="openManageWorkspaceDrawer('${ws.id}', 'quota')" title="Click to adjust AI Credits & top-up quota">
                                 <div class="flex items-center justify-between text-[11px]">
                                     <span class="text-zinc-500 font-medium flex items-center gap-1 group-hover/burn:text-zinc-950 transition-colors">
                                         <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
@@ -1734,7 +1780,7 @@ jQuery(document).ready(function($) {
 
                             <!-- Storage & Financial Run-Rate Row -->
                             <div class="flex items-center justify-between text-[11px] pt-0.5">
-                                <div class="flex items-center gap-1 text-zinc-500 cursor-pointer group/stor" onclick="openManageWorkspaceDrawer(${ws.id}, 'storage')" title="Click to boost storage capacity">
+                                <div class="flex items-center gap-1 text-zinc-500 cursor-pointer group/stor" onclick="openManageWorkspaceDrawer('${ws.id}', 'storage')" title="Click to boost storage capacity">
                                     <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
                                     <span class="font-mono text-[10.5px] text-zinc-700">
                                         <span class="font-bold text-zinc-900">${(ws.current_storage_mb || 0).toFixed(1)} MB</span>
@@ -2075,11 +2121,11 @@ jQuery(document).ready(function($) {
                     </td>
                     <td class="px-5 py-3.5 text-right">
                         <div class="flex items-center justify-end gap-1.5">
-                            <button onclick="openManageWorkspaceDrawer(${ws.id}, 'plan')" title="Configure Plan & Invoicing" class="px-2.5 py-1.5 border border-zinc-200 rounded-lg text-[10px] font-bold text-zinc-800 bg-white hover:bg-zinc-950 hover:text-white cursor-pointer shadow-xs active:scale-95 transition-all inline-flex items-center gap-1">
+                            <button onclick="openManageWorkspaceDrawer('${ws.id}', 'plan')" title="Configure Plan & Invoicing" class="px-2.5 py-1.5 border border-zinc-200 rounded-lg text-[10px] font-bold text-zinc-800 bg-white hover:bg-zinc-950 hover:text-white cursor-pointer shadow-xs active:scale-95 transition-all inline-flex items-center gap-1">
                                 <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
                                 Plan
                             </button>
-                            <button onclick="openManageWorkspaceDrawer(${ws.id}, 'quota')" title="Top Up Quota Add-ons" class="px-2.5 py-1.5 border border-zinc-200 rounded-lg text-[10px] font-bold text-zinc-800 bg-zinc-50 hover:bg-zinc-950 hover:text-white cursor-pointer shadow-xs active:scale-95 transition-all inline-flex items-center gap-1">
+                            <button onclick="openManageWorkspaceDrawer('${ws.id}', 'quota')" title="Top Up Quota Add-ons" class="px-2.5 py-1.5 border border-zinc-200 rounded-lg text-[10px] font-bold text-zinc-800 bg-zinc-50 hover:bg-zinc-950 hover:text-white cursor-pointer shadow-xs active:scale-95 transition-all inline-flex items-center gap-1">
                                 <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
                                 Top-Up
                             </button>
@@ -3195,8 +3241,9 @@ function findWorkspaceInStore(workspaceId) {
         ? window.rawWorkspaces
         : ((typeof rawWorkspaces !== 'undefined' && Array.isArray(rawWorkspaces)) ? rawWorkspaces : []);
     
-    return list.find(w => String(w.id) === String(workspaceId) || Number(w.id) === Number(workspaceId));
+    return list.find(w => String(w.id) === String(workspaceId) || Number(w.id) === Number(workspaceId) || (w.slug && String(w.slug).toLowerCase() === String(workspaceId).toLowerCase()));
 }
+window.findWorkspaceInStore = findWorkspaceInStore;
 
 window.selectedPlan = 'professional';
 window.selectedBillingCycle = 'monthly';
@@ -3204,7 +3251,7 @@ window.aiTopUpMode = 'one_time';
 window.storageBoostMode = 'one_time';
 
 window.openManageWorkspaceDrawer = function(workspaceId, focusSection) {
-    const ws = findWorkspaceInStore(workspaceId);
+    const ws = (typeof window.findWorkspaceInStore === 'function') ? window.findWorkspaceInStore(workspaceId) : findWorkspaceInStore(workspaceId);
 
     if (!ws) {
         if (window.coraShowToast) window.coraShowToast('Workspace data not found.', 'error');
@@ -3212,6 +3259,12 @@ window.openManageWorkspaceDrawer = function(workspaceId, focusSection) {
     }
 
     currentManagingWorkspaceId = ws.id;
+
+    // Ensure drawer and overlay are attached directly to document.body
+    const drawerEl = document.getElementById('cora-manage-workspace-drawer');
+    const overlayEl = document.getElementById('cora-manage-workspace-overlay');
+    if (drawerEl && drawerEl.parentNode !== document.body) document.body.appendChild(drawerEl);
+    if (overlayEl && overlayEl.parentNode !== document.body) document.body.appendChild(overlayEl);
 
     // Set Header Info
     $('#manage-ws-title').text(ws.name || 'Workspace #' + ws.id);
@@ -3222,11 +3275,11 @@ window.openManageWorkspaceDrawer = function(workspaceId, focusSection) {
 
     // Set Billing Cycle
     const cycle = (ws.billing_cycle === 'annual') ? 'annual' : 'monthly';
-    setDrawerBillingCycle(cycle, true);
+    if (typeof window.setDrawerBillingCycle === 'function') window.setDrawerBillingCycle(cycle, true);
 
     // Set Plan
     const pKey = (ws.plan || 'free').toLowerCase();
-    setDrawerPlan(pKey, true);
+    if (typeof window.setDrawerPlan === 'function') window.setDrawerPlan(pKey, true);
 
     // AI Telemetry & Quotas (1 AI Run = 1 credit = 500 Tokens)
     const usedTokens = Number(ws.used_tokens) || 0;
@@ -3249,7 +3302,7 @@ window.openManageWorkspaceDrawer = function(workspaceId, focusSection) {
     $('#manage-ws-unlimited-ai').prop('checked', isUnlimited);
     $('#manage-ws-ai-runs-base').val(baseRuns);
     $('#manage-ws-ai-topup-input').val('');
-    updateAiCostCalc();
+    if (typeof window.updateAiCostCalc === 'function') window.updateAiCostCalc();
 
     // Storage Telemetry & Quotas (in GB)
     const currentStorMb = Number(ws.current_storage_mb) || 0;
@@ -3262,7 +3315,7 @@ window.openManageWorkspaceDrawer = function(workspaceId, focusSection) {
     $('#manage-ws-storage-recurring-display').text('+' + recStorGb + ' GB');
     $('#manage-ws-storage-gb-base').val(storLimitGb);
     $('#manage-ws-storage-boost-input').val('');
-    updateStorageCostCalc();
+    if (typeof window.updateStorageCostCalc === 'function') window.updateStorageCostCalc();
 
     // Set Users & Emails Quotas
     $('#manage-ws-max-users').val(ws.max_users_limit || 1);
@@ -3277,15 +3330,15 @@ window.openManageWorkspaceDrawer = function(workspaceId, focusSection) {
     $('#manage-ws-enable-documents').prop('checked', ws.enable_documents !== false);
 
     // Reset Top-Up / Boost Modes
-    setAiTopUpMode('one_time');
-    setStorageBoostMode('one_time');
+    if (typeof window.setAiTopUpMode === 'function') window.setAiTopUpMode('one_time');
+    if (typeof window.setStorageBoostMode === 'function') window.setStorageBoostMode('one_time');
 
     // Recalculate invoice simulator
-    recalculateDrawerInvoice();
+    if (typeof window.recalculateDrawerInvoice === 'function') window.recalculateDrawerInvoice();
 
-    // Open Bottom Sheet Drawer with active class
-    $('#cora-manage-workspace-drawer').addClass('cora-sheet-active');
-    $('#cora-manage-workspace-overlay').addClass('cora-sheet-active');
+    // Open Bottom Sheet Drawer with active class and explicit display
+    $('#cora-manage-workspace-drawer').addClass('cora-sheet-active').css({'display': 'flex', 'transform': 'translateY(0)'});
+    $('#cora-manage-workspace-overlay').addClass('cora-sheet-active').css({'display': 'block'});
 
     // Auto focus appropriate input if requested
     if (focusSection === 'quota') {
@@ -3304,8 +3357,8 @@ window.openManageWorkspaceDrawer = function(workspaceId, focusSection) {
 };
 
 window.closeManageWorkspaceDrawer = function() {
-    $('#cora-manage-workspace-drawer').removeClass('cora-sheet-active');
-    $('#cora-manage-workspace-overlay').removeClass('cora-sheet-active');
+    $('#cora-manage-workspace-drawer').removeClass('cora-sheet-active').css({'display': 'none', 'transform': 'translateY(100%)'});
+    $('#cora-manage-workspace-overlay').removeClass('cora-sheet-active').css({'display': 'none'});
     currentManagingWorkspaceId = null;
 };
 
@@ -4651,21 +4704,28 @@ window.pendingDeleteWorkspaceId = null;
 
 window.openDeleteWorkspaceModal = function(workspaceId, workspaceName) {
     if (!workspaceId) return;
-    const ws = (typeof findWorkspaceInStore === 'function') ? findWorkspaceInStore(workspaceId) : null;
+    const ws = (typeof window.findWorkspaceInStore === 'function') ? window.findWorkspaceInStore(workspaceId) : null;
     if (ws) {
         workspaceId = ws.id;
         if (!workspaceName) workspaceName = ws.name || ws.slug;
     }
     window.pendingDeleteWorkspaceId = workspaceId;
     $('#delete-workspace-name-display').text(workspaceName ? '"' + workspaceName + '"' : 'this workspace');
-    $('#cora-delete-workspace-overlay').removeClass('hidden');
-    $('#cora-delete-workspace-modal').removeClass('hidden');
+    
+    // Ensure attached to body
+    const modal = document.getElementById('cora-delete-workspace-modal');
+    const overlay = document.getElementById('cora-delete-workspace-overlay');
+    if (modal && modal.parentNode !== document.body) document.body.appendChild(modal);
+    if (overlay && overlay.parentNode !== document.body) document.body.appendChild(overlay);
+
+    $('#cora-delete-workspace-overlay').removeClass('hidden').css('display', 'block');
+    $('#cora-delete-workspace-modal').removeClass('hidden').css('display', 'block');
 };
 
 window.closeDeleteWorkspaceModal = function() {
     window.pendingDeleteWorkspaceId = null;
-    $('#cora-delete-workspace-overlay').addClass('hidden');
-    $('#cora-delete-workspace-modal').addClass('hidden');
+    $('#cora-delete-workspace-overlay').addClass('hidden').css('display', 'none');
+    $('#cora-delete-workspace-modal').addClass('hidden').css('display', 'none');
 };
 
 window.confirmDeleteWorkspace = function() {
@@ -4676,28 +4736,29 @@ window.confirmDeleteWorkspace = function() {
     const origHtml = btn.html();
     btn.prop('disabled', true).html('Deleting...');
 
-    const ajaxUrl = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : (window.ajaxurl || '/wp-admin/admin-ajax.php');
-    const ajaxNonce = (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : '';
+    const ajaxUrl = (typeof window.coraREData !== 'undefined' && window.coraREData.ajaxUrl) ? window.coraREData.ajaxUrl : (window.ajaxurl || '/wp-admin/admin-ajax.php');
+    const ajaxNonce = (typeof window.coraREData !== 'undefined' && (window.coraREData.ajaxNonce || window.coraREData.nonce)) ? (window.coraREData.ajaxNonce || window.coraREData.nonce) : '';
 
     $.post(ajaxUrl, {
         action: 'cora_super_delete_workspace',
         security: ajaxNonce,
         nonce: ajaxNonce,
-        workspace_id: wsId
+        workspace_id: wsId,
+        id: wsId
     }, function(res) {
         btn.prop('disabled', false).html(origHtml);
         closeDeleteWorkspaceModal();
         if (res.success) {
             if (window.coraShowToast) window.coraShowToast(res.data && res.data.message ? res.data.message : 'Workspace deleted successfully.', 'success');
-            if (typeof closeManageWorkspaceDrawer === 'function') closeManageWorkspaceDrawer();
-            if (typeof loadPlatformData === 'function') loadPlatformData();
+            if (typeof window.closeManageWorkspaceDrawer === 'function') window.closeManageWorkspaceDrawer();
+            if (typeof window.loadPlatformData === 'function') window.loadPlatformData();
             setTimeout(function() {
                 const pathParts = window.location.pathname.split('/').filter(Boolean);
                 const currentSlug = pathParts[0] || '';
                 if (currentSlug && (String(wsId) === currentSlug || String(wsId).toLowerCase() === currentSlug.toLowerCase())) {
                     window.location.href = '/workspace/super-admin';
-                } else if (typeof loadPlatformData === 'function') {
-                    loadPlatformData();
+                } else if (typeof window.loadPlatformData === 'function') {
+                    window.loadPlatformData();
                 }
             }, 600);
         } else {
