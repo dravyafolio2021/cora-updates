@@ -1567,64 +1567,61 @@ function cora_get_sparkline_points( $history, $type ) {
                     <?php endif; ?>
                 </div>
 
-                <!-- ── Auto-Generate Menu Modal ─────────────────────────────── -->
-                <div id="auto-gen-menu-modal" class="hidden fixed inset-0 z-[9999] flex items-center justify-center p-4" style="background:rgba(0,0,0,0.45);">
-                    <div class="bg-white rounded-2xl shadow-2xl w-[460px] max-w-full flex flex-col border border-zinc-100" style="max-height:90vh;">
+                <!-- ── Auto-Generate Menu Drawer (Right-Sliding Sheet) ─────────────────────────────── -->
+                <div id="auto-gen-menu-modal" class="fixed inset-0 z-[999999] bg-zinc-900/40 backdrop-blur-[1px] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300 hidden">
+                    <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[480px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 pointer-events-auto" id="auto-gen-menu-modal-card">
 
-                        <!-- ── Fixed Header ── -->
-                        <div class="flex items-start justify-between gap-3 p-5 pb-4 flex-shrink-0">
-                            <div class="space-y-1">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-7 h-7 rounded-lg bg-zinc-950 flex items-center justify-center flex-shrink-0">
-                                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="white" stroke-width="2.2">
-                                            <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
-                                        </svg>
-                                    </div>
-                                    <h2 class="text-sm font-bold text-zinc-950">Auto-Generate Menu</h2>
+                        <!-- ── Drawer Header ── -->
+                        <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50 flex-shrink-0">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-zinc-950 flex items-center justify-center flex-shrink-0">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="white" stroke-width="2">
+                                        <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+                                    </svg>
                                 </div>
-                                <p class="text-[11px] text-zinc-500 leading-relaxed">Select published pages to add as menu items. Only published pages are shown.</p>
+                                <div>
+                                    <h3 class="text-sm font-bold text-zinc-950 font-sans">Auto-Generate Menu</h3>
+                                    <p class="text-[10px] text-zinc-500 mt-0.5 font-sans">Select published pages to add as menu items.</p>
+                                </div>
                             </div>
-                            <button onclick="closeAutoGenMenuModal()" class="p-1.5 hover:bg-zinc-100 rounded-lg text-zinc-400 hover:text-zinc-700 cursor-pointer transition-colors border-none bg-transparent flex-shrink-0 mt-0.5">
-                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                            <button type="button" onclick="closeAutoGenMenuModal()" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1 transition-colors bg-transparent border-none">
+                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                             </button>
                         </div>
 
-                        <!-- ── Fixed Select-All Bar ── -->
-                        <div class="flex items-center justify-between border-t border-b border-zinc-100 px-5 py-2.5 flex-shrink-0">
-                            <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Published Pages</span>
-                            <div class="flex items-center gap-2">
-                                <button onclick="autoGenSelectAll(true)" class="text-[10px] font-bold text-zinc-600 hover:text-zinc-900 cursor-pointer bg-transparent border-none transition-colors">Select all</button>
-                                <span class="text-zinc-300 text-[10px]">·</span>
-                                <button onclick="autoGenSelectAll(false)" class="text-[10px] font-bold text-zinc-600 hover:text-zinc-900 cursor-pointer bg-transparent border-none transition-colors">Deselect all</button>
-                            </div>
-                        </div>
-
-                        <!-- ── Scrollable Pages List ── -->
-                        <div id="auto-gen-pages-list" class="flex-1 overflow-y-auto min-h-0 py-1.5 px-2">
-                            <!-- Populated by JS -->
-                        </div>
-
-                        <!-- ── Fixed Footer: Sort + Actions ── -->
-                        <div class="flex-shrink-0 border-t border-zinc-100 px-5 py-4 space-y-3">
-                            <!-- Sort order -->
-                            <div class="flex items-center gap-3">
-                                <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider flex-shrink-0">Sort Order</label>
-                                <select id="auto-gen-sort-order" class="flex-1 px-2.5 py-1.5 border border-zinc-200 rounded-lg text-xs font-semibold text-zinc-700 focus:outline-none focus:border-zinc-400 bg-white cursor-pointer">
-                                    <option value="alpha">Alphabetical (A → Z)</option>
-                                    <option value="alpha_desc">Alphabetical (Z → A)</option>
-                                    <option value="homepage_first">Homepage First</option>
-                                </select>
-                            </div>
-                            <!-- Action buttons -->
-                            <div class="flex items-center justify-between">
-                                <span id="auto-gen-count-label" class="text-[10px] text-zinc-400 font-mono"></span>
+                        <!-- ── Drawer Body ── -->
+                        <div class="flex-1 overflow-y-auto p-5 space-y-4">
+                            <!-- Page count / Selection actions -->
+                            <div class="flex items-center justify-between text-xs text-zinc-500 pb-2 border-b border-zinc-100">
+                                <span id="auto-gen-count-label" class="font-medium text-zinc-700">None selected</span>
                                 <div class="flex items-center gap-2">
-                                    <button onclick="closeAutoGenMenuModal()" class="px-3.5 py-2 border border-zinc-200 text-zinc-600 hover:text-zinc-900 rounded-lg text-xs font-bold cursor-pointer transition-all active:scale-95 bg-transparent">Cancel</button>
-                                    <button onclick="confirmAutoGenMenu()" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold cursor-pointer transition-all active:scale-95 border-none shadow-sm">Add to Menu</button>
+                                    <button type="button" onclick="autoGenSelectAll(true)" class="text-[11px] text-zinc-600 hover:text-zinc-950 font-semibold cursor-pointer underline bg-transparent border-none font-sans">Select All</button>
+                                    <span class="text-zinc-300">·</span>
+                                    <button type="button" onclick="autoGenSelectAll(false)" class="text-[11px] text-zinc-600 hover:text-zinc-950 font-semibold cursor-pointer underline bg-transparent border-none font-sans">Clear</button>
                                 </div>
                             </div>
+
+                            <!-- Sort options -->
+                            <div class="space-y-1.5">
+                                <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-sans">Sort Order</label>
+                                <select id="auto-gen-sort-order" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 bg-white font-medium font-sans">
+                                    <option value="homepage_first">Home First, then Natural Order</option>
+                                    <option value="alpha">Alphabetical (A to Z)</option>
+                                    <option value="alpha_desc">Alphabetical (Z to A)</option>
+                                </select>
+                            </div>
+
+                            <!-- Pages List -->
+                            <div class="space-y-1.5 max-h-[340px] overflow-y-auto border border-zinc-200 rounded-xl p-2 bg-zinc-50/40 divide-y divide-zinc-100" id="auto-gen-pages-list">
+                                <!-- Populated dynamically by JS -->
+                            </div>
                         </div>
 
+                        <!-- ── Drawer Footer ── -->
+                        <div class="p-5 border-t border-zinc-200 flex items-center justify-end gap-2.5 bg-zinc-50/50 flex-shrink-0">
+                            <button type="button" onclick="closeAutoGenMenuModal()" class="px-3.5 py-2 border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 font-bold rounded-lg text-xs transition-colors cursor-pointer font-sans">Cancel</button>
+                            <button type="button" onclick="confirmAutoGenMenu()" class="px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer font-sans shadow-sm">Add Selected Pages</button>
+                        </div>
                     </div>
                 </div>
 
@@ -3485,23 +3482,31 @@ function cora_get_sparkline_points( $history, $type ) {
     </div>
 </div>
 
-<!-- 1. New Theme Setup Modal (Centered Popup) -->
-<div id="drawer-new-theme" class="fixed inset-0 z-[999999] bg-zinc-900/40 backdrop-blur-[1px] flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
-    <div class="bg-white border border-zinc-200 rounded-xl shadow-2xl p-6 w-full max-w-md space-y-4 transform scale-95 transition-transform duration-300" id="drawer-new-theme-card">
-        <div class="flex items-center justify-between">
-            <h3 class="text-sm font-bold text-zinc-950">Initialize New Theme</h3>
-            <button type="button" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1" onclick="closeNewThemeDrawer()">
+<!-- 1. New Theme Setup Drawer (Right-Sliding Sheet) -->
+<div id="drawer-new-theme" class="fixed inset-0 z-[999999] bg-zinc-900/40 backdrop-blur-[1px] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300 hidden">
+    <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[480px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 pointer-events-auto" id="drawer-new-theme-card">
+        <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50 flex-shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-zinc-100 flex items-center justify-center">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" class="text-zinc-700"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-zinc-950 font-sans">Initialize New Theme</h3>
+                    <p class="text-[10px] text-zinc-500 mt-0.5 font-sans">Choose template structure & theme identity.</p>
+                </div>
+            </div>
+            <button type="button" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1 transition-colors bg-transparent border-none" onclick="closeNewThemeDrawer()">
                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
-        <div class="space-y-4">
+        <div class="flex-1 overflow-y-auto p-5 space-y-4">
             <div class="space-y-2">
-                <label class="block text-[10px] font-bold text-zinc-500 uppercase">Theme Name *</label>
-                <input type="text" id="new-theme-name-input" placeholder="e.g. Westside Luxury Catalog" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400">
+                <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-sans">Theme Name *</label>
+                <input type="text" id="new-theme-name-input" placeholder="e.g. Westside Luxury Catalog" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 font-medium font-sans">
             </div>
             
             <div class="space-y-2">
-                <label class="block text-[10px] font-bold text-zinc-500 uppercase">Start From Structure</label>
+                <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-sans">Start From Structure</label>
                 <div class="grid grid-cols-1 gap-2.5">
                     <label class="border-2 border-zinc-900 bg-zinc-50/60 rounded-xl p-3 flex items-start gap-2.5 cursor-pointer hover:bg-zinc-100 transition-colors" onclick="closeNewThemeDrawer(); openAddThemeWizard();">
                         <input type="radio" name="new-theme-source" value="nextjs" checked class="mt-1 accent-zinc-950">
@@ -3537,6 +3542,12 @@ function cora_get_sparkline_points( $history, $type ) {
                 </div>
             </div>
         </div>
+        <div class="p-5 border-t border-zinc-200 flex items-center justify-end gap-2.5 bg-zinc-50/50 flex-shrink-0">
+            <button type="button" class="px-3.5 py-2 border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 font-bold rounded-lg text-xs transition-colors cursor-pointer font-sans" onclick="closeNewThemeDrawer()">Cancel</button>
+            <button type="button" class="px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer font-sans shadow-sm" onclick="saveNewTheme()">Create Theme</button>
+        </div>
+    </div>
+</div>
         <div class="flex items-center justify-end gap-2.5 pt-2">
             <button type="button" class="px-3.5 py-2 border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 font-semibold rounded-lg text-xs transition-colors cursor-pointer" onclick="closeNewThemeDrawer()">Cancel</button>
             <button type="button" class="px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-semibold rounded-lg text-xs transition-colors cursor-pointer" onclick="saveNewTheme()">Create Theme</button>
@@ -3544,84 +3555,126 @@ function cora_get_sparkline_points( $history, $type ) {
     </div>
 </div>
 
-<!-- 2. New Page Setup Modal (Centered Popup with Dual-Engine Creation) -->
-<div id="drawer-new-page" class="fixed inset-0 z-[999999] bg-zinc-900/40 backdrop-blur-[1px] flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
-    <div class="bg-white border border-zinc-200 rounded-2xl shadow-2xl p-6 w-full max-w-lg space-y-4 transform scale-95 transition-transform duration-300" id="drawer-new-page-card">
+<!-- 2. New Page Setup Drawer (Right-Sliding Sheet) -->
+<div id="drawer-new-page" class="fixed inset-0 z-[999999] bg-zinc-900/40 backdrop-blur-[1px] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300 hidden">
+    <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[500px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 pointer-events-auto" id="drawer-new-page-card">
         
         <!-- Header -->
-        <div class="flex items-center justify-between border-b border-zinc-100 pb-3">
+        <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50 flex-shrink-0">
             <div>
-                <h3 class="text-sm font-bold text-zinc-950 flex items-center gap-2">
+                <h3 class="text-sm font-bold text-zinc-950 flex items-center gap-2 font-sans">
                     <span>Add Page to Theme</span>
                     <span id="cora-page-engine-badge" class="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-zinc-100 text-zinc-700 border border-zinc-200 uppercase">Elementor</span>
                 </h3>
-                <p class="text-[11px] text-zinc-500 mt-0.5">Choose how you want to build this page.</p>
+                <p class="text-[10px] text-zinc-500 mt-0.5 font-sans">Choose how you want to build this page.</p>
             </div>
-            <button type="button" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1 rounded-lg hover:bg-zinc-100 transition-colors" onclick="closeNewPageDrawer()">
+            <button type="button" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1 transition-colors bg-transparent border-none" onclick="closeNewPageDrawer()">
                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
 
-        <!-- Creation Method Segmented Selector -->
-        <div class="p-1 bg-zinc-100 rounded-xl flex items-center gap-1 border border-zinc-200/80">
-            <button type="button" id="cora-engine-tab-elementor" onclick="switchPageEngineMode('elementor')" class="flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all bg-white text-zinc-950 shadow-2xs flex items-center justify-center gap-2 cursor-pointer">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
-                <span>Elementor Builder</span>
-            </button>
-            <button type="button" id="cora-engine-tab-html" onclick="switchPageEngineMode('html')" class="flex-1 py-2 px-3 rounded-lg text-xs font-semibold text-zinc-600 hover:text-zinc-950 transition-all flex items-center justify-center gap-2 cursor-pointer">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-                <span>Upload HTML (AI Smart Canvas)</span>
-            </button>
-        </div>
-
-        <!-- 1-Click Migrator Banner for Elementor -->
-        <div id="cora-elementor-migrator-banner" class="p-2.5 bg-zinc-50 border border-zinc-200 rounded-xl flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700 shrink-0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                <span class="text-[11px] text-zinc-700 font-semibold">Have an existing Elementor site?</span>
-            </div>
-            <button type="button" onclick="closeNewPageDrawer(); openElementorMigrationDrawer();" class="text-[11px] font-bold text-zinc-950 hover:underline cursor-pointer">Use 1-Click Migrator →</button>
-        </div>
-
-        <!-- HTML Upload & AI Optimization Panel (Hidden when Elementor active) -->
-        <div id="cora-html-upload-panel" class="hidden space-y-3">
-            <!-- Dropzone -->
-            <div id="cora-html-file-dropzone" class="border-2 border-dashed border-zinc-200 hover:border-zinc-400 bg-zinc-50/70 hover:bg-zinc-50 rounded-xl p-5 text-center cursor-pointer transition-all relative group" onclick="document.getElementById('cora-html-file-input').click()">
-                <input type="file" id="cora-html-file-input" accept=".html,.htm,.zip,.txt" class="hidden" onchange="handleHtmlFileSelect(this)">
-                <svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400 group-hover:text-zinc-800 mx-auto mb-2 transition-colors"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-                <div class="text-xs font-bold text-zinc-900" id="cora-html-file-label">Click to select or drag &amp; drop HTML / ZIP file here</div>
-                <p class="text-[10px] text-zinc-400 mt-0.5">Supports clean HTML5, Tailwind, Webflow/Framer exports, or ZIP with assets</p>
+        <!-- Body -->
+        <div class="flex-1 overflow-y-auto p-5 space-y-4">
+            <!-- Creation Method Segmented Selector -->
+            <div class="p-1 bg-zinc-100 rounded-xl flex items-center gap-1 border border-zinc-200/80">
+                <button type="button" id="cora-engine-tab-elementor" onclick="switchPageEngineMode('elementor')" class="flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all bg-white text-zinc-950 shadow-2xs flex items-center justify-center gap-2 cursor-pointer">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
+                    <span>Elementor Builder</span>
+                </button>
+                <button type="button" id="cora-engine-tab-html" onclick="switchPageEngineMode('html')" class="flex-1 py-2 px-3 rounded-lg text-xs font-semibold text-zinc-600 hover:text-zinc-950 transition-all flex items-center justify-center gap-2 cursor-pointer">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                    <span>Upload HTML (Smart Canvas)</span>
+                </button>
             </div>
 
-            <!-- Paste Code Toggle -->
-            <div class="text-right">
-                <button type="button" onclick="toggleHtmlPasteBox()" class="text-[11px] font-semibold text-zinc-600 hover:text-zinc-950 underline cursor-pointer" id="cora-toggle-paste-btn">Or paste raw HTML code</button>
-            </div>
-            <div id="cora-html-paste-box" class="hidden space-y-1">
-                <label class="block text-[10px] font-bold text-zinc-500 uppercase">Paste Raw HTML Code</label>
-                <textarea id="cora-html-paste-input" rows="4" oninput="handleHtmlPasteChange(this)" placeholder="<!DOCTYPE html><html><head>...</head><body>...</body></html>" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs font-mono focus:outline-none focus:border-zinc-400"></textarea>
+            <!-- 1-Click Migrator Banner for Elementor -->
+            <div id="cora-elementor-migrator-banner" class="p-2.5 bg-zinc-50 border border-zinc-200 rounded-xl flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-700 shrink-0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    <span class="text-[11px] text-zinc-700 font-semibold">Have an existing Elementor site?</span>
+                </div>
+                <button type="button" onclick="closeNewPageDrawer(); openElementorMigrationDrawer();" class="text-[11px] font-bold text-zinc-950 hover:underline cursor-pointer">Use 1-Click Migrator →</button>
             </div>
 
-            <!-- Live Telemetry Inspector Badge -->
-            <div id="cora-html-telemetry-badge" class="hidden p-3 bg-zinc-950 text-white rounded-xl space-y-1.5 animate-fade-in">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                        <span class="text-xs font-bold tracking-tight" id="cora-html-detected-title">Page Title</span>
+            <!-- HTML Upload & AI Optimization Panel (Hidden when Elementor active) -->
+            <div id="cora-html-upload-panel" class="hidden space-y-3">
+                <!-- Dropzone -->
+                <div id="cora-html-file-dropzone" class="border-2 border-dashed border-zinc-200 hover:border-zinc-400 bg-zinc-50/70 hover:bg-zinc-50 rounded-xl p-5 text-center cursor-pointer transition-all relative group" onclick="document.getElementById('cora-html-file-input').click()">
+                    <input type="file" id="cora-html-file-input" accept=".html,.htm,.zip,.txt" class="hidden" onchange="handleHtmlFileSelect(this)">
+                    <svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400 group-hover:text-zinc-800 mx-auto mb-2 transition-colors"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                    <div class="text-xs font-bold text-zinc-900" id="cora-html-file-label">Click to select or drag &amp; drop HTML / ZIP file here</div>
+                    <p class="text-[10px] text-zinc-400 mt-0.5">Supports clean HTML5, Tailwind, Webflow/Framer exports, or ZIP with assets</p>
+                </div>
+
+                <!-- Paste Code Toggle -->
+                <div class="text-right">
+                    <button type="button" onclick="toggleHtmlPasteBox()" class="text-[11px] font-semibold text-zinc-600 hover:text-zinc-950 underline cursor-pointer" id="cora-toggle-paste-btn">Or paste raw HTML code</button>
+                </div>
+                <div id="cora-html-paste-box" class="hidden space-y-1">
+                    <label class="block text-[10px] font-bold text-zinc-500 uppercase">Paste Raw HTML Code</label>
+                    <textarea id="cora-html-paste-input" rows="4" oninput="handleHtmlPasteChange(this)" placeholder="<!DOCTYPE html><html><head>...</head><body>...</body></html>" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs font-mono focus:outline-none focus:border-zinc-400"></textarea>
+                </div>
+
+                <!-- Live Telemetry Inspector Badge -->
+                <div id="cora-html-telemetry-badge" class="hidden p-3 bg-zinc-950 text-white rounded-xl space-y-1.5 animate-fade-in">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                            <span class="text-xs font-bold tracking-tight" id="cora-html-detected-title">Page Title</span>
+                        </div>
+                        <span class="px-2 py-0.5 bg-zinc-800 border border-zinc-700 rounded-md text-[9px] font-mono text-emerald-400 font-bold">✨ AI Optimization Ready</span>
                     </div>
-                    <span class="px-2 py-0.5 bg-zinc-800 border border-zinc-700 rounded-md text-[9px] font-mono text-emerald-400 font-bold">✨ AI Optimization Ready</span>
+                    <div class="flex items-center gap-4 text-[10px] text-zinc-300 pt-0.5 border-t border-zinc-800">
+                        <span id="cora-html-stat-headings">0 Headings</span>
+                        <span>•</span>
+                        <span id="cora-html-stat-images">0 Media Assets</span>
+                        <span>•</span>
+                        <span id="cora-html-stat-buttons">0 CTA Buttons</span>
+                        <span>•</span>
+                        <span class="text-emerald-300 font-semibold">1-Click Visual Editable</span>
+                    </div>
                 </div>
-                <div class="flex items-center gap-4 text-[10px] text-zinc-300 pt-0.5 border-t border-zinc-800">
-                    <span id="cora-html-stat-headings">0 Headings</span>
-                    <span>•</span>
-                    <span id="cora-html-stat-images">0 Media Assets</span>
-                    <span>•</span>
-                    <span id="cora-html-stat-buttons">0 CTA Buttons</span>
-                    <span>•</span>
-                    <span class="text-emerald-300 font-semibold">1-Click Visual Editable</span>
+            </div>
+
+            <!-- Form Inputs -->
+            <div class="space-y-3.5">
+                <div class="space-y-1.5">
+                    <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-sans">Page Title *</label>
+                    <input type="text" id="new-page-title-input" onkeyup="autoGenerateSlug(this)" placeholder="e.g. Featured Penthouse Listings" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 font-medium font-sans">
+                </div>
+                <div class="space-y-1.5">
+                    <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-sans">URL Slug Path *</label>
+                    <input type="text" id="new-page-slug-input" placeholder="e.g. penthouse-listings" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 font-medium font-sans">
+                </div>
+                <div class="grid grid-cols-2 gap-3.5">
+                    <div class="space-y-1.5">
+                        <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-sans">Page Layout</label>
+                        <select id="new-page-template-input" class="w-full px-2.5 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 cursor-pointer bg-white font-medium font-sans">
+                            <option value="canvas">Canvas (Standalone Clean HTML - Recommended)</option>
+                            <option value="default">Default (Wrap with Theme Header &amp; Footer)</option>
+                        </select>
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-sans">Status</label>
+                        <select id="new-page-status-input" class="w-full px-2.5 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 cursor-pointer bg-white font-medium font-sans">
+                            <option value="draft">Draft</option>
+                            <option value="published">Published</option>
+                        </select>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <!-- Action Buttons Footer -->
+        <div class="p-5 border-t border-zinc-200 flex items-center justify-end gap-2.5 bg-zinc-50/50 flex-shrink-0">
+            <button type="button" class="px-3.5 py-2 border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 font-bold rounded-lg text-xs transition-colors cursor-pointer font-sans" onclick="closeNewPageDrawer()">Cancel</button>
+            <button type="button" id="cora-create-page-only-btn" class="px-3.5 py-2 border border-zinc-200 hover:bg-zinc-50 text-zinc-700 font-bold rounded-lg text-xs transition-colors cursor-pointer font-sans" onclick="saveNewPage(false)">Create Only</button>
+            <button type="button" id="cora-create-and-edit-btn" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer flex items-center gap-1.5 font-sans shadow-sm" onclick="saveNewPage(true)">
+                <span id="cora-create-edit-text">Create &amp; Edit</span>
+            </button>
+        </div>
+    </div>
+</div>
 
         <!-- Form Inputs -->
         <div class="space-y-3.5">
@@ -3663,7 +3716,7 @@ function cora_get_sparkline_points( $history, $type ) {
 </div>
 
 <!-- 2.2. 1-Click Elementor Migration Modal (Centered Notion/Shopify Popup) -->
-<div id="drawer-elementor-migration" class="fixed inset-0 z-[999999] bg-zinc-900/40 backdrop-blur-[2px] flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+<div id="drawer-elementor-migration" class="fixed inset-0 z-[999999] bg-zinc-900/40 backdrop-blur-[2px] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300 hidden">
     <script>
     window.switchBlueprintTab = function(tab) {
         var btnPages = document.getElementById('blueprint-tab-btn-pages');
@@ -3689,7 +3742,7 @@ function cora_get_sparkline_points( $history, $type ) {
         }
     };
     </script>
-    <div class="bg-white border border-zinc-200 rounded-2xl shadow-2xl p-6 sm:p-7 w-full max-w-xl space-y-4 transform scale-95 transition-transform duration-300 max-h-[90vh] overflow-y-auto" id="drawer-elementor-migration-card">
+    <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[560px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 pointer-events-auto overflow-y-auto p-6 sm:p-7 space-y-4" id="drawer-elementor-migration-card">
         
         <!-- Header -->
         <div class="flex items-start justify-between border-b border-zinc-100 pb-3.5">
@@ -4027,108 +4080,123 @@ function cora_get_sparkline_points( $history, $type ) {
     </div>
 </div>
 
-<!-- 2.5. Menu Item Setup Drawer (Centered Popup Modal) -->
-<div id="drawer-menu-item" class="fixed inset-0 z-[999999] bg-zinc-900/40 backdrop-blur-[1px] flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
-    <div class="bg-white border border-zinc-200 rounded-xl shadow-2xl p-6 w-full max-w-md space-y-4 transform scale-95 transition-transform duration-300" id="drawer-menu-item-card">
-        <div class="flex items-center justify-between">
-            <div>
-                <h3 id="drawer-menu-item-title" class="text-sm font-bold text-zinc-950">Add Menu Item</h3>
-                <p class="text-[10px] text-zinc-500 mt-0.5">Configure link text, destination, and target options.</p>
+<!-- 2.5. Menu Item Setup Drawer (Right-Sliding Sheet) -->
+<div id="drawer-menu-item" class="fixed inset-0 z-[999999] bg-zinc-900/40 backdrop-blur-[1px] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300 hidden">
+    <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[460px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 pointer-events-auto" id="drawer-menu-item-card">
+        <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50 flex-shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-zinc-100 flex items-center justify-center">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" class="text-zinc-700"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                </div>
+                <div>
+                    <h3 id="drawer-menu-item-title" class="text-sm font-bold text-zinc-950 font-sans">Add Menu Item</h3>
+                    <p class="text-[10px] text-zinc-500 mt-0.5 font-sans">Configure link text, destination, and target options.</p>
+                </div>
             </div>
-            <button type="button" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1" onclick="closeMenuItemDrawer()">
+            <button type="button" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1 transition-colors bg-transparent border-none" onclick="closeMenuItemDrawer()">
                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
-        <div class="space-y-4">
+        <div class="flex-1 overflow-y-auto p-5 space-y-4">
             <input type="hidden" id="menu-item-edit-index" value="">
             
             <div class="space-y-2">
-                <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Link Label *</label>
-                <input type="text" id="menu-item-label-input" placeholder="e.g. Listings" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 font-medium">
+                <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-sans">Link Label *</label>
+                <input type="text" id="menu-item-label-input" placeholder="e.g. Listings" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 font-medium font-sans">
             </div>
             
             <div class="space-y-2">
-                <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Link Destination Type</label>
-                <select id="menu-item-type-input" onchange="toggleMenuItemTypeFields()" class="w-full px-2.5 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 cursor-pointer bg-white font-medium">
+                <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-sans">Link Destination Type</label>
+                <select id="menu-item-type-input" onchange="toggleMenuItemTypeFields()" class="w-full px-2.5 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 cursor-pointer bg-white font-medium font-sans">
                     <option value="page">Internal Page</option>
                     <option value="custom">Custom URL Link</option>
                 </select>
             </div>
             
             <div id="menu-item-page-field" class="space-y-2">
-                <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Select Page *</label>
-                <select id="menu-item-page-select" class="w-full px-2.5 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 cursor-pointer bg-white font-medium">
+                <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-sans">Select Page *</label>
+                <select id="menu-item-page-select" class="w-full px-2.5 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 cursor-pointer bg-white font-medium font-sans">
                     <!-- Dynamic Page list options will be inserted here -->
                 </select>
             </div>
             
             <div id="menu-item-url-field" class="space-y-2 hidden">
-                <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Custom URL Link *</label>
-                <input type="text" id="menu-item-url-input" placeholder="e.g. /custom-page or https://..." class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 font-medium">
+                <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-sans">Custom URL Link *</label>
+                <input type="text" id="menu-item-url-input" placeholder="e.g. /custom-page or https://..." class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 font-medium font-sans">
             </div>
 
             <div class="pt-2">
-                <label class="flex items-center gap-2 text-xs text-zinc-700 cursor-pointer select-none">
+                <label class="flex items-center gap-2 text-xs text-zinc-700 cursor-pointer select-none font-sans">
                     <input type="checkbox" id="menu-item-newtab-input" class="accent-zinc-950 rounded">
                     Open in a new browser tab
                 </label>
             </div>
         </div>
-        <div class="flex items-center justify-end gap-2.5 pt-2">
-            <button type="button" class="px-3.5 py-2 border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 font-bold rounded-lg text-xs transition-colors cursor-pointer" onclick="closeMenuItemDrawer()">Cancel</button>
-            <button type="button" class="px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer" onclick="saveMenuItem()">Apply Changes</button>
+        <div class="p-5 border-t border-zinc-200 flex items-center justify-end gap-2.5 bg-zinc-50/50 flex-shrink-0">
+            <button type="button" class="px-3.5 py-2 border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 font-bold rounded-lg text-xs transition-colors cursor-pointer font-sans" onclick="closeMenuItemDrawer()">Cancel</button>
+            <button type="button" class="px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer font-sans shadow-sm" onclick="saveMenuItem()">Apply Changes</button>
         </div>
     </div>
 </div>
 
-<!-- Rename Page Modal (Centered Popup) -->
-<div id="drawer-rename-page" class="fixed inset-0 z-[999999] bg-zinc-900/40 backdrop-blur-[1px] flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
-    <div class="bg-white border border-zinc-200 rounded-xl shadow-2xl p-6 w-full max-w-md space-y-4 transform scale-95 transition-transform duration-300" id="drawer-rename-page-card">
-        <div class="flex items-center justify-between">
-            <div>
-                <h3 class="text-sm font-bold text-zinc-950">Rename Page</h3>
-                <p class="text-[10px] text-zinc-500 mt-0.5">Specify a new display title for this page.</p>
+<!-- Rename Page Drawer (Right-Sliding Sheet) -->
+<div id="drawer-rename-page" class="fixed inset-0 z-[999999] bg-zinc-900/40 backdrop-blur-[1px] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300 hidden">
+    <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[460px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 pointer-events-auto" id="drawer-rename-page-card">
+        <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50 flex-shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-zinc-100 flex items-center justify-center">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" class="text-zinc-700"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-zinc-950 font-sans">Rename Page</h3>
+                    <p class="text-[10px] text-zinc-500 mt-0.5 font-sans">Specify a new display title for this page.</p>
+                </div>
             </div>
-            <button type="button" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1" onclick="closeRenamePageDrawer()">
+            <button type="button" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1 transition-colors bg-transparent border-none" onclick="closeRenamePageDrawer()">
                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
-        <div class="space-y-4">
+        <div class="flex-1 overflow-y-auto p-5 space-y-4">
             <input type="hidden" id="rename-page-id-input">
             <div class="space-y-2">
-                <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Page Title *</label>
-                <input type="text" id="rename-page-title-input" placeholder="e.g. Featured Penthouse Listings" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 font-medium">
+                <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-sans">Page Title *</label>
+                <input type="text" id="rename-page-title-input" placeholder="e.g. Featured Penthouse Listings" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 font-medium font-sans">
             </div>
         </div>
-        <div class="flex items-center justify-end gap-2.5 pt-2">
-            <button type="button" class="px-3.5 py-2 border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 font-bold rounded-lg text-xs transition-colors cursor-pointer" onclick="closeRenamePageDrawer()">Cancel</button>
-            <button type="button" class="px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer" onclick="saveRenamedPage()">Rename Page</button>
+        <div class="p-5 border-t border-zinc-200 flex items-center justify-end gap-2.5 bg-zinc-50/50 flex-shrink-0">
+            <button type="button" class="px-3.5 py-2 border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 font-bold rounded-lg text-xs transition-colors cursor-pointer font-sans" onclick="closeRenamePageDrawer()">Cancel</button>
+            <button type="button" class="px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer font-sans shadow-sm" onclick="saveRenamedPage()">Rename Page</button>
         </div>
     </div>
 </div>
 
-<!-- Change Page Slug Modal (Centered Popup) -->
-<div id="drawer-change-page-slug" class="fixed inset-0 z-[999999] bg-zinc-900/40 backdrop-blur-[1px] flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
-    <div class="bg-white border border-zinc-200 rounded-xl shadow-2xl p-6 w-full max-w-md space-y-4 transform scale-95 transition-transform duration-300" id="drawer-change-page-slug-card">
-        <div class="flex items-center justify-between">
-            <div>
-                <h3 class="text-sm font-bold text-zinc-950">Change Page Slug URL</h3>
-                <p class="text-[10px] text-zinc-500 mt-0.5">Specify a new URL path slug for this page route.</p>
+<!-- Change Page Slug Drawer (Right-Sliding Sheet) -->
+<div id="drawer-change-page-slug" class="fixed inset-0 z-[999999] bg-zinc-900/40 backdrop-blur-[1px] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300 hidden">
+    <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[460px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 pointer-events-auto" id="drawer-change-page-slug-card">
+        <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50 flex-shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-zinc-100 flex items-center justify-center">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" class="text-zinc-700"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-zinc-950 font-sans">Change Page Slug URL</h3>
+                    <p class="text-[10px] text-zinc-500 mt-0.5 font-sans">Specify a new URL path slug for this page route.</p>
+                </div>
             </div>
-            <button type="button" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1" onclick="closeChangePageSlugDrawer()">
+            <button type="button" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1 transition-colors bg-transparent border-none" onclick="closeChangePageSlugDrawer()">
                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
-        <div class="space-y-4">
+        <div class="flex-1 overflow-y-auto p-5 space-y-4">
             <input type="hidden" id="change-page-slug-id-input">
             <div class="space-y-2">
-                <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">URL Slug Path *</label>
-                <input type="text" id="change-page-slug-input" placeholder="e.g. penthouse-listings" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 font-medium">
+                <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-sans">URL Slug Path *</label>
+                <input type="text" id="change-page-slug-input" placeholder="e.g. penthouse-listings" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 font-medium font-sans">
             </div>
         </div>
-        <div class="flex items-center justify-end gap-2.5 pt-2">
-            <button type="button" class="px-3.5 py-2 border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 font-bold rounded-lg text-xs transition-colors cursor-pointer" onclick="closeChangePageSlugDrawer()">Cancel</button>
-            <button type="button" class="px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer" onclick="savePageSlug()">Update Slug</button>
+        <div class="p-5 border-t border-zinc-200 flex items-center justify-end gap-2.5 bg-zinc-50/50 flex-shrink-0">
+            <button type="button" class="px-3.5 py-2 border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 font-bold rounded-lg text-xs transition-colors cursor-pointer font-sans" onclick="closeChangePageSlugDrawer()">Cancel</button>
+            <button type="button" class="px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer font-sans shadow-sm" onclick="savePageSlug()">Update Slug</button>
         </div>
     </div>
 </div>
@@ -4375,42 +4443,36 @@ function cora_get_sparkline_points( $history, $type ) {
     </div>
 </div>
 
-<!-- 5. Activate theme confirmation modal -->
-<div id="canvas-confirm-modal" class="fixed inset-0 z-[999999] bg-zinc-900/40 backdrop-blur-[1px] flex items-center justify-center hidden">
-    <div class="bg-white border border-zinc-200 rounded-xl shadow-2xl p-6 w-full max-w-sm space-y-5">
-        <div class="space-y-2">
-            <h4 id="canvas-confirm-title" class="text-sm font-bold text-zinc-950">Confirm Action</h4>
-            <p id="canvas-confirm-message" class="text-xs text-zinc-500 leading-relaxed">Are you sure you want to perform this action?</p>
-        </div>
-        <div class="flex items-center justify-end gap-2.5">
-            <button onclick="closeCanvasConfirmModal()" class="px-3.5 py-2 border border-zinc-200 rounded-lg text-xs font-semibold text-zinc-750 bg-white hover:bg-zinc-50 transition-colors cursor-pointer">Cancel</button>
-            <button id="canvas-confirm-action-btn" class="px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-semibold shadow-sm transition-colors cursor-pointer">Confirm</button>
-        </div>
-    </div>
+<!-- 5. Activate theme confirmation modal removed (1-click toast activation) -->
 </div>
 
-<!-- 6. Theme Rename Modal (Centered Popup) -->
-<div id="drawer-rename-theme" class="fixed inset-0 z-[999999] bg-zinc-900/40 backdrop-blur-[1px] flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
-    <div class="bg-white border border-zinc-200 rounded-xl shadow-2xl p-6 w-full max-w-md space-y-4 transform scale-95 transition-transform duration-300" id="drawer-rename-theme-card">
-        <div class="flex items-center justify-between">
-            <div>
-                <h3 class="text-sm font-bold text-zinc-950">Rename Theme</h3>
-                <p class="text-[10px] text-zinc-500 mt-0.5">Specify a new display name for this theme workspace.</p>
+<!-- 6. Theme Rename Drawer (Right-Sliding Sheet) -->
+<div id="drawer-rename-theme" class="fixed inset-0 z-[999999] bg-zinc-900/40 backdrop-blur-[1px] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300 hidden">
+    <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[460px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 pointer-events-auto" id="drawer-rename-theme-card">
+        <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50 flex-shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-zinc-100 flex items-center justify-center">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" class="text-zinc-700"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-zinc-950 font-sans">Rename Theme</h3>
+                    <p class="text-[10px] text-zinc-500 mt-0.5 font-sans">Specify a new display name for this theme workspace.</p>
+                </div>
             </div>
-            <button type="button" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1" onclick="closeRenameThemeDrawer()">
+            <button type="button" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1 transition-colors bg-transparent border-none" onclick="closeRenameThemeDrawer()">
                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
-        <div class="space-y-4">
+        <div class="flex-1 overflow-y-auto p-5 space-y-4">
             <input type="hidden" id="rename-theme-id-input">
             <div class="space-y-2">
                 <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-sans">Theme Name *</label>
                 <input type="text" id="rename-theme-name-input" placeholder="e.g. Cora Custom Theme" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 font-medium font-sans">
             </div>
         </div>
-        <div class="flex items-center justify-end gap-2.5 pt-2">
+        <div class="p-5 border-t border-zinc-200 flex items-center justify-end gap-2.5 bg-zinc-50/50 flex-shrink-0">
             <button type="button" class="px-3.5 py-2 border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 font-bold rounded-lg text-xs transition-colors cursor-pointer font-sans" onclick="closeRenameThemeDrawer()">Cancel</button>
-            <button type="button" class="px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer font-sans" onclick="saveRenamedTheme()">Rename Theme</button>
+            <button type="button" class="px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer font-sans shadow-sm" onclick="saveRenamedTheme()">Rename Theme</button>
         </div>
     </div>
 </div>
@@ -4699,32 +4761,32 @@ function cora_get_sparkline_points( $history, $type ) {
     </div>
 </div>
 
-<!-- Lovable Connection Modal (Centered Popup) -->
-<div id="drawer-lovable-connect" class="fixed inset-0 z-[999999] bg-zinc-900/40 backdrop-blur-[1px] flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
-    <div class="bg-white border border-zinc-200 rounded-xl shadow-2xl p-6 w-full max-w-sm space-y-4 transform scale-95 transition-transform duration-300" id="drawer-lovable-connect-card">
-        <div class="flex items-center justify-between">
+<!-- Lovable Connection Drawer (Right-Sliding Sheet) -->
+<div id="drawer-lovable-connect" class="fixed inset-0 z-[999999] bg-zinc-900/40 backdrop-blur-[1px] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300 hidden">
+    <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[460px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 pointer-events-auto" id="drawer-lovable-connect-card">
+        <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50 flex-shrink-0">
             <div class="flex items-center gap-2">
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" class="text-purple-650"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-                <h3 class="text-sm font-bold text-zinc-950">Connect Lovable Studio</h3>
+                <h3 class="text-sm font-bold text-zinc-950 font-sans">Connect Lovable Studio</h3>
             </div>
-            <button type="button" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1" onclick="closeLovableConnectDrawer()">
+            <button type="button" class="text-zinc-400 hover:text-zinc-900 cursor-pointer p-1 transition-colors bg-transparent border-none" onclick="closeLovableConnectDrawer()">
                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
-        <p class="text-[10px] text-zinc-500 leading-normal">Deploy your frontend workspace dynamically from Lovable.dev by entering your project's share URL or API key.</p>
-        <div class="space-y-4">
+        <div class="flex-1 overflow-y-auto p-5 space-y-4">
+            <p class="text-[10px] text-zinc-500 leading-normal font-sans">Deploy your frontend workspace dynamically from Lovable.dev by entering your project's share URL or API key.</p>
             <div class="space-y-2">
-                <label class="block text-[10px] font-bold text-zinc-500 uppercase">Lovable Project URL *</label>
-                <input type="text" id="lovable-url-input" placeholder="e.g. lovable.dev/projects/your-project-id" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400">
+                <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-sans">Lovable Project URL *</label>
+                <input type="text" id="lovable-url-input" placeholder="e.g. lovable.dev/projects/your-project-id" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 font-medium font-sans">
             </div>
             <div class="space-y-2">
-                <label class="block text-[10px] font-bold text-zinc-500 uppercase">Personal Access Token (Lovable API Key)</label>
-                <input type="password" id="lovable-token-input" placeholder="lovable_pat_..." class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400">
+                <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-sans">Personal Access Token (Lovable API Key)</label>
+                <input type="password" id="lovable-token-input" placeholder="lovable_pat_..." class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 font-medium font-sans">
             </div>
         </div>
-        <div class="flex items-center justify-end gap-2.5 pt-2">
-            <button type="button" class="px-3.5 py-2 border border-zinc-350 bg-white hover:bg-zinc-50 text-zinc-700 font-semibold rounded-lg text-xs transition-colors cursor-pointer" onclick="closeLovableConnectDrawer()">Cancel</button>
-            <button type="button" class="px-3.5 py-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg text-xs transition-colors cursor-pointer border-none shadow-xs" onclick="triggerLovableConnect()">Connect & Sync</button>
+        <div class="p-5 border-t border-zinc-200 flex items-center justify-end gap-2.5 bg-zinc-50/50 flex-shrink-0">
+            <button type="button" class="px-3.5 py-2 border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 font-bold rounded-lg text-xs transition-colors cursor-pointer font-sans" onclick="closeLovableConnectDrawer()">Cancel</button>
+            <button type="button" class="px-3.5 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer border-none shadow-xs font-sans" onclick="triggerLovableConnect()">Connect & Sync</button>
         </div>
     </div>
 </div>
@@ -7024,20 +7086,11 @@ echo esc_textarea( json_encode( array(
             window.coraShowToast('Draft theme limit reached (' + limit + ' max for your plan). Please delete an existing draft or upgrade your account.', 'error');
             return;
         }
-        const modal = jQuery('#drawer-new-theme');
-        modal.removeClass('hidden');
-        setTimeout(() => {
-            modal.removeClass('opacity-0').css('opacity', '1');
-            jQuery('#drawer-new-theme-card').removeClass('scale-95').addClass('scale-100');
-        }, 10);
+        window.coraOpenDrawerSheet('drawer-new-theme', 'drawer-new-theme-card');
     }
     function closeNewThemeDrawer() {
-        jQuery('#drawer-new-theme-card').removeClass('scale-100').addClass('scale-95');
-        const modal = jQuery('#drawer-new-theme');
-        modal.addClass('opacity-0').css('opacity', '0');
-        setTimeout(function() {
-            modal.addClass('hidden');
-        }, 300);
+        window.coraCloseDrawerSheet('drawer-new-theme', 'drawer-new-theme-card');
+    }, 300);
     }
 
     function openImportKitDrawer() {
@@ -7265,33 +7318,28 @@ echo esc_textarea( json_encode( array(
         });
     }
 
-    // Activate theme confirmation modal
+    // Activate theme — 1-click seamless activation with monochromatic toast
     function triggerActivateTheme(id, name) {
         if (canvasState.isReadOnly) return;
-        jQuery('#canvas-confirm-title').text('Confirm Activation');
-        jQuery('#canvas-confirm-message').text(`Activating "${name}" will replace your current live theme. Your current live theme will move to Drafts. Continue?`);
-        
-        jQuery('#canvas-confirm-action-btn').off('click').on('click', function() {
-            window.coraShowToast('Activating theme...');
-            jQuery.post(coraREData.ajaxUrl, {
-                action: 'cora_ajax_activate_theme',
-                theme_id: id,
-                nonce: coraREData.ajaxNonce
-            }, function(res) {
-                if (res.success) {
-                    window.coraShowToast('Theme activated successfully.');
-                    closeCanvasConfirmModal();
-                    setTimeout(function() { window.location.reload(); }, 800);
-                } else {
-                    window.coraShowToast(res.data.message || 'Failed to activate theme.');
-                }
-            });
+        window.coraShowToast(`Activating "${name}"...`, 'info');
+        jQuery.post(coraREData.ajaxUrl, {
+            action: 'cora_ajax_activate_theme',
+            theme_id: id,
+            nonce: coraREData.ajaxNonce
+        }, function(res) {
+            if (res.success) {
+                window.coraShowToast(`"${name}" is now live!`, 'success');
+                setTimeout(function() { window.location.reload(); }, 600);
+            } else {
+                window.coraShowToast(res.data.message || 'Failed to activate theme.', 'error');
+            }
+        }).fail(function() {
+            window.coraShowToast('Network error while activating theme.', 'error');
         });
-        jQuery('#canvas-confirm-modal').removeClass('hidden');
     }
 
     function closeCanvasConfirmModal() {
-        jQuery('#canvas-confirm-modal').addClass('hidden');
+        // No-op legacy helper
     }
 
     function triggerActivateThemeFromHeader() {
@@ -7301,20 +7349,11 @@ echo esc_textarea( json_encode( array(
     function triggerRenameTheme(id, name) {
         jQuery('#rename-theme-id-input').val(id);
         jQuery('#rename-theme-name-input').val(name);
-        const modal = jQuery('#drawer-rename-theme');
-        modal.removeClass('hidden').css('pointer-events', 'auto');
-        setTimeout(() => {
-            modal.removeClass('opacity-0').css('opacity', '1');
-            jQuery('#drawer-rename-theme-card').removeClass('scale-95').addClass('scale-100');
-        }, 10);
+        window.coraOpenDrawerSheet('drawer-rename-theme', 'drawer-rename-theme-card');
     }
     function closeRenameThemeDrawer() {
-        jQuery('#drawer-rename-theme-card').removeClass('scale-100').addClass('scale-95');
-        const modal = jQuery('#drawer-rename-theme');
-        modal.addClass('opacity-0').css('opacity', '0').css('pointer-events', 'none');
-        setTimeout(function() {
-            modal.addClass('hidden');
-        }, 300);
+        window.coraCloseDrawerSheet('drawer-rename-theme', 'drawer-rename-theme-card');
+    }, 300);
     }
     function saveRenamedTheme() {
         const id = jQuery('#rename-theme-id-input').val();
@@ -8502,19 +8541,12 @@ echo esc_textarea( json_encode( array(
             window.switchPageEngineMode(defaultEngine);
         }
 
-        const modal = jQuery('#drawer-new-page');
-        modal.removeClass('hidden opacity-0').css({'display': 'flex', 'opacity': '1'});
-        jQuery('#drawer-new-page-card').removeClass('scale-95').addClass('scale-100');
+        window.coraOpenDrawerSheet('drawer-new-page', 'drawer-new-page-card');
     }
     window.openNewPageDrawer = openNewPageDrawer;
 
     function closeNewPageDrawer() {
-        jQuery('#drawer-new-page-card').removeClass('scale-100').addClass('scale-95');
-        const modal = jQuery('#drawer-new-page');
-        modal.addClass('opacity-0').css('opacity', '0');
-        setTimeout(function() {
-            modal.addClass('hidden').css('display', 'none');
-        }, 200);
+        window.coraCloseDrawerSheet('drawer-new-page', 'drawer-new-page-card');
     }
     window.closeNewPageDrawer = closeNewPageDrawer;
 
@@ -8529,19 +8561,13 @@ echo esc_textarea( json_encode( array(
         resetHtmlScan();
         resetElementorScan();
 
-        const modal = jQuery('#drawer-elementor-migration');
-        modal.removeClass('hidden opacity-0').css({'display': 'flex', 'opacity': '1'});
-        jQuery('#drawer-elementor-migration-card').removeClass('scale-95').addClass('scale-100');
+        window.coraOpenDrawerSheet('drawer-elementor-migration', 'drawer-elementor-migration-card');
     }
     window.openElementorMigrationDrawer = openElementorMigrationDrawer;
 
     function closeElementorMigrationDrawer() {
-        jQuery('#drawer-elementor-migration-card').removeClass('scale-100').addClass('scale-95');
-        const modal = jQuery('#drawer-elementor-migration');
-        modal.addClass('opacity-0').css('opacity', '0');
-        setTimeout(function() {
-            modal.addClass('hidden').css('display', 'none');
-        }, 200);
+        window.coraCloseDrawerSheet('drawer-elementor-migration', 'drawer-elementor-migration-card');
+    }, 200);
     }
     window.closeElementorMigrationDrawer = closeElementorMigrationDrawer;
 
@@ -9548,21 +9574,11 @@ echo esc_textarea( json_encode( array(
         if (canvasState.isReadOnly) return;
         jQuery('#rename-page-id-input').val(id);
         jQuery('#rename-page-title-input').val(oldTitle);
-        
-        const modal = jQuery('#drawer-rename-page');
-        modal.removeClass('hidden');
-        setTimeout(() => {
-            modal.removeClass('opacity-0').css('opacity', '1');
-            jQuery('#drawer-rename-page-card').removeClass('scale-95').addClass('scale-100');
-        }, 10);
+        window.coraOpenDrawerSheet('drawer-rename-page', 'drawer-rename-page-card');
     }
     function closeRenamePageDrawer() {
-        jQuery('#drawer-rename-page-card').removeClass('scale-100').addClass('scale-95');
-        const modal = jQuery('#drawer-rename-page');
-        modal.addClass('opacity-0').css('opacity', '0');
-        setTimeout(function() {
-            modal.addClass('hidden');
-        }, 300);
+        window.coraCloseDrawerSheet('drawer-rename-page', 'drawer-rename-page-card');
+    }, 300);
     }
     function saveRenamedPage() {
         const id = jQuery('#rename-page-id-input').val();
@@ -9593,21 +9609,11 @@ echo esc_textarea( json_encode( array(
         if (canvasState.isReadOnly) return;
         jQuery('#change-page-slug-id-input').val(id);
         jQuery('#change-page-slug-input').val(oldSlug);
-        
-        const modal = jQuery('#drawer-change-page-slug');
-        modal.removeClass('hidden');
-        setTimeout(() => {
-            modal.removeClass('opacity-0').css('opacity', '1');
-            jQuery('#drawer-change-page-slug-card').removeClass('scale-95').addClass('scale-100');
-        }, 10);
+        window.coraOpenDrawerSheet('drawer-change-page-slug', 'drawer-change-page-slug-card');
     }
     function closeChangePageSlugDrawer() {
-        jQuery('#drawer-change-page-slug-card').removeClass('scale-100').addClass('scale-95');
-        const modal = jQuery('#drawer-change-page-slug');
-        modal.addClass('opacity-0').css('opacity', '0');
-        setTimeout(function() {
-            modal.addClass('hidden');
-        }, 300);
+        window.coraCloseDrawerSheet('drawer-change-page-slug', 'drawer-change-page-slug-card');
+    }, 300);
     }
     function savePageSlug() {
         const id = jQuery('#change-page-slug-id-input').val();
@@ -10068,7 +10074,7 @@ echo esc_textarea( json_encode( array(
             autoGenUpdateCountLabel();
         });
 
-        jQuery('#auto-gen-menu-modal').removeClass('hidden');
+        window.coraOpenDrawerSheet('auto-gen-menu-modal', 'auto-gen-menu-modal-card');
     };
 
     function autoGenUpdateCountLabel() {
@@ -10082,7 +10088,7 @@ echo esc_textarea( json_encode( array(
     };
 
     window.closeAutoGenMenuModal = function() {
-        jQuery('#auto-gen-menu-modal').addClass('hidden');
+        window.coraCloseDrawerSheet('auto-gen-menu-modal', 'auto-gen-menu-modal-card');
     };
 
     // Close modal on backdrop click
