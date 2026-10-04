@@ -918,6 +918,7 @@ The Financials module provides complete visibility into tax obligations and stre
       { id: 'manifest-config', title: '1. Dynamic PWA Manifest' },
       { id: 'service-worker', title: '2. Service Worker Lifecycle' },
       { id: 'vapid-push', title: '3. VAPID Push Implementation' },
+      { id: 'admin-badging', title: '4. Super Admin Dynamic Badging' },
     ],
     content: `
 Cora ships with native Progressive Web App (PWA) capabilities, offering sub-50ms screen painting and native-like offline reliability.
@@ -930,6 +931,7 @@ Served dynamically at \`/cora-manifest.json\`:
 - \`display\`: \`standalone\`
 - \`theme_color\`: \`#ffffff\` (Pure Light Mode splash to eliminate dark flashes)
 - Dynamic version stamps (\`?v=CORA_WORKSPACE_VERSION\`) to trigger immediate OS icon updates on release.
+- Role-scoped manifest routing: super administrators receive distinct scope (\`/workspace/dashboard?role=admin\`) and dedicated app naming.
 
 ---
 
@@ -938,7 +940,85 @@ Served dynamically at \`/cora-manifest.json\`:
 Registered at root scope (\`/\`):
 - **Cache-First**: Static CSS/JS and font assets.
 - **Network-First**: AJAX actions and REST endpoints with sub-400ms timeout.
-- **Auto-Activation**: \`skipWaiting()\` and old version cache purging executed on update.
+- **Auto-Activation**: \`skipWaiting()\` and old version cache purging executed on update within 300ms.
+
+---
+
+## 3. VAPID Push Implementation
+
+- Cryptographically signed Web Push (RFC 8291/8292) using local ECDSA P-256 keys without third-party gateways.
+- In-app push notification preference center per device.
+
+---
+
+## 4. Super Admin Dynamic Badging
+
+- Super admin sessions dynamically render badged home screen icons (\`ADMIN\` pill badge across 512x512, 192x192, and Apple Touch icons via \`scripts/generate_admin_pwa_icons.php\`).
+- Prevents visual confusion between client workspace and master control plane on mobile home screens.
+    `,
+  },
+  {
+    slug: 'canvas-static-compiler',
+    title: 'Canvas Frontend Engine & Static Site Compiler',
+    shortTitle: 'Canvas & Static Compiler',
+    category: 'developers',
+    categoryLabel: 'Developer APIs & PWA',
+    description: 'AI Starter Prompts Grid, automated Next.js/Expo/Vite static compilation, single-CPU thread safety, and lead form ingestion.',
+    readTime: '7 min read',
+    lastUpdated: 'October 2026',
+    badge: 'Canvas v4.9.338',
+    toc: [
+      { id: 'ai-starters', title: '1. AI Starter Prompts Grid' },
+      { id: 'static-compiler', title: '2. Automated Static Compiler Pipeline' },
+      { id: 'inode-resilience', title: '3. Shared Hosting Inode & Memory Resilience' },
+      { id: 'form-interception', title: '4. Lead Form Ingestion & CRM Bridge' },
+      { id: 'security-containment', title: '5. Path Traversal & 304 Caching' },
+    ],
+    content: `
+The Canvas Frontend Engine allows creative studios to design, import, compile, and host custom websites directly within Cora.
+
+---
+
+## 1. AI Starter Prompts Grid
+
+The Canvas Theme Wizard includes a 5-template AI Starter Prompts Grid:
+- **Agency Showcase**: Monochromatic portfolio with case study drawers.
+- **SaaS Platform**: Metric counters, pricing matrices, and e-sign demos.
+- **Consulting / Advisory**: Lead capture funnels and appointment schedulers.
+- **Photography Studio**: Dark-room gallery, booking calendar, and client proofing.
+- **Custom Studio**: Universal minimalist blueprint.
+
+Prompts can be copied with 1-click and pasted into ChatGPT, Claude, or Gemini to generate production-ready HTML/Tailwind templates.
+
+---
+
+## 2. Automated Static Compiler Pipeline
+
+The background compiler (\`cora_nextjs_build_repo\`) supports Next.js, Expo, Vite, and Astro:
+- Automatic detection of package managers (\`pnpm\`, \`yarn\`, \`npm\`).
+- Automated dependency resolution and production export (\`out/\` or \`dist/\`).
+- Single-CPU thread allocation (\`UV_THREADPOOL_SIZE=1\`, \`NODE_OPTIONS="--max-old-space-size=1536"\`) to prevent resource exhaustion on shared cPanel hosting.
+
+---
+
+## 3. Shared Hosting Inode & Memory Resilience
+
+- CloudLinux Inode recovery cleanses temporary \`~/.npm/_cacache\` and build caches after every run.
+- Self-healing retry logic handles directory rename locks (\`ENOTEMPTY\`) during concurrent npm extractions.
+
+---
+
+## 4. Lead Form Ingestion & CRM Bridge
+
+- Ingests inbound leads from any Canvas site automatically via standard \`<form>\` tags or \`window.coraSubmitLead()\`.
+- Synchronizes submissions into \`wp_cora_leads\` with instant PWA push dispatch.
+
+---
+
+## 5. Path Traversal & 304 Caching
+
+- Hardened asset streaming with \`realpath\` root containment preventing \`../\` directory traversal.
+- HTTP 304 Not Modified caching with SHA-256 ETags and immutable cache headers.
     `,
   },
   {
