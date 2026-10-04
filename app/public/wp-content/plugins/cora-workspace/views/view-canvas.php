@@ -6075,7 +6075,7 @@ function cora_get_sparkline_points( $history, $type ) {
 
 /* Syntax Highlighting Colors - Clear, Vibrant & Aesthetic */
 .cm-s-cora-dark .cm-tag {
-    color: #60a5fa !important; /* Tailwind Blue for HTML tags: <html>, <head>, <meta>, <title>, <script>, <style>, <body>, <div>, <header>, etc. */
+    color: #60a5fa !important; /* Tailwind Blue for HTML tags: html, head, meta, title, script, style, body, div, header, etc. */
     font-weight: 600 !important;
 }
 .cm-s-cora-dark .cm-bracket {
@@ -7090,7 +7090,6 @@ echo esc_textarea( json_encode( array(
     }
     function closeNewThemeDrawer() {
         window.coraCloseDrawerSheet('drawer-new-theme', 'drawer-new-theme-card');
-    }, 300);
     }
 
     function openImportKitDrawer() {
@@ -7353,7 +7352,6 @@ echo esc_textarea( json_encode( array(
     }
     function closeRenameThemeDrawer() {
         window.coraCloseDrawerSheet('drawer-rename-theme', 'drawer-rename-theme-card');
-    }, 300);
     }
     function saveRenamedTheme() {
         const id = jQuery('#rename-theme-id-input').val();
@@ -8567,7 +8565,6 @@ echo esc_textarea( json_encode( array(
 
     function closeElementorMigrationDrawer() {
         window.coraCloseDrawerSheet('drawer-elementor-migration', 'drawer-elementor-migration-card');
-    }, 200);
     }
     window.closeElementorMigrationDrawer = closeElementorMigrationDrawer;
 
@@ -9578,7 +9575,6 @@ echo esc_textarea( json_encode( array(
     }
     function closeRenamePageDrawer() {
         window.coraCloseDrawerSheet('drawer-rename-page', 'drawer-rename-page-card');
-    }, 300);
     }
     function saveRenamedPage() {
         const id = jQuery('#rename-page-id-input').val();
@@ -9613,7 +9609,6 @@ echo esc_textarea( json_encode( array(
     }
     function closeChangePageSlugDrawer() {
         window.coraCloseDrawerSheet('drawer-change-page-slug', 'drawer-change-page-slug-card');
-    }, 300);
     }
     function savePageSlug() {
         const id = jQuery('#change-page-slug-id-input').val();
@@ -17342,7 +17337,7 @@ Please provide the complete, un-truncated index.html file ready to save and publ
         } catch(e) {}
     });
 
-    // Expose functions to window for Command Palette usage
+    // Expose functions to window for Command Palette usage & global HTML onclick triggers
     window.triggerRenamePage = triggerRenamePage;
     window.triggerChangePageSlug = triggerChangePageSlug;
     window.triggerSetHomepage = triggerSetHomepage;
@@ -17358,6 +17353,26 @@ Please provide the complete, un-truncated index.html file ready to save and publ
     window.triggerDeletePage = triggerDeletePage;
     window.switchTab = switchTab;
     window.fetchThemePages = fetchThemePages;
+    window.editTheme = typeof editTheme !== 'undefined' ? editTheme : window.editTheme;
+    window.triggerActivateTheme = typeof triggerActivateTheme !== 'undefined' ? triggerActivateTheme : window.triggerActivateTheme;
+    window.triggerActivateThemeFromHeader = typeof triggerActivateThemeFromHeader !== 'undefined' ? triggerActivateThemeFromHeader : window.triggerActivateThemeFromHeader;
+    window.triggerDuplicateTheme = typeof triggerDuplicateTheme !== 'undefined' ? triggerDuplicateTheme : window.triggerDuplicateTheme;
+    window.triggerDeleteTheme = typeof triggerDeleteTheme !== 'undefined' ? triggerDeleteTheme : window.triggerDeleteTheme;
+    window.triggerRenameTheme = typeof triggerRenameTheme !== 'undefined' ? triggerRenameTheme : window.triggerRenameTheme;
+    window.triggerDownloadTheme = typeof triggerDownloadTheme !== 'undefined' ? triggerDownloadTheme : window.triggerDownloadTheme;
+    window.toggleActiveThemeDropdown = window.toggleActiveThemeDropdown;
+    window.toggleDraftActionsMenu = window.toggleDraftActionsMenu;
+    window.toggleImportDropdown = window.toggleImportDropdown;
+    window.openImportKitDrawer = typeof openImportKitDrawer !== 'undefined' ? openImportKitDrawer : window.openImportKitDrawer;
+    window.closeImportKitDrawer = typeof closeImportKitDrawer !== 'undefined' ? closeImportKitDrawer : window.closeImportKitDrawer;
+    window.openNewThemeDrawer = typeof openNewThemeDrawer !== 'undefined' ? openNewThemeDrawer : window.openNewThemeDrawer;
+    window.closeNewThemeDrawer = typeof closeNewThemeDrawer !== 'undefined' ? closeNewThemeDrawer : window.closeNewThemeDrawer;
+    window.openNewPageDrawer = typeof openNewPageDrawer !== 'undefined' ? openNewPageDrawer : window.openNewPageDrawer;
+    window.closeNewPageDrawer = typeof closeNewPageDrawer !== 'undefined' ? closeNewPageDrawer : window.closeNewPageDrawer;
+    window.openElementorMigrationDrawer = typeof openElementorMigrationDrawer !== 'undefined' ? openElementorMigrationDrawer : window.openElementorMigrationDrawer;
+    window.closeElementorMigrationDrawer = typeof closeElementorMigrationDrawer !== 'undefined' ? closeElementorMigrationDrawer : window.closeElementorMigrationDrawer;
+    window.toggleThemeVersionDrawer = typeof toggleThemeVersionDrawer !== 'undefined' ? toggleThemeVersionDrawer : window.toggleThemeVersionDrawer;
+    window.coraSwitchCanvasSubTab = typeof coraSwitchCanvasSubTab !== 'undefined' ? coraSwitchCanvasSubTab : window.coraSwitchCanvasSubTab;
 
 </script>
 
