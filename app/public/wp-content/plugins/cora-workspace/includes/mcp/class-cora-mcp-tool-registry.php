@@ -764,7 +764,7 @@ class Cora_MCP_Tool_Registry {
                 'readOnly'      => true,
                 'destructive'   => false,
                 'openWorld'     => false,
-                'requiredScope' => 'workspace:read',
+                'requiredScope' => 'canvas:read',
                 'inputSchema'   => array(
                     'type'       => 'object',
                     'properties' => array(
@@ -774,13 +774,27 @@ class Cora_MCP_Tool_Registry {
                 'handler'       => array( __CLASS__, 'handle_canvas_get_active_theme' ),
             ),
 
+            'cora_canvas_list_themes' => array(
+                'name'          => 'cora_canvas_list_themes',
+                'description'   => 'List all Canvas website themes, builders (HTML AI / Next.js / Elementor), live/draft statuses, and preview links for the workspace.',
+                'readOnly'      => true,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'canvas:read',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => (object) array(),
+                ),
+                'handler'       => array( __CLASS__, 'handle_canvas_list_themes' ),
+            ),
+
             'cora_canvas_get_page_html' => array(
                 'name'          => 'cora_canvas_get_page_html',
                 'description'   => 'Get the full HTML source code of the active landing page or a specific Canvas page.',
                 'readOnly'      => true,
                 'destructive'   => false,
                 'openWorld'     => false,
-                'requiredScope' => 'workspace:read',
+                'requiredScope' => 'canvas:read',
                 'inputSchema'   => array(
                     'type'       => 'object',
                     'properties' => array(
@@ -797,7 +811,7 @@ class Cora_MCP_Tool_Registry {
                 'readOnly'      => false,
                 'destructive'   => false,
                 'openWorld'     => false,
-                'requiredScope' => 'workspace:write',
+                'requiredScope' => 'canvas:write',
                 'inputSchema'   => array(
                     'type'       => 'object',
                     'properties' => array(
@@ -809,6 +823,78 @@ class Cora_MCP_Tool_Registry {
                     'required'   => array( 'html' ),
                 ),
                 'handler'       => array( __CLASS__, 'handle_canvas_update_page_html' ),
+            ),
+
+            'cora_canvas_create_theme' => array(
+                'name'          => 'cora_canvas_create_theme',
+                'description'   => 'Create a brand new website theme / project with custom HTML code and optionally set it live immediately.',
+                'readOnly'      => false,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'canvas:write',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'name'          => array( 'type' => 'string', 'description' => 'Name of the new theme (e.g. Minimalist Agency).' ),
+                        'html'          => array( 'type' => 'string', 'description' => 'Initial HTML/Tailwind landing page code.' ),
+                        'template_key'  => array( 'type' => 'string', 'description' => 'Template category: agency, saas, consulting, photography, or custom.' ),
+                        'activate_live' => array( 'type' => 'boolean', 'description' => 'Whether to set this new theme as the live production site immediately (default: true).' ),
+                    ),
+                    'required'   => array( 'name' ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_canvas_create_theme' ),
+            ),
+
+            'cora_canvas_activate_theme' => array(
+                'name'          => 'cora_canvas_activate_theme',
+                'description'   => 'Switch and activate a specific theme ID to be the live production website for the workspace.',
+                'readOnly'      => false,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'canvas:write',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'theme_id' => array( 'type' => 'integer', 'description' => 'ID of the theme to activate live.' ),
+                    ),
+                    'required'   => array( 'theme_id' ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_canvas_activate_theme' ),
+            ),
+
+            // ── 12. Workspace & Website Settings ──────────────────────────────
+            'cora_get_website_settings' => array(
+                'name'          => 'cora_get_website_settings',
+                'description'   => 'Get website branding, business name, tagline, address, contact email/phone, and SEO settings.',
+                'readOnly'      => true,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'workspace:read',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => (object) array(),
+                ),
+                'handler'       => array( __CLASS__, 'handle_get_website_settings' ),
+            ),
+
+            'cora_update_website_settings' => array(
+                'name'          => 'cora_update_website_settings',
+                'description'   => 'Update website branding, business name, address, contact information, and meta descriptions.',
+                'readOnly'      => false,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'workspace:write',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'business_name' => array( 'type' => 'string', 'description' => 'Business / Studio name.' ),
+                        'tagline'       => array( 'type' => 'string', 'description' => 'Hero tagline or slogan.' ),
+                        'email'         => array( 'type' => 'string', 'description' => 'Public contact email.' ),
+                        'phone'         => array( 'type' => 'string', 'description' => 'Public contact phone / WhatsApp.' ),
+                        'address'       => array( 'type' => 'string', 'description' => 'Studio or office address.' ),
+                    ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_update_website_settings' ),
             ),
         );
     }
@@ -1022,6 +1108,30 @@ class Cora_MCP_Tool_Registry {
             'update_site_html'                  => 'cora_canvas_update_page_html',
             'publish_page_html'                 => 'cora_canvas_update_page_html',
             'save_page_html'                    => 'cora_canvas_update_page_html',
+
+            'cora_canvas_list_themes'           => 'cora_canvas_list_themes',
+            'list_themes'                       => 'cora_canvas_list_themes',
+            'get_themes'                        => 'cora_canvas_list_themes',
+            'canvas_list_themes'                => 'cora_canvas_list_themes',
+
+            'cora_canvas_create_theme'          => 'cora_canvas_create_theme',
+            'create_theme'                      => 'cora_canvas_create_theme',
+            'canvas_create_theme'               => 'cora_canvas_create_theme',
+            'add_theme'                         => 'cora_canvas_create_theme',
+
+            'cora_canvas_activate_theme'        => 'cora_canvas_activate_theme',
+            'activate_theme'                    => 'cora_canvas_activate_theme',
+            'set_active_theme'                  => 'cora_canvas_activate_theme',
+            'canvas_activate_theme'             => 'cora_canvas_activate_theme',
+
+            'cora_get_website_settings'         => 'cora_get_website_settings',
+            'get_website_settings'              => 'cora_get_website_settings',
+            'website_settings'                  => 'cora_get_website_settings',
+            'get_site_settings'                 => 'cora_get_website_settings',
+
+            'cora_update_website_settings'      => 'cora_update_website_settings',
+            'update_website_settings'           => 'cora_update_website_settings',
+            'update_site_settings'              => 'cora_update_website_settings',
         );
 
         if ( isset( $map[ $normalized ] ) ) {
@@ -2697,6 +2807,215 @@ class Cora_MCP_Tool_Registry {
             'live_url'       => home_url( '/site/' ),
             'change_summary' => $change_summary,
             'updated_at'     => current_time( 'mysql' ),
+        );
+    }
+
+    /**
+     * List all Canvas themes in the workspace
+     */
+    public static function handle_canvas_list_themes( $args, $auth ) {
+        $agency_id = self::get_agency_id( $auth, $args );
+        global $wpdb;
+
+        $rows = $wpdb->get_results( $wpdb->prepare(
+            "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE agency_id = %d ORDER BY id DESC",
+            $agency_id
+        ), ARRAY_A );
+
+        $themes = array();
+        if ( ! empty( $rows ) ) {
+            foreach ( $rows as $r ) {
+                $settings = json_decode( $r['settings'] ?? '{}', true ) ?: array();
+                $source = strtolower( $settings['source'] ?? 'elementor' );
+                $framework = strtolower( $settings['framework'] ?? '' );
+                $builder = ( $framework === 'html_tailwind' || ( $settings['builder'] ?? '' ) === 'html_ai' || ! empty( $settings['template_key'] ) )
+                    ? 'html_ai'
+                    : ( $source === 'nextjs' ? 'nextjs' : ( $source === 'lovable' ? 'lovable' : 'elementor' ) );
+
+                $themes[] = array(
+                    'theme_id'        => intval( $r['id'] ),
+                    'name'            => $r['name'],
+                    'status'          => $r['status'],
+                    'builder'         => $builder,
+                    'framework'       => $framework,
+                    'is_static_built' => ! empty( $settings['is_static_built'] ),
+                    'template_key'    => $settings['template_key'] ?? '',
+                    'live_url'        => ( $r['status'] === 'live' ) ? home_url( '/site/' ) : '',
+                    'preview_url'     => home_url( '/site/?cv_preview_theme=' . $r['id'] ),
+                    'updated_at'      => $r['updated_at'],
+                );
+            }
+        }
+
+        return array(
+            'total'  => count( $themes ),
+            'themes' => $themes,
+        );
+    }
+
+    /**
+     * Create a new Canvas Theme with custom HTML
+     */
+    public static function handle_canvas_create_theme( $args, $auth ) {
+        $agency_id = self::get_agency_id( $auth, $args );
+        global $wpdb;
+
+        $name = sanitize_text_field( $args['name'] ?? 'New AI Theme' );
+        $html = isset( $args['html'] ) ? trim( $args['html'] ) : '';
+        $template_key = sanitize_text_field( $args['template_key'] ?? 'agency' );
+        $activate_live = ! isset( $args['activate_live'] ) || ! empty( $args['activate_live'] );
+
+        $settings = array(
+            'source'            => 'nextjs',
+            'framework'         => 'html_tailwind',
+            'builder'           => 'html_ai',
+            'template_key'      => $template_key,
+            'is_static_built'   => ! empty( $html ),
+            'static_built_at'   => current_time( 'mysql' ),
+            'static_file_count' => ! empty( $html ) ? 1 : 0,
+        );
+
+        $status = $activate_live ? 'live' : 'draft';
+
+        // If activating live, draft existing live themes
+        if ( $activate_live ) {
+            $wpdb->update(
+                $wpdb->prefix . 'cora_canvas_themes',
+                array( 'status' => 'draft' ),
+                array( 'agency_id' => $agency_id, 'status' => 'live' )
+            );
+        }
+
+        $wpdb->insert(
+            $wpdb->prefix . 'cora_canvas_themes',
+            array(
+                'agency_id'   => $agency_id,
+                'name'        => $name,
+                'status'      => $status,
+                'settings'    => json_encode( $settings ),
+                'created_at'  => current_time( 'mysql' ),
+                'updated_at'  => current_time( 'mysql' ),
+            )
+        );
+        $new_theme_id = $wpdb->insert_id;
+
+        if ( ! empty( $html ) ) {
+            $upload_dir = wp_get_upload_dir();
+            $theme_dir  = $upload_dir['basedir'] . '/cora-nextjs-builds/theme_' . $new_theme_id;
+            $out_dir    = $theme_dir . '/out';
+            wp_mkdir_p( $out_dir );
+
+            file_put_contents( $theme_dir . '/index.html', $html );
+            file_put_contents( $out_dir . '/index.html', $html );
+
+            $settings['static_build_path'] = $out_dir;
+            $wpdb->update(
+                $wpdb->prefix . 'cora_canvas_themes',
+                array( 'settings' => json_encode( $settings ) ),
+                array( 'id' => $new_theme_id )
+            );
+        }
+
+        // Create Canvas Page
+        $wpdb->insert(
+            $wpdb->prefix . 'cora_canvas_pages',
+            array(
+                'theme_id'    => $new_theme_id,
+                'slug'        => 'home',
+                'title'       => 'Home',
+                'is_homepage' => 1,
+                'content'     => $html,
+                'status'      => 'publish',
+                'created_at'  => current_time( 'mysql' ),
+                'updated_at'  => current_time( 'mysql' ),
+            )
+        );
+
+        return array(
+            'success'     => true,
+            'message'     => 'Theme created successfully and configured.',
+            'theme_id'    => $new_theme_id,
+            'name'        => $name,
+            'status'      => $status,
+            'builder'     => 'html_ai',
+            'live_url'    => $activate_live ? home_url( '/site/' ) : '',
+            'preview_url' => home_url( '/site/?cv_preview_theme=' . $new_theme_id ),
+        );
+    }
+
+    /**
+     * Activate a theme to be live
+     */
+    public static function handle_canvas_activate_theme( $args, $auth ) {
+        $agency_id = self::get_agency_id( $auth, $args );
+        global $wpdb;
+
+        $theme_id = intval( $args['theme_id'] ?? 0 );
+        if ( ! $theme_id ) {
+            return array( 'error' => 'Parameter "theme_id" is required.' );
+        }
+
+        // Set all other themes to draft
+        $wpdb->update(
+            $wpdb->prefix . 'cora_canvas_themes',
+            array( 'status' => 'draft' ),
+            array( 'agency_id' => $agency_id )
+        );
+
+        // Set target theme to live
+        $wpdb->update(
+            $wpdb->prefix . 'cora_canvas_themes',
+            array( 'status' => 'live', 'updated_at' => current_time( 'mysql' ) ),
+            array( 'id' => $theme_id )
+        );
+
+        return array(
+            'success'  => true,
+            'message'  => "Theme #{$theme_id} is now live at " . home_url( '/site/' ),
+            'theme_id' => $theme_id,
+            'live_url' => home_url( '/site/' ),
+        );
+    }
+
+    /**
+     * Get Website Branding & Settings
+     */
+    public static function handle_get_website_settings( $args, $auth ) {
+        $agency_id = self::get_agency_id( $auth, $args );
+        
+        $name = get_bloginfo( 'name' );
+        $tagline = get_bloginfo( 'description' );
+        if ( function_exists( 'cora_get_agency_title' ) ) {
+            $name = cora_get_agency_title( $agency_id ) ?: $name;
+        }
+
+        return array(
+            'business_name' => $name,
+            'tagline'       => $tagline,
+            'site_url'      => home_url( '/site/' ),
+            'workspace_id'  => $agency_id,
+            'admin_email'   => get_option( 'admin_email' ),
+        );
+    }
+
+    /**
+     * Update Website Branding & Settings
+     */
+    public static function handle_update_website_settings( $args, $auth ) {
+        $agency_id = self::get_agency_id( $auth, $args );
+        
+        if ( ! empty( $args['business_name'] ) ) {
+            update_option( 'blogname', sanitize_text_field( $args['business_name'] ) );
+        }
+        if ( ! empty( $args['tagline'] ) ) {
+            update_option( 'blogdescription', sanitize_text_field( $args['tagline'] ) );
+        }
+
+        return array(
+            'success'       => true,
+            'message'       => 'Website settings updated successfully.',
+            'business_name' => get_bloginfo( 'name' ),
+            'tagline'       => get_bloginfo( 'description' ),
         );
     }
 }

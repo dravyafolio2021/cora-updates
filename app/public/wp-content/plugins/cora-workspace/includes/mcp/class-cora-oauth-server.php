@@ -25,112 +25,124 @@ class Cora_OAuth_Server {
     public static function get_supported_scopes() {
         return array(
             'workspace:read' => array(
-                'label'       => 'Workspace Information',
-                'description' => 'View workspace overview, settings, and team metadata.',
+                'label'       => 'Workspace Overview & Metadata',
+                'description' => 'View workspace profile, team members, status metrics, and intake forms.',
                 'category'    => 'core',
                 'level'       => 'read',
             ),
-            'clients:read' => array(
-                'label'       => 'View Clients',
-                'description' => 'Read client profiles, contacts, and account details.',
-                'category'    => 'crm',
+            'workspace:write' => array(
+                'label'       => 'Workspace Settings & Configuration',
+                'description' => 'Update workspace branding, business profile, and platform settings.',
+                'category'    => 'core',
+                'level'       => 'write',
+            ),
+            'canvas:read' => array(
+                'label'       => 'Website, Themes & Templates',
+                'description' => 'Inspect active themes, landing page templates, route maps, and source HTML.',
+                'category'    => 'canvas',
                 'level'       => 'read',
             ),
-            'clients:write' => array(
-                'label'       => 'Manage Clients',
-                'description' => 'Create and update client records.',
-                'category'    => 'crm',
+            'canvas:write' => array(
+                'label'       => 'Edit & Publish Website HTML',
+                'description' => 'Create themes, edit page markup, and publish landing page code live instantly.',
+                'category'    => 'canvas',
                 'level'       => 'write',
             ),
             'leads:read' => array(
-                'label'       => 'View Leads & Pipeline',
-                'description' => 'Access CRM inquiries, pipeline deal stages, and metrics.',
+                'label'       => 'View CRM Leads & Pipeline',
+                'description' => 'Access incoming client inquiries, deal values, and funnel pipeline stages.',
                 'category'    => 'crm',
                 'level'       => 'read',
             ),
             'leads:write' => array(
-                'label'       => 'Manage Leads',
-                'description' => 'Create new leads, update deal stages, and add interaction notes.',
+                'label'       => 'Manage Leads & Pipeline',
+                'description' => 'Create new leads, update deal values, advance funnel stages, and log notes.',
+                'category'    => 'crm',
+                'level'       => 'write',
+            ),
+            'clients:read' => array(
+                'label'       => 'View Client Directory',
+                'description' => 'Read client accounts, contact profiles, and historical interactions.',
+                'category'    => 'crm',
+                'level'       => 'read',
+            ),
+            'clients:write' => array(
+                'label'       => 'Manage Client Profiles',
+                'description' => 'Create, update, and manage client records and preferences.',
                 'category'    => 'crm',
                 'level'       => 'write',
             ),
             'projects:read' => array(
                 'label'       => 'View Projects & Bookings',
-                'description' => 'View active projects, shoot schedules, and deliverables.',
+                'description' => 'Read shoot schedules, booking packages, deliverables, and event milestones.',
                 'category'    => 'operations',
                 'level'       => 'read',
             ),
             'projects:write' => array(
-                'label'       => 'Manage Projects',
-                'description' => 'Create projects, update shoot details, and track statuses.',
+                'label'       => 'Manage Projects & Bookings',
+                'description' => 'Schedule bookings, assign shoot crews, update package amounts, and track delivery.',
                 'category'    => 'operations',
                 'level'       => 'write',
             ),
             'tasks:read' => array(
-                'label'       => 'View Tasks',
-                'description' => 'Read workspace task boards and assignments.',
+                'label'       => 'View Kanban Tasks',
+                'description' => 'Read workspace task boards, assignments, priorities, and deadlines.',
                 'category'    => 'operations',
                 'level'       => 'read',
             ),
             'tasks:write' => array(
-                'label'       => 'Manage Tasks',
-                'description' => 'Create, assign, update, and complete tasks.',
+                'label'       => 'Manage Kanban Tasks',
+                'description' => 'Create, assign, prioritize, update, and move tasks across Kanban stages.',
                 'category'    => 'operations',
-                'level'       => 'write',
-            ),
-            'content:read' => array(
-                'label'       => 'Read Content & SEO',
-                'description' => 'Search articles, guides, knowledge documents, and SEO metrics.',
-                'category'    => 'growth',
-                'level'       => 'read',
-            ),
-            'content:write' => array(
-                'label'       => 'Create & Publish Content',
-                'description' => 'Draft articles/guides, upload assets, validate, and publish live.',
-                'category'    => 'growth',
-                'level'       => 'write',
-            ),
-            'proposals:read' => array(
-                'label'       => 'View Proposals',
-                'description' => 'Read client proposals, quotes, and contract terms.',
-                'category'    => 'sales',
-                'level'       => 'read',
-            ),
-            'proposals:write' => array(
-                'label'       => 'Manage Proposals',
-                'description' => 'Generate and send client proposals and contracts.',
-                'category'    => 'sales',
                 'level'       => 'write',
             ),
             'finance:read' => array(
                 'label'       => 'View Financials & Invoices',
-                'description' => 'Read invoices, receivables, and revenue ledger analytics.',
+                'description' => 'Read revenue metrics, client invoices, outstanding receivables, and ledgers.',
                 'category'    => 'finance',
                 'level'       => 'read',
             ),
             'finance:write' => array(
                 'label'       => 'Record Financial Transactions',
-                'description' => 'Record payments, expenses, and transaction memos.',
+                'description' => 'Create invoices, record client payments, and track expense transactions.',
                 'category'    => 'finance',
                 'level'       => 'write',
             ),
-            'workflows:read' => array(
-                'label'       => 'View Workflows',
-                'description' => 'Inspect automated triggers and rule configurations.',
-                'category'    => 'automation',
+            'content:read' => array(
+                'label'       => 'Read Content & SEO Engine',
+                'description' => 'Search editorial articles, guides, knowledge documents, and SEO metrics.',
+                'category'    => 'growth',
                 'level'       => 'read',
             ),
-            'workflows:write' => array(
-                'label'       => 'Manage Workflows',
-                'description' => 'Configure automation workflows and alerts.',
-                'category'    => 'automation',
+            'content:write' => array(
+                'label'       => 'Draft & Publish Content',
+                'description' => 'Create structured articles/guides, optimize keywords, and publish live.',
+                'category'    => 'growth',
                 'level'       => 'write',
             ),
             'knowledge:read' => array(
                 'label'       => 'Living RAG Knowledge Base',
-                'description' => 'Query workspace living memory, documents, and historical intelligence.',
+                'description' => 'Semantic query across living memory, past shoots, SOPs, and intelligence.',
                 'category'    => 'intelligence',
                 'level'       => 'read',
+            ),
+            'knowledge:write' => array(
+                'label'       => 'Save Knowledge Fragments',
+                'description' => 'Store new context fragments, client preferences, and operational memory.',
+                'category'    => 'intelligence',
+                'level'       => 'write',
+            ),
+            'workflows:read' => array(
+                'label'       => 'View Automated Workflows',
+                'description' => 'Inspect automated rule configurations, triggers, and notification flows.',
+                'category'    => 'automation',
+                'level'       => 'read',
+            ),
+            'workflows:write' => array(
+                'label'       => 'Manage Automations',
+                'description' => 'Configure and trigger automated actions, webhooks, and alerts.',
+                'category'    => 'automation',
+                'level'       => 'write',
             ),
         );
     }
@@ -197,9 +209,19 @@ class Cora_OAuth_Server {
             }
 
             if ( $action === 'approve' ) {
+                $selected_workspace = sanitize_text_field( $_POST['workspace_id'] ?? '1' );
+                $full_access = ! empty( $_POST['full_access'] ) && (string) $_POST['full_access'] === '1';
+
                 $selected_scopes = ( isset( $_POST['scopes'] ) && is_array( $_POST['scopes'] ) && ! empty( $_POST['scopes'] ) )
                     ? array_map( 'sanitize_text_field', $_POST['scopes'] )
                     : array_keys( self::get_supported_scopes() );
+
+                // If full access is requested or all scopes are selected, include master wildcard
+                if ( $full_access || count( $selected_scopes ) >= count( self::get_supported_scopes() ) ) {
+                    if ( ! in_array( '*', $selected_scopes, true ) ) {
+                        array_unshift( $selected_scopes, '*' );
+                    }
+                }
 
                 // Verify workspace belongs to user
                 $workspace_valid = false;
@@ -567,15 +589,60 @@ class Cora_OAuth_Server {
                 $token = trim( $request->get_header( 'x-mcp-token' ) ?? '' );
             }
             if ( empty( $token ) ) {
+                $token = trim( $request->get_param( 'access_token' ) ?? '' );
+            }
+            if ( empty( $token ) ) {
                 $token = trim( $request->get_param( 'token' ) ?? '' );
             }
         }
 
+        // Check standard global headers and environment variables
         if ( empty( $token ) && isset( $_SERVER['HTTP_AUTHORIZATION'] ) ) {
             if ( preg_match( '/Bearer\s+(.+)$/i', $_SERVER['HTTP_AUTHORIZATION'], $matches ) ) {
                 $token = trim( $matches[1] );
             } else {
                 $token = trim( $_SERVER['HTTP_AUTHORIZATION'] );
+            }
+        }
+
+        if ( empty( $token ) && isset( $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ) ) {
+            if ( preg_match( '/Bearer\s+(.+)$/i', $_SERVER['REDIRECT_HTTP_AUTHORIZATION'], $matches ) ) {
+                $token = trim( $matches[1] );
+            } else {
+                $token = trim( $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] );
+            }
+        }
+
+        if ( empty( $token ) && isset( $_SERVER['AUTHORIZATION'] ) ) {
+            if ( preg_match( '/Bearer\s+(.+)$/i', $_SERVER['AUTHORIZATION'], $matches ) ) {
+                $token = trim( $matches[1] );
+            } else {
+                $token = trim( $_SERVER['AUTHORIZATION'] );
+            }
+        }
+
+        // Check Apache headers directly if FastCGI stripped them
+        if ( empty( $token ) && function_exists( 'apache_request_headers' ) ) {
+            $apache_headers = apache_request_headers();
+            $auth_val = $apache_headers['Authorization'] ?? ( $apache_headers['authorization'] ?? '' );
+            if ( ! empty( $auth_val ) ) {
+                if ( preg_match( '/Bearer\s+(.+)$/i', $auth_val, $matches ) ) {
+                    $token = trim( $matches[1] );
+                } else {
+                    $token = trim( $auth_val );
+                }
+            }
+        }
+
+        if ( empty( $token ) && function_exists( 'getallheaders' ) ) {
+            $all_headers = getallheaders();
+            $auth_val = $all_headers['Authorization'] ?? ( $all_headers['authorization'] ?? '' );
+            if ( ! empty( $auth_val ) ) {
+                if ( preg_match( '/Bearer\s+(.+)$/i', $auth_val, $matches ) ) {
+                    $token = trim( $matches[1] );
+                } else {
+                    $token = trim( $auth_val );
+                }
             }
         }
 
@@ -587,8 +654,12 @@ class Cora_OAuth_Server {
             $token = trim( sanitize_text_field( $_SERVER['HTTP_X_MCP_TOKEN'] ) );
         }
 
-        if ( empty( $token ) && isset( $_GET['token'] ) ) {
-            $token = sanitize_text_field( $_GET['token'] );
+        if ( empty( $token ) && isset( $_REQUEST['access_token'] ) ) {
+            $token = sanitize_text_field( $_REQUEST['access_token'] );
+        }
+
+        if ( empty( $token ) && isset( $_REQUEST['token'] ) ) {
+            $token = sanitize_text_field( $_REQUEST['token'] );
         }
 
         if ( empty( $token ) ) {
@@ -600,14 +671,14 @@ class Cora_OAuth_Server {
         $table_tokens = $wpdb->prefix . 'cora_oauth_tokens';
 
         if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $table_tokens ) ) {
-            $token_row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table_tokens} WHERE token_hash = %s", $token_hash ) );
+            $token_row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table_tokens} WHERE token_hash = %s OR token_hash = %s", $token_hash, $token ) );
 
             if ( $token_row ) {
                 if ( intval( $token_row->revoked ) === 1 ) {
                     return array( 'valid' => false, 'error' => 'Token has been revoked.' );
                 }
 
-                if ( strtotime( $token_row->expires_at ) < time() ) {
+                if ( ! empty( $token_row->expires_at ) && strtotime( $token_row->expires_at ) < time() ) {
                     return array( 'valid' => false, 'error' => 'Token has expired.' );
                 }
 
@@ -651,7 +722,7 @@ class Cora_OAuth_Server {
         }
 
         if ( $is_valid_direct ) {
-            $all_scopes = array_keys( self::get_supported_scopes() );
+            $all_scopes = array_merge( array( '*' ), array_keys( self::get_supported_scopes() ) );
             return array(
                 'valid'        => true,
                 'token_id'     => 0,
@@ -679,8 +750,8 @@ class Cora_OAuth_Server {
             ? $auth_context['scopes']
             : array_filter( array_map( 'trim', explode( ' ', (string) $auth_context['scopes'] ) ) );
 
-        // Master wildcards and coarse AI client scopes
-        $master_scopes = array( '*', 'all', 'mcp', 'admin', 'tools', 'workspace', 'root', 'full_access', 'offline_access', 'openid', 'profile', 'email' );
+        // Master wildcards and coarse AI client scopes (Full access to all tools)
+        $master_scopes = array( '*', 'all', 'mcp', 'admin', 'tools', 'workspace', 'root', 'full_access', 'offline_access', 'openid', 'profile', 'email', 'api' );
         foreach ( $master_scopes as $ms ) {
             if ( in_array( $ms, $scopes, true ) ) {
                 return true;
@@ -699,26 +770,69 @@ class Cora_OAuth_Server {
             return true;
         }
 
-        // Category-level coarse scopes (e.g. 'crm' grants 'clients:read', 'clients:write', 'leads:read', 'leads:write')
         $parts = explode( ':', $required_scope );
         $scope_resource = $parts[0] ?? '';
+        $scope_action   = $parts[1] ?? 'read';
+
         if ( ! empty( $scope_resource ) && in_array( $scope_resource, $scopes, true ) ) {
             return true;
         }
-        if ( in_array( 'crm', $scopes, true ) && in_array( $scope_resource, array( 'clients', 'leads' ), true ) ) {
-            return true;
-        }
-        if ( in_array( 'operations', $scopes, true ) && in_array( $scope_resource, array( 'projects', 'tasks', 'bookings' ), true ) ) {
-            return true;
-        }
-        if ( in_array( 'growth', $scopes, true ) && in_array( $scope_resource, array( 'content', 'seo' ), true ) ) {
-            return true;
-        }
-        if ( in_array( 'finance', $scopes, true ) && in_array( $scope_resource, array( 'finance', 'invoices', 'ledger' ), true ) ) {
-            return true;
+
+        // Canvas / Themes / Website synonyms
+        if ( in_array( $scope_resource, array( 'canvas', 'theme', 'themes', 'website', 'templates' ), true ) ) {
+            if ( in_array( 'canvas:' . $scope_action, $scopes, true ) ||
+                 in_array( 'theme:' . $scope_action, $scopes, true ) ||
+                 in_array( 'themes:' . $scope_action, $scopes, true ) ||
+                 in_array( 'website:' . $scope_action, $scopes, true ) ||
+                 in_array( 'canvas', $scopes, true ) ||
+                 in_array( 'theme', $scopes, true ) ||
+                 in_array( 'website', $scopes, true ) ||
+                 in_array( 'workspace:' . $scope_action, $scopes, true ) ||
+                 in_array( 'workspace', $scopes, true ) ) {
+                return true;
+            }
         }
 
-        // Write scope implies read scope (e.g. clients:write grants clients:read)
+        // CRM & Leads synonyms
+        if ( in_array( $scope_resource, array( 'clients', 'leads' ), true ) ) {
+            if ( in_array( 'crm', $scopes, true ) || in_array( 'crm:' . $scope_action, $scopes, true ) || in_array( 'leads:' . $scope_action, $scopes, true ) || in_array( 'clients:' . $scope_action, $scopes, true ) ) {
+                return true;
+            }
+        }
+
+        // Operations & Projects & Bookings & Tasks synonyms
+        if ( in_array( $scope_resource, array( 'projects', 'tasks', 'bookings' ), true ) ) {
+            if ( in_array( 'operations', $scopes, true ) || in_array( 'operations:' . $scope_action, $scopes, true ) ||
+                 in_array( 'projects:' . $scope_action, $scopes, true ) || in_array( 'bookings:' . $scope_action, $scopes, true ) || in_array( 'tasks:' . $scope_action, $scopes, true ) ) {
+                return true;
+            }
+        }
+
+        // Finance & Invoices synonyms
+        if ( in_array( $scope_resource, array( 'finance', 'invoices', 'ledger' ), true ) ) {
+            if ( in_array( 'finance', $scopes, true ) || in_array( 'finance:' . $scope_action, $scopes, true ) ||
+                 in_array( 'invoices:' . $scope_action, $scopes, true ) || in_array( 'ledger:' . $scope_action, $scopes, true ) ) {
+                return true;
+            }
+        }
+
+        // Content & SEO synonyms
+        if ( in_array( $scope_resource, array( 'content', 'seo', 'growth' ), true ) ) {
+            if ( in_array( 'growth', $scopes, true ) || in_array( 'content', $scopes, true ) ||
+                 in_array( 'content:' . $scope_action, $scopes, true ) || in_array( 'growth:' . $scope_action, $scopes, true ) ) {
+                return true;
+            }
+        }
+
+        // Intelligence & Knowledge synonyms
+        if ( in_array( $scope_resource, array( 'knowledge', 'intelligence', 'rag', 'memory' ), true ) ) {
+            if ( in_array( 'knowledge', $scopes, true ) || in_array( 'intelligence', $scopes, true ) ||
+                 in_array( 'knowledge:' . $scope_action, $scopes, true ) ) {
+                return true;
+            }
+        }
+
+        // Write scope implies read scope (e.g. canvas:write grants canvas:read)
         if ( substr( $required_scope, -5 ) === ':read' ) {
             $write_scope = substr( $required_scope, 0, -5 ) . ':write';
             if ( in_array( $write_scope, $scopes, true ) ) {
@@ -732,7 +846,7 @@ class Cora_OAuth_Server {
     /**
      * Generate an authorization code
      */
-    private static function generate_auth_code( $client_id, $user_id, $workspace_id, $redirect_uri, $code_challenge, $code_challenge_method, $scopes ) {
+    public static function generate_auth_code( $client_id, $user_id, $workspace_id, $redirect_uri, $code_challenge, $code_challenge_method, $scopes ) {
         global $wpdb;
         $code = 'cora_code_' . bin2hex( wp_generate_password( 24, false ) );
         $now  = time();
@@ -946,8 +1060,8 @@ class Cora_OAuth_Server {
 
         $supported_scopes = self::get_supported_scopes();
         $requested_scopes = array_filter( array_map( 'trim', explode( ' ', $scope_param ) ) );
-        $has_broad_scope = false;
-        $broad_keywords = array( 'mcp', 'all', '*', 'tools', 'workspace', 'default', 'openid', 'profile', 'email', 'api' );
+        $has_broad_scope  = false;
+        $broad_keywords   = array( 'mcp', 'all', '*', 'tools', 'workspace', 'default', 'openid', 'profile', 'email', 'api', 'full_access' );
         foreach ( $broad_keywords as $bk ) {
             if ( in_array( $bk, $requested_scopes, true ) ) {
                 $has_broad_scope = true;
@@ -958,6 +1072,26 @@ class Cora_OAuth_Server {
             $requested_scopes = array_keys( $supported_scopes );
         }
 
+        // Group scopes by category for intuitive UX
+        $categories = array(
+            'canvas'       => array( 'title' => 'Website, Themes & Canvas', 'icon' => 'globe', 'scopes' => array() ),
+            'crm'          => array( 'title' => 'CRM, Leads & Clients', 'icon' => 'users', 'scopes' => array() ),
+            'operations'   => array( 'title' => 'Projects, Bookings & Tasks', 'icon' => 'clipboard', 'scopes' => array() ),
+            'finance'      => array( 'title' => 'Financials, Invoices & Ledger', 'icon' => 'credit-card', 'scopes' => array() ),
+            'growth'       => array( 'title' => 'Content Engine & SEO', 'icon' => 'file-text', 'scopes' => array() ),
+            'intelligence' => array( 'title' => 'Living RAG Knowledge Base', 'icon' => 'cpu', 'scopes' => array() ),
+            'core'         => array( 'title' => 'Workspace & Settings', 'icon' => 'settings', 'scopes' => array() ),
+            'automation'   => array( 'title' => 'Automated Workflows', 'icon' => 'zap', 'scopes' => array() ),
+        );
+
+        foreach ( $supported_scopes as $key => $meta ) {
+            $cat = $meta['category'] ?? 'core';
+            if ( ! isset( $categories[ $cat ] ) ) {
+                $categories[ $cat ] = array( 'title' => ucfirst( $cat ), 'icon' => 'check', 'scopes' => array() );
+            }
+            $categories[ $cat ]['scopes'][ $key ] = $meta;
+        }
+
         $nonce = wp_create_nonce( 'cora_oauth_authorize_action' );
         ?>
         <!DOCTYPE html>
@@ -965,42 +1099,50 @@ class Cora_OAuth_Server {
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Authorize <?php echo esc_html( $client->client_name ); ?> — Cora AI Gateway</title>
+            <title>Authorize <?php echo esc_html( $client->client_name ); ?> — Cora Universal MCP</title>
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
             <script src="https://cdn.tailwindcss.com"></script>
             <style>
                 body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
                 .font-mono { font-family: 'JetBrains Mono', monospace; }
+                .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+                .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+                .custom-scrollbar::-webkit-scrollbar-thumb { background: #d4d4d8; border-radius: 4px; }
             </style>
         </head>
-        <body class="bg-zinc-50 text-zinc-900 flex items-center justify-center min-h-screen p-4 sm:p-6 antialiased">
-            <div class="bg-white border border-zinc-200/90 rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-sm">
+        <body class="bg-zinc-50 text-zinc-900 flex items-center justify-center min-h-screen p-3 sm:p-6 antialiased selection:bg-zinc-900 selection:text-white">
+            <div class="bg-white border border-zinc-200/90 rounded-3xl p-6 sm:p-8 max-w-xl w-full shadow-sm">
                 <!-- Header Badge -->
-                <div class="flex items-center justify-between pb-6 border-b border-zinc-100">
+                <div class="flex items-center justify-between pb-5 border-b border-zinc-100">
                     <div class="flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-2xl bg-zinc-900 text-white flex items-center justify-center font-bold text-sm tracking-tight shadow-sm">
+                        <div class="w-10 h-10 rounded-2xl bg-zinc-900 text-white flex items-center justify-center font-bold text-sm tracking-tight shadow-sm">
                             C
                         </div>
                         <div>
                             <div class="text-xs font-semibold text-zinc-900 tracking-tight flex items-center gap-1.5">
                                 Cora Universal MCP
-                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-zinc-100 text-zinc-600">OAuth 2.1</span>
+                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-zinc-100 text-zinc-700">OAuth 2.1</span>
                             </div>
-                            <div class="text-[11px] text-zinc-500">Autonomous AI Tool Integration</div>
+                            <div class="text-[11px] text-zinc-500">Autonomous AI Integration Gateway</div>
                         </div>
                     </div>
-                    <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 ring-4 ring-emerald-50"></div>
+                    <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200/60 text-emerald-700 text-[11px] font-medium">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        Ready to Connect
+                    </div>
                 </div>
 
                 <!-- Connection Hero -->
-                <div class="my-6">
-                    <h1 class="text-lg font-semibold text-zinc-900 tracking-tight">Connect <?php echo esc_html( $client->client_name ); ?></h1>
-                    <p class="text-xs text-zinc-600 mt-1 leading-relaxed">
-                        Authorize <span class="font-medium text-zinc-900"><?php echo esc_html( $client->client_name ); ?></span> to access your chosen Cora workspace via the Universal Model Context Protocol (MCP).
+                <div class="my-5">
+                    <h1 class="text-base sm:text-lg font-semibold text-zinc-900 tracking-tight flex items-center gap-2">
+                        Authorize <span class="underline decoration-zinc-300 underline-offset-4"><?php echo esc_html( $client->client_name ); ?></span>
+                    </h1>
+                    <p class="text-xs text-zinc-600 mt-1.5 leading-relaxed">
+                        Grant <span class="font-medium text-zinc-900"><?php echo esc_html( $client->client_name ); ?></span> secure Model Context Protocol access to your workspace tools, live website themes, CRM leads, and operations.
                     </p>
                 </div>
 
-                <form method="POST" action="" class="space-y-5">
+                <form method="POST" action="" id="cora-oauth-form" class="space-y-4">
                     <input type="hidden" name="cora_oauth_nonce" value="<?php echo esc_attr( $nonce ); ?>">
                     <input type="hidden" name="client_id" value="<?php echo esc_attr( $client->client_id ); ?>">
                     <input type="hidden" name="redirect_uri" value="<?php echo esc_attr( $redirect_uri ); ?>">
@@ -1010,37 +1152,81 @@ class Cora_OAuth_Server {
 
                     <!-- Workspace Selector -->
                     <div>
-                        <label class="block text-xs font-medium text-zinc-700 mb-1.5">Target Workspace</label>
-                        <select name="workspace_id" class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3.5 py-2.5 text-xs text-zinc-900 focus:bg-white focus:outline-none focus:border-zinc-400 transition-colors">
+                        <label class="block text-xs font-semibold text-zinc-800 mb-1.5">Target Workspace</label>
+                        <select name="workspace_id" class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3.5 py-2.5 text-xs text-zinc-900 focus:bg-white focus:outline-none focus:border-zinc-400 transition-colors font-medium">
                             <?php foreach ( $workspaces as $ws ) : ?>
                                 <option value="<?php echo esc_attr( $ws['id'] ); ?>"><?php echo esc_html( $ws['name'] ); ?> (<?php echo esc_html( $ws['slug'] ); ?>)</option>
                             <?php endforeach; ?>
                         </select>
-                        <p class="text-[11px] text-zinc-500 mt-1">AI actions will strictly bind to this workspace. Multi-tenant isolation is enforced server-side.</p>
+                        <p class="text-[11px] text-zinc-500 mt-1">AI tool calls and data mutations strictly bind to this workspace context.</p>
                     </div>
 
-                    <!-- Granular Scopes List -->
-                    <div>
-                        <div class="flex items-center justify-between mb-2">
-                            <label class="block text-xs font-medium text-zinc-700">Requested Permissions</label>
-                            <span class="text-[11px] text-zinc-400">User-controlled</span>
+                    <!-- Master Full Access Card -->
+                    <div class="p-3.5 rounded-2xl bg-zinc-900 text-white border border-zinc-800 flex items-start justify-between gap-3 cursor-pointer shadow-sm" onclick="toggleMasterSwitch(event)">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-semibold text-white tracking-tight">Grant Full Access (Read & Write)</span>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Recommended</span>
+                            </div>
+                            <p class="text-[11px] text-zinc-300 mt-0.5 leading-snug">
+                                Exposes all tools: Read/Edit Website Themes, Manage Leads & CRM, Schedule Bookings, Record Invoices, and Publish Content.
+                            </p>
                         </div>
-                        <div class="max-h-56 overflow-y-auto space-y-2 pr-1 border border-zinc-100 bg-zinc-50/50 rounded-2xl p-3">
-                            <?php foreach ( $supported_scopes as $key => $meta ) :
-                                $checked = in_array( $key, $requested_scopes, true );
+                        <input type="checkbox" id="cora-master-full-access" name="full_access" value="1" checked class="w-4 h-4 rounded text-zinc-900 accent-white cursor-pointer mt-0.5">
+                    </div>
+
+                    <!-- Preset Pills -->
+                    <div class="flex items-center justify-between pt-1">
+                        <span class="text-[11px] font-medium text-zinc-500">Quick Presets:</span>
+                        <div class="flex items-center gap-1.5">
+                            <button type="button" onclick="applyPreset('all')" class="px-2.5 py-1 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-800 text-[10px] font-semibold transition-colors">
+                                ⚡ All (Read & Write)
+                            </button>
+                            <button type="button" onclick="applyPreset('readonly')" class="px-2.5 py-1 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[10px] font-medium transition-colors">
+                                👁 Read-Only
+                            </button>
+                            <button type="button" onclick="applyPreset('website')" class="px-2.5 py-1 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[10px] font-medium transition-colors">
+                                🌐 Website Only
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Granular Permission Matrix -->
+                    <div>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="block text-xs font-semibold text-zinc-800">Permissions by Area</label>
+                            <span class="text-[11px] text-zinc-400" id="selected-scope-counter">20 of 20 granted</span>
+                        </div>
+
+                        <div class="max-h-60 overflow-y-auto space-y-2 pr-1 border border-zinc-200/80 bg-zinc-50/60 rounded-2xl p-2.5 custom-scrollbar">
+                            <?php foreach ( $categories as $cat_key => $cat_data ) :
+                                if ( empty( $cat_data['scopes'] ) ) continue;
                             ?>
-                                <label class="flex items-start gap-2.5 p-2 rounded-xl bg-white border border-zinc-100 hover:border-zinc-200 cursor-pointer transition-colors">
-                                    <input type="checkbox" name="scopes[]" value="<?php echo esc_attr( $key ); ?>" <?php checked( $checked ); ?> class="mt-0.5 rounded border-zinc-300 text-zinc-900 focus:ring-0">
-                                    <div class="flex-1">
-                                        <div class="flex items-center justify-between">
-                                            <span class="text-xs font-medium text-zinc-900"><?php echo esc_html( $meta['label'] ); ?></span>
-                                            <span class="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded <?php echo $meta['level'] === 'write' ? 'bg-zinc-100 text-zinc-700' : 'bg-zinc-50 text-zinc-500'; ?>">
-                                                <?php echo esc_html( $meta['level'] ); ?>
-                                            </span>
-                                        </div>
-                                        <p class="text-[11px] text-zinc-500 mt-0.5 leading-snug"><?php echo esc_html( $meta['description'] ); ?></p>
+                                <div class="bg-white border border-zinc-100 rounded-xl p-2.5 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+                                    <div class="flex items-center justify-between pb-1.5 border-b border-zinc-50 mb-1.5">
+                                        <span class="text-[11px] font-semibold text-zinc-900 tracking-tight"><?php echo esc_html( $cat_data['title'] ); ?></span>
+                                        <span class="text-[10px] font-mono text-zinc-400 uppercase"><?php echo esc_html( $cat_key ); ?></span>
                                     </div>
-                                </label>
+                                    <div class="space-y-1.5">
+                                        <?php foreach ( $cat_data['scopes'] as $key => $meta ) :
+                                            $checked = true; // Default all checked
+                                            $is_write = ( $meta['level'] === 'write' );
+                                        ?>
+                                            <label class="flex items-start gap-2 p-1.5 rounded-lg hover:bg-zinc-50 cursor-pointer transition-colors">
+                                                <input type="checkbox" name="scopes[]" value="<?php echo esc_attr( $key ); ?>" data-level="<?php echo esc_attr( $meta['level'] ); ?>" data-category="<?php echo esc_attr( $cat_key ); ?>" checked onchange="handleScopeChange()" class="cora-scope-checkbox mt-0.5 rounded border-zinc-300 text-zinc-900 focus:ring-0">
+                                                <div class="flex-1 min-w-0">
+                                                    <div class="flex items-center justify-between gap-1">
+                                                        <span class="text-xs font-medium text-zinc-800 truncate"><?php echo esc_html( $meta['label'] ); ?></span>
+                                                        <span class="text-[9px] font-mono uppercase px-1.5 py-0.2 rounded flex-shrink-0 <?php echo $is_write ? 'bg-zinc-100 text-zinc-800 font-semibold' : 'bg-zinc-50 text-zinc-500'; ?>">
+                                                            <?php echo esc_html( $meta['level'] ); ?>
+                                                        </span>
+                                                    </div>
+                                                    <p class="text-[10px] text-zinc-500 leading-snug truncate"><?php echo esc_html( $meta['description'] ); ?></p>
+                                                </div>
+                                            </label>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
                             <?php endforeach; ?>
                         </div>
                     </div>
@@ -1049,21 +1235,69 @@ class Cora_OAuth_Server {
                     <div class="p-3 rounded-2xl bg-zinc-50 border border-zinc-100 flex items-start gap-2.5">
                         <svg class="w-4 h-4 text-zinc-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
                         <div class="text-[11px] text-zinc-600 leading-tight">
-                            You can revoke access anytime in <span class="font-medium text-zinc-800">Settings → AI Assistants</span>. Access tokens expire automatically after 30 days.
+                            You can inspect or revoke tokens anytime from <span class="font-medium text-zinc-800">Admin Settings → AI Assistants</span>.
                         </div>
                     </div>
 
                     <!-- Actions -->
-                    <div class="flex items-center gap-3 pt-2">
-                        <button type="submit" name="cora_oauth_action" value="approve" class="flex-1 py-2.5 px-4 rounded-xl bg-zinc-900 text-white text-xs font-medium hover:bg-zinc-800 transition-colors shadow-sm text-center">
-                            Authorize Connection
+                    <div class="flex items-center gap-2.5 pt-1">
+                        <button type="submit" name="cora_oauth_action" value="approve" class="flex-1 py-2.5 px-4 rounded-xl bg-zinc-900 text-white text-xs font-semibold hover:bg-zinc-800 transition-colors shadow-sm text-center cursor-pointer">
+                            Authorize & Connect Now
                         </button>
-                        <button type="submit" name="cora_oauth_action" value="deny" class="py-2.5 px-4 rounded-xl bg-zinc-100 text-zinc-700 text-xs font-medium hover:bg-zinc-200 transition-colors text-center">
-                            Cancel
+                        <button type="submit" name="cora_oauth_action" value="deny" class="py-2.5 px-4 rounded-xl bg-zinc-100 text-zinc-700 text-xs font-medium hover:bg-zinc-200 transition-colors text-center cursor-pointer">
+                            Deny
                         </button>
                     </div>
                 </form>
             </div>
+
+            <script>
+                function updateCounter() {
+                    const checkboxes = document.querySelectorAll('.cora-scope-checkbox');
+                    const checked = document.querySelectorAll('.cora-scope-checkbox:checked');
+                    const counter = document.getElementById('selected-scope-counter');
+                    if (counter) {
+                        counter.textContent = `${checked.length} of ${checkboxes.length} granted`;
+                    }
+                    const master = document.getElementById('cora-master-full-access');
+                    if (master) {
+                        master.checked = (checked.length === checkboxes.length);
+                    }
+                }
+
+                function toggleMasterSwitch(e) {
+                    if (e.target.tagName !== 'INPUT') {
+                        const master = document.getElementById('cora-master-full-access');
+                        master.checked = !master.checked;
+                    }
+                    const isChecked = document.getElementById('cora-master-full-access').checked;
+                    document.querySelectorAll('.cora-scope-checkbox').forEach(cb => {
+                        cb.checked = isChecked;
+                    });
+                    updateCounter();
+                }
+
+                function handleScopeChange() {
+                    updateCounter();
+                }
+
+                function applyPreset(mode) {
+                    const checkboxes = document.querySelectorAll('.cora-scope-checkbox');
+                    checkboxes.forEach(cb => {
+                        if (mode === 'all') {
+                            cb.checked = true;
+                        } else if (mode === 'readonly') {
+                            cb.checked = (cb.getAttribute('data-level') === 'read');
+                        } else if (mode === 'website') {
+                            cb.checked = (cb.getAttribute('data-category') === 'canvas' || cb.getAttribute('data-category') === 'core');
+                        }
+                    });
+                    updateCounter();
+                }
+
+                // Initial run
+                updateCounter();
+            </script>
         </body>
         </html>
         <?php
