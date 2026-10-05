@@ -592,7 +592,7 @@ function cora_get_sparkline_points( $history, $type ) {
                                         <a href="<?php echo esc_url( $canvas_preview_url ); ?>" target="_blank" class="px-1.5 py-0.5 bg-white hover:bg-zinc-100 text-zinc-950 font-bold text-[8.5px] rounded flex items-center gap-0.5 no-underline shadow-3xs cursor-pointer select-none">
                                             <span>Open ↗</span>
                                         </a>
-                                        <button type="button" onclick="window.openAiMcpEditor(<?php echo $live_theme['id']; ?>, '<?php echo esc_js($live_theme['name']); ?>')" class="px-1.5 py-0.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 font-medium text-[8.5px] rounded flex items-center gap-1 cursor-pointer select-none" title="Edit with Claude / ChatGPT">
+                                        <button type="button" onclick="window.openAiMcpEditor(<?php echo $live_theme['id']; ?>, '<?php echo esc_js($live_theme['name']); ?>')" class="px-1.5 py-0.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 font-medium text-[8.5px] rounded flex items-center gap-1 cursor-pointer select-none" title="Edit with AI">
                                             <svg viewBox="0 0 24 24" width="8" height="8" fill="currentColor"><path d="M12 2L15 9L22 12L15 15L12 22L9 15L2 12L9 9Z"/></svg>
                                             <span>AI Edit</span>
                                         </button>
@@ -720,20 +720,12 @@ function cora_get_sparkline_points( $history, $type ) {
                         <!-- Action Buttons Group (Framework-Aware Architecture) -->
                         <div class="flex items-center gap-2 pt-3 border-t border-zinc-100 flex-wrap">
                             <?php if ( $is_html_ai ) : ?>
-                            <!-- HTML AI (Claude / ChatGPT MCP) Action Suite -->
+                            <!-- Unified AI & Code Editor Action -->
                             <button type="button" onclick="window.openAiMcpEditor(<?php echo $live_theme['id']; ?>, '<?php echo esc_js($live_theme['name']); ?>')"
                                     class="h-8 px-4 bg-zinc-950 hover:bg-zinc-900 text-white rounded-lg text-xs font-bold cursor-pointer transition-all flex items-center gap-1.5 border-none shadow-xs shrink-0 select-none"
-                                    title="Edit and live-update landing page with Claude or ChatGPT via MCP">
-                                <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><path d="M12 2L15 9L22 12L15 15L12 22L9 15L2 12L9 9Z"/></svg>
-                                <span>Edit with Claude / ChatGPT</span>
-                            </button>
-
-                            <!-- Direct Code Editor -->
-                            <button type="button" onclick="window.openHtmlCodeEditor(<?php echo $live_theme['id']; ?>, '<?php echo esc_js($live_theme['name']); ?>')"
-                                    class="h-8 px-3.5 bg-white hover:bg-zinc-50 border border-zinc-200/80 text-zinc-800 rounded-lg text-xs font-semibold cursor-pointer transition-all flex items-center gap-1.5 shadow-3xs shrink-0"
-                                    title="Directly view and edit index.html code">
-                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-                                <span>Edit Code</span>
+                                    title="Edit with AI & Live Code Editor">
+                                <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M12 2L15 9L22 12L15 15L12 22L9 15L2 12L9 9Z"/></svg>
+                                <span>Edit with AI</span>
                             </button>
 
                             <!-- Secondary Settings -->
@@ -775,11 +767,7 @@ function cora_get_sparkline_points( $history, $type ) {
                                     <?php if ( $is_html_ai ) : ?>
                                     <button onclick="window.openAiMcpEditor(<?php echo $live_theme['id']; ?>, '<?php echo esc_js($live_theme['name']); ?>')" class="w-full px-3 py-2 text-xs text-zinc-900 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-bold text-left bg-transparent transition-colors">
                                         <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" class="text-zinc-900 shrink-0"><path d="M12 2L15 9L22 12L15 15L12 22L9 15L2 12L9 9Z"/></svg>
-                                        <span>Edit with Claude / ChatGPT</span>
-                                    </button>
-                                    <button onclick="window.openHtmlCodeEditor(<?php echo $live_theme['id']; ?>, '<?php echo esc_js($live_theme['name']); ?>')" class="w-full px-3 py-2 text-xs text-zinc-800 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold text-left bg-transparent transition-colors">
-                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-                                        <span>Edit HTML Code</span>
+                                        <span>Edit with AI</span>
                                     </button>
                                     <?php endif; ?>
                                     <button onclick="triggerRenameTheme(<?php echo $live_theme['id']; ?>, '<?php echo esc_js($live_theme['name']); ?>')" class="w-full px-3 py-2 text-xs text-zinc-800 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold text-left bg-transparent transition-colors">
@@ -921,11 +909,10 @@ function cora_get_sparkline_points( $history, $type ) {
                             <button onclick="triggerActivateTheme(<?php echo $th['id']; ?>, '<?php echo esc_js($th['name']); ?>')" class="h-7 px-3 bg-zinc-950 hover:bg-zinc-900 text-white rounded-lg text-[11px] font-bold cursor-pointer transition-all border-none shadow-xs">Publish</button>
                             
                             <?php if ( $th_is_html_ai ) : ?>
-                            <button onclick="window.openAiMcpEditor(<?php echo $th['id']; ?>, '<?php echo esc_js($th['name']); ?>')" class="h-7 px-2.5 border border-zinc-200/80 hover:bg-zinc-50 rounded-lg text-[11px] font-semibold text-zinc-800 bg-white cursor-pointer transition-all shadow-3xs flex items-center gap-1" title="Edit with Claude / ChatGPT via MCP">
-                                <svg viewBox="0 0 24 24" width="9" height="9" fill="currentColor"><path d="M12 2L15 9L22 12L15 15L12 22L9 15L2 12L9 9Z"/></svg>
-                                <span>AI Edit</span>
+                            <button onclick="window.openAiMcpEditor(<?php echo $th['id']; ?>, '<?php echo esc_js($th['name']); ?>')" class="h-7 px-2.5 border border-zinc-200/80 hover:bg-zinc-50 rounded-lg text-[11px] font-semibold text-zinc-800 bg-white cursor-pointer transition-all shadow-3xs flex items-center gap-1" title="Edit with AI & Live Code Editor">
+                                <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><path d="M12 2L15 9L22 12L15 15L12 22L9 15L2 12L9 9Z"/></svg>
+                                <span>Edit with AI</span>
                             </button>
-                            <button onclick="window.openHtmlCodeEditor(<?php echo $th['id']; ?>, '<?php echo esc_js($th['name']); ?>')" class="h-7 px-2.5 border border-zinc-200/80 hover:bg-zinc-50 rounded-lg text-[11px] font-semibold text-zinc-700 bg-white cursor-pointer transition-all shadow-3xs" title="Edit HTML Code">Edit Code</button>
                             <?php else : ?>
                             <button onclick="editTheme(<?php echo $th['id']; ?>, '<?php echo esc_js($th['name']); ?>', false)" class="h-7 px-3 border border-zinc-200/80 hover:bg-zinc-50 rounded-lg text-[11px] font-semibold text-zinc-700 bg-white cursor-pointer transition-all shadow-3xs">Edit Theme</button>
                             <?php endif; ?>
@@ -939,11 +926,7 @@ function cora_get_sparkline_points( $history, $type ) {
                                     <?php if ( $th_is_html_ai ) : ?>
                                     <button onclick="window.openAiMcpEditor(<?php echo $th['id']; ?>, '<?php echo esc_js($th['name']); ?>')" class="w-full px-3 py-2 text-xs text-zinc-900 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-bold text-left bg-transparent transition-colors">
                                         <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" class="text-zinc-900 shrink-0"><path d="M12 2L15 9L22 12L15 15L12 22L9 15L2 12L9 9Z"/></svg>
-                                        <span>Edit with Claude / ChatGPT</span>
-                                    </button>
-                                    <button onclick="window.openHtmlCodeEditor(<?php echo $th['id']; ?>, '<?php echo esc_js($th['name']); ?>')" class="w-full px-3 py-2 text-xs text-zinc-800 hover:bg-zinc-50 flex items-center gap-2.5 cursor-pointer border-none font-semibold text-left bg-transparent transition-colors">
-                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-500 shrink-0"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-                                        <span>Edit HTML Code</span>
+                                        <span>Edit with AI</span>
                                     </button>
                                     <div class="border-t border-zinc-100 my-1"></div>
                                     <?php endif; ?>
@@ -16096,8 +16079,6 @@ Please provide the complete, un-truncated index.html file ready to save and publ
             navigator.clipboard.writeText(promptText).then(function() {
                 if (typeof window.coraShowToast === 'function') {
                     window.coraShowToast('Claude / ChatGPT Starter Prompt copied! Paste it into Claude or ChatGPT to generate your site.', 'success');
-                } else {
-                    alert('Claude / ChatGPT Starter Prompt copied to clipboard!');
                 }
             });
         } else {
