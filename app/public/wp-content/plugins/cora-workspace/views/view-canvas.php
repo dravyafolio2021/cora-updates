@@ -6161,7 +6161,7 @@ function cora_get_sparkline_points( $history, $type ) {
             </span>
         </div>
 
-        <!-- Center: Segmented Modes & Viewports -->
+        <!-- Center: Segmented Modes -->
         <div class="flex items-center gap-2">
             <!-- Mode Segmented Control -->
             <div class="flex items-center bg-zinc-900 p-0.5 rounded-lg border border-zinc-800">
@@ -6172,19 +6172,6 @@ function cora_get_sparkline_points( $history, $type ) {
                 <button type="button" id="cora-ai-mcp-tab-btn-ai" onclick="window.switchAiMcpTab('ai')" class="px-2.5 py-1 text-xs font-semibold rounded-md bg-transparent text-zinc-400 hover:text-zinc-200 border-none cursor-pointer transition-colors flex items-center gap-1.5">
                     <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
                     <span>MCP Connect</span>
-                </button>
-            </div>
-
-            <!-- Viewport Switcher -->
-            <div id="cora-editor-viewport-group" class="hidden md:flex items-center bg-zinc-900 p-0.5 rounded-lg border border-zinc-800">
-                <button type="button" onclick="window.setLiveEditorViewport('desktop')" id="cora-vp-btn-desktop" class="p-1 rounded bg-zinc-800 text-white hover:text-white transition-colors cursor-pointer border-none" title="Desktop View (100%)">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
-                </button>
-                <button type="button" onclick="window.setLiveEditorViewport('tablet')" id="cora-vp-btn-tablet" class="p-1 rounded bg-transparent text-zinc-400 hover:text-white transition-colors cursor-pointer border-none" title="Tablet View (768px)">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
-                </button>
-                <button type="button" onclick="window.setLiveEditorViewport('mobile')" id="cora-vp-btn-mobile" class="p-1 rounded bg-transparent text-zinc-400 hover:text-white transition-colors cursor-pointer border-none" title="Mobile View (375px)">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
                 </button>
             </div>
         </div>
