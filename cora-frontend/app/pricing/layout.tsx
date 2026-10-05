@@ -3,13 +3,13 @@ import React from 'react';
 
 export const metadata: Metadata = {
   title: 'Pricing & Plans — Cora AI Co-Founder',
-  description: 'Cora pricing: Free tier, Pro at ₹2,999/mo, and Enterprise plans with zero seat penalties. Simple, transparent pricing for professional service businesses.',
+  description: 'Cora transparent 4-tier pricing: Free forever plan, Starter at ₹999/mo, Professional at ₹2,499/mo, and Scale at ₹4,499/mo with free website development or migration. 2 months free on annual plans.',
   alternates: {
     canonical: 'https://heycora.in/pricing',
   },
   openGraph: {
     title: 'Pricing & Plans — Cora AI Co-Founder',
-    description: 'Cora pricing: Free tier, Pro at ₹2,999/mo, and Enterprise plans with zero seat penalties. Simple, transparent pricing for professional service businesses.',
+    description: 'Cora transparent 4-tier pricing: Free forever plan, Starter at ₹999/mo, Professional at ₹2,499/mo, and Scale at ₹4,499/mo with free website development or migration. 2 months free on annual plans.',
     url: 'https://heycora.in/pricing',
     siteName: 'Cora',
   },

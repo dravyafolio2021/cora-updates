@@ -266,7 +266,7 @@ export const BUILT_MODULES: FeatureModule[] = [
       headerTitle: 'Autonomous Agency Intelligence',
       headerSubtitle: 'Connected to CRM, Sprint Calendar & 18% GST Invoicing engine',
       primaryActionLabel: '+ New Command',
-      metric1: { label: 'Active AI Runs', value: '4,280 / 20k' },
+      metric1: { label: 'Active AI Runs', value: '4,280 / 15k' },
       metric2: { label: 'Avg Latency', value: '380ms' },
       metric3: { label: 'Actions Executed', value: '142 this wk' },
       tableHeaders: ['Command / Prompt', 'Action Triggered', 'Target Entity', 'Status', 'Execution'],

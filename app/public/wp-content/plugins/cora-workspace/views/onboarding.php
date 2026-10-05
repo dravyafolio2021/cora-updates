@@ -2111,6 +2111,11 @@ $login_nonce = wp_create_nonce( 'cora_login_nonce' );
                 formData.append('billing', billingKey);
                 formData.append('nonce', nonce);
 
+                var endorselyRef = (window.endorsely_referral || '') || (new URLSearchParams(window.location.search).get('endorsely_referral') || '') || (localStorage.getItem('endorsely_referral') || '');
+                if (endorselyRef) {
+                    formData.append('endorsely_referral', endorselyRef);
+                }
+
                 fetch(ajaxUrl, { method: 'POST', body: formData })
                 .then(function(r) { return r.json(); })
                 .then(function(res) {

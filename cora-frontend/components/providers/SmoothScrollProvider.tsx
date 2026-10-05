@@ -11,7 +11,18 @@ if (typeof window !== 'undefined') {
 
 export function SmoothScrollProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
-    // 1. Initialize Lenis Smooth Scroll
+    // Only enable Lenis smooth scrolling on non-touch desktop viewports to prevent mobile scroll hijacking
+    const isTouch = 
+      typeof window !== 'undefined' && 
+      (('ontouchstart' in window) || 
+       (navigator.maxTouchPoints > 0) || 
+       window.matchMedia('(pointer: coarse)').matches);
+
+    if (isTouch) {
+      return;
+    }
+
+    // 1. Initialize Lenis Smooth Scroll for desktop mouse wheel
     const lenis = new Lenis({
       duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -19,7 +30,7 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
       gestureOrientation: 'vertical',
       smoothWheel: true,
       wheelMultiplier: 0.9,
-      touchMultiplier: 1.5,
+      syncTouch: false,
     });
 
     // 2. Connect Lenis to GSAP ScrollTrigger

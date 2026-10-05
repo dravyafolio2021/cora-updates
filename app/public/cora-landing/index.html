@@ -40,7 +40,57 @@
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Inter+Tight:ital,wght@0,400..900;1,400..900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet" />
 
   <!-- Razorpay Official Checkout SDK -->
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script src="https://checkout.razorpay.com/v1/checkout.js" defer></script>
+
+  <!-- Endorsely Tracking -->
+  <link rel="preconnect" href="https://assets.endorsely.com" crossorigin />
+  <link rel="dns-prefetch" href="https://assets.endorsely.com" />
+  <script async src="https://assets.endorsely.com/endorsely.js" data-endorsely="75730c30-cbf9-4242-bf09-4bbbcb9e362c"></script>
+  <script>
+    (function() {
+      function syncEndorselyToStripe() {
+        var referralId = window.endorsely_referral;
+        if (!referralId) {
+          try {
+            var match = document.cookie.match(/(?:^|;\s*)endorsely_referral=([^;]+)/);
+            if (match && match[1]) referralId = decodeURIComponent(match[1]);
+            if (!referralId) referralId = localStorage.getItem('endorsely_referral') || new URLSearchParams(window.location.search).get('endorsely_referral') || new URLSearchParams(window.location.search).get('via') || new URLSearchParams(window.location.search).get('ref');
+          } catch(e) {}
+        }
+        if (!referralId) return;
+
+        // Stripe Payment Links (https://buy.stripe.com/...)
+        document.querySelectorAll('a[href^="https://buy.stripe.com/"]').forEach(function(el) {
+          var oldBuyUrl = el.getAttribute('href');
+          if (oldBuyUrl && oldBuyUrl.indexOf('client_reference_id') === -1) {
+            var separator = oldBuyUrl.indexOf('?') !== -1 ? '&' : '?';
+            el.setAttribute('href', oldBuyUrl + separator + 'client_reference_id=' + encodeURIComponent(referralId));
+          }
+        });
+
+        // Stripe Embedded Pricing Tables
+        document.querySelectorAll('[pricing-table-id]').forEach(function(el) {
+          el.setAttribute('client-reference-id', referralId);
+        });
+
+        // Stripe Buy Buttons
+        document.querySelectorAll('[buy-button-id]').forEach(function(el) {
+          el.setAttribute('client-reference-id', referralId);
+        });
+      }
+
+      if (typeof window !== 'undefined') {
+        setTimeout(syncEndorselyToStripe, 1000);
+        setTimeout(syncEndorselyToStripe, 2500);
+        setTimeout(syncEndorselyToStripe, 5000);
+
+        document.addEventListener('click', function(e) {
+          var target = e.target && e.target.closest && e.target.closest('a[href^="https://buy.stripe.com/"]');
+          if (target) syncEndorselyToStripe();
+        }, true);
+      }
+    })();
+  </script>
 
   <style>
     /* ==========================================================================

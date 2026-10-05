@@ -122,6 +122,8 @@ export default function RootLayout({
         {/* Performance Resource Hints for Faster LCP */}
         <link rel="preconnect" href="https://checkout.razorpay.com" />
         <link rel="dns-prefetch" href="https://checkout.razorpay.com" />
+        <link rel="preconnect" href="https://assets.endorsely.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://assets.endorsely.com" />
         
         {/* Preload Hero Visual Assets */}
         <link rel="preload" as="image" href="/images/cora_hero_landscape.jpg" fetchPriority="high" />
@@ -235,6 +237,62 @@ export default function RootLayout({
       </head>
       <body suppressHydrationWarning className="font-sans antialiased text-zinc-950 bg-white selection:bg-zinc-950 selection:text-white">
         <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
+        <Script
+          src="https://assets.endorsely.com/endorsely.js"
+          data-endorsely="75730c30-cbf9-4242-bf09-4bbbcb9e362c"
+          strategy="afterInteractive"
+        />
+        <Script
+          id="endorsely-stripe-sync"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                function syncEndorselyToStripe() {
+                  var referralId = window.endorsely_referral;
+                  if (!referralId) {
+                    try {
+                      var match = document.cookie.match(/(?:^|;\\s*)endorsely_referral=([^;]+)/);
+                      if (match && match[1]) referralId = decodeURIComponent(match[1]);
+                      if (!referralId) referralId = localStorage.getItem('endorsely_referral') || new URLSearchParams(window.location.search).get('endorsely_referral') || new URLSearchParams(window.location.search).get('via') || new URLSearchParams(window.location.search).get('ref');
+                    } catch(e) {}
+                  }
+                  if (!referralId) return;
+
+                  // 1. Stripe Payment Links (https://buy.stripe.com/...)
+                  document.querySelectorAll('a[href^="https://buy.stripe.com/"]').forEach(function(el) {
+                    var oldBuyUrl = el.getAttribute('href');
+                    if (oldBuyUrl && oldBuyUrl.indexOf('client_reference_id') === -1) {
+                      var separator = oldBuyUrl.indexOf('?') !== -1 ? '&' : '?';
+                      el.setAttribute('href', oldBuyUrl + separator + 'client_reference_id=' + encodeURIComponent(referralId));
+                    }
+                  });
+
+                  // 2. Stripe Embedded Pricing Tables
+                  document.querySelectorAll('[pricing-table-id]').forEach(function(el) {
+                    el.setAttribute('client-reference-id', referralId);
+                  });
+
+                  // 3. Stripe Buy Buttons
+                  document.querySelectorAll('[buy-button-id]').forEach(function(el) {
+                    el.setAttribute('client-reference-id', referralId);
+                  });
+                }
+
+                if (typeof window !== 'undefined') {
+                  setTimeout(syncEndorselyToStripe, 1000);
+                  setTimeout(syncEndorselyToStripe, 2500);
+                  setTimeout(syncEndorselyToStripe, 5000);
+
+                  document.addEventListener('click', function(e) {
+                    var target = e.target && e.target.closest && e.target.closest('a[href^="https://buy.stripe.com/"]');
+                    if (target) syncEndorselyToStripe();
+                  }, true);
+                }
+              })();
+            `
+          }}
+        />
         <SmoothScrollProvider>
           <ToastProvider>
             <Analytics />

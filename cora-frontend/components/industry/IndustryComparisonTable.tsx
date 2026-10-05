@@ -35,7 +35,7 @@ const COMPARISON_ROWS = [
   {
     feature: 'Monthly Agency Software Cost',
     generic: '₹15,000 – ₹30,000 / month across 6+ disparate apps',
-    cora: '₹0 Free Tier • Flat ₹2,999 / mo for entire agency',
+    cora: '₹0 Free Tier • Plans from ₹999/mo (Pro ₹2,499 / Scale ₹4,499)',
     coraHighlight: true
   }
 ];
