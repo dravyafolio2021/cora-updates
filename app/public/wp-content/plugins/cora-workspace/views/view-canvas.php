@@ -11321,7 +11321,7 @@ echo esc_textarea( json_encode( array(
         const iframe = document.getElementById('cora-html-canvas-iframe');
         if (!iframe) return;
 
-        iframe.srcdoc = html;
+        iframe.srcdoc = window.coraEnhancePreviewHtml ? window.coraEnhancePreviewHtml(html, { clickBridge: false }) : html;
         iframe.onload = function() {
             try {
                 const doc = iframe.contentDocument || iframe.contentWindow.document;
@@ -13063,24 +13063,26 @@ echo esc_textarea( json_encode( array(
         agency: `You are an elite web architect and front-end designer. 
 Create a complete, single-file, production-ready HTML5 landing page for a premier "Creative Agency & Video Studio" (named "Apex Studio").
 
-TECHNICAL REQUIREMENTS:
+STRICT TECHNICAL & DESIGN REQUIREMENTS:
 1. Include Tailwind CSS CDN: <script src="https://cdn.tailwindcss.com"><\/script>
 2. Google Fonts: Inter and JetBrains Mono for numbers/tags.
-3. Clean modern monochromatic dark aesthetic (zinc-950 background, zinc-100 typography, subtle zinc-800 borders, smooth micro-interactions).
-4. Fully responsive on mobile, tablet, and desktop with a mobile navigation menu.
+3. USE PURE TAILWIND CSS UTILITY CLASSES ON EVERY ELEMENT (e.g. grid grid-cols-1 md:grid-cols-3 gap-6, bg-zinc-900/60, border border-zinc-800, rounded-2xl, p-6). DO NOT write large raw custom <style> blocks.
+4. ZERO EMPTY PLACEHOLDERS: Always provide complete, self-contained SVG icons or high-res Unsplash photography. Never output empty canvas/art divs.
+5. ALL SECTIONS 100% VISIBLE: Ensure every section (Header, Hero, Marquee, Portfolio, Services, Process, Reviews, Lead Form, Footer) has complete copy, full markup, and is 100% visible with zero opacity-0 scroll-locks.
+6. Fully responsive on mobile, tablet, and desktop with a mobile navigation menu.
 
 SECTIONS TO INCLUDE:
 1. Sticky Header: Frosted navigation bar with logo, navigation links (Work, Services, Process, Case Studies), and a "Start Project" CTA button.
-2. Hero Section: High-impact headline ("Crafting Cinema-Grade Brand Stories That Scale"), subtitle, dual CTA ("View Showreel", "Book Consultation"), live client satisfaction badges, and a simulated video reel showcase card with play trigger.
+2. Hero Section: High-impact headline ("Crafting Cinema-Grade Brand Stories That Scale"), subtitle, dual CTA ("View Showreel", "Book Consultation"), live client satisfaction badges, and a simulated video reel showcase card.
 3. Marquee Brand Ticker: Clean horizontal logo ticker of global partner brands.
-4. Featured Work / Portfolio Grid: 4 filterable project cards (Brand Identity, 3D Commercials, Viral Social Ads, Motion Design) with category tags, hover zoom effects, and view case study buttons.
+4. Featured Work / Portfolio Grid: 4 project cards with high-res photos, category tags, hover zoom effects, and view case study buttons.
 5. Core Services Matrix: 6 interactive cards detailing Art Direction, Video Production, Brand Architecture, 3D Animation, Post-Production, and Performance Ads.
 6. Proven Process (4-Step Timeline): Discovery -> Concept & Storyboard -> Production -> Launch & Scale.
-7. Testimonials & Client Reviews: 3 quote cards with star ratings, client names, roles, and company tags.
+7. Testimonials & Client Reviews: 3 quote cards with 5-star ratings, client avatars, names, roles, and company tags.
 8. Native Lead Consultation Form:
-   - Form markup: <form method="POST" action="/wp-admin/admin-ajax.php" onsubmit="event.preventDefault(); window.coraSubmitLeadForm ? window.coraSubmitLeadForm(this) : alert('Inquiry received!');">
+   - Form markup: <form method="POST" action="/wp-admin/admin-ajax.php" onsubmit="event.preventDefault(); window.coraSubmitLeadForm ? window.coraSubmitLeadForm(this) : alert('Inquiry received!');" class="p-8 rounded-2xl bg-zinc-900 border border-zinc-800 shadow-2xl flex flex-col gap-4">
    - Hidden inputs: <input type="hidden" name="action" value="cora_ajax_submit_lead"><input type="hidden" name="form_name" value="Agency Consultation Form">
-   - Fields: Full Name, Work Email, Phone/WhatsApp, Project Budget dropdown ($5k-$10k, $10k-$25k, $25k+), and Project Scope description.
+   - Fields: Full Name, Work Email, Phone/WhatsApp, Project Budget dropdown ($5k-$10k, $10k-$25k, $25k+), and Project Scope description with styled inputs (w-full px-3.5 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-100).
    - High-contrast submit button with hover transition.
 9. Footer: Quick links, social SVG icons, copyright, and studio location tags.
 
@@ -13089,24 +13091,26 @@ Return ONLY clean, complete, copy-pasteable HTML inside an <!DOCTYPE html> docum
         saas: `You are an elite SaaS UI/UX engineer. 
 Create a complete, single-file, production-ready HTML5 landing page for an "AI SaaS & Workflow Automation Platform" (named "Pulse AI").
 
-TECHNICAL REQUIREMENTS:
+STRICT TECHNICAL & DESIGN REQUIREMENTS:
 1. Include Tailwind CSS CDN: <script src="https://cdn.tailwindcss.com"><\/script>
 2. Google Fonts: Inter and JetBrains Mono.
-3. Modern high-tech monochromatic aesthetic (pure black/zinc-950, deep zinc-900 surfaces, zinc-800 borders, subtle purple/indigo highlights).
-4. Fully responsive mobile & desktop layout.
+3. USE PURE TAILWIND CSS UTILITY CLASSES ON EVERY ELEMENT (e.g. grid grid-cols-1 md:grid-cols-3 gap-6, bg-zinc-900/60, border border-zinc-800, rounded-2xl, p-6). DO NOT write large raw custom <style> blocks.
+4. ZERO EMPTY PLACEHOLDERS: Always provide complete, self-contained SVG icons, interactive UI mockups, and complete card elements.
+5. ALL SECTIONS 100% VISIBLE: Ensure every section (Header, Hero, Proof Bar, Features, Pricing, Integrations, FAQ, Trial Form, Footer) has full content and is 100% visible without scroll-delayed opacity-0 traps.
+6. Fully responsive mobile & desktop layout.
 
 SECTIONS TO INCLUDE:
 1. Header: Sleek navbar with announcement pill ("✨ Introducing Pulse 2.0 Engine"), product links (Features, Integrations, Pricing, Docs), and "Start Free Trial" CTA.
-2. Hero: High-converting headline ("Automate 80% of Repetitive Operations with Autonomous AI"), live status pill ("🟢 99.99% Uptime SLA"), dual CTAs ("Get Started Free", "Request Enterprise Demo"), and an interactive Dashboard UI mockup preview.
+2. Hero: High-converting headline ("Automate 80% of Repetitive Operations with Autonomous AI"), live status pill ("🟢 99.99% Uptime SLA"), dual CTAs ("Get Started Free", "Request Enterprise Demo"), and an interactive Dashboard UI mockup card.
 3. Metrics & Proof Bar: 10M+ Tasks Automated, 4.9/5 Rating, 12,000+ Teams.
 4. Core Feature Matrix: 6 cards featuring AI Agent Workflows, Real-Time Data Sync, Multi-Model LLM Routing, Enterprise RBAC Security, Webhooks API, and Predictive Analytics.
-5. Interactive Pricing Tier Matrix: 3 cards (Starter $29/mo, Pro $79/mo, Enterprise Custom) with feature checklists and toggle switch (Monthly / Annual with 20% discount badge).
+5. Interactive Pricing Tier Matrix: 3 cards (Starter $29/mo, Pro $79/mo, Enterprise Custom) with feature checklists and toggle switch (Monthly / Annual).
 6. Enterprise Integrations Grid: Slack, GitHub, Notion, Stripe, Salesforce, Figma.
 7. Interactive FAQ Accordion: 5 common questions.
 8. Native Lead Demo & Trial Form:
-   - Form markup: <form method="POST" action="/wp-admin/admin-ajax.php" onsubmit="event.preventDefault(); window.coraSubmitLeadForm ? window.coraSubmitLeadForm(this) : alert('Demo requested!');">
+   - Form markup: <form method="POST" action="/wp-admin/admin-ajax.php" onsubmit="event.preventDefault(); window.coraSubmitLeadForm ? window.coraSubmitLeadForm(this) : alert('Demo requested!');" class="p-8 rounded-2xl bg-zinc-900 border border-zinc-800 shadow-2xl flex flex-col gap-4">
    - Hidden inputs: <input type="hidden" name="action" value="cora_ajax_submit_lead"><input type="hidden" name="form_name" value="SaaS Demo Request Form">
-   - Fields: Work Email, Full Name, Company Name, Team Size dropdown (1-10, 11-50, 50+), and Use Case note.
+   - Fields: Work Email, Full Name, Company Name, Team Size dropdown, and Use Case note with styled inputs (w-full px-3.5 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-100).
    - High-converting submit button.
 9. Footer: Product links, developer docs, status link, and social icons.
 
@@ -13115,11 +13119,13 @@ Return ONLY clean, valid, standalone HTML in an <!DOCTYPE html> document.`,
         consulting: `You are an elite corporate advisory web designer. 
 Create a complete, single-file, production-ready HTML5 landing page for a "B2B Advisory & Management Consulting Firm" (named "Vanguard Strategy Group").
 
-TECHNICAL REQUIREMENTS:
+STRICT TECHNICAL & DESIGN REQUIREMENTS:
 1. Include Tailwind CSS CDN: <script src="https://cdn.tailwindcss.com"><\/script>
 2. Google Fonts: Playfair Display for elegant headlines and Inter for UI body.
-3. Editorial luxury monochromatic palette (warm neutral ivory/zinc-50 background, deep obsidian zinc-900 typography, subtle amber/bronze accent borders).
-4. Fully responsive layout.
+3. USE PURE TAILWIND CSS UTILITY CLASSES ON EVERY ELEMENT. DO NOT write large raw custom <style> blocks.
+4. ZERO EMPTY PLACEHOLDERS: Always provide complete, self-contained SVG icons and verified case study cards.
+5. ALL SECTIONS 100% VISIBLE: Ensure every section (Header, Hero, Practice Areas, Case Studies, Leadership, Insights, Briefing Form, Footer) has full copy and is 100% visible.
+6. Fully responsive layout.
 
 SECTIONS TO INCLUDE:
 1. Header: Refined navigation with firm overview, practice areas, leadership partners, insights, and "Schedule Executive Briefing" button.
@@ -13129,7 +13135,7 @@ SECTIONS TO INCLUDE:
 5. Senior Leadership & Advisory Board: 3 executive partner profiles with credentials.
 6. Thought Leadership & Whitepapers: 3 editorial article cards with download links.
 7. Native Executive Consultation Form:
-   - Form markup: <form method="POST" action="/wp-admin/admin-ajax.php" onsubmit="event.preventDefault(); window.coraSubmitLeadForm ? window.coraSubmitLeadForm(this) : alert('Briefing requested!');">
+   - Form markup: <form method="POST" action="/wp-admin/admin-ajax.php" onsubmit="event.preventDefault(); window.coraSubmitLeadForm ? window.coraSubmitLeadForm(this) : alert('Briefing requested!');" class="p-8 rounded-2xl bg-zinc-900 border border-zinc-800 shadow-2xl flex flex-col gap-4">
    - Hidden inputs: <input type="hidden" name="action" value="cora_ajax_submit_lead"><input type="hidden" name="form_name" value="Executive Briefing Request Form">
    - Fields: Full Name, Corporate Email, Organization / Title, Engagement Type dropdown, and Advisory Objective.
    - Distinctive executive submit button.
@@ -13140,23 +13146,25 @@ Return ONLY clean, standalone HTML in an <!DOCTYPE html> document.`,
         photography: `You are an elite visual portfolio architect. 
 Create a complete, single-file, production-ready HTML5 landing page for a "Luxury Photography Studio & Production House" (named "Lumina Studio").
 
-TECHNICAL REQUIREMENTS:
+STRICT TECHNICAL & DESIGN REQUIREMENTS:
 1. Include Tailwind CSS CDN: <script src="https://cdn.tailwindcss.com"><\/script>
 2. Google Fonts: Space Grotesk and Inter.
-3. High-fashion minimalist monochromatic dark layout (black #09090b, charcoal surfaces, white typography, subtle glassmorphism overlays).
-4. Fully responsive gallery layout with masonry-style grid.
+3. USE PURE TAILWIND CSS UTILITY CLASSES ON EVERY ELEMENT. DO NOT write large raw custom <style> blocks.
+4. COMPLETE IMAGERY: Use high-res Unsplash photo URLs for all portfolio items and gallery showcases.
+5. ALL SECTIONS 100% VISIBLE: Ensure every section has complete markup and is 100% visible.
+6. Fully responsive gallery layout with masonry-style grid.
 
 SECTIONS TO INCLUDE:
-1. Sticky Minimal Header: Studio logo, curated collections links (Commercial, Editorial, Architecture, Portraits, Events), studio space, and "Book Session" CTA.
+1. Sticky Minimal Header: Studio logo, curated collections links (Commercial, Editorial, Architecture, Portraits, Events), and "Book Session" CTA.
 2. Hero: Fullscreen visual impact with headline ("Capturing Epochs in Light & Form"), subtitle, client portfolio marquee, and instant booking CTA.
-3. Curated Visual Gallery: High-resolution photographic showcase cards with aspect ratio presets (16:9 cinematic, 4:5 editorial, 1:1 square) and lightbox trigger overlays.
+3. Curated Visual Gallery: 6 high-resolution photographic showcase cards with aspect ratio presets (16:9 cinematic, 4:5 editorial, 1:1 square).
 4. Studio Spaces & Equipment Specs: 2 studio bay cards with floorplan specs, Profoto lighting inventory, and cyclorama wall dimensions.
-5. Transparent Package Pricing Cards: 3 tiers (Commercial Campaign, Editorial Lookbook, Private Executive Portrait) with detailed deliverables and GST breakdown calculations.
+5. Transparent Package Pricing Cards: 3 tiers (Commercial Campaign, Editorial Lookbook, Private Executive Portrait) with detailed deliverables.
 6. Client Testimonials & Press Accolades: Vogue, Forbes, GQ feature quotes.
 7. Native Studio Booking Inquiry Form:
-   - Form markup: <form method="POST" action="/wp-admin/admin-ajax.php" onsubmit="event.preventDefault(); window.coraSubmitLeadForm ? window.coraSubmitLeadForm(this) : alert('Booking request submitted!');">
+   - Form markup: <form method="POST" action="/wp-admin/admin-ajax.php" onsubmit="event.preventDefault(); window.coraSubmitLeadForm ? window.coraSubmitLeadForm(this) : alert('Booking request submitted!');" class="p-8 rounded-2xl bg-zinc-900 border border-zinc-800 shadow-2xl flex flex-col gap-4">
    - Hidden inputs: <input type="hidden" name="action" value="cora_ajax_submit_lead"><input type="hidden" name="form_name" value="Studio Booking Inquiry Form">
-   - Fields: Full Name, Email, Phone, Preferred Shoot Date picker, Shoot Type dropdown, and Creative Vision brief.
+   - Fields: Full Name, Email, Phone, Preferred Shoot Date, Shoot Type dropdown, and Creative Vision brief.
    - Sleek CTA button.
 8. Footer: Studio location, working hours, Instagram/Behance handles, and copyright.
 
@@ -13165,11 +13173,13 @@ Return ONLY clean, standalone HTML in an <!DOCTYPE html> document.`,
         realestate: `You are an elite real estate web architect. 
 Create a complete, single-file, production-ready HTML5 landing page for a premier "Luxury Real Estate & Architectural Properties Showcase" (named "Aura Estates").
 
-TECHNICAL REQUIREMENTS:
+STRICT TECHNICAL & DESIGN REQUIREMENTS:
 1. Include Tailwind CSS CDN: <script src="https://cdn.tailwindcss.com"><\/script>
 2. Google Fonts: Plus Jakarta Sans and Playfair Display.
-3. Modern architectural aesthetic (emerald-950/zinc-900 dark theme with emerald-500 accents and subtle frosted glass).
-4. Fully responsive on mobile, tablet, and desktop.
+3. USE PURE TAILWIND CSS UTILITY CLASSES ON EVERY ELEMENT. DO NOT write large raw custom <style> blocks.
+4. COMPLETE IMAGERY: Use high-res architectural Unsplash photos for all property listings.
+5. ALL SECTIONS 100% VISIBLE: Ensure every section is fully visible without scroll-delay locks.
+6. Fully responsive on mobile, tablet, and desktop.
 
 SECTIONS TO INCLUDE:
 1. Sticky Header: Modern logo, navigation (Properties, Developments, Private Client Services, About), and "Schedule Private Tour" CTA.
@@ -13178,7 +13188,7 @@ SECTIONS TO INCLUDE:
 4. Development Highlights: Interactive luxury amenities grid (Private Helipad, Infinity Pools, Concierge, Smart Home Automation).
 5. Neighborhood Guide: Featured prime residential districts with price appreciation metrics.
 6. Native VIP Tour & Acquisition Inquiry Form:
-   - Form markup: <form method="POST" action="/wp-admin/admin-ajax.php" onsubmit="event.preventDefault(); window.coraSubmitLeadForm ? window.coraSubmitLeadForm(this) : alert('Tour requested!');">
+   - Form markup: <form method="POST" action="/wp-admin/admin-ajax.php" onsubmit="event.preventDefault(); window.coraSubmitLeadForm ? window.coraSubmitLeadForm(this) : alert('Tour requested!');" class="p-8 rounded-2xl bg-zinc-900 border border-zinc-800 shadow-2xl flex flex-col gap-4">
    - Hidden inputs: <input type="hidden" name="action" value="cora_ajax_submit_lead"><input type="hidden" name="form_name" value="Real Estate VIP Tour Form">
    - Fields: Full Name, Email, Phone, Investment Range ($1M-$3M, $3M-$10M, $10M+), and Preferred Property Type.
    - High-contrast VIP submit button.
@@ -13189,10 +13199,10 @@ Return ONLY clean, standalone HTML in an <!DOCTYPE html> document.`,
         ecommerce: `You are an elite DTC e-commerce designer. 
 Create a complete, single-file, production-ready HTML5 landing page for a modern "Direct-to-Consumer (DTC) Brand & Online Shop" (named "Velox Goods").
 
-TECHNICAL & DESIGN REQUIREMENTS:
+STRICT TECHNICAL & DESIGN REQUIREMENTS:
 1. Include Tailwind CSS CDN: <script src="https://cdn.tailwindcss.com"><\/script>
 2. Google Fonts: Inter and JetBrains Mono.
-3. Clean modern minimalist product aesthetic (pure white #ffffff and deep obsidian #09090b contrast, soft shadow elevations, high-converting product showcases).
+3. USE PURE TAILWIND CSS UTILITY CLASSES ON EVERY ELEMENT (e.g. grid grid-cols-1 md:grid-cols-3 gap-6, bg-zinc-900/60, border border-zinc-800, rounded-2xl, p-6). DO NOT write large raw custom <style> blocks.
 4. COMPLETE SELF-CONTAINED ASSETS: Never output empty placeholder divs (e.g. <div id="heroArt"></div>). Always provide complete, self-contained visual elements with high-res Unsplash product photography (e.g. https://images.unsplash.com/photo-1602143407151-7111542de6e8?auto=format&fit=crop&w=800&q=80) or clean vector SVGs.
 5. ALL SECTIONS VISIBLE & STYLED: Ensure every section has complete markup, full copy, and is 100% visible without scroll-delayed opacity-0 locks.
 6. Mobile-first 100% responsive layout.
@@ -13202,11 +13212,11 @@ SECTIONS TO INCLUDE:
 2. Hero Section: High-converting headline ("Engineered for Everyday Excellence"), subheadline, ratings badge (4.9/5 from 4,800+ reviews), dual CTAs ("Shop Collection", "Watch Film"), and a stunning product showcase card with high-res image and price tag.
 3. Featured Products Grid: 4 product cards (Aero Flask 750ml, Nomad Tech Pack, Apex Minimalist Wallet, Chrono Titanium Watch) with high-res photos, color swatches, price tags with strike-through discounts, and "Quick Add to Cart" buttons.
 4. Product Craftsmanship & Benefits: 3 highlight cards showing sustainable engineering, aerospace-grade alloy, and lifetime warranty.
-5. Customer Reviews & Social Proof: 3 verified buyer photo review cards with 5-star ratings and customer tags.
+5. Customer Reviews & Social Proof: 3 verified buyer photo review cards with 5-star ratings, reviewer names, and verified tags.
 6. Native Order / Inquiries Form:
-   - Form markup: <form method="POST" action="/wp-admin/admin-ajax.php" onsubmit="event.preventDefault(); window.coraSubmitLeadForm ? window.coraSubmitLeadForm(this) : alert('Inquiry placed!');">
+   - Form markup: <form method="POST" action="/wp-admin/admin-ajax.php" onsubmit="event.preventDefault(); window.coraSubmitLeadForm ? window.coraSubmitLeadForm(this) : alert('Inquiry placed!');" class="p-8 rounded-2xl bg-zinc-900 border border-zinc-800 shadow-2xl flex flex-col gap-4">
    - Hidden inputs: <input type="hidden" name="action" value="cora_ajax_submit_lead"><input type="hidden" name="form_name" value="DTC Order Inquiry Form">
-   - Fields: Name, Email, Phone, Order Inquiry / Size preference, and Delivery Pincode.
+   - Fields: Name, Email, Phone, Order Inquiry / Size preference, and Delivery Pincode with styled inputs (w-full px-3.5 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-100).
    - High-converting submit button.
 7. Footer: Brand philosophy, guarantees (30-day money-back, 24/7 support), payment icons, and legal links.
 
@@ -13253,6 +13263,167 @@ Return ONLY clean, complete, standalone HTML inside an <!DOCTYPE html> document.
         }
         document.body.removeChild(ta);
     }
+
+    window.coraEnhancePreviewHtml = function(html, opts) {
+        opts = opts || {};
+        var content = (html || '').trim() || '<!DOCTYPE html><html><body class="p-6 text-zinc-500 font-sans">No HTML content provided.</body></html>';
+
+        var tailwindScript = '<script src="https://cdn.tailwindcss.com"><\/script>';
+        var fontStyles = '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">';
+
+        var resilienceStyles = '<style id="cora-preview-resilience">' + `
+            html, body {
+                overflow-y: auto !important;
+                overflow-x: hidden !important;
+                height: auto !important;
+                min-height: 100% !important;
+                max-height: none !important;
+            }
+            body > div, main, #root, #app, [class*="overflow-hidden"], [class*="h-screen"], [class*="min-h-screen"] {
+                max-height: none !important;
+                overflow: visible !important;
+            }
+            section, article, main, header, footer {
+                display: block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+                min-height: auto !important;
+                max-height: none !important;
+                position: relative !important;
+            }
+            [data-aos], .reveal, .animate-on-scroll, .fade-in, .scroll-reveal, [class*="opacity-0"], .invisible, [style*="opacity: 0"], [style*="opacity:0"], [style*="opacity: .0"], [style*="opacity:.0"], [style*="visibility: hidden"], [style*="visibility:hidden"] {
+                opacity: 1 !important;
+                visibility: visible !important;
+                transform: none !important;
+                transition: none !important;
+            }
+            .hero-art:empty, #heroArt:empty, .hero-image:empty, .hero-visual:empty {
+                min-height: 320px !important;
+                background: radial-gradient(circle at center, rgba(255,255,255,0.06) 0%, rgba(9,9,11,0.95) 100%), #18181b !important;
+                border: 1px dashed rgba(255,255,255,0.18) !important;
+                border-radius: 1.25rem !important;
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: center !important;
+                justify-content: center !important;
+                gap: 8px !important;
+                padding: 24px !important;
+                color: #a1a1aa !important;
+                text-align: center !important;
+            }
+            .hero-art:empty::before, #heroArt:empty::before, .hero-image:empty::before, .hero-visual:empty::before {
+                content: '✦';
+                font-size: 26px;
+                color: #71717a;
+            }
+            .hero-art:empty::after, #heroArt:empty::after, .hero-image:empty::after, .hero-visual:empty::after {
+                content: 'Interactive Visual Showcase';
+                font-size: 12.5px;
+                font-weight: 600;
+            }
+            input:not([class*="bg-"]), textarea:not([class*="bg-"]), select:not([class*="bg-"]) {
+                background-color: #09090b !important;
+                color: #f4f4f5 !important;
+                border: 1px solid #27272a !important;
+                border-radius: 0.75rem !important;
+                padding: 0.625rem 0.875rem !important;
+                font-size: 0.8125rem !important;
+            }
+            form button[type="submit"]:not([class*="bg-"]), form input[type="submit"]:not([class*="bg-"]) {
+                background-color: #ffffff !important;
+                color: #09090b !important;
+                font-weight: 700 !important;
+                border-radius: 0.75rem !important;
+                padding: 0.75rem 1.5rem !important;
+                cursor: pointer !important;
+            }
+            #preloader, .preloader, .page-loader, .loading-screen {
+                display: none !important;
+            }
+        ` + '</style>';
+
+        var errorBoundaryScript = '<' + 'script>' + `
+            window.onerror = function(msg, url, line) {
+                console.warn('[Cora Preview Shield] Handled script error:', msg);
+                return true;
+            };
+            window.addEventListener('unhandledrejection', function(e) {
+                console.warn('[Cora Preview Shield] Handled unhandled rejection:', e.reason);
+                e.preventDefault();
+            });
+        ` + '<' + '/script>';
+
+        var headBundle = errorBoundaryScript + resilienceStyles + fontStyles;
+        if (!content.includes('cdn.tailwindcss.com')) {
+            headBundle += tailwindScript;
+        }
+
+        if (content.includes('<head>')) {
+            content = content.replace('<head>', '<head>' + headBundle);
+        } else if (content.includes('<head ')) {
+            content = content.replace(/(<head[^>]*>)/i, '$1' + headBundle);
+        } else if (content.includes('<html>') || content.includes('<html ')) {
+            content = content.replace(/(<html[^>]*>)/i, '$1<head>' + headBundle + '</head>');
+        } else {
+            content = '<!DOCTYPE html><html><head>' + headBundle + '</head><body>' + content + '</body></html>';
+        }
+
+        if (opts.clickBridge) {
+            var clickBridge = '<' + 'script>' + `
+              (function() {
+                let lastHovered = null;
+                document.addEventListener('mouseover', function(e) {
+                  if (e.target && e.target !== document.body && e.target !== document.documentElement) {
+                    if (lastHovered && lastHovered !== e.target) {
+                      lastHovered.style.outline = '';
+                      lastHovered.style.outlineOffset = '';
+                    }
+                    lastHovered = e.target;
+                    e.target.style.outline = '2px dashed rgba(96, 165, 250, 0.7)';
+                    e.target.style.outlineOffset = '-2px';
+                    e.target.style.cursor = 'crosshair';
+                  }
+                }, true);
+                document.addEventListener('mouseout', function(e) {
+                  if (e.target) {
+                    e.target.style.outline = '';
+                    e.target.style.outlineOffset = '';
+                    e.target.style.cursor = '';
+                  }
+                }, true);
+                document.addEventListener('click', function(e) {
+                  const target = e.target.closest('section, header, footer, nav, article, aside, form, div[id], [id], h1, h2, h3, h4, h5, h6, p, button, a, img') || e.target;
+                  if (!target || target === document.body || target === document.documentElement) return;
+                  
+                  e.preventDefault();
+                  e.stopPropagation();
+
+                  const textSnippet = (target.textContent || '').trim().replace(/\\s+/g, ' ').substring(0, 45);
+                  const tag = target.tagName ? target.tagName.toLowerCase() : '';
+                  const id = target.id || '';
+                  const className = typeof target.className === 'string' ? target.className : '';
+                  const firstClass = className.split(' ').filter(function(c) { return c && !c.includes(':') && !c.startsWith('hover') && c.length > 3; })[0] || '';
+
+                  window.parent.postMessage({
+                    type: 'cora_preview_element_click',
+                    tag: tag,
+                    id: id,
+                    firstClass: firstClass,
+                    textSnippet: textSnippet
+                  }, '*');
+                }, true);
+              })();
+            ` + '<' + '/script>';
+
+            if (content.includes('</body>')) {
+                content = content.replace('</body>', clickBridge + '</body>');
+            } else {
+                content += clickBridge;
+            }
+        }
+
+        return content;
+    };
 
     window.selectHtmlTemplate = function(templateKey, title) {
         _wizSelectedTemplateKey = templateKey;
@@ -13380,7 +13551,7 @@ Return ONLY clean, complete, standalone HTML inside an <!DOCTYPE html> document.
         var modal = document.getElementById('wiz-html-preview-modal');
         var iframe = document.getElementById('wiz-html-preview-iframe');
         if (iframe) {
-            iframe.srcdoc = raw;
+            iframe.srcdoc = window.coraEnhancePreviewHtml(raw, { clickBridge: false });
         }
         if (modal) {
             modal.style.display = 'flex';
@@ -16619,142 +16790,7 @@ Please provide the complete, un-truncated index.html file ready to save and publ
         const frame = document.getElementById('cora-live-html-preview-frame');
         if (!frame) return;
 
-        let previewContent = html || '<!DOCTYPE html><html><body class="p-6 text-zinc-500 font-sans">No HTML content provided.</body></html>';
-
-        // Auto-inject Tailwind CSS CDN if not already present
-        const tailwindScript = '<script src="https://cdn.tailwindcss.com"><\/script>';
-        const fontStyles = '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">';
-        
-        // Resilience CSS & Error Boundary
-        const resilienceStyles = '<style id="cora-preview-resilience">' + `
-            html, body {
-                overflow-y: auto !important;
-                overflow-x: hidden !important;
-                height: auto !important;
-                min-height: 100% !important;
-                max-height: none !important;
-            }
-            [data-aos], .reveal, .animate-on-scroll, .fade-in, .scroll-reveal, [class*="opacity-0"], .invisible {
-                opacity: 1 !important;
-                visibility: visible !important;
-                transform: none !important;
-                transition: none !important;
-            }
-            .hero-art:empty, #heroArt:empty, .hero-image:empty, .hero-visual:empty {
-                min-height: 320px !important;
-                background: radial-gradient(circle at center, rgba(255,255,255,0.06) 0%, rgba(9,9,11,0.95) 100%), #18181b !important;
-                border: 1px dashed rgba(255,255,255,0.18) !important;
-                border-radius: 1.25rem !important;
-                display: flex !important;
-                flex-direction: column !important;
-                align-items: center !important;
-                justify-content: center !important;
-                gap: 8px !important;
-                padding: 24px !important;
-                color: #a1a1aa !important;
-                font-family: ui-sans-serif, system-ui, sans-serif !important;
-                text-align: center !important;
-            }
-            .hero-art:empty::before, #heroArt:empty::before, .hero-image:empty::before, .hero-visual:empty::before {
-                content: '✦';
-                font-size: 26px;
-                color: #71717a;
-            }
-            .hero-art:empty::after, #heroArt:empty::after, .hero-image:empty::after, .hero-visual:empty::after {
-                content: 'Product Visual & 3D Interactive Showcase';
-                font-size: 12.5px;
-                font-weight: 600;
-            }
-            section {
-                min-height: 60px;
-                position: relative;
-                display: block;
-                clear: both;
-            }
-            #preloader, .preloader, .page-loader, .loading-screen {
-                display: none !important;
-            }
-        ` + '</style>';
-
-        const errorBoundaryScript = '<' + 'script>' + `
-            window.onerror = function(msg, url, line) {
-                console.warn('[Cora Preview Shield] Handled script error:', msg);
-                return true;
-            };
-            window.addEventListener('unhandledrejection', function(e) {
-                console.warn('[Cora Preview Shield] Handled unhandled rejection:', e.reason);
-                e.preventDefault();
-            });
-        ` + '<' + '/script>';
-
-        // Inject click-to-code inspector bridge into iframe
-        const clickBridge = '<' + 'script>' + `
-          (function() {
-            let lastHovered = null;
-            document.addEventListener('mouseover', function(e) {
-              if (e.target && e.target !== document.body && e.target !== document.documentElement) {
-                if (lastHovered && lastHovered !== e.target) {
-                  lastHovered.style.outline = '';
-                  lastHovered.style.outlineOffset = '';
-                }
-                lastHovered = e.target;
-                e.target.style.outline = '2px dashed rgba(96, 165, 250, 0.7)';
-                e.target.style.outlineOffset = '-2px';
-                e.target.style.cursor = 'crosshair';
-              }
-            }, true);
-            document.addEventListener('mouseout', function(e) {
-              if (e.target) {
-                e.target.style.outline = '';
-                e.target.style.outlineOffset = '';
-                e.target.style.cursor = '';
-              }
-            }, true);
-            document.addEventListener('click', function(e) {
-              const target = e.target.closest('section, header, footer, nav, article, aside, form, div[id], [id], h1, h2, h3, h4, h5, h6, p, button, a, img') || e.target;
-              if (!target || target === document.body || target === document.documentElement) return;
-              
-              e.preventDefault();
-              e.stopPropagation();
-
-              const textSnippet = (target.textContent || '').trim().replace(/\\s+/g, ' ').substring(0, 45);
-              const tag = target.tagName ? target.tagName.toLowerCase() : '';
-              const id = target.id || '';
-              const className = typeof target.className === 'string' ? target.className : '';
-              const firstClass = className.split(' ').filter(function(c) { return c && !c.includes(':') && !c.startsWith('hover') && c.length > 3; })[0] || '';
-
-              window.parent.postMessage({
-                type: 'cora_preview_element_click',
-                tag: tag,
-                id: id,
-                firstClass: firstClass,
-                textSnippet: textSnippet
-              }, '*');
-            }, true);
-          })();
-        ` + '<' + '/script>';
-
-        // Assemble injected head bundle
-        let headBundle = errorBoundaryScript + resilienceStyles + fontStyles;
-        if (!previewContent.includes('cdn.tailwindcss.com')) {
-            headBundle += tailwindScript;
-        }
-
-        if (previewContent.includes('<head>')) {
-            previewContent = previewContent.replace('<head>', '<head>' + headBundle);
-        } else if (previewContent.includes('<head ')) {
-            previewContent = previewContent.replace(/(<head[^>]*>)/i, '$1' + headBundle);
-        } else if (previewContent.includes('<html>') || previewContent.includes('<html ')) {
-            previewContent = previewContent.replace(/(<html[^>]*>)/i, '$1<head>' + headBundle + '</head>');
-        } else {
-            previewContent = '<!DOCTYPE html><html><head>' + headBundle + '</head><body>' + previewContent + '</body></html>';
-        }
-
-        if (previewContent.includes('</body>')) {
-            previewContent = previewContent.replace('</body>', clickBridge + '</body>');
-        } else {
-            previewContent += clickBridge;
-        }
+        const previewContent = window.coraEnhancePreviewHtml ? window.coraEnhancePreviewHtml(html, { clickBridge: true }) : (html || '<!DOCTYPE html><html><body class="p-6 text-zinc-500 font-sans">No HTML content provided.</body></html>');
 
         const doc = frame.contentDocument || (frame.contentWindow ? frame.contentWindow.document : null);
         if (doc) {

@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.358
+ * Version:           4.9.359
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.358' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.359' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -39625,85 +39625,1009 @@ function cora_canvas_get_default_starter_html( $template_key = 'agency', $theme_
     $title = esc_html( ! empty( $theme_name ) ? $theme_name : 'Modern Studio' );
     
     switch ( $template_key ) {
-        case 'saas':
-            $hero_badge = '● v2.4 Platform Live · Intelligent Autonomous Agent Engine';
-            $hero_title = 'The Autonomous AI Workspace for Modern Teams';
-            $hero_sub = 'Streamline operations, automate client workflows, and sync digital assets in real time with high-performance infrastructure.';
-            $cta_primary = 'Start Free 14-Day Trial';
-            $cta_sec = 'Explore Live Demo';
-            break;
-            
-        case 'consulting':
-            $hero_badge = 'Strategic Enterprise Advisory & Valuation Practice';
-            $hero_title = 'Capital Strategy & Advisory for High-Growth Enterprises';
-            $hero_sub = 'Navigating market expansion, operational restructuring, and private capital transactions with data-driven institutional rigour.';
-            $cta_primary = 'Schedule Executive Audit';
-            $cta_sec = 'View Case Studies';
-            break;
-            
-        case 'photography':
-            $hero_badge = 'Premium Commercial & Editorial Photography';
-            $hero_title = 'Visual Storytelling for Brands & Global Campaigns';
-            $hero_sub = 'Capturing cinematic depth, brand identity, and editorial architecture with signature lighting and meticulous post-production.';
-            $cta_primary = 'Book Studio Session';
-            $cta_sec = 'View Portfolio Reel';
-            break;
-            
-        case 'custom':
-            $hero_badge = 'Tailored Digital Experience Platform';
-            $hero_title = 'Built for Performance, Conversion & Brand Authority';
-            $hero_sub = 'Delivering tailored digital experiences, responsive design, and seamless customer capture engineered for rapid growth.';
-            $cta_primary = 'Get Started Today';
-            $cta_sec = 'Learn More';
-            break;
-            
-        case 'agency':
-        default:
-            $hero_badge = 'Creative Agency of the Year 2026';
-            $hero_title = 'We Craft Iconic Brands & Cinematic Digital Experiences';
-            $hero_sub = 'Award-winning creative direction, high-converting web architecture, and video production engineered to scale modern enterprises.';
-            $cta_primary = 'Book Consultation';
-            $cta_sec = 'Explore Showcase';
-            break;
-    }
-
-    return '<!DOCTYPE html>
+        case 'ecommerce':
+            return '<!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>' . $title . ' · High-Performance Web Presence</title>
+    <title>' . $title . ' — Engineered for Everyday Excellence</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: [\'Inter\', \'-apple-system\', \'BlinkMacSystemFont\', \'sans-serif\'],
-                        mono: [\'JetBrains Mono\', \'monospace\']
-                    },
-                    colors: {
-                        brand: {
-                            50: \'#fafafa\',
-                            100: \'#f4f4f5\',
-                            800: \'#27272a\',
-                            900: \'#18181b\',
-                            950: \'#09090b\'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
 </head>
 <body class="bg-[#09090b] text-zinc-100 font-sans antialiased selection:bg-zinc-800 selection:text-white">
 
     <!-- Top Announcement Bar -->
-    <div class="bg-zinc-900 border-b border-zinc-800/80 py-2 px-4 text-center text-xs text-zinc-400 font-medium">
-        <span>' . $hero_badge . '</span>
+    <div class="bg-zinc-900 border-b border-zinc-800 py-2 px-4 text-center text-xs text-zinc-300 font-medium flex items-center justify-center gap-2">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span>Free express delivery on all orders over ₹999 · 30-Day Money-Back Guarantee</span>
+    </div>
+
+    <!-- Navigation Bar -->
+    <header class="sticky top-0 z-50 bg-[#09090b]/90 backdrop-blur-md border-b border-zinc-800/80">
+        <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-zinc-950 font-black text-sm">
+                    V
+                </div>
+                <span class="font-extrabold text-base tracking-tight text-white">' . $title . '</span>
+            </div>
+            <nav class="hidden md:flex items-center gap-8 text-xs font-semibold text-zinc-400">
+                <a href="#products" class="hover:text-white transition-colors">Products</a>
+                <a href="#craft" class="hover:text-white transition-colors">Craftsmanship</a>
+                <a href="#reviews" class="hover:text-white transition-colors">Reviews</a>
+                <a href="#contact" class="hover:text-white transition-colors">Order &amp; Support</a>
+            </nav>
+            <div class="flex items-center gap-3">
+                <a href="#products" class="px-4 py-2 bg-white hover:bg-zinc-200 text-zinc-950 text-xs font-bold rounded-lg transition-all shadow-xs">
+                    Shop Best Sellers
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="relative pt-20 pb-20 px-6 border-b border-zinc-800/60 overflow-hidden">
+        <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-[11px] font-semibold text-zinc-300 mb-6">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span>Aerospace-Grade Daily Essentials</span>
+                </div>
+                <h1 class="text-4xl sm:text-6xl font-black tracking-tight text-white leading-[1.08] mb-6">
+                    Engineered for Everyday Excellence.
+                </h1>
+                <p class="text-base sm:text-lg text-zinc-400 leading-relaxed mb-8 font-normal">
+                    Precision machined daily carry gear crafted from titanium, aerospace alloy, and recycled performance textiles. Built to outlive trends.
+                </p>
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 mb-8">
+                    <a href="#products" class="px-6 py-3.5 bg-white hover:bg-zinc-200 text-zinc-950 text-xs font-extrabold rounded-xl transition-all shadow-lg text-center">
+                        Shop Collection →
+                    </a>
+                    <a href="#craft" class="px-6 py-3.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 text-xs font-bold rounded-xl border border-zinc-800 transition-all text-center">
+                        Explore Materials
+                    </a>
+                </div>
+                <div class="flex items-center gap-4 text-xs text-zinc-400 font-medium">
+                    <div class="flex text-amber-400 text-sm">★★★★★</div>
+                    <span><b>4.9/5</b> from 4,800+ verified buyers</span>
+                </div>
+            </div>
+
+            <!-- Hero Product Showcase Card -->
+            <div class="relative group">
+                <div class="p-6 rounded-3xl bg-zinc-900/70 border border-zinc-800/90 shadow-2xl relative overflow-hidden flex flex-col items-center">
+                    <div class="w-full h-80 rounded-2xl overflow-hidden bg-zinc-950 mb-6 relative">
+                        <img src="https://images.unsplash.com/photo-1602143407151-7111542de6e8?auto=format&fit=crop&w=800&q=80" alt="Aero Flask 750ml" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <span class="absolute top-3 left-3 px-2.5 py-1 bg-white text-zinc-950 text-[10.5px] font-extrabold rounded-md shadow-xs">BEST SELLER</span>
+                    </div>
+                    <div class="w-full flex items-center justify-between">
+                        <div>
+                            <h3 class="text-lg font-bold text-white">Aero Flask 750ml</h3>
+                            <p class="text-xs text-zinc-400">Double-Wall Vacuum Insulated · Matte Obsidian</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-lg font-black text-white font-mono">₹2,499</span>
+                            <span class="text-xs text-zinc-500 line-through font-mono block">₹3,199</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Products Grid -->
+    <section id="products" class="py-20 px-6 border-b border-zinc-800/60">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center max-w-xl mx-auto mb-16">
+                <h2 class="text-xs font-bold tracking-widest text-zinc-500 uppercase mb-3 font-mono">Featured Gear</h2>
+                <h3 class="text-3xl font-black text-white tracking-tight">Built for Everyday Utility</h3>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Product 1 -->
+                <div class="p-5 rounded-2xl bg-zinc-900/50 border border-zinc-800 hover:border-zinc-700 transition-all flex flex-col justify-between">
+                    <div>
+                        <div class="w-full h-52 rounded-xl overflow-hidden bg-zinc-950 mb-4">
+                            <img src="https://images.unsplash.com/photo-1546868871-7041f2a55e12?auto=format&fit=crop&w=600&q=80" alt="Nomad Watch" class="w-full h-full object-cover hover:scale-105 transition-transform duration-300">
+                        </div>
+                        <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Titanium Edition</span>
+                        <h4 class="text-sm font-bold text-white mt-1">Chrono Field Watch</h4>
+                        <p class="text-xs text-zinc-400 mt-1">Sapphire glass, 100m water resistance.</p>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-zinc-800/80 flex items-center justify-between">
+                        <span class="text-sm font-bold text-white font-mono">₹8,999</span>
+                        <a href="#contact" class="px-3 py-1.5 bg-zinc-800 hover:bg-white hover:text-zinc-950 text-zinc-200 text-xs font-bold rounded-lg transition-colors">Quick Add</a>
+                    </div>
+                </div>
+
+                <!-- Product 2 -->
+                <div class="p-5 rounded-2xl bg-zinc-900/50 border border-zinc-800 hover:border-zinc-700 transition-all flex flex-col justify-between">
+                    <div>
+                        <div class="w-full h-52 rounded-xl overflow-hidden bg-zinc-950 mb-4">
+                            <img src="https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?auto=format&fit=crop&w=600&q=80" alt="Tech Pack" class="w-full h-full object-cover hover:scale-105 transition-transform duration-300">
+                        </div>
+                        <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Waterproof Carry</span>
+                        <h4 class="text-sm font-bold text-white mt-1">Nomad Sling 8L</h4>
+                        <p class="text-xs text-zinc-400 mt-1">X-Pac ripstop, YKK Aquaguard zips.</p>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-zinc-800/80 flex items-center justify-between">
+                        <span class="text-sm font-bold text-white font-mono">₹4,499</span>
+                        <a href="#contact" class="px-3 py-1.5 bg-zinc-800 hover:bg-white hover:text-zinc-950 text-zinc-200 text-xs font-bold rounded-lg transition-colors">Quick Add</a>
+                    </div>
+                </div>
+
+                <!-- Product 3 -->
+                <div class="p-5 rounded-2xl bg-zinc-900/50 border border-zinc-800 hover:border-zinc-700 transition-all flex flex-col justify-between">
+                    <div>
+                        <div class="w-full h-52 rounded-xl overflow-hidden bg-zinc-950 mb-4">
+                            <img src="https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&w=600&q=80" alt="Minimalist Wallet" class="w-full h-full object-cover hover:scale-105 transition-transform duration-300">
+                        </div>
+                        <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">RFID Blocking</span>
+                        <h4 class="text-sm font-bold text-white mt-1">Apex Slim Wallet</h4>
+                        <p class="text-xs text-zinc-400 mt-1">Grade 5 titanium plates, silicone band.</p>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-zinc-800/80 flex items-center justify-between">
+                        <span class="text-sm font-bold text-white font-mono">₹2,199</span>
+                        <a href="#contact" class="px-3 py-1.5 bg-zinc-800 hover:bg-white hover:text-zinc-950 text-zinc-200 text-xs font-bold rounded-lg transition-colors">Quick Add</a>
+                    </div>
+                </div>
+
+                <!-- Product 4 -->
+                <div class="p-5 rounded-2xl bg-zinc-900/50 border border-zinc-800 hover:border-zinc-700 transition-all flex flex-col justify-between">
+                    <div>
+                        <div class="w-full h-52 rounded-xl overflow-hidden bg-zinc-950 mb-4">
+                            <img src="https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=600&q=80" alt="EDC Pen" class="w-full h-full object-cover hover:scale-105 transition-transform duration-300">
+                        </div>
+                        <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Precision Machined</span>
+                        <h4 class="text-sm font-bold text-white mt-1">Bolt-Action Pen</h4>
+                        <p class="text-xs text-zinc-400 mt-1">Solid brass &amp; carbon fiber refill.</p>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-zinc-800/80 flex items-center justify-between">
+                        <span class="text-sm font-bold text-white font-mono">₹1,899</span>
+                        <a href="#contact" class="px-3 py-1.5 bg-zinc-800 hover:bg-white hover:text-zinc-950 text-zinc-200 text-xs font-bold rounded-lg transition-colors">Quick Add</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Verified Customer Reviews Section -->
+    <section id="reviews" class="py-20 px-6 border-b border-zinc-800/60 bg-zinc-950/40">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center max-w-xl mx-auto mb-16">
+                <span class="text-xs font-bold tracking-widest text-zinc-500 uppercase font-mono mb-2 block">/ VERIFIED BUYERS</span>
+                <h3 class="text-3xl font-black text-white tracking-tight">Loved by 4,800+ Owners.</h3>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Review 1 -->
+                <div class="p-6 rounded-2xl bg-zinc-900/60 border border-zinc-800 flex flex-col justify-between">
+                    <div>
+                        <div class="flex text-amber-400 text-sm mb-3">★★★★★</div>
+                        <p class="text-xs text-zinc-300 leading-relaxed italic mb-4">"The Aero Flask keeps water ice cold even in 45°C Delhi summers. The matte coating has zero scratches after 6 months of daily use."</p>
+                    </div>
+                    <div class="flex items-center gap-3 pt-4 border-t border-zinc-800/80">
+                        <div class="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center font-bold text-xs text-white">RV</div>
+                        <div>
+                            <div class="text-xs font-bold text-white">Rohan Verma</div>
+                            <div class="text-[10px] text-zinc-500">Verified Buyer · Mumbai</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Review 2 -->
+                <div class="p-6 rounded-2xl bg-zinc-900/60 border border-zinc-800 flex flex-col justify-between">
+                    <div>
+                        <div class="flex text-amber-400 text-sm mb-3">★★★★★</div>
+                        <p class="text-xs text-zinc-300 leading-relaxed italic mb-4">"Nomad Sling is easily the best tech bag I have owned. Fits my Kindle, iPad Mini, cables, and power bank without bulging."</p>
+                    </div>
+                    <div class="flex items-center gap-3 pt-4 border-t border-zinc-800/80">
+                        <div class="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center font-bold text-xs text-white">KP</div>
+                        <div>
+                            <div class="text-xs font-bold text-white">Kavya Patel</div>
+                            <div class="text-[10px] text-zinc-500">Verified Buyer · Bangalore</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Review 3 -->
+                <div class="p-6 rounded-2xl bg-zinc-900/60 border border-zinc-800 flex flex-col justify-between">
+                    <div>
+                        <div class="flex text-amber-400 text-sm mb-3">★★★★★</div>
+                        <p class="text-xs text-zinc-300 leading-relaxed italic mb-4">"Build quality is unmatched. You can immediately feel the weight and precision of the Grade 5 titanium wallet."</p>
+                    </div>
+                    <div class="flex items-center gap-3 pt-4 border-t border-zinc-800/80">
+                        <div class="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center font-bold text-xs text-white">AM</div>
+                        <div>
+                            <div class="text-xs font-bold text-white">Aarav Mehta</div>
+                            <div class="text-[10px] text-zinc-500">Verified Buyer · Pune</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Native Order & Inquiry Form -->
+    <section id="contact" class="py-20 px-6 bg-[#0c0c0e]">
+        <div class="max-w-xl mx-auto">
+            <div class="text-center mb-10">
+                <span class="text-xs font-bold tracking-widest text-zinc-500 uppercase font-mono mb-2 block">/ ORDER &amp; SIZE HELP</span>
+                <h3 class="text-3xl font-black text-white tracking-tight mb-2">Not sure which one? Ask us.</h3>
+                <p class="text-xs text-zinc-400">Tell us what you need and our product team will reply with clear size and delivery guidance.</p>
+            </div>
+            
+            <form method="POST" class="p-8 rounded-2xl bg-zinc-900 border border-zinc-800 shadow-2xl flex flex-col gap-4">
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[11px] font-bold text-zinc-300 uppercase tracking-wider">Full Name *</label>
+                    <input type="text" name="name" required placeholder="Aarav Mehta" class="w-full px-3.5 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500 transition-all">
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[11px] font-bold text-zinc-300 uppercase tracking-wider">Email Address *</label>
+                        <input type="email" name="email" required placeholder="aarav@company.com" class="w-full px-3.5 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500 transition-all">
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[11px] font-bold text-zinc-300 uppercase tracking-wider">Phone / WhatsApp</label>
+                        <input type="tel" name="phone" placeholder="+91 98765 43210" class="w-full px-3.5 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500 transition-all">
+                    </div>
+                </div>
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[11px] font-bold text-zinc-300 uppercase tracking-wider">Product Inquiry / Delivery Pincode</label>
+                    <textarea name="message" rows="3" placeholder="Tell us which product you are interested in or ask about custom corporate gifting..." class="w-full px-3.5 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500 transition-all resize-none"></textarea>
+                </div>
+                <button type="submit" class="w-full py-3.5 bg-white hover:bg-zinc-200 text-zinc-950 text-xs font-extrabold rounded-xl transition-all shadow-md mt-2 cursor-pointer">
+                    Submit Inquiry →
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-10 px-6 border-t border-zinc-800/80 text-center text-xs text-zinc-500">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+                <span class="font-bold text-zinc-300">' . $title . '</span>
+                <span>· Premium Everyday Carry</span>
+            </div>
+            <div>
+                <span>© ' . date('Y') . ' ' . $title . '. All rights reserved. Powered by Cora Canvas.</span>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>';
+
+        case 'saas':
+            return '<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>' . $title . ' — Autonomous AI Workspace for Modern Teams</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-[#09090b] text-zinc-100 font-sans antialiased selection:bg-zinc-800 selection:text-white">
+
+    <!-- Top Announcement Bar -->
+    <div class="bg-zinc-900 border-b border-zinc-800 py-2 px-4 text-center text-xs text-zinc-300 font-medium flex items-center justify-center gap-2">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span>✨ Introducing Pulse 2.0 Engine · Multi-Model LLM Routing with 99.99% Uptime SLA</span>
+    </div>
+
+    <!-- Navigation Bar -->
+    <header class="sticky top-0 z-50 bg-[#09090b]/90 backdrop-blur-md border-b border-zinc-800/80">
+        <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-zinc-950 font-black text-sm">
+                    P
+                </div>
+                <span class="font-extrabold text-base tracking-tight text-white">' . $title . '</span>
+            </div>
+            <nav class="hidden md:flex items-center gap-8 text-xs font-semibold text-zinc-400">
+                <a href="#features" class="hover:text-white transition-colors">Features</a>
+                <a href="#pricing" class="hover:text-white transition-colors">Pricing</a>
+                <a href="#integrations" class="hover:text-white transition-colors">Integrations</a>
+                <a href="#contact" class="hover:text-white transition-colors">Enterprise Demo</a>
+            </nav>
+            <div class="flex items-center gap-3">
+                <a href="#contact" class="px-4 py-2 bg-white hover:bg-zinc-200 text-zinc-950 text-xs font-bold rounded-lg transition-all shadow-xs">
+                    Start Free Trial
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="relative pt-20 pb-20 px-6 border-b border-zinc-800/60 overflow-hidden">
+        <div class="max-w-4xl mx-auto text-center mb-12">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-[11px] font-semibold text-zinc-300 mb-6">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>Autonomous AI Agent Platform · v2.4 Live</span>
+            </div>
+            <h1 class="text-4xl sm:text-6xl font-black tracking-tight text-white leading-[1.08] mb-6">
+                Automate 80% of Repetitive Operations with Autonomous AI.
+            </h1>
+            <p class="text-base sm:text-lg text-zinc-400 max-w-2xl mx-auto leading-relaxed mb-8 font-normal">
+                Deploy intelligent agents across customer ops, code generation, and financial reconciliation in minutes. Zero manual glue code required.
+            </p>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a href="#contact" class="w-full sm:w-auto px-6 py-3.5 bg-white hover:bg-zinc-200 text-zinc-950 text-xs font-extrabold rounded-xl transition-all shadow-lg">
+                    Get Started Free →
+                </a>
+                <a href="#features" class="w-full sm:w-auto px-6 py-3.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 text-xs font-bold rounded-xl border border-zinc-800 transition-all">
+                    Explore Architecture
+                </a>
+            </div>
+        </div>
+
+        <!-- Dashboard UI Mockup Card -->
+        <div class="max-w-5xl mx-auto rounded-2xl bg-zinc-900/80 border border-zinc-800 shadow-2xl p-6 relative overflow-hidden">
+            <div class="flex items-center justify-between pb-4 border-b border-zinc-800/80 mb-6">
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-zinc-700"></span>
+                    <span class="w-3 h-3 rounded-full bg-zinc-700"></span>
+                    <span class="w-3 h-3 rounded-full bg-zinc-700"></span>
+                    <span class="text-xs font-mono text-zinc-400 ml-2">app.pulseai.io/pipeline</span>
+                </div>
+                <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-[10.5px] font-mono font-bold">12 Agents Active</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="p-4 rounded-xl bg-zinc-950/80 border border-zinc-800/80">
+                    <span class="text-xs text-zinc-500 font-mono">Tasks Processed</span>
+                    <div class="text-2xl font-black text-white font-mono mt-1">1,248,930</div>
+                    <span class="text-[11px] text-emerald-400 font-medium">↑ +34.2% this week</span>
+                </div>
+                <div class="p-4 rounded-xl bg-zinc-950/80 border border-zinc-800/80">
+                    <span class="text-xs text-zinc-500 font-mono">Avg Latency</span>
+                    <div class="text-2xl font-black text-white font-mono mt-1">42 ms</div>
+                    <span class="text-[11px] text-zinc-400 font-medium">Global Edge Network</span>
+                </div>
+                <div class="p-4 rounded-xl bg-zinc-950/80 border border-zinc-800/80">
+                    <span class="text-xs text-zinc-500 font-mono">Cost Reduction</span>
+                    <div class="text-2xl font-black text-white font-mono mt-1">74.8%</div>
+                    <span class="text-[11px] text-emerald-400 font-medium">vs Traditional SaaS</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Core Features Matrix -->
+    <section id="features" class="py-20 px-6 border-b border-zinc-800/60">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center max-w-xl mx-auto mb-16">
+                <h2 class="text-xs font-bold tracking-widest text-zinc-500 uppercase mb-3 font-mono">Capabilities</h2>
+                <h3 class="text-3xl font-black text-white tracking-tight">Engineered for Autonomous Scale</h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="p-6 rounded-2xl bg-zinc-900/50 border border-zinc-800 hover:border-zinc-700 transition-all">
+                    <div class="w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-white mb-4 text-base font-bold">⚡</div>
+                    <h4 class="text-base font-bold text-white mb-2">Multi-Model Routing</h4>
+                    <p class="text-xs text-zinc-400 leading-relaxed">Dynamically route prompts to Claude 3.5 Sonnet, GPT-4o, or Gemini based on latency, context depth, and cost.</p>
+                </div>
+                <div class="p-6 rounded-2xl bg-zinc-900/50 border border-zinc-800 hover:border-zinc-700 transition-all">
+                    <div class="w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-white mb-4 text-base font-bold">🔒</div>
+                    <h4 class="text-base font-bold text-white mb-2">SOC-2 Type II Security</h4>
+                    <p class="text-xs text-zinc-400 leading-relaxed">End-to-end TLS 1.3 encryption, role-based access control (RBAC), and private VPC deployment options.</p>
+                </div>
+                <div class="p-6 rounded-2xl bg-zinc-900/50 border border-zinc-800 hover:border-zinc-700 transition-all">
+                    <div class="w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-white mb-4 text-base font-bold">🔄</div>
+                    <h4 class="text-base font-bold text-white mb-2">Bi-Directional Webhooks</h4>
+                    <p class="text-xs text-zinc-400 leading-relaxed">Trigger workflows via HTTP webhooks, Kafka streams, or database mutations with sub-50ms dispatch.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Tiers Matrix -->
+    <section id="pricing" class="py-20 px-6 border-b border-zinc-800/60 bg-zinc-950/40">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center max-w-xl mx-auto mb-16">
+                <span class="text-xs font-bold tracking-widest text-zinc-500 uppercase font-mono mb-2 block">/ TRANSPARENT PRICING</span>
+                <h3 class="text-3xl font-black text-white tracking-tight">Predictable Plans for Any Stage</h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="p-8 rounded-2xl bg-zinc-900/50 border border-zinc-800 flex flex-col justify-between">
+                    <div>
+                        <h4 class="text-base font-bold text-white">Starter</h4>
+                        <p class="text-xs text-zinc-400 mt-1 mb-4">For early-stage startups and solo builders.</p>
+                        <div class="text-3xl font-black text-white font-mono mb-6">$29 <span class="text-xs font-normal text-zinc-500">/mo</span></div>
+                        <ul class="space-y-2.5 text-xs text-zinc-300">
+                            <li class="flex items-center gap-2">✓ 100,000 Agent Actions/mo</li>
+                            <li class="flex items-center gap-2">✓ 3 Concurrent Workflows</li>
+                            <li class="flex items-center gap-2">✓ Community Slack Support</li>
+                        </ul>
+                    </div>
+                    <a href="#contact" class="mt-8 w-full py-3 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-bold rounded-xl text-center transition-colors">Select Starter</a>
+                </div>
+                <div class="p-8 rounded-2xl bg-zinc-900 border-2 border-white/20 relative flex flex-col justify-between shadow-2xl">
+                    <span class="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 bg-white text-zinc-950 text-[10.5px] font-extrabold rounded-full">POPULAR</span>
+                    <div>
+                        <h4 class="text-base font-bold text-white">Pro</h4>
+                        <p class="text-xs text-zinc-400 mt-1 mb-4">For fast-growing product &amp; engineering teams.</p>
+                        <div class="text-3xl font-black text-white font-mono mb-6">$79 <span class="text-xs font-normal text-zinc-500">/mo</span></div>
+                        <ul class="space-y-2.5 text-xs text-zinc-300">
+                            <li class="flex items-center gap-2">✓ Unlimited Agent Actions</li>
+                            <li class="flex items-center gap-2">✓ 25 Concurrent Workflows</li>
+                            <li class="flex items-center gap-2">✓ Multi-Model Routing (Claude + GPT)</li>
+                            <li class="flex items-center gap-2">✓ 24/7 Priority Support</li>
+                        </ul>
+                    </div>
+                    <a href="#contact" class="mt-8 w-full py-3 bg-white hover:bg-zinc-200 text-zinc-950 text-xs font-bold rounded-xl text-center transition-colors">Select Pro</a>
+                </div>
+                <div class="p-8 rounded-2xl bg-zinc-900/50 border border-zinc-800 flex flex-col justify-between">
+                    <div>
+                        <h4 class="text-base font-bold text-white">Enterprise</h4>
+                        <p class="text-xs text-zinc-400 mt-1 mb-4">Dedicated VPC, custom SLAs, and RBAC.</p>
+                        <div class="text-3xl font-black text-white font-mono mb-6">Custom</div>
+                        <ul class="space-y-2.5 text-xs text-zinc-300">
+                            <li class="flex items-center gap-2">✓ Dedicated Private Cluster</li>
+                            <li class="flex items-center gap-2">✓ Custom Fine-Tuned Models</li>
+                            <li class="flex items-center gap-2">✓ 99.99% SLA Guarantee</li>
+                            <li class="flex items-center gap-2">✓ Dedicated Solution Architect</li>
+                        </ul>
+                    </div>
+                    <a href="#contact" class="mt-8 w-full py-3 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-bold rounded-xl text-center transition-colors">Contact Enterprise</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Native Lead Demo Form -->
+    <section id="contact" class="py-20 px-6 bg-[#0c0c0e]">
+        <div class="max-w-xl mx-auto">
+            <div class="text-center mb-10">
+                <span class="text-xs font-bold tracking-widest text-zinc-500 uppercase font-mono mb-2 block">/ GET STARTED</span>
+                <h3 class="text-3xl font-black text-white tracking-tight mb-2">Request an Enterprise Demo</h3>
+                <p class="text-xs text-zinc-400">See how ' . $title . ' automates high-volume operations for your engineering team.</p>
+            </div>
+            
+            <form method="POST" class="p-8 rounded-2xl bg-zinc-900 border border-zinc-800 shadow-2xl flex flex-col gap-4">
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[11px] font-bold text-zinc-300 uppercase tracking-wider">Full Name *</label>
+                    <input type="text" name="name" required placeholder="Aarav Mehta" class="w-full px-3.5 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500 transition-all">
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[11px] font-bold text-zinc-300 uppercase tracking-wider">Work Email *</label>
+                        <input type="email" name="email" required placeholder="aarav@company.com" class="w-full px-3.5 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500 transition-all">
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[11px] font-bold text-zinc-300 uppercase tracking-wider">Company / Team Size</label>
+                        <input type="text" name="team_size" placeholder="50-200 employees" class="w-full px-3.5 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500 transition-all">
+                    </div>
+                </div>
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[11px] font-bold text-zinc-300 uppercase tracking-wider">Primary Use Case</label>
+                    <textarea name="message" rows="3" placeholder="Describe the workflow or repetitive process you want to automate..." class="w-full px-3.5 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500 transition-all resize-none"></textarea>
+                </div>
+                <button type="submit" class="w-full py-3.5 bg-white hover:bg-zinc-200 text-zinc-950 text-xs font-extrabold rounded-xl transition-all shadow-md mt-2 cursor-pointer">
+                    Request Demo →
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-10 px-6 border-t border-zinc-800/80 text-center text-xs text-zinc-500">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+                <span class="font-bold text-zinc-300">' . $title . '</span>
+                <span>· AI Autonomous Infrastructure</span>
+            </div>
+            <div>
+                <span>© ' . date('Y') . ' ' . $title . '. All rights reserved. Powered by Cora Canvas.</span>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>';
+
+        case 'consulting':
+            return '<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>' . $title . ' — Strategic Enterprise Advisory &amp; Capital Strategy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-[#09090b] text-zinc-100 font-sans antialiased selection:bg-zinc-800 selection:text-white">
+
+    <!-- Top Announcement Bar -->
+    <div class="bg-zinc-900 border-b border-zinc-800 py-2 px-4 text-center text-xs text-zinc-300 font-medium">
+        <span>Strategic Enterprise Advisory &amp; Valuation Practice · Q4 2026 Executive Briefing Available</span>
+    </div>
+
+    <!-- Navigation Bar -->
+    <header class="sticky top-0 z-50 bg-[#09090b]/90 backdrop-blur-md border-b border-zinc-800/80">
+        <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-zinc-950 font-serif font-black text-sm">
+                    V
+                </div>
+                <span class="font-bold text-base tracking-tight text-white font-serif">' . $title . '</span>
+            </div>
+            <nav class="hidden md:flex items-center gap-8 text-xs font-semibold text-zinc-400">
+                <a href="#practices" class="hover:text-white transition-colors">Practice Areas</a>
+                <a href="#cases" class="hover:text-white transition-colors">Case Studies</a>
+                <a href="#leadership" class="hover:text-white transition-colors">Leadership</a>
+                <a href="#contact" class="hover:text-white transition-colors">Executive Briefing</a>
+            </nav>
+            <div class="flex items-center gap-3">
+                <a href="#contact" class="px-4 py-2 bg-white hover:bg-zinc-200 text-zinc-950 text-xs font-bold rounded-lg transition-all shadow-xs">
+                    Schedule Audit
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="relative pt-20 pb-20 px-6 border-b border-zinc-800/60 overflow-hidden">
+        <div class="max-w-4xl mx-auto text-center">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-[11px] font-semibold text-zinc-300 mb-6 font-mono">
+                <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                <span>$4.2B+ Capital Transactions Advised</span>
+            </div>
+            <h1 class="text-4xl sm:text-6xl font-bold tracking-tight text-white leading-[1.12] mb-6 font-serif">
+                Capital Strategy &amp; Advisory for High-Growth Enterprises.
+            </h1>
+            <p class="text-base sm:text-lg text-zinc-400 max-w-2xl mx-auto leading-relaxed mb-8 font-normal">
+                Navigating complex market expansions, operational restructuring, and private transactions with institutional rigor and precision.
+            </p>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a href="#contact" class="w-full sm:w-auto px-6 py-3.5 bg-white hover:bg-zinc-200 text-zinc-950 text-xs font-bold rounded-xl transition-all shadow-lg">
+                    Schedule Executive Audit →
+                </a>
+                <a href="#cases" class="w-full sm:w-auto px-6 py-3.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 text-xs font-bold rounded-xl border border-zinc-800 transition-all">
+                    View Case Studies
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Key Metrics Ticker -->
+    <section class="py-12 px-6 border-b border-zinc-800/60 bg-zinc-950/50">
+        <div class="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            <div class="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800/60">
+                <div class="text-3xl font-black text-white font-mono mb-1">$4.2B+</div>
+                <div class="text-xs text-zinc-400 font-medium">M&amp;A Advised</div>
+            </div>
+            <div class="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800/60">
+                <div class="text-3xl font-black text-white font-mono mb-1">180+</div>
+                <div class="text-xs text-zinc-400 font-medium">Enterprise Engagements</div>
+            </div>
+            <div class="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800/60">
+                <div class="text-3xl font-black text-white font-mono mb-1">34%</div>
+                <div class="text-xs text-zinc-400 font-medium">Avg EBITDA Expansion</div>
+            </div>
+            <div class="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800/60">
+                <div class="text-3xl font-black text-white font-mono mb-1">14</div>
+                <div class="text-xs text-zinc-400 font-medium">Global Jurisdictions</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Practice Areas -->
+    <section id="practices" class="py-20 px-6 border-b border-zinc-800/60">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center max-w-xl mx-auto mb-16">
+                <h2 class="text-xs font-bold tracking-widest text-zinc-500 uppercase mb-3 font-mono">Core Practices</h2>
+                <h3 class="text-3xl font-bold text-white tracking-tight font-serif">Strategic Advisory Disciplines</h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="p-6 rounded-2xl bg-zinc-900/50 border border-zinc-800">
+                    <div class="w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-white mb-4 text-base font-bold">📊</div>
+                    <h4 class="text-base font-bold text-white mb-2">Corporate Restructuring</h4>
+                    <p class="text-xs text-zinc-400 leading-relaxed">Balance sheet optimization, debt refinancing, and capital allocation frameworks for multinational organizations.</p>
+                </div>
+                <div class="p-6 rounded-2xl bg-zinc-900/50 border border-zinc-800">
+                    <div class="w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-white mb-4 text-base font-bold">🤝</div>
+                    <h4 class="text-base font-bold text-white mb-2">M&amp;A &amp; Valuation</h4>
+                    <p class="text-xs text-zinc-400 leading-relaxed">Comprehensive buy-side &amp; sell-side advisory, due diligence, and enterprise valuation modeling.</p>
+                </div>
+                <div class="p-6 rounded-2xl bg-zinc-900/50 border border-zinc-800">
+                    <div class="w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-white mb-4 text-base font-bold">🌐</div>
+                    <h4 class="text-base font-bold text-white mb-2">Market Expansion</h4>
+                    <p class="text-xs text-zinc-400 leading-relaxed">Regulatory navigation, cross-border structuring, and local partner acquisition across high-growth corridors.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Native Lead Consultation Form -->
+    <section id="contact" class="py-20 px-6 bg-[#0c0c0e]">
+        <div class="max-w-xl mx-auto">
+            <div class="text-center mb-10">
+                <span class="text-xs font-bold tracking-widest text-zinc-500 uppercase font-mono mb-2 block">/ EXECUTIVE BRIEFING</span>
+                <h3 class="text-3xl font-bold text-white tracking-tight mb-2 font-serif">Request Confidential Consultation</h3>
+                <p class="text-xs text-zinc-400">Directly connect with senior partners under non-disclosure terms.</p>
+            </div>
+            
+            <form method="POST" class="p-8 rounded-2xl bg-zinc-900 border border-zinc-800 shadow-2xl flex flex-col gap-4">
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[11px] font-bold text-zinc-300 uppercase tracking-wider">Full Name *</label>
+                    <input type="text" name="name" required placeholder="Rohan Verma" class="w-full px-3.5 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500 transition-all">
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[11px] font-bold text-zinc-300 uppercase tracking-wider">Corporate Email *</label>
+                        <input type="email" name="email" required placeholder="rohan@enterprise.com" class="w-full px-3.5 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500 transition-all">
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[11px] font-bold text-zinc-300 uppercase tracking-wider">Organization / Title</label>
+                        <input type="text" name="company" placeholder="Managing Director" class="w-full px-3.5 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500 transition-all">
+                    </div>
+                </div>
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[11px] font-bold text-zinc-300 uppercase tracking-wider">Advisory Scope / Objective</label>
+                    <textarea name="message" rows="3" placeholder="Outline your capital, restructuring, or transaction requirements..." class="w-full px-3.5 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500 transition-all resize-none"></textarea>
+                </div>
+                <button type="submit" class="w-full py-3.5 bg-white hover:bg-zinc-200 text-zinc-950 text-xs font-bold rounded-xl transition-all shadow-md mt-2 cursor-pointer">
+                    Schedule Executive Briefing →
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-10 px-6 border-t border-zinc-800/80 text-center text-xs text-zinc-500">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+                <span class="font-bold text-zinc-300">' . $title . '</span>
+                <span>· Institutional Advisory &amp; Capital Strategy</span>
+            </div>
+            <div>
+                <span>© ' . date('Y') . ' ' . $title . '. All rights reserved. Powered by Cora Canvas.</span>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>';
+
+        case 'photography':
+            return '<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>' . $title . ' — Luxury Photography Studio &amp; Production House</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-[#09090b] text-zinc-100 font-sans antialiased selection:bg-zinc-800 selection:text-white">
+
+    <!-- Sticky Minimal Header -->
+    <header class="sticky top-0 z-50 bg-[#09090b]/90 backdrop-blur-md border-b border-zinc-800/80">
+        <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-zinc-950 font-black text-sm">
+                    ✦
+                </div>
+                <span class="font-extrabold text-base tracking-tight text-white">' . $title . '</span>
+            </div>
+            <nav class="hidden md:flex items-center gap-8 text-xs font-semibold text-zinc-400">
+                <a href="#gallery" class="hover:text-white transition-colors">Curated Gallery</a>
+                <a href="#studios" class="hover:text-white transition-colors">Studio Spaces</a>
+                <a href="#packages" class="hover:text-white transition-colors">Packages</a>
+                <a href="#contact" class="hover:text-white transition-colors">Book Session</a>
+            </nav>
+            <div class="flex items-center gap-3">
+                <a href="#contact" class="px-4 py-2 bg-white hover:bg-zinc-200 text-zinc-950 text-xs font-bold rounded-lg transition-all shadow-xs">
+                    Book Session
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="relative pt-20 pb-20 px-6 border-b border-zinc-800/60 overflow-hidden">
+        <div class="max-w-4xl mx-auto text-center">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-[11px] font-semibold text-zinc-300 mb-6 font-mono">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>Vogue · Forbes · GQ Featured Studio</span>
+            </div>
+            <h1 class="text-4xl sm:text-6xl font-black tracking-tight text-white leading-[1.08] mb-6">
+                Capturing Epochs in Light &amp; Form.
+            </h1>
+            <p class="text-base sm:text-lg text-zinc-400 max-w-2xl mx-auto leading-relaxed mb-8 font-normal">
+                Signature lighting, cyclorama soundstages, and world-class commercial post-production for luxury brands and editorial covers.
+            </p>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a href="#contact" class="w-full sm:w-auto px-6 py-3.5 bg-white hover:bg-zinc-200 text-zinc-950 text-xs font-extrabold rounded-xl transition-all shadow-lg">
+                    Book Studio Session →
+                </a>
+                <a href="#gallery" class="w-full sm:w-auto px-6 py-3.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 text-xs font-bold rounded-xl border border-zinc-800 transition-all">
+                    Explore Gallery
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Curated Visual Gallery -->
+    <section id="gallery" class="py-20 px-6 border-b border-zinc-800/60">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center max-w-xl mx-auto mb-16">
+                <h2 class="text-xs font-bold tracking-widest text-zinc-500 uppercase mb-3 font-mono">Showcase</h2>
+                <h3 class="text-3xl font-black text-white tracking-tight">Curated Photographic Works</h3>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="rounded-2xl overflow-hidden bg-zinc-950 border border-zinc-800 group relative">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80" alt="Editorial Portrait" class="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-500">
+                    <div class="p-4 bg-zinc-900/90 border-t border-zinc-800/80">
+                        <span class="text-[10px] font-mono font-bold text-zinc-400">EDITORIAL · 4:5</span>
+                        <h4 class="text-sm font-bold text-white mt-0.5">High-Fashion Autumn Campaign</h4>
+                    </div>
+                </div>
+                <div class="rounded-2xl overflow-hidden bg-zinc-950 border border-zinc-800 group relative">
+                    <img src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80" alt="Executive Portrait" class="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-500">
+                    <div class="p-4 bg-zinc-900/90 border-t border-zinc-800/80">
+                        <span class="text-[10px] font-mono font-bold text-zinc-400">COMMERCIAL · 1:1</span>
+                        <h4 class="text-sm font-bold text-white mt-0.5">Global Executive Keynote Series</h4>
+                    </div>
+                </div>
+                <div class="rounded-2xl overflow-hidden bg-zinc-950 border border-zinc-800 group relative">
+                    <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80" alt="Architecture" class="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-500">
+                    <div class="p-4 bg-zinc-900/90 border-t border-zinc-800/80">
+                        <span class="text-[10px] font-mono font-bold text-zinc-400">INTERIORS · 16:9</span>
+                        <h4 class="text-sm font-bold text-white mt-0.5">Minimalist Spatial Architecture</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Native Lead Consultation Form -->
+    <section id="contact" class="py-20 px-6 bg-[#0c0c0e]">
+        <div class="max-w-xl mx-auto">
+            <div class="text-center mb-10">
+                <span class="text-xs font-bold tracking-widest text-zinc-500 uppercase font-mono mb-2 block">/ BOOK SESSION</span>
+                <h3 class="text-3xl font-black text-white tracking-tight mb-2">Reserve Studio Production</h3>
+                <p class="text-xs text-zinc-400">Tell us about your campaign scope and our creative team will confirm studio availability.</p>
+            </div>
+            
+            <form method="POST" class="p-8 rounded-2xl bg-zinc-900 border border-zinc-800 shadow-2xl flex flex-col gap-4">
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[11px] font-bold text-zinc-300 uppercase tracking-wider">Full Name *</label>
+                    <input type="text" name="name" required placeholder="Kavya Patel" class="w-full px-3.5 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500 transition-all">
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[11px] font-bold text-zinc-300 uppercase tracking-wider">Email Address *</label>
+                        <input type="email" name="email" required placeholder="kavya@brand.com" class="w-full px-3.5 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500 transition-all">
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[11px] font-bold text-zinc-300 uppercase tracking-wider">Phone / WhatsApp</label>
+                        <input type="tel" name="phone" placeholder="+91 98765 43210" class="w-full px-3.5 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500 transition-all">
+                    </div>
+                </div>
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[11px] font-bold text-zinc-300 uppercase tracking-wider">Shoot Details &amp; Preferred Date</label>
+                    <textarea name="message" rows="3" placeholder="Commercial campaign, editorial lookbook, or executive portrait..." class="w-full px-3.5 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500 transition-all resize-none"></textarea>
+                </div>
+                <button type="submit" class="w-full py-3.5 bg-white hover:bg-zinc-200 text-zinc-950 text-xs font-extrabold rounded-xl transition-all shadow-md mt-2 cursor-pointer">
+                    Submit Booking Request →
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-10 px-6 border-t border-zinc-800/80 text-center text-xs text-zinc-500">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+                <span class="font-bold text-zinc-300">' . $title . '</span>
+                <span>· High-End Photography Studio</span>
+            </div>
+            <div>
+                <span>© ' . date('Y') . ' ' . $title . '. All rights reserved. Powered by Cora Canvas.</span>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>';
+
+        case 'realestate':
+            return '<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>' . $title . ' — Luxury Real Estate &amp; Architectural Estates</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-[#09090b] text-zinc-100 font-sans antialiased selection:bg-zinc-800 selection:text-white">
+
+    <!-- Top Announcement Bar -->
+    <div class="bg-zinc-900 border-b border-zinc-800 py-2 px-4 text-center text-xs text-zinc-300 font-medium">
+        <span>Curated Architectural Properties &amp; Prime Waterfront Residences</span>
+    </div>
+
+    <!-- Navigation Bar -->
+    <header class="sticky top-0 z-50 bg-[#09090b]/90 backdrop-blur-md border-b border-zinc-800/80">
+        <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-zinc-950 font-black text-sm">
+                    ◆
+                </div>
+                <span class="font-bold text-base tracking-tight text-white font-serif">' . $title . '</span>
+            </div>
+            <nav class="hidden md:flex items-center gap-8 text-xs font-semibold text-zinc-400">
+                <a href="#properties" class="hover:text-white transition-colors">Properties</a>
+                <a href="#amenities" class="hover:text-white transition-colors">Amenities</a>
+                <a href="#contact" class="hover:text-white transition-colors">VIP Private Tour</a>
+            </nav>
+            <div class="flex items-center gap-3">
+                <a href="#contact" class="px-4 py-2 bg-white hover:bg-zinc-200 text-zinc-950 text-xs font-bold rounded-lg transition-all shadow-xs">
+                    Schedule Tour
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="relative pt-20 pb-20 px-6 border-b border-zinc-800/60 overflow-hidden">
+        <div class="max-w-4xl mx-auto text-center">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-[11px] font-semibold text-zinc-300 mb-6 font-mono">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>Exclusive Off-Market Listings</span>
+            </div>
+            <h1 class="text-4xl sm:text-6xl font-bold tracking-tight text-white leading-[1.08] mb-6 font-serif">
+                Extraordinary Living Spaces for Discerning Curators.
+            </h1>
+            <p class="text-base sm:text-lg text-zinc-400 max-w-2xl mx-auto leading-relaxed mb-8 font-normal">
+                Discover curated architectural masterpieces, private waterfront villas, and bespoke penthouses in prime global locations.
+            </p>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a href="#contact" class="w-full sm:w-auto px-6 py-3.5 bg-white hover:bg-zinc-200 text-zinc-950 text-xs font-bold rounded-xl transition-all shadow-lg">
+                    Schedule Private Tour →
+                </a>
+                <a href="#properties" class="w-full sm:w-auto px-6 py-3.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 text-xs font-bold rounded-xl border border-zinc-800 transition-all">
+                    View Portfolio
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Curated Properties Grid -->
+    <section id="properties" class="py-20 px-6 border-b border-zinc-800/60">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center max-w-xl mx-auto mb-16">
+                <h2 class="text-xs font-bold tracking-widest text-zinc-500 uppercase mb-3 font-mono">Portfolio</h2>
+                <h3 class="text-3xl font-bold text-white tracking-tight font-serif">Featured Architectural Residences</h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Property 1 -->
+                <div class="rounded-2xl overflow-hidden bg-zinc-900/60 border border-zinc-800 flex flex-col justify-between">
+                    <div>
+                        <div class="w-full h-72 overflow-hidden bg-zinc-950">
+                            <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80" alt="The Glass Pavilion" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-mono text-emerald-400 font-bold">ALIBAG WATERFRONT</span>
+                                <span class="text-lg font-black text-white font-mono">₹28.5 Cr</span>
+                            </div>
+                            <h4 class="text-xl font-bold text-white font-serif">The Coastal Glass Pavilion</h4>
+                            <p class="text-xs text-zinc-400 mt-2">6 Bed · 8 Bath · 12,000 Sq Ft · Private Jetty &amp; Infinity Pool.</p>
+                        </div>
+                    </div>
+                    <div class="px-6 pb-6 pt-2">
+                        <a href="#contact" class="block w-full py-3 bg-zinc-800 hover:bg-white hover:text-zinc-950 text-white text-xs font-bold rounded-xl text-center transition-colors">Request Private Dossier</a>
+                    </div>
+                </div>
+
+                <!-- Property 2 -->
+                <div class="rounded-2xl overflow-hidden bg-zinc-900/60 border border-zinc-800 flex flex-col justify-between">
+                    <div>
+                        <div class="w-full h-72 overflow-hidden bg-zinc-950">
+                            <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80" alt="The Sky Penthouse" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-mono text-emerald-400 font-bold">WORLI SEA FACE</span>
+                                <span class="text-lg font-black text-white font-mono">₹45.0 Cr</span>
+                            </div>
+                            <h4 class="text-xl font-bold text-white font-serif">The Sky Penthouse Level 62</h4>
+                            <p class="text-xs text-zinc-400 mt-2">5 Bed · 6 Bath · 9,400 Sq Ft · 360° Arabian Sea View &amp; Helipad Access.</p>
+                        </div>
+                    </div>
+                    <div class="px-6 pb-6 pt-2">
+                        <a href="#contact" class="block w-full py-3 bg-zinc-800 hover:bg-white hover:text-zinc-950 text-white text-xs font-bold rounded-xl text-center transition-colors">Request Private Dossier</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Native VIP Tour Form -->
+    <section id="contact" class="py-20 px-6 bg-[#0c0c0e]">
+        <div class="max-w-xl mx-auto">
+            <div class="text-center mb-10">
+                <span class="text-xs font-bold tracking-widest text-zinc-500 uppercase font-mono mb-2 block">/ PRIVATE ACQUISITION</span>
+                <h3 class="text-3xl font-bold text-white tracking-tight mb-2 font-serif">Schedule VIP Property Tour</h3>
+                <p class="text-xs text-zinc-400">Our private client advisors facilitate discreet, personalized showings.</p>
+            </div>
+            
+            <form method="POST" class="p-8 rounded-2xl bg-zinc-900 border border-zinc-800 shadow-2xl flex flex-col gap-4">
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[11px] font-bold text-zinc-300 uppercase tracking-wider">Full Name *</label>
+                    <input type="text" name="name" required placeholder="Aarav Mehta" class="w-full px-3.5 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500 transition-all">
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[11px] font-bold text-zinc-300 uppercase tracking-wider">Email Address *</label>
+                        <input type="email" name="email" required placeholder="aarav@holding.com" class="w-full px-3.5 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500 transition-all">
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[11px] font-bold text-zinc-300 uppercase tracking-wider">Phone Number</label>
+                        <input type="tel" name="phone" placeholder="+91 98765 43210" class="w-full px-3.5 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500 transition-all">
+                    </div>
+                </div>
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[11px] font-bold text-zinc-300 uppercase tracking-wider">Target Budget / Location Preference</label>
+                    <textarea name="message" rows="3" placeholder="Preferred location, square footage, or specific property dossier requested..." class="w-full px-3.5 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500 transition-all resize-none"></textarea>
+                </div>
+                <button type="submit" class="w-full py-3.5 bg-white hover:bg-zinc-200 text-zinc-950 text-xs font-bold rounded-xl transition-all shadow-md mt-2 cursor-pointer">
+                    Request VIP Tour →
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-10 px-6 border-t border-zinc-800/80 text-center text-xs text-zinc-500">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+                <span class="font-bold text-zinc-300">' . $title . '</span>
+                <span>· Prime &amp; Architectural Estates</span>
+            </div>
+            <div>
+                <span>© ' . date('Y') . ' ' . $title . '. All rights reserved. Powered by Cora Canvas.</span>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>';
+
+        case 'custom':
+        case 'agency':
+        default:
+            return '<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>' . $title . ' — Creative Agency &amp; Digital Studio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-[#09090b] text-zinc-100 font-sans antialiased selection:bg-zinc-800 selection:text-white">
+
+    <!-- Top Announcement Bar -->
+    <div class="bg-zinc-900 border-b border-zinc-800 py-2 px-4 text-center text-xs text-zinc-300 font-medium">
+        <span>Creative Agency of the Year 2026 · Brand Identity, Digital Architecture &amp; Cinema Production</span>
     </div>
 
     <!-- Navigation Bar -->
@@ -39716,14 +40640,14 @@ function cora_canvas_get_default_starter_html( $template_key = 'agency', $theme_
                 <span class="font-extrabold text-base tracking-tight text-white">' . $title . '</span>
             </div>
             <nav class="hidden md:flex items-center gap-8 text-xs font-semibold text-zinc-400">
+                <a href="#work" class="hover:text-white transition-colors">Featured Work</a>
                 <a href="#services" class="hover:text-white transition-colors">Services</a>
-                <a href="#showcase" class="hover:text-white transition-colors">Showcase</a>
-                <a href="#metrics" class="hover:text-white transition-colors">Performance</a>
+                <a href="#reviews" class="hover:text-white transition-colors">Reviews</a>
                 <a href="#contact" class="hover:text-white transition-colors">Contact</a>
             </nav>
             <div class="flex items-center gap-3">
                 <a href="#contact" class="px-4 py-2 bg-white hover:bg-zinc-200 text-zinc-950 text-xs font-bold rounded-lg transition-all shadow-xs">
-                    ' . $cta_primary . '
+                    Start Project
                 </a>
             </div>
         </div>
@@ -39732,77 +40656,54 @@ function cora_canvas_get_default_starter_html( $template_key = 'agency', $theme_
     <!-- Hero Section -->
     <section class="relative pt-24 pb-20 px-6 border-b border-zinc-800/60 overflow-hidden">
         <div class="max-w-4xl mx-auto text-center">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-[11px] font-semibold text-zinc-300 mb-6">
-                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span>' . $hero_badge . '</span>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-[11px] font-semibold text-zinc-300 mb-6 font-mono">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>Crafting Cinema-Grade Brand Stories</span>
             </div>
             <h1 class="text-4xl sm:text-6xl font-black tracking-tight text-white leading-[1.08] mb-6">
-                ' . $hero_title . '
+                We Craft Iconic Brands &amp; Cinematic Digital Experiences.
             </h1>
             <p class="text-base sm:text-lg text-zinc-400 max-w-2xl mx-auto leading-relaxed mb-10 font-normal">
-                ' . $hero_sub . '
+                Award-winning creative direction, high-converting web architecture, and video production engineered to scale modern enterprises.
             </p>
             <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <a href="#contact" class="w-full sm:w-auto px-6 py-3.5 bg-white hover:bg-zinc-200 text-zinc-950 text-xs font-extrabold rounded-xl transition-all shadow-lg">
-                    ' . $cta_primary . ' →
+                    Book Consultation →
                 </a>
-                <a href="#services" class="w-full sm:w-auto px-6 py-3.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 text-xs font-bold rounded-xl border border-zinc-800 transition-all">
-                    ' . $cta_sec . '
+                <a href="#work" class="w-full sm:w-auto px-6 py-3.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 text-xs font-bold rounded-xl border border-zinc-800 transition-all">
+                    Explore Showcase
                 </a>
             </div>
         </div>
     </section>
 
-    <!-- Key Metrics Ticker -->
-    <section id="metrics" class="py-12 px-6 border-b border-zinc-800/60 bg-zinc-950/50">
-        <div class="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-            <div class="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800/60">
-                <div class="text-3xl font-black text-white font-mono mb-1">99.9%</div>
-                <div class="text-xs text-zinc-400 font-medium">Uptime & Reliability</div>
-            </div>
-            <div class="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800/60">
-                <div class="text-3xl font-black text-white font-mono mb-1">&lt;50ms</div>
-                <div class="text-xs text-zinc-400 font-medium">Global Edge Latency</div>
-            </div>
-            <div class="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800/60">
-                <div class="text-3xl font-black text-white font-mono mb-1">500+</div>
-                <div class="text-xs text-zinc-400 font-medium">Projects Delivered</div>
-            </div>
-            <div class="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800/60">
-                <div class="text-3xl font-black text-white font-mono mb-1">4.9/5</div>
-                <div class="text-xs text-zinc-400 font-medium">Client Satisfaction</div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Core Services Grid -->
-    <section id="services" class="py-20 px-6 border-b border-zinc-800/60">
+    <!-- Portfolio Showcase Grid -->
+    <section id="work" class="py-20 px-6 border-b border-zinc-800/60">
         <div class="max-w-6xl mx-auto">
             <div class="text-center max-w-xl mx-auto mb-16">
-                <h2 class="text-xs font-bold tracking-widest text-zinc-500 uppercase mb-3 font-mono">Our Capabilities</h2>
-                <h3 class="text-3xl font-black text-white tracking-tight">Engineered for Exponential Results</h3>
+                <h2 class="text-xs font-bold tracking-widest text-zinc-500 uppercase mb-3 font-mono">Portfolio</h2>
+                <h3 class="text-3xl font-black text-white tracking-tight">Selected Case Studies</h3>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="p-8 rounded-2xl bg-zinc-900/50 border border-zinc-800/80 hover:border-zinc-700 transition-all">
-                    <div class="w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-white mb-6">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="rounded-2xl overflow-hidden bg-zinc-900/60 border border-zinc-800 group">
+                    <div class="w-full h-72 overflow-hidden bg-zinc-950">
+                        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80" alt="Fintech Rebrand" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                     </div>
-                    <h4 class="text-lg font-bold text-white mb-2">Strategy & Brand Identity</h4>
-                    <p class="text-xs text-zinc-400 leading-relaxed">Comprehensive positioning, visual systems, and narrative architecture that elevate market value.</p>
+                    <div class="p-6">
+                        <span class="text-xs font-mono text-zinc-400">FINTECH · REBRAND &amp; WEB</span>
+                        <h4 class="text-lg font-bold text-white mt-1">Aura Global Rebranding</h4>
+                        <p class="text-xs text-zinc-400 mt-2">+180% inbound demo conversions following identity refresh.</p>
+                    </div>
                 </div>
-                <div class="p-8 rounded-2xl bg-zinc-900/50 border border-zinc-800/80 hover:border-zinc-700 transition-all">
-                    <div class="w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-white mb-6">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+                <div class="rounded-2xl overflow-hidden bg-zinc-900/60 border border-zinc-800 group">
+                    <div class="w-full h-72 overflow-hidden bg-zinc-950">
+                        <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80" alt="SaaS Growth" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                     </div>
-                    <h4 class="text-lg font-bold text-white mb-2">Next-Gen Web Architecture</h4>
-                    <p class="text-xs text-zinc-400 leading-relaxed">Zero-lag, mobile-first responsive interfaces optimized for Core Web Vitals and peak search conversion.</p>
-                </div>
-                <div class="p-8 rounded-2xl bg-zinc-900/50 border border-zinc-800/80 hover:border-zinc-700 transition-all">
-                    <div class="w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-white mb-6">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                    <div class="p-6">
+                        <span class="text-xs font-mono text-zinc-400">SAAS PLATFORM · DESIGN SYSTEM</span>
+                        <h4 class="text-lg font-bold text-white mt-1">Krypton Enterprise UI</h4>
+                        <p class="text-xs text-zinc-400 mt-2">Design system across 40+ microfrontends with zero-latency load times.</p>
                     </div>
-                    <h4 class="text-lg font-bold text-white mb-2">Automated Growth & CRM</h4>
-                    <p class="text-xs text-zinc-400 leading-relaxed">Built-in lead capture directly synchronized with client pipelines and instant notification funnels.</p>
                 </div>
             </div>
         </div>
@@ -39812,11 +40713,9 @@ function cora_canvas_get_default_starter_html( $template_key = 'agency', $theme_
     <section id="contact" class="py-20 px-6 bg-[#0c0c0e]">
         <div class="max-w-xl mx-auto">
             <div class="text-center mb-10">
-                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-[11px] font-semibold text-zinc-300 mb-3">
-                    <span>⚡ Instant CRM Sync</span>
-                </div>
+                <span class="text-xs font-bold tracking-widest text-zinc-500 uppercase font-mono mb-2 block">/ START A PROJECT</span>
                 <h3 class="text-3xl font-black text-white tracking-tight mb-2">Request a Consultation</h3>
-                <p class="text-xs text-zinc-400">Fill in your requirements below and our team will get in touch within 24 hours.</p>
+                <p class="text-xs text-zinc-400">Fill in your project brief and our creative director will reach out within 24 hours.</p>
             </div>
             
             <form method="POST" class="p-8 rounded-2xl bg-zinc-900 border border-zinc-800 shadow-2xl flex flex-col gap-4">
@@ -39850,7 +40749,7 @@ function cora_canvas_get_default_starter_html( $template_key = 'agency', $theme_
         <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
             <div class="flex items-center gap-2">
                 <span class="font-bold text-zinc-300">' . $title . '</span>
-                <span>· High-Performance Website</span>
+                <span>· High-Performance Creative Studio</span>
             </div>
             <div>
                 <span>© ' . date('Y') . ' ' . $title . '. All rights reserved. Powered by Cora Canvas.</span>
@@ -39860,6 +40759,7 @@ function cora_canvas_get_default_starter_html( $template_key = 'agency', $theme_
 
 </body>
 </html>';
+    }
 }
 }
 
