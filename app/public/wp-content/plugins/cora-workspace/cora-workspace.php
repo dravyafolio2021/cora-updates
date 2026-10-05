@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.362
+ * Version:           4.9.363
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.362' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.363' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -9224,6 +9224,18 @@ function cora_render_nextjs_static_build( $static_dir, $route_path = '/', $activ
         . "    }\n"
         . "});\n"
         . "</script>\n";
+
+    // Universal Styling & Resilience Shield: Ensure Tailwind CSS CDN & Google Fonts exist on live render
+    $styling_assets = '';
+    if ( stripos( $html, 'tailwindcss' ) === false && stripos( $html, 'tailwind.css' ) === false ) {
+        $styling_assets .= '<script src="https://cdn.tailwindcss.com"></script>' . "\n";
+    }
+    if ( stripos( $html, 'fonts.googleapis.com' ) === false ) {
+        $styling_assets .= '<link rel="preconnect" href="https://fonts.googleapis.com">' . "\n"
+            . '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' . "\n"
+            . '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">' . "\n";
+    }
+    $injection = $styling_assets . $injection;
 
     if ( strpos( $html, 'cora-form-embed' ) !== false || strpos( $html, 'data-cora-open-form' ) !== false ) {
         $injection .= '<script src="' . esc_url( $form_embed_url ) . '" defer></script>' . "\n";
@@ -41489,6 +41501,23 @@ function cora_ajax_canvas_save_page_html() {
     $raw_html = wp_unslash( $_POST['raw_html'] ?? ( $_POST['html'] ?? '' ) );
     if ( empty( trim( $raw_html ) ) ) {
         wp_send_json_error( array( 'message' => 'HTML content cannot be empty.' ) );
+    }
+
+    // Auto-inject Tailwind CSS CDN & Google Fonts into saved HTML if missing
+    if ( stripos( $raw_html, 'tailwindcss' ) === false && stripos( $raw_html, 'tailwind.css' ) === false ) {
+        if ( stripos( $raw_html, '<head>' ) !== false ) {
+            $raw_html = str_ireplace( '<head>', "<head>\n    <script src=\"https://cdn.tailwindcss.com\"></script>", $raw_html );
+        } elseif ( stripos( $raw_html, '<head ' ) !== false ) {
+            $raw_html = preg_replace( '/(<head\b[^>]*>)/i', "$1\n    <script src=\"https://cdn.tailwindcss.com\"></script>", $raw_html, 1 );
+        }
+    }
+    if ( stripos( $raw_html, 'fonts.googleapis.com' ) === false ) {
+        $fonts_tag = "    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n    <link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap\" rel=\"stylesheet\">\n";
+        if ( stripos( $raw_html, '<head>' ) !== false ) {
+            $raw_html = str_ireplace( '<head>', "<head>\n" . $fonts_tag, $raw_html );
+        } elseif ( stripos( $raw_html, '<head ' ) !== false ) {
+            $raw_html = preg_replace( '/(<head\b[^>]*>)/i', "$1\n" . $fonts_tag, $raw_html, 1 );
+        }
     }
 
     $upload_dir = wp_get_upload_dir();
