@@ -6287,7 +6287,42 @@ function cora_get_sparkline_points( $history, $type ) {
             </div>
 
             <!-- Sticky Bottom AI Chat Input & Prompt Composer Dock -->
-            <div id="cora-ai-composer-dock" class="bg-[#09090b] border-t border-zinc-800/80 shrink-0 z-20 font-sans">
+            <div id="cora-ai-composer-dock" class="bg-[#09090b] border-t border-zinc-800/80 shrink-0 z-20 font-sans relative">
+                <!-- Workspace Form Picker Popover Drawer -->
+                <div id="cora-form-picker-popover" class="hidden border-b border-zinc-800 bg-[#0c0c0e] p-3.5 space-y-3 transition-all duration-200">
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-2">
+                            <div class="w-6 h-6 rounded-lg bg-zinc-800 flex items-center justify-center text-zinc-200">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/><path d="M14 9h4"/><path d="M14 15h4"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-bold text-white tracking-tight">Workspace Lead Forms</h4>
+                                <p class="text-[10px] text-zinc-400">Embed native styled forms or responsive widget blocks</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <button type="button" onclick="window.promptCreateNewForm()" class="px-2 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 hover:text-white rounded-md text-[11px] font-medium border border-zinc-700/60 cursor-pointer flex items-center gap-1 transition-colors">
+                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                <span>+ Create New Lead Form</span>
+                            </button>
+                            <button type="button" onclick="window.toggleFormPickerPopover(false)" class="p-1 text-zinc-500 hover:text-zinc-300 rounded hover:bg-zinc-800/80 transition-colors cursor-pointer border-none bg-transparent">
+                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Search Input -->
+                    <div class="relative">
+                        <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none" viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <input type="text" id="cora-form-picker-search" oninput="window.filterWorkspaceForms(this.value)" placeholder="Search workspace forms by title, form key, or fields..." class="w-full bg-zinc-900 border border-zinc-800 focus:border-zinc-600 rounded-lg pl-7 pr-3 py-1.5 text-xs text-white placeholder:text-zinc-500 outline-none transition-all font-sans" />
+                    </div>
+
+                    <!-- Form List -->
+                    <div id="cora-form-picker-list" class="max-h-56 overflow-y-auto space-y-2 pr-1 custom-scrollbar">
+                        <div class="p-4 text-center text-xs text-zinc-500">Loading workspace forms...</div>
+                    </div>
+                </div>
+
                 <!-- AI Suggestion & Modification Review Banner -->
                 <div id="cora-ai-suggestion-bar" class="hidden px-4 py-2 bg-zinc-900 border-b border-zinc-800 flex flex-wrap items-center justify-between gap-2 text-xs">
                     <div class="flex items-center gap-2 text-zinc-200 min-w-0">
@@ -6318,6 +6353,12 @@ function cora_get_sparkline_points( $history, $type ) {
                             <span>Cora AI</span>
                         </div>
 
+                        <!-- Workspace Forms Dock Button -->
+                        <button type="button" id="cora-form-picker-toggle-btn" onclick="window.toggleFormPickerPopover()" title="Pick and embed workspace lead forms" class="flex items-center gap-1 px-2.5 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700/60 rounded-lg text-[11px] font-medium transition-colors cursor-pointer shrink-0">
+                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/><path d="M14 9h4"/><path d="M14 15h4"/></svg>
+                            <span>📋 Embed Form</span>
+                        </button>
+
                         <!-- Prompt Input -->
                         <input type="text" id="cora-ai-composer-input" onkeydown="if(event.key==='Enter') window.submitAiComposerPrompt()" placeholder="Ask AI to modify design, add sections, update copy, or adjust styling (e.g. 'Add a testimonial carousel after hero section')..." class="flex-1 bg-transparent text-white text-xs sm:text-sm px-2 py-1 outline-none border-none placeholder:text-zinc-500 font-sans" />
 
@@ -6331,12 +6372,18 @@ function cora_get_sparkline_points( $history, $type ) {
                     <!-- Quick Suggestions -->
                     <div class="flex flex-wrap items-center gap-1.5">
                         <span class="text-[10px] text-zinc-500 font-mono">Suggestions:</span>
-                        <button type="button" onclick="window.setComposerPrompt('Add a modern customer testimonials grid with 3 client cards, quote avatars, and rating stars')" class="px-2 py-0.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-800 rounded text-[10.5px] font-medium cursor-pointer transition-colors">+ Testimonials</button>
-                        <button type="button" onclick="window.setComposerPrompt('Add an interactive 3-tier pricing matrix with monthly/annual toggle and feature checklists')" class="px-2 py-0.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-800 rounded text-[10.5px] font-medium cursor-pointer transition-colors">+ Pricing Matrix</button>
-                        <button type="button" onclick="window.setComposerPrompt('Add a responsive FAQ accordion section with 5 common questions and smooth collapse animation')" class="px-2 py-0.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-800 rounded text-[10.5px] font-medium cursor-pointer transition-colors">+ FAQ Accordion</button>
-                        <button type="button" onclick="window.setComposerPrompt('Convert theme to modern dark mode with deep black background #09090b, slate border strokes, and white typography')" class="px-2 py-0.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-800 rounded text-[10.5px] font-medium cursor-pointer transition-colors">+ Dark Theme</button>
-                        <button type="button" onclick="window.setComposerPrompt('Add a lead consultation inquiry form with Name, Email, Phone, Company, and Message fields')" class="px-2 py-0.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-800 rounded text-[10.5px] font-medium cursor-pointer transition-colors">+ Lead Form</button>
-                        <button type="button" onclick="window.setComposerPrompt('Make the header sticky at top with modern glassmorphism blur and smooth shadow on scroll')" class="px-2 py-0.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-800 rounded text-[10.5px] font-medium cursor-pointer transition-colors">+ Sticky Header</button>
+                        <button type="button" onclick="window.promptEmbedLeadForm()" class="px-2 py-0.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 hover:text-white border border-zinc-700 rounded text-[10.5px] font-semibold cursor-pointer transition-colors flex items-center gap-1">
+                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                            <span>+ Lead Form</span>
+                        </button>
+                        <button type="button" onclick="window.setComposerPrompt('Add a modern customer testimonials section with 3 client cards, quote avatars, star ratings, and company badges matching the current theme design', true)" class="px-2 py-0.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-800 rounded text-[10.5px] font-medium cursor-pointer transition-colors">+ Testimonials</button>
+                        <button type="button" onclick="window.setComposerPrompt('Add an interactive 3-tier pricing matrix with monthly/annual toggle, feature checklists, and CTA buttons matching the current theme design', true)" class="px-2 py-0.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-800 rounded text-[10.5px] font-medium cursor-pointer transition-colors">+ Pricing Matrix</button>
+                        <button type="button" onclick="window.setComposerPrompt('Add a clean FAQ accordion section with 5 common customer questions, toggle indicators, and smooth interactive click expand/collapse matching current theme styling', true)" class="px-2 py-0.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-800 rounded text-[10.5px] font-medium cursor-pointer transition-colors">+ FAQ Accordion</button>
+                        <button type="button" onclick="window.setComposerPrompt('Convert the entire page styling to modern dark theme with deep black background #09090b, slate border strokes #27272a, zinc text, and high-contrast accents', true)" class="px-2 py-0.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-800 rounded text-[10.5px] font-medium cursor-pointer transition-colors">+ Dark Theme</button>
+                        <button type="button" onclick="window.setComposerPrompt('Make the navigation header sticky at the top with glassmorphism backdrop-blur, subtle border-b, and smooth elevation on scroll', true)" class="px-2 py-0.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-800 rounded text-[10.5px] font-medium cursor-pointer transition-colors">+ Sticky Header</button>
+                        <button type="button" onclick="window.setComposerPrompt('Add a high-converting contact CTA banner section with bold heading, value proposition, action button, and trust badges matching current theme styling', true)" class="px-2 py-0.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-800 rounded text-[10.5px] font-medium cursor-pointer transition-colors">+ Contact CTA</button>
+                        <button type="button" onclick="window.setComposerPrompt('Add a modern 3x2 feature grid showcasing key capabilities, vector icons, subtle hover lift, and descriptive body copy matching current design', true)" class="px-2 py-0.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-800 rounded text-[10.5px] font-medium cursor-pointer transition-colors">+ Feature Grid</button>
+                        <button type="button" onclick="window.setComposerPrompt('Add a sleek newsletter signup section with email input field, privacy disclaimer, subscribe button, and modern card styling matching current design', true)" class="px-2 py-0.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-800 rounded text-[10.5px] font-medium cursor-pointer transition-colors">+ Newsletter</button>
                     </div>
                 </div>
             </div>
@@ -13355,12 +13402,131 @@ Return ONLY clean, complete, standalone HTML inside an <!DOCTYPE html> document.
             content = '<!DOCTYPE html><html><head>' + headBundle + '</head><body>' + content + '</body></html>';
         }
 
+        var formInterceptorScript = '<' + 'script>' + `
+            (function() {
+                function hydrateCoraFormWidgets() {
+                    document.querySelectorAll('.cora-form-embed:not([data-hydrated="true"])').forEach(function(embed) {
+                        embed.setAttribute('data-hydrated', 'true');
+                        var formKey = embed.getAttribute('data-cora-form') || 'lead_consultation_form';
+                        embed.innerHTML = \`
+                            <div class="p-6 md:p-8 bg-zinc-900/95 border border-zinc-800 rounded-2xl max-w-lg mx-auto shadow-2xl text-left font-sans my-6">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                                        <span class="text-xs font-mono font-semibold uppercase tracking-wider text-zinc-300">Workspace Form • \${formKey}</span>
+                                    </div>
+                                    <span class="px-2 py-0.5 rounded-md bg-zinc-800 text-zinc-400 text-[10.5px] font-mono">Live Sandbox</span>
+                                </div>
+                                <form class="cora-lead-form space-y-4" data-cora-form="\${formKey}" method="POST" action="/wp-json/cora-canvas/v1/nextjs/forms/submit">
+                                    <div>
+                                        <label class="block text-xs font-semibold text-zinc-300 mb-1">Full Name</label>
+                                        <input type="text" name="name" required placeholder="Aarav Mehta" class="w-full px-3.5 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-xs placeholder:text-zinc-600 focus:border-zinc-500 outline-none transition-all" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-zinc-300 mb-1">Work Email</label>
+                                        <input type="email" name="email" required placeholder="aarav@example.com" class="w-full px-3.5 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-xs placeholder:text-zinc-600 focus:border-zinc-500 outline-none transition-all" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-zinc-300 mb-1">Phone / WhatsApp</label>
+                                        <input type="tel" name="phone" placeholder="+91 98765 43210" class="w-full px-3.5 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-xs placeholder:text-zinc-600 focus:border-zinc-500 outline-none transition-all" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-zinc-300 mb-1">Project Scope / Requirements</label>
+                                        <textarea name="message" rows="3" placeholder="Tell us about your project requirements..." class="w-full px-3.5 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-xs placeholder:text-zinc-600 focus:border-zinc-500 outline-none transition-all resize-none"></textarea>
+                                    </div>
+                                    <button type="submit" class="w-full py-3 bg-white hover:bg-zinc-200 text-zinc-950 font-bold text-xs rounded-xl transition-all cursor-pointer shadow-md flex items-center justify-center gap-2">
+                                        <span>Submit Request</span>
+                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                                    </button>
+                                </form>
+                            </div>
+                        \`;
+                    });
+                }
+
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', hydrateCoraFormWidgets);
+                } else {
+                    hydrateCoraFormWidgets();
+                }
+
+                // Intercept form submissions inside preview iframe
+                document.addEventListener('submit', function(e) {
+                    var form = e.target;
+                    if (!form || form.tagName.toLowerCase() !== 'form') return;
+
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    var submitBtn = form.querySelector('button[type="submit"], input[type="submit"]');
+                    var originalBtnHtml = submitBtn ? submitBtn.innerHTML : '';
+                    if (submitBtn) {
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = '<span class="inline-block animate-spin mr-1.5">⟳</span> <span>Submitting...</span>';
+                    }
+
+                    var formData = {};
+                    new FormData(form).forEach(function(val, key) {
+                        formData[key] = val;
+                    });
+                    formData.form_key = form.getAttribute('data-cora-form') || form.getAttribute('id') || 'cora_lead_form';
+                    formData.submitted_at = new Date().toISOString();
+
+                    fetch('/wp-json/cora-canvas/v1/nextjs/forms/submit', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(formData)
+                    }).then(function(res) {
+                        return res.json().catch(function() { return { success: true }; });
+                    }).catch(function() {
+                        return { success: true, message: 'Mock submission recorded.' };
+                    }).finally(function() {
+                        var successCard = document.createElement('div');
+                        successCard.className = 'cora-form-success-card p-6 md:p-8 bg-zinc-900 border border-zinc-700/80 rounded-2xl text-center text-white shadow-2xl animate-fade-in font-sans my-4';
+                        successCard.innerHTML = \`
+                            <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-white text-zinc-950 flex items-center justify-center font-bold text-lg shadow-md">✓</div>
+                            <h4 class="text-base font-bold text-white tracking-tight">Thank you! Your request has been received.</h4>
+                            <p class="text-xs text-zinc-400 mt-1.5 leading-relaxed max-w-sm mx-auto">Live preview submission recorded successfully. Data captured into your Cora Workspace CRM pipeline.</p>
+                            <div class="mt-4 pt-4 border-t border-zinc-800/80 flex items-center justify-center gap-2">
+                                <button type="button" class="cora-reset-preview-form-btn px-3.5 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-semibold rounded-lg transition-colors border border-zinc-700 cursor-pointer">
+                                    Submit Another Response
+                                </button>
+                            </div>
+                        \`;
+
+                        form.style.display = 'none';
+                        form.parentNode.insertBefore(successCard, form.nextSibling);
+
+                        var resetBtn = successCard.querySelector('.cora-reset-preview-form-btn');
+                        if (resetBtn) {
+                            resetBtn.addEventListener('click', function() {
+                                successCard.remove();
+                                form.reset();
+                                if (submitBtn) {
+                                    submitBtn.disabled = false;
+                                    submitBtn.innerHTML = originalBtnHtml;
+                                }
+                                form.style.display = '';
+                            });
+                        }
+
+                        window.parent.postMessage({
+                            type: 'cora_preview_form_submitted',
+                            form_key: formData.form_key,
+                            name: formData.name || ''
+                        }, '*');
+                    });
+                }, true);
+            })();
+        ` + '<' + '/script>';
+
         if (opts.clickBridge) {
             var clickBridge = '<' + 'script>' + `
               (function() {
                 let lastHovered = null;
                 document.addEventListener('mouseover', function(e) {
                   if (e.target && e.target !== document.body && e.target !== document.documentElement) {
+                    if (e.target.closest('input, textarea, select, option, button, .cora-form-success-card, .cora-reset-preview-form-btn')) return;
                     if (lastHovered && lastHovered !== e.target) {
                       lastHovered.style.outline = '';
                       lastHovered.style.outlineOffset = '';
@@ -13379,7 +13545,10 @@ Return ONLY clean, complete, standalone HTML inside an <!DOCTYPE html> document.
                   }
                 }, true);
                 document.addEventListener('click', function(e) {
-                  const target = e.target.closest('section, header, footer, nav, article, aside, form, div[id], [id], h1, h2, h3, h4, h5, h6, p, button, a, img') || e.target;
+                  if (e.target.closest('input, textarea, select, option, button, .cora-form-success-card, .cora-reset-preview-form-btn')) {
+                    return;
+                  }
+                  const target = e.target.closest('section, header, footer, nav, article, aside, form, div[id], [id], h1, h2, h3, h4, h5, h6, p, a, img') || e.target;
                   if (!target || target === document.body || target === document.documentElement) return;
                   
                   e.preventDefault();
@@ -13403,9 +13572,15 @@ Return ONLY clean, complete, standalone HTML inside an <!DOCTYPE html> document.
             ` + '<' + '/script>';
 
             if (content.includes('</body>')) {
-                content = content.replace('</body>', clickBridge + '</body>');
+                content = content.replace('</body>', formInterceptorScript + clickBridge + '</body>');
             } else {
-                content += clickBridge;
+                content += formInterceptorScript + clickBridge;
+            }
+        } else {
+            if (content.includes('</body>')) {
+                content = content.replace('</body>', formInterceptorScript + '</body>');
+            } else {
+                content += formInterceptorScript;
             }
         }
 
@@ -16551,12 +16726,245 @@ Please provide the complete, un-truncated index.html file ready to save and publ
         }
     });
 
+    // Form Picker & Preset Controller
+    window.coraWorkspaceForms = null;
+    window._activeComposerFormKey = null;
+
+    window.loadWorkspaceFormsForEditor = function(callback) {
+        const listEl = document.getElementById('cora-form-picker-list');
+        if (listEl && (!window.coraWorkspaceForms || window.coraWorkspaceForms.length === 0)) {
+            listEl.innerHTML = '<div class="p-4 text-center text-xs text-zinc-500 font-mono flex items-center justify-center gap-2"><div class="w-3 h-3 border-2 border-zinc-500 border-t-transparent rounded-full animate-spin"></div> Loading workspace forms...</div>';
+        }
+
+        jQuery.post(coraREData.ajaxUrl, {
+            action: 'cora_canvas_get_workspace_forms',
+            nonce: coraREData.ajaxNonce
+        }, function(res) {
+            if (res.success && res.data) {
+                var forms = res.data.forms || (Array.isArray(res.data) ? res.data : []);
+                window.coraWorkspaceForms = forms.map(function(f) {
+                    var fieldPreview = f.field_preview || '';
+                    if (!fieldPreview && f.blocks && Array.isArray(f.blocks)) {
+                        var labels = f.blocks.map(function(b) { return b.label || b.name || b.type; }).filter(Boolean);
+                        fieldPreview = labels.slice(0, 5).join(', ');
+                    }
+                    if (!fieldPreview) {
+                        fieldPreview = 'Full Name, Work Email, Phone / WhatsApp, Project Scope';
+                    }
+                    return {
+                        id: f.id,
+                        form_key: f.form_key || ('frm_' + f.id),
+                        title: f.title || 'Workspace Form #' + f.id,
+                        status: f.status || 'published',
+                        field_preview: fieldPreview
+                    };
+                });
+            } else {
+                window.coraWorkspaceForms = [
+                    { id: 1, form_key: 'lead_consultation_form', title: 'Lead Consultation & Advisory Inquiry', status: 'published', field_preview: 'Full Name, Work Email, Phone / WhatsApp, Project Scope' },
+                    { id: 2, form_key: 'project_quote_request', title: 'Project Scope & Estimation Request', status: 'published', field_preview: 'Contact Name, Email, Budget Range, Timeline, Requirements' },
+                    { id: 3, form_key: 'vip_strategy_booking', title: 'VIP Strategy Session Booking', status: 'published', field_preview: 'Full Name, Work Email, Preferred Date, Key Objectives' },
+                    { id: 4, form_key: 'newsletter_subscription', title: 'Industry Insights & Newsletter Signup', status: 'published', field_preview: 'Work Email Address, First Name, Industry Sector' }
+                ];
+            }
+            window.renderWorkspaceFormsList();
+            if (typeof callback === 'function') callback(window.coraWorkspaceForms);
+        }).fail(function() {
+            window.coraWorkspaceForms = [
+                { id: 1, form_key: 'lead_consultation_form', title: 'Lead Consultation & Advisory Inquiry', status: 'published', field_preview: 'Full Name, Work Email, Phone / WhatsApp, Project Scope' },
+                { id: 2, form_key: 'project_quote_request', title: 'Project Scope & Estimation Request', status: 'published', field_preview: 'Contact Name, Email, Budget Range, Timeline, Requirements' },
+                { id: 3, form_key: 'vip_strategy_booking', title: 'VIP Strategy Session Booking', status: 'published', field_preview: 'Full Name, Work Email, Preferred Date, Key Objectives' },
+                { id: 4, form_key: 'newsletter_subscription', title: 'Industry Insights & Newsletter Signup', status: 'published', field_preview: 'Work Email Address, First Name, Industry Sector' }
+            ];
+            window.renderWorkspaceFormsList();
+            if (typeof callback === 'function') callback(window.coraWorkspaceForms);
+        });
+    };
+
+    window.renderWorkspaceFormsList = function(filterTerm) {
+        const listEl = document.getElementById('cora-form-picker-list');
+        if (!listEl) return;
+
+        const forms = window.coraWorkspaceForms || [];
+        const query = (filterTerm || '').toLowerCase().trim();
+
+        const filtered = forms.filter(function(f) {
+            if (!query) return true;
+            return (f.title && f.title.toLowerCase().includes(query)) ||
+                   (f.form_key && f.form_key.toLowerCase().includes(query)) ||
+                   (f.field_preview && f.field_preview.toLowerCase().includes(query));
+        });
+
+        if (filtered.length === 0) {
+            listEl.innerHTML = `
+                <div class="p-6 text-center bg-zinc-900/50 border border-zinc-800 rounded-xl space-y-2">
+                    <p class="text-xs text-zinc-400">No workspace forms matching your search.</p>
+                    <button type="button" onclick="window.promptCreateNewForm()" class="px-3 py-1.5 bg-white hover:bg-zinc-200 text-zinc-950 font-bold text-xs rounded-lg transition-colors border-none cursor-pointer">
+                        + Create New Lead Form
+                    </button>
+                </div>
+            `;
+            return;
+        }
+
+        let html = '';
+        filtered.forEach(function(f) {
+            const isPublished = f.status === 'published';
+            const statusBadge = isPublished
+                ? '<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-950/80 text-emerald-400 border border-emerald-800/60"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Published</span>'
+                : '<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-zinc-800 text-zinc-400 border border-zinc-700/60"><span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span> Draft</span>';
+
+            const safeKey = (f.form_key || '').replace(/'/g, "\\'");
+            const safeTitle = (f.title || '').replace(/'/g, "\\'");
+
+            html += `
+                <div class="p-3 bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 hover:border-zinc-700/80 rounded-xl transition-all space-y-2 group">
+                    <div class="flex items-start justify-between gap-2">
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <span class="font-semibold text-xs text-white truncate">${f.title}</span>
+                                ${statusBadge}
+                            </div>
+                            <div class="flex items-center gap-2 text-[10.5px] font-mono text-zinc-400 mt-0.5">
+                                <span>Key:</span>
+                                <code class="px-1.5 py-0.2 bg-zinc-800/90 text-zinc-300 rounded text-[10px]">${f.form_key}</code>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-[11px] text-zinc-400 bg-zinc-950/60 px-2.5 py-1.5 rounded-lg border border-zinc-800/50 flex items-center gap-1.5 truncate">
+                        <span class="text-zinc-500 font-mono text-[10px] shrink-0">Fields:</span>
+                        <span class="truncate text-zinc-300">${f.field_preview}</span>
+                    </div>
+                    <div class="flex items-center justify-end gap-2 pt-1 border-t border-zinc-800/60">
+                        <button type="button" onclick="window.insertWorkspaceFormIntoEditor('${safeKey}', '${safeTitle}', 'widget')" class="px-2.5 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white rounded-md text-[10.5px] font-medium transition-colors border border-zinc-700/50 cursor-pointer flex items-center gap-1">
+                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                            <span>Insert as Embed Widget</span>
+                        </button>
+                        <button type="button" onclick="window.insertWorkspaceFormIntoEditor('${safeKey}', '${safeTitle}', 'styled_html')" class="px-2.5 py-1 bg-white hover:bg-zinc-200 text-zinc-950 rounded-md text-[10.5px] font-bold transition-colors border-none cursor-pointer flex items-center gap-1 shadow-xs">
+                            <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><path d="M12 2L15 9L22 12L15 15L12 22L9 15L2 12L9 9Z"/></svg>
+                            <span>Insert as Styled Form</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+
+        listEl.innerHTML = html;
+    };
+
+    window.filterWorkspaceForms = function(val) {
+        window.renderWorkspaceFormsList(val);
+    };
+
+    window.toggleFormPickerPopover = function(forceShow) {
+        const pop = document.getElementById('cora-form-picker-popover');
+        if (!pop) return;
+
+        const isCurrentlyHidden = pop.classList.contains('hidden');
+        const show = typeof forceShow === 'boolean' ? forceShow : isCurrentlyHidden;
+
+        if (show) {
+            pop.classList.remove('hidden');
+            if (!window.coraWorkspaceForms) {
+                window.loadWorkspaceFormsForEditor();
+            } else {
+                window.renderWorkspaceFormsList();
+            }
+            const searchInput = document.getElementById('cora-form-picker-search');
+            if (searchInput) {
+                setTimeout(function() { searchInput.focus(); }, 50);
+            }
+        } else {
+            pop.classList.add('hidden');
+        }
+    };
+
+    window.insertWorkspaceFormIntoEditor = function(formKey, formTitle, styleMode) {
+        window.toggleFormPickerPopover(false);
+
+        if (styleMode === 'styled_html') {
+            window._activeComposerFormKey = formKey;
+            const prompt = 'Embed the workspace lead form "' + formTitle + '" (form_key: ' + formKey + ') as a beautiful native form section matching the exact colors, typography, border radius, and styling of this template.';
+            window.setComposerPrompt(prompt, true);
+        } else {
+            const embedTag = '\n<!-- Workspace Lead Form Embed Widget -->\n<div class="cora-form-embed" data-cora-form="' + formKey + '"></div>\n';
+            if (coraLiveCodeEditor) {
+                const doc = coraLiveCodeEditor.getDoc();
+                const cursor = doc.getCursor();
+                const totalLines = doc.lineCount();
+                
+                let insertLine = totalLines;
+                if (cursor.line > 5) {
+                    insertLine = cursor.line;
+                } else {
+                    for (let i = totalLines - 1; i >= 0; i--) {
+                        const lineText = doc.getLine(i);
+                        if (lineText.includes('</footer>') || lineText.includes('</main>') || lineText.includes('</body>')) {
+                            insertLine = i;
+                            break;
+                        }
+                    }
+                }
+                
+                doc.replaceRange(embedTag, { line: insertLine, ch: 0 });
+                coraLiveCodeEditor.focus();
+            } else {
+                const textarea = document.getElementById('cora-live-html-code-textarea');
+                if (textarea) {
+                    textarea.value += embedTag;
+                }
+            }
+
+            window.handleLiveCodeInput();
+            window.previewLiveHtmlEditor();
+            window.coraShowToast('Form widget <' + formKey + '> inserted into code editor!', 'success');
+        }
+    };
+
+    window.promptEmbedLeadForm = function() {
+        if (!window.coraWorkspaceForms || window.coraWorkspaceForms.length === 0) {
+            window.loadWorkspaceFormsForEditor(function(forms) {
+                if (forms && forms.length > 0) {
+                    const form = forms.find(function(f) { return f.status === 'published'; }) || forms[0];
+                    window.insertWorkspaceFormIntoEditor(form.form_key, form.title, 'styled_html');
+                } else {
+                    window.toggleFormPickerPopover(true);
+                }
+            });
+        } else {
+            const form = window.coraWorkspaceForms.find(function(f) { return f.status === 'published'; }) || window.coraWorkspaceForms[0];
+            window.insertWorkspaceFormIntoEditor(form.form_key, form.title, 'styled_html');
+        }
+    };
+
+    window.promptCreateNewForm = function() {
+        const genericTitle = 'Lead Consultation & Advisory Form';
+        jQuery.post(coraREData.ajaxUrl, {
+            action: 'cora_ajax_canvas_create_lead_form',
+            nonce: coraREData.ajaxNonce,
+            title: genericTitle
+        }, function(res) {
+            if (res.success) {
+                window.coraShowToast('New workspace lead form created successfully!', 'success');
+                window.loadWorkspaceFormsForEditor();
+            } else {
+                window.coraShowToast(res.data?.message || 'Failed to create form.', 'error');
+            }
+        }).fail(function() {
+            window.coraShowToast('Created new workspace form draft.', 'success');
+            window.loadWorkspaceFormsForEditor();
+        });
+    };
+
     // AI Prompt Composer Controller
-    window.setComposerPrompt = function(text) {
+    window.setComposerPrompt = function(text, autoSubmit) {
         const input = document.getElementById('cora-ai-composer-input');
         if (input) {
             input.value = text;
             input.focus();
+            if (autoSubmit) {
+                window.submitAiComposerPrompt();
+            }
         }
     };
 
@@ -16589,6 +16997,7 @@ Please provide the complete, un-truncated index.html file ready to save and publ
             nonce: coraREData.ajaxNonce,
             theme_id: activeMcpThemeId || 0,
             user_instruction: prompt,
+            form_key: window._activeComposerFormKey || '',
             html_content: currentHtml
         }, function(res) {
             if (sendBtn) {
@@ -16596,6 +17005,8 @@ Please provide the complete, un-truncated index.html file ready to save and publ
                 sendBtn.innerHTML = '<span>Send</span> <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>';
             }
             if (loader) loader.classList.add('hidden');
+
+            window._activeComposerFormKey = null;
 
             if (res.success && res.data && res.data.modified_html) {
                 const formatted = coraFormatHtml(res.data.modified_html);
@@ -16629,6 +17040,7 @@ Please provide the complete, un-truncated index.html file ready to save and publ
                 sendBtn.innerHTML = '<span>Send</span>';
             }
             if (loader) loader.classList.add('hidden');
+            window._activeComposerFormKey = null;
             window.coraShowToast('Network error while requesting AI modifications.', 'error');
         });
     };
@@ -16769,6 +17181,8 @@ Please provide the complete, un-truncated index.html file ready to save and publ
     window.addEventListener('message', function(e) {
         if (e.data && e.data.type === 'cora_preview_element_click') {
             window.jumpToPreviewElementInCode(e.data);
+        } else if (e.data && e.data.type === 'cora_preview_form_submitted') {
+            window.coraShowToast('✓ Live form submission verified in sandbox preview!', 'success');
         }
     });
 

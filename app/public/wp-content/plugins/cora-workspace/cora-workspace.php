@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.360
+ * Version:           4.9.361
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.360' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.361' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -43109,10 +43109,347 @@ function cora_ajax_canvas_ai_rewrite_element() {
 }
 add_action( 'wp_ajax_cora_ajax_ai_rewrite_element', 'cora_ajax_canvas_ai_rewrite_element' );
 
-// 4b. AJAX: AI Standard Modification for HTML Pages (Targeted, Preserving Layout & Structure)
+// 4a. AJAX: Canvas Workspace Forms Interoperability Handlers
+if ( ! function_exists( 'cora_get_current_agency_id' ) ) {
+function cora_get_current_agency_id() {
+    if ( function_exists( 'cora_db_get_agency_id' ) ) {
+        $id = cora_db_get_agency_id();
+        if ( ! empty( $id ) && $id !== 'super' ) {
+            return intval( $id );
+        }
+    }
+    if ( function_exists( 'cora_get_current_user_agency_id' ) ) {
+        $id = cora_get_current_user_agency_id();
+        if ( ! empty( $id ) && $id !== 'super' && is_numeric( $id ) ) {
+            return intval( $id );
+        }
+    }
+    return 1;
+}
+}
+
+if ( ! function_exists( 'cora_ajax_canvas_get_workspace_forms' ) ) {
+function cora_ajax_canvas_get_workspace_forms() {
+    $nonce = $_REQUEST['nonce'] ?? ( $_REQUEST['_wpnonce'] ?? ( $_REQUEST['cora_nonce'] ?? '' ) );
+    $valid_nonce = wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) || wp_verify_nonce( $nonce, 'cora_canvas_nonce' ) || wp_verify_nonce( $nonce, 'cora_re_nonce' ) || check_ajax_referer( 'cora_ajax_nonce', 'nonce', false ) || check_ajax_referer( 'cora_canvas_nonce', 'nonce', false );
+    
+    if ( ! $valid_nonce && ! is_user_logged_in() ) {
+        wp_send_json_error( array( 'message' => 'Invalid security token or session expired.' ) );
+    }
+    
+    cora_canvas_ajax_permission_check( false );
+    global $wpdb;
+
+    // Resolve agency ID
+    $agency_id = 0;
+    if ( ! empty( $_REQUEST['agency_id'] ) ) {
+        $agency_id = intval( $_REQUEST['agency_id'] );
+    }
+    if ( ! $agency_id && function_exists( 'cora_get_current_agency_id' ) ) {
+        $agency_id = intval( cora_get_current_agency_id() );
+    }
+    if ( ! $agency_id && function_exists( 'cora_db_get_agency_id' ) ) {
+        $db_agency = cora_db_get_agency_id();
+        $agency_id = ( $db_agency === 'super' || empty( $db_agency ) ) ? 1 : intval( $db_agency );
+    }
+    if ( ! $agency_id && function_exists( 'cora_get_current_user_agency_id' ) ) {
+        $user_agency = cora_get_current_user_agency_id();
+        $agency_id = ( $user_agency === 'super' || empty( $user_agency ) ) ? 1 : intval( $user_agency );
+    }
+    if ( ! $agency_id ) {
+        $agency_id = 1;
+    }
+
+    $forms_table = "{$wpdb->prefix}cora_forms";
+    $blocks_table = "{$wpdb->prefix}cora_form_blocks";
+
+    // Query published and draft forms for this agency
+    $forms = array();
+    $db_forms = $wpdb->get_results( $wpdb->prepare(
+        "SELECT f.id, f.form_key, f.title, f.status, f.styling, f.settings, f.created_at, f.updated_at, b.blocks_json, b.logic_json 
+         FROM {$forms_table} f 
+         LEFT JOIN {$blocks_table} b ON f.id = b.form_id 
+         WHERE f.agency_id = %d AND f.status IN ('published', 'draft') 
+         ORDER BY f.id DESC",
+        $agency_id
+    ), ARRAY_A );
+
+    // Fallback to all forms if agency has none
+    if ( empty( $db_forms ) ) {
+        $db_forms = $wpdb->get_results(
+            "SELECT f.id, f.form_key, f.title, f.status, f.styling, f.settings, f.created_at, f.updated_at, b.blocks_json, b.logic_json 
+             FROM {$forms_table} f 
+             LEFT JOIN {$blocks_table} b ON f.id = b.form_id 
+             WHERE f.status IN ('published', 'draft') 
+             ORDER BY f.id DESC",
+            ARRAY_A
+        );
+    }
+
+    if ( ! empty( $db_forms ) && is_array( $db_forms ) ) {
+        foreach ( $db_forms as $row ) {
+            $fid = intval( $row['id'] );
+            $form_key = ! empty( $row['form_key'] ) ? $row['form_key'] : ( 'frm_' . substr( md5( $fid . $row['title'] ), 0, 8 ) );
+            $raw_blocks = ! empty( $row['blocks_json'] ) ? json_decode( $row['blocks_json'], true ) : array();
+            
+            // Flatten if multi-step nested array
+            $blocks = array();
+            if ( is_array( $raw_blocks ) ) {
+                foreach ( $raw_blocks as $blk ) {
+                    if ( is_array( $blk ) && isset( $blk[0] ) && is_array( $blk[0] ) ) {
+                        foreach ( $blk as $sub_blk ) {
+                            $blocks[] = $sub_blk;
+                        }
+                    } elseif ( is_array( $blk ) ) {
+                        $blocks[] = $blk;
+                    }
+                }
+            }
+
+            $forms[] = array(
+                'id'         => $fid,
+                'form_key'   => $form_key,
+                'title'      => $row['title'],
+                'status'     => $row['status'],
+                'blocks'     => $blocks,
+                'created_at' => $row['created_at'],
+                'updated_at' => $row['updated_at']
+            );
+        }
+    }
+
+    // If no forms exist at all in the DB, automatically create default high-converting form
+    if ( empty( $forms ) ) {
+        $default_key = 'frm_lead_inquiry_' . substr( md5( uniqid( (string) rand(), true ) ), 0, 6 );
+        $default_title = 'Lead Consultation & Inquiry Form';
+        $now = current_time( 'mysql' );
+
+        $wpdb->insert(
+            $forms_table,
+            array(
+                'agency_id'  => $agency_id,
+                'form_key'   => $default_key,
+                'title'      => $default_title,
+                'status'     => 'published',
+                'styling'    => '{}',
+                'settings'   => json_encode( array(
+                    'submit_button_text' => 'Request Consultation',
+                    'success_message'    => 'Thank you! We will be in touch shortly.'
+                ) ),
+                'created_at' => $now,
+                'updated_at' => $now
+            )
+        );
+        $new_form_id = $wpdb->insert_id;
+
+        $default_blocks = array(
+            array(
+                'id'          => 'blk_name_' . wp_generate_password( 6, false ),
+                'type'        => 'text',
+                'label'       => 'Full Name',
+                'placeholder' => 'Enter your full name',
+                'name'        => 'name',
+                'required'    => true
+            ),
+            array(
+                'id'          => 'blk_email_' . wp_generate_password( 6, false ),
+                'type'        => 'email',
+                'label'       => 'Email Address',
+                'placeholder' => 'you@example.com',
+                'name'        => 'email',
+                'required'    => true
+            ),
+            array(
+                'id'          => 'blk_phone_' . wp_generate_password( 6, false ),
+                'type'        => 'phone',
+                'label'       => 'Phone Number',
+                'placeholder' => '+1 (555) 000-0000',
+                'name'        => 'phone',
+                'required'    => false
+            ),
+            array(
+                'id'          => 'blk_message_' . wp_generate_password( 6, false ),
+                'type'        => 'textarea',
+                'label'       => 'Business / Project Details',
+                'placeholder' => 'Tell us about your project goals, scope, and timeline...',
+                'name'        => 'message',
+                'required'    => true
+            ),
+            array(
+                'id'          => 'blk_submit_' . wp_generate_password( 6, false ),
+                'type'        => 'button',
+                'label'       => 'Request Consultation',
+                'required'    => false
+            )
+        );
+
+        if ( $new_form_id ) {
+            $wpdb->insert(
+                $blocks_table,
+                array(
+                    'form_id'     => $new_form_id,
+                    'blocks_json' => json_encode( $default_blocks ),
+                    'logic_json'  => '[]',
+                    'created_at'  => $now,
+                    'updated_at'  => $now
+                )
+            );
+
+            $forms[] = array(
+                'id'         => $new_form_id,
+                'form_key'   => $default_key,
+                'title'      => $default_title,
+                'status'     => 'published',
+                'blocks'     => $default_blocks,
+                'created_at' => $now,
+                'updated_at' => $now
+            );
+        }
+    }
+
+    wp_send_json_success( array(
+        'forms' => $forms,
+        'data'  => $forms
+    ) );
+}
+}
+add_action( 'wp_ajax_cora_canvas_get_workspace_forms', 'cora_ajax_canvas_get_workspace_forms' );
+
+if ( ! function_exists( 'cora_ajax_canvas_create_lead_form' ) ) {
+function cora_ajax_canvas_create_lead_form() {
+    $nonce = $_REQUEST['nonce'] ?? ( $_REQUEST['_wpnonce'] ?? ( $_REQUEST['cora_nonce'] ?? '' ) );
+    $valid_nonce = wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) || wp_verify_nonce( $nonce, 'cora_canvas_nonce' ) || wp_verify_nonce( $nonce, 'cora_re_nonce' ) || check_ajax_referer( 'cora_ajax_nonce', 'nonce', false ) || check_ajax_referer( 'cora_canvas_nonce', 'nonce', false );
+    
+    if ( ! $valid_nonce && ! is_user_logged_in() ) {
+        wp_send_json_error( array( 'message' => 'Invalid security token or session expired.' ) );
+    }
+
+    cora_canvas_ajax_permission_check( true );
+    global $wpdb;
+
+    $title = ! empty( $_POST['title'] ) ? sanitize_text_field( $_POST['title'] ) : 'Lead Consultation Form';
+    $agency_id = ! empty( $_POST['agency_id'] ) ? intval( $_POST['agency_id'] ) : ( function_exists( 'cora_get_current_agency_id' ) ? cora_get_current_agency_id() : 1 );
+    if ( ! $agency_id ) {
+        $agency_id = 1;
+    }
+
+    $fields = ! empty( $_POST['fields'] ) ? $_POST['fields'] : ( ! empty( $_POST['blocks'] ) ? $_POST['blocks'] : null );
+    if ( is_string( $fields ) ) {
+        $decoded = json_decode( wp_unslash( $fields ), true );
+        if ( is_array( $decoded ) ) {
+            $fields = $decoded;
+        }
+    }
+
+    if ( empty( $fields ) || ! is_array( $fields ) ) {
+        $fields = array(
+            array(
+                'id'          => 'blk_name_' . wp_generate_password( 6, false ),
+                'type'        => 'text',
+                'label'       => 'Full Name',
+                'placeholder' => 'Enter your full name',
+                'name'        => 'name',
+                'required'    => true
+            ),
+            array(
+                'id'          => 'blk_email_' . wp_generate_password( 6, false ),
+                'type'        => 'email',
+                'label'       => 'Email Address',
+                'placeholder' => 'you@example.com',
+                'name'        => 'email',
+                'required'    => true
+            ),
+            array(
+                'id'          => 'blk_phone_' . wp_generate_password( 6, false ),
+                'type'        => 'phone',
+                'label'       => 'Phone Number',
+                'placeholder' => '+1 (555) 000-0000',
+                'name'        => 'phone',
+                'required'    => false
+            ),
+            array(
+                'id'          => 'blk_company_' . wp_generate_password( 6, false ),
+                'type'        => 'text',
+                'label'       => 'Company / Project Name',
+                'placeholder' => 'Acme Studio / Brand Name',
+                'name'        => 'company',
+                'required'    => false
+            ),
+            array(
+                'id'          => 'blk_message_' . wp_generate_password( 6, false ),
+                'type'        => 'textarea',
+                'label'       => 'Project Scope & Requirements',
+                'placeholder' => 'Describe your goals, vision, and timeline...',
+                'name'        => 'message',
+                'required'    => true
+            ),
+            array(
+                'id'          => 'blk_submit_' . wp_generate_password( 6, false ),
+                'type'        => 'button',
+                'label'       => 'Submit Inquiry',
+                'required'    => false
+            )
+        );
+    }
+
+    $form_key = 'frm_' . substr( md5( uniqid( $title . time() . rand(), true ) ), 0, 8 );
+    $now = current_time( 'mysql' );
+    $forms_table = "{$wpdb->prefix}cora_forms";
+    $blocks_table = "{$wpdb->prefix}cora_form_blocks";
+
+    $inserted = $wpdb->insert(
+        $forms_table,
+        array(
+            'agency_id'  => $agency_id,
+            'form_key'   => $form_key,
+            'title'      => $title,
+            'status'     => 'published',
+            'styling'    => '{}',
+            'settings'   => json_encode( array(
+                'submit_button_text' => 'Submit Inquiry',
+                'success_message'    => 'Thank you! Your inquiry has been submitted successfully.'
+            ) ),
+            'created_at' => $now,
+            'updated_at' => $now
+        )
+    );
+
+    if ( ! $inserted ) {
+        wp_send_json_error( array( 'message' => 'Failed to create lead form: ' . $wpdb->last_error ) );
+    }
+
+    $new_id = $wpdb->insert_id;
+
+    $wpdb->insert(
+        $blocks_table,
+        array(
+            'form_id'     => $new_id,
+            'blocks_json' => json_encode( $fields ),
+            'logic_json'  => '[]',
+            'created_at'  => $now,
+            'updated_at'  => $now
+        )
+    );
+
+    wp_send_json_success( array(
+        'form_key' => $form_key,
+        'id'       => $new_id,
+        'title'    => $title
+    ) );
+}
+}
+add_action( 'wp_ajax_cora_canvas_create_lead_form', 'cora_ajax_canvas_create_lead_form' );
+
+// 4b. AJAX: AI Master Frontend Modification Engine for Canvas HTML Pages
 if ( ! function_exists( 'cora_ajax_canvas_ai_modify_html' ) ) {
 function cora_ajax_canvas_ai_modify_html() {
-    check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+    $nonce = $_POST['nonce'] ?? ( $_POST['_wpnonce'] ?? ( $_POST['cora_nonce'] ?? '' ) );
+    $valid_nonce = wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) || wp_verify_nonce( $nonce, 'cora_canvas_nonce' ) || check_ajax_referer( 'cora_ajax_nonce', 'nonce', false ) || check_ajax_referer( 'cora_canvas_nonce', 'nonce', false );
+    
+    if ( ! $valid_nonce && ! is_user_logged_in() ) {
+        wp_send_json_error( array( 'message' => 'Invalid security nonce or session expired.' ) );
+    }
+
     cora_canvas_ajax_permission_check( true );
     global $wpdb;
 
@@ -43158,24 +43495,136 @@ function cora_ajax_canvas_ai_modify_html() {
     $raw_html = preg_replace( '/\s*data-grammarly-[a-zA-Z0-9\-]+="[^"]*"/i', '', $raw_html );
     $raw_html = preg_replace( '/\s*data-gr-ext-[a-zA-Z0-9\-]+="[^"]*"/i', '', $raw_html );
 
-    $system_prompt = "You are an elite Frontend Engineer and Web Designer. You specialize in standard, targeted HTML/CSS modifications.
-The user wants to make a standard modification to the provided HTML code.
+    // 1. Resolve Workspace Context & Available Forms
+    $agency_id = function_exists( 'cora_get_current_agency_id' ) ? cora_get_current_agency_id() : 1;
+    $agency_name = 'Cora Studio';
+    if ( $wpdb->get_var( "SHOW TABLES LIKE '{$wpdb->prefix}cora_workspaces'" ) ) {
+        $ws_row = $wpdb->get_row( $wpdb->prepare( "SELECT name FROM {$wpdb->prefix}cora_workspaces WHERE id = %d", $agency_id ), ARRAY_A );
+        if ( ! empty( $ws_row['name'] ) ) {
+            $agency_name = $ws_row['name'];
+        }
+    }
 
-CRITICAL INSTRUCTIONS:
-1. STRICT TARGETED MODIFICATION: Do NOT completely transform or rewrite the page from scratch. Preserve existing DOM structure, classes, IDs, scripts, stylesheets, fonts, and layout architecture.
-2. SURGICAL APPLICATION: Apply ONLY the requested modifications (e.g. updating copy/headings, changing CSS colors, adjusting margins/padding, modifying button styles/links, replacing image URLs, adding hover effects).
-3. COMPLETE & VALID HTML: Return the complete valid HTML document with <!DOCTYPE html><html>...</html>.
-4. ABSOLUTELY ZERO MARKDOWN: Output ONLY pure raw HTML. Do NOT include markdown code fences like ```html or ``` and do NOT write any explanation, greetings, or conversational notes.";
+    $available_forms_summary = array();
+    $matched_form_key = 'frm_lead_inquiry';
+    if ( $wpdb->get_var( "SHOW TABLES LIKE '{$wpdb->prefix}cora_forms'" ) ) {
+        $db_forms = $wpdb->get_results( $wpdb->prepare(
+            "SELECT f.id, f.form_key, f.title, b.blocks_json 
+             FROM {$wpdb->prefix}cora_forms f 
+             LEFT JOIN {$wpdb->prefix}cora_form_blocks b ON f.id = b.form_id 
+             WHERE f.agency_id = %d AND f.status = 'published' 
+             ORDER BY f.id DESC LIMIT 5",
+            $agency_id
+        ), ARRAY_A );
+        if ( empty( $db_forms ) ) {
+            $db_forms = $wpdb->get_results(
+                "SELECT f.id, f.form_key, f.title, b.blocks_json 
+                 FROM {$wpdb->prefix}cora_forms f 
+                 LEFT JOIN {$wpdb->prefix}cora_form_blocks b ON f.id = b.form_id 
+                 WHERE f.status = 'published' 
+                 ORDER BY f.id DESC LIMIT 5",
+                ARRAY_A
+            );
+        }
+        if ( ! empty( $db_forms ) && is_array( $db_forms ) ) {
+            $matched_form_key = $db_forms[0]['form_key'];
+            foreach ( $db_forms as $df ) {
+                $f_blocks = ! empty( $df['blocks_json'] ) ? json_decode( $df['blocks_json'], true ) : array();
+                $field_names = array();
+                if ( is_array( $f_blocks ) ) {
+                    foreach ( $f_blocks as $fb ) {
+                        if ( isset( $fb['name'] ) ) {
+                            $field_names[] = $fb['name'];
+                        } elseif ( isset( $fb['label'] ) ) {
+                            $field_names[] = sanitize_title( $fb['label'] );
+                        }
+                    }
+                }
+                $available_forms_summary[] = sprintf(
+                    'Form "%s" (form_key: "%s", fields: [%s])',
+                    $df['title'],
+                    $df['form_key'],
+                    ! empty( $field_names ) ? implode( ', ', $field_names ) : 'name, email, phone, message'
+                );
+            }
+        }
+    }
+    $forms_context_str = ! empty( $available_forms_summary ) ? implode( "\n- ", $available_forms_summary ) : 'Lead Consultation & Inquiry Form (form_key: "frm_lead_inquiry", fields: [name, email, phone, message])';
+
+    // 2. Extract Template Characteristics
+    $is_dark = (
+        stripos( $raw_html, 'bg-zinc-950' ) !== false || 
+        stripos( $raw_html, 'bg-zinc-900' ) !== false || 
+        stripos( $raw_html, 'bg-black' ) !== false || 
+        stripos( $raw_html, 'background: #09090b' ) !== false || 
+        stripos( $raw_html, 'background:#09090b' ) !== false || 
+        stripos( $raw_html, 'background: #000' ) !== false ||
+        stripos( $raw_html, 'class="dark' ) !== false
+    );
+    $has_tailwind = ( stripos( $raw_html, 'class=' ) !== false && ( stripos( $raw_html, 'flex' ) !== false || stripos( $raw_html, 'text-' ) !== false || stripos( $raw_html, 'px-' ) !== false || stripos( $raw_html, 'grid' ) !== false ) );
+    
+    $detected_font = 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+    if ( preg_match( '/font-family:\s*[\'"]?([^\'";]+)[\'"]?/i', $raw_html, $fm ) ) {
+        $detected_font = trim( $fm[1] );
+    } elseif ( stripos( $raw_html, 'font-mono' ) !== false ) {
+        $detected_font = 'JetBrains Mono, monospace';
+    }
+
+    $detected_radius = 'rounded-2xl';
+    if ( stripos( $raw_html, 'rounded-3xl' ) !== false ) $detected_radius = 'rounded-3xl';
+    elseif ( stripos( $raw_html, 'rounded-xl' ) !== false ) $detected_radius = 'rounded-xl';
+    elseif ( stripos( $raw_html, 'rounded-lg' ) !== false ) $detected_radius = 'rounded-lg';
+    elseif ( stripos( $raw_html, 'rounded-full' ) !== false ) $detected_radius = 'rounded-full';
+
+    $detected_max_w = 'max-w-7xl';
+    if ( stripos( $raw_html, 'max-w-6xl' ) !== false ) $detected_max_w = 'max-w-6xl';
+    elseif ( stripos( $raw_html, 'max-w-5xl' ) !== false ) $detected_max_w = 'max-w-5xl';
+    elseif ( stripos( $raw_html, 'max-w-4xl' ) !== false ) $detected_max_w = 'max-w-4xl';
+
+    $button_classes = $is_dark ? 'bg-white text-zinc-900 hover:bg-zinc-100 font-medium' : 'bg-zinc-900 text-white hover:bg-zinc-800 font-medium';
+
+    // 3. Construct Master AI System Prompt
+    $system_prompt = "You are Cora's Master Frontend AI Architect and Principal Web Engineer. You specialize in standard, high-precision HTML/CSS/JS page modifications, component insertions, and seamless workspace interoperability.
+
+WORKSPACE CONTEXT:
+- Active Workspace: {$agency_name} (ID: {$agency_id})
+- Available Workspace Forms:
+- {$forms_context_str}
+
+DETECTED TEMPLATE DESIGN TOKENS:
+- Theme Tone: " . ( $is_dark ? 'Dark Mode (Deep Zinc #09090b / #18181b, text-zinc-100/zinc-400)' : 'Light Mode (Clean White #ffffff / #f8fafc, text-zinc-900/zinc-600)' ) . "
+- Framework: " . ( $has_tailwind ? 'Tailwind CSS utility classes' : 'Semantic HTML with scoped CSS / style attributes' ) . "
+- Typography: {$detected_font}
+- Border Radius: {$detected_radius}
+- Container Max Width: {$detected_max_w}
+- Button Style: {$button_classes}
+
+MASTER INSTRUCTIONS:
+1. STRICT TARGETED MODIFICATION: Preserve existing DOM structure, <!DOCTYPE html>, <html>, <head>, <script>, stylesheets, fonts, and layout architecture. Apply only surgical additions or edits requested by the user.
+2. FORM INTEROPERABILITY:
+   - When the user asks to add or embed a form (e.g. Lead Form, Contact Form, Inquiry Form, Consultation, Quote Request):
+     - Use the matching or active workspace `form_key` (e.g. `{$matched_form_key}`) or the key explicitly specified in the instruction.
+     - Structure the form with: `<form action=\"/wp-json/cora-canvas/v1/nextjs/forms/submit\" method=\"POST\" data-cora-form=\"[FORM_KEY]\" class=\"cora-lead-form ...\">`.
+     - Fields MUST have semantic names: `name=\"name\"`, `name=\"email\"`, `name=\"phone\"`, `name=\"company\"`, `name=\"message\"`, `name=\"service\"`, etc.
+     - Form styling MUST match the template's exact aesthetic (same background tone, border color, input focus ring, typography, rounded corners {$detected_radius}, and button styling).
+     - Include working inline submission compatibility or script that submits asynchronously to `/wp-json/cora-canvas/v1/nextjs/forms/submit`, displays an in-place success alert card, and resets the form.
+3. STANDARD COMPONENT EXPANSIONS:
+   - Testimonials: Clean 3-column responsive grid with authentic quotes, star ratings, and avatars.
+   - Pricing Matrix: 3-tier card layout with featured tier badge and monthly/annual toggle.
+   - FAQ Accordion: Clean disclosure accordion with pure JS interactive show/hide toggle.
+   - Theme Toggle: Dark/Light toggle mechanism preserving styling integrity.
+   - Sticky Header: Backdrop blur header fixed at the top with z-index.
+4. ABSOLUTELY ZERO MARKDOWN: Return ONLY pure valid HTML. Do NOT include markdown code fences (no ```html or ```). Do NOT include conversational explanations or greetings.";
 
     $user_message = "USER INSTRUCTION:\n" . $user_instruction . "\n\nEXISTING HTML CODE TO MODIFY:\n" . $raw_html;
 
     $modified_html = '';
 
-    // Provider 1: Groq LLM (High-speed Llama 3.3 70B / 3.1 8B)
-    $groq_key = defined( 'CORA_GROQ_API_KEY' ) ? CORA_GROQ_API_KEY : ( defined( 'CORA_PLATFORM_GROQ_API_KEY' ) ? CORA_PLATFORM_GROQ_API_KEY : get_option( 'cora_groq_api_key', '' ) );
+    // Provider 1: Groq LLM (High-speed Llama 3.3 70B / Qwen 2.5 32B)
+    $groq_key = defined( 'CORA_PLATFORM_GROQ_API_KEY' ) ? CORA_PLATFORM_GROQ_API_KEY : ( defined( 'CORA_GROQ_API_KEY' ) ? CORA_GROQ_API_KEY : get_option( 'cora_groq_api_key', '' ) );
     if ( ! empty( $groq_key ) ) {
         $response = wp_remote_post( 'https://api.groq.com/openai/v1/chat/completions', array(
-            'timeout' => 30,
+            'timeout' => 45,
             'headers' => array(
                 'Authorization' => 'Bearer ' . $groq_key,
                 'Content-Type'  => 'application/json'
@@ -43186,51 +43635,60 @@ CRITICAL INSTRUCTIONS:
                     array( 'role' => 'system', 'content' => $system_prompt ),
                     array( 'role' => 'user', 'content' => $user_message )
                 ),
-                'temperature' => 0.3,
-                'max_tokens'  => 8192
+                'temperature' => 0.2,
+                'max_tokens'  => 16000
             ) )
         ) );
 
         if ( ! is_wp_error( $response ) ) {
-            $body = json_decode( wp_remote_retrieve_body( $response ), true );
-            if ( ! empty( $body['choices'][0]['message']['content'] ) ) {
-                $modified_html = trim( $body['choices'][0]['message']['content'] );
+            $code = wp_remote_retrieve_response_code( $response );
+            if ( $code === 200 ) {
+                $body = json_decode( wp_remote_retrieve_body( $response ), true );
+                if ( ! empty( $body['choices'][0]['message']['content'] ) ) {
+                    $modified_html = trim( $body['choices'][0]['message']['content'] );
+                }
             }
         }
     }
 
-    // Provider 2: Gemini API
+    // Provider 2: Gemini API (Gemini 1.5 Flash)
     if ( empty( $modified_html ) ) {
         $gemini_key = defined( 'CORA_PLATFORM_GEMINI_API_KEY' ) ? CORA_PLATFORM_GEMINI_API_KEY : ( defined( 'CORA_GEMINI_API_KEY' ) ? CORA_GEMINI_API_KEY : get_option( 'cora_gemini_api_key', '' ) );
         if ( ! empty( $gemini_key ) ) {
             $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' . $gemini_key;
             $response = wp_remote_post( $url, array(
-                'timeout' => 30,
+                'timeout' => 45,
                 'headers' => array( 'Content-Type' => 'application/json' ),
                 'body'    => json_encode( array(
                     'system_instruction' => array( 'parts' => array( array( 'text' => $system_prompt ) ) ),
                     'contents' => array(
                         array( 'role' => 'user', 'parts' => array( array( 'text' => $user_message ) ) )
                     ),
-                    'generationConfig' => array( 'temperature' => 0.3, 'maxOutputTokens' => 8192 )
+                    'generationConfig' => array(
+                        'temperature'     => 0.2,
+                        'maxOutputTokens' => 16000
+                    )
                 ) )
             ) );
 
             if ( ! is_wp_error( $response ) ) {
-                $body = json_decode( wp_remote_retrieve_body( $response ), true );
-                if ( ! empty( $body['candidates'][0]['content']['parts'][0]['text'] ) ) {
-                    $modified_html = trim( $body['candidates'][0]['content']['parts'][0]['text'] );
+                $code = wp_remote_retrieve_response_code( $response );
+                if ( $code === 200 ) {
+                    $body = json_decode( wp_remote_retrieve_body( $response ), true );
+                    if ( ! empty( $body['candidates'][0]['content']['parts'][0]['text'] ) ) {
+                        $modified_html = trim( $body['candidates'][0]['content']['parts'][0]['text'] );
+                    }
                 }
             }
         }
     }
 
-    // Provider 3: OpenAI API
+    // Provider 3: OpenAI API (GPT-4o-mini)
     if ( empty( $modified_html ) ) {
         $openai_key = defined( 'CORA_PLATFORM_OPENAI_API_KEY' ) ? CORA_PLATFORM_OPENAI_API_KEY : ( defined( 'CORA_OPENAI_API_KEY' ) ? CORA_OPENAI_API_KEY : get_option( 'cora_openai_api_key', '' ) );
         if ( ! empty( $openai_key ) ) {
             $response = wp_remote_post( 'https://api.openai.com/v1/chat/completions', array(
-                'timeout' => 30,
+                'timeout' => 45,
                 'headers' => array(
                     'Authorization' => 'Bearer ' . $openai_key,
                     'Content-Type'  => 'application/json'
@@ -43241,32 +43699,260 @@ CRITICAL INSTRUCTIONS:
                         array( 'role' => 'system', 'content' => $system_prompt ),
                         array( 'role' => 'user', 'content' => $user_message )
                     ),
-                    'temperature' => 0.3,
-                    'max_tokens'  => 8192
+                    'temperature' => 0.2,
+                    'max_tokens'  => 16000
                 ) )
             ) );
 
             if ( ! is_wp_error( $response ) ) {
-                $body = json_decode( wp_remote_retrieve_body( $response ), true );
-                if ( ! empty( $body['choices'][0]['message']['content'] ) ) {
-                    $modified_html = trim( $body['choices'][0]['message']['content'] );
+                $code = wp_remote_retrieve_response_code( $response );
+                if ( $code === 200 ) {
+                    $body = json_decode( wp_remote_retrieve_body( $response ), true );
+                    if ( ! empty( $body['choices'][0]['message']['content'] ) ) {
+                        $modified_html = trim( $body['choices'][0]['message']['content'] );
+                    }
                 }
             }
         }
     }
 
-    // Clean any accidental markdown code fences
+    // Clean any accidental markdown code fences from AI response
     if ( ! empty( $modified_html ) ) {
         if ( preg_match( '/```(?:html)?\s*([\s\S]*?)\s*```/i', $modified_html, $matches ) ) {
             $modified_html = trim( $matches[1] );
         }
     } else {
-        // Fallback intelligent targeted local modifications
+        // 4. Intelligent Deterministic Local Modifier Fallback
         $modified_html = $raw_html;
         $lower_instr = strtolower( $user_instruction );
+
+        // Fallback A: Form Injection / Embedding
+        if ( preg_match( '/(form|contact|lead|inquiry|consultation|quote|message|reach out|get in touch)/i', $lower_instr ) ) {
+            $form_bg = $is_dark ? 'bg-zinc-900 border-zinc-800 text-zinc-100' : 'bg-white border-zinc-200 text-zinc-900 shadow-sm';
+            $input_bg = $is_dark ? 'bg-zinc-800/80 border-zinc-700/80 text-zinc-100 placeholder-zinc-500' : 'bg-zinc-50 border-zinc-200 text-zinc-900 placeholder-zinc-400';
+            $btn_cls = $is_dark ? 'bg-white text-zinc-950 hover:bg-zinc-100' : 'bg-zinc-900 text-white hover:bg-zinc-800';
+            $section_bg = $is_dark ? 'bg-zinc-950/60 border-zinc-800/80' : 'bg-zinc-50/70 border-zinc-200/80';
+
+            $form_section_html = "\n<!-- Cora Workspace Lead Form Section -->\n"
+                . "<section class=\"cora-lead-section py-20 px-4 sm:px-6 lg:px-8 border-t {$section_bg}\" id=\"contact\">\n"
+                . "  <div class=\"max-w-3xl mx-auto text-center mb-10\">\n"
+                . "    <h2 class=\"text-3xl font-bold tracking-tight text-zinc-900 dark:text-white\">Get In Touch</h2>\n"
+                . "    <p class=\"mt-3 text-base text-zinc-600 dark:text-zinc-400\">Have a project in mind or want to learn more? Send us a message and our team will get back to you promptly.</p>\n"
+                . "  </div>\n"
+                . "  <div class=\"max-w-xl mx-auto {$form_bg} border {$detected_radius} p-6 sm:p-8\">\n"
+                . "    <form action=\"/wp-json/cora-canvas/v1/nextjs/forms/submit\" method=\"POST\" data-cora-form=\"{$matched_form_key}\" class=\"cora-lead-form space-y-4\">\n"
+                . "      <div>\n"
+                . "        <label class=\"block text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400 mb-1.5\">Full Name</label>\n"
+                . "        <input type=\"text\" name=\"name\" required placeholder=\"Jane Doe\" class=\"w-full px-4 py-2.5 rounded-xl border {$input_bg} text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 transition\" />\n"
+                . "      </div>\n"
+                . "      <div class=\"grid grid-cols-1 sm:grid-cols-2 gap-4\">\n"
+                . "        <div>\n"
+                . "          <label class=\"block text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400 mb-1.5\">Email Address</label>\n"
+                . "          <input type=\"email\" name=\"email\" required placeholder=\"jane@example.com\" class=\"w-full px-4 py-2.5 rounded-xl border {$input_bg} text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 transition\" />\n"
+                . "        </div>\n"
+                . "        <div>\n"
+                . "          <label class=\"block text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400 mb-1.5\">Phone Number</label>\n"
+                . "          <input type=\"tel\" name=\"phone\" placeholder=\"+1 (555) 000-0000\" class=\"w-full px-4 py-2.5 rounded-xl border {$input_bg} text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 transition\" />\n"
+                . "        </div>\n"
+                . "      </div>\n"
+                . "      <div>\n"
+                . "        <label class=\"block text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400 mb-1.5\">Project / Inquiry Details</label>\n"
+                . "        <textarea name=\"message\" rows=\"3\" required placeholder=\"Describe your project scope, timeline, and goals...\" class=\"w-full px-4 py-2.5 rounded-xl border {$input_bg} text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 transition resize-none\"></textarea>\n"
+                . "      </div>\n"
+                . "      <div class=\"pt-2\">\n"
+                . "        <button type=\"submit\" class=\"w-full py-3 px-6 rounded-xl {$btn_cls} text-sm font-semibold transition shadow-sm flex items-center justify-center gap-2\">\n"
+                . "          <span>Send Inquiry</span>\n"
+                . "          <svg width=\"15\" height=\"15\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><line x1=\"22\" y1=\"2\" x2=\"11\" y2=\"13\"></line><polygon points=\"22 2 15 22 11 13 2 9 22 2\"></polygon></svg>\n"
+                . "        </button>\n"
+                . "      </div>\n"
+                . "    </form>\n"
+                . "  </div>\n"
+                . "</section>\n";
+
+            if ( stripos( $modified_html, '<footer' ) !== false ) {
+                $modified_html = preg_replace( '/<footer\b/i', $form_section_html . "<footer", $modified_html, 1 );
+            } elseif ( stripos( $modified_html, '</body>' ) !== false ) {
+                $modified_html = str_ireplace( '</body>', $form_section_html . '</body>', $modified_html );
+            } else {
+                $modified_html .= $form_section_html;
+            }
+        }
+
+        // Fallback B: Testimonials Grid Injection
+        if ( preg_match( '/(testimonial|review|client story|social proof)/i', $lower_instr ) ) {
+            $t_bg = $is_dark ? 'bg-zinc-900/70 border-zinc-800' : 'bg-white border-zinc-200 shadow-sm';
+            $t_section_html = "\n<!-- Cora Testimonials Section -->\n"
+                . "<section class=\"cora-testimonials-section py-20 px-4 sm:px-6 lg:px-8 border-t border-zinc-200/80 dark:border-zinc-800/80\">\n"
+                . "  <div class=\"max-w-7xl mx-auto\">\n"
+                . "    <div class=\"text-center max-w-2xl mx-auto mb-14\">\n"
+                . "      <h2 class=\"text-3xl font-bold tracking-tight text-zinc-900 dark:text-white\">Trusted by Industry Leaders</h2>\n"
+                . "      <p class=\"mt-3 text-base text-zinc-600 dark:text-zinc-400\">See what clients have to say about partnering with our studio.</p>\n"
+                . "    </div>\n"
+                . "    <div class=\"grid grid-cols-1 md:grid-cols-3 gap-6\">\n"
+                . "      <div class=\"p-6 rounded-2xl border {$t_bg}\">\n"
+                . "        <div class=\"flex items-center gap-1 text-amber-400 mb-4\">★★★★★</div>\n"
+                . "        <p class=\"text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed mb-6\">\"The attention to detail and creative execution exceeded all our expectations. Our brand conversion jumped 40% immediately.\"</p>\n"
+                . "        <div class=\"flex items-center gap-3\">\n"
+                . "          <div class=\"w-10 h-10 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center font-bold text-xs\">RV</div>\n"
+                . "          <div><div class=\"text-sm font-semibold text-zinc-900 dark:text-white\">Rohan Verma</div><div class=\"text-xs text-zinc-500\">Founder, Apex Digital</div></div>\n"
+                . "        </div>\n"
+                . "      </div>\n"
+                . "      <div class=\"p-6 rounded-2xl border {$t_bg}\">\n"
+                . "        <div class=\"flex items-center gap-1 text-amber-400 mb-4\">★★★★★</div>\n"
+                . "        <p class=\"text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed mb-6\">\"Flawless execution from concept to deployment. Fast, responsive, and incredibly polished design aesthetic.\"</p>\n"
+                . "        <div class=\"flex items-center gap-3\">\n"
+                . "          <div class=\"w-10 h-10 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center font-bold text-xs\">KP</div>\n"
+                . "          <div><div class=\"text-sm font-semibold text-zinc-900 dark:text-white\">Kavya Patel</div><div class=\"text-xs text-zinc-500\">Creative Director, Lumina</div></div>\n"
+                . "        </div>\n"
+                . "      </div>\n"
+                . "      <div class=\"p-6 rounded-2xl border {$t_bg}\">\n"
+                . "        <div class=\"flex items-center gap-1 text-amber-400 mb-4\">★★★★★</div>\n"
+                . "        <p class=\"text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed mb-6\">\"A transformative partnership for our web presence. Clean code, sub-second load times, and effortless usability.\"</p>\n"
+                . "        <div class=\"flex items-center gap-3\">\n"
+                . "          <div class=\"w-10 h-10 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center font-bold text-xs\">AM</div>\n"
+                . "          <div><div class=\"text-sm font-semibold text-zinc-900 dark:text-white\">Aarav Mehta</div><div class=\"text-xs text-zinc-500\">Head of Growth, Nexa</div></div>\n"
+                . "        </div>\n"
+                . "      </div>\n"
+                . "    </div>\n"
+                . "  </div>\n"
+                . "</section>\n";
+
+            if ( stripos( $modified_html, '<footer' ) !== false ) {
+                $modified_html = preg_replace( '/<footer\b/i', $t_section_html . "<footer", $modified_html, 1 );
+            } elseif ( stripos( $modified_html, '</body>' ) !== false ) {
+                $modified_html = str_ireplace( '</body>', $t_section_html . '</body>', $modified_html );
+            } else {
+                $modified_html .= $t_section_html;
+            }
+        }
+
+        // Fallback C: Pricing Matrix Injection
+        if ( preg_match( '/(pricing|tier|plan|package)/i', $lower_instr ) ) {
+            $p_bg = $is_dark ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200 shadow-sm';
+            $p_feat = $is_dark ? 'bg-zinc-800/90 border-zinc-600' : 'bg-zinc-50 border-zinc-900 shadow-md';
+            $pricing_section_html = "\n<!-- Cora Pricing Matrix Section -->\n"
+                . "<section class=\"cora-pricing-section py-20 px-4 sm:px-6 lg:px-8 border-t border-zinc-200/80 dark:border-zinc-800/80\" id=\"pricing\">\n"
+                . "  <div class=\"max-w-7xl mx-auto\">\n"
+                . "    <div class=\"text-center max-w-2xl mx-auto mb-14\">\n"
+                . "      <h2 class=\"text-3xl font-bold tracking-tight text-zinc-900 dark:text-white\">Transparent, Value-Driven Plans</h2>\n"
+                . "      <p class=\"mt-3 text-base text-zinc-600 dark:text-zinc-400\">Choose the right tier to scale your vision with zero hidden fees.</p>\n"
+                . "    </div>\n"
+                . "    <div class=\"grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch\">\n"
+                . "      <div class=\"p-8 rounded-2xl border {$p_bg} flex flex-col justify-between\">\n"
+                . "        <div>\n"
+                . "          <h3 class=\"text-lg font-bold text-zinc-900 dark:text-white\">Starter</h3>\n"
+                . "          <p class=\"text-xs text-zinc-500 mt-1\">Essential foundation for new projects.</p>\n"
+                . "          <div class=\"my-6 text-3xl font-extrabold text-zinc-900 dark:text-white\">\$49 <span class=\"text-xs font-normal text-zinc-500\">/mo</span></div>\n"
+                . "          <ul class=\"space-y-3 text-xs text-zinc-600 dark:text-zinc-300\">\n"
+                . "            <li>✓ 1 Active Workspace</li>\n"
+                . "            <li>✓ Standard Design System</li>\n"
+                . "            <li>✓ Community Support</li>\n"
+                . "          </ul>\n"
+                . "        </div>\n"
+                . "        <button class=\"mt-8 w-full py-2.5 rounded-xl border border-zinc-300 dark:border-zinc-700 text-xs font-semibold hover:bg-zinc-100 dark:hover:bg-zinc-800 transition\">Get Started</button>\n"
+                . "      </div>\n"
+                . "      <div class=\"p-8 rounded-2xl border {$p_feat} flex flex-col justify-between relative ring-1 ring-zinc-900/10 dark:ring-white/20\">\n"
+                . "        <div class=\"absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 text-[10px] font-bold uppercase tracking-wider\">Most Popular</div>\n"
+                . "        <div>\n"
+                . "          <h3 class=\"text-lg font-bold text-zinc-900 dark:text-white\">Professional</h3>\n"
+                . "          <p class=\"text-xs text-zinc-500 mt-1\">Full-stack power for growing studios.</p>\n"
+                . "          <div class=\"my-6 text-3xl font-extrabold text-zinc-900 dark:text-white\">\$149 <span class=\"text-xs font-normal text-zinc-500\">/mo</span></div>\n"
+                . "          <ul class=\"space-y-3 text-xs text-zinc-600 dark:text-zinc-300\">\n"
+                . "            <li>✓ Up to 10 Workspaces</li>\n"
+                . "            <li>✓ AI HTML Engine & Next.js Export</li>\n"
+                . "            <li>✓ Custom Domain & SSL</li>\n"
+                . "            <li>✓ Priority 24/7 SLA Support</li>\n"
+                . "          </ul>\n"
+                . "        </div>\n"
+                . "        <button class=\"mt-8 w-full py-2.5 rounded-xl bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 text-xs font-semibold hover:opacity-90 transition\">Start Free Trial</button>\n"
+                . "      </div>\n"
+                . "      <div class=\"p-8 rounded-2xl border {$p_bg} flex flex-col justify-between\">\n"
+                . "        <div>\n"
+                . "          <h3 class=\"text-lg font-bold text-zinc-900 dark:text-white\">Enterprise</h3>\n"
+                . "          <p class=\"text-xs text-zinc-500 mt-1\">Bespoke infrastructure for scaling agencies.</p>\n"
+                . "          <div class=\"my-6 text-3xl font-extrabold text-zinc-900 dark:text-white\">\$399 <span class=\"text-xs font-normal text-zinc-500\">/mo</span></div>\n"
+                . "          <ul class=\"space-y-3 text-xs text-zinc-600 dark:text-zinc-300\">\n"
+                . "            <li>✓ Unlimited Workspaces & Seats</li>\n"
+                . "            <li>✓ Dedicated API Cluster</li>\n"
+                . "            <li>✓ Custom Integrations & Webhooks</li>\n"
+                . "          </ul>\n"
+                . "        </div>\n"
+                . "        <button class=\"mt-8 w-full py-2.5 rounded-xl border border-zinc-300 dark:border-zinc-700 text-xs font-semibold hover:bg-zinc-100 dark:hover:bg-zinc-800 transition\">Contact Sales</button>\n"
+                . "      </div>\n"
+                . "    </div>\n"
+                . "  </div>\n"
+                . "</section>\n";
+
+            if ( stripos( $modified_html, '<footer' ) !== false ) {
+                $modified_html = preg_replace( '/<footer\b/i', $pricing_section_html . "<footer", $modified_html, 1 );
+            } elseif ( stripos( $modified_html, '</body>' ) !== false ) {
+                $modified_html = str_ireplace( '</body>', $pricing_section_html . '</body>', $modified_html );
+            } else {
+                $modified_html .= $pricing_section_html;
+            }
+        }
+
+        // Fallback D: FAQ Accordion Injection
+        if ( preg_match( '/(faq|accordion|frequently asked|questions)/i', $lower_instr ) ) {
+            $faq_bg = $is_dark ? 'bg-zinc-900/60 border-zinc-800' : 'bg-white border-zinc-200 shadow-sm';
+            $faq_section_html = "\n<!-- Cora FAQ Accordion Section -->\n"
+                . "<section class=\"cora-faq-section py-20 px-4 sm:px-6 lg:px-8 border-t border-zinc-200/80 dark:border-zinc-800/80\" id=\"faq\">\n"
+                . "  <div class=\"max-w-3xl mx-auto\">\n"
+                . "    <div class=\"text-center mb-12\">\n"
+                . "      <h2 class=\"text-3xl font-bold tracking-tight text-zinc-900 dark:text-white\">Frequently Asked Questions</h2>\n"
+                . "      <p class=\"mt-3 text-base text-zinc-600 dark:text-zinc-400\">Find quick answers to common questions about our platform and services.</p>\n"
+                . "    </div>\n"
+                . "    <div class=\"space-y-4\">\n"
+                . "      <details class=\"group p-6 rounded-2xl border {$faq_bg} transition\">\n"
+                . "        <summary class=\"flex justify-between items-center font-semibold text-sm text-zinc-900 dark:text-white cursor-pointer list-none\">\n"
+                . "          <span>How does the Lead Form integration work?</span>\n"
+                . "          <span class=\"text-zinc-400 group-open:rotate-180 transition-transform\">↓</span>\n"
+                . "        </summary>\n"
+                . "        <p class=\"mt-3 text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed\">Forms submit asynchronously via our REST endpoint straight into your Cora workspace lead CRM, with real-time email alerts and notification logs.</p>\n"
+                . "      </details>\n"
+                . "      <details class=\"group p-6 rounded-2xl border {$faq_bg} transition\">\n"
+                . "        <summary class=\"flex justify-between items-center font-semibold text-sm text-zinc-900 dark:text-white cursor-pointer list-none\">\n"
+                . "          <span>Can I export this template to Next.js or static HTML?</span>\n"
+                . "          <span class=\"text-zinc-400 group-open:rotate-180 transition-transform\">↓</span>\n"
+                . "        </summary>\n"
+                . "        <p class=\"mt-3 text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed\">Yes, Cora supports 1-click Headless Next.js export with SSG optimization, dynamic manifest routes, and tailored styling tokens.</p>\n"
+                . "      </details>\n"
+                . "      <details class=\"group p-6 rounded-2xl border {$faq_bg} transition\">\n"
+                . "        <summary class=\"flex justify-between items-center font-semibold text-sm text-zinc-900 dark:text-white cursor-pointer list-none\">\n"
+                . "          <span>Is the design system fully responsive and accessible?</span>\n"
+                . "          <span class=\"text-zinc-400 group-open:rotate-180 transition-transform\">↓</span>\n"
+                . "        </summary>\n"
+                . "        <p class=\"mt-3 text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed\">Every component is engineered according to the Cora Monochromatic Design System with full WCAG AA contrast standards and mobile touch ergonomics.</p>\n"
+                . "      </details>\n"
+                . "    </div>\n"
+                . "  </div>\n"
+                . "</section>\n";
+
+            if ( stripos( $modified_html, '<footer' ) !== false ) {
+                $modified_html = preg_replace( '/<footer\b/i', $faq_section_html . "<footer", $modified_html, 1 );
+            } elseif ( stripos( $modified_html, '</body>' ) !== false ) {
+                $modified_html = str_ireplace( '</body>', $faq_section_html . '</body>', $modified_html );
+            } else {
+                $modified_html .= $faq_section_html;
+            }
+        }
+
+        // Fallback E: Theme Toggle & Colors
         if ( strpos( $lower_instr, 'dark' ) !== false ) {
             $modified_html = str_replace( 'background: #f6f7f9;', 'background: #09090b; color: #f4f4f5;', $modified_html );
             $modified_html = str_replace( 'background: #ffffff;', 'background: #18181b; color: #f4f4f5; border-color: #27272a;', $modified_html );
+            if ( stripos( $modified_html, 'class="html' ) === false && stripos( $modified_html, '<html class="dark"' ) === false ) {
+                $modified_html = str_ireplace( '<html', '<html class="dark"', $modified_html );
+            }
+        }
+
+        // Fallback F: Sticky Header
+        if ( preg_match( '/(sticky|header|nav bar|navbar)/i', $lower_instr ) ) {
+            if ( preg_match( '/<header\b([^>]*)class="([^"]*)"/i', $modified_html ) ) {
+                $modified_html = preg_replace( '/<header\b([^>]*)class="([^"]*)"/i', '<header$1class="$2 sticky top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-zinc-950/80 border-b border-zinc-200/50 dark:border-zinc-800/50"', $modified_html, 1 );
+            } elseif ( preg_match( '/<nav\b([^>]*)class="([^"]*)"/i', $modified_html ) ) {
+                $modified_html = preg_replace( '/<nav\b([^>]*)class="([^"]*)"/i', '<nav$1class="$2 sticky top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-zinc-950/80 border-b border-zinc-200/50 dark:border-zinc-800/50"', $modified_html, 1 );
+            }
         }
     }
 
@@ -43283,6 +43969,7 @@ CRITICAL INSTRUCTIONS:
 }
 }
 add_action( 'wp_ajax_cora_ajax_ai_modify_html', 'cora_ajax_canvas_ai_modify_html' );
+add_action( 'wp_ajax_cora_canvas_ai_modify_html', 'cora_ajax_canvas_ai_modify_html' );
 
 // 5. AJAX: AI Page Optimizer & Core Web Vitals Audit
 if ( ! function_exists( 'cora_ajax_canvas_ai_optimize_page' ) ) {
