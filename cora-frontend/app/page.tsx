@@ -14,7 +14,7 @@ import { FAQSection } from '@/components/faq/FAQSection';
 
 export const metadata: Metadata = {
   title: { absolute: 'Cora — Build Your Website with an AI Co-Founder' },
-  description: 'Build your website with an AI co-founder. Create websites with Cora, and manage leads, forms, emails, finances, media, docs, and sheets in the same workspace.',
+  description: 'Build your website with an AI co-founder. Create websites, and manage leads, forms, emails, finances, media, docs, and sheets in the same workspace.',
   alternates: { canonical: 'https://heycora.in/' },
 };
 

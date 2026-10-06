@@ -150,7 +150,7 @@ export function Hero() {
 
           {/* Subtitle */}
           <p className="w-full max-w-[720px] text-center text-zinc-700 text-sm sm:text-base md:text-lg font-normal font-sans leading-relaxed sm:leading-7 px-2">
-            Create websites with Cora, and manage leads, forms, emails, finances, media, docs, and sheets in the same workspace.
+            Create websites, and manage leads, forms, emails, finances, media, docs, and sheets in the same workspace.
           </p>
 
         </div>
