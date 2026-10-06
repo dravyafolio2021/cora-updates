@@ -127,22 +127,23 @@ export function Hero() {
         <div className="hero-anim-item flex flex-col items-center max-w-[960px] gap-3.5 sm:gap-4.5">
           
           {/* Headline */}
-          <h1 className="font-display text-[2.25rem] xs:text-[2.65rem] sm:text-5xl md:text-[62px] font-semibold text-zinc-950 leading-[1.12] sm:leading-[1.08] md:leading-[70px] tracking-[-0.035em] flex flex-col items-center justify-center gap-1.5 sm:gap-2 text-center">
-            <div className="inline-flex items-center justify-center flex-wrap gap-2 sm:gap-3">
-              <span>Build your website with an</span>
-              <span className="inline-flex items-center align-middle whitespace-nowrap gap-1.5 sm:gap-2.5">
+          <h1 className="font-display text-[2.25rem] xs:text-[2.65rem] sm:text-5xl md:text-[62px] font-semibold text-zinc-950 leading-[1.15] sm:leading-[1.10] md:leading-[72px] tracking-[-0.035em] flex flex-col items-center justify-center gap-1 sm:gap-2 text-center">
+            <span>Build your website</span>
+            <div className="inline-flex items-center justify-center flex-wrap gap-2 sm:gap-2.5">
+              <span>with an</span>
+              <span className="inline-flex items-center align-middle whitespace-nowrap gap-1.5 sm:gap-2">
                 <span
                   ref={badgeRef}
-                  className="relative inline-flex items-center justify-center w-10 h-10 xs:w-11 xs:h-11 sm:w-14 sm:h-14 md:w-[58px] md:h-[58px] shrink-0 self-center transition-transform duration-300 hover:scale-105"
+                  className="relative inline-flex items-center justify-center w-9 h-9 xs:w-10 xs:h-10 sm:w-13 sm:h-13 md:w-[54px] md:h-[54px] shrink-0 self-center transition-transform duration-300 hover:scale-105"
                 >
                   <Image
                     src="/images/cora_3d_ai_badge.png"
-                    alt="3D AI Badge"
+                    alt="AI Badge"
                     fill
                     className="object-contain rounded-xl sm:rounded-2xl shadow-[0px_6px_14px_rgba(0,0,0,0.12)]"
                   />
                 </span>
-                <span>AI co-founder.</span>
+                <span>co-founder.</span>
               </span>
             </div>
           </h1>
