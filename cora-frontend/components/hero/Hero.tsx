@@ -124,33 +124,32 @@ export function Hero() {
         </div>
 
         {/* 2. Main Display Headline & Subtitle */}
-        <div className="hero-anim-item flex flex-col items-center max-w-[940px] gap-3 sm:gap-4">
+        <div className="hero-anim-item flex flex-col items-center max-w-[960px] gap-3.5 sm:gap-4.5">
           
           {/* Headline */}
-          <h1 className="font-display text-[2.1rem] xs:text-[2.45rem] sm:text-5xl md:text-[58px] font-semibold text-zinc-950 leading-[1.12] sm:leading-[1.10] md:leading-[68px] tracking-[-0.035em] flex flex-col items-center justify-center gap-1.5 sm:gap-2">
+          <h1 className="font-display text-[2.25rem] xs:text-[2.65rem] sm:text-5xl md:text-[62px] font-semibold text-zinc-950 leading-[1.12] sm:leading-[1.08] md:leading-[70px] tracking-[-0.035em] flex flex-col items-center justify-center gap-1.5 sm:gap-2 text-center">
             <div className="inline-flex items-center justify-center flex-wrap gap-2 sm:gap-3">
-              <span>Your</span>
-              <div
-                ref={badgeRef}
-                className="relative inline-flex items-center justify-center w-11 h-11 xs:w-12 xs:h-12 sm:w-15 sm:h-15 md:w-[64px] md:h-[64px] shrink-0 self-center transition-transform duration-300 hover:scale-105"
-              >
-                <Image
-                  src="/images/cora_3d_ai_badge.png"
-                  alt="3D AI Badge"
-                  fill
-                  className="object-contain rounded-xl sm:rounded-2xl shadow-[0px_6px_14px_rgba(0,0,0,0.12)]"
-                />
-              </div>
-              <span>Cofounder with</span>
-            </div>
-            <div className="text-center px-1">
-              Website, Forms &amp; Finance....
+              <span>Build your website with an</span>
+              <span className="inline-flex items-center align-middle whitespace-nowrap gap-1.5 sm:gap-2.5">
+                <span
+                  ref={badgeRef}
+                  className="relative inline-flex items-center justify-center w-10 h-10 xs:w-11 xs:h-11 sm:w-14 sm:h-14 md:w-[58px] md:h-[58px] shrink-0 self-center transition-transform duration-300 hover:scale-105"
+                >
+                  <Image
+                    src="/images/cora_3d_ai_badge.png"
+                    alt="3D AI Badge"
+                    fill
+                    className="object-contain rounded-xl sm:rounded-2xl shadow-[0px_6px_14px_rgba(0,0,0,0.12)]"
+                  />
+                </span>
+                <span>AI co-founder.</span>
+              </span>
             </div>
           </h1>
 
           {/* Subtitle */}
-          <p className="w-full max-w-[640px] text-center text-zinc-700 text-sm sm:text-base md:text-lg font-normal font-sans leading-relaxed sm:leading-7 px-2">
-            Deliver branded client portals, automate 18% GST invoices, and close contracts on autopilot—all in one place.
+          <p className="w-full max-w-[720px] text-center text-zinc-700 text-sm sm:text-base md:text-lg font-normal font-sans leading-relaxed sm:leading-7 px-2">
+            Create websites with Cora, and manage leads, forms, emails, finances, media, docs, and sheets in the same workspace.
           </p>
 
         </div>
@@ -159,13 +158,13 @@ export function Hero() {
         <div className="hero-anim-item flex flex-col items-center gap-4 sm:gap-6 w-full">
           
           {/* Dual Buttons */}
-          <div className="flex items-center justify-center gap-3 sm:gap-4 flex-col sm:flex-row w-full max-w-[340px] sm:max-w-none">
+          <div className="flex items-center justify-center gap-3 sm:gap-4 flex-col sm:flex-row w-full max-w-[360px] sm:max-w-none">
             
             {/* Primary CTA: Sign up with Google */}
             <a
               href="https://app.heycora.in/workspace/login?source=hero_google_cta"
               onClick={handleGoogleSignup}
-              className="px-6 sm:px-10 py-3 sm:py-2.5 bg-zinc-950 text-white rounded-xl shadow-[0px_1px_2px_0px_rgba(0,0,0,0.08)] shadow-[0px_4px_14px_-2px_rgba(0,0,0,0.16)] outline outline-1 outline-offset-[-1px] outline-white/15 flex items-center justify-center gap-2.5 hover:bg-zinc-800 transition-all hover:-translate-y-0.5 active:translate-y-0 w-full sm:w-auto shrink-0"
+              className="px-6 sm:px-8 py-3 sm:py-2.5 bg-zinc-950 text-white rounded-xl shadow-[0px_1px_2px_0px_rgba(0,0,0,0.08)] shadow-[0px_4px_14px_-2px_rgba(0,0,0,0.16)] outline outline-1 outline-offset-[-1px] outline-white/15 flex items-center justify-center gap-2.5 hover:bg-zinc-800 transition-all hover:-translate-y-0.5 active:translate-y-0 w-full sm:w-auto shrink-0"
             >
               {/* Official Google Icon */}
               <div className="w-5 h-5 flex items-center justify-center shrink-0">
@@ -181,13 +180,12 @@ export function Hero() {
               </span>
             </a>
 
-            {/* Secondary CTA: Connect with founder */}
+            {/* Secondary CTA: Explore free templates */}
             <a
-              href="mailto:dravya.bansal@heycora.in?subject=Connecting%20with%20Cora%20Founder"
-              onClick={handleFounderClick}
-              className="px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl flex items-center justify-center gap-1.5 text-zinc-950 text-sm sm:text-base font-medium font-sans leading-6 hover:bg-white/40 transition-colors"
+              href="https://app.heycora.in/workspace/login?redirect_to=canvas&source=hero_explore_templates"
+              className="px-5 sm:px-6 py-2.5 sm:py-2.5 rounded-xl flex items-center justify-center gap-1.5 text-zinc-950 text-sm sm:text-base font-semibold font-sans leading-6 bg-white/80 hover:bg-white border border-zinc-200/80 shadow-xs hover:border-zinc-300 transition-all hover:-translate-y-0.5 active:translate-y-0 w-full sm:w-auto"
             >
-              <span>Connect with founder</span>
+              <span>Explore free templates</span>
               <ChevronRight className="w-4 h-4 text-zinc-950" />
             </a>
 

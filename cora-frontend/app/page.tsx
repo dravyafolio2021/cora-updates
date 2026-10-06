@@ -13,8 +13,8 @@ import { TestimonialsSection } from '@/components/testimonials/TestimonialsSecti
 import { FAQSection } from '@/components/faq/FAQSection';
 
 export const metadata: Metadata = {
-  title: { absolute: 'Cora — The AI Co-Founder for Agencies' },
-  description: 'Meet Cora (Co-founder for Operations, Revenue & Automation). The autonomous AI co-founder for agencies and service businesses—running proposals, SHA-256 contracts, 18% GST invoices, crew dispatch, and client delivery on autopilot.',
+  title: { absolute: 'Cora — Build Your Website with an AI Co-Founder' },
+  description: 'Build your website with an AI co-founder. Create websites with Cora, and manage leads, forms, emails, finances, media, docs, and sheets in the same workspace.',
   alternates: { canonical: 'https://heycora.in/' },
 };
 
