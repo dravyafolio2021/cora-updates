@@ -1,4 +1,4 @@
-# Cora Platform — Developer Feature & Optimization Guide (v4.9.357)
+# Cora Platform — Developer Feature & Optimization Guide (v4.9.364)
 
 This guide defines the standardized architectural patterns, blueprints, and performance guidelines for engineering new modules and extending features across the Cora SaaS Workspace (`app/public/wp-content/plugins/cora-workspace`) and Marketing Frontend (`cora-frontend`).
 
@@ -83,6 +83,12 @@ This guide defines the standardized architectural patterns, blueprints, and perf
 72. **Super Admin Multi-Tenancy Action Button Portaling & Launch Routing (v4.9.343)**: Multi-tenant action buttons in Super Admin tables must portal dialogs to `document.body` to avoid container clipping and z-index traps, pairing with clean URL routing (`/workspace/dashboard?agency_id={id}&industry={type}`) for launching specific tenant workspaces.
 73. **Universal In-App PWA Install Trigger Architecture (v4.9.342)**: PWA installation prompts must be exposed programmatically in two strategic touchpoints: the System Settings Suite install card and the sticky sidebar admin popover. Prompts must hook the `beforeinstallprompt` event and support manual fallback guides for iOS Safari WebClips.
 74. **Admin Role Quota & Session Timeout Exemption Standard (v4.9.339)**: Administrative accounts (`current_user_can('manage_options')`) are exempt from artificial 6-hour session timeouts and rate limit throttles, ensuring continuous access during deep administrative configuration and tenant maintenance.
+75. **AI Run Quota Standardization & Fair Usage Pacing (v4.9.364)**: Standardize monthly quotas across tiers (Starter: 500, Pro: 15,000, Scale: 25,000 runs/mo) with weekly soft-limit throttling (`ceil($monthly_quota / 4)`: Pro 3,750/wk, Scale 6,250/wk) to prevent quota burnout while granting Super Admins complete bypass and continuous quota monitoring.
+76. **Endorsely Affiliate & Conversion Tracking Suite (v4.9.364)**: Platform-wide integration of Endorsely affiliate tracking script (`https://app.endorsely.com/assets/affiliate-tracking.js`, Affiliate ID: `d56e72c8-89fa-47cb-bc87-920aa9e3a6bb`) across frontend layouts and checkout flows, triggering `window.endorsely?.trackConversion()` upon successful payment verification.
+77. **Live HTML Preview Resilience Shield & Auto-Tailwind Injection (v4.9.358 - v4.9.359)**: Automatically inject the Tailwind CSS CDN script (`https://cdn.tailwindcss.com`) into preview iframes and exported static bundles if missing, wrapping preview DOM in error boundaries to eliminate blank sections.
+78. **Unified 'Edit with AI' Toolbar Architecture (v4.9.362)**: Consolidate fragmented AI editing triggers in the Live Code Editor into a unified, high-visibility "Edit with AI" action bar with context-aware prompts and instant diff previewing.
+79. **Workspace Forms Embedding Suite & Dynamic Form Interoperability (v4.9.361)**: Support embedding dynamic Cora lead capture forms into Canvas landing page themes using `[cora-form id="..."]` shortcodes or `<iframe src="...">` embed codes with responsive height autosizing and AJAX submission handling.
+80. **Live Static Site Styling Parity & CSS Scope Containment (v4.9.363)**: Guarantee 100% styling parity between preview iframes and published static sites by encapsulating Tailwind styles and preventing host stylesheet leakage.
 
 ---
 ---
@@ -926,4 +932,40 @@ When presenting editor drawers and template settings:
 
 ---
 
-*Cora Developer Feature Guide v4.9.357 — Last updated: October 2026.*
+## 43. AI Run Quota Pacing, Fair Usage Architecture & Super Admin Bypass (`cora-workspace.php`)
+
+When managing conversational and tool-calling AI token allowances:
+1. **Tier Allocation**:
+   - Free / Starter: 500 runs/month (weekly pacing: 125 runs/week)
+   - Pro: 15,000 runs/month (weekly soft limit: 3,750 runs/week)
+   - Scale: 25,000 runs/month (weekly soft limit: 6,250 runs/week)
+2. **Anti-Burnout Pacing**:
+   - Soft throttling checks warning thresholds at `ceil($monthly_quota / 4)` to notify agencies before depleting monthly pools early.
+3. **Super Admin Unrestricted Access**:
+   - Super Admins and users with `manage_options` bypass all rate limiting, session timeouts, and AI quotas.
+
+---
+
+## 44. Platform-Wide Affiliate & Conversion Tracking Suite (`Endorsely`)
+
+When attributing partner referrals across the marketing site and workspace checkout:
+1. **High-Speed CDN Loading**:
+   - Injected in root Next.js layout (`cora-frontend/app/layout.tsx`) using `https://app.endorsely.com/assets/affiliate-tracking.js` with defer loading.
+2. **Checkout Conversion Bridge**:
+   - Dispatches conversion events on verified Razorpay payments with order ID, monetary value, and customer email.
+
+---
+
+## 45. Live HTML Preview Resilience Shield & Workspace Forms Embedding (`view-canvas.php`)
+
+When rendering and embedding custom landing pages:
+1. **Automatic Tailwind CSS CDN Injection**:
+   - Injects `<script src="https://cdn.tailwindcss.com"></script>` into preview frames and static distribution bundles if Tailwind classes are detected without existing stylesheets.
+2. **Iframe Error Boundary**:
+   - Catches broken scripts, eliminating blank screen freezes.
+3. **Dynamic Forms Shortcode & Iframe Generator**:
+   - Supports `[cora-form id="..."]` shortcodes and responsive `<iframe src="...">` embeds with instant CRM lead pipeline routing.
+
+---
+
+*Cora Developer Feature Guide v4.9.364 — Last updated: October 2026.*

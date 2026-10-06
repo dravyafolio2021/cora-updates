@@ -1,7 +1,7 @@
 # Cora Platform — Comprehensive Platform & Onboarding Strategic Brief
 > **Target Audience for this Document**: AI Product & Growth Strategist Agent  
 > **Objective**: Comprehensive platform architectural overview, feature breakdown, and onboarding evaluation brief to formulate optimal user onboarding, product activation, and launch strategies for Cora.  
-> **Platform Version**: `v4.9.357` | **Date**: October 2026
+> **Platform Version**: `v4.9.364` | **Date**: October 2026
 
 ---
 
@@ -47,6 +47,10 @@ Cora consolidates the entire agency lifecycle into a single, unified, white-labe
 24. **Turnkey Official ChatGPT Plugin & Remote MCP 3.0.1 Package**: `cora-chatgpt-plugin/` distribution containing `ai-plugin.json`, hardened OpenAPI 3.0.1 specifications for 28 curated tools adhering strictly to ChatGPT Custom GPT Actions parameter validation (zero emojis in descriptions, non-empty properties objects, omitted empty required arrays), and prompt definitions.
 25. **Super Admin Dynamic PWA Badging & Action Restoration**: Dynamic `ADMIN` badge rendering across 512/192/Apple/Favicon icons for Super Admins, role-scoped Web App Manifest (`CORA Workspace (Admin)`), and Super Admin workspace action button portaling to `document.body` with seamless launch routing restoration.
 26. **Standardized Canvas Drawers & Live Action Playground**: Unified `.cora-drawer` slide-in sheets across the Canvas Template Editor with background scroll lock (`body.cora-canvas-drawer-open`), event listener recovery, and an integrated AI Tools MCP Gateway & Live Action Playground (`nl`, `guided`, `dev` modes) for live tool testing and 1-click code reflection.
+27. **AI Run Quota Standardization & Fair Usage Pacing (v4.9.364)**: Standardized monthly quotas (Pro: 15,000 runs/mo, Scale: 25,000 runs/mo) with weekly soft-limit throttling (3,750 Pro / 6,250 Scale runs/week), Super Admin rate-limit bypass, and session lock elimination.
+28. **Endorsely Affiliate & Referral Tracking Suite (v4.9.364)**: Platform-wide Endorsely tracking (`app.endorsely.com/assets/affiliate-tracking.js`) with dynamic conversion attribution on verified payments, seamless INR/USD checkout sheets, and automatic 18% GST calculation.
+29. **Canvas Live HTML Preview Resilience Shield & Auto-Tailwind (v4.9.358 - v4.9.363)**: Auto-Tailwind CDN injection, error boundaries, zero blank sections guarantee, postMessage sync, and live static site styling parity.
+30. **Unified AI Editor & Workspace Forms Embedding Suite (v4.9.360 - v4.9.362)**: Unified 'Edit with AI' toolbar action in Live Code Editor, streamlined minimalist toolbar without viewport switchers, and `[cora-form id="..."]` / iframe generator to embed dynamic lead capture forms in static pages.
 
 ---
 

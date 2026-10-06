@@ -1,8 +1,8 @@
-# Cora Platform — Canvas & Frontend Module Documentation (v4.9.357)
+# Cora Platform — Canvas & Frontend Module Documentation (v4.9.364)
 
 ## Section 1: Overview & Multi-Engine Architecture
 
-Cora Canvas is a unified frontend website and theme creation engine providing a 100% white-labeled builder experience for agencies and workspace owners. Hardened through **v4.9.357**, Canvas operates across five core architectural engines:
+Cora Canvas is a unified frontend website and theme creation engine providing a 100% white-labeled builder experience for agencies and workspace owners. Hardened through **v4.9.364**, Canvas operates across five core architectural engines:
 
 1. **Engine A: Elementor White-Labeled Engine**: Wraps native Elementor in a sandboxed, two-row monochromatic toolbar (`cora-elementor-reskin.js` and `.css`), stripping out all WordPress headers, admin bars, upsell notices, and third-party references.
 2. **Engine B: Visual HTML Canvas Engine (Lovable-Compatible)**: In-browser visual HTML editor rendering semantic HTML5/Tailwind inside an isolated sandboxed iframe (`#cora-html-canvas-iframe`) with inline `contenteditable` editing, media inventory scanning, 1-click image swapping, code-split editing, URL edit state persistence, and AI rewriting.
@@ -677,4 +677,76 @@ Clicking `📥 Apply to Live Editor` immediately pipes tool-generated HTML into 
 
 ---
 
-*Cora Canvas Documentation v4.9.357 — Last updated: October 2026.*
+## Section 20: Live HTML Preview Resilience Shield & Auto-Tailwind Injection (v4.9.358 - v4.9.359)
+
+### 20.1 Automatic Tailwind CSS CDN Injection
+When rendering live HTML previews in `#cora-html-canvas-iframe` or exporting static bundles, the compiler scans the document markup. If Tailwind utility classes are detected without an active stylesheet link or compilation pipeline, the engine dynamically injects:
+```html
+<script src="https://cdn.tailwindcss.com"></script>
+```
+into the document `<head>`. This ensures all utility classes (gradients, flex layouts, typography, shadows) render with 100% fidelity without requiring Node.js build processes.
+
+### 20.2 Iframe Error Boundary & Zero Blank Section Fallback
+Preview iframes are guarded by runtime error boundaries. If an embedded JavaScript component, third-party widget, or broken SVG fails to parse, the resilience shield isolates the broken node and renders a graceful placeholder, completely eliminating blank screen freezes and whiteout errors.
+
+### 20.3 PostMessage Live State Synchronization
+The parent workspace and preview iframe exchange DOM state changes through a bidirectional `window.postMessage` bridge. Modifications made in the CodeMirror editor or visual customizer update the live DOM instantaneously without full iframe reloads.
+
+---
+
+## Section 21: Streamlined Live Code Editor Header (v4.9.360)
+
+### 21.1 Removal of Viewport Switcher Clutter
+Redundant portrait and viewport switcher controls have been removed from the Live Code Editor header bar. This creates a clean, distraction-free environment maximizing horizontal and vertical space for code editing and live preview verification.
+
+### 21.2 Monochromatic Control Clusters
+Controls are organized into logical, high-contrast clusters:
+- **Left Cluster**: Theme Title, Active File Chip (`index.html`), and Status Badge.
+- **Center Cluster**: Unified "Edit with AI" action bar.
+- **Right Cluster**: Live Preview Toggle, Save & Publish CTA, and External Tab Launch.
+
+---
+
+## Section 22: Workspace Forms Embedding Suite & Dynamic Lead Bridge (v4.9.361)
+
+### 22.1 Universal Form Embedding Shortcodes & Iframes
+Agencies can easily embed any active Form AI Architect lead form into Canvas landing pages:
+- **Shortcode Format**: `[cora-form id="{form_id}" theme="light"]`
+- **Responsive Iframe Embed**:
+  ```html
+  <iframe 
+    src="https://app.heycora.in/workspace/forms/embed?id={form_id}" 
+    class="w-full border-0 rounded-2xl min-h-[480px]" 
+    loading="lazy">
+  </iframe>
+  ```
+
+### 22.2 Automatic CRM Ingestion & Attribution
+Submissions through embedded forms are automatically captured by the central CRM lead engine (`wp_cora_leads`), attributing the source theme and landing page path while dispatching instant in-app and PWA push notifications.
+
+---
+
+## Section 23: Unified "Edit with AI" Toolbar Action (v4.9.362)
+
+### 23.1 Consolidated Action Pipeline
+Multiple fragmented AI editing triggers in the Live Code Editor have been consolidated into a unified "Edit with AI" action bar. Developers can enter targeted natural language instructions:
+- "Add a testimonial grid with 3 client reviews"
+- "Update pricing table to quarterly billing with a 20% discount badge"
+- "Make the hero call-to-action button high-contrast black with subtle hover animation"
+
+### 23.2 Instant Diff Preview & 1-Click Code Apply
+The AI pipeline evaluates the existing DOM structure, generates target code diffs, highlights proposed modifications, and allows 1-click application directly into the CodeMirror editor buffer.
+
+---
+
+## Section 24: Live Static Site Styling Parity & CSS Scope Containment (v4.9.363)
+
+### 24.1 100% Visual Parity Guarantee
+Guarantees that CSS resets, typography rendering, and responsive media queries behave identically between the local editor preview iframe and the exported production static distribution (`out/`, `dist/`).
+
+### 24.2 Host Stylesheet Encapsulation
+Enforces strict CSS containment on preview iframes, preventing WordPress admin styles or workspace dashboard utilities from leaking into the sandboxed website DOM.
+
+---
+
+*Cora Canvas Documentation v4.9.364 — Last updated: October 2026.*

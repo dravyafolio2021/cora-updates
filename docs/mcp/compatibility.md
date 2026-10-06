@@ -141,3 +141,7 @@ Integrated in **v4.9.351** directly within the Canvas Template Editor:
 - **Guided Actions Mode**: Select canonical tools from a dropdown with dynamic form fields corresponding to each tool's schema.
 - **Raw JSON Mode**: Low-level JSON-RPC 2.0 console for testing and inspecting responses.
 - **1-Click Apply (`window.coraApplyPlaygroundCodeToEditor`)**: Reflects returned HTML code directly into the CodeMirror editor and writes immediately to the static distribution build.
+
+---
+
+*Cora Universal MCP Compatibility Matrix v4.9.364 — Last updated: October 2026.*

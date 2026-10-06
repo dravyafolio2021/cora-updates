@@ -1,6 +1,6 @@
 # Cora Workspace — Official ChatGPT Plugin & MCP Connector
 
-This package contains the official distribution files for integrating **Cora Creative & Field Studio OS (v4.9.357)** with **ChatGPT** via OpenAI Custom GPT Actions, ChatGPT Plugins, and the Model Context Protocol (MCP).
+This package contains the official distribution files for integrating **Cora Creative & Field Studio OS (v4.9.364)** with **ChatGPT** via OpenAI Custom GPT Actions, ChatGPT Plugins, and the Model Context Protocol (MCP).
 
 ---
 

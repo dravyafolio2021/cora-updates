@@ -1,6 +1,6 @@
 # Cora Platform — Comprehensive Platform Documentation
 
-This document serves as the master technical specification and architectural manual for the Cora Workspace Platform (v4.9.357).
+This document serves as the master technical specification and architectural manual for the Cora Workspace Platform (v4.9.364).
 
 ---
 
@@ -280,6 +280,41 @@ High-contrast bounding boxes and heavy outline borders create visual fatigue and
   - `id`: `/workspace/dashboard?role=admin`
   - `start_url`: `/workspace/dashboard`
 * **Isolated Standalone App Identity**: Prevents Android WebAPK and iOS WebClip identity collisions between regular staff workspace apps and platform administration consoles.
+
+---
+
+### 1.22 Dynamic AI Quota Pacing, Weekly Soft Throttling & Super Admin Bypass (v4.9.364)
+* **Standardized Monthly AI Quota Tiers**:
+  - **Free / Starter Tier**: 500 AI runs/month (weekly pacing: 125 runs/week)
+  - **Pro Tier**: 15,000 AI runs/month (weekly soft-limit pacing: 3,750 runs/week)
+  - **Scale Tier**: 25,000 AI runs/month (weekly soft-limit pacing: 6,250 runs/week)
+  - **Enterprise Tier**: Custom unlimited AI runs with dedicated tenant compute clusters
+* **Weekly Pacing & Anti-Burnout Engine**: Soft throttling calculates `ceil($monthly_quota / 4)` to warn agency owners when weekly consumption exceeds baseline pacing, preventing catastrophic token exhaustion during early billing cycles while permitting burst allocations on critical client deliverables.
+* **Super Admin Rate-Limit & Session Unlock**: Users with administrative capabilities (`current_user_can('manage_options')` or Super Admin) completely bypass all rate limits, AI run caps, and artificial 6-hour session timeouts, ensuring continuous 24/7 maintenance operations.
+* **Real-Time Quota Telemetry**: AI usage counters are synchronized in real-time across the sticky sidebar admin popover, the AI drawer header progress bar, and the System Settings Suite.
+
+---
+
+### 1.23 Platform-Wide Affiliate & Referral Tracking Suite (Endorsely Integration) (v4.9.364)
+* **Global Affiliate Script Integration**: Injected across the Next.js marketing site (`cora-frontend/app/layout.tsx`) and workspace checkout modals via Endorsely's high-speed tracking CDN:
+  ```html
+  <script 
+    src="https://app.endorsely.com/assets/affiliate-tracking.js" 
+    data-affiliate-id="d56e72c8-89fa-47cb-bc87-920aa9e3a6bb" 
+    defer>
+  </script>
+  ```
+* **Dynamic Payment Attribution Bridge**: On successful Razorpay order verification (`FastRazorpayModal.tsx`, `CheckoutSheet.tsx`), the client fires conversion telemetry to credit referring affiliates:
+  ```javascript
+  if (window.endorsely && typeof window.endorsely.trackConversion === 'function') {
+    window.endorsely.trackConversion({
+      orderId: paymentResponse.razorpay_order_id,
+      amount: planAmount,
+      customerEmail: userEmail
+    });
+  }
+  ```
+* **Dual Currency & GST Checkout Engine**: Supports seamless INR (`₹`) and USD (`$`) checkouts, automatic 18% GST calculation (SAC 9983), real-time promo code validation, and instant workspace provisioning upon payment confirmation.
 
 ---
 
@@ -1131,6 +1166,29 @@ Engineered in `includes/mcp/class-cora-oauth-server.php`:
 * **Dynamic Scope Selection Counter**: Displays live granted counts (`X of 20 granted`) before authorization.
 * **Multi-Tenant Security Guarantee**: OAuth tokens are cryptographically generated (32-byte CSPRNG) and bound strictly to authenticated tenant agencies (`agency_id`). Any request attempting parameter-level tenant spoofing is overridden server-side.
 
+### 3.17 Live HTML Preview Resilience Shield & Auto-Tailwind Injection (v4.9.358 - v4.9.359)
+* **Automatic Tailwind CSS CDN Injection**: When rendering live HTML previews in `#cora-html-canvas-iframe` or exporting static sites, the compiler automatically detects if Tailwind CSS is referenced. If missing, it dynamically injects `<script src="https://cdn.tailwindcss.com"></script>` into the document `<head>`, guaranteeing that Tailwind utility classes render with 100% fidelity without build-time compiling.
+* **Iframe Error Boundary & Zero Blank Section Shield**: Wrapped preview DOM elements in defensive error boundaries. If an inline JavaScript snippet or external script fails, the preview catches the runtime exception gracefully, rendering fallback mockups and preventing blank screen freezes.
+* **PostMessage Bidirectional Synchronization**: The parent workspace and preview iframe exchange DOM state changes via secure `window.postMessage()` channels, enabling zero-latency live text editing and real-time element style mutations.
+
+### 3.18 Streamlined Live Code Editor Header Architecture (v4.9.360)
+* **Distraction-Free Minimalist Toolbar**: Removed redundant portrait and viewport switcher controls from the Live Code Editor header bar, eliminating visual noise and giving developers maximal vertical and horizontal real estate for CodeMirror code editing and preview inspection.
+* **Monochromatic Action Clusters**: Grouped primary controls (File Explorer, Edit with AI, Play, Save & Publish, New Tab Live Site) into distinct, tonal clusters adhering to Rule 13 zero-outline specifications.
+
+### 3.19 Cora AI Editor Interoperability & Workspace Forms Embedding Suite (v4.9.361)
+* **Dynamic Lead Form Shortcode & Iframe Generator**: Allows agencies to embed any active Form AI Architect lead form directly into Canvas landing pages and static themes:
+  - **WordPress Shortcode**: `[cora-form id="12" theme="light"]`
+  - **Standalone Responsive Iframe**: `<iframe src="https://app.heycora.in/workspace/forms/embed?id=12" class="w-full border-0 rounded-2xl min-h-[480px]"></iframe>`
+* **Real-Time Cross-Module Lead Pipeline Ingestion**: Submissions from embedded forms route directly into `wp_cora_leads` with full campaign attribution, triggering in-app bell alerts and PWA push notifications.
+
+### 3.20 Unified "Edit with AI" Toolbar Architecture (v4.9.362)
+* **Consolidated Single-Action AI Trigger**: Replaced fragmented multiple AI edit buttons with a unified, high-visibility "Edit with AI" action bar docked in the Live Code Editor.
+* **Context-Aware Prompt Pipeline**: Passing natural language directives (e.g. "Add a modern FAQ accordion with 4 questions below the pricing table") automatically inspects the active DOM, generates target diffs, and reflects updated markup into the CodeMirror editor with 1-click apply.
+
+### 3.21 Live Static Site Styling Parity & CSS Scope Containment (v4.9.363)
+* **100% Visual Parity Guarantee**: Enforces identical CSS reset standards and font loading between in-editor preview iframes and exported production static distributions (`out/`, `dist/`).
+* **Host Stylesheet Isolation**: Prevents parent dashboard stylesheets from leaking into the sandboxed website DOM, ensuring published static sites look pixel-identical to developer previews.
+
 ---
 
 ## Section 4: Public Developer Documentation Portal (`/docs`)
@@ -1412,6 +1470,13 @@ When authenticated as Super Admin (`cora_admin` / `admin@cora.local`), the platf
 
 | Version | Release Date | Key Features & Enhancements |
 | :--- | :--- | :--- |
+| **v4.9.364** | Oct 2026 | Standardized AI run quotas (15K Pro / 25K Scale monthly), weekly soft-limit throttling (3,750 Pro / 6,250 Scale runs/week), Super Admin rate-limit bypass, and platform-wide Endorsely affiliate tracking integration (`app.endorsely.com/assets/affiliate-tracking.js`) with dynamic conversion attribution on checkout completion |
+| **v4.9.363** | Oct 2026 | Live static site styling parity, automated Tailwind CSS CDN injection, and CSS scope containment across Canvas previews |
+| **v4.9.362** | Oct 2026 | Unified 'Edit with AI' toolbar action in Live Code Editor with instant diff previewing and context-aware prompt execution |
+| **v4.9.361** | Oct 2026 | Cora AI editor interoperability and workspace forms embedding suite with `[cora-form id="..."]` shortcode and responsive iframe generator for static sites |
+| **v4.9.360** | Oct 2026 | Streamlined Live Code Editor header by eliminating redundant portrait and viewport switchers for clean, distraction-free editing |
+| **v4.9.359** | Oct 2026 | Completed landing page template markup and universal live preview resilience shield across all 6 niche templates |
+| **v4.9.358** | Oct 2026 | Live HTML preview resilience shield: auto-injection of Tailwind CSS CDN, error boundary encapsulation, postMessage bridge, and zero blank sections guarantee |
 | **v4.9.357** | Oct 2026 | ChatGPT action discovery resolved with 28 curated tools ceiling, OpenAPI 3.0.1 schema hardening, empty property sanitization, and session discovery |
 | **v4.9.356** | Oct 2026 | ChatGPT MCP server plugin handshake support, session tool discovery, and unified REST handler |
 | **v4.9.355** | Oct 2026 | Upgraded OpenAPI to 3.0.1, curated 28 core actions ceiling for ChatGPT Custom GPT compliance, and purged emojis from action descriptions |
@@ -1642,4 +1707,4 @@ When authenticated as Super Admin (`cora_admin` / `admin@cora.local`), the platf
 
 ---
 
-*Cora Platform v4.9.357 — Master Architectural Manual. Last updated: October 2026.*
+*Cora Platform v4.9.364 — Master Architectural Manual. Last updated: October 2026.*

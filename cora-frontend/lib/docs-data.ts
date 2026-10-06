@@ -387,14 +387,18 @@ The AI Co-Founder features a WhatsApp-style conversational chat interface:
 
 ---
 
-## 3. Token Quotas & AI Credit Tracking
+## 3. Token Quotas & AI Credit Tracking (v4.9.364)
 
-AI execution is tracked per session with a real-time progress meter:
-- **Starter Plan**: 100,000 monthly RAG tokens.
-- **Pro Plan**: 1,000,000 monthly RAG tokens.
-- **Studio Enterprise**: Unlimited custom model context tokens.
+AI execution is tracked per session with a real-time progress meter and anti-burnout weekly pacing:
+- **Free / Starter Tier**: 500 monthly AI runs (weekly pacing: 125 runs/week).
+- **Pro Tier**: 15,000 monthly AI runs (weekly soft limit: 3,750 runs/week).
+- **Scale Tier**: 25,000 monthly AI runs (weekly soft limit: 6,250 runs/week).
+- **Studio Enterprise**: Unlimited custom model context runs with dedicated compute instances.
 
-Credits sync in real-time between local browser storage and the backend MySQL accounting ledger.
+### Fair Usage Anti-Burnout Pacing & Admin Bypass
+- **Weekly Soft-Throttling**: Pacing alerts calculate \`ceil(monthly_quota / 4)\` to advise agency teams before exhausting monthly token pools early in billing cycles.
+- **Super Admin Unrestricted Access**: Platform Super Admins and users with \`manage_options\` bypass all rate limits, AI run caps, and artificial session timeouts.
+- **Ledger Synchronization**: Usage counters sync in real-time between local browser storage, the sticky admin popover, and the backend MySQL accounting ledger.
 
 ---
 
@@ -596,6 +600,9 @@ Starting in **v4.9.300–v4.9.302**, lead inspection features:
       { id: 'mcp-playground', title: '4. AI Tools MCP Gateway & Live Action Playground' },
       { id: 'git-sync', title: '5. Next.js Git Connector & Route Scanner' },
       { id: 'headless-preview', title: '6. Headless REST APIs & Preview Proxy' },
+      { id: 'preview-resilience', title: '7. Live Preview Resilience Shield & Auto-Tailwind' },
+      { id: 'ai-edit-toolbar', title: '8. Unified "Edit with AI" Toolbar' },
+      { id: 'forms-embedding', title: '9. Workspace Forms Embedding Suite' },
     ],
     content: `
 The **Canvas Builder** enables creative agencies to design and publish lightning-fast client landing pages, portfolio showcases, and lead-capture funnels directly inside the Cora workspace across Elementor, Visual HTML, and Next.js engines.
@@ -661,6 +668,29 @@ Connect your production Next.js repositories directly via GitHub Personal Access
 - **Clean REST Endpoints**: \`/wp-json/cora-canvas/v1/manifest\`, \`/wp-json/cora-canvas/v1/page\`, and \`/wp-json/cora-canvas/v1/form-submit\`.
 - **Offline Dev Server Ping**: Automatically tests \`localhost:3000\` within 150ms and provides clear instructions if offline.
 - **Isolated Preview Cookies**: Scopes \`cora_canvas_preview\` cookies strictly to explicit preview queries, preventing unintended leaks to production visitors.
+
+---
+
+## 7. Live Preview Resilience Shield & Auto-Tailwind (v4.9.358 - v4.9.363)
+
+- **Auto-Tailwind CDN Injection**: The compiler dynamically injects \`<script src="https://cdn.tailwindcss.com"></script>\` into preview iframes and exported static bundles if Tailwind utility classes are detected without an active stylesheet.
+- **Error Boundary Encapsulation**: Isolates faulty custom scripts and guarantees zero blank screens or layout crashes.
+- **100% Styling Parity**: Prevents host admin CSS leakage to ensure preview rendering exactly matches the production static site.
+
+---
+
+## 8. Unified "Edit with AI" Toolbar (v4.9.362)
+
+- **Streamlined Minimalist Toolbar**: Eliminates cluttered viewport switchers from the Live Code Editor header.
+- **Context-Aware Prompts**: Consolidates multi-step AI actions into a single prompt bar that generates and validates live code diffs.
+- **1-Click Code Apply**: Reflects suggested HTML/CSS improvements directly into the CodeMirror editor buffer.
+
+---
+
+## 9. Workspace Forms Embedding Suite (v4.9.361)
+
+- **Native Embed Codes**: Generate shortcodes (\`[cora-form id="..."]\`) or responsive iframes to embed Form AI Architect forms into any static or headless page.
+- **Direct CRM Ingestion**: Submissions route automatically to \`wp_cora_leads\` with full source campaign attribution.
     `,
   },
   {
@@ -1015,7 +1045,7 @@ Cora provides persistent, frictionless PWA installation triggers across desktop 
     description: 'AI Starter Prompts Grid, automated Next.js/Expo/Vite static compilation, single-CPU thread safety, and lead form ingestion.',
     readTime: '7 min read',
     lastUpdated: 'October 2026',
-    badge: 'Canvas v4.9.338',
+    badge: 'Canvas v4.9.364',
     toc: [
       { id: 'ai-starters', title: '1. AI Starter Prompts Grid' },
       { id: 'static-compiler', title: '2. Automated Static Compiler Pipeline' },

@@ -9,8 +9,15 @@
 
 | Module Name | Branch Name | Status | Main Touchpoint Files | Assigned Agent / Chat |
 |---|---|---|---|---|
-| **Core Platform** | `main` | 🟢 Stable (v4.9.357) | `cora-workspace.php`, `admin-dashboard.php` | Main Orchestrator |
+| **Core Platform** | `main` | 🟢 Stable (v4.9.364) | `cora-workspace.php`, `admin-dashboard.php` | Main Orchestrator |
 <!-- MODULE_ROWS_START -->
+| **AI Run Quotas & Fair Usage Pacing** | `main` | 🟢 Complete & Active (v4.9.364) | `cora-workspace.php`, `views/view-settings-suite.php`, `admin-dashboard.php` | AI Architecture & Super Admin Agent |
+| **Endorsely Affiliate Tracking Suite** | `main` | 🟢 Complete & Active (v4.9.364) | `cora-frontend/app/layout.tsx`, `cora-frontend/components/pricing/*` | Growth & Checkout Agent |
+| **Live Static Site & Tailwind Parity Engine** | `main` | 🟢 Complete & Active (v4.9.363) | `views/view-canvas.php`, `cora-workspace.php` | Canvas Visual Engine Agent |
+| **Unified 'Edit with AI' Workflow** | `main` | 🟢 Complete & Active (v4.9.362) | `views/view-canvas.php`, `cora-workspace.php` | Canvas Visual Engine Agent |
+| **Forms Embedding Suite & Interoperability** | `main` | 🟢 Complete & Active (v4.9.361) | `views/view-canvas.php`, `views/view-forms.php`, `cora-workspace.php` | Forms & Canvas Agent |
+| **Streamlined Live Code Editor Header** | `main` | 🟢 Complete & Active (v4.9.360) | `views/view-canvas.php` | Canvas UX Agent |
+| **Landing Page Template Markup & Resilience Shield** | `main` | 🟢 Complete & Active (v4.9.358 - v4.9.359) | `views/view-canvas.php`, `cora-workspace.php` | Canvas Visual Engine Agent |
 | **ChatGPT Action Discovery & 28 Tools Ceiling** | `main` | 🟢 Complete & Active (v4.9.355 - v4.9.357) | `cora-workspace.php`, `includes/mcp/class-cora-universal-mcp-server.php`, `includes/mcp/class-cora-mcp-tool-registry.php` | AI Architecture Agent |
 | **Interactive OAuth 2.1 Consent Panel** | `main` | 🟢 Complete & Active (v4.9.354) | `includes/mcp/class-cora-oauth-server.php`, `scripts/test_mcp_full_access.php` | Identity & Security Agent |
 | **Canvas Drawers Standard & Overflow Locking** | `main` | 🟢 Complete & Active (v4.9.352 - v4.9.353) | `views/view-canvas.php`, `cora-workspace.php` | Canvas Visual Engine Agent |
@@ -296,6 +303,13 @@
 
 | Version | Date | Key Changes |
 | :--- | :--- | :--- |
+| **v4.9.364** | Oct 2026 | Standardized AI run quotas (15K Pro / 25K Scale monthly), added weekly soft-limit throttling (3,750 Pro / 6,250 Scale runs/week), Super Admin rate-limit bypass, integrated Endorsely affiliate tracking suite (`app.endorsely.com/assets/affiliate-tracking.js`) across frontend layouts and checkout sheets with dynamic conversion pinging |
+| **v4.9.363** | Oct 2026 | Guaranteed live static site styling parity, automated Tailwind CSS CDN injection, and CSS scope containment across Canvas previews |
+| **v4.9.362** | Oct 2026 | Combined fragmented editor edit actions into unified 'Edit with AI' toolbar button in Canvas Live Code Editor with instant diff previewing |
+| **v4.9.361** | Oct 2026 | Cora AI editor interoperability and workspace forms embedding suite with `[cora-form id="..."]` shortcode and iframe generator for static sites |
+| **v4.9.360** | Oct 2026 | Streamlined Live Code Editor header by removing redundant portrait and viewport switchers for clean, distraction-free editing |
+| **v4.9.359** | Oct 2026 | Completed landing page template markup and universal live preview resilience shield across all 6 niche templates |
+| **v4.9.358** | Oct 2026 | Live HTML preview resilience shield: auto-injection of Tailwind CSS CDN, error boundary encapsulation, postMessage bridge, and zero blank sections guarantee |
 | **v4.9.357** | Oct 2026 | ChatGPT action discovery resolved with 28 curated tools ceiling, OpenAPI 3.0.1 schema hardening, empty property sanitization, and session discovery |
 | **v4.9.356** | Oct 2026 | ChatGPT MCP server plugin handshake support, session tool discovery, and unified REST handler |
 | **v4.9.355** | Oct 2026 | Upgraded OpenAPI to 3.0.1, curated 28 core actions ceiling for ChatGPT Custom GPT compliance, and purged emojis from action descriptions |
@@ -386,4 +400,4 @@
 
 ---
 
-*Cora Platform Release Manifest v4.9.357 — Architecture & Engineering Team.*
+*Cora Platform Release Manifest v4.9.364 — Architecture & Engineering Team.*
