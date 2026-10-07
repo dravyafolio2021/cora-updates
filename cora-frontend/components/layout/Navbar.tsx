@@ -1684,7 +1684,7 @@ export function Navbar() {
                     {/* Top 3 Side-by-Side Atmospheric Hero Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-4 items-stretch">
 
-                      {/* ── CARD 1: FREE TOOLS (Atmospheric Periwinkle / Slate Pastel) ── */}
+                      {/* ── CARD 1: TOOLS & TEMPLATES (Atmospheric Periwinkle / Slate Pastel) ── */}
                       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-b from-[#ebf1ff] via-[#dfebfd] to-[#d0e0fb] border border-blue-200/70 p-5 sm:p-5.5 flex flex-col justify-between shadow-[0_4px_20px_rgba(79,114,205,0.06)] hover:shadow-md hover:border-blue-300 transition-all duration-300 min-h-[310px]">
                         {/* Soft atmospheric cloud & glow accents */}
                         <div className="absolute top-0 right-0 -mt-8 -mr-8 w-44 h-44 rounded-full bg-white/50 blur-2xl pointer-events-none" />
@@ -1694,10 +1694,10 @@ export function Navbar() {
                           {/* Centered Cora Header */}
                           <div className="text-center mb-3.5">
                             <h3 className="text-base font-bold text-zinc-900 tracking-tight leading-snug">
-                              Free Tools
+                              Tools &amp; Templates
                             </h3>
                             <p className="text-[11.5px] text-zinc-600 font-normal mt-0.5 leading-tight">
-                              Quick business calculators &amp; generators
+                              Quick business calculators &amp; website templates
                             </p>
                           </div>
 
@@ -1728,28 +1728,28 @@ export function Navbar() {
                               </div>
                             </Link>
 
-                            {/* Floating Mockup 2: Pricing Calculator */}
+                            {/* Floating Mockup 2: Website & Workspace Templates */}
                             <Link
-                              href="/tools/retainer-calculator"
+                              href="/use-cases"
                               onClick={() => setActiveDropdown(null)}
                               className="block rounded-xl bg-white/95 backdrop-blur-md p-2.5 sm:p-3 border border-white/90 shadow-[0_6px_20px_rgba(0,0,0,0.08)] hover:shadow-md hover:scale-[1.01] transition-all group ml-2 sm:ml-3"
                             >
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                   <div className="w-5 h-5 rounded-md bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-200/60">
-                                    <BarChart2 className="w-3 h-3" />
+                                    <LayoutTemplate className="w-3 h-3" />
                                   </div>
                                   <span className="text-xs font-bold text-zinc-900 group-hover:text-blue-700 transition-colors">
-                                    Pricing Calculator
+                                    Website &amp; Agency Templates
                                   </span>
                                 </div>
                                 <span className="text-[9px] font-mono font-bold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded-full border border-blue-200/60">
-                                  Retainer
+                                  16+ Schemas
                                 </span>
                               </div>
                               <div className="mt-1.5 pt-1.5 border-t border-zinc-100 flex items-center justify-between text-[10.5px] font-mono text-zinc-500">
-                                <span>Target Margin 65%</span>
-                                <span className="font-bold text-zinc-900">₹45,000/mo</span>
+                                <span>Pre-Seeded Schemas</span>
+                                <span className="font-bold text-zinc-900">Turnkey</span>
                               </div>
                             </Link>
 
@@ -1777,7 +1777,7 @@ export function Navbar() {
                             onClick={() => setActiveDropdown(null)}
                             className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-950 hover:text-blue-700 transition-colors group"
                           >
-                            <span>Explore Free Tools</span>
+                            <span>Explore Tools &amp; Templates</span>
                             <span className="w-4.5 h-4.5 rounded-full bg-white/90 shadow-2xs flex items-center justify-center group-hover:translate-x-0.5 group-hover:bg-white transition-all">
                               <ArrowRight className="w-2.5 h-2.5 stroke-[2.2]" />
                             </span>
@@ -2717,7 +2717,7 @@ export function Navbar() {
                     RESOURCES &amp; TOOLS
                   </span>
 
-                  {/* 1. Free Tools */}
+                  {/* 1. Tools & Templates */}
                   <Link
                     href="/tools"
                     onClick={() => setMobileMenuOpen(false)}
@@ -2728,13 +2728,13 @@ export function Navbar() {
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between">
-                        <span className="text-[13px] font-bold text-zinc-950">Free Tools</span>
+                        <span className="text-[13px] font-bold text-zinc-950">Tools &amp; Templates</span>
                         <span className="text-[9px] font-mono font-bold text-blue-700 bg-blue-100/70 px-2 py-0.5 rounded-full">
-                          Calculators
+                          Calculators &amp; Schemas
                         </span>
                       </div>
                       <p className="text-[11px] text-zinc-500 font-normal mt-0.5">
-                        GST, pricing &amp; agency proposal generators
+                        GST calculators, proposal builders &amp; website templates
                       </p>
                     </div>
                     <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:text-zinc-700 group-hover:translate-x-0.5 transition-all" />

@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
 import { ArrowRight, ChevronRight, Zap, Lock } from 'lucide-react';
@@ -182,13 +183,13 @@ export function Hero() {
             </a>
 
             {/* Secondary CTA: Explore free templates */}
-            <a
-              href="https://app.heycora.in/workspace/login?redirect_to=canvas&source=hero_explore_templates"
+            <Link
+              href="/use-cases"
               className="px-5 sm:px-6 py-2.5 sm:py-2.5 rounded-xl flex items-center justify-center gap-1.5 text-zinc-950 text-sm sm:text-base font-semibold font-sans leading-6 bg-white/80 hover:bg-white border border-zinc-200/80 shadow-xs hover:border-zinc-300 transition-all hover:-translate-y-0.5 active:translate-y-0 w-full sm:w-auto"
             >
               <span>Explore free templates</span>
               <ChevronRight className="w-4 h-4 text-zinc-950" />
-            </a>
+            </Link>
 
           </div>
 
