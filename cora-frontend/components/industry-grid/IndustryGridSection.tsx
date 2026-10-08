@@ -43,16 +43,16 @@ const capabilityColumns: CapabilityColumn[] = [
     badgeColor: 'bg-emerald-50 text-emerald-700 border-emerald-200/80',
     items: [
       {
-        name: 'Work with your AI co-founder',
-        desc: 'Plan your next steps and handle daily work.',
+        name: 'Work with AI co-founder',
+        desc: 'Plan daily tasks, draft replies, and run operations.',
         icon: Bot,
         iconBg: 'bg-emerald-50',
         iconBorder: 'border-emerald-100',
         iconColor: 'text-emerald-600',
       },
       {
-        name: 'Turn voice notes into a plan',
-        desc: 'Turn client messages into clear project steps.',
+        name: 'Turn voice notes into plans',
+        desc: 'Turn client audio into clear, actionable project steps.',
         icon: AudioWaveform,
         iconBg: 'bg-purple-50',
         iconBorder: 'border-purple-100',
@@ -60,15 +60,15 @@ const capabilityColumns: CapabilityColumn[] = [
       },
       {
         name: 'Create content faster',
-        desc: 'Draft scripts and prepare content for AI search.',
+        desc: 'Draft video scripts, posts, and search-ready copy.',
         icon: Sparkles,
         iconBg: 'bg-amber-50',
         iconBorder: 'border-amber-100',
         iconColor: 'text-amber-500',
       },
       {
-        name: 'Find the answers you need',
-        desc: 'Search client briefs, files, and past decisions.',
+        name: 'Find answers instantly',
+        desc: 'Search client briefs, documents, and past project notes.',
         icon: Database,
         iconBg: 'bg-sky-50',
         iconBorder: 'border-sky-100',
@@ -83,15 +83,15 @@ const capabilityColumns: CapabilityColumn[] = [
     items: [
       {
         name: 'Follow up with every lead',
-        desc: 'Track enquiries and deals in your CRM.',
+        desc: 'Track deals, log calls, and message prospects on WhatsApp.',
         icon: Kanban,
         iconBg: 'bg-blue-50',
         iconBorder: 'border-blue-100',
         iconColor: 'text-blue-600',
       },
       {
-        name: 'Build pages that bring enquiries',
-        desc: 'Create landing pages for your services and campaigns.',
+        name: 'Build pages that bring leads',
+        desc: 'Launch fast landing pages for your services and campaigns.',
         icon: Layers,
         iconBg: 'bg-rose-50',
         iconBorder: 'border-rose-100',
@@ -99,15 +99,15 @@ const capabilityColumns: CapabilityColumn[] = [
       },
       {
         name: 'Collect clear client briefs',
-        desc: 'Use forms to gather details and book calls.',
+        desc: 'Use forms to gather project details and book intake calls.',
         icon: FileText,
         iconBg: 'bg-teal-50',
         iconBorder: 'border-teal-100',
         iconColor: 'text-teal-600',
       },
       {
-        name: 'Ask clients for reviews',
-        desc: 'Collect feedback and invite clients to leave reviews.',
+        name: 'Collect client reviews',
+        desc: 'Request feedback and publish 5-star Google reviews.',
         icon: Star,
         iconBg: 'bg-amber-50',
         iconBorder: 'border-amber-100',
@@ -121,32 +121,32 @@ const capabilityColumns: CapabilityColumn[] = [
     badgeColor: 'bg-purple-50 text-purple-700 border-purple-200/80',
     items: [
       {
-        name: 'Get client agreements signed',
-        desc: 'Send contracts for clients to sign online.',
+        name: 'Sign client agreements',
+        desc: 'Send digital contracts for clients to sign online legally.',
         icon: FileCheck2,
         iconBg: 'bg-emerald-50',
         iconBorder: 'border-emerald-100',
         iconColor: 'text-emerald-600',
       },
       {
-        name: 'Keep your team informed',
-        desc: 'Share job details and check for schedule clashes.',
+        name: 'Keep your team updated',
+        desc: 'Share job briefs, call sheets, and avoid scheduling clashes.',
         icon: Navigation,
         iconBg: 'bg-indigo-50',
         iconBorder: 'border-indigo-100',
         iconColor: 'text-indigo-600',
       },
       {
-        name: 'Plan your week',
-        desc: 'Keep client calls and team schedules together.',
+        name: 'Plan your weekly schedule',
+        desc: 'Keep client calls, shoots, and team deadlines together.',
         icon: Calendar,
         iconBg: 'bg-rose-50',
         iconBorder: 'border-rose-100',
         iconColor: 'text-rose-500',
       },
       {
-        name: 'Stay on top of tasks',
-        desc: 'Assign work and see what’s done or due.',
+        name: 'Track and assign tasks',
+        desc: 'Assign work to team members and monitor progress in real time.',
         icon: CheckSquare,
         iconBg: 'bg-purple-50',
         iconBorder: 'border-purple-100',
@@ -161,15 +161,15 @@ const capabilityColumns: CapabilityColumn[] = [
     items: [
       {
         name: 'Send GST invoices',
-        desc: 'Create invoices for your client work.',
+        desc: 'Create compliant GST invoices with instant UPI QR payments.',
         icon: Receipt,
         iconBg: 'bg-emerald-50',
         iconBorder: 'border-emerald-100',
         iconColor: 'text-emerald-600',
       },
       {
-        name: 'Track your equipment',
-        desc: 'See what’s available and who’s using it.',
+        name: 'Track studio equipment',
+        desc: 'See which gear is available and who is currently using it.',
         icon: Camera,
         iconBg: 'bg-zinc-100',
         iconBorder: 'border-zinc-200',
@@ -177,15 +177,15 @@ const capabilityColumns: CapabilityColumn[] = [
       },
       {
         name: 'Keep client files together',
-        desc: 'Organise images, videos, and project files.',
+        desc: 'Organise project files, media assets, and delivery galleries.',
         icon: Film,
         iconBg: 'bg-fuchsia-50',
         iconBorder: 'border-fuchsia-100',
         iconColor: 'text-fuchsia-600',
       },
       {
-        name: 'Control who sees what',
-        desc: 'Choose what clients and teammates can access.',
+        name: 'Control team permissions',
+        desc: 'Choose exactly what clients and team members can view.',
         icon: ShieldCheck,
         iconBg: 'bg-cyan-50',
         iconBorder: 'border-cyan-100',
@@ -200,57 +200,58 @@ export function IndustryGridSection() {
     <section className="py-16 sm:py-[100px] bg-[#FFFFFF] relative z-10 overflow-hidden">
       <div className="w-full max-w-[1280px] mx-auto px-4 sm:px-6">
         
-        {/* ── Section Header (Properly Centered with Dual Tone Gradient) ── */}
-        <div className="max-w-[760px] mx-auto text-center mb-12 sm:mb-16">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-zinc-100 rounded-full text-zinc-800 text-xs font-semibold uppercase tracking-wider mb-3.5 border border-zinc-200/80">
+        {/* ── Section Header (Strictly Centered Stack with Clean Hierarchy) ── */}
+        <div className="max-w-[760px] mx-auto flex flex-col items-center text-center mb-12 sm:mb-16">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-zinc-100 rounded-full text-zinc-800 text-xs font-semibold uppercase tracking-wider mb-4 border border-zinc-200/80 shadow-2xs">
             <span className="w-1.5 h-1.5 rounded-full bg-indigo-600 animate-pulse" />
             <span>AGENCY WORKSPACE</span>
           </div>
 
-          <h2 className="font-display text-3xl xs:text-4xl sm:text-5xl lg:text-[46px] font-bold leading-[1.2] tracking-[-0.03em] bg-gradient-to-r from-zinc-950 via-zinc-700 to-zinc-400 bg-clip-text text-transparent inline-block pb-2 mb-3">
+          <h2 className="w-full font-display text-3xl xs:text-4xl sm:text-5xl lg:text-[48px] font-bold leading-[1.12] tracking-[-0.03em] text-zinc-950 mb-3.5">
             Keep your agency moving.
           </h2>
-          <p className="text-zinc-600 text-base sm:text-lg font-normal leading-relaxed max-w-[640px] mx-auto">
+          
+          <p className="text-zinc-600 text-sm sm:text-base md:text-lg font-normal leading-relaxed max-w-[600px]">
             Manage leads, projects, files, and payments in one workspace.
           </p>
         </div>
 
-        {/* ── 4-Column Directory (Clean, Simple, High-Readability) ── */}
+        {/* ── 4-Column Directory (Single-Line Titles & Max 2-Line Descriptions) ── */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6 max-w-[1280px] mx-auto">
           {capabilityColumns.map((col, cIdx) => (
-            <div key={cIdx} className="space-y-5">
+            <div key={cIdx} className="space-y-4">
               {/* Column Header */}
-              <div className="flex items-center justify-between pb-3 border-b border-zinc-100">
-                <span className="text-xs sm:text-[13px] font-bold text-zinc-900 tracking-tight">
+              <div className="flex items-center justify-between pb-3 border-b border-zinc-100 gap-2">
+                <span className="text-xs sm:text-[13px] font-bold text-zinc-900 tracking-tight truncate">
                   {col.category}
                 </span>
-                <span className={`text-[9.5px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${col.badgeColor}`}>
+                <span className={`text-[9.5px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border shrink-0 ${col.badgeColor}`}>
                   {col.badge}
                 </span>
               </div>
 
               {/* Column Items */}
-              <div className="space-y-4">
+              <div className="space-y-3.5">
                 {col.items.map((item, iIdx) => {
                   const Icon = item.icon;
                   return (
                     <div
                       key={iIdx}
-                      className="flex items-start gap-3.5 p-2 -m-2 rounded-2xl hover:bg-zinc-50/80 transition-colors duration-150 group cursor-default select-none"
+                      className="flex items-start gap-3 p-2 -m-2 rounded-2xl hover:bg-zinc-50/80 transition-colors duration-150 group cursor-default select-none"
                     >
                       {/* Icon */}
                       <div
-                        className={`w-11 h-11 rounded-2xl ${item.iconBg} ${item.iconBorder} border ${item.iconColor} flex items-center justify-center shrink-0 shadow-2xs transition-transform group-hover:scale-105 mt-0.5`}
+                        className={`w-10 h-10 rounded-xl ${item.iconBg} ${item.iconBorder} border ${item.iconColor} flex items-center justify-center shrink-0 shadow-2xs transition-transform group-hover:scale-105 mt-0.5`}
                       >
-                        <Icon className="w-5 h-5" />
+                        <Icon className="w-4.5 h-4.5" />
                       </div>
 
-                      {/* Text */}
+                      {/* Text Container: Guaranteed 1-Line Title & Max 2-Line Active Voice Description */}
                       <div className="space-y-0.5 min-w-0 flex-1">
-                        <h3 className="font-bold text-zinc-950 text-[14.5px] leading-snug group-hover:text-indigo-600 transition-colors">
+                        <h3 className="font-bold text-zinc-950 text-xs sm:text-[13.5px] leading-snug group-hover:text-indigo-600 transition-colors truncate">
                           {item.name}
                         </h3>
-                        <p className="text-zinc-500 text-xs sm:text-[12.5px] leading-relaxed">
+                        <p className="text-zinc-500 text-xs leading-snug line-clamp-2">
                           {item.desc}
                         </p>
                       </div>
