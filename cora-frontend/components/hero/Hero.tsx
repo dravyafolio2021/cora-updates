@@ -150,8 +150,8 @@ export function Hero() {
           </h1>
 
           {/* Subtitle */}
-          <p className="w-full max-w-[720px] text-center text-zinc-700 text-sm sm:text-base md:text-lg font-normal font-sans leading-relaxed sm:leading-7 px-2">
-            Create websites, and manage leads, forms, emails, finances, media, docs, and sheets in the same workspace.
+          <p className="w-full max-w-[760px] text-center text-zinc-700 text-sm sm:text-base md:text-lg font-normal font-sans leading-relaxed sm:leading-7 px-2">
+            Build websites, capture leads, manage clients, and create content—all in one workspace with CRM, forms, email, and finance built in.
           </p>
 
         </div>
