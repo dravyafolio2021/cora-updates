@@ -405,217 +405,206 @@ export function HeroAIInput() {
 
       </div>
 
-      {/* ── 2. STICKY FLOATING BOTTOM-CENTER AI SDR BAR & DIALOGUE MODAL ── */}
+      {/* ── 2. STICKY FLOATING BOTTOM-CENTER AI SDR BAR (Zero Dark Overlay, Full Page Scrollable) ── */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-2 sm:p-4 md:p-6 animate-in fade-in duration-200">
-          
-          {/* Backdrop Blur Overlay */}
-          <div
-            className="fixed inset-0 bg-black/35 backdrop-blur-xs transition-opacity cursor-pointer"
-            onClick={() => setIsOpen(false)}
-          />
-
-          {/* The Floating Center-Bottom SDR Panel */}
-          <div className="relative z-10 w-full max-w-[700px] max-h-[85vh] sm:max-h-[80vh] bg-white/98 backdrop-blur-2xl rounded-3xl border border-zinc-200/90 shadow-[0_24px_70px_rgba(0,0,0,0.22)] ring-1 ring-black/[0.06] flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 duration-200 text-left">
-            
-            {/* Header Bar with Live Deal Desk Status */}
-            <div className="flex items-center justify-between px-4 sm:px-6 py-3 bg-zinc-50/95 border-b border-zinc-100 shrink-0">
-              <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-full bg-zinc-950 text-white flex items-center justify-center shadow-xs">
-                  <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs sm:text-sm font-bold text-zinc-950">Cora AI</span>
-                    <span className="px-2 py-0.5 text-[10px] font-mono font-bold bg-emerald-100 text-emerald-800 border border-emerald-200/80 rounded-full flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
-                      Deal Desk SDR
-                    </span>
-                  </div>
-                </div>
+        <aside
+          aria-label="Cora AI SDR Deal Desk"
+          className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-1.5rem)] sm:w-[calc(100%-3rem)] max-w-[840px] max-h-[70vh] sm:max-h-[58vh] bg-white/98 backdrop-blur-2xl rounded-2xl sm:rounded-3xl border border-zinc-200/90 shadow-[0_16px_50px_rgba(0,0,0,0.14)] ring-1 ring-black/[0.05] flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 duration-200 text-left"
+        >
+          {/* Header Bar with Live Deal Desk Status */}
+          <div className="flex items-center justify-between px-4 sm:px-5 py-2.5 sm:py-3 bg-zinc-50/95 border-b border-zinc-100 shrink-0">
+            <div className="flex items-center gap-2 sm:gap-2.5">
+              <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-zinc-950 text-white flex items-center justify-center shadow-xs">
+                <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
               </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs sm:text-sm font-bold text-zinc-950">Cora AI</span>
+                <span className="px-2 py-0.5 text-[10px] font-mono font-bold bg-emerald-100 text-emerald-800 border border-emerald-200/80 rounded-full flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
+                  Deal Desk SDR
+                </span>
+              </div>
+            </div>
 
-              <div className="flex items-center gap-1.5">
-                {messages.length > 0 && (
-                  <button
-                    type="button"
-                    onClick={handleReset}
-                    title="Reset Conversation"
-                    className="p-1.5 rounded-full text-zinc-400 hover:text-zinc-900 hover:bg-zinc-200/70 transition-colors cursor-pointer"
-                  >
-                    <RotateCcw className="w-3.5 h-3.5" />
-                  </button>
-                )}
+            <div className="flex items-center gap-1">
+              {messages.length > 0 && (
                 <button
                   type="button"
-                  onClick={() => setIsOpen(false)}
-                  title="Close (Esc)"
+                  onClick={handleReset}
+                  title="Reset Conversation"
                   className="p-1.5 rounded-full text-zinc-400 hover:text-zinc-900 hover:bg-zinc-200/70 transition-colors cursor-pointer"
                 >
-                  <X className="w-4 h-4" />
+                  <RotateCcw className="w-3.5 h-3.5" />
                 </button>
-              </div>
-            </div>
-
-            {/* Scrollable Conversation Feed */}
-            <div 
-              ref={chatScrollContainerRef}
-              className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 overscroll-contain scrollbar-thin scrollbar-thumb-zinc-300 min-h-[220px]"
-            >
-              {messages.length === 0 ? (
-                <div className="py-6 sm:py-8 text-center text-zinc-500 text-xs sm:text-sm max-w-[460px] mx-auto space-y-3">
-                  <div className="w-10 h-10 rounded-2xl bg-zinc-100 text-zinc-900 flex items-center justify-center mx-auto border border-zinc-200 shadow-2xs">
-                    <Sparkles className="w-5 h-5 text-emerald-600" />
-                  </div>
-                  <p className="font-semibold text-zinc-900 text-sm sm:text-base">
-                    Test me with a tough prospect objection.
-                  </p>
-                  <p className="text-xs text-zinc-500 leading-relaxed">
-                    Ask why you should switch from HoneyBook, request our free website migration service, or claim exclusive annual discounts.
-                  </p>
-                  
-                  {/* Quick Objection Prompts */}
-                  <div className="flex flex-wrap items-center justify-center gap-1.5 pt-2">
-                    {sampleObjections.map((obj, i) => (
-                      <button
-                        key={i}
-                        type="button"
-                        onClick={() => handleSend(obj.query)}
-                        className="text-[11px] font-medium bg-zinc-100/80 hover:bg-zinc-200 text-zinc-800 px-3 py-1.5 rounded-full border border-zinc-200/80 transition-colors cursor-pointer text-left"
-                      >
-                        {obj.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                messages.map((msg) => (
-                  <div
-                    key={msg.id}
-                    className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'} gap-2`}
-                  >
-                    {/* Message Bubble */}
-                    <div
-                      className={`max-w-[90%] sm:max-w-[85%] rounded-2xl p-3.5 sm:p-4 text-xs sm:text-[13.5px] leading-relaxed ${
-                        msg.sender === 'user'
-                          ? 'bg-zinc-950 text-white rounded-br-xs font-medium shadow-2xs'
-                          : 'bg-zinc-50 text-zinc-900 rounded-bl-xs border border-zinc-200/90 font-normal shadow-2xs'
-                      }`}
-                    >
-                      <p className={`whitespace-pre-line ${msg.sender === 'user' ? 'text-zinc-100' : 'text-zinc-900'} leading-relaxed font-sans`}>
-                        {msg.text}
-                      </p>
-                    </div>
-
-                    {/* Dedicated High-Converting Deal Card (When Triggered by SDR) */}
-                    {msg.offer && (
-                      <div className="w-full max-w-[90%] sm:max-w-[85%] rounded-2xl bg-gradient-to-br from-emerald-50/80 via-white to-zinc-50 p-3.5 sm:p-4 border border-emerald-200 shadow-sm animate-in fade-in zoom-in-95 duration-150">
-                        <div className="flex items-start justify-between gap-2 mb-1.5">
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-mono font-bold">
-                            <Gift className="w-3 h-3" />
-                            {msg.offer.badge}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => handleCopyCode(msg.offer!.code)}
-                            className="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-zinc-600 hover:text-zinc-900 bg-white px-2 py-0.5 rounded border border-zinc-200/80 shadow-2xs cursor-pointer"
-                          >
-                            {copiedCode === msg.offer.code ? (
-                              <>
-                                <Check className="w-2.5 h-2.5 text-emerald-600" />
-                                <span>COPIED</span>
-                              </>
-                            ) : (
-                              <>
-                                <Copy className="w-2.5 h-2.5 text-zinc-400" />
-                                <span>{msg.offer.code}</span>
-                              </>
-                            )}
-                          </button>
-                        </div>
-
-                        <h5 className="text-xs sm:text-sm font-bold text-zinc-950 mb-0.5">
-                          {msg.offer.title}
-                        </h5>
-                        <p className="text-[11.5px] text-zinc-600 mb-3 leading-snug">
-                          {msg.offer.description}
-                        </p>
-
-                        <a
-                          href={msg.offer.actionUrl}
-                          className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-zinc-950 text-white text-xs font-bold hover:bg-zinc-800 transition-all shadow-xs w-full sm:w-auto"
-                        >
-                          <span>{msg.offer.actionText}</span>
-                        </a>
-                      </div>
-                    )}
-
-                    {/* Quick Reply Objection Follow-ups */}
-                    {msg.quickReplies && msg.quickReplies.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5 pt-0.5">
-                        {msg.quickReplies.map((qr, idx) => (
-                          <button
-                            key={idx}
-                            type="button"
-                            onClick={() => handleSend(qr.query)}
-                            className="text-[11px] font-medium bg-white hover:bg-zinc-100 text-zinc-800 px-3 py-1 rounded-full border border-zinc-200 shadow-2xs transition-colors cursor-pointer"
-                          >
-                            {qr.label}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ))
               )}
-
-              {isLoading && (
-                <div className="flex items-center gap-2 text-zinc-500 text-xs py-1.5 pl-1">
-                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <span>Cora SDR is formulating a direct response...</span>
-                </div>
-              )}
-            </div>
-
-            {/* Quick Objection Presets Carousel Above Input */}
-            <div className="px-4 sm:px-6 py-2 border-t border-zinc-100 bg-zinc-50/80 overflow-x-auto scrollbar-none shrink-0">
-              <div className="flex items-center gap-1.5 min-w-max">
-                <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider pr-1">
-                  Objections:
-                </span>
-                {sampleObjections.map((obj, i) => (
-                  <button
-                    key={i}
-                    type="button"
-                    onClick={() => handleSend(obj.query)}
-                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10.5px] font-medium bg-white hover:bg-zinc-100 text-zinc-800 border border-zinc-200/90 transition-colors cursor-pointer shadow-2xs"
-                  >
-                    <span>{obj.label}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Integrated SDR Input Bar */}
-            <form onSubmit={handleSubmit} className="p-3 sm:p-4 bg-white border-t border-zinc-100 flex items-center gap-2.5 shrink-0">
-              <input
-                ref={activeInputRef}
-                type="text"
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                placeholder="Type your sales objection, question, or request a deal..."
-                className="flex-1 bg-zinc-100 rounded-full px-4 py-2.5 text-xs sm:text-sm text-zinc-950 placeholder:text-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-950 font-sans"
-              />
               <button
-                type="submit"
-                className="w-9 h-9 rounded-full bg-zinc-950 text-white flex items-center justify-center shrink-0 shadow-xs hover:bg-zinc-800 transition-colors cursor-pointer"
+                type="button"
+                onClick={() => setIsOpen(false)}
+                title="Close (Esc)"
+                className="p-1.5 rounded-full text-zinc-400 hover:text-zinc-900 hover:bg-zinc-200/70 transition-colors cursor-pointer"
               >
-                <Send className="w-4 h-4" />
+                <X className="w-4 h-4" />
               </button>
-            </form>
-
+            </div>
           </div>
-        </div>
+
+          {/* Scrollable Conversation Feed */}
+          <div 
+            ref={chatScrollContainerRef}
+            className="flex-1 overflow-y-auto p-3.5 sm:p-5 space-y-3.5 overscroll-contain scrollbar-thin scrollbar-thumb-zinc-300 min-h-[160px]"
+          >
+            {messages.length === 0 ? (
+              <div className="py-4 sm:py-6 text-center text-zinc-500 text-xs sm:text-sm max-w-[480px] mx-auto space-y-2.5">
+                <div className="w-9 h-9 rounded-2xl bg-zinc-100 text-zinc-900 flex items-center justify-center mx-auto border border-zinc-200 shadow-2xs">
+                  <Sparkles className="w-4 h-4 text-emerald-600" />
+                </div>
+                <p className="font-semibold text-zinc-900 text-xs sm:text-sm">
+                  Test me with a tough prospect objection.
+                </p>
+                <p className="text-[11.5px] sm:text-xs text-zinc-500 leading-relaxed">
+                  Ask why you should switch from HoneyBook, request our free website migration service, or claim exclusive annual discounts.
+                </p>
+                
+                {/* Quick Objection Prompts */}
+                <div className="flex flex-wrap items-center justify-center gap-1.5 pt-1">
+                  {sampleObjections.map((obj, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => handleSend(obj.query)}
+                      className="text-[10.5px] sm:text-[11px] font-medium bg-zinc-100/80 hover:bg-zinc-200 text-zinc-800 px-3 py-1.5 rounded-full border border-zinc-200/80 transition-colors cursor-pointer text-left"
+                    >
+                      {obj.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              messages.map((msg) => (
+                <div
+                  key={msg.id}
+                  className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'} gap-2`}
+                >
+                  {/* Message Bubble */}
+                  <div
+                    className={`max-w-[92%] sm:max-w-[85%] rounded-2xl p-3 sm:p-3.5 text-xs sm:text-[13px] leading-relaxed ${
+                      msg.sender === 'user'
+                        ? 'bg-zinc-950 text-white rounded-br-xs font-medium shadow-2xs'
+                        : 'bg-zinc-50 text-zinc-900 rounded-bl-xs border border-zinc-200/90 font-normal shadow-2xs'
+                    }`}
+                  >
+                    <p className={`whitespace-pre-line ${msg.sender === 'user' ? 'text-zinc-100' : 'text-zinc-900'} leading-relaxed font-sans`}>
+                      {msg.text}
+                    </p>
+                  </div>
+
+                  {/* Dedicated High-Converting Deal Card (When Triggered by SDR) */}
+                  {msg.offer && (
+                    <div className="w-full max-w-[92%] sm:max-w-[85%] rounded-2xl bg-gradient-to-br from-emerald-50/80 via-white to-zinc-50 p-3 sm:p-3.5 border border-emerald-200 shadow-xs animate-in fade-in zoom-in-95 duration-150">
+                      <div className="flex items-start justify-between gap-2 mb-1">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-mono font-bold">
+                          <Gift className="w-3 h-3" />
+                          {msg.offer.badge}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => handleCopyCode(msg.offer!.code)}
+                          className="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-zinc-600 hover:text-zinc-900 bg-white px-2 py-0.5 rounded border border-zinc-200/80 shadow-2xs cursor-pointer"
+                        >
+                          {copiedCode === msg.offer.code ? (
+                            <>
+                              <Check className="w-2.5 h-2.5 text-emerald-600" />
+                              <span>COPIED</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-2.5 h-2.5 text-zinc-400" />
+                              <span>{msg.offer.code}</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+
+                      <h5 className="text-xs sm:text-[13px] font-bold text-zinc-950 mb-0.5">
+                        {msg.offer.title}
+                      </h5>
+                      <p className="text-[11px] text-zinc-600 mb-2.5 leading-snug">
+                        {msg.offer.description}
+                      </p>
+
+                      <a
+                        href={msg.offer.actionUrl}
+                        className="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-zinc-950 text-white text-[11.5px] font-bold hover:bg-zinc-800 transition-all shadow-xs w-full sm:w-auto"
+                      >
+                        <span>{msg.offer.actionText}</span>
+                      </a>
+                    </div>
+                  )}
+
+                  {/* Quick Reply Objection Follow-ups */}
+                  {msg.quickReplies && msg.quickReplies.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 pt-0.5">
+                      {msg.quickReplies.map((qr, idx) => (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => handleSend(qr.query)}
+                          className="text-[10.5px] font-medium bg-white hover:bg-zinc-100 text-zinc-800 px-2.5 py-1 rounded-full border border-zinc-200 shadow-2xs transition-colors cursor-pointer"
+                        >
+                          {qr.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))
+            )}
+
+            {isLoading && (
+              <div className="flex items-center gap-2 text-zinc-500 text-xs py-1.5 pl-1">
+                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span>Cora SDR is formulating a direct response...</span>
+              </div>
+            )}
+          </div>
+
+          {/* Quick Objection Presets Carousel Above Input */}
+          <div className="px-3.5 sm:px-5 py-1.5 sm:py-2 border-t border-zinc-100 bg-zinc-50/80 overflow-x-auto scrollbar-none shrink-0">
+            <div className="flex items-center gap-1.5 min-w-max">
+              <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider pr-1">
+                Objections:
+              </span>
+              {sampleObjections.map((obj, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => handleSend(obj.query)}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] sm:text-[10.5px] font-medium bg-white hover:bg-zinc-100 text-zinc-800 border border-zinc-200/90 transition-colors cursor-pointer shadow-2xs"
+                >
+                  <span>{obj.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Integrated SDR Input Bar */}
+          <form onSubmit={handleSubmit} className="p-2.5 sm:p-3.5 bg-white border-t border-zinc-100 flex items-center gap-2 shrink-0">
+            <input
+              ref={activeInputRef}
+              type="text"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              placeholder="Type your sales objection, question, or request a deal..."
+              className="flex-1 bg-zinc-100/90 rounded-full px-4 py-2 text-xs sm:text-[13px] text-zinc-950 placeholder:text-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-950 font-sans"
+            />
+            <button
+              type="submit"
+              className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-zinc-950 text-white flex items-center justify-center shrink-0 shadow-xs hover:bg-zinc-800 transition-colors cursor-pointer"
+            >
+              <Send className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            </button>
+          </form>
+        </aside>
       )}
     </>
   );
