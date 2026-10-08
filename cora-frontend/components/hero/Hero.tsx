@@ -129,7 +129,12 @@ export function Hero() {
           
           {/* Headline */}
           <h1 className="font-display text-[2.25rem] xs:text-[2.65rem] sm:text-5xl md:text-[62px] font-semibold text-zinc-950 leading-[1.15] sm:leading-[1.10] md:leading-[72px] tracking-[-0.035em] flex flex-col items-center justify-center gap-1 sm:gap-2 text-center">
-            <span>Build websites. Run your business,</span>
+            <span>
+              Build websites.{' '}
+              <span className="font-serif italic font-normal tracking-[-0.02em]">
+                Run your business,
+              </span>
+            </span>
             <div className="inline-flex items-center justify-center flex-wrap gap-2 sm:gap-2.5">
               <span>with an</span>
               <span className="inline-flex items-center align-middle whitespace-nowrap gap-1.5 sm:gap-2">

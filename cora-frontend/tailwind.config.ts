@@ -18,6 +18,8 @@ const config: Config = {
         heading: ["'General Sans'", "var(--font-display)", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
         mono: ["var(--font-mono)", "JetBrains Mono", "monospace"],
         scribble: ["var(--font-scribble)", "Caveat", "cursive"],
+        serif: ["var(--font-serif)", "Instrument Serif", "Georgia", "serif"],
+        glitz: ["var(--font-serif)", "Instrument Serif", "Georgia", "serif"],
       },
       borderRadius: {
         '2xl': '16px',

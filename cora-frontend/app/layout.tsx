@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter, Inter_Tight, Caveat, JetBrains_Mono } from 'next/font/google';
+import { Inter, Inter_Tight, Caveat, JetBrains_Mono, Instrument_Serif } from 'next/font/google';
 import Script from 'next/script';
 import '@/styles/globals.css';
 import { Navbar } from '@/components/layout/Navbar';
@@ -33,6 +33,14 @@ const caveat = Caveat({
 const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
   variable: '--font-mono',
+  display: 'swap',
+});
+
+const instrumentSerif = Instrument_Serif({
+  subsets: ['latin'],
+  weight: '400',
+  style: ['normal', 'italic'],
+  variable: '--font-serif',
   display: 'swap',
 });
 
@@ -116,7 +124,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${inter.variable} ${interTight.variable} ${caveat.variable} ${jetbrainsMono.variable}`}
+      className={`${inter.variable} ${interTight.variable} ${caveat.variable} ${jetbrainsMono.variable} ${instrumentSerif.variable}`}
     >
       <head>
         {/* Performance Resource Hints for Faster LCP */}
