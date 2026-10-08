@@ -37,18 +37,18 @@ export function PricingSection() {
       <div className="w-full max-w-[1360px] mx-auto px-4 sm:px-6">
         
         {/* Section Header */}
-        <div className="text-center max-w-[760px] mx-auto mb-10 sm:mb-12">
-          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 bg-zinc-100 rounded-full text-zinc-800 text-xs font-semibold uppercase tracking-wider mb-4 border border-zinc-200/80">
+        <div className="text-center max-w-[760px] mx-auto mb-10 sm:mb-12 flex flex-col items-center">
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 bg-zinc-100 rounded-full text-zinc-800 text-xs font-semibold uppercase tracking-wider mb-4 border border-zinc-200/80 shadow-2xs">
             <Sparkles className="w-3.5 h-3.5 text-zinc-950" />
-            <span>HONEST 4-TIER PRICING</span>
+            <span>TRANSPARENT PRICING</span>
           </div>
 
-          <h2 className="font-display text-3xl xs:text-4xl sm:text-5xl font-bold leading-[1.18] tracking-[-0.03em] bg-gradient-to-r from-zinc-950 via-zinc-700 to-zinc-400 bg-clip-text text-transparent inline-block pb-2 mb-2">
-            Transparent pricing. Exclusive of taxes.
+          <h2 className="font-display text-3xl xs:text-4xl sm:text-5xl font-bold leading-[1.15] tracking-[-0.03em] text-zinc-950 mb-3 text-center">
+            Simple, honest pricing.
           </h2>
 
-          <p className="text-zinc-600 text-base sm:text-lg font-normal leading-relaxed max-w-[600px] mx-auto">
-            Get started for free today. Upgrade when your business grows with 2 months free on annual plans.
+          <p className="text-zinc-600 text-base sm:text-lg font-normal leading-relaxed max-w-[600px] text-center">
+            Start free. Upgrade anytime with 2 months free on annual plans.
           </p>
         </div>
 
@@ -73,7 +73,7 @@ export function PricingSection() {
             >
               <span>Annual</span>
               <span className="px-2 py-0.5 text-[10px] font-bold bg-emerald-500 text-white rounded-full">
-                2 Mo. Free
+                Save 20%
               </span>
             </button>
           </div>
@@ -92,13 +92,13 @@ export function PricingSection() {
                   </div>
                   <h3 className="font-display text-lg font-bold text-zinc-950">Free Forever</h3>
                 </div>
-                <span className="px-2.5 py-1 bg-zinc-100 text-zinc-700 rounded-full text-[11px] font-bold">
-                  ₹0
+                <span className="px-2.5 py-0.5 bg-zinc-100 text-zinc-700 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider">
+                  FREE
                 </span>
               </div>
 
               <p className="text-xs text-zinc-500 leading-relaxed mb-6">
-                For solo operators, freelancers &amp; solopreneurs starting out.
+                Run your CRM, generate invoices, and test AI agents.
               </p>
 
               <div className="mb-6 pb-6 border-b border-zinc-100">
@@ -138,7 +138,7 @@ export function PricingSection() {
               onClick={() => handlePlanSelect('free')}
               className="w-full py-3 bg-zinc-100 hover:bg-zinc-200 text-zinc-900 rounded-xl text-xs sm:text-sm font-semibold transition-colors shadow-2xs cursor-pointer text-center block"
             >
-              Start free — no card needed
+              Start Free
             </button>
           </div>
 
@@ -152,13 +152,13 @@ export function PricingSection() {
                   </div>
                   <h3 className="font-display text-lg font-bold text-zinc-950">Starter</h3>
                 </div>
-                <span className="px-2.5 py-1 bg-emerald-50 text-emerald-800 rounded-full text-[11px] font-bold">
-                  ₹{isAnnual ? '833' : '999'}/mo
+                <span className="px-2.5 py-0.5 bg-emerald-50 text-emerald-800 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider">
+                  POPULAR
                 </span>
               </div>
 
               <p className="text-xs text-zinc-500 leading-relaxed mb-6">
-                For independent operators establishing their brand with custom domains.
+                Connect custom domains, send branded emails, and invite 2 teammates.
               </p>
 
               <div className="mb-6 pb-6 border-b border-zinc-100">
@@ -202,7 +202,7 @@ export function PricingSection() {
               onClick={() => handlePlanSelect('starter')}
               className="w-full py-3 bg-zinc-100 hover:bg-zinc-200 text-zinc-900 rounded-xl text-xs sm:text-sm font-semibold transition-colors shadow-2xs cursor-pointer text-center block"
             >
-              Get started with Starter
+              Get Started
             </button>
           </div>
 
@@ -212,12 +212,12 @@ export function PricingSection() {
               ? 'bg-zinc-950 border-2 border-emerald-500 shadow-2xl ring-4 ring-emerald-400/20'
               : 'bg-zinc-950 border-2 border-zinc-950'
           }`}>
-            <div className={`absolute -top-3.5 left-1/2 -translate-x-1/2 text-[11px] font-bold px-3.5 py-1 rounded-full uppercase tracking-wider shadow-2xs ${
+            <div className={`absolute -top-3.5 left-1/2 -translate-x-1/2 text-[10px] font-mono font-bold px-3 py-0.5 rounded-full uppercase tracking-wider shadow-2xs ${
               isPartner100Coupon(appliedCoupon)
                 ? 'bg-emerald-400 text-zinc-950 font-extrabold animate-pulse'
                 : 'bg-emerald-500 text-zinc-950'
             }`}>
-              {isPartner100Coupon(appliedCoupon) ? '🎉 100% OFF PARTNER PASS' : 'Recommended'}
+              {isPartner100Coupon(appliedCoupon) ? '100% OFF PASS' : 'RECOMMENDED'}
             </div>
 
             <div>
@@ -228,13 +228,13 @@ export function PricingSection() {
                   </div>
                   <h3 className="font-display text-lg font-bold text-white">Professional</h3>
                 </div>
-                <span className="px-2.5 py-1 bg-zinc-800 text-emerald-400 rounded-full text-[11px] font-bold">
-                  {isPartner100Coupon(appliedCoupon) ? '₹0' : (isAnnual ? '₹2,083' : '₹2,499')}/mo
+                <span className="px-2.5 py-0.5 bg-zinc-800 text-emerald-400 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider">
+                  {isPartner100Coupon(appliedCoupon) ? 'FREE' : 'PRO TIER'}
                 </span>
               </div>
 
               <p className="text-xs text-zinc-400 leading-relaxed mb-6">
-                Autonomous backbone with advanced AI, official WhatsApp dispatch &amp; UPI QR.
+                Automate WhatsApp alerts, add dynamic UPI QR, and unlock reasoning AI.
               </p>
 
               <div className="mb-6 pb-6 border-b border-zinc-800">
@@ -290,8 +290,8 @@ export function PricingSection() {
               }`}
             >
               {isPartner100Coupon(appliedCoupon)
-                ? 'Claim 100% Free Professional Plan →'
-                : 'Get Started with Professional'}
+                ? 'Claim Free Plan'
+                : 'Get Started'}
             </button>
           </div>
 
@@ -305,13 +305,13 @@ export function PricingSection() {
                   </div>
                   <h3 className="font-display text-lg font-bold text-zinc-950">Scale</h3>
                 </div>
-                <span className="px-2.5 py-1 bg-purple-50 text-purple-800 rounded-full text-[11px] font-bold">
-                  ₹{isAnnual ? '3,749' : '4,499'}/mo
+                <span className="px-2.5 py-0.5 bg-purple-50 text-purple-800 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider">
+                  SCALE
                 </span>
               </div>
 
               <p className="text-xs text-zinc-500 leading-relaxed mb-6">
-                High-throughput infrastructure for agencies &amp; multi-member teams.
+                Scale your agency with unlimited seats, custom APIs, and free site migration.
               </p>
 
               <div className="mb-6 pb-6 border-b border-zinc-100">
@@ -355,7 +355,7 @@ export function PricingSection() {
               onClick={() => handlePlanSelect('scale')}
               className="w-full py-3 bg-zinc-100 hover:bg-zinc-200 text-zinc-900 rounded-xl text-xs sm:text-sm font-semibold transition-colors shadow-2xs cursor-pointer text-center block"
             >
-              Get Started with Scale
+              Get Started
             </button>
           </div>
 
@@ -364,7 +364,7 @@ export function PricingSection() {
         {/* Tax Note */}
         <div className="mt-8 text-center text-xs text-zinc-500 flex items-center justify-center gap-1.5 font-mono">
           <Receipt className="w-3.5 h-3.5 text-zinc-600" />
-          <span>* All prices are exclusive of 18% GST. Fast 1-step checkout via UPI &amp; Cards with instant GST tax invoices.</span>
+          <span>All prices exclude 18% GST. Instant UPI &amp; card checkout with compliant tax invoices.</span>
         </div>
 
       </div>

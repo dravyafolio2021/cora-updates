@@ -275,9 +275,9 @@ export default function PricingPage() {
           {/* Trust Badge */}
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white/95 backdrop-blur-md rounded-full text-xs font-mono font-medium text-zinc-800 border border-zinc-200/90 shadow-2xs mb-5">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="font-semibold text-zinc-950">CORA CLOUD 4.0</span>
+            <span className="font-semibold text-zinc-950">CORA CLOUD</span>
             <span className="text-zinc-400">•</span>
-            <span>INSTANT DIRECT CHECKOUT &bull; 18% GST READY</span>
+            <span>18% GST READY</span>
           </div>
 
           {/* Heading */}
