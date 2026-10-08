@@ -8,6 +8,7 @@ import { INDUSTRY_WORKSPACES } from '@/lib/industry-data';
 import { COMPARISONS_DATA } from '@/lib/comparisons-data';
 import { INTEGRATIONS_LIST } from '@/lib/integrations-data';
 import { TOOLS_DATA } from '@/lib/tools-data';
+import { TEMPLATES_DATA } from '@/lib/templates-data';
 
 export const dynamic = 'force-static';
 
@@ -101,6 +102,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.85,
   }));
 
+  const templateUrls = TEMPLATES_DATA.map((tmpl) => ({
+    url: `${baseUrl}/templates/${tmpl.slug}`,
+    lastModified: now,
+    changeFrequency: 'weekly' as const,
+    priority: 0.92,
+  }));
+
   const staticHubPages = [
     { url: baseUrl, lastModified: now, changeFrequency: 'daily' as const, priority: 1.0 },
     { url: `${baseUrl}/cora-ai/`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.98 },
@@ -110,6 +118,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/tools/agency-proposal-generator/`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.92 },
     { url: `${baseUrl}/blog`, lastModified: now, changeFrequency: 'daily' as const, priority: 0.98 },
     { url: `${baseUrl}/guides`, lastModified: now, changeFrequency: 'daily' as const, priority: 0.98 },
+    { url: `${baseUrl}/templates`, lastModified: now, changeFrequency: 'daily' as const, priority: 0.98 },
     { url: `${baseUrl}/articles`, lastModified: now, changeFrequency: 'daily' as const, priority: 0.95 },
     { url: `${baseUrl}/docs`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.95 },
     { url: `${baseUrl}/features`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.95 },
@@ -146,6 +155,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...featureUrls,
     ...industryUrls,
     ...useCaseUrls,
+    ...templateUrls,
     ...comparisonUrls,
     ...integrationUrls,
     ...toolUrls,

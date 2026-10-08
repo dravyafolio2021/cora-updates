@@ -157,6 +157,8 @@ echo "Remote deployment extraction finished successfully."
         ("Features Page (Next.js)", "https://heycora.in/features/", "Features"),
         ("Integrations Hub (Next.js)", "https://heycora.in/integrations/", "Ecosystem"),
         ("Embed Builder Tool (Next.js)", "https://heycora.in/tools/embed-builder/", "Website Embed"),
+        ("Templates & Theme Library (Next.js)", "https://heycora.in/templates", "Templates"),
+        ("Web Dev Agency Template (Next.js)", "https://heycora.in/templates/web-development-agency", "Agency"),
         ("Production Workspace (WordPress)", "https://heycora.in/workspace/login", "login-form"),
         ("Staging Workspace (WordPress)", "https://stagging.heycora.in", None),
     ]

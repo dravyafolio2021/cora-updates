@@ -184,7 +184,7 @@ export function Hero() {
 
             {/* Secondary CTA: Explore free templates */}
             <Link
-              href="/use-cases"
+              href="/templates"
               className="px-4 py-2.5 rounded-xl flex items-center justify-center gap-1.5 text-zinc-900 hover:text-black text-sm sm:text-base font-medium font-sans leading-6 bg-transparent hover:bg-black/5 transition-all group w-full sm:w-auto"
             >
               <span>Explore free templates</span>

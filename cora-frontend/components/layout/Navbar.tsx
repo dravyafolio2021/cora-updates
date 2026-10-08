@@ -2018,7 +2018,7 @@ export function Navbar() {
                       </div>
 
                       <Link
-                        href="/use-cases"
+                        href="/templates"
                         onClick={() => setActiveDropdown(null)}
                         className="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-white hover:bg-purple-50 text-purple-900 text-xs font-bold transition-all shadow-2xs group shrink-0 border border-purple-200/70"
                       >
