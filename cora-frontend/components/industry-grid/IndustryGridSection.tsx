@@ -38,37 +38,37 @@ interface CapabilityColumn {
 
 const capabilityColumns: CapabilityColumn[] = [
   {
-    category: 'INTELLIGENCE & AI',
-    badge: 'FLAGSHIP',
+    category: 'Get help from AI',
+    badge: 'AI HELP',
     badgeColor: 'bg-emerald-50 text-emerald-700 border-emerald-200/80',
     items: [
       {
-        name: 'AI Co-Founder',
-        desc: 'Autonomous operations triage',
+        name: 'Work with your AI co-founder',
+        desc: 'Plan your next steps and handle daily work.',
         icon: Bot,
         iconBg: 'bg-emerald-50',
         iconBorder: 'border-emerald-100',
         iconColor: 'text-emerald-600',
       },
       {
-        name: 'Voice-to-Scope',
-        desc: 'Audio briefs to structured milestones',
+        name: 'Turn voice notes into a plan',
+        desc: 'Turn client messages into clear project steps.',
         icon: AudioWaveform,
         iconBg: 'bg-purple-50',
         iconBorder: 'border-purple-100',
         iconColor: 'text-purple-600',
       },
       {
-        name: 'Content AI & GEO',
-        desc: '3-Act viral scripts & answer engines',
+        name: 'Create content faster',
+        desc: 'Draft scripts and prepare content for AI search.',
         icon: Sparkles,
         iconBg: 'bg-amber-50',
         iconBorder: 'border-amber-100',
         iconColor: 'text-amber-500',
       },
       {
-        name: 'RAG Memory MCP',
-        desc: 'Semantic memory & IDE bridge',
+        name: 'Find the answers you need',
+        desc: 'Search client briefs, files, and past decisions.',
         icon: Database,
         iconBg: 'bg-sky-50',
         iconBorder: 'border-sky-100',
@@ -77,37 +77,37 @@ const capabilityColumns: CapabilityColumn[] = [
     ],
   },
   {
-    category: 'GROWTH & PIPELINE',
-    badge: 'GROWTH',
+    category: 'Turn enquiries into clients',
+    badge: 'SALES',
     badgeColor: 'bg-blue-50 text-blue-700 border-blue-200/80',
     items: [
       {
-        name: 'Kanban Lead CRM',
-        desc: 'Deal stages & WhatsApp follow-up',
+        name: 'Follow up with every lead',
+        desc: 'Track enquiries and deals in your CRM.',
         icon: Kanban,
         iconBg: 'bg-blue-50',
         iconBorder: 'border-blue-100',
         iconColor: 'text-blue-600',
       },
       {
-        name: 'Funnel Builder',
-        desc: 'High-converting pages & reels',
+        name: 'Build pages that bring enquiries',
+        desc: 'Create landing pages for your services and campaigns.',
         icon: Layers,
         iconBg: 'bg-rose-50',
         iconBorder: 'border-rose-100',
         iconColor: 'text-rose-500',
       },
       {
-        name: 'Visual Forms',
-        desc: 'Dynamic briefs & call-time booking',
+        name: 'Collect clear client briefs',
+        desc: 'Use forms to gather details and book calls.',
         icon: FileText,
         iconBg: 'bg-teal-50',
         iconBorder: 'border-teal-100',
         iconColor: 'text-teal-600',
       },
       {
-        name: '5★ Review Portal',
-        desc: 'Smart sentiment routing & Google reviews',
+        name: 'Ask clients for reviews',
+        desc: 'Collect feedback and invite clients to leave reviews.',
         icon: Star,
         iconBg: 'bg-amber-50',
         iconBorder: 'border-amber-100',
@@ -116,37 +116,37 @@ const capabilityColumns: CapabilityColumn[] = [
     ],
   },
   {
-    category: 'OPERATIONS & LEGAL',
-    badge: 'LEGAL TECH',
+    category: 'Keep projects moving',
+    badge: 'CLIENT WORK',
     badgeColor: 'bg-purple-50 text-purple-700 border-purple-200/80',
     items: [
       {
-        name: 'SHA-256 E-Signs',
-        desc: '5-Step legally binding digital contracts',
+        name: 'Get client agreements signed',
+        desc: 'Send contracts for clients to sign online.',
         icon: FileCheck2,
         iconBg: 'bg-emerald-50',
         iconBorder: 'border-emerald-100',
         iconColor: 'text-emerald-600',
       },
       {
-        name: 'Crew Dispatch',
-        desc: 'Automated call sheets & conflict alerts',
+        name: 'Keep your team informed',
+        desc: 'Share job details and check for schedule clashes.',
         icon: Navigation,
         iconBg: 'bg-indigo-50',
         iconBorder: 'border-indigo-100',
         iconColor: 'text-indigo-600',
       },
       {
-        name: 'Master Calendar',
-        desc: 'Multi-location scheduling & iCal sync',
+        name: 'Plan your week',
+        desc: 'Keep client calls and team schedules together.',
         icon: Calendar,
         iconBg: 'bg-rose-50',
         iconBorder: 'border-rose-100',
         iconColor: 'text-rose-500',
       },
       {
-        name: 'Task Board',
-        desc: 'Post-production sprints & proofing',
+        name: 'Stay on top of tasks',
+        desc: 'Assign work and see what’s done or due.',
         icon: CheckSquare,
         iconBg: 'bg-purple-50',
         iconBorder: 'border-purple-100',
@@ -155,37 +155,37 @@ const capabilityColumns: CapabilityColumn[] = [
     ],
   },
   {
-    category: 'FINANCE & ASSETS',
-    badge: 'INDIA GST',
+    category: 'Manage money and files',
+    badge: 'FINANCE & FILES',
     badgeColor: 'bg-emerald-50 text-emerald-700 border-emerald-200/80',
     items: [
       {
-        name: '18% GST Invoicing',
-        desc: 'Automated CGST/SGST splitting & SAC codes',
+        name: 'Send GST invoices',
+        desc: 'Create invoices for your client work.',
         icon: Receipt,
         iconBg: 'bg-emerald-50',
         iconBorder: 'border-emerald-100',
         iconColor: 'text-emerald-600',
       },
       {
-        name: 'Gear & Inventory',
-        desc: 'Equipment registry & checkouts',
+        name: 'Track your equipment',
+        desc: 'See what’s available and who’s using it.',
         icon: Camera,
         iconBg: 'bg-zinc-100',
         iconBorder: 'border-zinc-200',
         iconColor: 'text-zinc-700',
       },
       {
-        name: 'Media Hub & RAW',
-        desc: 'Workspace library & 4K galleries',
+        name: 'Keep client files together',
+        desc: 'Organise images, videos, and project files.',
         icon: Film,
         iconBg: 'bg-fuchsia-50',
         iconBorder: 'border-fuchsia-100',
         iconColor: 'text-fuchsia-600',
       },
       {
-        name: 'Multi-Tenant RBAC',
-        desc: '30-Point security & capability roles',
+        name: 'Control who sees what',
+        desc: 'Choose what clients and teammates can access.',
         icon: ShieldCheck,
         iconBg: 'bg-cyan-50',
         iconBorder: 'border-cyan-100',
@@ -204,14 +204,14 @@ export function IndustryGridSection() {
         <div className="max-w-[760px] mx-auto text-center mb-12 sm:mb-16">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-zinc-100 rounded-full text-zinc-800 text-xs font-semibold uppercase tracking-wider mb-3.5 border border-zinc-200/80">
             <span className="w-1.5 h-1.5 rounded-full bg-indigo-600 animate-pulse" />
-            <span>UNIFIED AGENCY ECOSYSTEM</span>
+            <span>AGENCY WORKSPACE</span>
           </div>
 
           <h2 className="font-display text-3xl xs:text-4xl sm:text-5xl lg:text-[46px] font-bold leading-[1.2] tracking-[-0.03em] bg-gradient-to-r from-zinc-950 via-zinc-700 to-zinc-400 bg-clip-text text-transparent inline-block pb-2 mb-3">
-            Powering every agency capability
+            Keep your agency moving.
           </h2>
           <p className="text-zinc-600 text-base sm:text-lg font-normal leading-relaxed max-w-[640px] mx-auto">
-            From autonomous AI brief triage to legally binding SHA-256 contracts and 18% GST billing — every module works as one unified engine.
+            Manage leads, projects, files, and payments in one workspace.
           </p>
         </div>
 
@@ -221,10 +221,10 @@ export function IndustryGridSection() {
             <div key={cIdx} className="space-y-5">
               {/* Column Header */}
               <div className="flex items-center justify-between pb-3 border-b border-zinc-100">
-                <span className="text-[11px] font-mono font-bold tracking-widest text-zinc-400 uppercase">
+                <span className="text-xs sm:text-[13px] font-bold text-zinc-900 tracking-tight">
                   {col.category}
                 </span>
-                <span className={`text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${col.badgeColor}`}>
+                <span className={`text-[9.5px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${col.badgeColor}`}>
                   {col.badge}
                 </span>
               </div>
@@ -250,7 +250,7 @@ export function IndustryGridSection() {
                         <h3 className="font-bold text-zinc-950 text-[14.5px] leading-snug group-hover:text-indigo-600 transition-colors">
                           {item.name}
                         </h3>
-                        <p className="text-zinc-500 text-xs sm:text-[12.5px] leading-tight">
+                        <p className="text-zinc-500 text-xs sm:text-[12.5px] leading-relaxed">
                           {item.desc}
                         </p>
                       </div>
@@ -266,6 +266,3 @@ export function IndustryGridSection() {
     </section>
   );
 }
-
-
-
