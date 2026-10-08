@@ -4,7 +4,7 @@ import React, { useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
-import { Sparkles, Layers, Cpu, CheckCircle2 } from 'lucide-react';
+import { Sparkles, MessageSquare, FolderKanban, Receipt } from 'lucide-react';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -51,10 +51,10 @@ export function UnifiedHubSprawlSection() {
           </div>
 
           <h2 className="font-display text-2xl xs:text-3xl sm:text-4xl lg:text-[38px] font-bold leading-[1.18] tracking-[-0.03em] bg-gradient-to-r from-zinc-950 via-zinc-700 to-zinc-400 bg-clip-text text-transparent inline-block pb-2 mb-1.5">
-            Stop losing client context &mdash; Cora unifies your entire agency
+            Run your business in one place.
           </h2>
           <p className="text-zinc-600 text-xs sm:text-sm font-normal leading-relaxed max-w-[580px] mx-auto">
-            Replace 10+ disconnected apps with one intelligent workspace for client proposals, branded delivery portals, and GST invoicing.
+            Keep your website, clients, work, and payments together.
           </p>
         </div>
 
@@ -74,45 +74,45 @@ export function UnifiedHubSprawlSection() {
         {/* ── 3. Three Compact Context Columns (Mobile-First Optimized) ── */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 max-w-[960px] mx-auto">
           
-          {/* Column 1: Eliminate Tool Sprawl */}
+          {/* Column 1: Get enquiries */}
           <div className="hub-col space-y-1.5 text-left border-t border-zinc-100 pt-3 md:border-t-0 md:pt-0">
             <div className="w-5 h-0.5 bg-zinc-300 mb-1.5 hidden md:block" />
             <div className="flex items-center gap-1.5">
-              <Layers className="w-3.5 h-3.5 text-zinc-500 shrink-0" />
+              <MessageSquare className="w-3.5 h-3.5 text-zinc-600 shrink-0" />
               <h3 className="font-display text-base sm:text-lg font-bold text-zinc-950 tracking-tight">
-                Eliminate Tool Sprawl
+                Get enquiries
               </h3>
             </div>
             <p className="text-zinc-600 text-xs sm:text-[12.5px] leading-relaxed">
-              Stop juggling scattered apps. Centralize client files, project briefs, and scope updates in one shared workspace.
+              Collect requests and follow up with clients.
             </p>
           </div>
 
-          {/* Column 2: Automate Agency Ops */}
+          {/* Column 2: Manage client work */}
           <div className="hub-col space-y-1.5 text-left border-t border-zinc-100 pt-3 md:border-t-0 md:pt-0">
             <div className="w-5 h-0.5 bg-indigo-600 mb-1.5 hidden md:block" />
             <div className="flex items-center gap-1.5">
-              <Cpu className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+              <FolderKanban className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
               <h3 className="font-display text-base sm:text-lg font-bold text-zinc-950 tracking-tight">
-                Automate Agency Ops
+                Manage client work
               </h3>
             </div>
             <p className="text-zinc-600 text-xs sm:text-[12.5px] leading-relaxed">
-              Draft winning proposals, calculate 18% GST invoices, and close client contracts with legally binding e-signatures.
+              Keep files, feedback, and updates together.
             </p>
           </div>
 
-          {/* Column 3: Deliver on Autopilot */}
+          {/* Column 3: Track payments */}
           <div className="hub-col space-y-1.5 text-left border-t border-zinc-100 pt-3 md:border-t-0 md:pt-0">
             <div className="w-5 h-0.5 bg-emerald-600 mb-1.5 hidden md:block" />
             <div className="flex items-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+              <Receipt className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
               <h3 className="font-display text-base sm:text-lg font-bold text-zinc-950 tracking-tight">
-                Deliver on Autopilot
+                Track payments
               </h3>
             </div>
             <p className="text-zinc-600 text-xs sm:text-[12.5px] leading-relaxed">
-              Give clients branded staging portals, instant UPI payment options, and real-time milestone approvals with zero delays.
+              Send invoices and see who has paid.
             </p>
           </div>
 
