@@ -185,10 +185,10 @@ export function Hero() {
             {/* Secondary CTA: Explore free templates */}
             <Link
               href="/use-cases"
-              className="px-5 sm:px-6 py-2.5 sm:py-2.5 rounded-xl flex items-center justify-center gap-1.5 text-zinc-950 text-sm sm:text-base font-semibold font-sans leading-6 bg-white/80 hover:bg-white border border-zinc-200/80 shadow-xs hover:border-zinc-300 transition-all hover:-translate-y-0.5 active:translate-y-0 w-full sm:w-auto"
+              className="px-4 py-2.5 rounded-xl flex items-center justify-center gap-1.5 text-zinc-900 hover:text-black text-sm sm:text-base font-medium font-sans leading-6 bg-transparent hover:bg-black/5 transition-all group w-full sm:w-auto"
             >
               <span>Explore free templates</span>
-              <ChevronRight className="w-4 h-4 text-zinc-950" />
+              <ChevronRight className="w-4 h-4 text-zinc-700 group-hover:text-black group-hover:translate-x-0.5 transition-all" />
             </Link>
 
           </div>
