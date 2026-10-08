@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Sparkles, Search, Check, Zap, Lock, ShieldCheck } from 'lucide-react';
+import { Sparkles, Search, Check, Zap, Code2, Copy, LayoutTemplate, Layers } from 'lucide-react';
 import { ArtisticHeroBackground } from '@/components/features/ArtisticHeroBackground';
 
 interface TemplateHeroProps {
@@ -25,21 +25,21 @@ export function TemplateHero({
         <div className="mb-4 sm:mb-6">
           <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full bg-white/95 backdrop-blur-md text-zinc-900 border border-zinc-200/80 text-xs sm:text-sm font-medium shadow-2xs">
             <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-purple-600" />
-            <span>16+ Production-Ready Schemas &amp; Kits</span>
+            <span>Frontend Assets &amp; UI Templates</span>
           </span>
         </div>
 
         {/* 2-Line Headline */}
         <h1 className="font-display text-4xl sm:text-6xl md:text-7xl font-semibold text-zinc-950 tracking-[-0.035em] leading-[1.12] sm:leading-[1.08] mb-4 sm:mb-6 max-w-[980px] mx-auto">
-          <span className="block">Template &amp; Theme Library</span>
+          <span className="block">Frontend Assets &amp; UI Kits</span>
           <span className="block mt-1 sm:mt-2 text-zinc-600 font-normal text-2xl sm:text-4xl md:text-5xl">
-            Pre-built websites, workspace schemas &amp; turnkey kits
+            Landing pages, AI section prompts, Elementor &amp; Lovable
           </span>
         </h1>
 
         {/* Subtitle */}
-        <p className="text-zinc-600 text-sm sm:text-base md:text-lg font-normal leading-relaxed max-w-[660px] mx-auto mb-7 sm:mb-9 px-3">
-          Deploy complete agency websites, client proofing portals, SHA-256 contracts, and 18% GST invoicing schemas with one click.
+        <p className="text-zinc-600 text-sm sm:text-base md:text-lg font-normal leading-relaxed max-w-[680px] mx-auto mb-7 sm:mb-9 px-3">
+          Copy-paste ready Tailwind landing pages, battle-tested AI section prompts for Claude &amp; Cursor, importable Elementor Pro kits, and 1-click forkable Lovable web apps.
         </p>
 
         {/* Value Trust Pillars */}
@@ -49,16 +49,16 @@ export function TemplateHero({
             <span>100% Free Forever</span>
           </div>
           <div className="flex items-center gap-1.5 bg-white/70 backdrop-blur-xs px-3 py-1 rounded-full border border-zinc-200/60 shadow-2xs">
-            <Zap className="w-3.5 h-3.5 text-purple-600" />
-            <span>1-Click Workspace Deploy</span>
+            <Copy className="w-3.5 h-3.5 text-purple-600" />
+            <span>1-Click Copy AI Prompts</span>
           </div>
           <div className="flex items-center gap-1.5 bg-white/70 backdrop-blur-xs px-3 py-1 rounded-full border border-zinc-200/60 shadow-2xs">
-            <Lock className="w-3.5 h-3.5 text-blue-600" />
-            <span>Pre-Configured Indian GST</span>
+            <LayoutTemplate className="w-3.5 h-3.5 text-blue-600" />
+            <span>Elementor .json Kits</span>
           </div>
           <div className="flex items-center gap-1.5 bg-white/70 backdrop-blur-xs px-3 py-1 rounded-full border border-zinc-200/60 shadow-2xs">
-            <ShieldCheck className="w-3.5 h-3.5 text-indigo-600" />
-            <span>IT Act Contract E-Signs</span>
+            <Code2 className="w-3.5 h-3.5 text-indigo-600" />
+            <span>Lovable &amp; v0 Projects</span>
           </div>
         </div>
 
@@ -70,7 +70,7 @@ export function TemplateHero({
               type="text"
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
-              placeholder="Search templates e.g. web dev, branding, CA firm, law firm, real estate..."
+              placeholder="Search assets e.g. Hero prompts, Pricing table, Elementor kit, Lovable CRM, Agency page..."
               className="w-full bg-transparent text-xs sm:text-sm text-zinc-950 placeholder:text-zinc-400 focus:outline-none font-sans"
             />
             {searchQuery && (

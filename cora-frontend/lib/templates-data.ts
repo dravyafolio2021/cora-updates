@@ -1,22 +1,13 @@
-export interface TemplatePageItem {
-  name: string;
-  slug: string;
-  description: string;
-  type: 'landing' | 'portal' | 'form' | 'invoice' | 'contract' | 'dashboard';
-}
+export type AssetFormat = 'native_page' | 'section_prompts' | 'elementor_kit' | 'lovable_project';
 
-export interface TemplateSchemaField {
-  name: string;
-  type: string;
-  required: boolean;
-  description: string;
-}
-
-export interface TemplateSchemaEntity {
+export interface TemplateSectionItem {
+  id: string;
   name: string;
   badge: string;
   description: string;
-  fields: TemplateSchemaField[];
+  promptText: string;
+  tailwindSnippet?: string;
+  elementorBlueprint?: string;
 }
 
 export interface TemplateItem {
@@ -25,11 +16,11 @@ export interface TemplateItem {
   title: string;
   shortTitle: string;
   tagline: string;
-  category: 'tech_dev' | 'creative_design' | 'legal_finance' | 'marketing_growth' | 'services_lifestyle';
+  category: 'landing_pages' | 'section_prompts' | 'elementor_kits' | 'lovable_projects';
   categoryLabel: string;
+  assetFormat: AssetFormat;
+  formatBadge: string;
   badge: string;
-  sacCode: string;
-  gstRate: string;
   rating: number;
   reviewsCount: number;
   downloadsCount: number;
@@ -39,12 +30,12 @@ export interface TemplateItem {
   accentText: string;
   accentColor: string;
   coverImage: string;
-  includedPages: TemplatePageItem[];
-  schemaStructures: TemplateSchemaEntity[];
+  compatibleBuilders: string[];
+  sectionsIncluded: TemplateSectionItem[];
   features: string[];
-  recommendedModules: { id: string; title: string; icon: string }[];
   toolsReplaced: { name: string; monthlyCostUSD: number }[];
-  workflowHighlights: string[];
+  frameworkStack: string[];
+  quickCopyPrompt: string;
   faqs: { question: string; answer: string }[];
 }
 
@@ -57,892 +48,940 @@ export interface TemplateCategory {
 }
 
 export const TEMPLATE_CATEGORIES: TemplateCategory[] = [
-  { id: 'all', label: 'All Templates & Schemas', shortLabel: 'All', badge: '16+ SCHEMAS', count: 16 },
-  { id: 'tech_dev', label: 'Tech & Development', shortLabel: 'Tech & Dev', badge: 'TECH & DEV', count: 4 },
-  { id: 'creative_design', label: 'Creative & Design', shortLabel: 'Design & Media', badge: 'DESIGN & MEDIA', count: 4 },
-  { id: 'legal_finance', label: 'Legal & Finance', shortLabel: 'Legal & Finance', badge: 'LEGAL & FINANCE', count: 4 },
-  { id: 'marketing_growth', label: 'Marketing & Advisory', shortLabel: 'Marketing', badge: 'MARKETING', count: 2 },
-  { id: 'services_lifestyle', label: 'Services & Lifestyle', shortLabel: 'Services', badge: 'SERVICES', count: 2 },
+  { id: 'all', label: 'All Frontend Assets', shortLabel: 'All Assets', badge: '16+ ASSETS', count: 16 },
+  { id: 'landing_pages', label: 'Native Landing Pages', shortLabel: 'Landing Pages', badge: 'NATIVE TAILWIND', count: 4 },
+  { id: 'section_prompts', label: 'AI Section Prompts', shortLabel: 'AI Prompts', badge: 'CLAUDE & CURSOR', count: 4 },
+  { id: 'elementor_kits', label: 'Elementor Template Kits', shortLabel: 'Elementor Kits', badge: 'ELEMENTOR JSON', count: 4 },
+  { id: 'lovable_projects', label: 'Lovable & React Projects', shortLabel: 'Lovable Projects', badge: 'LOVABLE & V0', count: 4 },
 ];
 
 export const TEMPLATES_DATA: TemplateItem[] = [
+  // ── 1. NATIVE LANDING PAGES ──
   {
-    id: 'web-dev-agency',
+    id: 'agency-flagship-landing',
     slug: 'web-development-agency',
-    title: 'Web & App Development Agency Kit',
-    shortTitle: 'Web & Dev Agency',
-    tagline: 'Turnkey client staging vaults, milestone sprint billing & SAC 9983 invoicing.',
-    category: 'tech_dev',
-    categoryLabel: 'Tech & Development',
-    badge: 'Popular Kit',
-    sacCode: 'SAC 998314',
-    gstRate: '18% GST',
+    title: 'Modern Digital Agency Flagship Landing Page',
+    shortTitle: 'Agency Flagship',
+    tagline: 'High-converting interactive hero, dynamic pricing matrix, case study bento & slide-up booking sheet.',
+    category: 'landing_pages',
+    categoryLabel: 'Native Landing Pages',
+    assetFormat: 'native_page',
+    formatBadge: 'Native Tailwind / Next.js',
+    badge: 'Popular Page',
     rating: 4.96,
     reviewsCount: 142,
-    downloadsCount: 1840,
-    heroDescription: 'Complete operating framework for web agencies. Features staging client approval portals, scope change request locks, and automated milestone invoicing.',
-    accentBg: 'bg-blue-50',
-    accentBorder: 'border-blue-200',
-    accentText: 'text-blue-900',
-    accentColor: '#2563EB',
-    coverImage: '/images/cora_hero_landscape.jpg',
-    includedPages: [
-      { name: 'Agency Flagship Landing', slug: 'home', description: 'High-converting interactive hero with instant project estimator', type: 'landing' },
-      { name: 'Interactive Services Matrix', slug: 'services', description: 'Tiered dev packages with dynamic scope calculator', type: 'landing' },
-      { name: 'Client Staging Portal', slug: 'portal', description: 'Passwordless client preview and visual feedback hub', type: 'portal' },
-      { name: 'Milestone Tax Invoice', slug: 'invoice', description: '18% GST SAC 9983 B2B invoice with instant UPI QR', type: 'invoice' },
-      { name: 'Master Services Agreement', slug: 'contract', description: 'SHA-256 digital signature legal agreement with IP transfer', type: 'contract' },
-    ],
-    schemaStructures: [
-      {
-        name: 'Sprint Deliverables',
-        badge: 'Dev Registry',
-        description: 'Tracks milestones, staging URLs, QA signoffs, and release dates',
-        fields: [
-          { name: 'milestone_title', type: 'String', required: true, description: 'Sprint or milestone phase label' },
-          { name: 'staging_url', type: 'URL', required: true, description: 'Isolated staging review subdomain' },
-          { name: 'signoff_status', type: 'Enum', required: true, description: 'Pending, In-Review, Approved, Revision' },
-          { name: 'payment_trigger', type: 'Boolean', required: true, description: 'Auto-release invoice upon approval' },
-        ],
-      },
-      {
-        name: 'Scope Change Registry',
-        badge: 'Contract Gate',
-        description: 'Locks out-of-scope client requests with digital addendums',
-        fields: [
-          { name: 'request_details', type: 'Text', required: true, description: 'Client request specification' },
-          { name: 'additional_hours', type: 'Number', required: true, description: 'Billable sprint hour estimation' },
-          { name: 'approval_signature', type: 'DigitalSign', required: true, description: 'SHA-256 client authorization' },
-        ],
-      },
-    ],
-    features: ['Staging feedback collection', 'Automated GST SAC 9983 calculation', 'SHA-256 MSA e-signatures', 'Milestone release payment gates'],
-    recommendedModules: [
-      { id: 'portals', title: 'Client Portals', icon: 'Globe' },
-      { id: 'invoices', title: 'GST Invoicing', icon: 'Receipt' },
-      { id: 'contracts', title: 'E-Sign Vault', icon: 'ShieldCheck' },
-    ],
-    toolsReplaced: [
-      { name: 'HoneyBook / Dubsado', monthlyCostUSD: 40 },
-      { name: 'PandaDoc', monthlyCostUSD: 35 },
-      { name: 'Staging Feedback Plugin', monthlyCostUSD: 29 },
-    ],
-    workflowHighlights: [
-      'Automatic staging subdomain generation upon contract execution',
-      'Client feedback pinned directly to UI coordinates',
-      'Instant UPI payment QR embedded directly into invoice PDF',
-    ],
-    faqs: [
-      { question: 'Can I connect our custom domain?', answer: 'Yes, every template supports custom white-label domains and SSL.' },
-      { question: 'Is 18% GST calculation automated?', answer: 'Yes, both intra-state CGST/SGST and inter-state IGST with SAC 9983 are automated.' },
-    ],
-  },
-  {
-    id: 'creative-branding-kit',
-    slug: 'creative-branding-studio',
-    title: 'Brand Design & Creative Studio Schema',
-    shortTitle: 'Branding Studio',
-    tagline: 'High-res brand asset delivery vaults, moodboards & digital copyright transfer.',
-    category: 'creative_design',
-    categoryLabel: 'Creative & Design',
-    badge: 'Turnkey Studio',
-    sacCode: 'SAC 998311',
-    gstRate: '18% GST',
-    rating: 4.98,
-    reviewsCount: 118,
-    downloadsCount: 1520,
-    heroDescription: 'Designed for brand identity agencies. Delivers vector assets, style guides, and font licenses inside password-protected client download vaults.',
-    accentBg: 'bg-purple-50',
-    accentBorder: 'border-purple-200',
-    accentText: 'text-purple-900',
-    accentColor: '#7C3AED',
-    coverImage: '/images/cora_hero_landscape.jpg',
-    includedPages: [
-      { name: 'Creative Studio Showreel', slug: 'home', description: 'Minimalist editorial showcase with grid case studies', type: 'landing' },
-      { name: 'Brand Identity Vault', slug: 'asset-vault', description: 'Gated SVG, PNG, PDF asset delivery vault with licensing', type: 'portal' },
-      { name: 'Scope Defense Contract', slug: 'contract', description: 'Revision limits & copyright assignment agreement', type: 'contract' },
-      { name: 'Advance Retainer Invoice', slug: 'invoice', description: '50% upfront retainer invoice with SAC 9983 billing', type: 'invoice' },
-    ],
-    schemaStructures: [
-      {
-        name: 'Brand Deliverables Vault',
-        badge: 'Asset Gate',
-        description: 'Categorizes typography, vector logos, color palettes, and guidelines',
-        fields: [
-          { name: 'asset_type', type: 'Enum', required: true, description: 'Primary Logo, Secondary Mark, Typography, Palette' },
-          { name: 'file_download_url', type: 'StorageURL', required: true, description: 'Protected high-resolution asset link' },
-          { name: 'license_grant', type: 'Text', required: true, description: 'Commercial usage rights certificate' },
-        ],
-      },
-    ],
-    features: ['High-res asset delivery gates', '3-round revision limit contract', 'Instant advance deposit checkout', 'Brand guidelines interactive view'],
-    recommendedModules: [
-      { id: 'vault', title: 'Asset Vaults', icon: 'FolderKanban' },
-      { id: 'contracts', title: 'Copyright E-Sign', icon: 'ShieldCheck' },
-      { id: 'invoices', title: 'Milestone Billing', icon: 'Receipt' },
-    ],
-    toolsReplaced: [
-      { name: 'Dropbox Pro', monthlyCostUSD: 20 },
-      { name: 'DocuSign', monthlyCostUSD: 40 },
-      { name: 'Invoicing SaaS', monthlyCostUSD: 25 },
-    ],
-    workflowHighlights: [
-      'Client e-signs contract before download link unlocks',
-      'Automatic watermark protection on unapproved concept rounds',
-    ],
-    faqs: [
-      { question: 'How do clients download final vectors?', answer: 'Once final milestone payment is received, the high-res download gate unlocks automatically.' },
-    ],
-  },
-  {
-    id: 'performance-marketing-kit',
-    slug: 'performance-marketing-seo',
-    title: 'Performance & SEO Agency OS',
-    shortTitle: 'Performance & SEO',
-    tagline: 'Automated recurring monthly retainers, client analytics & 1st-of-month invoicing.',
-    category: 'marketing_growth',
-    categoryLabel: 'Marketing & Advisory',
-    badge: 'Retainer Schema',
-    sacCode: 'SAC 998313',
-    gstRate: '18% GST',
-    rating: 4.94,
-    reviewsCount: 96,
-    downloadsCount: 1340,
-    heroDescription: 'Built for growth agencies. Automatically bills clients on the 1st of every month, tracks ad budgets, and hosts client KPI summary portals.',
-    accentBg: 'bg-emerald-50',
-    accentBorder: 'border-emerald-200',
-    accentText: 'text-emerald-900',
-    accentColor: '#059669',
-    coverImage: '/images/cora_hero_landscape.jpg',
-    includedPages: [
-      { name: 'Growth Agency Homepage', slug: 'home', description: 'Performance case studies & dynamic ROI calculator', type: 'landing' },
-      { name: 'Client Retainer Portal', slug: 'portal', description: 'Live KPI reporting & campaign task backlog', type: 'portal' },
-      { name: 'Monthly Recurring Invoice', slug: 'invoice', description: 'Automated 1st-of-month GST retainer invoice', type: 'invoice' },
-      { name: 'Quarterly Service Agreement', slug: 'contract', description: '3-month minimum commitment contract with auto-renew', type: 'contract' },
-    ],
-    schemaStructures: [
-      {
-        name: 'Retainer Schedules',
-        badge: 'Recurring Ops',
-        description: 'Manages recurring billing cycles, ad budget management fees, and renewals',
-        fields: [
-          { name: 'monthly_retainer_inr', type: 'Currency', required: true, description: 'Fixed base agency retainer' },
-          { name: 'ad_spend_percentage', type: 'Number', required: false, description: 'Variable performance fee percentage' },
-          { name: 'next_invoice_date', type: 'Date', required: true, description: 'Auto-generation trigger date' },
-        ],
-      },
-    ],
-    features: ['Recurring monthly retainer billing', 'Ad spend fee calculation', 'Quarterly auto-renewal contracts', 'Client deliverable dashboard'],
-    recommendedModules: [
-      { id: 'retainers', title: 'Recurring Billing', icon: 'Receipt' },
-      { id: 'portals', title: 'Client Reporting', icon: 'Globe' },
-      { id: 'contracts', title: 'Auto-Renew Agreements', icon: 'ShieldCheck' },
-    ],
-    toolsReplaced: [
-      { name: 'Chargebee / Recurring Tool', monthlyCostUSD: 99 },
-      { name: 'Contract Tool', monthlyCostUSD: 30 },
-    ],
-    workflowHighlights: [
-      'Invoices sent automatically on the 1st with automated WhatsApp reminder links',
-      'Client payment receipts sent automatically upon UPI confirmation',
-    ],
-    faqs: [
-      { question: 'Does it support recurring UPI auto-debit?', answer: 'Yes, instant UPI intent and automated recurring invoice links are included.' },
-    ],
-  },
-  {
-    id: 'saas-launchpad-kit',
-    slug: 'saas-product-launchpad',
-    title: 'SaaS & Micro-Product Starter Kit',
-    shortTitle: 'SaaS Launchpad',
-    tagline: 'Product marketing, feature comparisons, pricing matrices & self-serve signup.',
-    category: 'tech_dev',
-    categoryLabel: 'Tech & Development',
-    badge: 'Launchpad',
-    sacCode: 'SAC 998315',
-    gstRate: '18% GST',
-    rating: 4.95,
-    reviewsCount: 88,
-    downloadsCount: 1120,
-    heroDescription: 'Modern dark/light SaaS marketing kit. Features interactive 3-tier pricing matrix, feature comparison matrix, changelog, and API doc layout.',
+    downloadsCount: 2840,
+    heroDescription: 'Production-ready monochromatic landing page built with pure Tailwind CSS and Next.js 15. Features sub-50ms paint times, accessible ARIA focus rings, responsive mobile sheets, and zero bloated JavaScript.',
     accentBg: 'bg-zinc-100',
     accentBorder: 'border-zinc-300',
     accentText: 'text-zinc-950',
     accentColor: '#18181B',
     coverImage: '/images/cora_hero_landscape.jpg',
-    includedPages: [
-      { name: 'SaaS Marketing Homepage', slug: 'home', description: 'Product hero with animated UI showcase & customer proof', type: 'landing' },
-      { name: 'Tiered Pricing Matrix', slug: 'pricing', description: 'Monthly/annual toggle with feature breakdown', type: 'landing' },
-      { name: 'Feature Deep-Dives', slug: 'features', description: 'Modular product capability layout', type: 'landing' },
-      { name: 'Public Changelog', slug: 'changelog', description: 'Versioned product update feed with RSS', type: 'landing' },
-    ],
-    schemaStructures: [
+    compatibleBuilders: ['Tailwind CSS', 'Next.js 15', 'React', 'Cursor AI', 'Claude 3.5', 'v0.dev'],
+    frameworkStack: ['Tailwind CSS v4', 'React 19', 'Framer Motion', 'Lucide Icons'],
+    quickCopyPrompt: 'Create a monochromatic modern agency landing page with an atmospheric hero, 3-column service bento grid, interactive 3-tier pricing matrix, client testimonial ticker, and a mobile bottom slide-up lead capture sheet.',
+    sectionsIncluded: [
       {
-        name: 'Product Subscriptions',
-        badge: 'SaaS Engine',
-        description: 'Manages user seats, tier quotas, and plan upgrades',
-        fields: [
-          { name: 'plan_id', type: 'Enum', required: true, description: 'Starter, Professional, Enterprise' },
-          { name: 'billing_cycle', type: 'Enum', required: true, description: 'Monthly or Annual' },
-          { name: 'seats_quota', type: 'Number', required: true, description: 'Active user seat count' },
-        ],
+        id: 'hero-section',
+        name: 'Atmospheric Hero & Value Prop',
+        badge: 'Hero Section',
+        description: 'Clean typography header with dual action buttons and live client badge ribbon.',
+        promptText: `Create a clean, monochromatic SaaS/Agency hero section using Tailwind CSS.
+- Top status pill with subtle border and sparkling icon.
+- Headline: 4xl to 7xl font-display tracking tight with bold primary title and muted secondary line.
+- Subtitle: text-zinc-600 max-w-2xl mx-auto leading-relaxed.
+- CTA Row: Primary solid black button with arrow icon, and Secondary soft ghost button with live demo trigger.
+- Background: Soft atmospheric radial wash, no heavy outlines.`,
+        tailwindSnippet: `<section className="relative pt-32 pb-20 text-center px-4 max-w-5xl mx-auto">
+  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-zinc-100 border border-zinc-200 text-xs font-semibold text-zinc-800 mb-6">
+    <span>✦</span> 100% Turnkey Frontend Kit
+  </div>
+  <h1 className="text-5xl sm:text-7xl font-bold tracking-tight text-zinc-950 mb-6">
+    Build websites that close clients effortlessly.
+  </h1>
+  <p className="text-lg text-zinc-600 max-w-2xl mx-auto mb-8 leading-relaxed">
+    Complete monochromatic layouts, ready-to-paste AI section prompts, and native frontend kits.
+  </p>
+  <div className="flex items-center justify-center gap-3">
+    <button className="px-6 py-3 rounded-full bg-zinc-950 text-white font-bold text-sm hover:bg-zinc-800 transition-all">
+      Get Started Free
+    </button>
+    <button className="px-6 py-3 rounded-full bg-zinc-100 text-zinc-800 font-bold text-sm hover:bg-zinc-200 transition-all">
+      View Live Demo
+    </button>
+  </div>
+</section>`,
+      },
+      {
+        id: 'pricing-matrix',
+        name: 'Interactive 3-Tier Pricing Matrix',
+        badge: 'Pricing Section',
+        description: 'Monthly/Annual toggle with feature comparison checkboxes and highlight pills.',
+        promptText: `Build an interactive 3-tier pricing matrix in Tailwind CSS with an Annual 20% discount switch:
+- Three columns: Starter (₹0), Studio Pro (₹2,999/mo), Agency Scale (₹7,999/mo).
+- Center card highlighted with subtle zinc-100 background and 'Most Popular' floating badge.
+- Feature lists with thin emerald check icons.
+- Instant 1-click upgrade checkout buttons.`,
+        tailwindSnippet: `<div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto px-4">
+  <div className="p-6 rounded-3xl bg-white border border-zinc-200 shadow-sm">
+    <h3 className="font-bold text-lg text-zinc-950">Starter</h3>
+    <div className="text-3xl font-extrabold mt-2 mb-4">₹0<span className="text-xs text-zinc-500 font-normal">/mo</span></div>
+    <ul className="space-y-2 text-xs text-zinc-600 mb-6">
+      <li>✓ 1 Active Workspace</li>
+      <li>✓ Unlimited Invoicing</li>
+    </ul>
+    <button className="w-full py-2.5 rounded-xl bg-zinc-100 font-bold text-xs hover:bg-zinc-200">Start Free</button>
+  </div>
+</div>`,
+      },
+      {
+        id: 'bento-grid',
+        name: 'Feature Bento Showcase Grid',
+        badge: 'Bento Section',
+        description: 'Asymmetric 4-card grid showing metrics, mock UI cards, and capability badges.',
+        promptText: `Generate a 4-card asymmetric Bento grid with monochromatic surfaces:
+- Card 1 (Span 2 cols): Large interactive mockup showcase with clean typography.
+- Card 2: Performance metrics badge counter (sub-50ms speed).
+- Card 3: Security & compliance indicator.
+- Card 4: Multi-tenant client collaboration switcher.`,
+      },
+      {
+        id: 'lead-drawer',
+        name: 'Slide-Up Lead Capture Sheet',
+        badge: 'Lead Form',
+        description: 'Mobile-first bottom slide-up sheet with instant email validation and calendar picker.',
+        promptText: `Create a mobile-friendly bottom slide-up lead intake drawer in React and Tailwind:
+- Smooth translateY open animation with dark blurred backdrop.
+- Drag handle indicator at top.
+- Name, Email, Project Budget range pill selector, and Project Brief textarea.
+- Monochromatic primary submit button with loading spinner state.`,
       },
     ],
-    features: ['3-tier annual/monthly pricing matrix', 'Interactive feature comparison table', 'Changelog timeline', 'Instant onboarding forms'],
-    recommendedModules: [
-      { id: 'pricing', title: 'Pricing Matrix', icon: 'Receipt' },
-      { id: 'changelog', title: 'Changelog Feed', icon: 'Layers' },
+    features: [
+      'Pure Tailwind CSS & Next.js 15 App Router codebase',
+      'Instant responsive desktop, tablet, and mobile layouts',
+      'Zero layout shift (CLS 0.00) & Sub-50ms static hydration',
+      'Dark and light monochromatic theme tokens included',
+      'WCAG AAA accessible focus states & keyboard navigation',
+      'Pre-built copy prompts for instant Claude & Cursor iteration',
     ],
     toolsReplaced: [
-      { name: 'Webflow Workspace', monthlyCostUSD: 49 },
-      { name: 'Feature Base Changelog', monthlyCostUSD: 29 },
-    ],
-    workflowHighlights: [
-      'Instant static compilation with sub-50ms page load speeds',
-      'Built-in analytics event tracking for signups and pricing toggles',
+      { name: 'Webflow Workspace', monthlyCostUSD: 39 },
+      { name: 'ThemeForest Premium Theme', monthlyCostUSD: 19 },
+      { name: 'Formspree Pro Form Backend', monthlyCostUSD: 15 },
     ],
     faqs: [
-      { question: 'Can I customize the pricing plans?', answer: 'Yes, change plan names, prices, and features with simple JSON edits.' },
+      {
+        question: 'How do I install this native landing page?',
+        answer: 'You can copy the raw React/Tailwind component code directly into your Next.js project, or download the ZIP asset pack and run npm install & npm run dev.',
+      },
+      {
+        question: 'Can I edit the copy and layout with AI?',
+        answer: 'Yes! Every section includes a prompt specifically engineered for Claude 3.5 Sonnet, Cursor AI, and v0. Just copy the prompt, modify your requirements, and paste.',
+      },
     ],
   },
   {
-    id: 'photo-video-kit',
-    slug: 'photo-video-production',
-    title: 'Commercial Photography & Cinema Studio',
-    shortTitle: 'Photo & Video Studio',
-    tagline: 'Shoot booking forms, call sheet vaults, client proofing & model releases.',
-    category: 'creative_design',
-    categoryLabel: 'Creative & Design',
-    badge: 'Media Kit',
-    sacCode: 'SAC 998381',
-    gstRate: '18% GST',
-    rating: 4.97,
-    reviewsCount: 104,
-    downloadsCount: 1410,
-    heroDescription: 'Turnkey operating kit for photo and film studios. Manage shoot dates, client gallery proofing, SHA-256 model releases, and milestone day-rate billing.',
-    accentBg: 'bg-rose-50',
-    accentBorder: 'border-rose-200',
-    accentText: 'text-rose-900',
-    accentColor: '#E11D48',
+    id: 'studio-creative-portfolio',
+    slug: 'creative-design-studio',
+    title: 'Minimalist Creative Studio & Portfolio',
+    shortTitle: 'Creative Portfolio',
+    tagline: 'Horizontal project scroll, full-bleed media case studies, interactive client review vault.',
+    category: 'landing_pages',
+    categoryLabel: 'Native Landing Pages',
+    assetFormat: 'native_page',
+    formatBadge: 'Native Tailwind / Next.js',
+    badge: 'Design Favorite',
+    rating: 4.98,
+    reviewsCount: 118,
+    downloadsCount: 2150,
+    heroDescription: 'A high-aesthetic, editorial-inspired portfolio template tailored for branding agencies, UI/UX designers, and creative directors. Featuring smooth horizontal work galleries and minimal case study layouts.',
+    accentBg: 'bg-zinc-100',
+    accentBorder: 'border-zinc-300',
+    accentText: 'text-zinc-950',
+    accentColor: '#18181B',
     coverImage: '/images/cora_hero_landscape.jpg',
-    includedPages: [
-      { name: 'Production House Showreel', slug: 'home', description: 'Full-bleed video hero with category portfolio filters', type: 'landing' },
-      { name: 'Client Proofing Vault', slug: 'proofing', description: 'Grid photo selection portal with client approvals', type: 'portal' },
-      { name: 'Shoot Day Rate Agreement', slug: 'contract', description: 'Commercial shoot contract with copyright licensing', type: 'contract' },
-      { name: 'Production Tax Invoice', slug: 'invoice', description: 'Line-item shoot gear, crew, and studio billing', type: 'invoice' },
-    ],
-    schemaStructures: [
+    compatibleBuilders: ['Tailwind CSS', 'Next.js', 'React', 'Cursor AI', 'Claude 3.5', 'v0.dev'],
+    frameworkStack: ['Tailwind CSS', 'Framer Motion', 'React 19'],
+    quickCopyPrompt: 'Design a high-fashion minimalist design studio portfolio with large editorial typography, masonry case study grid, video player placeholders, and clean project drawer overlays.',
+    sectionsIncluded: [
       {
-        name: 'Production Shoots',
-        badge: 'Shoot Ops',
-        description: 'Coordinates shoot dates, call sheets, crew lists, and client deliverables',
-        fields: [
-          { name: 'shoot_date', type: 'DateTime', required: true, description: 'Production day schedule' },
-          { name: 'location_address', type: 'String', required: true, description: 'Studio or on-location venue' },
-          { name: 'crew_count', type: 'Number', required: true, description: 'Assigned assistants and operators' },
-        ],
+        id: 'editorial-hero',
+        name: 'Editorial Typography Hero',
+        badge: 'Hero Section',
+        description: 'Huge serif/sans mix headline with subtle client reel marquee.',
+        promptText: `Build a minimalist creative studio hero section with high-contrast editorial typography, client marquee ticker, and smooth fade-in animations in Tailwind CSS.`,
+      },
+      {
+        id: 'case-study-masonry',
+        name: 'Masonry Case Study Gallery',
+        badge: 'Portfolio Grid',
+        description: '2-column dynamic aspect ratio project cards with hover zoom and tags.',
+        promptText: `Create a 2-column responsive masonry case study grid with hover zoom on project thumbnails, client name, category tags, and click-to-open drawer previews.`,
+      },
+      {
+        id: 'awards-marquee',
+        name: 'Awards & Recognition Ticker',
+        badge: 'Trust Bar',
+        description: 'Clean typographic list of Awwwards, FWA, and design accolades.',
+        promptText: `Build a minimalist awards and press ticker showcasing year, award name, project, and category in a clean monochromatic table.`,
       },
     ],
-    features: ['Client photo proofing portal', 'Day-rate and crew line-item invoices', 'Model release digital agreements', 'Call sheet distribution'],
-    recommendedModules: [
-      { id: 'gallery', title: 'Proofing Gallery', icon: 'Camera' },
-      { id: 'contracts', title: 'Model Releases', icon: 'ShieldCheck' },
-      { id: 'invoices', title: 'Shoot Billing', icon: 'Receipt' },
+    features: [
+      'High-fashion editorial typography & minimal grid',
+      'Smooth masonry and horizontal scroll project showcases',
+      'Interactive project drawer modal preview',
+      'Optimized image loaders with blur placeholder states',
+      'Full dark/light monochromatic styling',
     ],
     toolsReplaced: [
-      { name: 'Pixieset / Pic-Time', monthlyCostUSD: 30 },
-      { name: 'Studio Ninja', monthlyCostUSD: 29 },
-    ],
-    workflowHighlights: [
-      'Clients select favorite proof photos and trigger automated editing workflow',
+      { name: 'Readymag Business', monthlyCostUSD: 45 },
+      { name: 'Squarespace Portfolio Tier', monthlyCostUSD: 23 },
     ],
     faqs: [
-      { question: 'Is photo proofing client-side secure?', answer: 'Yes, proofing galleries feature PIN protection and download authorization gates.' },
+      {
+        question: 'Does this support video case studies?',
+        answer: 'Yes! The case study gallery natively supports HTML5 MP4/WebM loops, YouTube/Vimeo embeds, and high-res image carousels.',
+      },
     ],
   },
   {
-    id: 'law-firm-kit',
-    slug: 'law-firm-legal-practice',
-    title: 'Corporate Law & Legal Practice Schema',
-    shortTitle: 'Law & Legal Practice',
-    tagline: 'Client intake briefs, retainer agreements, court milestone billing & case vaults.',
-    category: 'legal_finance',
-    categoryLabel: 'Legal & Finance',
-    badge: 'Legal Practice',
-    sacCode: 'SAC 998211',
-    gstRate: '18% GST',
+    id: 'saas-fintech-landing',
+    slug: 'saas-fintech-landing',
+    title: 'Fintech & B2B SaaS High-Conversion Landing',
+    shortTitle: 'Fintech SaaS Page',
+    tagline: 'Interactive live calculator, compliance trust badge wall, and conversion-optimized CTA.',
+    category: 'landing_pages',
+    categoryLabel: 'Native Landing Pages',
+    assetFormat: 'native_page',
+    formatBadge: 'Native Tailwind / Next.js',
+    badge: 'Fintech Ready',
+    rating: 4.94,
+    reviewsCount: 89,
+    downloadsCount: 1650,
+    heroDescription: 'Engineered for high-ticket SaaS and financial tools. Includes live client ROI calculators, bank-grade encryption badges, feature tabs, and multi-step intake flows.',
+    accentBg: 'bg-zinc-100',
+    accentBorder: 'border-zinc-300',
+    accentText: 'text-zinc-950',
+    accentColor: '#18181B',
+    coverImage: '/images/cora_hero_landscape.jpg',
+    compatibleBuilders: ['Tailwind CSS', 'Next.js', 'Cursor AI', 'Claude 3.5', 'Lovable'],
+    frameworkStack: ['Tailwind CSS', 'React 19', 'Chart.js / SVG'],
+    quickCopyPrompt: 'Build a fintech landing page with a live ROI savings calculator slider, SOC2/ISO compliance trust badges, tabbed feature switcher, and instant signup modal.',
+    sectionsIncluded: [
+      {
+        id: 'fintech-hero',
+        name: 'Fintech Calculator Hero',
+        badge: 'Hero Section',
+        description: 'Split hero with live interactive slider computing monthly agency savings.',
+        promptText: `Create a split hero section with headline on the left and an interactive monthly fee savings calculator on the right with real-time slider updates.`,
+      },
+      {
+        id: 'compliance-wall',
+        name: 'Bank-Grade Compliance Wall',
+        badge: 'Trust Badges',
+        description: 'Certifications, RBI guidelines, UPI 2.0 integration, and SHA-256 e-sign badges.',
+        promptText: `Design a monochromatic compliance banner with 4 verified trust cards: 256-Bit SSL, UPI 2.0 Auto-Debit, IT Act 2000 E-Sign, and GST SAC 9983 Automated Compliance.`,
+      },
+    ],
+    features: [
+      'Interactive client savings calculator component',
+      'Pre-built Indian payment & compliance badges',
+      'Tabbed product feature switcher with SVG graphs',
+      'Sub-50ms static speed and instant CTA response',
+    ],
+    toolsReplaced: [
+      { name: 'Unbounce Conversion Builder', monthlyCostUSD: 99 },
+      { name: 'Calconic Calculator Widget', monthlyCostUSD: 17 },
+    ],
+    faqs: [
+      {
+        question: 'Can I connect this calculator to my CRM?',
+        answer: 'Yes, the calculator component exposes an onChange callback that sends lead metrics directly to your webhook or database.',
+      },
+    ],
+  },
+  {
+    id: 'consulting-advisory-page',
+    slug: 'consulting-advisory-page',
+    title: 'Executive Consulting & Fractional CXO Page',
+    shortTitle: 'Executive Advisory',
+    tagline: 'Authority personal branding hero, calendar scheduler embed, and retainer package cards.',
+    category: 'landing_pages',
+    categoryLabel: 'Native Landing Pages',
+    assetFormat: 'native_page',
+    formatBadge: 'Native Tailwind / Next.js',
+    badge: 'Executive Kit',
+    rating: 4.95,
+    reviewsCount: 76,
+    downloadsCount: 1420,
+    heroDescription: 'Tailored for fractional CMOs, management consultants, and independent legal/finance advisors. Includes calendar booking slots, client case metrics, and retainer tier structures.',
+    accentBg: 'bg-zinc-100',
+    accentBorder: 'border-zinc-300',
+    accentText: 'text-zinc-950',
+    accentColor: '#18181B',
+    coverImage: '/images/cora_hero_landscape.jpg',
+    compatibleBuilders: ['Tailwind CSS', 'Next.js', 'React', 'Cursor AI', 'Claude 3.5'],
+    frameworkStack: ['Tailwind CSS', 'React 19'],
+    quickCopyPrompt: 'Design a clean executive consulting landing page with personal authority bio, client revenue metrics, 3 retainer package options, and an integrated booking widget.',
+    sectionsIncluded: [
+      {
+        id: 'advisory-hero',
+        name: 'Executive Bio & Authority Hero',
+        badge: 'Hero Section',
+        description: 'Clean headshot layout, revenue growth statistics, and immediate consultation CTA.',
+        promptText: `Build an authority bio hero section with clean monochrome styling, client growth numbers (+₹12Cr Revenue Delivered), and a 1-click consultation scheduler button.`,
+      },
+    ],
+    features: [
+      'Clean personal authority layout & bio card',
+      'Retainer package cards with SLA breakdowns',
+      'Built-in calendar slot picker layout',
+      'Client testimonial quotes with verified LinkedIn badges',
+    ],
+    toolsReplaced: [
+      { name: 'Kajabi Website Tier', monthlyCostUSD: 149 },
+      { name: 'Calendly Pro Plan', monthlyCostUSD: 16 },
+    ],
+    faqs: [
+      {
+        question: 'Does this integrate with Google Calendar?',
+        answer: 'Yes, the consultation booking component easily connects with Cal.com, Google Calendar, or Cora Workspace native scheduler.',
+      },
+    ],
+  },
+
+  // ── 2. AI SECTION BUILDER PROMPTS (Claude, Cursor, Lovable, v0) ──
+  {
+    id: 'prompt-pack-hero-headers',
+    slug: 'ai-prompt-pack-hero-headers',
+    title: 'Master AI Prompt Pack: 20+ High-Converting Hero Sections',
+    shortTitle: '20+ Hero Prompts',
+    tagline: 'Engineered prompts for Claude 3.5, Cursor AI, Lovable & v0 to generate production-ready heroes.',
+    category: 'section_prompts',
+    categoryLabel: 'AI Section Prompts',
+    assetFormat: 'section_prompts',
+    formatBadge: 'Claude & Cursor Prompts',
+    badge: 'AI Prompt Pack',
     rating: 4.99,
-    reviewsCount: 78,
-    downloadsCount: 890,
-    heroDescription: 'Operating suite for advocates, corporate legal advisors, and boutique law firms. Complete with matter intake forms, fee structures, and SHA-256 contracts.',
-    accentBg: 'bg-slate-100',
-    accentBorder: 'border-slate-300',
-    accentText: 'text-slate-900',
-    accentColor: '#334155',
+    reviewsCount: 310,
+    downloadsCount: 5400,
+    heroDescription: 'A master library of battle-tested AI generation prompts. Paste these prompts into Cursor, Claude 3.5 Sonnet, Lovable, or v0 to generate modern monochromatic hero sections with zero AI hallucinations or weird layouts.',
+    accentBg: 'bg-purple-50',
+    accentBorder: 'border-purple-200',
+    accentText: 'text-purple-900',
+    accentColor: '#9333EA',
     coverImage: '/images/cora_hero_landscape.jpg',
-    includedPages: [
-      { name: 'Legal Practice Homepage', slug: 'home', description: 'Practice area directory with confidential inquiry form', type: 'landing' },
-      { name: 'Client Matter Vault', slug: 'matter-vault', description: 'Confidential client document room with access logs', type: 'portal' },
-      { name: 'Legal Retainer Engagement', slug: 'contract', description: 'Bar Council compliant legal engagement letter', type: 'contract' },
-      { name: 'Professional Legal Fee Invoice', slug: 'invoice', description: 'SAC 9982 legal advisory invoice with GST split', type: 'invoice' },
-    ],
-    schemaStructures: [
+    compatibleBuilders: ['Claude 3.5 Sonnet', 'Cursor AI', 'Lovable.dev', 'v0.dev', 'Bolt.new', 'ChatGPT-4o'],
+    frameworkStack: ['Prompt Engineering', 'Tailwind CSS v4', 'React 19'],
+    quickCopyPrompt: 'Generate a monochromatic hero section using Tailwind CSS. It must include a subtle status badge, a 2-line high-contrast headline, an lead subtitle, two pill action buttons, and a responsive mockup preview card below.',
+    sectionsIncluded: [
       {
-        name: 'Legal Matters',
-        badge: 'Case Registry',
-        description: 'Organizes case files, court hearing dates, opposing counsel, and briefs',
-        fields: [
-          { name: 'matter_ref_no', type: 'String', required: true, description: 'Unique case identifier' },
-          { name: 'practice_area', type: 'Enum', required: true, description: 'Corporate, Tax, IP, Litigation' },
-          { name: 'court_forum', type: 'String', required: false, description: 'High Court, NCLT, Supreme Court' },
-        ],
+        id: 'prompt-split-hero',
+        name: 'Split Video / Mockup Hero Prompt',
+        badge: 'AI Prompt',
+        description: 'For SaaS tools and digital agencies needing a side-by-side software preview.',
+        promptText: `Act as a senior frontend engineer. Write a responsive Split Hero component in React and Tailwind CSS:
+1. Left column: Status pill with glowing green dot, 60px display headline, 18px body copy, dual action button row (Primary black, Secondary white with border).
+2. Right column: Floating browser mockup card with dark header bar, tab switcher, and live stats chart.
+3. Use only neutral zinc shades (zinc-50 through zinc-950) with zero colorful gradients.
+4. Add smooth hover transitions (hover:scale-[1.02] duration-200).`,
+      },
+      {
+        id: 'prompt-centered-saas',
+        name: 'Centered Atmospheric SaaS Hero Prompt',
+        badge: 'AI Prompt',
+        description: 'Minimalist centered hero with subtle gradient blur and email waitlist form.',
+        promptText: `Write a modern centered SaaS hero in React and Tailwind CSS:
+- Max-width 800px centered container with text-center.
+- Headline with tracking-[-0.03em] and font-semibold.
+- Integrated pill input group containing email text field and 'Claim Workspace' button.
+- Sub-text with 'Zero credit card required · Instant 30s setup' trust note.`,
+      },
+      {
+        id: 'prompt-bento-hero',
+        name: 'Asymmetric Bento Header Prompt',
+        badge: 'AI Prompt',
+        description: 'Hero that integrates live metric counters directly into the header fold.',
+        promptText: `Generate an asymmetric Bento Header in Tailwind CSS with 3 metric tiles directly below the main title. Include 99.9% Uptime, Sub-50ms Latency, and ₹0 Setup Fee badges.`,
       },
     ],
-    features: ['Confidential client intake forms', 'SHA-256 engagement letters', 'Hourly & fixed-fee legal invoices', 'Matter document repository'],
-    recommendedModules: [
-      { id: 'vault', title: 'Case Vault', icon: 'FolderKanban' },
-      { id: 'contracts', title: 'Engagement Agreements', icon: 'ShieldCheck' },
+    features: [
+      '20+ battle-tested prompts engineered for Claude 3.5 and Cursor',
+      'Guaranteed monochromatic design output with zero colorful AI noise',
+      'Includes explicit responsive instructions for desktop, tablet & mobile',
+      'Copy-paste ready for immediate code generation in 1 click',
     ],
     toolsReplaced: [
-      { name: 'Clio Legal Software', monthlyCostUSD: 89 },
-      { name: 'DocuSign', monthlyCostUSD: 40 },
-    ],
-    workflowHighlights: [
-      'Client identity verification and conflict check intake form',
+      { name: 'UI Prompt Packs Paid Subscriptions', monthlyCostUSD: 29 },
     ],
     faqs: [
-      { question: 'Is digital e-signing valid under Indian law?', answer: 'Yes, all contracts comply with Section 10A of the Information Technology Act 2000.' },
+      {
+        question: 'How do I use these prompts in Cursor or Claude?',
+        answer: 'Simply copy the prompt using the 1-click button, open Cursor Composer (Cmd+I) or Claude 3.5 Sonnet, paste the prompt, and specify your brand details.',
+      },
     ],
   },
   {
-    id: 'ca-tax-firm-kit',
-    slug: 'chartered-accountant-tax',
-    title: 'CA & Tax Advisory Practice Kit',
-    shortTitle: 'CA & Tax Practice',
-    tagline: 'Audit document requests, GST filing checklists, digital signing & fee notes.',
-    category: 'legal_finance',
-    categoryLabel: 'Legal & Finance',
-    badge: 'CA Practice',
-    sacCode: 'SAC 998221',
-    gstRate: '18% GST',
+    id: 'prompt-pack-pricing-bento',
+    slug: 'ai-prompt-pack-pricing-bento',
+    title: 'AI Prompt Pack: Pricing Tables, Bento Grids & Feature Sections',
+    shortTitle: 'Pricing & Bento Prompts',
+    tagline: 'Generate pixel-perfect feature grids, comparison tables, and interactive pricing toggles.',
+    category: 'section_prompts',
+    categoryLabel: 'AI Section Prompts',
+    assetFormat: 'section_prompts',
+    formatBadge: 'Claude & Cursor Prompts',
+    badge: 'High Conversion',
     rating: 4.97,
-    reviewsCount: 112,
-    downloadsCount: 1680,
-    heroDescription: 'Tailored for Chartered Accountants and Tax Consultants. Streamline annual audit document collections, GST compliance workflows, and professional debit notes.',
+    reviewsCount: 184,
+    downloadsCount: 3900,
+    heroDescription: 'Targeted prompt collection for generating pricing tables with billing toggles, 4-card bento grids, interactive feature accordions, and customer proof sliders.',
+    accentBg: 'bg-purple-50',
+    accentBorder: 'border-purple-200',
+    accentText: 'text-purple-900',
+    accentColor: '#9333EA',
+    coverImage: '/images/cora_hero_landscape.jpg',
+    compatibleBuilders: ['Claude 3.5 Sonnet', 'Cursor AI', 'Lovable', 'v0.dev'],
+    frameworkStack: ['Prompt Engineering', 'Tailwind CSS'],
+    quickCopyPrompt: 'Create an interactive 3-column pricing matrix in Tailwind CSS with monthly and annual billing switcher, feature checklists, and sticky popular badge on the middle tier.',
+    sectionsIncluded: [
+      {
+        id: 'pricing-toggle-prompt',
+        name: 'Interactive Billing Toggle Prompt',
+        badge: 'AI Prompt',
+        description: 'Prompt to generate animated Monthly / Annual switchers with savings badges.',
+        promptText: `Create a clean animated billing toggle in React/Tailwind:
+- Segmented control with 'Monthly' and 'Annual (Save 20%)'.
+- Smooth spring indicator transition.
+- Dynamically calculates price difference for ₹1,499/mo vs ₹1,199/mo.`,
+      },
+      {
+        id: 'feature-accordion-prompt',
+        name: 'Expandable Feature Accordion Prompt',
+        badge: 'AI Prompt',
+        description: 'Interactive QA and feature breakdown accordion with Plus/Minus icons.',
+        promptText: `Write an accessible FAQ accordion component in Tailwind CSS:
+- Smooth height animation.
+- Plus / Minus toggle icon with transition-transform.
+- Clean neutral zinc border with subtle hover background fill.`,
+      },
+    ],
+    features: [
+      'Pre-formatted pricing math and discount calculator logic',
+      'Bento grid layouts with responsive column wrapping',
+      'Accessible ARIA compliance prompts',
+    ],
+    toolsReplaced: [
+      { name: 'Elfsight Pricing Table Widget', monthlyCostUSD: 18 },
+    ],
+    faqs: [
+      {
+        question: 'Will these prompts work with plain HTML/CSS?',
+        answer: 'Yes! You can ask the AI model to output pure HTML/Tailwind or React JSX as needed.',
+      },
+    ],
+  },
+  {
+    id: 'prompt-pack-forms-modals',
+    slug: 'ai-prompt-pack-forms-modals',
+    title: 'AI Prompt Pack: Mobile Bottom Sheets, Forms & Drawers',
+    shortTitle: 'Forms & Drawers Prompts',
+    tagline: 'Mobile-first bottom slide-up sheets, multi-step lead funnels, and checkout drawers.',
+    category: 'section_prompts',
+    categoryLabel: 'AI Section Prompts',
+    assetFormat: 'section_prompts',
+    formatBadge: 'Claude & Cursor Prompts',
+    badge: 'Mobile UX',
+    rating: 4.96,
+    reviewsCount: 140,
+    downloadsCount: 2980,
+    heroDescription: 'Mobile UX prompt guidelines that eliminate clunky side drawers and popups on phones. Generates silky bottom slide-up sheets with drag handles and instant validation.',
+    accentBg: 'bg-purple-50',
+    accentBorder: 'border-purple-200',
+    accentText: 'text-purple-900',
+    accentColor: '#9333EA',
+    coverImage: '/images/cora_hero_landscape.jpg',
+    compatibleBuilders: ['Claude 3.5 Sonnet', 'Cursor AI', 'Lovable', 'v0.dev'],
+    frameworkStack: ['Prompt Engineering', 'Tailwind CSS', 'Framer Motion'],
+    quickCopyPrompt: 'Build a mobile bottom-up slide sheet in React and Tailwind with a drag indicator handle, top-rounded corners, backdrop blur, and 3-step lead intake form.',
+    sectionsIncluded: [
+      {
+        id: 'mobile-sheet-prompt',
+        name: 'Mobile Slide-Up Sheet Prompt',
+        badge: 'AI Prompt',
+        description: 'Eliminates side drawers on mobile with ergonomic bottom sheets.',
+        promptText: `Write a React bottom slide sheet component:
+- Position fixed inset-x-0 bottom-0 z-50.
+- Top rounded 3xl corners with subtle zinc border.
+- Drag handle at top (w-10 h-1 bg-zinc-300 rounded-full mx-auto mb-4).
+- Dark blurred backdrop with click-to-close handler.`,
+      },
+    ],
+    features: [
+      'Zero mobile side drawers — pure bottom slide-up UX',
+      'Integrated touch-action and gesture drag handles',
+      'Step-by-step form progress indicators',
+    ],
+    toolsReplaced: [
+      { name: 'Typeform Starter Plan', monthlyCostUSD: 29 },
+    ],
+    faqs: [
+      {
+        question: 'Does this handle keyboard focus on iOS Safari?',
+        answer: 'Yes, the prompt includes specific viewport resize and virtual keyboard padding handlers for iOS.',
+      },
+    ],
+  },
+  {
+    id: 'prompt-pack-dashboard-widgets',
+    slug: 'ai-prompt-pack-dashboard-widgets',
+    title: 'AI Prompt Pack: SaaS Dashboards & Admin Portals',
+    shortTitle: 'Dashboard UI Prompts',
+    tagline: 'Prompts to build Notion-style tables, admin popovers, status cards & KPI ribbons.',
+    category: 'section_prompts',
+    categoryLabel: 'AI Section Prompts',
+    assetFormat: 'section_prompts',
+    formatBadge: 'Claude & Cursor Prompts',
+    badge: 'Admin SaaS',
+    rating: 4.95,
+    reviewsCount: 162,
+    downloadsCount: 3120,
+    heroDescription: 'Construct comprehensive SaaS portals and backoffice dashboards. Features sticky bottom admin popovers, searchable data tables, and client milestone trackers.',
+    accentBg: 'bg-purple-50',
+    accentBorder: 'border-purple-200',
+    accentText: 'text-purple-900',
+    accentColor: '#9333EA',
+    coverImage: '/images/cora_hero_landscape.jpg',
+    compatibleBuilders: ['Cursor AI', 'Claude 3.5', 'Lovable', 'v0.dev'],
+    frameworkStack: ['Prompt Engineering', 'React', 'Tailwind CSS'],
+    quickCopyPrompt: 'Generate a Notion-styled interactive data table in Tailwind CSS with search filtering, column sorting, status tags, and row action popovers.',
+    sectionsIncluded: [
+      {
+        id: 'admin-popover-prompt',
+        name: 'Sticky Sidebar Admin Popover Prompt',
+        badge: 'AI Prompt',
+        description: 'Bottom sticky user profile widget that opens a floating settings popover.',
+        promptText: `Create a sticky bottom sidebar admin profile widget:
+- Fixed to the bottom of the sidebar with avatar, user name, and workspace status dot.
+- Clicking opens a floating popover card directly above it with AI model selector and quota metrics.`,
+      },
+    ],
+    features: [
+      'Notion-inspired monochromatic data table layouts',
+      'Admin popover menus with status indicators',
+      'Real-time search and filter UI blueprints',
+    ],
+    toolsReplaced: [
+      { name: 'Tailwind UI Application UI Kit', monthlyCostUSD: 299 },
+    ],
+    faqs: [
+      {
+        question: 'Can I use this for client portals?',
+        answer: 'Yes! These prompts are designed for building client staging dashboards and approval portals.',
+      },
+    ],
+  },
+
+  // ── 3. ELEMENTOR TEMPLATE KITS (.json blueprints) ──
+  {
+    id: 'elementor-agency-pro-kit',
+    slug: 'elementor-agency-pro-kit',
+    title: 'Elementor Pro Agency Turnkey Template Kit',
+    shortTitle: 'Elementor Agency Kit',
+    tagline: 'Monochromatic Elementor Pro template kit (.json) with 8 ready-to-import page templates.',
+    category: 'elementor_kits',
+    categoryLabel: 'Elementor Template Kits',
+    assetFormat: 'elementor_kit',
+    formatBadge: 'Elementor Kit (.json)',
+    badge: 'Elementor Pro',
+    rating: 4.92,
+    reviewsCount: 165,
+    downloadsCount: 3450,
+    heroDescription: 'Complete, lightweight Elementor Pro template kit. Clean JSON blueprints for Header, Footer, Hero, Case Studies, Pricing Table, and Lead Forms without any slow 3rd-party add-ons.',
     accentBg: 'bg-emerald-50',
     accentBorder: 'border-emerald-200',
     accentText: 'text-emerald-900',
     accentColor: '#059669',
     coverImage: '/images/cora_hero_landscape.jpg',
-    includedPages: [
-      { name: 'CA Practice Homepage', slug: 'home', description: 'Tax filing services, statutory audit, and direct booking', type: 'landing' },
-      { name: 'Tax Document Upload Room', slug: 'portal', description: 'Encrypted client financial statement dropzone', type: 'portal' },
-      { name: 'Annual Retainer Fee Note', slug: 'invoice', description: 'SAC 9982 accounting fee invoice with GST breakups', type: 'invoice' },
-    ],
-    schemaStructures: [
+    compatibleBuilders: ['Elementor Pro', 'WordPress', 'Hello Elementor Theme'],
+    frameworkStack: ['Elementor JSON', 'CSS Flexbox Containers', 'SVG Icons'],
+    quickCopyPrompt: 'Importable Elementor Pro kit with Flexbox Container layouts, custom global typography, neutral color palette, and zero external widget dependencies.',
+    sectionsIncluded: [
       {
-        name: 'Statutory Filings',
-        badge: 'Tax Engine',
-        description: 'Tracks GSTR-1, GSTR-3B, TDS returns, and corporate audit deadlines',
-        fields: [
-          { name: 'client_gstin', type: 'String', required: true, description: '15-digit GST identification number' },
-          { name: 'filing_period', type: 'String', required: true, description: 'Fiscal quarter / month' },
-          { name: 'acknowledgement_no', type: 'String', required: false, description: 'Filed ARN or acknowledgement' },
-        ],
+        id: 'el-hero-container',
+        name: 'Flexbox Hero Container Blueprint',
+        badge: 'Elementor Section',
+        description: 'Clean Flexbox container layout ready to import into Elementor Theme Builder.',
+        promptText: 'Elementor Flexbox Container: Hero section with heading, subtext, dual buttons, and responsive tablet/mobile breakpoints.',
+        elementorBlueprint: '{"version":"0.4","title":"Cora Agency Hero Container","type":"container","elements":[{"elType":"container","settings":{"content_width":"boxed","flex_direction":"column","align_items":"center"}}]}',
+      },
+      {
+        id: 'el-pricing-table',
+        name: 'Elementor 3-Tier Pricing Blueprint',
+        badge: 'Elementor Section',
+        description: 'Container-based pricing layout with highlighted central card and button triggers.',
+        promptText: 'Elementor Pricing Container: 3 column flexbox with custom CSS borders and button links.',
       },
     ],
-    features: ['Encrypted tax document dropzone', 'Recurring monthly compliance fee notes', 'Statutory audit checklist generator', 'GSTIN verification'],
-    recommendedModules: [
-      { id: 'invoices', title: 'CA Fee Notes', icon: 'Receipt' },
-      { id: 'vault', title: 'Audit Dropzone', icon: 'FolderKanban' },
+    features: [
+      '100% Flexbox Container based — zero legacy inner sections',
+      'No slow third-party Elementor addon plugins needed',
+      'Pre-configured global color palette and typography styles',
+      'Includes Header, Footer, 404, Single Post, and Archive templates',
     ],
     toolsReplaced: [
-      { name: 'Accounting Invoicing Tools', monthlyCostUSD: 45 },
-      { name: 'Secure File Portal', monthlyCostUSD: 35 },
-    ],
-    workflowHighlights: [
-      'Clients receive automated checklist for Form 26AS, bank statements, and invoices',
+      { name: 'Envato Elements Subscription', monthlyCostUSD: 33 },
+      { name: 'CrocoBlock JetElements', monthlyCostUSD: 19 },
     ],
     faqs: [
-      { question: 'Can we issue debit notes and fee notes?', answer: 'Yes, full B2B debit notes and 18% GST invoices are built in.' },
+      {
+        question: 'How do I import this into Elementor?',
+        answer: 'In WordPress, go to Elementor > Tools > Import / Export Kit, upload the template JSON package, and click Apply.',
+      },
     ],
   },
   {
-    id: 'consulting-advisory-kit',
-    slug: 'management-consulting',
-    title: 'Strategic Consulting & Advisory Kit',
-    shortTitle: 'Management Consulting',
-    tagline: 'Client discovery diagnostics, executive proposals, NDA vaults & milestone roadmaps.',
-    category: 'marketing_growth',
-    categoryLabel: 'Marketing & Advisory',
-    badge: 'Advisory Kit',
-    sacCode: 'SAC 998311',
-    gstRate: '18% GST',
-    rating: 4.96,
-    reviewsCount: 84,
-    downloadsCount: 960,
-    heroDescription: 'For executive advisors and consulting firms. Includes diagnostic lead capture funnels, multi-tiered advisory proposals, and client project management vaults.',
+    id: 'elementor-creative-studio-kit',
+    slug: 'elementor-creative-studio-kit',
+    title: 'Elementor Creative Studio & Freelancer Kit',
+    shortTitle: 'Elementor Studio Kit',
+    tagline: 'Minimalist editorial portfolio kit with full-width showcase containers & booking forms.',
+    category: 'elementor_kits',
+    categoryLabel: 'Elementor Template Kits',
+    assetFormat: 'elementor_kit',
+    formatBadge: 'Elementor Kit (.json)',
+    badge: 'Portfolio Kit',
+    rating: 4.93,
+    reviewsCount: 104,
+    downloadsCount: 2100,
+    heroDescription: 'Tailored for freelance photographers, designers, and visual creators who use WordPress & Elementor. Clean aesthetic, fast load times, and mobile responsive containers.',
+    accentBg: 'bg-emerald-50',
+    accentBorder: 'border-emerald-200',
+    accentText: 'text-emerald-900',
+    accentColor: '#059669',
+    coverImage: '/images/cora_hero_landscape.jpg',
+    compatibleBuilders: ['Elementor Pro', 'WordPress', 'Hello Theme'],
+    frameworkStack: ['Elementor JSON', 'Flexbox Containers'],
+    quickCopyPrompt: 'Importable Elementor portfolio kit with grid gallery, lightbox triggers, bio card, and booking form popup.',
+    sectionsIncluded: [
+      {
+        id: 'el-gallery-container',
+        name: 'Full-Width Gallery Showcase',
+        badge: 'Elementor Section',
+        description: 'Dynamic grid showcase with built-in lightbox preview.',
+        promptText: 'Elementor Portfolio Gallery: Flex container with 2-column image cards and hover zoom.',
+      },
+    ],
+    features: [
+      'Minimal editorial layout with spacious padding',
+      'Pre-built lightbox gallery and case study single page',
+      'Integrated contact & consultation form blueprint',
+    ],
+    toolsReplaced: [
+      { name: 'TemplateMonster Single Theme', monthlyCostUSD: 59 },
+    ],
+    faqs: [
+      {
+        question: 'Does this work with free Elementor?',
+        answer: 'The core page containers work with free Elementor; header/footer builders require Elementor Pro or Theme Builder.',
+      },
+    ],
+  },
+  {
+    id: 'elementor-real-estate-kit',
+    slug: 'elementor-real-estate-kit',
+    title: 'Elementor Luxury Real Estate & Brokerage Kit',
+    shortTitle: 'Elementor Real Estate',
+    tagline: 'High-end property listing cards, floorplan tabs, and tour booking modal triggers.',
+    category: 'elementor_kits',
+    categoryLabel: 'Elementor Template Kits',
+    assetFormat: 'elementor_kit',
+    formatBadge: 'Elementor Kit (.json)',
+    badge: 'Real Estate',
+    rating: 4.91,
+    reviewsCount: 88,
+    downloadsCount: 1890,
+    heroDescription: 'High-converting real estate kit for property developers and luxury brokers. Includes property detail layouts, amenity icon grids, interactive map embeds, and lead forms.',
+    accentBg: 'bg-emerald-50',
+    accentBorder: 'border-emerald-200',
+    accentText: 'text-emerald-900',
+    accentColor: '#059669',
+    coverImage: '/images/cora_hero_landscape.jpg',
+    compatibleBuilders: ['Elementor Pro', 'WordPress'],
+    frameworkStack: ['Elementor JSON', 'Flexbox Containers'],
+    quickCopyPrompt: 'Elementor luxury real estate listing page with property specifications bar, photo slider, floorplan preview, and scheduled tour contact box.',
+    sectionsIncluded: [
+      {
+        id: 'el-property-hero',
+        name: 'Property Listing Hero Blueprint',
+        badge: 'Elementor Section',
+        description: 'High-impact hero with price badge, square footage counter, and 3D tour button.',
+        promptText: 'Elementor Property Hero: Full-width banner with overlay badge and instant booking trigger.',
+      },
+    ],
+    features: [
+      'Property amenity spec bar (Beds, Baths, Sq. Ft., Price)',
+      'Floorplan download trigger and high-res gallery',
+      'VIP private viewing scheduler form',
+    ],
+    toolsReplaced: [
+      { name: 'RealHomes Premium WordPress Theme', monthlyCostUSD: 69 },
+    ],
+    faqs: [
+      {
+        question: 'Can I add dynamic custom fields (ACF)?',
+        answer: 'Yes, all container elements are mapped to standard Elementor dynamic tags for seamless ACF/Pods integration.',
+      },
+    ],
+  },
+  {
+    id: 'elementor-law-ca-firm-kit',
+    slug: 'elementor-law-ca-firm-kit',
+    title: 'Elementor Corporate Legal & CA Advisory Kit',
+    shortTitle: 'Elementor Legal Kit',
+    tagline: 'Authoritative law firm & chartered accountant kit with practice area matrices & retainer forms.',
+    category: 'elementor_kits',
+    categoryLabel: 'Elementor Template Kits',
+    assetFormat: 'elementor_kit',
+    formatBadge: 'Elementor Kit (.json)',
+    badge: 'Legal & CA',
+    rating: 4.95,
+    reviewsCount: 72,
+    downloadsCount: 1540,
+    heroDescription: 'Prestigious corporate layout designed for law firms, tax practitioners, and audit consultants. Features structured practice area grids, attorney bio cards, and retainer inquiry forms.',
+    accentBg: 'bg-emerald-50',
+    accentBorder: 'border-emerald-200',
+    accentText: 'text-emerald-900',
+    accentColor: '#059669',
+    coverImage: '/images/cora_hero_landscape.jpg',
+    compatibleBuilders: ['Elementor Pro', 'WordPress'],
+    frameworkStack: ['Elementor JSON', 'Flexbox Containers'],
+    quickCopyPrompt: 'Corporate legal advisor Elementor kit with practice area cards, compliance trust badges, case victory metrics, and confidential consultation form.',
+    sectionsIncluded: [
+      {
+        id: 'el-practice-areas',
+        name: 'Practice Areas Grid Blueprint',
+        badge: 'Elementor Section',
+        description: '6-card corporate practice matrix with icon pills and learn more links.',
+        promptText: 'Elementor Practice Area: 3x2 grid container with icon, title, short description, and link.',
+      },
+    ],
+    features: [
+      'Authoritative corporate design with understated typography',
+      'Confidential consultation inquiry form with file upload support',
+      'Attorney and partner biography cards',
+    ],
+    toolsReplaced: [
+      { name: 'LawPress WordPress Theme', monthlyCostUSD: 49 },
+    ],
+    faqs: [
+      {
+        question: 'Is this kit mobile responsive?',
+        answer: 'Yes, all container breakpoints are verified for iPhone, iPad, and desktop viewports.',
+      },
+    ],
+  },
+
+  // ── 4. LOVABLE & REACT PROJECTS ──
+  {
+    id: 'lovable-agency-fullstack-kit',
+    slug: 'lovable-agency-fullstack-kit',
+    title: 'Lovable Turnkey Agency Workspace Project',
+    shortTitle: 'Lovable Agency Project',
+    tagline: 'Ready-to-fork fullstack Lovable.dev / React project with auth, client portals & invoices.',
+    category: 'lovable_projects',
+    categoryLabel: 'Lovable & React Projects',
+    assetFormat: 'lovable_project',
+    formatBadge: 'Lovable Project & React',
+    badge: '1-Click Fork',
+    rating: 4.98,
+    reviewsCount: 220,
+    downloadsCount: 4100,
+    heroDescription: 'A complete Lovable.dev project repository. Fork with 1 click to get a live web app featuring Supabase authentication, client portal staging vaults, GST tax math calculators, and dark/light mode.',
     accentBg: 'bg-indigo-50',
     accentBorder: 'border-indigo-200',
     accentText: 'text-indigo-900',
     accentColor: '#4F46E5',
     coverImage: '/images/cora_hero_landscape.jpg',
-    includedPages: [
-      { name: 'Advisory Firm Flagship', slug: 'home', description: 'Thought leadership showcase with diagnostic assessment', type: 'landing' },
-      { name: 'Executive Strategy Vault', slug: 'portal', description: 'Deliverable roadmaps, slide decks, and meeting records', type: 'portal' },
-      { name: 'Mutual Non-Disclosure Agreement', slug: 'contract', description: 'Standard mutual NDA with SHA-256 e-signatures', type: 'contract' },
-      { name: 'Advisory Retainer Invoice', slug: 'invoice', description: 'Monthly management consulting retainer invoice', type: 'invoice' },
-    ],
-    schemaStructures: [
+    compatibleBuilders: ['Lovable.dev', 'v0.dev', 'Cursor AI', 'React 19', 'Vite', 'Tailwind CSS'],
+    frameworkStack: ['Lovable / Vite', 'React 19', 'Tailwind CSS', 'Supabase / Mock DB'],
+    quickCopyPrompt: 'Fork complete Lovable agency template with Supabase client management, milestone billing, and passwordless review portal.',
+    sectionsIncluded: [
       {
-        name: 'Advisory Engagements',
-        badge: 'Engagement Ops',
-        description: 'Tracks executive roadmaps, steering committee meetings, and milestones',
-        fields: [
-          { name: 'engagement_phase', type: 'String', required: true, description: 'Discovery, Analysis, Implementation' },
-          { name: 'advisory_hours_used', type: 'Number', required: true, description: 'Monthly consumed partner hours' },
-        ],
+        id: 'lovable-dashboard',
+        name: 'Interactive Agency Dashboard View',
+        badge: 'Lovable View',
+        description: 'Kanban lead pipeline, client project timeline, and revenue analytics.',
+        promptText: 'Build a fullstack agency dashboard in Lovable with Kanban board, revenue metrics card, and client portal access generator.',
+      },
+      {
+        id: 'lovable-client-portal',
+        name: 'Client Staging & Approval Vault',
+        badge: 'Lovable View',
+        description: 'Interactive client screen where prospects leave feedback and sign off milestones.',
+        promptText: 'Create a passwordless client staging portal with visual feedback pins and 1-click milestone approval buttons.',
       },
     ],
-    features: ['Diagnostic lead capture quizzes', 'Mutual NDA digital contracts', 'Executive client strategy portals', 'Retainer billing'],
-    recommendedModules: [
-      { id: 'contracts', title: 'NDA & MSA Vault', icon: 'ShieldCheck' },
-      { id: 'portals', title: 'Strategy Vault', icon: 'Globe' },
+    features: [
+      '1-Click fork to Lovable.dev and immediate live preview',
+      'Includes complete React components, routes, and UI state',
+      'Pre-integrated with Tailwind CSS and Radix UI primitives',
+      'Clean file structure ready for Supabase or custom API hooks',
     ],
     toolsReplaced: [
-      { name: 'Typeform Pro', monthlyCostUSD: 50 },
-      { name: 'Qwilr Proposals', monthlyCostUSD: 49 },
-    ],
-    workflowHighlights: [
-      'Lead completes diagnostic assessment -> Instant customized proposal generated',
+      { name: 'Lovable Pro Project Starter', monthlyCostUSD: 20 },
+      { name: 'SaaS Boilerplate License', monthlyCostUSD: 199 },
     ],
     faqs: [
-      { question: 'Can I customize the diagnostic questions?', answer: 'Yes, the assessment questions and logic can be modified anytime.' },
+      {
+        question: 'How do I fork this into my Lovable account?',
+        answer: 'Click "Fork in Lovable" or copy the full component project code directly into Lovable.dev or v0.dev to start customizing.',
+      },
     ],
   },
   {
-    id: 'architecture-interior-kit',
-    slug: 'architecture-interior-design',
-    title: 'Architect & Interior Design Showcase',
-    shortTitle: 'Architecture & Interiors',
-    tagline: '3D render galleries, material moodboards, site inspection reports & fee schedules.',
-    category: 'creative_design',
-    categoryLabel: 'Creative & Design',
-    badge: 'Design Kit',
-    sacCode: 'SAC 998321',
-    gstRate: '18% GST',
-    rating: 4.98,
-    reviewsCount: 92,
-    downloadsCount: 1240,
-    heroDescription: 'Purpose-built for architects and interior design practices. Features full-bleed project galleries, material selection approval portals, and stage-gate invoices.',
-    accentBg: 'bg-amber-50',
-    accentBorder: 'border-amber-200',
-    accentText: 'text-amber-900',
-    accentColor: '#D97706',
-    coverImage: '/images/cora_hero_landscape.jpg',
-    includedPages: [
-      { name: 'Architectural Portfolio', slug: 'home', description: 'Editorial layout with residential & commercial filters', type: 'landing' },
-      { name: 'Material & Spec Approval Vault', slug: 'portal', description: 'Client finishes, fixture approvals, and 3D renders', type: 'portal' },
-      { name: 'Architectural Service Agreement', slug: 'contract', description: 'Stage-wise design contract with revision terms', type: 'contract' },
-      { name: 'Phase Gate Tax Invoice', slug: 'invoice', description: 'Concept, GFC, and Site Execution milestone billing', type: 'invoice' },
-    ],
-    schemaStructures: [
-      {
-        name: 'Project Phases',
-        badge: 'Arch Ops',
-        description: 'Tracks Concept Design, Tender Drawings, Site Visits, and Handover',
-        fields: [
-          { name: 'project_area_sqft', type: 'Number', required: true, description: 'Super built-up area in square feet' },
-          { name: 'current_stage', type: 'Enum', required: true, description: 'Concept, Schematic, GFC, Handover' },
-        ],
-      },
-    ],
-    features: ['Material spec client approvals', 'Stage-gate architectural fee billing', 'Site progress inspection logs', '3D render vaults'],
-    recommendedModules: [
-      { id: 'gallery', title: 'Render Gallery', icon: 'FolderKanban' },
-      { id: 'invoices', title: 'Stage-Gate Invoices', icon: 'Receipt' },
-    ],
-    toolsReplaced: [
-      { name: 'Houzz Pro', monthlyCostUSD: 85 },
-      { name: 'PandaDoc', monthlyCostUSD: 35 },
-    ],
-    workflowHighlights: [
-      'Clients approve material swatches and fixtures with 1-click digital signoffs',
-    ],
-    faqs: [
-      { question: 'Does it support sq.ft rate calculation?', answer: 'Yes, billing can be calculated by fixed price, stage gates, or per-sq.ft rates.' },
-    ],
-  },
-  {
-    id: 'real-estate-deck-kit',
-    slug: 'real-estate-property-deck',
-    title: 'Luxury Real Estate & Brokerage Hub',
-    shortTitle: 'Real Estate Hub',
-    tagline: 'Property listings, digital brochures, site visit scheduler & broker commission notes.',
-    category: 'services_lifestyle',
-    categoryLabel: 'Services & Lifestyle',
-    badge: 'Property Kit',
-    sacCode: 'SAC 997211',
-    gstRate: '18% GST',
-    rating: 4.95,
-    reviewsCount: 130,
-    downloadsCount: 1750,
-    heroDescription: 'Complete property showcase and brokerage management kit. High-converting floor plan views, instant WhatsApp site tour booking, and digital buyer agreements.',
-    accentBg: 'bg-teal-50',
-    accentBorder: 'border-teal-200',
-    accentText: 'text-teal-900',
-    accentColor: '#0D9488',
-    coverImage: '/images/cora_hero_landscape.jpg',
-    includedPages: [
-      { name: 'Property Showcase Flagship', slug: 'home', description: 'Filterable luxury villa and commercial unit listings', type: 'landing' },
-      { name: 'Interactive Floor Plan Deck', slug: 'listing-detail', description: 'Unit specs, pricing breakdown, and brochure download', type: 'landing' },
-      { name: 'Buyer Token Agreement', slug: 'contract', description: 'Expression of Interest (EOI) digital booking form', type: 'contract' },
-      { name: 'Brokerage Commission Note', slug: 'invoice', description: 'Real estate advisory invoice with 18% GST', type: 'invoice' },
-    ],
-    schemaStructures: [
-      {
-        name: 'Property Inventory',
-        badge: 'Realty Engine',
-        description: 'Manages unit configurations, carpet area, pricing, and availability',
-        fields: [
-          { name: 'unit_type', type: 'Enum', required: true, description: '2BHK, 3BHK, 4BHK Penthouse, Commercial' },
-          { name: 'carpet_area_sqft', type: 'Number', required: true, description: 'RERA carpet area' },
-          { name: 'quoted_price_inr', type: 'Currency', required: true, description: 'Base property asking price' },
-        ],
-      },
-    ],
-    features: ['Filterable property directory', 'WhatsApp 1-click site visit scheduler', 'RERA compliant buyer booking forms', 'Brokerage fee invoicing'],
-    recommendedModules: [
-      { id: 'listings', title: 'Property Listings', icon: 'Building2' },
-      { id: 'contracts', title: 'EOI Agreements', icon: 'ShieldCheck' },
-    ],
-    toolsReplaced: [
-      { name: 'Real Estate CRM Plugin', monthlyCostUSD: 60 },
-      { name: 'Booking Calendar Tool', monthlyCostUSD: 20 },
-    ],
-    workflowHighlights: [
-      'Instant brochure download captures buyer phone number with verified OTP lead generation',
-    ],
-    faqs: [
-      { question: 'Is it RERA compliance friendly?', answer: 'Yes, RERA registration numbers and carpet area disclosures are pre-formatted.' },
-    ],
-  },
-  {
-    id: 'ai-automation-agency-kit',
-    slug: 'ai-automation-agency',
-    title: 'AI Automation & Workflow Agency Schema',
-    shortTitle: 'AI Automation Agency',
-    tagline: 'AI workflow scopes, API consumption billing, sprint pilots & SLA agreements.',
-    category: 'tech_dev',
-    categoryLabel: 'Tech & Development',
-    badge: 'AI Agency Kit',
-    sacCode: 'SAC 998313',
-    gstRate: '18% GST',
-    rating: 4.97,
-    reviewsCount: 86,
-    downloadsCount: 1190,
-    heroDescription: 'Tailored for agencies building LLM workflows, custom AI chatbots, and automated voice agents. Features pilot project agreements and monthly maintenance retainer billing.',
-    accentBg: 'bg-violet-50',
-    accentBorder: 'border-violet-200',
-    accentText: 'text-violet-900',
-    accentColor: '#8B5CF6',
-    coverImage: '/images/cora_hero_landscape.jpg',
-    includedPages: [
-      { name: 'AI Agency Landing Page', slug: 'home', description: 'Live chatbot demo embedding & ROI calculator', type: 'landing' },
-      { name: 'Client Workflow Portal', slug: 'portal', description: 'API uptime logs, webhook status, and prompt registries', type: 'portal' },
-      { name: 'AI Pilot Scope Agreement', slug: 'contract', description: '2-week sprint pilot contract with API liability clauses', type: 'contract' },
-      { name: 'Monthly AI Maintenance Invoice', slug: 'invoice', description: 'Fixed retainer + OpenAI/Anthropic API passthrough', type: 'invoice' },
-    ],
-    schemaStructures: [
-      {
-        name: 'AI Agent Deployments',
-        badge: 'AI Registry',
-        description: 'Coordinates agent webhooks, system prompts, token budgets, and SLAs',
-        fields: [
-          { name: 'agent_name', type: 'String', required: true, description: 'AI agent / workflow title' },
-          { name: 'underlying_model', type: 'String', required: true, description: 'Gemini 1.5, Claude 3.5, GPT-4o' },
-          { name: 'monthly_token_budget', type: 'Number', required: true, description: 'Allocated client API capacity' },
-        ],
-      },
-    ],
-    features: ['Embedded AI agent demo widget', 'API token budget pass-through billing', 'AI liability & SLA digital contracts', 'Webhook health dashboard'],
-    recommendedModules: [
-      { id: 'ai', title: 'AI Copilot', icon: 'Sparkles' },
-      { id: 'invoices', title: 'Token Invoicing', icon: 'Receipt' },
-    ],
-    toolsReplaced: [
-      { name: 'Custom Portal Dev', monthlyCostUSD: 120 },
-      { name: 'Billing SaaS', monthlyCostUSD: 40 },
-    ],
-    workflowHighlights: [
-      'Clients can test interactive AI bot directly on the landing page before booking a discovery call',
-    ],
-    faqs: [
-      { question: 'Can I embed custom Make / n8n workflows?', answer: 'Yes, webhooks and embed endpoints can be attached seamlessly.' },
-    ],
-  },
-  {
-    id: 'event-wedding-production-kit',
-    slug: 'event-wedding-production',
-    title: 'Event & Wedding Production Vault',
-    shortTitle: 'Event & Wedding',
-    tagline: 'Vendor quote management, event itinerary decks, RSVP tracking & deposit billing.',
-    category: 'services_lifestyle',
-    categoryLabel: 'Services & Lifestyle',
-    badge: 'Events Kit',
-    sacCode: 'SAC 998596',
-    gstRate: '18% GST',
+    id: 'lovable-crm-lead-pipeline',
+    slug: 'lovable-crm-lead-pipeline',
+    title: 'Lovable CRM & Lead Funnel Pipeline Project',
+    shortTitle: 'Lovable CRM Pipeline',
+    tagline: 'Interactive Kanban pipeline, lead scoring matrix, and automated follow-up triggers.',
+    category: 'lovable_projects',
+    categoryLabel: 'Lovable & React Projects',
+    assetFormat: 'lovable_project',
+    formatBadge: 'Lovable Project & React',
+    badge: 'CRM App',
     rating: 4.96,
-    reviewsCount: 102,
-    downloadsCount: 1430,
-    heroDescription: 'Operating suite for luxury wedding planners, event curators, and experiential production agencies. Features vendor budgets, itineraries, and digital contracts.',
-    accentBg: 'bg-rose-50',
-    accentBorder: 'border-rose-200',
-    accentText: 'text-rose-900',
-    accentColor: '#F43F5E',
+    reviewsCount: 145,
+    downloadsCount: 2750,
+    heroDescription: 'Ready-to-run React/Lovable CRM web application. Features drag-and-drop Kanban columns (Inquiry -> Proposal Sent -> Negotiation -> Won), lead value calculations, and quick call log drawers.',
+    accentBg: 'bg-indigo-50',
+    accentBorder: 'border-indigo-200',
+    accentText: 'text-indigo-900',
+    accentColor: '#4F46E5',
     coverImage: '/images/cora_hero_landscape.jpg',
-    includedPages: [
-      { name: 'Event Production Flagship', slug: 'home', description: 'Atmospheric gallery with event type filters', type: 'landing' },
-      { name: 'Client Wedding & Event Vault', slug: 'portal', description: 'Timeline schedules, moodboards, and budget tracking', type: 'portal' },
-      { name: 'Production Engagement Contract', slug: 'contract', description: 'Force majeure & cancellation clause agreements', type: 'contract' },
-      { name: 'Staged Milestone Invoices', slug: 'invoice', description: 'Venue deposit, vendor advance, and final settlement', type: 'invoice' },
-    ],
-    schemaStructures: [
+    compatibleBuilders: ['Lovable.dev', 'Cursor AI', 'v0.dev', 'React 19'],
+    frameworkStack: ['React', 'Tailwind CSS', 'dnd-kit / Drag & Drop'],
+    quickCopyPrompt: 'Create an interactive CRM Kanban board in React and Tailwind with draggable deal cards, pipeline total revenue calculation, and deal detail drawer.',
+    sectionsIncluded: [
       {
-        name: 'Event Itineraries',
-        badge: 'Event Ops',
-        description: 'Manages multi-day event timelines, guest counts, and vendor allocations',
-        fields: [
-          { name: 'event_date_start', type: 'DateTime', required: true, description: 'Event kickoff date and time' },
-          { name: 'expected_guest_count', type: 'Number', required: true, description: 'Total invited attendees' },
-          { name: 'total_budget_inr', type: 'Currency', required: true, description: 'Overall production budget' },
-        ],
+        id: 'lovable-kanban-board',
+        name: 'Draggable Deal Kanban Pipeline',
+        badge: 'Lovable Component',
+        description: 'Drag-and-drop lead stage workflow with real-time deal stage summation.',
+        promptText: 'Build a Kanban pipeline with 4 columns: New Lead, Qualified, In Negotiation, Closed Won. Each card shows deal value, client avatar, and last contact date.',
       },
     ],
-    features: ['Multi-day event timeline vaults', 'Vendor advance invoice management', 'Guest RSVP collection forms', 'Cancellation policy contracts'],
-    recommendedModules: [
-      { id: 'vault', title: 'Event Vault', icon: 'FolderKanban' },
-      { id: 'invoices', title: 'Vendor Settlement', icon: 'Receipt' },
+    features: [
+      'Interactive drag-and-drop deal management',
+      'Real-time deal value aggregation across stages',
+      'Contact card drawer with communication history timeline',
     ],
     toolsReplaced: [
-      { name: 'Aisle Planner', monthlyCostUSD: 49 },
-      { name: 'Form Builder Tool', monthlyCostUSD: 25 },
-    ],
-    workflowHighlights: [
-      'Couples receive interactive mobile-friendly itinerary vault with live weather and vendor updates',
+      { name: 'Pipedrive Starter Tier', monthlyCostUSD: 24 },
+      { name: 'HubSpot Sales Hub Starter', monthlyCostUSD: 20 },
     ],
     faqs: [
-      { question: 'Can vendors access their specific section?', answer: 'Yes, selective client and vendor portal links can be shared.' },
+      {
+        question: 'Does this support drag and drop on mobile?',
+        answer: 'Yes, it uses touch-optimized gesture handlers to ensure seamless column re-ordering on mobile devices.',
+      },
     ],
   },
   {
-    id: 'fitness-wellness-kit',
-    slug: 'fitness-wellness-coaching',
-    title: 'Fitness, Gym & Wellness Studio Hub',
-    shortTitle: 'Fitness & Wellness',
-    tagline: 'Class booking schedules, client health waivers, recurring memberships & trainer vaults.',
-    category: 'services_lifestyle',
-    categoryLabel: 'Services & Lifestyle',
-    badge: 'Wellness Kit',
-    sacCode: 'SAC 999311',
-    gstRate: '18% GST',
-    rating: 4.93,
-    reviewsCount: 76,
-    downloadsCount: 980,
-    heroDescription: 'Built for high-end boutique gyms, yoga studios, and personal coaches. Includes class timetables, automated recurring membership passes, and digital liability waivers.',
-    accentBg: 'bg-emerald-50',
-    accentBorder: 'border-emerald-200',
-    accentText: 'text-emerald-900',
-    accentColor: '#10B981',
-    coverImage: '/images/cora_hero_landscape.jpg',
-    includedPages: [
-      { name: 'Wellness Studio Homepage', slug: 'home', description: 'Interactive timetable & trainer bios with 1-click booking', type: 'landing' },
-      { name: 'Member Progress Vault', slug: 'portal', description: 'Workout plans, nutrition guides, and attendance pass', type: 'portal' },
-      { name: 'Physical Activity Readiness Waiver', slug: 'contract', description: 'PAR-Q digital health waiver with e-signature', type: 'contract' },
-      { name: 'Monthly Membership Tax Invoice', slug: 'invoice', description: 'Automated recurring gym membership invoice', type: 'invoice' },
-    ],
-    schemaStructures: [
-      {
-        name: 'Member Passes',
-        badge: 'Fitness Engine',
-        description: 'Tracks membership tier, remaining personal training credits, and renewal',
-        fields: [
-          { name: 'membership_type', type: 'Enum', required: true, description: 'Monthly Unlimited, 10-Class Pack, Annual VIP' },
-          { name: 'pt_credits_remaining', type: 'Number', required: true, description: 'Available 1-on-1 coaching sessions' },
-        ],
-      },
-    ],
-    features: ['Weekly class timetable scheduler', 'Digital PAR-Q health waivers', 'Recurring monthly membership billing', 'Trainer bio showcases'],
-    recommendedModules: [
-      { id: 'schedules', title: 'Class Timetables', icon: 'Calendar' },
-      { id: 'invoices', title: 'Membership Billing', icon: 'Receipt' },
-    ],
-    toolsReplaced: [
-      { name: 'Mindbody', monthlyCostUSD: 139 },
-      { name: 'Waiver Electronic Tool', monthlyCostUSD: 19 },
-    ],
-    workflowHighlights: [
-      'New members sign liability waiver on phone before first class booking',
-    ],
-    faqs: [
-      { question: 'Does it support pack-based credit deductions?', answer: 'Yes, 10-class passes and recurring monthly subscriptions are fully supported.' },
-    ],
-  },
-  {
-    id: 'education-creator-kit',
-    slug: 'education-creator-academy',
-    title: 'Cohort Course & Creator Academy',
-    shortTitle: 'Creator Academy',
-    tagline: 'Curriculum syllabus decks, student portal vaults, cohort billing & certificates.',
-    category: 'services_lifestyle',
-    categoryLabel: 'Services & Lifestyle',
-    badge: 'Education Kit',
-    sacCode: 'SAC 999293',
-    gstRate: '18% GST',
+    id: 'lovable-invoice-payment-app',
+    slug: 'lovable-invoice-payment-app',
+    title: 'Lovable Instant GST Invoice & UPI QR App',
+    shortTitle: 'Lovable Invoice App',
+    tagline: '18% GST tax math engine, SAC 9983 lookup, and dynamic dynamic UPI QR code generator.',
+    category: 'lovable_projects',
+    categoryLabel: 'Lovable & React Projects',
+    assetFormat: 'lovable_project',
+    formatBadge: 'Lovable Project & React',
+    badge: 'Fintech Tool',
     rating: 4.97,
-    reviewsCount: 114,
-    downloadsCount: 1560,
-    heroDescription: 'For educators, coaches, and creators running live cohort courses. Features interactive syllabus breakdowns, student resource rooms, and installment checkout.',
-    accentBg: 'bg-sky-50',
-    accentBorder: 'border-sky-200',
-    accentText: 'text-sky-900',
-    accentColor: '#0284C7',
+    reviewsCount: 190,
+    downloadsCount: 3800,
+    heroDescription: 'A standalone React/Lovable billing web app. Calculate CGST/SGST/IGST breakdown in real-time, generate downloadable PDF invoices, and render live UPI QR payment codes for Indian clients.',
+    accentBg: 'bg-indigo-50',
+    accentBorder: 'border-indigo-200',
+    accentText: 'text-indigo-900',
+    accentColor: '#4F46E5',
     coverImage: '/images/cora_hero_landscape.jpg',
-    includedPages: [
-      { name: 'Cohort Academy Flagship', slug: 'home', description: 'Curriculum breakdown, alumni reviews, and apply button', type: 'landing' },
-      { name: 'Student Resource Room', slug: 'portal', description: 'Session recordings, templates, and homework submissions', type: 'portal' },
-      { name: 'Course Enrollment Agreement', slug: 'contract', description: 'Academic integrity & refund policy agreement', type: 'contract' },
-      { name: 'Tuition Fee Tax Invoice', slug: 'invoice', description: 'B2B/B2C education invoice with GST tax invoice', type: 'invoice' },
-    ],
-    schemaStructures: [
+    compatibleBuilders: ['Lovable.dev', 'Cursor AI', 'v0.dev', 'React 19'],
+    frameworkStack: ['React', 'Tailwind CSS', 'QRCode.react', 'html2pdf'],
+    quickCopyPrompt: 'Build an Indian GST invoicing tool in React with real-time SAC 9983 tax math, intra-state CGST/SGST split, and dynamic UPI QR code generator.',
+    sectionsIncluded: [
       {
-        name: 'Cohort Enrollments',
-        badge: 'Academy Engine',
-        description: 'Manages student batches, attendance signoffs, and certificate issuance',
-        fields: [
-          { name: 'cohort_batch_id', type: 'String', required: true, description: 'e.g. Cohort Spring 2026' },
-          { name: 'enrollment_status', type: 'Enum', required: true, description: 'Applied, Enrolled, Graduated' },
-        ],
+        id: 'lovable-tax-calc',
+        name: 'Live GST Calculation Engine',
+        badge: 'Lovable Engine',
+        description: 'Auto-computes 18% GST, reverses inclusive tax, and handles reverse charge.',
+        promptText: 'React GST calculator with subtotal, 9% CGST, 9% SGST or 18% IGST radio switch, and instant UPI QR code renderer.',
       },
     ],
-    features: ['Interactive chaptered syllabus', 'Student resource vault with video embeds', 'Installment fee invoice splits', 'Digital course completion certificates'],
-    recommendedModules: [
-      { id: 'syllabus', title: 'Curriculum View', icon: 'BookOpen' },
-      { id: 'invoices', title: 'Tuition Invoices', icon: 'Receipt' },
+    features: [
+      'Real-time Indian GST tax calculator (CGST/SGST/IGST)',
+      'Dynamic UPI string generator (upi://pay?pa=...&am=...)',
+      '1-Click PDF export and client share link generator',
     ],
     toolsReplaced: [
-      { name: 'Teachable / Kajabi', monthlyCostUSD: 119 },
-      { name: 'DocuSign', monthlyCostUSD: 40 },
-    ],
-    workflowHighlights: [
-      'Students submit application -> Approved -> Instant payment link and student portal access generated',
+      { name: 'Vyapar Desktop Invoice Pro', monthlyCostUSD: 15 },
+      { name: 'Zoho Invoice Premium', monthlyCostUSD: 19 },
     ],
     faqs: [
-      { question: 'Can students pay in 2 installments?', answer: 'Yes, split milestone tuition invoices are supported natively.' },
+      {
+        question: 'Does this generate valid GST tax invoices?',
+        answer: 'Yes, it complies with Rule 46 of the CGST Rules 2017 with SAC code, HSN breakdown, and supplier GSTIN fields.',
+      },
     ],
   },
   {
-    id: 'healthcare-clinic-kit',
-    slug: 'healthcare-clinic-practice',
-    title: 'Private Medical & Dental Clinic OS',
-    shortTitle: 'Clinic & Healthcare',
-    tagline: 'Patient appointment triage, treatment estimate notes, consent forms & billing.',
-    category: 'services_lifestyle',
-    categoryLabel: 'Services & Lifestyle',
-    badge: 'Clinical Kit',
-    sacCode: 'SAC 999312',
-    gstRate: 'Exempt / 18%',
-    rating: 4.96,
-    reviewsCount: 68,
-    downloadsCount: 790,
-    heroDescription: 'Tailored for private healthcare practices, dental studios, and wellness doctors. Manage appointment triage, treatment estimates, and patient consent forms.',
-    accentBg: 'bg-cyan-50',
-    accentBorder: 'border-cyan-200',
-    accentText: 'text-cyan-900',
-    accentColor: '#0891B2',
-    coverImage: '/images/cora_hero_landscape.jpg',
-    includedPages: [
-      { name: 'Clinical Practice Homepage', slug: 'home', description: 'Doctor profiles, specialty treatments & instant appointment triage', type: 'landing' },
-      { name: 'Patient Treatment Estimate', slug: 'invoice', description: 'Itemized procedure estimate note with payment options', type: 'invoice' },
-      { name: 'Informed Procedure Consent Form', slug: 'contract', description: 'Digital patient medical consent form with SHA-256 e-sign', type: 'contract' },
-    ],
-    schemaStructures: [
-      {
-        name: 'Patient Consultations',
-        badge: 'Clinical Ops',
-        description: 'Coordinates appointment slots, doctor assignment, and treatment records',
-        fields: [
-          { name: 'patient_mrn', type: 'String', required: true, description: 'Medical record number' },
-          { name: 'attending_specialist', type: 'String', required: true, description: 'Doctor name' },
-        ],
-      },
-    ],
-    features: ['Specialist treatment estimate breakdowns', 'Informed consent digital e-signatures', 'Mobile appointment triage forms', 'Bilingual patient instructions'],
-    recommendedModules: [
-      { id: 'consent', title: 'Consent Forms', icon: 'ShieldCheck' },
-      { id: 'invoices', title: 'Treatment Billing', icon: 'Receipt' },
-    ],
-    toolsReplaced: [
-      { name: 'Practo Practice', monthlyCostUSD: 65 },
-      { name: 'Form Software', monthlyCostUSD: 29 },
-    ],
-    workflowHighlights: [
-      'Patients sign medical consent form on iPad / mobile prior to clinical procedure',
-    ],
-    faqs: [
-      { question: 'Is patient data stored securely?', answer: 'Yes, all sensitive records utilize client-side encryption and secure vaults.' },
-    ],
-  },
-  {
-    id: 'ecommerce-dtc-kit',
-    slug: 'ecommerce-dtc-brand',
-    title: 'DTC Brand & E-Commerce Flagship Kit',
-    shortTitle: 'DTC E-Commerce',
-    tagline: 'Direct product showcases, customer reviews, B2B wholesale orders & GST invoices.',
-    category: 'tech_dev',
-    categoryLabel: 'Tech & Development',
-    badge: 'DTC Kit',
-    sacCode: 'HSN 9983 / Goods',
-    gstRate: '18% / Slab',
+    id: 'lovable-client-onboarding-flow',
+    slug: 'lovable-client-onboarding-flow',
+    title: 'Lovable 5-Step Guided Client Onboarding Flow',
+    shortTitle: 'Lovable Onboarding',
+    tagline: 'Multi-step onboarding wizard: Project Details -> Scope -> Agreement -> Payment -> Portal Access.',
+    category: 'lovable_projects',
+    categoryLabel: 'Lovable & React Projects',
+    assetFormat: 'lovable_project',
+    formatBadge: 'Lovable Project & React',
+    badge: 'Onboarding Flow',
     rating: 4.95,
-    reviewsCount: 122,
-    downloadsCount: 1690,
-    heroDescription: 'Modern luxury DTC brand showcase. Features high-converting product hero, wholesale B2B bulk inquiry builder, customer social proof, and tax invoices.',
-    accentBg: 'bg-zinc-100',
-    accentBorder: 'border-zinc-300',
-    accentText: 'text-zinc-950',
-    accentColor: '#18181B',
+    reviewsCount: 112,
+    downloadsCount: 2340,
+    heroDescription: 'A friction-free multi-step client onboarding wizard. Guides new agency clients through project scope intake, digital signature sign-off, advance retainer payment, and workspace setup in under 3 minutes.',
+    accentBg: 'bg-indigo-50',
+    accentBorder: 'border-indigo-200',
+    accentText: 'text-indigo-900',
+    accentColor: '#4F46E5',
     coverImage: '/images/cora_hero_landscape.jpg',
-    includedPages: [
-      { name: 'DTC Brand Flagship', slug: 'home', description: 'Luxury visual product hero with lifestyle storytelling', type: 'landing' },
-      { name: 'Product Deep-Dive & Specs', slug: 'product-detail', description: 'Material breakdown, size guide, and customer photo reviews', type: 'landing' },
-      { name: 'B2B Wholesale Invoicing Deck', slug: 'invoice', description: 'Bulk order quotation with GST breakups and freight terms', type: 'invoice' },
-    ],
-    schemaStructures: [
+    compatibleBuilders: ['Lovable.dev', 'Cursor AI', 'v0.dev', 'React 19'],
+    frameworkStack: ['React', 'Tailwind CSS', 'Framer Motion'],
+    quickCopyPrompt: 'Create a 5-step client onboarding wizard in React: Step 1 Details, Step 2 Scope Checklist, Step 3 Digital Agreement Sign, Step 4 Advance Payment UPI, Step 5 Success Screen.',
+    sectionsIncluded: [
       {
-        name: 'Product Inventory & SKUs',
-        badge: 'Commerce Engine',
-        description: 'Manages product variants, stock alerts, wholesale pricing, and barcodes',
-        fields: [
-          { name: 'sku_code', type: 'String', required: true, description: 'Unique product stock keeping unit' },
-          { name: 'wholesale_moq', type: 'Number', required: true, description: 'Minimum order quantity for B2B' },
-        ],
+        id: 'lovable-stepper',
+        name: '5-Step Linear Progress Stepper',
+        badge: 'Lovable Wizard',
+        description: 'Guided progress stepper with validated inputs and instant step restoration.',
+        promptText: 'Build a 5-step guided stepper with animated step numbers, back/next navigation, and completed step checkmarks.',
       },
     ],
-    features: ['High-resolution product galleries', 'Wholesale B2B quotation builder', 'Customer review photo submission', 'Instant UPI checkout'],
-    recommendedModules: [
-      { id: 'products', title: 'Product Catalog', icon: 'FolderKanban' },
-      { id: 'invoices', title: 'Wholesale Billing', icon: 'Receipt' },
+    features: [
+      '5-Step guided progress stepper with form state persistence',
+      'Integrated digital signature canvas component',
+      'Instant client workspace portal provisioning trigger',
     ],
     toolsReplaced: [
-      { name: 'Shopify Plus Addons', monthlyCostUSD: 80 },
-      { name: 'B2B Wholesale Plugin', monthlyCostUSD: 49 },
-    ],
-    workflowHighlights: [
-      'B2B wholesale buyers calculate bulk order volume pricing and receive instant GST proforma invoices',
+      { name: 'PandaDoc Onboarding Workflow', monthlyCostUSD: 49 },
+      { name: 'Bonsai Client Onboarding', monthlyCostUSD: 32 },
     ],
     faqs: [
-      { question: 'Can I connect my existing payment gateway?', answer: 'Yes, Stripe, Razorpay, and direct UPI QR links are pre-configured.' },
+      {
+        question: 'Can I add custom onboarding steps?',
+        answer: 'Yes, the stepper is array-driven. You can add or remove steps (like KYC upload or questionnaire) with 1 line of config.',
+      },
     ],
   },
 ];

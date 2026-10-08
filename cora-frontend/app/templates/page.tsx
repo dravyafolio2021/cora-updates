@@ -11,8 +11,10 @@ import {
   RotateCcw, 
   Search, 
   Layers, 
-  ShieldCheck, 
-  Receipt, 
+  Code2, 
+  Bot, 
+  LayoutTemplate,
+  Copy,
   Check 
 } from 'lucide-react';
 import { 
@@ -26,20 +28,20 @@ import { TemplatePreviewModal } from '@/components/templates/TemplatePreviewModa
 
 const TEMPLATES_FAQS = [
   {
-    question: 'How do Cora Templates differ from standard WordPress or Webflow themes?',
-    answer: 'Standard themes only provide static visual HTML/CSS layouts. Cora Templates are full turnkey workspace schemas that include integrated client review portals, Indian GST SAC 9983 tax math, legally binding SHA-256 e-sign agreements, and automated UPI payment links right out of the box.'
+    question: 'What types of Frontend Assets are included in this library?',
+    answer: 'Our library contains 4 main formats: (1) Native Tailwind CSS & Next.js full landing pages, (2) Master AI section generation prompts engineered for Claude 3.5 Sonnet, Cursor AI, and v0, (3) Importable Elementor Pro Flexbox container JSON kits, and (4) 1-click forkable Lovable.dev fullstack React projects.'
   },
   {
-    question: 'Can I customize the branding, colors, and fields of a template?',
-    answer: 'Yes, 100%. Every template is fully modular. You can adjust typography, color ramps, add custom database fields, upload your own logo, and set custom domain subdomains in minutes.'
+    question: 'How do I use the AI Section Prompts in Cursor or Claude?',
+    answer: 'Click "Copy Prompt" on any section (Hero, Pricing Matrix, Bento Grid, Form Drawer), open Cursor Composer (⌘I) or Claude 3.5 Sonnet, and paste. The prompts are pre-engineered with layout constraints, accessibility classes, and typography tokens to ensure zero AI hallucinations.'
   },
   {
-    question: 'Are digital contracts in these templates legally binding in India?',
-    answer: 'Yes. All contracts included in the templates conform to Section 10A of the Information Technology Act 2000 regarding electronic contract validity, complete with SHA-256 cryptographic audit logs and client IP tracking.'
+    question: 'How do I import Elementor Template Kits?',
+    answer: 'In your WordPress dashboard with Elementor installed, go to Elementor > Tools > Import / Export Kit. Upload the downloaded JSON template blueprint or copy the container structure directly into Elementor.'
   },
   {
-    question: 'How do I deploy a template to my live workspace?',
-    answer: 'Click "Deploy Schema" on any template. If you already have a Cora Workspace, the database collections, client portals, and invoice templates will install instantly without overwriting your existing data.'
+    question: 'Are all these frontend assets and prompts free?',
+    answer: 'Yes, 100% free and open-source under the MIT license. You can use them for commercial client projects, SaaS landing pages, agency websites, and portfolio builds without any attribution or licensing fees.'
   }
 ];
 
@@ -62,9 +64,10 @@ export default function TemplatesHubPage() {
         tmpl.tagline.toLowerCase().includes(q) ||
         tmpl.heroDescription.toLowerCase().includes(q) ||
         tmpl.categoryLabel.toLowerCase().includes(q) ||
-        tmpl.sacCode.toLowerCase().includes(q) ||
+        tmpl.formatBadge.toLowerCase().includes(q) ||
+        tmpl.compatibleBuilders.some(b => b.toLowerCase().includes(q)) ||
         tmpl.features.some(f => f.toLowerCase().includes(q)) ||
-        tmpl.includedPages.some(p => p.name.toLowerCase().includes(q));
+        tmpl.sectionsIncluded.some(s => s.name.toLowerCase().includes(q));
 
       return matchesCategory && matchesSearch;
     });
@@ -109,28 +112,28 @@ export default function TemplatesHubPage() {
                 16+
               </div>
               <div className="text-left">
-                <span className="block text-xs font-bold text-zinc-900 leading-tight">Turnkey</span>
-                <span className="block text-[11px] text-zinc-500 leading-tight">Industry Schemas</span>
+                <span className="block text-xs font-bold text-zinc-900 leading-tight">Frontend Kits</span>
+                <span className="block text-[11px] text-zinc-500 leading-tight">Native &amp; AI Formats</span>
               </div>
             </div>
 
             <div className="flex items-center gap-3 pt-2 sm:pt-0 sm:px-4">
               <div className="font-display text-xl sm:text-3xl font-extrabold text-zinc-950 tracking-tight">
-                100%
+                4 Formats
               </div>
               <div className="text-left">
-                <span className="block text-xs font-bold text-zinc-900 leading-tight">Indian GST</span>
-                <span className="block text-[11px] text-zinc-500 leading-tight">SAC 9983 Pre-Set</span>
+                <span className="block text-xs font-bold text-zinc-900 leading-tight">Tailwind &amp; Next.js</span>
+                <span className="block text-[11px] text-zinc-500 leading-tight">Elementor, Lovable &amp; AI</span>
               </div>
             </div>
 
             <div className="flex items-center gap-3 pt-2 sm:pt-0 sm:px-4">
               <div className="font-display text-xl sm:text-3xl font-extrabold text-zinc-950 tracking-tight">
-                &lt; 60s
+                1-Click
               </div>
               <div className="text-left">
-                <span className="block text-xs font-bold text-zinc-900 leading-tight">Workspace</span>
-                <span className="block text-[11px] text-zinc-500 leading-tight">Deployment Time</span>
+                <span className="block text-xs font-bold text-zinc-900 leading-tight">Prompt Copy</span>
+                <span className="block text-[11px] text-zinc-500 leading-tight">Cursor &amp; Claude Ready</span>
               </div>
             </div>
 
@@ -140,7 +143,7 @@ export default function TemplatesHubPage() {
               </div>
               <div className="text-left">
                 <span className="block text-xs font-bold text-zinc-900 leading-tight">Free Forever</span>
-                <span className="block text-[11px] text-zinc-500 leading-tight">Zero Plugin Fees</span>
+                <span className="block text-[11px] text-zinc-500 leading-tight">Zero Paywalls</span>
               </div>
             </div>
 
@@ -155,10 +158,10 @@ export default function TemplatesHubPage() {
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 sm:mb-8 pb-4 border-b border-zinc-100">
           <div>
             <h2 className="font-display text-xl sm:text-2xl font-bold text-zinc-950 tracking-tight">
-              Explore Turnkey Schemas
+              Explore Frontend Assets
             </h2>
             <span className="text-xs text-zinc-500">
-              Showing {filteredTemplates.length} of {TEMPLATES_DATA.length} pre-built workspace templates
+              Showing {filteredTemplates.length} of {TEMPLATES_DATA.length} landing pages, AI prompt packs, Elementor kits &amp; Lovable projects
             </span>
           </div>
 
@@ -185,15 +188,15 @@ export default function TemplatesHubPage() {
           </div>
         </div>
 
-        {/* Templates Cards Grid (3 Columns on Desktop, 1 on Mobile) */}
+        {/* Templates Cards Grid */}
         {filteredTemplates.length === 0 ? (
           <div className="text-center py-16 px-4 bg-zinc-50 rounded-3xl border border-zinc-200">
             <Search className="w-8 h-8 text-zinc-400 mx-auto mb-3" />
             <h3 className="text-base font-bold text-zinc-950 mb-1">
-              No matching templates found
+              No matching frontend assets found
             </h3>
             <p className="text-xs text-zinc-500 max-w-sm mx-auto mb-4">
-              We couldn&apos;t find any templates matching &ldquo;{searchQuery}&rdquo;. Try another term or reset filters.
+              We couldn&apos;t find any assets matching &ldquo;{searchQuery}&rdquo;. Try another term or reset filters.
             </p>
             <button
               onClick={handleResetFilters}
@@ -217,19 +220,19 @@ export default function TemplatesHubPage() {
 
       </section>
 
-      {/* ── 4. "CORA SCHEMAS VS GENERIC THEMES" ARCHITECTURE TABLE ── */}
+      {/* ── 4. "CORA FRONTEND ASSETS VS BLOATED THEMES" COMPARISON ── */}
       <section className="w-full py-14 sm:py-20 bg-zinc-50/80 border-t border-zinc-200/80 mt-12 sm:mt-16">
         <div className="max-w-[1100px] mx-auto px-4 sm:px-6">
           
           <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-12">
             <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-500 bg-zinc-100 px-3 py-1 rounded-full border border-zinc-200 mb-3 inline-block">
-              Architectural Comparison
+              Builder Architecture
             </span>
             <h2 className="font-display text-2xl sm:text-4xl font-bold text-zinc-950 tracking-tight mb-3">
-              Why Cora Schemas Outperform Traditional Website Themes
+              Why Cora Frontend Assets Build Faster
             </h2>
             <p className="text-xs sm:text-base text-zinc-600 font-normal leading-relaxed">
-              Standard templates require 10+ paid plugins, separate CRM setups, and manual invoicing. Cora delivers a unified business engine.
+              Traditional marketplace themes lock you into bloated code. Cora provides clean Tailwind, ready AI section prompts, Elementor kits, and Lovable repositories.
             </p>
           </div>
 
@@ -238,31 +241,31 @@ export default function TemplatesHubPage() {
               <table className="w-full text-left text-xs sm:text-sm">
                 <thead className="bg-zinc-100/80 text-zinc-700 font-mono text-[11px] uppercase tracking-wider border-b border-zinc-200">
                   <tr>
-                    <th className="p-4 sm:p-5">Capability</th>
-                    <th className="p-4 sm:p-5 text-zinc-500 font-normal">WordPress / ThemeForest Themes</th>
-                    <th className="p-4 sm:p-5 text-zinc-950 font-bold bg-purple-50/50">Cora Turnkey Schemas</th>
+                    <th className="p-4 sm:p-5">Asset Feature</th>
+                    <th className="p-4 sm:p-5 text-zinc-500 font-normal">Generic Marketplace Themes</th>
+                    <th className="p-4 sm:p-5 text-zinc-950 font-bold bg-purple-50/50">Cora Frontend Assets</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-100">
                   <tr className="hover:bg-zinc-50/50">
-                    <td className="p-4 sm:p-5 font-bold text-zinc-900">Website &amp; Landing Page</td>
-                    <td className="p-4 sm:p-5 text-zinc-600">Static HTML/PHP theme requiring heavy builder plugins</td>
-                    <td className="p-4 sm:p-5 font-semibold text-purple-950 bg-purple-50/30">Sub-50ms Next.js static speed with zero plugin bloat</td>
+                    <td className="p-4 sm:p-5 font-bold text-zinc-900">AI Prompt Engineering</td>
+                    <td className="p-4 sm:p-5 text-zinc-600">No prompts; manual customization only</td>
+                    <td className="p-4 sm:p-5 font-semibold text-purple-950 bg-purple-50/30">Engineered prompts for Claude 3.5 Sonnet, Cursor &amp; v0</td>
                   </tr>
                   <tr className="hover:bg-zinc-50/50">
-                    <td className="p-4 sm:p-5 font-bold text-zinc-900">Client Review Portals</td>
-                    <td className="p-4 sm:p-5 text-zinc-600">Requires separate $30/mo client portal plugin or SaaS</td>
-                    <td className="p-4 sm:p-5 font-semibold text-purple-950 bg-purple-50/30">Built-in passwordless staging &amp; deliverable review vaults</td>
+                    <td className="p-4 sm:p-5 font-bold text-zinc-900">Elementor Compatibility</td>
+                    <td className="p-4 sm:p-5 text-zinc-600">Requires 10+ paid third-party add-on plugins</td>
+                    <td className="p-4 sm:p-5 font-semibold text-purple-950 bg-purple-50/30">100% Flexbox container JSON kits with zero bloat</td>
                   </tr>
                   <tr className="hover:bg-zinc-50/50">
-                    <td className="p-4 sm:p-5 font-bold text-zinc-900">18% GST Invoicing &amp; SAC 9983</td>
-                    <td className="p-4 sm:p-5 text-zinc-600">Requires third-party accounting integration and manual reconciliation</td>
-                    <td className="p-4 sm:p-5 font-semibold text-purple-950 bg-purple-50/30">Automated Indian GST tax math, SAC codes &amp; instant UPI QR</td>
+                    <td className="p-4 sm:p-5 font-bold text-zinc-900">Lovable &amp; v0 Ready</td>
+                    <td className="p-4 sm:p-5 text-zinc-600">Non-existent or incompatible legacy PHP files</td>
+                    <td className="p-4 sm:p-5 font-semibold text-purple-950 bg-purple-50/30">1-Click forkable React &amp; Lovable.dev web apps</td>
                   </tr>
                   <tr className="hover:bg-zinc-50/50">
-                    <td className="p-4 sm:p-5 font-bold text-zinc-900">Legally Binding E-Signatures</td>
-                    <td className="p-4 sm:p-5 text-zinc-600">Separate $40/mo DocuSign or PandaDoc account needed</td>
-                    <td className="p-4 sm:p-5 font-semibold text-purple-950 bg-purple-50/30">Unlimited SHA-256 digital signatures conforming to IT Act 2000</td>
+                    <td className="p-4 sm:p-5 font-bold text-zinc-900">Performance &amp; Speed</td>
+                    <td className="p-4 sm:p-5 text-zinc-600">Slow TTFB with bulky JS bundles (2MB+)</td>
+                    <td className="p-4 sm:p-5 font-semibold text-purple-950 bg-purple-50/30">Sub-50ms static speed, 0.00 CLS &amp; pure Tailwind</td>
                   </tr>
                 </tbody>
               </table>
@@ -279,7 +282,7 @@ export default function TemplatesHubPage() {
             Frequently Asked Questions
           </span>
           <h2 className="font-display text-xl sm:text-3xl font-bold text-zinc-950 tracking-tight">
-            Common questions about Cora templates &amp; schemas
+            Common questions about frontend assets &amp; templates
           </h2>
         </div>
 

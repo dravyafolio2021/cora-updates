@@ -13,14 +13,13 @@ import {
   Star, 
   Download, 
   Layers, 
-  ShieldCheck, 
-  Receipt, 
-  FolderKanban, 
   ChevronRight, 
   Check, 
   ExternalLink,
   Code2,
-  Calendar,
+  Copy,
+  Bot,
+  LayoutTemplate,
   Zap,
   Globe
 } from 'lucide-react';
@@ -42,19 +41,19 @@ export async function generateMetadata({ params }: TemplatePageProps): Promise<M
 
   if (!template) {
     return {
-      title: 'Template Not Found — Cora',
-      description: 'The requested turnkey workspace template could not be found.',
+      title: 'Asset Not Found — Cora',
+      description: 'The requested frontend asset could not be found.',
     };
   }
 
   const url = `https://heycora.in/templates/${template.slug}`;
 
   return {
-    title: `${template.title} — Turnkey Workspace Schema & Website Kit | Cora`,
+    title: `${template.title} — Frontend Asset & AI Prompts | Cora`,
     description: template.heroDescription,
     alternates: { canonical: url },
     openGraph: {
-      title: `${template.title} — Cora Turnkey Kit`,
+      title: `${template.title} — Cora Frontend Asset`,
       description: template.heroDescription,
       url,
       siteName: 'Cora',
@@ -72,7 +71,7 @@ export default async function TemplateDetailPage({ params }: TemplatePageProps) 
   }
 
   const relatedTemplates = TEMPLATES_DATA.filter(
-    (t) => t.id !== template.id && (t.category === template.category || t.sacCode === template.sacCode)
+    (t) => t.id !== template.id && (t.category === template.category || t.assetFormat === template.assetFormat)
   ).slice(0, 3);
 
   const totalMonthlySavings = template.toolsReplaced.reduce((acc, curr) => acc + curr.monthlyCostUSD, 0);
@@ -81,7 +80,7 @@ export default async function TemplateDetailPage({ params }: TemplatePageProps) 
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
     name: template.title,
-    applicationCategory: 'BusinessApplication',
+    applicationCategory: 'DesignApplication',
     operatingSystem: 'Web, Cloud',
     description: template.heroDescription,
     offers: {
@@ -116,7 +115,7 @@ export default async function TemplateDetailPage({ params }: TemplatePageProps) 
             </li>
             <li><ChevronRight className="w-3.5 h-3.5 text-zinc-300" /></li>
             <li>
-              <Link href="/templates" className="hover:text-zinc-950 transition-colors">Templates &amp; Themes</Link>
+              <Link href="/templates" className="hover:text-zinc-950 transition-colors">Frontend Assets</Link>
             </li>
             <li><ChevronRight className="w-3.5 h-3.5 text-zinc-300" /></li>
             <li className="text-zinc-950 font-bold truncate max-w-[200px] sm:max-w-none">
@@ -125,238 +124,236 @@ export default async function TemplateDetailPage({ params }: TemplatePageProps) 
           </ol>
         </nav>
 
-        {/* ── 2. HERO SHOWCASE CARD ── */}
-        <div className="rounded-3xl bg-zinc-50/80 border border-zinc-200/90 p-6 sm:p-10 mb-12 sm:mb-16 shadow-[0_4px_24px_rgba(0,0,0,0.02)]">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        {/* ── 2. ASSET HERO HEADER ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start pb-12 sm:pb-16 border-b border-zinc-100">
+          
+          {/* Left Column: Title & Metadata */}
+          <div className="lg:col-span-7 space-y-4 sm:space-y-6">
             
-            {/* Left Header Specs */}
-            <div className="lg:col-span-7 space-y-4 text-left">
-              
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-zinc-200/80 text-zinc-800">
-                  {template.categoryLabel}
-                </span>
-                <span className="text-[10px] font-mono font-bold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200/60">
-                  {template.sacCode} ({template.gstRate})
-                </span>
-                <div className="flex items-center gap-1 text-xs font-semibold text-zinc-700 bg-white px-2.5 py-1 rounded-full border border-zinc-200/80 shadow-2xs">
-                  <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-                  <span>{template.rating}</span>
-                  <span className="text-zinc-400">({template.reviewsCount} reviews)</span>
-                </div>
-              </div>
-
-              <h1 className="font-display text-3xl sm:text-4xl md:text-5xl font-semibold text-zinc-950 tracking-tight leading-[1.12]">
-                {template.title}
-              </h1>
-
-              <p className="text-sm sm:text-base text-zinc-600 font-normal leading-relaxed">
-                {template.heroDescription}
-              </p>
-
-              {/* Action Buttons */}
-              <div className="flex flex-wrap items-center gap-3 pt-3">
-                <a
-                  href={`https://app.heycora.in/workspace/login?template=${template.slug}&source=template_hero`}
-                  className="px-6 py-3 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white text-xs sm:text-sm font-bold transition-all shadow-sm flex items-center gap-2"
-                >
-                  <Sparkles className="w-4 h-4 text-emerald-400" />
-                  <span>Deploy Schema into Workspace</span>
-                  <ArrowRight className="w-4 h-4" />
-                </a>
-
-                <a
-                  href={`https://app.heycora.in/preview/sample-preview?template=${template.slug}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-5 py-3 rounded-xl bg-white hover:bg-zinc-100 text-zinc-900 border border-zinc-200 text-xs sm:text-sm font-semibold transition-all shadow-2xs flex items-center gap-1.5"
-                >
-                  <span>Live Staging Demo</span>
-                  <ExternalLink className="w-3.5 h-3.5 text-zinc-500" />
-                </a>
-              </div>
-
-              {/* Trust Metric Row */}
-              <div className="flex items-center gap-5 pt-2 text-xs text-zinc-500 font-mono">
-                <span>✓ {template.downloadsCount.toLocaleString()}+ live instances</span>
-                <span>✓ Zero plugin fees</span>
-                <span>✓ 100% white-label</span>
-              </div>
-
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-700 bg-zinc-100 px-2.5 py-1 rounded-full border border-zinc-200">
+                {template.categoryLabel}
+              </span>
+              <span className="text-[10px] font-mono font-bold px-2.5 py-1 rounded-full bg-purple-100 text-purple-800 border border-purple-200/60">
+                {template.formatBadge}
+              </span>
+              <span className="text-[10px] font-mono font-bold px-2.5 py-1 rounded-full bg-zinc-200 text-zinc-800">
+                {template.badge}
+              </span>
             </div>
 
-            {/* Right Interactive Visual Card */}
-            <div className="lg:col-span-5">
-              <div className="rounded-2xl bg-white border border-zinc-200/90 p-5 sm:p-6 shadow-md space-y-4 text-left">
-                
-                <div className="flex items-center justify-between pb-3 border-b border-zinc-100">
-                  <span className="text-xs font-mono font-bold text-zinc-400 uppercase tracking-wider">
-                    Blueprint Overview
-                  </span>
-                  <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60">
-                    Saves ${totalMonthlySavings}/mo
-                  </span>
-                </div>
+            <h1 className="font-display text-3xl sm:text-5xl font-bold text-zinc-950 tracking-tight leading-[1.12]">
+              {template.title}
+            </h1>
 
-                {/* Included Key Components */}
-                <div className="space-y-2 text-xs">
-                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-zinc-50">
-                    <span className="font-semibold text-zinc-900 flex items-center gap-2">
-                      <Layers className="w-4 h-4 text-zinc-500" />
-                      Included Pages &amp; Views
-                    </span>
-                    <span className="font-mono font-bold text-zinc-950">{template.includedPages.length} Pages</span>
-                  </div>
+            <p className="text-sm sm:text-base text-zinc-600 leading-relaxed font-normal">
+              {template.heroDescription}
+            </p>
 
-                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-zinc-50">
-                    <span className="font-semibold text-zinc-900 flex items-center gap-2">
-                      <ShieldCheck className="w-4 h-4 text-zinc-500" />
-                      E-Sign Contract Template
-                    </span>
-                    <span className="font-mono font-bold text-emerald-700">SHA-256</span>
-                  </div>
-
-                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-zinc-50">
-                    <span className="font-semibold text-zinc-900 flex items-center gap-2">
-                      <Receipt className="w-4 h-4 text-zinc-500" />
-                      GST Invoicing Engine
-                    </span>
-                    <span className="font-mono font-bold text-zinc-950">{template.gstRate}</span>
-                  </div>
-
-                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-zinc-50">
-                    <span className="font-semibold text-zinc-900 flex items-center gap-2">
-                      <FolderKanban className="w-4 h-4 text-zinc-500" />
-                      Database Collections
-                    </span>
-                    <span className="font-mono font-bold text-zinc-950">{template.schemaStructures.length} Schemas</span>
-                  </div>
-                </div>
-
-                {/* Subscriptions Replaced List */}
-                <div className="pt-2 border-t border-zinc-100">
-                  <span className="text-[11px] text-zinc-500 font-medium block mb-2">
-                    Eliminates Separate Subscriptions:
-                  </span>
-                  <div className="flex flex-wrap gap-1.5">
-                    {template.toolsReplaced.map((t, idx) => (
-                      <span key={idx} className="text-[10px] font-mono text-zinc-700 bg-zinc-100 px-2 py-0.5 rounded border border-zinc-200/60">
-                        {t.name}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
+            {/* Compatible Frameworks */}
+            <div>
+              <div className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-400 mb-2">
+                Compatible Builders &amp; Frameworks
               </div>
+              <div className="flex flex-wrap gap-2">
+                {template.compatibleBuilders.map((builder, idx) => (
+                  <span key={idx} className="text-xs font-mono text-zinc-800 bg-zinc-50 px-3 py-1 rounded-lg border border-zinc-200 font-medium">
+                    {builder}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Trust Metrics Pill Bar */}
+            <div className="flex flex-wrap items-center gap-4 sm:gap-6 pt-2 text-xs font-medium text-zinc-600">
+              <div className="flex items-center gap-1.5">
+                <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
+                <span className="font-bold text-zinc-950">{template.rating}</span>
+                <span className="text-zinc-400">({template.reviewsCount} reviews)</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Download className="w-4 h-4 text-zinc-400" />
+                <span>{template.downloadsCount.toLocaleString()}+ installs</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Layers className="w-4 h-4 text-zinc-400" />
+                <span>{template.sectionsIncluded.length} Ready Sections</span>
+              </div>
+            </div>
+
+            {/* Primary Action Buttons */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-4">
+              <a
+                href="#sections-breakdown"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-zinc-950 text-white text-xs sm:text-sm font-bold hover:bg-zinc-800 transition-all shadow-sm group"
+              >
+                <Bot className="w-4 h-4 text-purple-400" />
+                <span>Inspect AI Prompts &amp; Code</span>
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+              </a>
+
+              <a
+                href="/templates"
+                className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-900 text-xs sm:text-sm font-bold transition-all"
+              >
+                <span>Browse All Assets</span>
+              </a>
             </div>
 
           </div>
+
+          {/* Right Column: Visual Preview Card & Replaced Tools */}
+          <div className="lg:col-span-5 space-y-6">
+            
+            {/* Visual Preview Box */}
+            <div className="rounded-3xl bg-zinc-50 border border-zinc-200/90 p-5 sm:p-6 shadow-sm">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-xs font-mono font-bold text-zinc-500 uppercase tracking-wider">
+                  Asset Blueprint Box
+                </span>
+                <span className="text-[10px] font-mono text-emerald-700 bg-emerald-100/70 px-2 py-0.5 rounded-full font-bold">
+                  MIT License / Free
+                </span>
+              </div>
+
+              <div className="space-y-3">
+                {template.sectionsIncluded.map((sec, idx) => (
+                  <div key={sec.id} className="flex items-start justify-between p-3 rounded-xl bg-white border border-zinc-200/70 shadow-2xs">
+                    <div className="flex items-start gap-2.5">
+                      <div className="w-6 h-6 rounded-lg bg-zinc-100 border border-zinc-200 flex items-center justify-center text-[11px] font-bold text-zinc-700 shrink-0 mt-0.5">
+                        {idx + 1}
+                      </div>
+                      <div>
+                        <div className="text-xs font-bold text-zinc-900">{sec.name}</div>
+                        <div className="text-[10.5px] text-zinc-500">{sec.badge}</div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Savings Box */}
+            <div className="rounded-3xl bg-zinc-50 border border-zinc-200/90 p-5 sm:p-6">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-bold text-zinc-950">Subscription Tools Replaced</span>
+                <span className="text-xs font-mono font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60">
+                  Saves ~${totalMonthlySavings}/mo
+                </span>
+              </div>
+              <ul className="space-y-2">
+                {template.toolsReplaced.map((tool, idx) => (
+                  <li key={idx} className="flex items-center justify-between text-xs text-zinc-600 bg-white p-2.5 rounded-xl border border-zinc-200/60">
+                    <span className="font-medium text-zinc-800">{tool.name}</span>
+                    <span className="font-mono text-zinc-500">${tool.monthlyCostUSD}/mo</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+          </div>
+
         </div>
 
-        {/* ── 3. INCLUDED PAGES BREAKDOWN ── */}
-        <section className="mb-14 sm:mb-20 text-left">
-          <div className="mb-6 sm:mb-8">
-            <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-400 block mb-1">
-              Architecture Specs
+        {/* ── 3. DETAILED SECTIONS & AI PROMPT VIEWER ── */}
+        <section id="sections-breakdown" className="py-12 sm:py-16 border-b border-zinc-100">
+          <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-12">
+            <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-500 bg-zinc-100 px-3 py-1 rounded-full border border-zinc-200 mb-3 inline-block">
+              Section Blueprints
             </span>
-            <h2 className="font-display text-2xl sm:text-3xl font-bold text-zinc-950 tracking-tight">
-              Pre-Configured Pages &amp; Workflows
+            <h2 className="font-display text-2xl sm:text-4xl font-bold text-zinc-950 tracking-tight mb-2">
+              Included Section Prompts &amp; Code
             </h2>
+            <p className="text-xs sm:text-sm text-zinc-600 font-normal">
+              Copy any prompt directly into Cursor, Claude 3.5 Sonnet, Lovable, or v0 to generate clean responsive UI.
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {template.includedPages.map((page, idx) => (
-              <div key={idx} className="p-5 rounded-2xl bg-white border border-zinc-200/90 shadow-2xs space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-zinc-100 text-zinc-700 uppercase">
-                    {page.type}
-                  </span>
-                  <span className="text-xs font-mono text-zinc-400">/{page.slug}</span>
-                </div>
-                <h3 className="text-sm font-bold text-zinc-950">
-                  {page.name}
-                </h3>
-                <p className="text-xs text-zinc-600 leading-relaxed font-normal">
-                  {page.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* ── 4. DATABASE & SCHEMA ARCHITECTURE ── */}
-        <section className="mb-14 sm:mb-20 text-left">
-          <div className="mb-6 sm:mb-8">
-            <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-400 block mb-1">
-              Data Model
-            </span>
-            <h2 className="font-display text-2xl sm:text-3xl font-bold text-zinc-950 tracking-tight">
-              Integrated CRM &amp; Database Schemas
-            </h2>
-          </div>
-
-          <div className="space-y-5">
-            {template.schemaStructures.map((schema, idx) => (
-              <div key={idx} className="rounded-2xl bg-zinc-50 border border-zinc-200/90 p-5 sm:p-6 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-sm sm:text-base font-bold text-zinc-950">{schema.name}</h3>
-                    <span className="text-[10px] font-mono bg-purple-100 text-purple-800 px-2 py-0.5 rounded-full font-bold">
-                      {schema.badge}
+          <div className="space-y-6">
+            {template.sectionsIncluded.map((sec, idx) => (
+              <div key={sec.id} className="p-5 sm:p-7 rounded-3xl bg-zinc-50/80 border border-zinc-200/90 space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div className="flex items-center gap-3">
+                    <span className="w-7 h-7 rounded-xl bg-zinc-950 text-white font-mono text-xs font-bold flex items-center justify-center shrink-0">
+                      {idx + 1}
                     </span>
+                    <div>
+                      <h3 className="text-sm sm:text-base font-bold text-zinc-950">{sec.name}</h3>
+                      <p className="text-xs text-zinc-500">{sec.description}</p>
+                    </div>
+                  </div>
+                  <span className="text-[10px] font-mono bg-purple-100 text-purple-800 px-2.5 py-1 rounded-full font-bold self-start sm:self-auto">
+                    {sec.badge}
+                  </span>
+                </div>
+
+                {/* AI Prompt Box */}
+                <div className="space-y-1.5">
+                  <div className="text-[11px] font-mono font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-1.5">
+                    <Bot className="w-3.5 h-3.5 text-purple-600" />
+                    <span>Engineered AI Prompt (Claude &amp; Cursor)</span>
+                  </div>
+                  <div className="p-4 bg-zinc-900 text-zinc-200 rounded-2xl font-mono text-xs leading-relaxed overflow-x-auto whitespace-pre-wrap border border-zinc-800 select-all">
+                    {sec.promptText}
                   </div>
                 </div>
-                <p className="text-xs text-zinc-600">{schema.description}</p>
 
-                <div className="border border-zinc-200 rounded-xl overflow-hidden bg-white">
-                  <table className="w-full text-left text-xs">
-                    <thead className="bg-zinc-100/80 text-zinc-600 font-mono text-[10.5px]">
-                      <tr>
-                        <th className="p-3">Field Name</th>
-                        <th className="p-3">Data Type</th>
-                        <th className="p-3">Required</th>
-                        <th className="p-3">Description</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-zinc-100 font-sans">
-                      {schema.fields.map((f, fIdx) => (
-                        <tr key={fIdx} className="hover:bg-zinc-50/60">
-                          <td className="p-3 font-mono font-bold text-zinc-900">{f.name}</td>
-                          <td className="p-3 font-mono text-purple-700">{f.type}</td>
-                          <td className="p-3 font-mono text-zinc-500">{f.required ? 'Yes' : 'No'}</td>
-                          <td className="p-3 text-zinc-600">{f.description}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                {/* Tailwind / Blueprint Snippet if available */}
+                {(sec.tailwindSnippet || sec.elementorBlueprint) && (
+                  <div className="space-y-1.5 pt-2">
+                    <div className="text-[11px] font-mono font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-1.5">
+                      <Code2 className="w-3.5 h-3.5 text-zinc-700" />
+                      <span>{sec.tailwindSnippet ? 'Tailwind / React Component Snippet' : 'Elementor Blueprint JSON'}</span>
+                    </div>
+                    <pre className="p-4 bg-zinc-950 text-emerald-400 rounded-2xl font-mono text-xs leading-relaxed overflow-x-auto max-h-56 whitespace-pre border border-zinc-800">
+                      {sec.tailwindSnippet || sec.elementorBlueprint}
+                    </pre>
+                  </div>
+                )}
               </div>
             ))}
           </div>
         </section>
 
-        {/* ── 5. RELATED TEMPLATES ── */}
+        {/* ── 4. KEY CAPABILITIES & FEATURES ── */}
+        <section className="py-12 sm:py-16 border-b border-zinc-100">
+          <div className="max-w-3xl mx-auto space-y-6">
+            <h2 className="font-display text-xl sm:text-3xl font-bold text-zinc-950 tracking-tight text-center">
+              Frontend Quality Standards
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              {template.features.map((feature, idx) => (
+                <div key={idx} className="flex items-start gap-3 p-4 rounded-2xl bg-zinc-50 border border-zinc-200/80">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <span className="text-xs sm:text-sm font-medium text-zinc-800 leading-snug">{feature}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── 5. RELATED ASSETS ── */}
         {relatedTemplates.length > 0 && (
-          <section className="mb-14 sm:mb-20 text-left">
-            <div className="flex items-center justify-between mb-6 sm:mb-8">
+          <section className="py-12 sm:py-16">
+            <div className="flex items-center justify-between mb-8">
               <div>
-                <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-400 block mb-1">
-                  Discover More
-                </span>
-                <h2 className="font-display text-2xl sm:text-3xl font-bold text-zinc-950 tracking-tight">
-                  Related Turnkey Templates
+                <h2 className="font-display text-xl sm:text-2xl font-bold text-zinc-950 tracking-tight">
+                  Related Frontend Assets
                 </h2>
+                <span className="text-xs text-zinc-500">
+                  Explore other high-converting UI kits and prompts
+                </span>
               </div>
               <Link
                 href="/templates"
-                className="text-xs font-bold text-zinc-950 hover:text-black inline-flex items-center gap-1"
+                className="text-xs font-bold text-zinc-900 hover:text-black inline-flex items-center gap-1 transition-colors"
               >
-                <span>View All 16 Schemas</span>
+                <span>View All</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
               {relatedTemplates.map((rel) => (
                 <TemplateCard key={rel.id} template={rel} />
               ))}
@@ -364,33 +361,7 @@ export default async function TemplateDetailPage({ params }: TemplatePageProps) 
           </section>
         )}
 
-        {/* ── 6. BOTTOM CALL TO ACTION ── */}
-        <div className="rounded-3xl bg-zinc-950 text-white p-8 sm:p-12 text-center relative overflow-hidden shadow-xl">
-          <div className="relative z-10 max-w-xl mx-auto space-y-4">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-emerald-400 border border-white/15 text-xs font-mono font-bold">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Deploy in 60 seconds</span>
-            </span>
-            <h2 className="font-display text-2xl sm:text-4xl font-bold tracking-tight">
-              Ready to launch your {template.shortTitle} workspace?
-            </h2>
-            <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
-              Deploy pre-configured client portals, GST invoicing, and e-signatures into your Cora Workspace with one click.
-            </p>
-            <div className="pt-2">
-              <a
-                href={`https://app.heycora.in/workspace/login?template=${template.slug}&source=template_bottom_cta`}
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white text-zinc-950 text-xs sm:text-sm font-bold hover:bg-zinc-100 transition-all shadow-md"
-              >
-                <span>Deploy {template.shortTitle} Free</span>
-                <ArrowRight className="w-4 h-4" />
-              </a>
-            </div>
-          </div>
-        </div>
-
       </div>
-
     </main>
   );
 }

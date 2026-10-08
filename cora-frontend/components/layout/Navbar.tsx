@@ -1996,7 +1996,7 @@ export function Navbar() {
 
                     </div>
 
-                    {/* ── CARD 4: TEMPLATE & THEME LIBRARY (Atmospheric Lavender / Violet Full-Width Rail) ── */}
+                    {/* ── CARD 4: FRONTEND ASSETS & TEMPLATES (Atmospheric Lavender / Violet Full-Width Rail) ── */}
                     <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-[#f4f1fd] via-[#f8f5ff] to-[#ebe5fc] border border-purple-200/70 p-3 sm:p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-[0_2px_10px_rgba(147,51,234,0.04)] hover:border-purple-300 transition-all">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-lg bg-white text-purple-700 border border-purple-200/70 flex items-center justify-center shrink-0 shadow-2xs">
@@ -2005,14 +2005,14 @@ export function Navbar() {
                         <div>
                           <div className="flex items-center gap-2">
                             <h4 className="font-bold text-xs text-zinc-950">
-                              Template &amp; Theme Library
+                              Frontend Assets &amp; Templates
                             </h4>
                             <span className="text-[9px] font-mono font-bold text-purple-700 bg-purple-100/70 px-1.5 py-0.2 rounded border border-purple-200/60">
-                              16+ Schemas
+                              UI Kits &amp; Prompts
                             </span>
                           </div>
                           <p className="text-[11px] text-zinc-600 font-normal">
-                            Pre-built websites, agency workspace schemas &amp; turnkey kits
+                            Native landing pages, Elementor kits, Lovable projects &amp; AI section prompts
                           </p>
                         </div>
                       </div>
@@ -2022,7 +2022,7 @@ export function Navbar() {
                         onClick={() => setActiveDropdown(null)}
                         className="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-white hover:bg-purple-50 text-purple-900 text-xs font-bold transition-all shadow-2xs group shrink-0 border border-purple-200/70"
                       >
-                        <span>Explore Templates</span>
+                        <span>Explore Assets</span>
                         <span className="w-4 h-4 rounded-full bg-purple-100 text-purple-900 flex items-center justify-center group-hover:translate-x-0.5 transition-transform">
                           <ArrowRight className="w-2.5 h-2.5 stroke-[2.5]" />
                         </span>
@@ -2745,9 +2745,9 @@ export function Navbar() {
                     <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:text-zinc-700 group-hover:translate-x-0.5 transition-all" />
                   </Link>
 
-                  {/* 2. Template & Theme Library */}
+                  {/* 2. Frontend Assets & Templates */}
                   <Link
-                    href="/use-cases"
+                    href="/templates"
                     onClick={() => setMobileMenuOpen(false)}
                     className="flex items-center gap-3.5 p-3 rounded-2xl bg-purple-50/60 hover:bg-purple-50 border border-purple-100/80 transition-all group"
                   >
@@ -2756,13 +2756,13 @@ export function Navbar() {
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between">
-                        <span className="text-[13px] font-bold text-zinc-950">Template &amp; Theme Library</span>
+                        <span className="text-[13px] font-bold text-zinc-950">Frontend Assets &amp; Templates</span>
                         <span className="text-[9px] font-mono font-bold text-purple-700 bg-purple-100/70 px-2 py-0.5 rounded-full">
-                          16+ Schemas
+                          Kits &amp; Prompts
                         </span>
                       </div>
                       <p className="text-[11px] text-zinc-500 font-normal mt-0.5">
-                        Pre-built websites &amp; turnkey workspace schemas
+                        Native landing pages, Elementor kits, Lovable &amp; AI prompts
                       </p>
                     </div>
                     <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:text-zinc-700 group-hover:translate-x-0.5 transition-all" />

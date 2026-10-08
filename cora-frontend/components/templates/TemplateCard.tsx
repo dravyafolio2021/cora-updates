@@ -1,17 +1,19 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { 
   ArrowRight, 
   Sparkles, 
   Star, 
   Layers, 
-  ShieldCheck, 
-  Receipt, 
   Eye, 
-  Download 
+  Download, 
+  Copy, 
+  Check, 
+  Code2, 
+  LayoutTemplate,
+  Bot
 } from 'lucide-react';
 import { TemplateItem } from '@/lib/templates-data';
 
@@ -21,10 +23,35 @@ interface TemplateCardProps {
 }
 
 export function TemplateCard({ template, onQuickPreview }: TemplateCardProps) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyPrompt = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(template.quickCopyPrompt || template.sectionsIncluded[0]?.promptText || '');
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const getFormatIcon = (format: string) => {
+    switch (format) {
+      case 'section_prompts':
+        return <Bot className="w-3.5 h-3.5 text-purple-600" />;
+      case 'elementor_kit':
+        return <LayoutTemplate className="w-3.5 h-3.5 text-emerald-600" />;
+      case 'lovable_project':
+        return <Code2 className="w-3.5 h-3.5 text-indigo-600" />;
+      default:
+        return <Layers className="w-3.5 h-3.5 text-zinc-700" />;
+    }
+  };
+
   return (
     <div className="group rounded-2xl sm:rounded-3xl bg-white border border-zinc-200/90 hover:border-zinc-300 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_16px_40px_rgba(0,0,0,0.08)] transition-all duration-300 flex flex-col justify-between overflow-hidden text-left">
       
-      {/* Top Preview Frame with Atmospheric Gradient Header */}
+      {/* Top Preview Frame with Atmospheric Vignette */}
       <div className="relative w-full aspect-[16/10] bg-zinc-100 overflow-hidden border-b border-zinc-100 flex items-center justify-center">
         
         {/* Subtle Background Scenic Vignette */}
@@ -37,31 +64,32 @@ export function TemplateCard({ template, onQuickPreview }: TemplateCardProps) {
             <span className="w-2 h-2 rounded-full bg-zinc-300" />
             <span className="w-2 h-2 rounded-full bg-zinc-300" />
           </div>
-          <span className="text-[10px] font-mono font-medium text-zinc-400 bg-white/90 px-2 py-0.5 rounded-full border border-zinc-200/60 shadow-2xs">
-            {template.sacCode}
+          <span className="text-[10px] font-mono font-medium text-zinc-600 bg-white/95 px-2 py-0.5 rounded-full border border-zinc-200/70 shadow-2xs flex items-center gap-1">
+            {getFormatIcon(template.assetFormat)}
+            <span>{template.formatBadge}</span>
           </span>
         </div>
 
         {/* Central Mock Visual Card */}
-        <div className="relative z-10 w-[84%] bg-white rounded-xl border border-zinc-200/80 p-3.5 shadow-md group-hover:scale-[1.03] transition-transform duration-300">
+        <div className="relative z-10 w-[86%] bg-white rounded-xl border border-zinc-200/80 p-3.5 shadow-md group-hover:scale-[1.03] transition-transform duration-300">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               <div 
-                className="w-6 h-6 rounded-lg flex items-center justify-center text-white text-xs font-bold shadow-2xs"
+                className="w-6 h-6 rounded-lg flex items-center justify-center text-white text-xs font-bold shadow-2xs shrink-0"
                 style={{ backgroundColor: template.accentColor }}
               >
                 ✦
               </div>
-              <div>
-                <div className="text-xs font-bold text-zinc-950 truncate max-w-[130px]">
+              <div className="min-w-0">
+                <div className="text-xs font-bold text-zinc-950 truncate max-w-[140px]">
                   {template.shortTitle}
                 </div>
-                <div className="text-[9.5px] text-zinc-400 font-mono">
-                  {template.gstRate}
+                <div className="text-[9.5px] text-zinc-400 font-mono truncate">
+                  {template.sectionsIncluded.length} Ready Sections Included
                 </div>
               </div>
             </div>
-            <span className="text-[9.5px] font-mono font-bold px-1.5 py-0.5 rounded-md bg-zinc-100 text-zinc-700 border border-zinc-200/60">
+            <span className="text-[9.5px] font-mono font-bold px-1.5 py-0.5 rounded-md bg-zinc-100 text-zinc-700 border border-zinc-200/60 shrink-0">
               {template.badge}
             </span>
           </div>
@@ -84,13 +112,15 @@ export function TemplateCard({ template, onQuickPreview }: TemplateCardProps) {
               <span>Preview</span>
             </button>
           )}
-          <Link
-            href={`/templates/${template.slug}`}
-            className="px-3.5 py-1.5 rounded-full bg-zinc-950 text-white text-xs font-bold shadow-md hover:bg-zinc-800 transition-all flex items-center gap-1.5"
+
+          <button
+            type="button"
+            onClick={handleCopyPrompt}
+            className="px-3 py-1.5 rounded-full bg-purple-600 text-white text-xs font-bold shadow-md hover:bg-purple-700 transition-all flex items-center gap-1.5 cursor-pointer"
           >
-            <span>Details</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
+            {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+            <span>{copied ? 'Copied!' : 'Copy Prompt'}</span>
+          </button>
         </div>
 
       </div>
@@ -101,7 +131,7 @@ export function TemplateCard({ template, onQuickPreview }: TemplateCardProps) {
         <div>
           {/* Category Pill & Rating */}
           <div className="flex items-center justify-between gap-2 mb-2">
-            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-500 bg-zinc-100/90 px-2 py-0.5 rounded-full border border-zinc-200/70">
+            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-600 bg-zinc-100/90 px-2 py-0.5 rounded-full border border-zinc-200/70">
               {template.categoryLabel}
             </span>
             <div className="flex items-center gap-1 text-[11px] font-medium text-zinc-600">
@@ -121,20 +151,18 @@ export function TemplateCard({ template, onQuickPreview }: TemplateCardProps) {
             </p>
           </Link>
 
-          {/* Included Blueprints Pill Row */}
+          {/* Compatible Frameworks Badge Row */}
           <div className="flex flex-wrap gap-1.5 mb-4">
-            <span className="text-[10.5px] font-mono text-zinc-600 bg-zinc-50 px-2 py-0.5 rounded border border-zinc-200/70 flex items-center gap-1">
-              <Layers className="w-3 h-3 text-zinc-400" />
-              <span>{template.includedPages.length} Pages</span>
-            </span>
-            <span className="text-[10.5px] font-mono text-zinc-600 bg-zinc-50 px-2 py-0.5 rounded border border-zinc-200/70 flex items-center gap-1">
-              <ShieldCheck className="w-3 h-3 text-zinc-400" />
-              <span>E-Sign</span>
-            </span>
-            <span className="text-[10.5px] font-mono text-zinc-600 bg-zinc-50 px-2 py-0.5 rounded border border-zinc-200/70 flex items-center gap-1">
-              <Receipt className="w-3 h-3 text-zinc-400" />
-              <span>GST Invoices</span>
-            </span>
+            {template.compatibleBuilders.slice(0, 3).map((builder, idx) => (
+              <span key={idx} className="text-[10.5px] font-mono text-zinc-600 bg-zinc-50 px-2 py-0.5 rounded border border-zinc-200/70">
+                {builder}
+              </span>
+            ))}
+            {template.compatibleBuilders.length > 3 && (
+              <span className="text-[10.5px] font-mono text-zinc-400 bg-zinc-50 px-1.5 py-0.5 rounded border border-zinc-200/70">
+                +{template.compatibleBuilders.length - 3}
+              </span>
+            )}
           </div>
         </div>
 
@@ -149,7 +177,7 @@ export function TemplateCard({ template, onQuickPreview }: TemplateCardProps) {
             href={`/templates/${template.slug}`}
             className="inline-flex items-center gap-1 text-xs font-bold text-zinc-950 group-hover:text-black transition-colors"
           >
-            <span>Explore Schema</span>
+            <span>Explore Asset</span>
             <ArrowRight className="w-3 h-3 transition-transform group-hover:translate-x-0.5" />
           </Link>
         </div>
