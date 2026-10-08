@@ -90,14 +90,14 @@ export function MobilePwaSection() {
               {/* Headings */}
               <div className="space-y-3">
                 <h2 className="font-display text-3xl xs:text-4xl sm:text-5xl lg:text-[46px] xl:text-[50px] font-bold leading-[1.12] tracking-[-0.03em] text-zinc-950">
-                  Cora on your phone. <br />
+                  CORA on your phone. <br />
                   <span className="bg-gradient-to-r from-zinc-700 via-zinc-500 to-zinc-400 bg-clip-text text-transparent">
                     Your business, always with you.
                   </span>
                 </h2>
 
                 <p className="text-zinc-600 text-base sm:text-lg font-normal leading-relaxed max-w-[540px]">
-                  Install Cora as a PWA and access your workspace anytime, anywhere.
+                  Install CORA as a PWA and access your workspace anytime, anywhere.
                 </p>
               </div>
 
