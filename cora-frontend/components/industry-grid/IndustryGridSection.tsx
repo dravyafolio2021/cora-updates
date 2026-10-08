@@ -51,7 +51,7 @@ const capabilityColumns: CapabilityColumn[] = [
         iconColor: 'text-emerald-600',
       },
       {
-        name: 'Voice to Scope',
+        name: 'Voice to Text',
         desc: 'Turn client audio into clear, actionable project steps.',
         icon: AudioWaveform,
         iconBg: 'bg-purple-50',
