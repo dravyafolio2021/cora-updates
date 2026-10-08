@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import {
   Sparkles,
@@ -193,6 +194,7 @@ function getSimpleSdrReply(query: string): {
 }
 
 export function HeroAIInput() {
+  const [mounted, setMounted] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -202,6 +204,11 @@ export function HeroAIInput() {
 
   const chatScrollContainerRef = useRef<HTMLDivElement>(null);
   const activeInputRef = useRef<HTMLInputElement>(null);
+
+  // Set mounted on client mount for createPortal
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Auto-scroll internal chat container
   useEffect(() => {
@@ -405,11 +412,11 @@ export function HeroAIInput() {
 
       </div>
 
-      {/* ── 2. STICKY FLOATING BOTTOM-CENTER AI SDR BAR (Zero Dark Overlay, Full Page Scrollable) ── */}
-      {isOpen && (
+      {/* ── 2. STICKY FLOATING BOTTOM-CENTER AI SDR BAR (Portaled to document.body, True Viewport Bottom) ── */}
+      {mounted && isOpen && createPortal(
         <aside
           aria-label="Cora AI SDR Deal Desk"
-          className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-1.5rem)] sm:w-[calc(100%-3rem)] max-w-[840px] max-h-[70vh] sm:max-h-[58vh] bg-white/98 backdrop-blur-2xl rounded-2xl sm:rounded-3xl border border-zinc-200/90 shadow-[0_16px_50px_rgba(0,0,0,0.14)] ring-1 ring-black/[0.05] flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 duration-200 text-left"
+          className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-1.5rem)] sm:w-[calc(100%-3rem)] max-w-[840px] max-h-[70vh] sm:max-h-[58vh] bg-white/98 backdrop-blur-2xl rounded-2xl sm:rounded-3xl border border-zinc-200/90 shadow-[0_16px_50px_rgba(0,0,0,0.14)] ring-1 ring-black/[0.05] flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 duration-200 text-left"
         >
           {/* Header Bar with Live Deal Desk Status */}
           <div className="flex items-center justify-between px-4 sm:px-5 py-2.5 sm:py-3 bg-zinc-50/95 border-b border-zinc-100 shrink-0">
@@ -604,7 +611,8 @@ export function HeroAIInput() {
               <Send className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </button>
           </form>
-        </aside>
+        </aside>,
+        document.body
       )}
     </>
   );
