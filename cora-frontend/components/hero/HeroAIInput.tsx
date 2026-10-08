@@ -94,10 +94,110 @@ function getSimpleSdrReply(query: string): {
 } {
   const q = query.trim().toLowerCase();
 
-  // 1. Migration Objection
+  // 1. Web Design & Dev
+  if (q.includes('web design') || q.includes('web dev') || q.includes('development agency')) {
+    return {
+      text: `Cora gives your web agency staging preview portals, automated client design feedback, and 1-click 18% GST milestone invoicing with Indian SAC 9983 compliance.`,
+      quickReplies: [
+        { label: 'Free Website Migration', query: 'How does free website migration work if we switch?' },
+        { label: 'See GST Invoicing', query: 'How does 18% GST invoicing work in Cora?' },
+        { label: 'Claim 10% Discount', query: 'Is there an annual discount code available?' },
+      ],
+      offer: {
+        code: 'MIGRATEFREE',
+        badge: 'White-Glove Migration',
+        title: '100% Free Website & Client Migration',
+        description: 'Our engineering team will migrate your client sites and templates with zero downtime.',
+        actionText: 'Claim Free Migration →',
+        actionUrl: 'https://heycora.in/pricing/?coupon=MIGRATEFREE&plan=pro',
+      },
+    };
+  }
+
+  // 2. Creative & Branding
+  if (q.includes('creative') || q.includes('branding') || q.includes('brand asset')) {
+    return {
+      text: `For branding agencies, Cora lets you deliver brand guidelines in protected client vaults, lock scopes with digital signatures, and collect milestone payments seamlessly.`,
+      quickReplies: [
+        { label: 'Lock Scope E-Signs', query: 'How do digital contract signatures work in Cora?' },
+        { label: 'Client Vault Portals', query: 'Can clients download high-res files from the portal?' },
+        { label: 'Claim 10% Discount', query: 'How do I apply the 10% annual coupon?' },
+      ],
+      offer: {
+        code: 'CORA10',
+        badge: 'Studio Deal',
+        title: '10% Off Annual Plan + Free Migration',
+        description: 'Lock in branded client portals and contract e-signatures with code CORA10.',
+        actionText: 'Claim 10% Off Now →',
+        actionUrl: 'https://heycora.in/pricing/?coupon=CORA10&plan=pro',
+      },
+    };
+  }
+
+  // 3. Performance & SEO / Retainers
+  if (q.includes('marketing') || q.includes('seo') || q.includes('retainer')) {
+    return {
+      text: `Cora automates your monthly client retainers, auto-generates 18% GST invoices on the 1st of every month, and gives clients a live portal to track deliverables.`,
+      quickReplies: [
+        { label: 'Automate Retainers', query: 'How do recurring monthly client retainers work?' },
+        { label: 'GST Compliance', query: 'How does SAC 9983 GST invoicing work?' },
+        { label: 'Claim 10% Discount', query: 'What discounts are available on annual plans?' },
+      ],
+      offer: {
+        code: 'CORA10',
+        badge: 'Retainer Boost',
+        title: '10% Off Annual Plan + 2 Months Free',
+        description: 'Automate recurring agency billing and client portals for ₹449/mo ($8/mo).',
+        actionText: 'Apply 10% Discount →',
+        actionUrl: 'https://heycora.in/pricing/?coupon=CORA10&plan=pro',
+      },
+    };
+  }
+
+  // 4. Software & App Dev
+  if (q.includes('software') || q.includes('app dev') || q.includes('sprint')) {
+    return {
+      text: `Cora streamlines sprint handoffs with gated client staging portals, tracked scope change orders, and SHA-256 e-signed master service agreements.`,
+      quickReplies: [
+        { label: 'Sprint Contracts', query: 'How does Cora handle digital contracts and scope locks?' },
+        { label: 'Client Portals', query: 'How do client review portals work?' },
+        { label: '500 Bonus AI Runs', query: 'How do I claim 500 bonus AI runs?' },
+      ],
+      offer: {
+        code: 'BONUS500',
+        badge: 'Developer Boost',
+        title: '+500 Bonus AI Runs for Month 1',
+        description: 'Get extra AI capacity for scope drafting and proposal generation.',
+        actionText: 'Unlock Bonus AI Runs →',
+        actionUrl: 'https://heycora.in/pricing/?coupon=BONUS500&plan=pro',
+      },
+    };
+  }
+
+  // 5. Media & Production
+  if (q.includes('production') || q.includes('media') || q.includes('shoot') || q.includes('photo')) {
+    return {
+      text: `Cora keeps your shoot contracts, call sheets, and raw asset delivery vaults organized under one link with built-in milestone payment releases.`,
+      quickReplies: [
+        { label: 'Shoot Contracts', query: 'Can clients e-sign shoot agreements on mobile?' },
+        { label: 'Asset Vaults', query: 'How do file deliveries and download gates work?' },
+        { label: 'Claim 10% Discount', query: 'How do I get the annual discount code?' },
+      ],
+      offer: {
+        code: 'CORA10',
+        badge: 'Production Deal',
+        title: '10% Off Annual Plan + Free Migration',
+        description: 'Replace fragmented tools with all-in-one studio management.',
+        actionText: 'Claim 10% Off Now →',
+        actionUrl: 'https://heycora.in/pricing/?coupon=CORA10&plan=pro',
+      },
+    };
+  }
+
+  // 6. Migration Objection
   if (q.includes('migrat') || q.includes('switch') || q.includes('move') || q.includes('import') || q.includes('existing')) {
     return {
-      text: `We migrate your entire website, client records, and proposal templates 100% free with zero downtime. Our engineering team ports your workflows within 48 hours so you start billing immediately.`,
+      text: `Yes—our engineering team ports your entire website, client database, and contract templates 100% free within 48 hours with zero downtime.`,
       quickReplies: [
         { label: 'Claim Free Migration', query: 'How do I get the free website migration with my upgrade?' },
         { label: '10% Annual Discount', query: 'Is there a discount code on annual plans?' },
@@ -114,10 +214,10 @@ function getSimpleSdrReply(query: string): {
     };
   }
 
-  // 2. HoneyBook / Notion / Tool Sprawl Objection
+  // 7. HoneyBook / Notion / Tool Sprawl Objection
   if (q.includes('honeybook') || q.includes('notion') || q.includes('wordpress') || q.includes('dubsado') || q.includes('hubspot') || q.includes('plugins') || q.includes('already use')) {
     return {
-      text: `HoneyBook and Notion don't host websites, build forms, or generate compliant 18% GST SAC 9983 invoices. Cora consolidates your website builder, CRM, SHA-256 e-signatures, and payment links into one tab—cutting your software bill by 60%.`,
+      text: `HoneyBook doesn't host websites or automate Indian GST invoices, and Notion lacks contract e-signatures. Cora unifies your website, client CRM, contracts, and payments into one tab—cutting software costs by 60%.`,
       quickReplies: [
         { label: 'Claim 10% Discount', query: 'How do I apply the 10% annual coupon?' },
         { label: 'Free Migration', query: 'Can you migrate our clients from HoneyBook for free?' },
@@ -127,17 +227,17 @@ function getSimpleSdrReply(query: string): {
         code: 'CORA10',
         badge: 'Switching Bonus',
         title: 'Extra 10% Off Annual Plan + Free Migration',
-        description: 'Replace $110+/mo in fragmented tools with code CORA10 at checkout.',
+        description: 'Replace $110+/mo in fragmented subscriptions with code CORA10 at checkout.',
         actionText: 'Apply 10% Discount →',
         actionUrl: 'https://heycora.in/pricing/?coupon=CORA10&plan=pro',
       },
     };
   }
 
-  // 3. Pricing / Cost / Discount Inquiries
+  // 8. Pricing / Cost / Discount Inquiries
   if (q.includes('price') || q.includes('cost') || q.includes('discount') || q.includes('coupon') || q.includes('deal') || q.includes('expensive') || q.includes('annual')) {
     return {
-      text: `You can start completely free with no credit card. When you are ready to scale, use coupon CORA10 to lock in an additional 10% discount on top of 2 months free on our annual plan.`,
+      text: `You can start free with zero credit card. When scaling, coupon CORA10 gives you an extra 10% instant discount on top of 2 months free on annual plans.`,
       quickReplies: [
         { label: 'Apply 10% Off', query: 'How do I redeem the 10% annual discount code?' },
         { label: 'Free Website Migration', query: 'Does the annual plan include free website migration?' },
@@ -154,10 +254,10 @@ function getSimpleSdrReply(query: string): {
     };
   }
 
-  // 4. AI Runs & Quotas
+  // 9. AI Runs & Quotas
   if (q.includes('ai run') || q.includes('quota') || q.includes('limit') || q.includes('token') || q.includes('ai limit')) {
     return {
-      text: `Cora gives you 15,000 monthly AI runs on Professional and 25,000 on Scale with zero hourly rate limits. Upgrade today with code BONUS500 to receive 500 additional AI runs in your first month.`,
+      text: `You get 15,000 monthly AI runs on Professional and 25,000 on Scale with zero hourly throttles, plus 500 bonus runs in Month 1 with code BONUS500.`,
       quickReplies: [
         { label: 'Claim 500 Bonus AI Runs', query: 'How do I activate the 500 bonus AI runs?' },
         { label: 'Free Website Migration', query: 'Is website migration included with Professional?' },
@@ -174,9 +274,9 @@ function getSimpleSdrReply(query: string): {
     };
   }
 
-  // 5. Default SDR Response
+  // 10. Default SDR Response
   return {
-    text: `Cora unifies your website, client leads, digital contracts, and 18% GST billing in one place so you never lose revenue to workflow sprawl. You can start completely free or upgrade today with free white-glove migration included.`,
+    text: `Cora consolidates your website builder, client proposals, SHA-256 contracts, and 18% GST billing into one workspace—saving agencies 15+ hours each month.`,
     quickReplies: [
       { label: 'Free Website Migration', query: 'How does free website migration work if we switch?' },
       { label: '10% Annual Discount', query: 'What discounts are available on annual plans?' },
