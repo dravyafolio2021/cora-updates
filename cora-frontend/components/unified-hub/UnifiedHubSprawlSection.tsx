@@ -4,7 +4,7 @@ import React, { useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
-import { Sparkles, MessageSquare, FolderKanban, Receipt } from 'lucide-react';
+import { Sparkles, Inbox, FolderKanban, CreditCard } from 'lucide-react';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -44,13 +44,13 @@ export function UnifiedHubSprawlSection() {
       <div className="w-full max-w-[1200px] mx-auto px-4 sm:px-6">
         
         {/* ── 1. Compact Header ── */}
-        <div className="max-w-[760px] mx-auto text-center mb-3 sm:mb-5">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-zinc-100 rounded-full text-zinc-800 text-[10.5px] font-semibold uppercase tracking-wider mb-2 border border-zinc-200/80 shadow-2xs">
-            <Sparkles className="w-3 h-3 text-zinc-950" />
-            <span>UNIFIED AGENCY INTELLIGENCE</span>
+        <div className="max-w-[760px] mx-auto text-center mb-6 sm:mb-8 flex flex-col items-center">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-zinc-100 rounded-full text-zinc-900 text-[11px] font-semibold uppercase tracking-wider mb-3 border border-zinc-200/80 shadow-2xs">
+            <Sparkles className="w-3.5 h-3.5 text-zinc-900 stroke-[1.8]" />
+            <span>Unified Platform</span>
           </div>
 
-          <h2 className="font-display text-2xl xs:text-3xl sm:text-4xl lg:text-[38px] font-bold leading-[1.18] tracking-[-0.03em] bg-gradient-to-r from-zinc-950 via-zinc-700 to-zinc-400 bg-clip-text text-transparent inline-block pb-2 mb-1.5">
+          <h2 className="w-full font-display text-2xl xs:text-3xl sm:text-4xl lg:text-[40px] font-bold leading-[1.18] tracking-[-0.03em] text-zinc-950 mb-2.5">
             Run your business in one place.
           </h2>
           <p className="text-zinc-600 text-xs sm:text-sm font-normal leading-relaxed max-w-[580px] mx-auto">
@@ -59,7 +59,7 @@ export function UnifiedHubSprawlSection() {
         </div>
 
         {/* ── 2. Visual Centerpiece: Ultra-Tight Spacing ── */}
-        <div className="relative w-full max-w-[960px] mx-auto mb-4 sm:mb-6">
+        <div className="relative w-full max-w-[960px] mx-auto mb-6 sm:mb-8">
           <div className="relative w-full aspect-[1024/450] max-h-[340px]">
             <Image
               src="/images/cora_unified_hub_sprawl.png"
@@ -72,46 +72,43 @@ export function UnifiedHubSprawlSection() {
         </div>
 
         {/* ── 3. Three Compact Context Columns (Mobile-First Optimized) ── */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 max-w-[960px] mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 lg:gap-8 max-w-[960px] mx-auto">
           
           {/* Column 1: Get enquiries */}
-          <div className="hub-col space-y-1.5 text-left border-t border-zinc-100 pt-3 md:border-t-0 md:pt-0">
-            <div className="w-5 h-0.5 bg-zinc-300 mb-1.5 hidden md:block" />
-            <div className="flex items-center gap-1.5">
-              <MessageSquare className="w-3.5 h-3.5 text-zinc-600 shrink-0" />
+          <div className="hub-col space-y-1.5 text-left pt-2 md:pt-0">
+            <div className="flex items-center gap-2">
+              <Inbox className="w-4 h-4 text-zinc-900 stroke-[1.8] shrink-0" />
               <h3 className="font-display text-base sm:text-lg font-bold text-zinc-950 tracking-tight">
                 Get enquiries
               </h3>
             </div>
-            <p className="text-zinc-600 text-xs sm:text-[12.5px] leading-relaxed">
+            <p className="text-zinc-600 text-xs sm:text-[13px] leading-relaxed">
               Collect requests and follow up with clients.
             </p>
           </div>
 
           {/* Column 2: Manage client work */}
-          <div className="hub-col space-y-1.5 text-left border-t border-zinc-100 pt-3 md:border-t-0 md:pt-0">
-            <div className="w-5 h-0.5 bg-indigo-600 mb-1.5 hidden md:block" />
-            <div className="flex items-center gap-1.5">
-              <FolderKanban className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+          <div className="hub-col space-y-1.5 text-left pt-2 md:pt-0">
+            <div className="flex items-center gap-2">
+              <FolderKanban className="w-4 h-4 text-zinc-900 stroke-[1.8] shrink-0" />
               <h3 className="font-display text-base sm:text-lg font-bold text-zinc-950 tracking-tight">
                 Manage client work
               </h3>
             </div>
-            <p className="text-zinc-600 text-xs sm:text-[12.5px] leading-relaxed">
+            <p className="text-zinc-600 text-xs sm:text-[13px] leading-relaxed">
               Keep files, feedback, and updates together.
             </p>
           </div>
 
           {/* Column 3: Track payments */}
-          <div className="hub-col space-y-1.5 text-left border-t border-zinc-100 pt-3 md:border-t-0 md:pt-0">
-            <div className="w-5 h-0.5 bg-emerald-600 mb-1.5 hidden md:block" />
-            <div className="flex items-center gap-1.5">
-              <Receipt className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+          <div className="hub-col space-y-1.5 text-left pt-2 md:pt-0">
+            <div className="flex items-center gap-2">
+              <CreditCard className="w-4 h-4 text-zinc-900 stroke-[1.8] shrink-0" />
               <h3 className="font-display text-base sm:text-lg font-bold text-zinc-950 tracking-tight">
                 Track payments
               </h3>
             </div>
-            <p className="text-zinc-600 text-xs sm:text-[12.5px] leading-relaxed">
+            <p className="text-zinc-600 text-xs sm:text-[13px] leading-relaxed">
               Send invoices and see who has paid.
             </p>
           </div>
