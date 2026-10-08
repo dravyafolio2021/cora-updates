@@ -1684,7 +1684,7 @@ export function Navbar() {
                     {/* Top 3 Side-by-Side Atmospheric Hero Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-4 items-stretch">
 
-                      {/* ── CARD 1: TOOLS & TEMPLATES (Atmospheric Periwinkle / Slate Pastel) ── */}
+                      {/* ── CARD 1: FREE TOOLS (Atmospheric Periwinkle / Slate Pastel) ── */}
                       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-b from-[#ebf1ff] via-[#dfebfd] to-[#d0e0fb] border border-blue-200/70 p-5 sm:p-5.5 flex flex-col justify-between shadow-[0_4px_20px_rgba(79,114,205,0.06)] hover:shadow-md hover:border-blue-300 transition-all duration-300 min-h-[310px]">
                         {/* Soft atmospheric cloud & glow accents */}
                         <div className="absolute top-0 right-0 -mt-8 -mr-8 w-44 h-44 rounded-full bg-white/50 blur-2xl pointer-events-none" />
@@ -1694,10 +1694,10 @@ export function Navbar() {
                           {/* Centered Cora Header */}
                           <div className="text-center mb-3.5">
                             <h3 className="text-base font-bold text-zinc-900 tracking-tight leading-snug">
-                              Tools &amp; Templates
+                              Free Tools
                             </h3>
                             <p className="text-[11.5px] text-zinc-600 font-normal mt-0.5 leading-tight">
-                              Quick business calculators &amp; website templates
+                              Quick business calculators &amp; generators
                             </p>
                           </div>
 
@@ -1728,28 +1728,28 @@ export function Navbar() {
                               </div>
                             </Link>
 
-                            {/* Floating Mockup 2: Website & Workspace Templates */}
+                            {/* Floating Mockup 2: Pricing Calculator */}
                             <Link
-                              href="/use-cases"
+                              href="/tools/retainer-calculator"
                               onClick={() => setActiveDropdown(null)}
                               className="block rounded-xl bg-white/95 backdrop-blur-md p-2.5 sm:p-3 border border-white/90 shadow-[0_6px_20px_rgba(0,0,0,0.08)] hover:shadow-md hover:scale-[1.01] transition-all group ml-2 sm:ml-3"
                             >
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                   <div className="w-5 h-5 rounded-md bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-200/60">
-                                    <LayoutTemplate className="w-3 h-3" />
+                                    <BarChart2 className="w-3 h-3" />
                                   </div>
                                   <span className="text-xs font-bold text-zinc-900 group-hover:text-blue-700 transition-colors">
-                                    Website &amp; Agency Templates
+                                    Pricing Calculator
                                   </span>
                                 </div>
                                 <span className="text-[9px] font-mono font-bold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded-full border border-blue-200/60">
-                                  16+ Schemas
+                                  Retainer
                                 </span>
                               </div>
                               <div className="mt-1.5 pt-1.5 border-t border-zinc-100 flex items-center justify-between text-[10.5px] font-mono text-zinc-500">
-                                <span>Pre-Seeded Schemas</span>
-                                <span className="font-bold text-zinc-900">Turnkey</span>
+                                <span>Target Margin 65%</span>
+                                <span className="font-bold text-zinc-900">₹45,000/mo</span>
                               </div>
                             </Link>
 
@@ -1777,7 +1777,7 @@ export function Navbar() {
                             onClick={() => setActiveDropdown(null)}
                             className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-950 hover:text-blue-700 transition-colors group"
                           >
-                            <span>Explore Tools &amp; Templates</span>
+                            <span>Explore Free Tools</span>
                             <span className="w-4.5 h-4.5 rounded-full bg-white/90 shadow-2xs flex items-center justify-center group-hover:translate-x-0.5 group-hover:bg-white transition-all">
                               <ArrowRight className="w-2.5 h-2.5 stroke-[2.2]" />
                             </span>
@@ -1996,29 +1996,34 @@ export function Navbar() {
 
                     </div>
 
-                    {/* ── CARD 4: DEVELOPER HUB (Atmospheric Sage / Mint Pastel Full-Width Rail) ── */}
-                    <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-[#eaf7ee] via-[#f3faf5] to-[#e0f4e6] border border-emerald-200/70 p-3 sm:p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-[0_2px_10px_rgba(16,185,129,0.04)] hover:border-emerald-300 transition-all">
+                    {/* ── CARD 4: TEMPLATE & THEME LIBRARY (Atmospheric Lavender / Violet Full-Width Rail) ── */}
+                    <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-[#f4f1fd] via-[#f8f5ff] to-[#ebe5fc] border border-purple-200/70 p-3 sm:p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-[0_2px_10px_rgba(147,51,234,0.04)] hover:border-purple-300 transition-all">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-white text-emerald-800 border border-emerald-200/70 flex items-center justify-center shrink-0 font-mono font-bold text-xs shadow-2xs select-none">
-                          &lt;/&gt;
+                        <div className="w-8 h-8 rounded-lg bg-white text-purple-700 border border-purple-200/70 flex items-center justify-center shrink-0 shadow-2xs">
+                          <LayoutTemplate className="w-4 h-4" />
                         </div>
                         <div>
-                          <h4 className="font-bold text-xs text-zinc-950">
-                            Building something custom?
-                          </h4>
+                          <div className="flex items-center gap-2">
+                            <h4 className="font-bold text-xs text-zinc-950">
+                              Template &amp; Theme Library
+                            </h4>
+                            <span className="text-[9px] font-mono font-bold text-purple-700 bg-purple-100/70 px-1.5 py-0.2 rounded border border-purple-200/60">
+                              16+ Schemas
+                            </span>
+                          </div>
                           <p className="text-[11px] text-zinc-600 font-normal">
-                            Developer Docs, Integrations &amp; API access
+                            Pre-built websites, agency workspace schemas &amp; turnkey kits
                           </p>
                         </div>
                       </div>
 
                       <Link
-                        href="/docs"
+                        href="/use-cases"
                         onClick={() => setActiveDropdown(null)}
-                        className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-white hover:bg-emerald-50 text-emerald-800 text-xs font-bold transition-all shadow-2xs group shrink-0 border border-emerald-200/70"
+                        className="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-white hover:bg-purple-50 text-purple-900 text-xs font-bold transition-all shadow-2xs group shrink-0 border border-purple-200/70"
                       >
-                        <span>Developer Hub</span>
-                        <span className="w-4 h-4 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center group-hover:translate-x-0.5 transition-transform">
+                        <span>Explore Templates</span>
+                        <span className="w-4 h-4 rounded-full bg-purple-100 text-purple-900 flex items-center justify-center group-hover:translate-x-0.5 transition-transform">
                           <ArrowRight className="w-2.5 h-2.5 stroke-[2.5]" />
                         </span>
                       </Link>
@@ -2717,7 +2722,7 @@ export function Navbar() {
                     RESOURCES &amp; TOOLS
                   </span>
 
-                  {/* 1. Tools & Templates */}
+                  {/* 1. Free Tools */}
                   <Link
                     href="/tools"
                     onClick={() => setMobileMenuOpen(false)}
@@ -2728,19 +2733,42 @@ export function Navbar() {
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between">
-                        <span className="text-[13px] font-bold text-zinc-950">Tools &amp; Templates</span>
+                        <span className="text-[13px] font-bold text-zinc-950">Free Tools</span>
                         <span className="text-[9px] font-mono font-bold text-blue-700 bg-blue-100/70 px-2 py-0.5 rounded-full">
-                          Calculators &amp; Schemas
+                          Calculators
                         </span>
                       </div>
                       <p className="text-[11px] text-zinc-500 font-normal mt-0.5">
-                        GST calculators, proposal builders &amp; website templates
+                        GST, pricing &amp; agency proposal generators
                       </p>
                     </div>
                     <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:text-zinc-700 group-hover:translate-x-0.5 transition-all" />
                   </Link>
 
-                  {/* 2. Guides */}
+                  {/* 2. Template & Theme Library */}
+                  <Link
+                    href="/use-cases"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-3.5 p-3 rounded-2xl bg-purple-50/60 hover:bg-purple-50 border border-purple-100/80 transition-all group"
+                  >
+                    <div className="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-700 border border-purple-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                      <LayoutTemplate className="w-4.5 h-4.5 stroke-[2]" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[13px] font-bold text-zinc-950">Template &amp; Theme Library</span>
+                        <span className="text-[9px] font-mono font-bold text-purple-700 bg-purple-100/70 px-2 py-0.5 rounded-full">
+                          16+ Schemas
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-zinc-500 font-normal mt-0.5">
+                        Pre-built websites &amp; turnkey workspace schemas
+                      </p>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:text-zinc-700 group-hover:translate-x-0.5 transition-all" />
+                  </Link>
+
+                  {/* 3. Guides */}
                   <Link
                     href="/guides"
                     onClick={() => setMobileMenuOpen(false)}
@@ -2763,7 +2791,7 @@ export function Navbar() {
                     <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:text-zinc-700 group-hover:translate-x-0.5 transition-all" />
                   </Link>
 
-                  {/* 3. Blogs */}
+                  {/* 4. Blogs */}
                   <Link
                     href="/blog"
                     onClick={() => setMobileMenuOpen(false)}
@@ -2781,29 +2809,6 @@ export function Navbar() {
                       </div>
                       <p className="text-[11px] text-zinc-500 font-normal mt-0.5">
                         Tactical answers to client &amp; workflow issues
-                      </p>
-                    </div>
-                    <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:text-zinc-700 group-hover:translate-x-0.5 transition-all" />
-                  </Link>
-
-                  {/* 4. Developer Hub */}
-                  <Link
-                    href="/docs"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center gap-3.5 p-3 rounded-2xl bg-emerald-50/60 hover:bg-emerald-50 border border-emerald-100/80 transition-all group"
-                  >
-                    <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-700 border border-emerald-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform font-mono font-bold text-xs">
-                      &lt;/&gt;
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[13px] font-bold text-zinc-950">Developer Hub</span>
-                        <span className="text-[9px] font-mono font-bold text-emerald-700 bg-emerald-100/70 px-2 py-0.5 rounded-full">
-                          API &amp; Docs
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-zinc-500 font-normal mt-0.5">
-                        REST APIs, webhooks &amp; architecture specs
                       </p>
                     </div>
                     <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:text-zinc-700 group-hover:translate-x-0.5 transition-all" />
