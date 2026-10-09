@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Check, ArrowRight, Sparkles, Rocket, TrendingUp, Leaf, Gift, Receipt } from 'lucide-react';
+import { Check, ArrowRight, Sparkles, Rocket, TrendingUp, Leaf, Gift, Receipt, HardDrive, Globe } from 'lucide-react';
 import { trackEvent } from '../analytics/Analytics';
 import { triggerRazorpayCheckout, useRazorpayPreload, isPartner100Coupon, PlanKey } from './FastRazorpayModal';
 
@@ -115,12 +115,12 @@ export function PricingSection() {
                   <span>1,000 AI runs / mo</span>
                 </li>
                 <li className="flex items-start gap-2.5">
-                  <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                  <span>1 User workspace</span>
+                  <Globe className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <span>Website on heycora.in subdomain</span>
                 </li>
                 <li className="flex items-start gap-2.5">
-                  <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                  <span>Website on heycora.in subdomain</span>
+                  <HardDrive className="w-4 h-4 text-zinc-700 shrink-0 mt-0.5" />
+                  <span><strong>5 GB</strong> bandwidth &bull; <strong>1 GB</strong> storage</span>
                 </li>
                 <li className="flex items-start gap-2.5">
                   <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
@@ -129,6 +129,10 @@ export function PricingSection() {
                 <li className="flex items-start gap-2.5">
                   <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                   <span>18% GST invoicing &amp; receipts</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <span>1 User workspace</span>
                 </li>
               </ul>
             </div>
@@ -177,6 +181,10 @@ export function PricingSection() {
                 <li className="flex items-start gap-2.5">
                   <Sparkles className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
                   <span><strong>{isAnnual ? '6,000' : '5,000'}</strong> AI runs / mo</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <HardDrive className="w-4 h-4 text-zinc-700 shrink-0 mt-0.5" />
+                  <span><strong>25 GB</strong> bandwidth &bull; <strong>5 GB</strong> storage</span>
                 </li>
                 <li className="flex items-start gap-2.5">
                   <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
@@ -264,6 +272,10 @@ export function PricingSection() {
                   <span><strong>15,000</strong> AI runs / mo</span>
                 </li>
                 <li className="flex items-start gap-2.5">
+                  <HardDrive className="w-4 h-4 text-pink-400 shrink-0 mt-0.5" />
+                  <span><strong>50 GB</strong> bandwidth &bull; <strong>15 GB</strong> storage</span>
+                </li>
+                <li className="flex items-start gap-2.5">
                   <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                   <span>Official WhatsApp automated dispatch</span>
                 </li>
@@ -291,7 +303,15 @@ export function PricingSection() {
           </div>
 
           {/* ── CARD 4: SCALE (COLUMN 4) ── */}
-          <div className="bg-white rounded-3xl p-6 sm:p-7 border border-zinc-200/90 shadow-2xs flex flex-col justify-between hover:shadow-md transition-all duration-300">
+          <div className="bg-white rounded-3xl p-6 sm:p-7 border border-zinc-200/90 shadow-2xs flex flex-col justify-between hover:shadow-md transition-all duration-300 relative overflow-visible">
+            {/* Floating Highlighted SaaS Badge - Positioned OUTSIDE the frame at the top */}
+            <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-30 whitespace-nowrap select-none pointer-events-none">
+              <div className="inline-flex items-center gap-1.5 px-4 py-1 rounded-full text-[11px] font-mono font-bold tracking-wider uppercase shadow-md border bg-gradient-to-r from-[#432bb3] via-[#5438dc] to-[#432bb3] text-white border-purple-300/50 ring-2 ring-purple-500/20 shadow-[0_4px_14px_rgba(84,56,220,0.35)]">
+                <Gift className="w-3.5 h-3.5 text-purple-200 shrink-0" />
+                <span>FREE SITE MIGRATION</span>
+              </div>
+            </div>
+
             <div>
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
@@ -322,9 +342,9 @@ export function PricingSection() {
               </div>
 
               <ul className="space-y-3 text-xs sm:text-sm text-zinc-700 mb-8">
-                <li className="flex items-start gap-2.5 p-2 rounded-xl bg-purple-50/80 border border-purple-200/70 text-purple-950 font-semibold">
+                <li className="flex items-start gap-2.5">
                   <Gift className="w-4 h-4 text-purple-700 shrink-0 mt-0.5" />
-                  <span>Free Website Dev or Migration</span>
+                  <span><strong>Free Website Dev &amp; Migration</strong></span>
                 </li>
                 <li className="flex items-start gap-2.5">
                   <Sparkles className="w-4 h-4 text-purple-600 shrink-0 mt-0.5" />
@@ -333,6 +353,10 @@ export function PricingSection() {
                 <li className="flex items-start gap-2.5">
                   <Sparkles className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
                   <span><strong>25,000</strong> AI runs / mo</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <HardDrive className="w-4 h-4 text-zinc-700 shrink-0 mt-0.5" />
+                  <span><strong>100 GB</strong> bandwidth &bull; <strong>30 GB</strong> storage</span>
                 </li>
                 <li className="flex items-start gap-2.5">
                   <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />

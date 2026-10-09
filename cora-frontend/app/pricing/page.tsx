@@ -30,7 +30,8 @@ import {
   TrendingUp,
   Shield,
   Clock,
-  Flame
+  Flame,
+  HardDrive
 } from 'lucide-react';
 import { trackEvent } from '@/components/analytics/Analytics';
 import { triggerRazorpayCheckout, useRazorpayPreload, isPartner100Coupon, PlanKey } from '@/components/pricing/FastRazorpayModal';
@@ -490,6 +491,10 @@ export default function PricingPage() {
                       <span>Website on heycora.in subdomain</span>
                     </li>
                     <li className="flex items-start gap-2.5 min-h-[20px]">
+                      <HardDrive className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0 mt-0.5" />
+                      <span><strong>5 GB</strong> bandwidth &bull; <strong>1 GB</strong> storage</span>
+                    </li>
+                    <li className="flex items-start gap-2.5 min-h-[20px]">
                       <Check className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0 mt-0.5" />
                       <span>Standard Kanban CRM &amp; leads</span>
                     </li>
@@ -587,6 +592,10 @@ export default function PricingPage() {
                     <li className="flex items-start gap-2.5 min-h-[20px]">
                       <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
                       <span><strong>{billingCycle === 'annual' ? '6,000' : '5,000'}</strong> AI runs / mo</span>
+                    </li>
+                    <li className="flex items-start gap-2.5 min-h-[20px]">
+                      <HardDrive className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0 mt-0.5" />
+                      <span><strong>25 GB</strong> bandwidth &bull; <strong>5 GB</strong> storage</span>
                     </li>
                     <li className="flex items-start gap-2.5 min-h-[20px]">
                       <Check className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0 mt-0.5" />
@@ -733,6 +742,10 @@ export default function PricingPage() {
                       <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
                       <span><strong>15,000</strong> AI runs / mo</span>
                     </li>
+                    <li className="flex items-start gap-2.5 min-h-[20px]">
+                      <HardDrive className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0 mt-0.5" />
+                      <span><strong>50 GB</strong> bandwidth &bull; <strong>15 GB</strong> storage</span>
+                    </li>
                     <li className="flex items-start gap-2.5 min-h-[20px] text-zinc-950 font-medium">
                       <WhatsAppIcon className="w-3.5 h-3.5 text-[#25D366] shrink-0 mt-0.5" />
                       <span>Official WhatsApp automated dispatch</span>
@@ -762,9 +775,17 @@ export default function PricingPage() {
           </div>
 
           {/* ── CARD 4: SCALE (COLUMN 4) ── */}
-          <div className="w-full bg-white border border-zinc-200/90 rounded-2xl sm:rounded-[22px] overflow-hidden flex flex-col h-full shadow-[0_2px_10px_rgba(0,0,0,0.03)] hover:shadow-lg hover:border-zinc-300 transition-all">
+          <div className="w-full bg-white border border-zinc-200/90 rounded-2xl sm:rounded-[22px] flex flex-col h-full shadow-[0_2px_10px_rgba(0,0,0,0.03)] hover:shadow-lg hover:border-zinc-300 transition-all relative z-20 overflow-visible">
+            {/* Floating Highlighted SaaS Badge - Positioned OUTSIDE the frame at the top */}
+            <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-30 whitespace-nowrap select-none pointer-events-none">
+              <div className="inline-flex items-center gap-1.5 px-4 py-1 rounded-full text-[11px] font-mono font-bold tracking-wider uppercase shadow-md border bg-gradient-to-r from-[#432bb3] via-[#5438dc] to-[#432bb3] text-white border-purple-300/50 ring-2 ring-purple-500/20 shadow-[0_4px_14px_rgba(84,56,220,0.35)]">
+                <Gift className="w-3.5 h-3.5 text-purple-200 shrink-0" />
+                <span>FREE SITE MIGRATION</span>
+              </div>
+            </div>
+
             {/* Top Header Banner in Vibrant Royal Violet / Indigo */}
-            <div className="bg-[#5438dc] h-[160px] p-5 text-white flex flex-col justify-between relative shrink-0">
+            <div className="bg-[#5438dc] h-[160px] p-5 text-white flex flex-col justify-between relative shrink-0 rounded-t-[14px] sm:rounded-t-[20px] overflow-hidden">
               <div className="flex items-center justify-between gap-2 h-9">
                 <div className="w-9 h-9 rounded-xl bg-[#ddd6fe] text-[#4c1d95] shadow-xs flex items-center justify-center shrink-0">
                   <TrendingUp className="w-4 h-4" />
@@ -834,9 +855,9 @@ export default function PricingPage() {
                     Everything in Professional, plus:
                   </div>
                   <ul className="space-y-2 text-xs text-zinc-700">
-                    <li className="flex items-start gap-2.5 min-h-[20px] p-2 rounded-xl bg-purple-50/80 border border-purple-200/70 text-purple-950 font-semibold">
-                      <Gift className="w-4 h-4 text-purple-700 shrink-0 mt-0.5" />
-                      <span>Free Website Dev or Migration</span>
+                    <li className="flex items-start gap-2.5 min-h-[20px]">
+                      <Gift className="w-3.5 h-3.5 text-purple-700 shrink-0 mt-0.5" />
+                      <span><strong>Free Website Dev &amp; Migration</strong></span>
                     </li>
                     <li className="flex items-start gap-2.5 min-h-[20px]">
                       <Sparkles className="w-3.5 h-3.5 text-purple-600 shrink-0 mt-0.5" />
@@ -845,6 +866,10 @@ export default function PricingPage() {
                     <li className="flex items-start gap-2.5 min-h-[20px]">
                       <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
                       <span><strong>25,000</strong> AI runs / mo</span>
+                    </li>
+                    <li className="flex items-start gap-2.5 min-h-[20px]">
+                      <HardDrive className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0 mt-0.5" />
+                      <span><strong>100 GB</strong> bandwidth &bull; <strong>30 GB</strong> storage</span>
                     </li>
                     <li className="flex items-start gap-2.5 min-h-[20px]">
                       <Check className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0 mt-0.5" />
