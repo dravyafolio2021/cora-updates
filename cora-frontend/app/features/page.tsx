@@ -226,29 +226,39 @@ export default function FeaturesPage() {
           {/* Status Pill */}
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/90 backdrop-blur-md rounded-full border border-zinc-200/80 text-[11px] font-semibold text-zinc-800 mb-3.5 shadow-2xs">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span>20 Features Live • 8 In Roadmap</span>
+            <span>20 Modules Live • Free Forever</span>
           </div>
 
-          {/* Clean, Refined Heading with Active Agency Language */}
-          <h1 className="font-display text-3xl sm:text-4xl md:text-[46px] font-semibold text-zinc-950 leading-[1.26] sm:leading-[1.32] tracking-[-0.03em] max-w-[840px] mx-auto mb-4">
-            Scale Your Agency. Automate Operations. Ship Client Work Faster.
+          {/* Clean, Refined Heading with Natural Active Voice */}
+          <h1 className="font-display text-3xl sm:text-4xl md:text-[44px] lg:text-[48px] font-bold text-zinc-950 leading-[1.18] sm:leading-[1.22] tracking-tight max-w-[760px] mx-auto mb-3.5">
+            Win clients, manage projects, and get paid faster.
           </h1>
 
-          {/* Subtitle */}
-          <p className="text-zinc-600 text-xs sm:text-base font-normal leading-relaxed max-w-[660px] mx-auto mb-6">
-            Capture high-ticket client leads, streamline design and dev sprints, execute SHA-256 e-sign contracts, automate 18% GST retainers, and deploy AI copilots — all in one unified agency operating system.
+          {/* Subtitle with Less Text, Zero Jargon */}
+          <p className="text-zinc-600 text-sm sm:text-base font-normal leading-relaxed max-w-[560px] mx-auto mb-6">
+            Track leads, sign contracts, organize team tasks, and create GST invoices — without juggling ten different apps.
           </p>
 
-          {/* Primary Action Button */}
-          <div className="flex items-center justify-center gap-3">
+          {/* Primary Action Button & Trust Indicators */}
+          <div className="flex flex-col items-center justify-center gap-3">
             <a
               href="https://app.heycora.in/workspace/login?source=features_hero"
               onClick={() => trackEvent('features_page_cta_clicked')}
               className="inline-flex items-center gap-2 bg-zinc-950 text-white px-7 py-3 rounded-xl text-xs sm:text-sm font-semibold hover:bg-zinc-800 transition-all shadow-sm group cursor-pointer"
             >
-              <span>Get Started Free Forever</span>
+              <span>Start Free — No Card Needed</span>
               <ArrowRight className="w-3.5 h-3.5 text-zinc-400 group-hover:translate-x-0.5 transition-transform" />
             </a>
+
+            <div className="flex items-center justify-center gap-2 text-[11px] font-mono text-zinc-500">
+              <span className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Free Tier
+              </span>
+              <span>&bull;</span>
+              <span>Ready in 2 Minutes</span>
+              <span>&bull;</span>
+              <span>Made for India 🇮🇳</span>
+            </div>
           </div>
 
         </div>
