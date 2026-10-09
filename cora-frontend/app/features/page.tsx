@@ -229,14 +229,14 @@ export default function FeaturesPage() {
             <span>20 Modules Live • Free Forever</span>
           </div>
 
-          {/* Direct, clean product features heading */}
+          {/* Active voice, natural product features heading */}
           <h1 className="font-display text-3xl sm:text-4xl md:text-[44px] lg:text-[48px] font-bold text-zinc-950 leading-[1.18] sm:leading-[1.22] tracking-tight max-w-[760px] mx-auto mb-3.5">
-            Every feature built into your workspace.
+            Explore everything you can do in your workspace.
           </h1>
 
-          {/* Direct, clean subtitle */}
+          {/* Direct, natural subtitle */}
           <p className="text-zinc-600 text-sm sm:text-base font-normal leading-relaxed max-w-[560px] mx-auto mb-6">
-            Explore the tools, AI assistants, and client workflows available in Cora.
+            Discover all the tools, AI assistants, and client workflows built into Cora.
           </p>
 
           {/* Primary Action Button & Trust Indicators */}
@@ -429,7 +429,7 @@ export default function FeaturesPage() {
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-emerald-500" />
                     <h2 className="font-display text-lg sm:text-xl font-bold text-zinc-950">
-                      Live Modules ({filteredBuiltModules.length})
+                      Features ready to use ({filteredBuiltModules.length})
                     </h2>
                   </div>
                 </div>
