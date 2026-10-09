@@ -229,14 +229,14 @@ export default function FeaturesPage() {
             <span>20 Modules Live • Free Forever</span>
           </div>
 
-          {/* Clean, Refined Heading with Natural Active Voice */}
+          {/* Direct, clean product features heading */}
           <h1 className="font-display text-3xl sm:text-4xl md:text-[44px] lg:text-[48px] font-bold text-zinc-950 leading-[1.18] sm:leading-[1.22] tracking-tight max-w-[760px] mx-auto mb-3.5">
-            Win clients, manage projects, and get paid faster.
+            Every feature built into your workspace.
           </h1>
 
-          {/* Subtitle with Less Text, Zero Jargon */}
+          {/* Direct, clean subtitle */}
           <p className="text-zinc-600 text-sm sm:text-base font-normal leading-relaxed max-w-[560px] mx-auto mb-6">
-            Track leads, sign contracts, organize team tasks, and create GST invoices — without juggling ten different apps.
+            Explore the tools, AI assistants, and client workflows available in Cora.
           </p>
 
           {/* Primary Action Button & Trust Indicators */}
