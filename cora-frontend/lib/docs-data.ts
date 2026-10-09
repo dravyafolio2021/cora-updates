@@ -32,7 +32,7 @@ export const DOCS_DATA: DocArticle[] = [
     description: 'Comprehensive architectural guide to Cora’s single-plugin WordPress backend runtime, Next.js 16 SSG edge layer, and isolated MySQL schemas.',
     readTime: '7 min read',
     lastUpdated: 'August 2026',
-    badge: 'Core System',
+    badge: 'Core',
     toc: [
       { id: 'system-overview', title: '1. System Overview' },
       { id: 'routing-layer', title: '2. Hybrid Routing & Subdomains' },
@@ -362,7 +362,7 @@ Every state mutation in the workspace (contract signature, invoice cancellation,
     description: 'Indian Information Technology Act 2000 digital signature compliance, SHA-256 integrity hashing, and data encryption standards.',
     readTime: '5 min read',
     lastUpdated: 'August 2026',
-    badge: 'Legal Tech',
+    badge: 'Legal',
     toc: [
       { id: 'it-act-compliance', title: '1. Indian IT Act 2000 Compliance' },
       { id: 'cryptographic-integrity', title: '2. Cryptographic SHA-256 Hashing' },
@@ -415,7 +415,7 @@ If even a single character or metadata byte is altered post-signature, the check
     description: 'Autonomous co-founder agent for daily operations triage, automatic quote generation, and LLM reasoning.',
     readTime: '6 min read',
     lastUpdated: 'August 2026',
-    badge: 'Flagship AI',
+    badge: 'AI',
     toc: [
       { id: 'agent-capabilities', title: '1. Agent Capabilities' },
       { id: 'conversational-triage', title: '2. WhatsApp-Style Founder Triage' },
@@ -529,7 +529,7 @@ Schedule and preview posts across Instagram, LinkedIn, and WordPress with brand 
     description: 'Living studio context memory with keyword-dense semantic retrieval and bidirectional Model Context Protocol (MCP) gateway.',
     readTime: '7 min read',
     lastUpdated: 'August 2026',
-    badge: 'Developer Protocol',
+    badge: 'MCP',
     toc: [
       { id: 'rag-architecture', title: '1. RAG Memory Architecture' },
       { id: 'ingestion-sources', title: '2. Dynamic Knowledge Ingestion' },
@@ -785,7 +785,7 @@ Directly integrated with the public homepage ("Explore free templates") and navi
     description: 'Form AI Architect with 15 field types, universal All Entries 5th tab registry, edge-docked entry inspector, and client timezone engine.',
     readTime: '6 min read',
     lastUpdated: 'October 2026',
-    badge: 'Core Foundation',
+    badge: 'Core',
     toc: [
       { id: 'field-types', title: '1. Supported Field Types' },
       { id: 'card-ergonomics', title: '2. Card Ergonomics & Live Preview Modal' },
@@ -887,7 +887,7 @@ Automate 5-star Google review collection. When a client rates their experience 4
     description: 'Legally binding digital contracts with 5-step guided wizard, GST verification, canvas signatures, and Indian IT Act 2000 compliance.',
     readTime: '6 min read',
     lastUpdated: 'August 2026',
-    badge: 'Legal Tech',
+    badge: 'Legal',
     toc: [
       { id: '5-step-wizard', title: '1. 5-Step Guided Signing Wizard' },
       { id: 'it-act-compliance', title: '2. Indian IT Act 2000 Compliance' },
@@ -986,7 +986,7 @@ Track post-production status from RAW ingest to rough cut, color grading, client
     description: 'Automated CGST/SGST/IGST splitting, HSN/SAC code registry, pro-forma invoices, and payment reconciliation.',
     readTime: '6 min read',
     lastUpdated: 'August 2026',
-    badge: 'India Compliant',
+    badge: 'GST',
     toc: [
       { id: 'tax-math', title: '1. Automated GST Tax Splitting' },
       { id: 'hsn-sac-registry', title: '2. HSN & SAC Code Registry' },
@@ -1127,7 +1127,7 @@ The Financials module provides complete visibility into tax obligations and stre
     description: 'Progressive Web App specifications, dynamic manifest configuration, sub-50ms cache lifecycle, and VAPID push.',
     readTime: '6 min read',
     lastUpdated: 'October 2026',
-    badge: 'Mobile Protocol',
+    badge: 'PWA',
     toc: [
       { id: 'manifest-config', title: '1. Dynamic PWA Manifest' },
       { id: 'service-worker', title: '2. Service Worker Lifecycle' },
@@ -1190,7 +1190,7 @@ Cora provides persistent, frictionless PWA installation triggers across desktop 
     description: 'AI Starter Prompts Grid, automated Next.js/Expo/Vite static compilation, single-CPU thread safety, and lead form ingestion.',
     readTime: '7 min read',
     lastUpdated: 'October 2026',
-    badge: 'Canvas v4.9.364',
+    badge: 'v4.9',
     toc: [
       { id: 'ai-starters', title: '1. AI Starter Prompts Grid' },
       { id: 'static-compiler', title: '2. Automated Static Compiler Pipeline' },
@@ -1254,7 +1254,7 @@ The background compiler (\`cora_nextjs_build_repo\`) supports Next.js, Expo, Vit
     description: 'Complete API reference for bookings, leads, invoices, e-sign contracts, and PWA push subscriptions.',
     readTime: '8 min read',
     lastUpdated: 'October 2026',
-    badge: 'API Spec',
+    badge: 'REST',
     toc: [
       { id: 'auth', title: '1. Authentication & Nonces' },
       { id: 'crm-endpoints', title: '2. CRM & Lead Endpoints' },
@@ -1302,7 +1302,7 @@ All endpoints are accessible via WordPress REST API (\`/wp-json/cora/v1/\` or \`
     description: 'Connect any MCP-compatible AI assistant (ChatGPT, Claude, Gemini, Cursor, VS Code, Windsurf) to your Cora workspace via standards-compliant OAuth 2.1.',
     readTime: '8 min read',
     lastUpdated: 'October 2026',
-    badge: 'Universal MCP & OpenAPI 3.0.1',
+    badge: 'MCP',
     toc: [
       { id: 'universal-architecture', title: '1. Universal Architecture' },
       { id: 'oauth-authentication', title: '2. OAuth 2.1 & Interactive Consent Panel' },

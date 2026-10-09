@@ -197,37 +197,42 @@ export function DocsClient({ currentArticle }: DocsClientProps) {
         ══════════════════════════════════════════════════════════════════ */}
         <aside
           data-lenis-prevent
-          className="hidden lg:block w-[280px] shrink-0 sticky top-[57px] h-[calc(100vh-57px)] overflow-y-auto overscroll-contain p-6 border-r border-zinc-100 space-y-6"
+          className="hidden lg:block w-[290px] xl:w-[300px] shrink-0 sticky top-[57px] h-[calc(100vh-57px)] overflow-y-auto overscroll-contain p-5 xl:p-6 border-r border-zinc-100 space-y-6"
         >
           
-          <div className="space-y-5">
+          <div className="space-y-6">
             {DOC_CATEGORIES.map((cat) => {
               const IconComp = CATEGORY_ICONS[cat.id] || BookOpen;
-              const hasActive = cat.articles.some((a) => a.slug === currentArticle.slug);
 
               return (
                 <div key={cat.id} className="space-y-1.5">
-                  <div className="flex items-center gap-2 text-[11px] font-mono font-bold text-zinc-400 uppercase tracking-wider px-2 py-1">
-                    <IconComp className="w-3.5 h-3.5 text-zinc-500" />
+                  <div className="flex items-center gap-2 text-[10.5px] font-mono font-bold text-zinc-400 uppercase tracking-wider px-2 py-1">
+                    <IconComp className="w-3.5 h-3.5 text-zinc-400" />
                     <span>{cat.label}</span>
                   </div>
 
-                  <div className="space-y-0.5">
+                  <div className="space-y-1">
                     {cat.articles.map((art) => {
                       const isActive = art.slug === currentArticle.slug;
                       return (
                         <Link
                           key={art.slug}
                           href={`/docs/${art.slug}`}
-                          className={`flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs transition-colors group ${
+                          className={`flex items-center justify-between gap-2.5 px-3 py-2 rounded-xl text-xs transition-all group ${
                             isActive
-                              ? 'bg-zinc-950 text-white font-semibold shadow-2xs'
-                              : 'text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100/70 font-medium'
+                              ? 'bg-zinc-900 text-white font-semibold shadow-xs'
+                              : 'text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100/80 font-medium'
                           }`}
                         >
-                          <span className="truncate">{art.shortTitle}</span>
-                          {art.badge && !isActive && (
-                            <span className="text-[9px] font-mono font-bold text-zinc-500 bg-zinc-100 px-1.5 py-0.5 rounded-md">
+                          <span className="truncate leading-tight">{art.shortTitle}</span>
+                          {art.badge && (
+                            <span
+                              className={`shrink-0 whitespace-nowrap text-[9px] font-mono font-semibold px-1.5 py-0.5 rounded-md border leading-none ${
+                                isActive
+                                  ? 'bg-zinc-800 text-zinc-300 border-zinc-700/60'
+                                  : 'bg-zinc-100 text-zinc-500 border-zinc-200/60'
+                              }`}
+                            >
                               {art.badge}
                             </span>
                           )}
@@ -243,7 +248,7 @@ export function DocsClient({ currentArticle }: DocsClientProps) {
           <div className="pt-4 border-t border-zinc-100">
             <Link
               href="/changelog"
-              className="flex items-center justify-between text-xs font-semibold text-zinc-600 hover:text-zinc-950 p-2 rounded-lg hover:bg-zinc-50 transition-colors"
+              className="flex items-center justify-between text-xs font-semibold text-zinc-600 hover:text-zinc-950 p-2.5 rounded-xl hover:bg-zinc-50 transition-colors"
             >
               <span>Platform Changelog</span>
               <span className="text-[10px] font-mono bg-emerald-50 text-emerald-700 font-bold px-1.5 py-0.5 rounded-full border border-emerald-200">
@@ -518,9 +523,9 @@ export function DocsClient({ currentArticle }: DocsClientProps) {
               {DOC_CATEGORIES.map((cat) => {
                 const IconComp = CATEGORY_ICONS[cat.id] || BookOpen;
                 return (
-                  <div key={cat.id} className="space-y-2">
-                    <div className="flex items-center gap-2 text-[11px] font-mono font-bold text-zinc-400 uppercase tracking-wider px-1">
-                      <IconComp className="w-3.5 h-3.5 text-zinc-500" />
+                  <div key={cat.id} className="space-y-1.5">
+                    <div className="flex items-center gap-2 text-[10.5px] font-mono font-bold text-zinc-400 uppercase tracking-wider px-1">
+                      <IconComp className="w-3.5 h-3.5 text-zinc-400" />
                       <span>{cat.label}</span>
                     </div>
                     <div className="grid grid-cols-1 gap-1">
@@ -531,15 +536,21 @@ export function DocsClient({ currentArticle }: DocsClientProps) {
                             key={art.slug}
                             href={`/docs/${art.slug}`}
                             onClick={() => setMobileSidebarOpen(false)}
-                            className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs transition-colors ${
+                            className={`flex items-center justify-between gap-2.5 px-3.5 py-2.5 rounded-xl text-xs transition-colors ${
                               isActive
-                                ? 'bg-zinc-950 text-white font-semibold shadow-2xs'
-                                : 'text-zinc-700 hover:bg-zinc-100 hover:text-zinc-950 font-medium bg-zinc-50/60 border border-zinc-100'
+                                ? 'bg-zinc-900 text-white font-semibold shadow-xs'
+                                : 'text-zinc-800 hover:bg-zinc-100 hover:text-zinc-950 font-medium bg-zinc-50/70 border border-zinc-200/60'
                             }`}
                           >
-                            <span className="truncate">{art.shortTitle}</span>
-                            {art.badge && !isActive && (
-                              <span className="text-[9px] font-mono font-bold text-zinc-500 bg-white px-1.5 py-0.5 rounded-md border border-zinc-200">
+                            <span className="truncate leading-tight">{art.shortTitle}</span>
+                            {art.badge && (
+                              <span
+                                className={`shrink-0 whitespace-nowrap text-[9px] font-mono font-semibold px-1.5 py-0.5 rounded-md border leading-none ${
+                                  isActive
+                                    ? 'bg-zinc-800 text-zinc-300 border-zinc-700/60'
+                                    : 'bg-white text-zinc-500 border-zinc-200'
+                                }`}
+                              >
                                 {art.badge}
                               </span>
                             )}
