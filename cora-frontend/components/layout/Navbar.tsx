@@ -93,11 +93,6 @@ export function Navbar() {
   const navRef = useRef<HTMLElement>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Dedicated independent header on Docs pages & Partner Landing Pages (Menu not required)
-  if (pathname?.startsWith('/docs') || pathname?.startsWith('/vanshrajput') || pathname?.startsWith('/vnxdigital')) {
-    return null;
-  }
-
   // Track scroll state for sticky header backdrop styling
   useEffect(() => {
     const handleScroll = () => {
@@ -153,6 +148,12 @@ export function Navbar() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // Dedicated independent header on Docs pages & Partner Landing Pages (Menu not required)
+  const isHiddenRoute = pathname?.startsWith('/docs') || pathname?.startsWith('/vanshrajput') || pathname?.startsWith('/vnxdigital');
+  if (isHiddenRoute) {
+    return null;
+  }
 
   const isToolsPage = pathname?.startsWith('/tools') || false;
 
