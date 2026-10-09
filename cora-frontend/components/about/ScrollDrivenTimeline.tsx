@@ -81,13 +81,13 @@ export function ScrollDrivenTimeline() {
         </p>
       </div>
 
-      {/* ── Connected Milestone Journey Cards (Space-Optimized for Mobile) ── */}
-      <div className="relative max-w-[780px] mx-auto px-2 xs:px-3 sm:px-6">
-        
-        {/* Continuous Left Connected Track Spine */}
-        <div className="absolute left-[17px] xs:left-[21px] sm:left-[39px] top-4 bottom-4 w-0.5 bg-zinc-200/90 pointer-events-none" />
+      {/* ── Modern Connected Milestone Journey Cards ── */}
+      <div className="max-w-[780px] mx-auto px-4 sm:px-6">
+        <div className="relative space-y-4 sm:space-y-6">
+          
+          {/* Subtle Vertical Connector (Desktop) */}
+          <div className="hidden sm:block absolute left-6 top-8 bottom-8 w-px bg-zinc-200 pointer-events-none" />
 
-        <div className="space-y-3.5 xs:space-y-4 sm:space-y-8">
           {MILESTONES.map((item, idx) => {
             const Icon = item.icon;
             const isHovered = hoveredIdx === idx;
@@ -97,73 +97,68 @@ export function ScrollDrivenTimeline() {
                 key={idx} 
                 onMouseEnter={() => setHoveredIdx(idx)}
                 onMouseLeave={() => setHoveredIdx(null)}
-                className="relative flex items-start gap-2.5 xs:gap-3.5 sm:gap-6 group"
-              >
-                
-                {/* Milestone Spine Indicator Node */}
-                <div className="relative z-10 shrink-0 mt-2.5 sm:mt-3">
-                  <div className={`w-7 h-7 xs:w-8 xs:h-8 sm:w-10 sm:h-10 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
-                    isHovered
-                      ? 'bg-zinc-950 border-zinc-950 text-white shadow-md scale-110'
-                      : 'bg-white border-zinc-300 text-zinc-700 shadow-2xs group-hover:border-zinc-950 group-hover:text-zinc-950'
-                  }`}>
-                    <Icon className="w-3 h-3 xs:w-3.5 xs:h-3.5 sm:w-4 sm:h-4 stroke-[2]" />
-                  </div>
-                </div>
-
-                {/* Milestone Detail Card */}
-                <div className={`flex-1 rounded-xl xs:rounded-2xl sm:rounded-3xl bg-white border p-3.5 xs:p-4.5 sm:p-7 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.03)] transition-all duration-300 ${
+                className={`relative group rounded-2xl sm:rounded-3xl bg-white border p-5 sm:p-7 transition-all duration-300 ${
                   isHovered
-                    ? 'border-zinc-400 shadow-[0_10px_30px_-6px_rgba(0,0,0,0.08)] -translate-y-0.5'
-                    : 'border-zinc-200/80 hover:border-zinc-300'
-                }`}>
-                  
-                  {/* Card Top: Phase, Year & Category Pill */}
-                  <div className="flex items-center justify-between flex-wrap gap-1.5 mb-2 sm:mb-3">
-                    <div className="flex items-center gap-1.5 sm:gap-2">
-                      <span className="text-[10px] sm:text-[11px] font-mono font-bold uppercase text-zinc-900 bg-zinc-100 px-2 sm:px-2.5 py-0.5 rounded-md">
-                        {item.phase}
-                      </span>
-                      <span className="text-[11px] sm:text-xs font-mono font-bold text-zinc-500">
-                        {item.year}
-                      </span>
+                    ? 'border-zinc-400 shadow-[0_12px_36px_-8px_rgba(0,0,0,0.08)] -translate-y-0.5'
+                    : 'border-zinc-200/90 shadow-[0_2px_12px_-2px_rgba(0,0,0,0.03)] hover:border-zinc-300'
+                }`}
+              >
+                {/* Top Bar: Icon Tile + Phase/Year + Category Badge */}
+                <div className="flex items-center justify-between gap-3 mb-4">
+                  <div className="flex items-center gap-3">
+                    {/* Icon Badge */}
+                    <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center transition-colors duration-200 ${
+                      isHovered
+                        ? 'bg-zinc-950 text-white shadow-xs'
+                        : 'bg-zinc-100 text-zinc-900 group-hover:bg-zinc-950 group-hover:text-white'
+                    }`}>
+                      <Icon className="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2]" />
                     </div>
 
-                    <span className="text-[9px] sm:text-[10px] font-mono font-semibold tracking-wider text-zinc-400 uppercase">
-                      {item.badge}
-                    </span>
-                  </div>
-
-                  {/* Headline */}
-                  <h3 className="font-display text-base xs:text-lg sm:text-2xl font-bold text-zinc-950 tracking-tight mb-1.5 sm:mb-2">
-                    {item.title}
-                  </h3>
-
-                  {/* Story Copy */}
-                  <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed font-normal mb-3 sm:mb-4">
-                    {item.story}
-                  </p>
-
-                  {/* Capability Tags */}
-                  <div className="flex items-center flex-wrap gap-1 sm:gap-2 pt-2.5 sm:pt-3 border-t border-zinc-100">
-                    {item.tags.map((tag, tIdx) => (
-                      <span
-                        key={tIdx}
-                        className="inline-flex items-center gap-1 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full bg-zinc-50 border border-zinc-200/70 text-[9px] xs:text-[10px] sm:text-[11px] font-mono font-medium text-zinc-700"
-                      >
-                        <Check className="w-2.5 h-2.5 text-emerald-600 stroke-[2.5]" />
-                        <span>{tag}</span>
+                    {/* Phase & Year */}
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
+                      <span className="text-xs sm:text-[13px] font-mono font-bold text-zinc-950 tracking-tight">
+                        {item.phase}
                       </span>
-                    ))}
+                      <span className="text-[11px] sm:text-xs font-mono text-zinc-400 font-medium">
+                        • {item.year}
+                      </span>
+                    </div>
                   </div>
 
+                  {/* Status/Category Tag */}
+                  <span className="text-[10px] sm:text-[11px] font-mono font-bold tracking-wider text-zinc-500 bg-zinc-50 border border-zinc-200/80 px-2.5 py-1 rounded-full uppercase">
+                    {item.badge}
+                  </span>
+                </div>
+
+                {/* Headline */}
+                <h3 className="font-display text-lg sm:text-2xl font-bold text-zinc-950 tracking-tight mb-2 leading-snug">
+                  {item.title}
+                </h3>
+
+                {/* Story Copy */}
+                <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed font-normal mb-4">
+                  {item.story}
+                </p>
+
+                {/* Capability Tags */}
+                <div className="flex items-center flex-wrap gap-1.5 sm:gap-2 pt-3 border-t border-zinc-100">
+                  {item.tags.map((tag, tIdx) => (
+                    <span
+                      key={tIdx}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-50 border border-zinc-200/70 text-[10px] sm:text-[11px] font-mono font-medium text-zinc-700"
+                    >
+                      <Check className="w-3 h-3 text-zinc-900 stroke-[2.5]" />
+                      <span>{tag}</span>
+                    </span>
+                  ))}
                 </div>
 
               </div>
             );
           })}
         </div>
-
       </div>
 
     </div>
