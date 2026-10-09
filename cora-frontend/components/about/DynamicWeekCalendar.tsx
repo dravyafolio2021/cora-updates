@@ -103,8 +103,8 @@ export function DynamicWeekCalendar() {
         </div>
 
         {/* Subtitle */}
-        <p className="text-zinc-600 text-xs xs:text-sm sm:text-base lg:text-[16.5px] leading-relaxed max-w-[660px] mx-auto font-normal">
-          Marketing agencies, design shops, and dev consultancies reclaim 52 billable days every year — Cora executes your client onboarding, 18% GST billing, and retainer workflows completely on autopilot.
+        <p className="text-zinc-600 text-xs sm:text-sm lg:text-base leading-relaxed max-w-[580px] mx-auto font-normal">
+          Agencies lose 1 full day every week to admin friction. Cora puts onboarding, GST invoicing, and retainer ops on autopilot.
         </p>
       </div>
 

@@ -18,7 +18,7 @@ const VALUES = [
     tag: 'Design Polish',
     icon: Sparkles,
     title: 'Be in the details.',
-    desc: 'We obsess over typography, micro-interactions, and visual polish so every agency pitch, portal, and touchpoint feels world-class.'
+    desc: 'Obsessing over typography and micro-interactions so every client touchpoint feels world-class.'
   },
   {
     num: '02',
@@ -26,7 +26,7 @@ const VALUES = [
     tag: 'Zero Friction',
     icon: Zap,
     title: 'Move with intent.',
-    desc: 'We eliminate administrative friction so agency founders and client-facing teams can operate at the speed of thought.'
+    desc: 'Eliminating administrative friction so client-facing teams operate at the speed of thought.'
   },
   {
     num: '03',
@@ -34,7 +34,7 @@ const VALUES = [
     tag: 'Uncluttered UI',
     icon: CheckCircle2,
     title: 'Radical simplicity.',
-    desc: 'No bloated menus or fragmented SaaS sprawl. We replace dozens of disconnected tools with one unified, high-margin workspace.'
+    desc: 'Replacing dozens of disconnected tools with one calm, high-margin agency command center.'
   },
   {
     num: '04',
@@ -42,7 +42,7 @@ const VALUES = [
     tag: 'Agency First',
     icon: Heart,
     title: 'Built for agencies.',
-    desc: 'We design specifically for discovery intake, client retainers, scope sign-offs, and the fast-paced agency teams running them.'
+    desc: 'Designed specifically for discovery intake, retainer billing, and fast-paced client delivery.'
   },
   {
     num: '05',
@@ -50,7 +50,7 @@ const VALUES = [
     tag: 'Daily Velocity',
     icon: TrendingUp,
     title: 'Grow 1% every day.',
-    desc: 'Continuous refinement through listening closely to top agency operators, shipping improvements fast, and setting a higher bar.'
+    desc: 'Listening closely to top operators, shipping improvements fast, and setting a higher standard.'
   },
   {
     num: '06',
@@ -58,7 +58,7 @@ const VALUES = [
     tag: 'Proven ROI',
     icon: Award,
     title: 'Client delight first.',
-    desc: 'Our success is measured solely by the billable hours, client trust, and headspace agency founders gain back for high-margin growth.'
+    desc: 'Measured by the billable hours and creative headspace agency founders win back.'
   }
 ];
 
@@ -67,19 +67,19 @@ export function CoreValuesSection() {
     <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-6">
       
       {/* ── Section Header ── */}
-      <div className="text-center space-y-3 sm:space-y-4 max-w-[780px] mx-auto mb-8 sm:mb-16">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1 bg-white/95 backdrop-blur-md rounded-full text-[11px] font-mono font-bold tracking-[0.16em] uppercase text-zinc-700 border border-zinc-200/90 shadow-2xs">
+      <div className="text-center space-y-2.5 sm:space-y-3.5 max-w-[760px] mx-auto mb-6 sm:mb-12">
+        <div className="inline-flex items-center gap-2 px-3 py-0.5 bg-white/95 backdrop-blur-md rounded-full text-[10.5px] font-mono font-bold tracking-[0.16em] uppercase text-zinc-700 border border-zinc-200/90 shadow-2xs">
           <span>DNA &amp; PRINCIPLES</span>
         </div>
         
         <div>
-          <h2 className="font-display text-3xl xs:text-4xl sm:text-6xl lg:text-[70px] font-bold tracking-[-0.03em] leading-[1.08] bg-gradient-to-r from-zinc-950 via-zinc-700 to-zinc-400 bg-clip-text text-transparent inline-block">
+          <h2 className="font-display text-3xl xs:text-4xl sm:text-5xl lg:text-[62px] font-bold tracking-[-0.03em] leading-[1.08] bg-gradient-to-r from-zinc-950 via-zinc-700 to-zinc-400 bg-clip-text text-transparent inline-block">
             Our core values.
           </h2>
         </div>
         
-        <p className="text-zinc-600 text-xs xs:text-sm sm:text-base lg:text-lg leading-relaxed max-w-[620px] mx-auto font-normal">
-          The fundamental beliefs that guide how we build products, support agencies, and scale together.
+        <p className="text-zinc-600 text-xs sm:text-sm lg:text-base leading-relaxed max-w-[560px] mx-auto font-normal">
+          The fundamental beliefs that guide how we build products and support modern agencies.
         </p>
       </div>
 
