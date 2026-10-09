@@ -59,8 +59,10 @@ const MILESTONES: Milestone[] = [
 ];
 
 export function ScrollDrivenTimeline() {
+  const [activeIdx, setActiveIdx] = useState<number | null>(null);
+
   return (
-    <div className="w-full space-y-6 sm:space-y-10">
+    <div className="w-full space-y-8 sm:space-y-12">
       
       {/* ── Section Header ── */}
       <div className="text-center space-y-2.5 sm:space-y-3.5 max-w-[720px] mx-auto px-4">
@@ -79,58 +81,167 @@ export function ScrollDrivenTimeline() {
         </p>
       </div>
 
-      {/* ── Structured 2x2 Bento Matrix (Effortless Grid on Desktop, Clean Stack on Mobile) ── */}
-      <div className="max-w-[1080px] mx-auto px-4 sm:px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 sm:gap-5">
+      {/* ── Desktop: Horizontal Connected Timeline Track (4 Columns) ── */}
+      <div className="hidden lg:block max-w-[1240px] mx-auto px-6">
+        
+        {/* Continuous Horizontal Timeline Rail */}
+        <div className="relative mb-8 px-6">
+          <div className="absolute top-1/2 left-10 right-10 -translate-y-1/2 h-0.5 bg-gradient-to-r from-zinc-200 via-zinc-300 to-zinc-200 pointer-events-none" />
+          
+          <div className="grid grid-cols-4 gap-6 relative z-10">
+            {MILESTONES.map((item, idx) => {
+              const isHovered = activeIdx === idx;
+              return (
+                <div 
+                  key={idx} 
+                  className="flex flex-col items-center cursor-pointer group"
+                  onMouseEnter={() => setActiveIdx(idx)}
+                  onMouseLeave={() => setActiveIdx(null)}
+                >
+                  {/* Year Pill Node on Timeline */}
+                  <div className={`px-3.5 py-1 rounded-full text-xs font-mono font-bold transition-all duration-300 flex items-center gap-1.5 shadow-2xs ${
+                    isHovered 
+                      ? 'bg-zinc-950 text-white scale-110 shadow-md ring-4 ring-zinc-100' 
+                      : 'bg-white text-zinc-800 border border-zinc-300 group-hover:border-zinc-950'
+                  }`}>
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                    <span>{item.year}</span>
+                  </div>
+
+                  {/* Vertical connecting tick into card */}
+                  <div className={`w-0.5 h-6 transition-colors duration-300 ${
+                    isHovered ? 'bg-zinc-950' : 'bg-zinc-200'
+                  }`} />
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* 4 Connected Cards Matrix */}
+        <div className="grid grid-cols-4 gap-5">
           {MILESTONES.map((item, idx) => {
             const Icon = item.icon;
+            const isHovered = activeIdx === idx;
 
             return (
-              <div 
-                key={idx} 
-                className="group relative rounded-2xl sm:rounded-3xl bg-white border border-zinc-200/80 p-5 sm:p-6 shadow-[0_2px_12px_-2px_rgba(0,0,0,0.03)] hover:shadow-[0_10px_30px_-6px_rgba(0,0,0,0.07)] hover:border-zinc-300 transition-all duration-300 flex flex-col justify-between"
+              <div
+                key={idx}
+                onMouseEnter={() => setActiveIdx(idx)}
+                onMouseLeave={() => setActiveIdx(null)}
+                className={`rounded-2xl bg-white border p-5 flex flex-col justify-between transition-all duration-300 ${
+                  isHovered
+                    ? 'border-zinc-950 shadow-[0_12px_32px_-6px_rgba(0,0,0,0.09)] -translate-y-1'
+                    : 'border-zinc-200/90 shadow-[0_2px_10px_-2px_rgba(0,0,0,0.03)] hover:border-zinc-300'
+                }`}
               >
                 <div>
-                  {/* Top Bar: Icon Tile + Phase Number + Year + Category Badge */}
-                  <div className="flex items-center justify-between gap-3 mb-3.5">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-zinc-100 group-hover:bg-zinc-950 group-hover:text-white text-zinc-900 flex items-center justify-center transition-colors duration-200 shrink-0">
-                        <Icon className="w-4 h-4 stroke-[2]" />
+                  {/* Top Bar: Icon + Phase + Category */}
+                  <div className="flex items-center justify-between gap-2 mb-3">
+                    <div className="flex items-center gap-2">
+                      <div className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors ${
+                        isHovered ? 'bg-zinc-950 text-white' : 'bg-zinc-100 text-zinc-800'
+                      }`}>
+                        <Icon className="w-3.5 h-3.5 stroke-[2]" />
                       </div>
-                      <div className="flex items-center gap-1.5 font-mono text-xs">
-                        <span className="font-bold text-zinc-950">Phase {item.num}</span>
-                        <span className="text-zinc-400">·</span>
-                        <span className="text-zinc-500">{item.year}</span>
-                      </div>
+                      <span className="text-[11px] font-mono font-bold text-zinc-900">
+                        Phase {item.num}
+                      </span>
                     </div>
 
-                    <span className="text-[10px] sm:text-[10.5px] font-mono font-semibold tracking-wider text-zinc-500 bg-zinc-50 border border-zinc-200/70 px-2 py-0.5 rounded-full uppercase">
+                    <span className="text-[9.5px] font-mono font-semibold tracking-wider text-zinc-400 uppercase">
                       {item.badge}
                     </span>
                   </div>
 
-                  {/* Headline */}
-                  <h3 className="font-display text-base sm:text-xl font-bold text-zinc-950 tracking-tight mb-1.5 leading-snug">
+                  {/* Title */}
+                  <h3 className="font-display text-[15px] font-bold text-zinc-950 tracking-tight leading-snug mb-2">
                     {item.title}
                   </h3>
 
-                  {/* Short 1-Line Narrative */}
-                  <p className="text-xs sm:text-[13.5px] text-zinc-600 leading-relaxed font-normal mb-4">
+                  {/* Narrative */}
+                  <p className="text-xs text-zinc-600 leading-relaxed font-normal mb-4">
                     {item.story}
                   </p>
                 </div>
 
-                {/* Minimalist Feature Tags */}
-                <div className="flex items-center flex-wrap gap-1.5 pt-3 border-t border-zinc-100">
+                {/* Tags */}
+                <div className="flex items-center flex-wrap gap-1 pt-3 border-t border-zinc-100">
                   {item.tags.map((tag, tIdx) => (
                     <span
                       key={tIdx}
-                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-50 border border-zinc-200/60 text-[10px] sm:text-[10.5px] font-mono text-zinc-600 font-medium"
+                      className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-zinc-50 border border-zinc-200/60 text-[9.5px] font-mono text-zinc-600"
                     >
                       <Check className="w-2.5 h-2.5 text-zinc-900 stroke-[2.5]" />
                       <span>{tag}</span>
                     </span>
                   ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+      </div>
+
+      {/* ── Mobile / Tablet: Clean Connected Vertical Timeline Thread ── */}
+      <div className="block lg:hidden max-w-[620px] mx-auto px-4 sm:px-6">
+        <div className="relative pl-6 sm:pl-8 border-l-2 border-zinc-200/90 ml-3 sm:ml-4 space-y-6 sm:space-y-8">
+          {MILESTONES.map((item, idx) => {
+            const Icon = item.icon;
+
+            return (
+              <div key={idx} className="relative group">
+                
+                {/* Timeline Spine Node */}
+                <div className="absolute -left-[31px] sm:-left-[39px] top-1.5 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-white border-2 border-zinc-900 flex items-center justify-center text-zinc-900 shadow-2xs z-10">
+                  <span className="w-1.5 h-1.5 rounded-full bg-zinc-900" />
+                </div>
+
+                {/* Timeline Milestone Content */}
+                <div className="rounded-2xl bg-white border border-zinc-200/80 p-4 sm:p-5 shadow-[0_2px_12px_-2px_rgba(0,0,0,0.03)] hover:border-zinc-300 transition-all">
+                  
+                  {/* Top Bar: Icon + Phase + Year + Badge */}
+                  <div className="flex items-center justify-between gap-2 mb-2.5">
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-lg bg-zinc-100 text-zinc-900 flex items-center justify-center shrink-0">
+                        <Icon className="w-3.5 h-3.5 stroke-[2]" />
+                      </div>
+                      <div className="flex items-center gap-1.5 text-xs font-mono">
+                        <span className="font-bold text-zinc-950">Phase {item.num}</span>
+                        <span className="text-zinc-400">·</span>
+                        <span className="font-bold text-zinc-700 bg-zinc-100 px-1.5 py-0.5 rounded text-[11px]">{item.year}</span>
+                      </div>
+                    </div>
+
+                    <span className="text-[10px] font-mono font-semibold tracking-wider text-zinc-500 bg-zinc-50 border border-zinc-200/70 px-2 py-0.5 rounded-full uppercase">
+                      {item.badge}
+                    </span>
+                  </div>
+
+                  {/* Title */}
+                  <h3 className="font-display text-base font-bold text-zinc-950 tracking-tight leading-snug mb-1.5">
+                    {item.title}
+                  </h3>
+
+                  {/* Story */}
+                  <p className="text-xs text-zinc-600 leading-relaxed font-normal mb-3">
+                    {item.story}
+                  </p>
+
+                  {/* Tags */}
+                  <div className="flex items-center flex-wrap gap-1.5 pt-2.5 border-t border-zinc-100">
+                    {item.tags.map((tag, tIdx) => (
+                      <span
+                        key={tIdx}
+                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-50 border border-zinc-200/60 text-[10px] font-mono text-zinc-600"
+                      >
+                        <Check className="w-2.5 h-2.5 text-zinc-900 stroke-[2.5]" />
+                        <span>{tag}</span>
+                      </span>
+                    ))}
+                  </div>
+
                 </div>
 
               </div>
