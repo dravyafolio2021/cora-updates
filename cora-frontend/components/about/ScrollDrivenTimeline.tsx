@@ -84,43 +84,7 @@ export function ScrollDrivenTimeline() {
       {/* ── Desktop: Horizontal Connected Timeline Track (4 Columns) ── */}
       <div className="hidden lg:block max-w-[1240px] mx-auto px-6">
         
-        {/* Continuous Horizontal Timeline Rail */}
-        <div className="relative mb-6">
-          <div className="absolute top-1/2 left-[12.5%] right-[12.5%] -translate-y-1/2 h-0.5 bg-gradient-to-r from-zinc-200 via-zinc-300 to-zinc-200 pointer-events-none" />
-          
-          <div className="grid grid-cols-4 gap-5 relative z-10">
-            {MILESTONES.map((item, idx) => {
-              const isHovered = activeIdx === idx;
-              return (
-                <div 
-                  key={idx} 
-                  className="flex flex-col items-center cursor-pointer group"
-                  onMouseEnter={() => setActiveIdx(idx)}
-                  onMouseLeave={() => setActiveIdx(null)}
-                >
-                  {/* Year Pill Node on Timeline */}
-                  <div className={`px-4 py-1 rounded-full text-xs font-mono font-bold transition-all duration-300 flex items-center gap-2 shadow-2xs ${
-                    isHovered 
-                      ? 'bg-zinc-950 text-white scale-105 shadow-md ring-4 ring-zinc-100' 
-                      : 'bg-white text-zinc-800 border border-zinc-200/90 group-hover:border-zinc-950'
-                  }`}>
-                    <span className={`w-1.5 h-1.5 rounded-full transition-colors ${
-                      isHovered ? 'bg-emerald-400' : 'bg-emerald-500'
-                    }`} />
-                    <span>{item.year}</span>
-                  </div>
-
-                  {/* Vertical connecting tick into card */}
-                  <div className={`w-0.5 h-5 transition-colors duration-300 ${
-                    isHovered ? 'bg-zinc-950' : 'bg-zinc-200'
-                  }`} />
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* 4 Connected Cards Matrix with Perfect Height & Baseline Alignment */}
+        {/* Unified 4-Column Timeline & Card Assembly */}
         <div className="grid grid-cols-4 gap-5 items-stretch">
           {MILESTONES.map((item, idx) => {
             const Icon = item.icon;
@@ -131,55 +95,90 @@ export function ScrollDrivenTimeline() {
                 key={idx}
                 onMouseEnter={() => setActiveIdx(idx)}
                 onMouseLeave={() => setActiveIdx(null)}
-                className={`rounded-2xl bg-white border p-5 flex flex-col justify-between transition-all duration-300 ${
+                className="flex flex-col group cursor-pointer"
+              >
+                {/* ── Timeline Rail Header ── */}
+                <div className="relative flex items-center justify-center mb-4 py-1">
+                  
+                  {/* Connecting Rail: Left Segment (hidden on 1st item) */}
+                  {idx > 0 && (
+                    <div className={`absolute left-0 right-1/2 top-1/2 -translate-y-1/2 h-[1.5px] transition-colors duration-200 ${
+                      isHovered ? 'bg-zinc-400' : 'bg-zinc-200'
+                    }`} />
+                  )}
+
+                  {/* Connecting Rail: Right Segment (hidden on last item) */}
+                  {idx < MILESTONES.length - 1 && (
+                    <div className={`absolute left-1/2 right-0 top-1/2 -translate-y-1/2 h-[1.5px] transition-colors duration-200 ${
+                      isHovered ? 'bg-zinc-400' : 'bg-zinc-200'
+                    }`} />
+                  )}
+
+                  {/* Year Pill Node (Centered on Rail) */}
+                  <div className={`relative z-10 px-3.5 py-1 rounded-full text-xs font-mono font-bold transition-all duration-300 flex items-center gap-1.5 shadow-2xs ${
+                    isHovered 
+                      ? 'bg-zinc-950 text-white scale-105 shadow-md' 
+                      : 'bg-white text-zinc-800 border border-zinc-200/90 group-hover:border-zinc-950'
+                  }`}>
+                    <span className={`w-1.5 h-1.5 rounded-full transition-colors ${
+                      isHovered ? 'bg-emerald-400' : 'bg-emerald-500'
+                    }`} />
+                    <span>{item.year}</span>
+                  </div>
+
+                </div>
+
+                {/* ── Milestone Card ── */}
+                <div className={`flex-1 rounded-2xl bg-white border p-5 flex flex-col justify-between transition-all duration-300 ${
                   isHovered
                     ? 'border-zinc-950 shadow-[0_14px_36px_-6px_rgba(0,0,0,0.09)] -translate-y-1'
                     : 'border-zinc-200/90 shadow-[0_2px_10px_-2px_rgba(0,0,0,0.03)] hover:border-zinc-300'
-                }`}
-              >
-                <div>
-                  {/* Top Bar: Icon + Phase + Category Badge */}
-                  <div className="flex items-center justify-between gap-2 mb-3.5">
-                    <div className="flex items-center gap-2">
-                      <div className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors ${
-                        isHovered ? 'bg-zinc-950 text-white' : 'bg-zinc-100 text-zinc-800'
-                      }`}>
-                        <Icon className="w-3.5 h-3.5 stroke-[2]" />
+                }`}>
+                  <div>
+                    {/* Top Bar: Icon + Phase + Category Badge */}
+                    <div className="flex items-center justify-between gap-2 mb-3.5">
+                      <div className="flex items-center gap-2">
+                        <div className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors ${
+                          isHovered ? 'bg-zinc-950 text-white' : 'bg-zinc-100 text-zinc-800'
+                        }`}>
+                          <Icon className="w-3.5 h-3.5 stroke-[2]" />
+                        </div>
+                        <span className="text-[11px] font-mono font-bold text-zinc-900">
+                          Phase {item.num}
+                        </span>
                       </div>
-                      <span className="text-[11px] font-mono font-bold text-zinc-900">
-                        Phase {item.num}
+
+                      {/* Refined Category Badge */}
+                      <span className="text-[9.5px] font-mono font-bold tracking-wider text-zinc-700 bg-zinc-100/90 border border-zinc-200/70 px-2 py-0.5 rounded-md uppercase">
+                        {item.badge}
                       </span>
                     </div>
 
-                    {/* Refined Category Badge */}
-                    <span className="text-[9.5px] font-mono font-bold tracking-wider text-zinc-700 bg-zinc-100/90 border border-zinc-200/70 px-2 py-0.5 rounded-md uppercase">
-                      {item.badge}
-                    </span>
+                    {/* Title (Aligned with min-height) */}
+                    <h3 className="font-display text-[15px] font-bold text-zinc-950 tracking-tight leading-snug mb-2 min-h-[42px] flex items-center">
+                      {item.title}
+                    </h3>
+
+                    {/* Narrative (Aligned with min-height) */}
+                    <p className="text-xs text-zinc-600 leading-relaxed font-normal mb-4 min-h-[52px]">
+                      {item.story}
+                    </p>
                   </div>
 
-                  {/* Title (Aligned with min-height) */}
-                  <h3 className="font-display text-[15px] font-bold text-zinc-950 tracking-tight leading-snug mb-2 min-h-[42px] flex items-center">
-                    {item.title}
-                  </h3>
-
-                  {/* Narrative (Aligned with min-height) */}
-                  <p className="text-xs text-zinc-600 leading-relaxed font-normal mb-4 min-h-[52px]">
-                    {item.story}
-                  </p>
+                  {/* Feature Tags */}
+                  <div className="flex items-center flex-wrap gap-1.5 pt-3 border-t border-zinc-100">
+                    {item.tags.map((tag, tIdx) => (
+                      <span
+                        key={tIdx}
+                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-50 border border-zinc-200/60 text-[9.5px] font-mono text-zinc-600 font-medium"
+                      >
+                        <Check className="w-2.5 h-2.5 text-zinc-900 stroke-[2.5]" />
+                        <span>{tag}</span>
+                      </span>
+                    ))}
+                  </div>
                 </div>
 
-                {/* Feature Tags */}
-                <div className="flex items-center flex-wrap gap-1.5 pt-3 border-t border-zinc-100">
-                  {item.tags.map((tag, tIdx) => (
-                    <span
-                      key={tIdx}
-                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-50 border border-zinc-200/60 text-[9.5px] font-mono text-zinc-600 font-medium"
-                    >
-                      <Check className="w-2.5 h-2.5 text-zinc-900 stroke-[2.5]" />
-                      <span>{tag}</span>
-                    </span>
-                  ))}
-                </div>
               </div>
             );
           })}
