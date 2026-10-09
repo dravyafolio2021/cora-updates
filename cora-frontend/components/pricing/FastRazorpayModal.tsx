@@ -73,9 +73,9 @@ export const PLAN_PRICING: Record<PlanKey, PlanPricingConfig> = {
     annualBase: 44990
   },
   india_only: {
-    name: 'India Edition Plan',
+    name: 'India Startup Credits',
     monthlyBase: 499,
-    annualBase: 4990
+    annualBase: 5988
   },
   vnx_starter: {
     name: 'Coaches Starter (VNX Digital)',
@@ -159,8 +159,8 @@ export function calculateDiscountedPrice(
 
   if (planKey === 'india_only') {
     standardFullRate = 499 * (isAnnual ? 12 : 1);
-    originalBasePrice = isAnnual ? 4990 : 499;
-    annualSavings = isAnnual ? 998 : 0;
+    originalBasePrice = isAnnual ? 5988 : 499;
+    annualSavings = 0;
   } else if (planKey === 'vnx_vip') {
     standardFullRate = 49999;
     originalBasePrice = 49999;
@@ -278,6 +278,20 @@ export function triggerRazorpayCheckout({
     });
     window.location.href = `https://app.heycora.in/workspace/login?plan=pro&billing=${encodeURIComponent(billingCycle)}&coupon=${encodeURIComponent(appliedCoupon || '')}&discount=100&paid=1${refParam}`;
     return;
+  }
+
+  // India Startup Credits -> Strictly available only for users in India
+  if (planKey === 'india_only') {
+    try {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+      const isIndiaTz = tz.includes('Kolkata') || tz.includes('Calcutta') || tz.includes('India') || tz.includes('Asia/Colombo');
+      if (!isIndiaTz) {
+        if (typeof window !== 'undefined' && (window as any).coraShowToast) {
+          (window as any).coraShowToast('India Startup Credits are strictly restricted to Indian residents & billing addresses.', 'error');
+        }
+        return;
+      }
+    } catch (e) {}
   }
 
   const plan = PLAN_PRICING[planKey] || PLAN_PRICING.pro;

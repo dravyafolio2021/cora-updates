@@ -195,6 +195,47 @@ function cora_seed_docs_data() {
             }
         }
 
+        // ── Upsert v4.9.374+ documentation pages ─────────────────────────
+        if ( function_exists( 'cora_docs_get_new_pages_v49374' ) ) {
+            $v49374_pages = cora_docs_get_new_pages_v49374();
+            foreach ( $v49374_pages as $p ) {
+                $exists = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$t_pages} WHERE slug = %s", $p['slug'] ) );
+                if ( ! $exists ) {
+                    $wpdb->insert( $t_pages, array_merge( $p, array(
+                        'status'     => 'public_live',
+                        'created_by' => $author_id,
+                        'updated_by' => $author_id,
+                        'created_at' => current_time('mysql'),
+                        'updated_at' => current_time('mysql'),
+                    ) ) );
+                } else {
+                    $wpdb->update( $t_pages, array(
+                        'title'      => $p['title'],
+                        'content'    => $p['content'],
+                        'category'   => $p['category'],
+                        'updated_at' => current_time('mysql'),
+                    ), array( 'slug' => $p['slug'] ) );
+                }
+            }
+        }
+
+        // ── Upsert v4.9.374+ changelog entries ───────────────────────────
+        if ( function_exists( 'cora_docs_get_v49374_changelog_entries' ) ) {
+            $v49374_entries = cora_docs_get_v49374_changelog_entries();
+            foreach ( $v49374_entries as $entry ) {
+                $exists = $wpdb->get_var( $wpdb->prepare(
+                    "SELECT id FROM {$t_changelog} WHERE version = %s AND title = %s",
+                    $entry['version'], $entry['title']
+                ) );
+                if ( ! $exists ) {
+                    $wpdb->insert( $t_changelog, array_merge( $entry, array(
+                        'author_id'  => $author_id,
+                        'created_at' => current_time('mysql'),
+                    ) ) );
+                }
+            }
+        }
+
         return; // Already seeded, upserts done
     }
 
@@ -1725,4 +1766,113 @@ function cora_docs_get_v49364_changelog_entries() {
     );
 }
 }
+
+// ── 11. New Documentation Pages (v4.9.374) ───────────────────────────────
+
+if ( ! function_exists( 'cora_docs_get_new_pages_v49374' ) ) {
+function cora_docs_get_new_pages_v49374() {
+    return array(
+        array(
+            'slug'     => 'forms-cards-all-entries',
+            'title'    => 'Forms Overhaul & Universal All Entries Registry',
+            'category' => 'forms',
+            'content'  => "# Forms Overhaul & Universal All Entries Registry\n\nShipped in **v4.9.372**, this release revamps the Form AI Architect cards and introduces the universal All Entries 5th tab.\n\n## Form Card Padding & Mobile Unlocking\n- **Expanded Padding**: Card internal padding is expanded to `p-5 sm:p-6` with dedicated `p-3.5` inner container for campaign details and `px-3 py-1.5` status chips, preventing text from colliding with borders.\n- **Full Card Clickability**: Clicking anywhere on `.form-card` or the form title navigates directly to `#edit/\${form.id}`.\n- **Mobile Editing Unlocked**: Removed `< 1024px` viewport blockers in routing and form loading, allowing full form editing on mobile and tablet devices.\n\n## In-App Interactive Form Live Preview Modal\n- Sandboxed preview modal (`#cora-form-preview-modal`) allowing founders to test forms with responsive viewport toggles (`Desktop`, `Mobile`) and an external tab launcher.\n\n## Universal 5th Tab: All Entries Registry (`#all-entries`)\n- **Metric Summary Strip**: Real-time KPI counter cards for Total Submissions, Active Forms with Entries, Completion Rate, and Latest Activity.\n- **Notion-Style Filter Toolbar**: Form source selector dropdown, Status dropdown (Completed vs. Partial), live search input, 1-click CSV export, and refresh button.\n- **Table Layout Hardening**: Implemented `table-fixed` and rigid explicit column widths preventing horizontal blowout.\n- **REST Endpoints**:\n  - `GET /wp-json/cora/v1/forms/all-submissions`: Returns all agency submissions with form title, form key, and settings JOINed.\n  - `DELETE /wp-json/cora/v1/forms/submissions/{id}`: Secure REST deletion endpoint with multi-tenant tenancy verification."
+        ),
+        array(
+            'slug'     => 'edge-docked-entry-inspector',
+            'title'    => 'Universal Edge-Docked Entry Inspector & Zero-Backdrop Shield',
+            'category' => 'forms',
+            'content'  => "# Universal Edge-Docked Entry Inspector & Zero-Backdrop Shield\n\nDeployed in **v4.9.374**, the Entry Inspector (`#cora-entry-inspector`) provides an ergonomic detail viewer across all form entries:\n\n## Edge-Docked Responsive Layout\n- **Desktop Viewports (>= 768px)**: Slides smoothly from the right edge (`top-0 right-0 bottom-0 w-[480px] max-w-[90vw] border-l border-zinc-200 bg-white translate-x-0`).\n- **Mobile Viewports (< 768px)**: Slides up from the bottom as a high-density sheet (`inset-x-0 bottom-0 h-[85vh] max-h-[85vh] rounded-t-3xl border-t border-zinc-200 bg-white translate-y-0`).\n\n## Zero-Backdrop Overlay Clarity\n- Completely purged dark and blurred backdrop overlays. The underlying submissions table remains 100% visible, sharp, and readable.\n- Dismissed smoothly via outside document clicks.\n\n## Submitter Quick Overview & Inline Signatures\n- Renders avatar initials, primary submitter name, and email/phone quick chips.\n- Inspects field values for image MIME types and base64 digital signatures (`data:image/...`), rendering inline `<img src=\"...\">` previews instead of dumping raw text blobs.\n- Sticky footer with 1-click 'Copy Raw JSON', 'Delete Entry', and 'Done' actions."
+        ),
+        array(
+            'slug'     => 'client-timezone-engine',
+            'title'    => 'Client Timezone Engine & Localized Timestamps',
+            'category' => 'overview',
+            'content'  => "# Client Timezone Engine & Localized Timestamps\n\nStarting in **v4.9.374**, Cora integrates an automatic client timezone detection and formatting engine.\n\n## Automatic Browser Detection\n- Dynamically evaluates `Intl.DateTimeFormat().resolvedOptions().timeZone` upon client hydration.\n- Automatically translates UTC server timestamps into localized operational dates across tables, entry inspectors, and audit feeds.\n\n## Dual-Format Display\n- Renders relative timestamps (\"15 minutes ago\", \"Yesterday at 3:30 PM\") with localized full datetime tooltips on hover."
+        ),
+        array(
+            'slug'     => 'affiliate-referral-tracking',
+            'title'    => 'Dynamic Affiliate Referral Tracking & Checkout Discounts',
+            'category' => 'finance',
+            'content'  => "# Dynamic Affiliate Referral Tracking & Checkout Discounts\n\nShipped in **v4.9.374**, Cora enhances its affiliate architecture with automated tracking APIs and checkout coupon deductions.\n\n## Referral Tracking REST API\n- `POST /wp-json/cora/v1/referrals/track`: Records referral code impressions, page URLs, referrers, and conversions.\n- Frontend proxy route at `cora-frontend/app/api/referral/track/route.ts` bridging public marketing visitors with backend attribution.\n\n## Multi-Parameter Ingestion & 30-Day Cookies\n- Captures referral query parameters: `cora_ref`, `ref`, `via`, `partner` via `cora-frontend/lib/referral.ts`.\n- Persists active tokens across 30-day secure cookies and `localStorage`.\n\n## Automated Checkout Coupon Discount Application\n- Checkout modals (`CheckoutSheet.tsx`, `FastRazorpayModal.tsx`, `PricingSection.tsx`) automatically detect active referral codes and deduct 10%–20% coupon discounts from plan totals.\n- Fires dual attribution hooks: Endorsely tracking (`window.endorsely?.trackConversion()`) and backend conversion logging."
+        ),
+        array(
+            'slug'     => 'global-resources-hero',
+            'title'    => 'Unified Global Resources Hero & Knowledge Directory',
+            'category' => 'overview',
+            'content'  => "# Unified Global Resources Hero & Knowledge Directory\n\nDeployed across the Cora public frontend, `GlobalResourcesHero.tsx` unifies the top header presentation across Templates, Tools, Guides, Blog, Newsletter, and Articles.\n\n## Design System Consistency\n- Shared typography, subtle monochromatic badges, centered search input with keyboard shortcut hints (`⌘K`), and fluid category pills.\n- Responsive layout scaling cleanly from mobile devices to 4K ultra-wide displays."
+        ),
+        array(
+            'slug'     => 'pricing-hierarchy-specs',
+            'title'    => 'Pricing SaaS Hierarchy & Bandwidth/Storage Specifications',
+            'category' => 'finance',
+            'content'  => "# Pricing SaaS Hierarchy & Bandwidth/Storage Specifications\n\nOverhauled public pricing matrix adhering to Notion/Shopify monochromatic design:\n\n## SaaS Hierarchy Pills & Resource Specs\n- **Starter**: 5GB Cloud Storage, 25GB Monthly Bandwidth.\n- **Professional (Pro)**: 15GB Cloud Storage, 100GB Monthly Bandwidth.\n- **Scale**: 50GB Cloud Storage, 500GB Monthly Bandwidth.\n- **Enterprise**: Custom High-Performance Storage & Unmetered Bandwidth.\n\n## Scale Plan Free Site Migration\n- Floats an external 'Free Site Migration' badge above the Scale card frame to accelerate agency migration from legacy stacks."
+        ),
+        array(
+            'slug'     => 'partner-coaching-portal',
+            'title'    => 'Partner & Coaching Accelerator Portal (VNX Digital)',
+            'category' => 'marketing',
+            'content'  => "# Partner & Coaching Accelerator Portal (VNX Digital)\n\nCustom co-branded partner landing page for VNX Digital members (`/vnxdigital`, `/vanshrajput`):\n\n## Key Features\n- Co-branded hero section, creator social proof, and video walkthroughs.\n- Locked 3-day trial granting full access to the Coaching Accelerator and Cora Studio operational suite."
+        )
+    );
+}
+}
+
+// ── 12. Latest Changelog Entries (v4.9.374) ───────────────────────────────
+
+if ( ! function_exists( 'cora_docs_get_v49374_changelog_entries' ) ) {
+function cora_docs_get_v49374_changelog_entries() {
+    return array(
+        array(
+            'module_key'  => 'forms',
+            'version'     => '4.9.374',
+            'status'      => 'released',
+            'title'       => 'Universal Edge-Docked Entry Inspector & Client Timezone Engine',
+            'description' => 'Docked entry inspector cleanly to right edge on desktop and bottom on mobile with zero backdrop blur. Integrated automatic client timezone engine for localized relative and absolute timestamps.',
+            'ticket_id'   => 'CORA-1214',
+        ),
+        array(
+            'module_key'  => 'affiliates',
+            'version'     => '4.9.374-aff',
+            'status'      => 'released',
+            'title'       => 'Dynamic Affiliate Referral Tracking API & Checkout Coupon Deductions',
+            'description' => 'Implemented POST /wp-json/cora/v1/referrals/track, multi-cookie referral ingestion (cora_ref, ref, via, partner), automated 10%-20% coupon discount deductions in checkout sheets, and dual conversion attribution.',
+            'ticket_id'   => 'CORA-1215',
+        ),
+        array(
+            'module_key'  => 'forms',
+            'version'     => '4.9.372',
+            'status'      => 'released',
+            'title'       => 'Forms Cards Overhaul & Universal 5th Tab All Entries Registry',
+            'description' => 'Redesigned form cards with p-5 sm:p-6 padding, full card clickability, unlocked mobile form editing, live preview modal, 5th All Entries tab with metric summary strip, Notion filter toolbar, table-fixed columns, and dynamic multi-form CSV export.',
+            'ticket_id'   => 'CORA-1216',
+        ),
+        array(
+            'module_key'  => 'pricing',
+            'version'     => '4.9.370',
+            'status'      => 'released',
+            'title'       => 'Pricing Page Overhaul: Webflow/Framer Hierarchy & Explicit Specs',
+            'description' => 'Implemented SaaS hierarchy pills, explicit storage (5-50GB) and bandwidth (25-500GB) specs, floating Free Site Migration badge on Scale, and active-voice copy.',
+            'ticket_id'   => 'CORA-1217',
+        ),
+        array(
+            'module_key'  => 'partner',
+            'version'     => '4.9.368',
+            'status'      => 'released',
+            'title'       => 'VNX Digital Coaching Accelerator Partner Landing Page',
+            'description' => 'Launched co-branded partner landing page at /vnxdigital and /vanshrajput with creator social proof and locked 3-day trial to Full Coaching Accelerator.',
+            'ticket_id'   => 'CORA-1218',
+        ),
+        array(
+            'module_key'  => 'design-system',
+            'version'     => '4.9.366',
+            'status'      => 'released',
+            'title'       => 'Unified Global Resources Hero Section across Knowledge Directories',
+            'description' => 'Deployed standardized GlobalResourcesHero across Templates, Tools, Guides, Blog, Newsletter, and Articles with unified typography, search, and category pills.',
+            'ticket_id'   => 'CORA-1219',
+        ),
+    );
+}
+}
+
 

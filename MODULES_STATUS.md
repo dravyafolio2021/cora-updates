@@ -9,8 +9,14 @@
 
 | Module Name | Branch Name | Status | Main Touchpoint Files | Assigned Agent / Chat |
 |---|---|---|---|---|
-| **Core Platform** | `main` | 🟢 Stable (v4.9.364) | `cora-workspace.php`, `admin-dashboard.php` | Main Orchestrator |
+| **Core Platform** | `main` | 🟢 Stable (v4.9.374) | `cora-workspace.php`, `admin-dashboard.php` | Main Orchestrator |
 <!-- MODULE_ROWS_START -->
+| **Universal Edge-Docked Entry Inspector & Timezone Engine** | `main` | 🟢 Complete & Active (v4.9.374) | `views/view-forms.php`, `assets/css/admin-style.css`, `cora-workspace.php` | Forms & Telemetry Agent |
+| **Dynamic Affiliate Referral Tracking & Checkout Discounts** | `main` | 🟢 Complete & Active (v4.9.374) | `includes/affiliate-referral-engine.php`, `views/view-affiliate-referrals.php`, `cora-frontend/app/api/referral/track/route.ts`, `cora-frontend/lib/referral.ts` | Growth & Affiliate Agent |
+| **Forms Cards Overhaul & Universal 5th Tab All Entries** | `main` | 🟢 Complete & Active (v4.9.372) | `views/view-forms.php`, `cora-workspace.php` | Forms UX & Performance Agent |
+| **Pricing SaaS Hierarchy & Resource Specifications** | `feat/marketing-site-reform-2026-10-06` | 🟢 Complete & Active (Oct 2026) | `cora-frontend/app/pricing/page.tsx`, `cora-frontend/components/pricing/*` | Growth & Marketing Frontend Agent |
+| **Partner Coaching Accelerator Funnel (VNX Digital)** | `feat/marketing-site-reform-2026-10-06` | 🟢 Complete & Active (Oct 2026) | `cora-frontend/app/vnxdigital/page.tsx`, `cora-frontend/app/vanshrajput/page.tsx` | Growth & Partnership Agent |
+| **Unified Global Resources Hero Component** | `feat/marketing-site-reform-2026-10-06` | 🟢 Complete & Active (Oct 2026) | `cora-frontend/components/resources/GlobalResourcesHero.tsx` | Design System Agent |
 | **Marketing Site Reform & Tools/Templates Ecosystem** | `feat/marketing-site-reform-2026-10-06` | 🟢 Complete & Active (Oct 2026) | `cora-frontend/app/*`, `cora-frontend/components/hero/Hero.tsx`, `cora-frontend/components/layout/Navbar.tsx` | Growth & Marketing Frontend Agent |
 | **Sticky AI SDR Bar & Objection Handling Engine** | `feat/marketing-site-reform-2026-10-06` | 🟢 Complete & Active (Oct 2026) | `cora-frontend/components/hero/HeroAIInput.tsx`, `cora-frontend/app/api/ai-preview/route.ts` | Growth AI & Sales Agent |
 | **Multi-Format Template & Asset Library (16+ Schemas)** | `feat/marketing-site-reform-2026-10-06` | 🟢 Complete & Active (Oct 2026) | `cora-frontend/app/templates/*`, `cora-frontend/lib/templates-data.ts` | Templates & Theme Ecosystem Agent |
@@ -306,6 +312,12 @@
 
 | Version | Date | Key Changes |
 | :--- | :--- | :--- |
+| **v4.9.374** | Oct 2026 | Universal Edge-Docked Entry Inspector with zero-backdrop clarity, Client Timezone Engine with localized relative and absolute timestamps, Dynamic Affiliate Referral Tracking (`POST /wp-json/cora/v1/referrals/track`), multi-cookie referral attribution (`cora-frontend/lib/referral.ts`), automated checkout coupon discount deductions (10%–20% off plans in Razorpay checkout and pricing), and unified global resources hero across all resource directories |
+| **v4.9.373** | Oct 2026 | Submissions data sanitization, base64 digital signature preview rendering, table-fixed explicit layout preventing horizontal blowouts, and REST deletion endpoint (`DELETE /wp-json/cora/v1/forms/submissions/{id}`) with tenant isolation |
+| **v4.9.372** | Oct 2026 | Forms Cards Overhaul & Universal 5th Tab "All Entries" Registry (`#all-entries`): Expanded form card padding (`p-5 sm:p-6`), fully clickable form cards navigating to editor, unlocked mobile form editing across all screen widths, live interactive form preview modal with device switchers, metric summary strip, Notion-style filter toolbar, and dynamic multi-form CSV export |
+| **v4.9.370** | Oct 2026 | Pricing Page Overhaul: Webflow/Framer style hierarchy pills, information tooltips across all cards, "Free Site Migration" floating badge on Scale plan, explicit bandwidth & storage specifications (15–50GB storage, 100–500GB bandwidth), pure monochrome switcher pills, and active-voice copy |
+| **v4.9.368** | Oct 2026 | Partner & Coaching Accelerator Portal (`/vnxdigital`, `/vanshrajput`): Co-branded hero, creator social proof, and locked 3-day trial to Full Coaching Accelerator |
+| **v4.9.366** | Oct 2026 | Unified Global Resources Hero Section (`GlobalResourcesHero.tsx`) across Templates, Tools, Guides, Blog, Newsletter, and Articles with consistent search and filter chips |
 | **Marketing Reform** | Oct 2026 | Repositioned homepage hero headline to 'Build websites. Run your business, with an AI co-founder.', dual Google / Free Templates CTAs, sticky bottom AI SDR bar with automated objection handling and dynamic conversion coupons (MIGRATEFREE, CORA10), overhauled navbar to 'Tools & Templates', deployed 16+ multi-format templates and schemas at /templates (Native Pages, AI Prompts, Elementor Kits, Lovable Projects), updated autonomous AI workforce agent portraits, and overhauled executive confidence 6-feature grid with active-voice copy |
 | **v4.9.364** | Oct 2026 | Standardized AI run quotas (15K Pro / 25K Scale monthly), added weekly soft-limit throttling (3,750 Pro / 6,250 Scale runs/week), Super Admin rate-limit bypass, integrated Endorsely affiliate tracking suite (`app.endorsely.com/assets/affiliate-tracking.js`) across frontend layouts and checkout sheets with dynamic conversion pinging |
 | **v4.9.363** | Oct 2026 | Guaranteed live static site styling parity, automated Tailwind CSS CDN injection, and CSS scope containment across Canvas previews |
@@ -404,4 +416,4 @@
 
 ---
 
-*Cora Platform Release Manifest v4.9.364 — Architecture & Engineering Team.*
+*Cora Platform Release Manifest v4.9.374 — Architecture & Engineering Team.*

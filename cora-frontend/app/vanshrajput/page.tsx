@@ -98,12 +98,11 @@ export default function VanshRajputPartnerPage() {
   // Preload Razorpay Checkout
   useRazorpayPreload();
 
-  // 24-Hour Partner Lock: Persist on mount so user cannot visit default pricing for 24h
+  // Remove any legacy partner lock to ensure normal navigation
   useEffect(() => {
     if (typeof window !== 'undefined') {
       try {
-        const expiry = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
-        localStorage.setItem('cora_partner_lock', JSON.stringify({ partner: 'vanshrajput', expiry }));
+        localStorage.removeItem('cora_partner_lock');
       } catch (e) {}
     }
   }, []);

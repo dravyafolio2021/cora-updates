@@ -42,6 +42,9 @@ export const DOCS_DATA: DocArticle[] = [
       { id: 'marketing-discovery', title: '6. Marketing Reform & Discovery Layer' },
       { id: 'ai-sdr-engine', title: '7. Sticky AI SDR Sales Assistant' },
       { id: 'template-ecosystem', title: '8. 4-Tier Template & Asset Ecosystem' },
+      { id: 'forms-all-entries', title: '9. Forms Architect & Universal All Entries' },
+      { id: 'entry-inspector-timezone', title: '10. Edge-Docked Inspector & Timezone Engine' },
+      { id: 'affiliate-referral-discounts', title: '11. Dynamic Referral Tracking & Checkout Discounts' },
     ],
     content: `
 Cora is engineered as an enterprise-grade autonomous operating system for Indian creative studios and agencies. It operates on a **hybrid decoupled architecture** where a high-performance Next.js marketing and documentation layer is paired with a resilient, single-plugin WordPress/PHP 8.2 backend runtime.
@@ -164,6 +167,30 @@ The \`/templates\` directory provides 16+ production-grade frontend assets acros
 2. **AI Section Prompts (\`section_prompts\`)**: Token-engineered prompts for Claude 3.5 Sonnet and Cursor Composer.
 3. **Elementor Template Kits (\`elementor_kit\`)**: Standardized Elementor JSON blueprints for instant page builder import.
 4. **Lovable & React Projects (\`lovable_project\`)**: Rapid full-stack scaffolding configurations for Lovable.dev and v0.dev.
+
+---
+
+## 9. Forms Architect & Universal All Entries Registry (v4.9.372)
+
+- **Ergonomic Form Cards**: Overhauled card padding (\`p-5 sm:p-6\`), clickable card surface navigating to form editor, and unlocked mobile form editing.
+- **In-App Live Preview Modal**: Sandboxed viewport simulator (\`Desktop\`, \`Mobile\`) with direct embed URL launcher.
+- **Universal 5th Tab (\`#all-entries\`)**: Unified submissions repository with real-time KPI counter cards, Notion-style multi-form filter toolbar, fixed column width table preventing layout blowout, and multi-form dynamic CSV exports.
+
+---
+
+## 10. Edge-Docked Inspector & Timezone Engine (v4.9.374)
+
+- **Edge Docking**: Slides smoothly from right edge on desktop (\`w-[480px] max-w-[90vw]\`) and bottom sheet on mobile (\`h-[85vh]\`) with zero backdrop blur, keeping background records completely visible.
+- **Data Rendering**: Renders inline digital signatures and image thumbnails (\`<img src="...">\`) rather than dumping 50,000-character raw text blobs.
+- **Client Timezone Engine**: Automatically evaluates browser timezone using \`Intl.DateTimeFormat().resolvedOptions().timeZone\` to render human-readable relative and absolute timestamps.
+
+---
+
+## 11. Dynamic Referral Tracking & Checkout Discounts (v4.9.374)
+
+- **Attribution API**: Dedicated REST endpoint \`POST /wp-json/cora/v1/referrals/track\` with frontend proxy route.
+- **Multi-Parameter Capture**: Ingests referral codes (\`cora_ref\`, \`ref\`, \`via\`, \`partner\`) and stores 30-day secure cookies.
+- **Automatic Checkout Discounts**: Automatically applies 10%–20% coupon discount deductions across pricing checkout sheets with dual conversion attribution to Endorsely and Cora backends.
     `,
   },
   {
@@ -751,20 +778,82 @@ Directly integrated with the public homepage ("Explore free templates") and navi
   },
   {
     slug: 'form-builder',
-    title: 'Visual Forms Builder & Lead Capture',
-    shortTitle: 'Forms Builder',
+    title: 'Visual Forms Builder, All Entries Registry & Inspector',
+    shortTitle: 'Forms Builder & Entries',
     category: 'sales',
     categoryLabel: 'Sales & CRM',
-    description: 'No-code drag-and-drop form creation system for client questionnaires, shoot booking briefs, and GST collection.',
-    readTime: '5 min read',
-    lastUpdated: 'August 2026',
+    description: 'Form AI Architect with 15 field types, universal All Entries 5th tab registry, edge-docked entry inspector, and client timezone engine.',
+    readTime: '6 min read',
+    lastUpdated: 'October 2026',
+    badge: 'Core Foundation',
     toc: [
       { id: 'field-types', title: '1. Supported Field Types' },
-      { id: 'conditional-logic', title: '2. Conditional Flow Logic' },
-      { id: 'crm-piping', title: '3. Direct CRM Lead Piping' },
+      { id: 'card-ergonomics', title: '2. Card Ergonomics & Live Preview Modal' },
+      { id: 'all-entries', title: '3. Universal "All Entries" 5th Tab Registry' },
+      { id: 'entry-inspector', title: '4. Edge-Docked Entry Inspector & Zero-Backdrop' },
+      { id: 'timezone-engine', title: '5. Client Timezone Engine & Localized Dates' },
+      { id: 'api-reference', title: '6. Submissions REST API & Deletion' },
     ],
     content: `
-Create custom embeddable forms with conditional branching, date slot selection, and direct piping into your Kanban Lead CRM.
+Form AI Architect is a permanent foundation module providing end-to-end form creation, live responsive previewing, client questionnaire ingestion, and a unified submissions registry.
+
+---
+
+## 1. Supported Field Types
+
+The builder provides 15 standardized form input primitives:
+- **Text & Area**: Single Line Text, Long Text (Textarea).
+- **Contact**: Email Address, Numeric Phone (with regex validation).
+- **Selection**: Dropdown Select, Multi-Select Checkboxes, Radio Button Groups.
+- **Scheduling**: Date Picker, Call-Time Slot Selector.
+- **Media & Files**: Drag-and-Drop File Upload Dropzone.
+- **Scoring & Feedback**: 5-Star Rating, NPS Score Scale (0–10).
+- **Legals**: Digital Signature Pad with touch-drawn canvas.
+
+---
+
+## 2. Card Ergonomics & Live Preview Modal
+
+Shipped in **v4.9.372**, the Forms card list underwent an ergonomics overhaul:
+- **Expanded Card Padding**: Form cards feature \`p-5 sm:p-6\` internal padding with a dedicated \`p-3.5\` container for campaign details and \`px-3 py-1.5\` status pills, preventing text from colliding with borders.
+- **Full Card Clickability**: Clicking anywhere on the card body or form title navigates directly to \`#edit/\${form.id}\`.
+- **Unlocked Mobile Editing**: Removed \`< 1024px\` viewport restrictions in routing handlers, allowing founders to edit forms on mobile and tablet screens.
+- **In-App Interactive Form Live Preview Modal (\`#cora-form-preview-modal\`)**: Test forms in real time with responsive viewport switchers (\`Desktop\`, \`Mobile\`) and a 1-click external tab launcher.
+
+---
+
+## 3. Universal "All Entries" 5th Tab Registry
+
+Located under the \`#all-entries\` sub-tab:
+- **Metric Summary Strip**: Real-time counter cards for Total Submissions, Active Forms with Entries, Completion Rate, and Latest Activity.
+- **Notion-Style Filter Toolbar**: Filter by specific form source, filter by completion status (Completed vs. Partial), live search input, 1-click CSV export, and refresh.
+- **Table Layout Hardening**: Implemented \`table-fixed\` and rigid explicit column widths (\`w-14\`, \`w-48 md:w-56\`, \`w-auto\`, \`w-24\`, \`w-36\`, \`w-28\`, \`w-24\`) eliminating table blowouts from wide text strings.
+- **Dynamic CSV Export**: Exports filtered submissions across all forms with dynamically parsed header columns.
+
+---
+
+## 4. Edge-Docked Entry Inspector & Zero-Backdrop
+
+Shipped in **v4.9.374**, the Entry Inspector (\`#cora-entry-inspector\`) provides an ergonomic detail viewer:
+- **Edge Docking**: Slides smoothly from the right edge on desktop (\`top-0 right-0 bottom-0 w-[480px] max-w-[90vw] border-l\`) and slides up from the bottom on mobile (\`inset-x-0 bottom-0 h-[85vh] rounded-t-3xl border-t\`).
+- **Zero-Backdrop Overlay Clarity**: Dark blurred overlays have been completely removed. The background table remains 100% visible, sharp, and readable, dismissible via outside clicks.
+- **Submitter Quick Overview**: Renders avatar initials, submitter name, and email/phone chips.
+- **Inline Signatures & Media**: Inspects data for base64 signatures or images and renders inline \`<img src="...">\` thumbnails rather than raw text dumps.
+- **Sticky Footer Controls**: 1-click "Copy Raw JSON", "Delete Entry", and "Done" actions.
+
+---
+
+## 5. Client Timezone Engine & Localized Dates
+
+- Automatically detects browser timezone using \`Intl.DateTimeFormat().resolvedOptions().timeZone\` upon client hydration.
+- Converts UTC server timestamps into localized relative timestamps ("10 minutes ago", "Yesterday at 4:15 PM") with full ISO datetime tooltips on hover.
+
+---
+
+## 6. Submissions REST API & Deletion
+
+- \`GET /wp-json/cora/v1/forms/all-submissions\`: Fetches all submissions with form metadata JOINed.
+- \`DELETE /wp-json/cora/v1/forms/submissions/{id}\`: Deletes a submission with multi-tenant tenancy verification and custom monochromatic \`coraConfirmAction\` confirmation modal.
     `,
   },
   {
@@ -1190,9 +1279,11 @@ All endpoints are accessible via WordPress REST API (\`/wp-json/cora/v1/\` or \`
 
 | Method | Route / Action | Required Permission | Description |
 |---|---|---|---|
-| \`GET\` | \`/wp-json/cora/v1/leads\` | \`cora_view_dashboard\` | Fetch paginated leads list |
-| \`POST\` | \`/wp-json/cora/v1/leads\` | \`cora_manage_bookings\` | Create new shoot lead |
+| \`GET\` | \`/wp-json/cora/v1/invoices\` | \`cora_manage_financials\` | Fetch agency tax invoices |
 | \`POST\` | \`/wp-json/cora/v1/invoices\` | \`cora_manage_financials\` | Create 18% GST invoice |
+| \`GET\` | \`/wp-json/cora/v1/forms/all-submissions\` | \`cora_view_dashboard\` | Fetch all workspace form submissions with form metadata JOINed |
+| \`DELETE\` | \`/wp-json/cora/v1/forms/submissions/{id}\` | \`cora_manage_bookings\` | Securely delete single form submission record |
+| \`POST\` | \`/wp-json/cora/v1/referrals/track\` | Public | Record affiliate referral impressions, clicks, and checkout conversions |
 | \`POST\` | \`/wp-json/cora/v1/contracts/sign\` | Public (Token-Based) | Submit SHA-256 e-signature |
 | \`POST\` | \`/wp-json/cora-pwa/v1/save-subscription\` | Authenticated User | Store VAPID Web Push subscription |
 | \`GET\` | \`/wp-json/cora-pwa/v1/version-check\` | Public | Query active workspace version & changelog |

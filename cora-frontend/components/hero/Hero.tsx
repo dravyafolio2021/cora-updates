@@ -129,9 +129,9 @@ export function Hero() {
           
           {/* Headline */}
           <h1 className="font-display text-[2.25rem] xs:text-[2.65rem] sm:text-5xl md:text-[62px] font-semibold text-zinc-950 leading-[1.15] sm:leading-[1.10] md:leading-[72px] tracking-[-0.035em] flex flex-col items-center justify-center gap-1 sm:gap-2 text-center">
-            <span>Build websites. Run your business,</span>
+            <span>Build websites &amp; your business</span>
             <div className="inline-flex items-center justify-center flex-wrap gap-2 sm:gap-2.5">
-              <span>with an</span>
+              <span>With an</span>
               <span className="inline-flex items-center align-middle whitespace-nowrap gap-1.5 sm:gap-2">
                 <span
                   ref={badgeRef}
@@ -144,7 +144,7 @@ export function Hero() {
                     className="object-contain rounded-xl sm:rounded-2xl shadow-[0px_6px_14px_rgba(0,0,0,0.12)]"
                   />
                 </span>
-                <span>co-founder.</span>
+                <span>Co-Founder</span>
               </span>
             </div>
           </h1>

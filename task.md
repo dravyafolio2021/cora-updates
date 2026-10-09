@@ -1,48 +1,53 @@
-# Task: Cora Forms Cards Overhaul & Universal "All Entries" 5th Tab
+# Task: Platform Analysis & Comprehensive Documentation Synchronization (v4.9.374)
 
-## 1. Objectives & Deliverables
-- **Form Card Padding & Interaction Architecture**:
-  - [x] Fix distorted card padding: Expanded card internal padding to `p-5 sm:p-6` with dedicated `p-3.5` internal container for campaign/standard details and `px-3 py-1.5` tag chips, preventing any text from touching borders or corners.
-  - [x] Make entire form card clickable: Clicking anywhere on `.form-card` or the form title navigates directly to `#edit/${form.id}` without interfering with action buttons.
-  - [x] Make action buttons reliable across all screen sizes:
-    - Removed `hidden lg:flex` / `hidden sm:flex` restrictions on `.btn-edit-form`.
-    - Removed `< 1024px` blockage in `handleRouting()` and `loadFormIntoEditor()` that was kicking users back to `#list`.
-    - Fixed `ReferenceError: coraREData is not defined` in `.btn-view-live`.
-  - [x] Built in-app interactive Form Live Preview Modal (`#cora-form-preview-modal`): Allows viewing any form in real time with desktop and mobile viewport toggles and a 1-click external tab launcher.
+## 1. Objectives & Overview
+Analyze the entire Cora platform following recent developments (Forms Overhaul & Universal All Entries 5th Tab, Edge-Docked Entry Inspector, Client Timezone Engine, Dynamic Affiliate Referral Tracking & Checkout Discounts, Unified Global Resources Hero, Pricing Hierarchy & Specs, Partner Coaching Funnel, and 16+ Template Ecosystem) and synchronize all platform documentation artifacts across the codebase.
 
-- **Universal 5th Top Tab: "All Entries" (`#all-entries`)**:
-  - [x] Added 5th tab to `$forms_header_args['tabs']` with dynamic submission count badge (`#tab-all-entries-badge`).
-  - [x] Built `#forms-all-entries-tab-content` DOM view:
-    - Metric summary strip (Total Submissions, Active Forms with Entries, Completion Rate, Latest Activity).
-    - Notion-style filter toolbar: Form source dropdown selector, status dropdown (Completed / Partial), live search input, 1-click CSV export, and refresh button.
-    - Notion-style data table (Desktop table with columns `#`, `Form`, `Submitter / Data`, `Status`, `Submitted At`, `IP Address`, `Actions` + Mobile responsive card list).
-  - [x] Enhanced Entry Inspector (`openEntryInspector`): Made universal across both single-form submissions drawer and the All Entries registry with slide sheet animation (slide-up on mobile, slide-over on desktop) and blurred monochromatic backdrop.
-  - [x] Added REST deletion for submissions (`DELETE /wp-json/cora/v1/forms/submissions/{id}`) with custom `coraConfirmAction` monochromatic modal.
-  - [x] Export to CSV: Exports all filtered submissions across all forms with dynamic field columns from `submitted_data`.
+## 2. Granular Task Decomposition & Progress Tracker
 
-## 2. Granular Subtask Decomposition & Execution
-- **Subtask 1: Backend REST Enhancements (`cora-workspace.php`)** [x]
-  - Enhanced `cora_rest_get_all_form_submissions` to JOIN `cora_forms` (`SELECT s.*, f.title as form_title, f.form_key, f.settings as form_settings`).
-  - Added `DELETE /wp-json/cora/v1/forms/submissions/(?P<id>\d+)` endpoint with tenancy permission checks.
-- **Subtask 2: Header Tabs & 5th Tab Registration** [x]
-  - Registered `all-entries` tab in `$forms_header_args['tabs']` with dynamic submission badge count.
-- **Subtask 3: DOM Containers & Universal Inspector** [x]
-  - Added `#forms-all-entries-tab-content` markup.
-  - Made `#cora-entry-inspector` universal and mobile slide-up compliant (Rule 1 & Rule 12).
-  - Added `#cora-form-preview-modal` with responsive device toggles.
-- **Subtask 4: Client-Side Routing & Submissions Engine (`view-forms.php`)** [x]
-  - Wired `#all-entries` and `#entries` in `handleRouting()`.
-  - Implemented `loadAllWorkspaceSubmissions()`, `renderAllEntriesTable()`, `getSubmitterSummary()`, and `exportAllEntriesCsv()`.
-  - Fixed form card delegated click handlers and unlocked editor across all viewport widths.
-- **Subtask 5: Entries Drawer & Scrolling Overhaul** [x]
-  - Fixed horizontal table blowout: Added `table-fixed` and set explicit column widths (`w-14`, `w-48 md:w-56`, `w-auto`, `w-24`, `w-36`, `w-28`, `w-24`).
-  - Sanitized `getSubmitterSummary()`: Base64 digital signatures and long data blobs are detected and summarized compactly (`[Uploaded File / Signature]`), preventing massive width stretching.
-  - Overhauled `#cora-entry-inspector`:
-    - Desktop: Slides smoothly from the right (`top-0 right-0 bottom-0 w-[480px] max-w-[90vw] border-l translate-x-0`).
-    - Mobile: Slides up from the bottom (`inset-x-0 bottom-0 h-[85vh] max-h-[85vh] rounded-t-3xl border-t translate-y-0`).
-    - Added submitter quick overview strip (Name, Email/Phone).
-    - Added inline signature/image preview `<img src="...">` inside cards instead of dumping 50,000-character base64 text strings.
-    - Added sticky footer with "Copy JSON", "Delete", and "Done" actions.
-  - Fixed function name collision: Renamed drawer submissions table function to `renderDrawerSubmissionsTable()`, resolving collision with builder view table.
-  - Removed backdrop overlay from Entry Inspector (`openEntryInspector`): Background table remains 100% visible, clear, and unblurred. Added outside click detection to dismiss inspector seamlessly.
-  - Bumped version to `4.9.372`.
+- **Phase 1: Platform Audit & Codebase Diff Analysis** [x]
+  - [x] Trace git commit history and diffs from `v4.9.364` (`1163049c9`) to `v4.9.374` (`HEAD`).
+  - [x] Audit backend changes in `cora-workspace.php`, `affiliate-referral-engine.php`, `view-affiliate-referrals.php`, `view-canvas.php`, `view-forms.php`, `assets/css/admin-style.css`, and `updates/`.
+  - [x] Audit frontend changes in `cora-frontend/app/templates/*`, `app/pricing/*`, `app/api/*`, `components/resources/*`, `components/hero/*`, `lib/referral.ts`, `lib/templates-data.ts`, and partner pages.
+  - [x] Verify compliance with Rule 3 (Zero use of owner name; generic placeholders only) and Rule 4/13 (Monochromatic palette, Rule 13 zero-outline styling).
+
+- **Phase 2: Master Platform Specification Synchronization (`docs/cora-platform-documentation.md`)** [x]
+  - [x] Bump target version from `v4.9.364` to `v4.9.374`.
+  - [x] Add Section 1.28: Cora Forms Cards Overhaul & Universal "All Entries" 5th Tab Architecture.
+  - [x] Add Section 1.29: Universal Edge-Docked Entry Inspector & Zero-Backdrop Shield Architecture.
+  - [x] Add Section 1.30: Client Timezone Engine & Localized Timestamps Architecture.
+  - [x] Add Section 1.31: Dynamic Affiliate Referral Tracking, Coupon Discount Engine & Checkout Attribution.
+  - [x] Add Section 1.32: Pricing Architecture, Plan Hierarchy & Bandwidth/Storage Specifications.
+  - [x] Add Section 1.33: Unified Global Resources Hero Section Architecture.
+  - [x] Add Section 1.34: Partner & Coaching Accelerator Portal Architecture (VNX Digital / Vansh Rajput).
+  - [x] Update Section 2.8 (Form AI Architect & All Entries Submissions Engine) and Section 2.20 (Affiliate & Referral Ecosystem).
+  - [x] Update Section 16 (Version History & Release Manifest) with entries from `v4.9.365` through `v4.9.374`.
+
+- **Phase 3: Root Platform Documentation (`README.md` & `MODULES_STATUS.md`)** [x]
+  - [x] Update `README.md` to `v4.9.374`, synchronizing Architecture tree, Core Modules table, REST API endpoints, and Principles 86–92.
+  - [x] Update `MODULES_STATUS.md` with active modules for Forms Overhaul, All Entries Tab, Edge Inspector, Timezone Engine, Referral Discount Engine, and Version History through `v4.9.374`.
+
+- **Phase 4: Developer Feature Guide (`docs/DEVELOPER_FEATURE_GUIDE.md`)** [x]
+  - [x] Bump version to `v4.9.374`.
+  - [x] Add Architectural Principles 86–92 covering Forms Overhaul, Edge-Docked Inspector, Timezone Engine, Referral Tracking API, Pricing Hierarchy, Partner Portal, and Global Resources Hero.
+  - [x] Document REST API specifications for `GET /wp-json/cora/v1/forms/all-submissions`, `DELETE /wp-json/cora/v1/forms/submissions/{id}`, and `POST /wp-json/cora/v1/referrals/track`.
+
+- **Phase 5: In-Dashboard Documentation Engine (`includes/docs-engine.php`)** [x]
+  - [x] Add `cora_docs_get_new_pages_v49374()` registering in-dashboard documentation for Forms Overhaul, All Entries Registry, Edge Inspector, Timezone Engine, and Affiliate Referral Discounts.
+  - [x] Add `cora_docs_get_v49374_changelog_entries()` with release tickets (`CORA-1214` to `CORA-1219`).
+  - [x] Wire upsert calls into `cora_docs_init_tables()`.
+
+- **Phase 6: Public Frontend Documentation (`cora-frontend/lib/docs-data.ts`)** [x]
+  - [x] Update `form-builder` article with All Entries tab, Live Preview modal, Edge-Docked Inspector, and Client Timezone formatting.
+  - [x] Update `rest-api-reference` table adding all new REST endpoints.
+  - [x] Update `platform-architecture` article with Sections 9–11.
+
+- **Phase 7: Supplementary Documentation Sync (`walkthrough.md`, `canvas-frontend-module.md` & `CORA_PLATFORM_ONBOARDING_ONE_PAGER.md`)** [x]
+  - [x] Update `CORA_PLATFORM_ONBOARDING_ONE_PAGER.md` to `v4.9.374` adding items 35–38.
+  - [x] Update `docs/canvas-frontend-module.md` to `v4.9.374` adding Section 27 (Forms Embedding, Live Preview Parity, Isolated CSS Scoping).
+  - [x] Update `walkthrough.md` documenting platform analysis findings and synchronization verification across all files.
+
+- **Phase 8: Validation, Linting & Regression Verification** [x]
+  - [x] Run PHP CLI syntax checks on modified PHP files (`php -l`).
+  - [x] Run TypeScript typecheck on `cora-frontend` (`npx tsc --noEmit`).
+  - [x] Verify zero occurrences of owner's real name across all files (Rule 3 check).

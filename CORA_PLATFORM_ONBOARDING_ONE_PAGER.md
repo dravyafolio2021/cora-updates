@@ -1,7 +1,7 @@
 # Cora Platform — Comprehensive Platform & Onboarding Strategic Brief
 > **Target Audience for this Document**: AI Product & Growth Strategist Agent  
 > **Objective**: Comprehensive platform architectural overview, feature breakdown, and onboarding evaluation brief to formulate optimal user onboarding, product activation, and launch strategies for Cora.  
-> **Platform Version**: `v4.9.364` | **Date**: October 2026
+> **Platform Version**: `v4.9.374` | **Date**: October 2026
 
 ---
 
@@ -55,6 +55,10 @@ Cora consolidates the entire agency lifecycle into a single, unified, white-labe
 32. **Sticky Floating AI SDR Bar & Objection Handling Engine (Oct 2026)**: Portals the AI sales co-founder directly to `document.body` for true viewport bottom-center positioning without backdrop overlay. Delivers query-aligned active voice answers, industry pills (Web Design, Branding, Retainers, App Dev, Media), automated objection handling, and dedicated conversion coupons (`MIGRATEFREE`, `CORA10`) linking to checkout.
 33. **Multi-Format Frontend Asset & Template Ecosystem (16+ Schemas) (Oct 2026)**: Complete distribution engine at `/templates` providing 16+ production-ready frontend assets across 4 distinct formats: Native Landing Pages (Tailwind/Next.js), AI Section Prompts (Claude/Cursor), Elementor Template Kits (JSON blueprints), and Lovable/React Projects, complete with live modal previews and automated lead routing into `wp_cora_leads`.
 34. **Autonomous AI Workforce & Structured Domain Personas (Oct 2026)**: Integrated autonomous AI workforce spanning 9 specialized domain agents (Operations, Sales, Contracts, Knowledge, Creative, Delivery, Finance, Legal, Marketing) with dedicated operational capabilities, active-voice descriptions, and curated high-resolution portraits.
+35. **Cora Forms Cards Overhaul & Universal 5th Tab "All Entries" (v4.9.372)**: Overhauled Forms dashboard cards with live conversion rate badges, question counts, and quick actions. Introduced the universal 5th tab `#all-entries` providing a single cross-form aggregate submissions table with real-time text search, form filtering, status pills, and direct detail inspection.
+36. **Universal Edge-Docked Entry Inspector & Zero-Backdrop Clarity Shield (v4.9.374)**: Edge-docked right sheet drawer (`#form-submission-inspector-drawer`) for inspecting form submissions with transparent zero-backdrop clarity shield (`bg-transparent pointer-events-none`), allowing full visibility of underlying table rows while viewing questions, answers, metadata, IP, user-agent, and delete actions.
+37. **Client Timezone Engine & Localized Timestamps (v4.9.374)**: Client-side timezone detection (`Intl.DateTimeFormat().resolvedOptions().timeZone`) and formatting engine automatically converting all submission timestamps to the user's localized date/time format with UTC tooltip disclosures.
+38. **Dynamic Affiliate Referral Tracking, Coupon Discount Engine & Checkout Attribution (v4.9.374)**: Ingests `ref` parameters across URL queries, localStorage, and cookies (`cora_ref`, `cora_referral`, `endorsely_ref`), exposes `POST /wp-json/cora/v1/referrals/track` for click/conversion logging, and applies automated partner coupon discounts (10%–20%) directly in checkout sheets with instant price adjustments.
 
 ---
 
@@ -182,4 +186,4 @@ Cora consolidates the entire agency lifecycle into a single, unified, white-labe
 
 ---
 
-*Cora Strategic Onboarding Brief v4.9.357 — Architecture & Growth Team. Last updated: October 2026.*
+*Cora Strategic Onboarding Brief v4.9.374 — Architecture & Growth Team. Last updated: October 2026.*

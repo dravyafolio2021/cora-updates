@@ -1,6 +1,6 @@
 # Cora Platform — Comprehensive Platform Documentation
 
-This document serves as the master technical specification and architectural manual for the Cora Workspace Platform (v4.9.364).
+This document serves as the master technical specification and architectural manual for the Cora Workspace Platform (v4.9.374).
 
 ---
 
@@ -385,6 +385,107 @@ High-contrast bounding boxes and heavy outline borders create visual fatigue and
 
 ---
 
+### 1.28 Cora Forms Cards Overhaul & Universal "All Entries" 5th Tab Architecture (v4.9.372)
+Shipped in **v4.9.372**, the Forms module underwent an architectural overhaul eliminating card layout distortions and unlocking global form response management:
+* **Form Card Padding & Interactive Surface Overhaul**:
+  - Expanded internal padding to `p-5 sm:p-6` with dedicated `p-3.5` inner container for campaign details and `px-3 py-1.5` status chips, preventing any text or badge clipping at card borders.
+  - Made the entire `.form-card` surface and title fully clickable, navigating directly to `#edit/${form.id}` without interfering with action buttons.
+  - Removed `< 1024px` viewport restrictions in `handleRouting()` and `loadFormIntoEditor()`, unlocking full form editing capabilities on mobile and tablet screens.
+  - Resolved `ReferenceError: coraREData is not defined` in the live view handler.
+* **In-App Interactive Form Live Preview Modal (`#cora-form-preview-modal`)**:
+  - Sandboxed live preview modal allowing agency founders to test forms in real time.
+  - Features responsive viewport toggles (`Desktop`, `Mobile`) and a 1-click external tab launcher (`/workspace/forms/embed?id={form_id}`).
+* **Universal 5th Top Tab: "All Entries" (`#all-entries`)**:
+  - Registered as the 5th tab in `$forms_header_args['tabs']` with dynamic live count badge (`#tab-all-entries-badge`).
+  - **Metric Summary Strip**: Real-time KPI counter cards for Total Submissions, Active Forms with Entries, Completion Rate, and Latest Activity.
+  - **Notion-Style Filter Toolbar**: Form source selector dropdown, Status dropdown (Completed vs. Partial), live search input, 1-click CSV export, and instant refresh.
+  - **Table Layout Hardening**: Implemented `table-fixed` and rigid explicit column widths (`w-14`, `w-48 md:w-56`, `w-auto`, `w-24`, `w-36`, `w-28`, `w-24`) preventing horizontal table blowout from wide text strings.
+  - **Backend REST Enhancement**:
+    - `cora_rest_get_all_form_submissions` joins `cora_forms` (`SELECT s.*, f.title as form_title, f.form_key, f.settings as form_settings`).
+    - Dedicated deletion endpoint: `DELETE /wp-json/cora/v1/forms/submissions/(?P<id>\d+)` with multi-tenant agency context assertions.
+  - **Dynamic Multi-Form CSV Export**: Exports filtered submissions across all forms with dynamic field columns parsed from `submitted_data`.
+
+---
+
+### 1.29 Universal Edge-Docked Entry Inspector & Zero-Backdrop Shield Architecture (v4.9.374)
+Deployed in **v4.9.374**, the Entry Inspector (`#cora-entry-inspector`) provides an ergonomic detail viewer across both single-form submissions and the universal All Entries registry:
+* **Edge-Docked Layout Standard**:
+  - **Desktop Viewports (>= 768px)**: Slides smoothly from the right edge (`top-0 right-0 bottom-0 w-[480px] max-w-[90vw] border-l border-zinc-200 bg-white translate-x-0`).
+  - **Mobile Viewports (< 768px)**: Slides up from the bottom as a high-density sheet (`inset-x-0 bottom-0 h-[85vh] max-h-[85vh] rounded-t-3xl border-t border-zinc-200 bg-white translate-y-0`).
+* **Zero-Backdrop Overlay Clarity**:
+  - Completely purged intrusive dark/blurred backdrop overlays. The underlying submissions data table remains 100% visible, sharp, and readable.
+  - Integrated outside click listener on the document body to dismiss the inspector seamlessly.
+* **Submitter Quick Overview Strip**:
+  - Renders avatar initials, primary submitter name, and email/phone quick chips at the top of the inspector panel.
+* **Inline Signature & Media Asset Rendering**:
+  - Inspects field values for image MIME types and base64 digital signatures (`data:image/...`).
+  - Renders inline `<img src="..." class="max-h-32 rounded-lg border border-zinc-200 object-contain bg-zinc-50">` rather than dumping 50,000-character raw base64 string dumps.
+* **Sanitized Summary & Sticky Action Footer**:
+  - Long JSON blobs and signatures are sanitized in table views as `[Uploaded File / Signature]`, eliminating column stretching.
+  - Sticky footer with 1-click "Copy Raw JSON", "Delete Entry", and "Done" action triggers.
+
+---
+
+### 1.30 Client Timezone Engine & Localized Timestamps Architecture (v4.9.374)
+* **Automatic Client Timezone Detection**:
+  - Automatically detects browser timezone using `Intl.DateTimeFormat().resolvedOptions().timeZone` on client hydration.
+  - Converts UTC server timestamps to localized timestamps across submission tables, entry inspectors, and audit logs.
+* **Dual-Format Display**:
+  - Renders human-readable relative timestamps ("10 minutes ago", "Yesterday at 4:15 PM") paired with full localized ISO tooltips on hover.
+  - Ensures accurate operational scheduling for agency teams operating across diverse geographic markets.
+
+---
+
+### 1.31 Dynamic Affiliate Referral Tracking, Coupon Discount Engine & Multi-Tier Checkout Attribution (v4.9.374)
+* **Backend Referral Tracking API**:
+  - Dedicated REST endpoint: `POST /wp-json/cora/v1/referrals/track` logging impressions, referral links, UTM tags, user agents, and conversion milestones into `wp_cora_referrals`.
+  - Frontend proxy route: `cora-frontend/app/api/referral/track/route.ts` bridging public marketing visitors with backend attribution databases.
+* **Multi-Cookie & Parameter Ingestion Engine (`cora-frontend/lib/referral.ts`)**:
+  - Listens for query parameters: `?cora_ref=...`, `?ref=...`, `?via=...`, `?partner=...`.
+  - Stores referral tokens in secure 30-day cookies and `localStorage` fallback.
+  - Dispatches automated impression pings on page landing.
+* **Automated Checkout Coupon Discount Application**:
+  - When users navigate to checkout via an affiliate link, `CheckoutSheet.tsx`, `FastRazorpayModal.tsx`, and `PricingSection.tsx` automatically detect the active referral code.
+  - Applies instant 10%–20% coupon discount deductions directly against plan pricing.
+  - Displays a clean monochromatic referral savings badge showing partner discount savings.
+  - Fires dual attribution hooks upon payment verification: Endorsely script tracking (`window.endorsely?.trackConversion()`) and Cora backend conversion logging.
+
+---
+
+### 1.32 Pricing Architecture, Plan Hierarchy & Bandwidth/Storage Specifications (Oct 2026)
+* **Visual Hierarchy & Framer/Webflow Pill Design**:
+  - Overhauled plan cards with SaaS hierarchy pills (`Starter`, `Pro`, `Scale`, `Enterprise`).
+  - Active-voice card headlines and feature descriptions capped at max 2–3 words per badge.
+  - Removed all neon color accents and blue focus rings in strict accordance with Rule 4 monochromatic principles.
+* **Explicit Resource Allocations**:
+  - Standardized bandwidth and storage specifications across all tiers:
+    * **Starter**: 5GB Cloud Storage, 25GB Monthly Bandwidth.
+    * **Professional (Pro)**: 15GB Cloud Storage, 100GB Monthly Bandwidth.
+    * **Scale**: 50GB Cloud Storage, 500GB Monthly Bandwidth.
+    * **Enterprise**: Custom High-Performance Storage & Unmetered Bandwidth.
+* **Scale Plan White-Glove Migration Badge**:
+  - Floats an external "Free Site Migration" badge above the Scale card frame, converting legacy WordPress/Wix users into turnkey agency tenants.
+
+---
+
+### 1.33 Unified Global Resources Hero Section Architecture (Oct 2026)
+* **Standardized Header Component (`GlobalResourcesHero.tsx`)**:
+  - Unifies the top hero presentation across all 6 platform knowledge directories: Templates (`/templates`), Tools (`/tools`), Guides (`/guides`), Blog (`/blog`), Newsletter (`/newsletter`), and Articles (`/articles`).
+* **Visual Continuity & Search Experience**:
+  - Consistent editorial typography, subtle monochromatic badges, centered search input with keyboard shortcut hints (`⌘K`), and fluid category pills.
+  - Responsive layout scaling cleanly from 320px mobile screens to 4K ultra-wide displays.
+
+---
+
+### 1.34 Partner & Coaching Accelerator Portal Architecture (VNX Digital / Vansh Rajput) (Oct 2026)
+* **Dedicated Partner Landing Page (`/vnxdigital`, `/vanshrajput`)**:
+  - Deployed co-branded partner landing page for VNX Digital accelerator members.
+  - Includes creator social proof, high-converting feature walkthroughs, and bespoke video production assets.
+* **Locked 3-Day Trial to Full Coaching Accelerator**:
+  - Custom onboarding flow granting exclusive 3-day full-access trial to the Coaching Accelerator and Cora Studio operational suite.
+
+---
+
 ## Section 2: Core SaaS Business Modules
 
 ### 2.1 Content AI Suite & Myra Assistant
@@ -518,12 +619,33 @@ To maximize vertical density and minimize layout friction, lead cards use an ult
 * **GST Engine**: Auto CGST/SGST (intra-state 9% + 9%) or IGST (inter-state 18%) calculation.
 * **Legal E-Sign Audit Registry**: SHA-256 fingerprinting, IP address capture, timestamp certification.
 
-### 2.8 Form AI Architect & Full Lifecycle Engine (v4.9.175 - v4.9.177)
+### 2.8 Form AI Architect & Full Lifecycle Engine (v4.9.175 - v4.9.374)
 * **Full CRUD Lifecycle**: Comprehensive form builder supporting draft staging, publishing, editing, field reordering, and safe deletion without page reloads.
 * **15 Standardized Field Types**: Text, Long Text (Textarea), Numeric Phone, Email, Number, Dropdown Select, Multi-Select, Checkbox Group, Radio Buttons, Date Picker, Time Slot, File Dropzone, Star Rating, NPS Score (0-10), and Signature Pad.
 * **Multi-Step Wizard Engine**: Supports multi-page forms with animated progress steppers, step validation barriers, and dynamic conditional branching.
-* **Sandboxed Full-Height Live Preview Modal**: Real-time rendering inside a sandboxed viewport simulator supporting Desktop (`100%`), Tablet (`768px`), and Mobile (`375px`) form testing prior to publication.
-* **Isolated Top Control Panel**: Form builder header isolated with full-screen focus mode, publishing actions, and preview triggers without interfering with workspace navigation.
+* **Form Card Padding & Ergonomics Overhaul (v4.9.372)**:
+  - Redesigned form cards with expanded internal padding (`p-5 sm:p-6`), dedicated `p-3.5` inner container for campaign info, and `px-3 py-1.5` status chips, preventing text from colliding with borders.
+  - Made the entire `.form-card` and title clickable to open `#edit/${form.id}` directly without interfering with action buttons.
+  - Unlocked mobile editing by removing `< 1024px` viewport blockers in `handleRouting()` and `loadFormIntoEditor()`.
+* **In-App Interactive Form Live Preview Modal (`#cora-form-preview-modal`)**:
+  - Sandboxed live preview modal allowing instant real-time form testing with responsive viewport toggles (`Desktop`, `Mobile`) and a 1-click external tab launcher (`/workspace/forms/embed?id={form_id}`).
+* **Universal 5th Top Tab: "All Entries" Registry (`#all-entries`) (v4.9.372)**:
+  - 5th tab registered in `$forms_header_args['tabs']` with dynamic live count badge (`#tab-all-entries-badge`).
+  - **Metric Summary Strip**: Real-time KPI counter cards for Total Submissions, Active Forms with Entries, Completion Rate, and Latest Activity.
+  - **Notion-Style Filter Toolbar**: Form source selector dropdown, Status dropdown (Completed vs. Partial), live search input, 1-click CSV export, and refresh button.
+  - **Table Layout Hardening**: Implemented `table-fixed` and rigid explicit column widths (`w-14`, `w-48 md:w-56`, `w-auto`, `w-24`, `w-36`, `w-28`, `w-24`) eliminating horizontal table blowout.
+  - **Submissions REST API**:
+    - `GET /wp-json/cora/v1/forms/all-submissions`: Returns all agency submissions with form title, form key, and settings JOINed.
+    - `DELETE /wp-json/cora/v1/forms/submissions/{id}`: Secure REST deletion endpoint with multi-tenant tenancy verification and custom `coraConfirmAction` modal.
+* **Universal Edge-Docked Entry Inspector & Zero-Backdrop Architecture (v4.9.374)**:
+  - Universal inspector panel (`#cora-entry-inspector`) shared across single-form drawers and the All Entries registry.
+  - Desktop right-edge docking (`top-0 right-0 bottom-0 w-[480px] border-l`) and mobile bottom slide-up (`inset-x-0 bottom-0 h-[85vh] rounded-t-3xl border-t`).
+  - Zero-backdrop overlay: completely eliminated dark backdrop blur, leaving the underlying data table 100% visible and sharp. Dismissible via outside click.
+  - Submitter quick overview strip (Avatar initials, Name, Email/Phone).
+  - Inline signature & image rendering (`<img src="...">`) replacing 50k base64 string dumps.
+  - Sticky footer with Copy Raw JSON, Delete, and Done actions.
+* **Client Timezone Engine (v4.9.374)**:
+  - Automatically detects browser timezone (`Intl.DateTimeFormat().resolvedOptions().timeZone`) and localized timestamps into human-readable relative ("2 hours ago") and absolute dates.
 * **3-Metric Stage Funnel Analytics**:
   - `1. Form Views` ➔ `2. Started Submissions` ➔ `3. Completed Leads Captured` with drop-off percentages at each barrier.
   - **AI Conversion Doctor**: Highlighted Recommendation Banner detailing diagnostic bottlenecks and estimated conversion lift percentage.
@@ -898,6 +1020,15 @@ Located in `views/view-affiliate-referrals.php` and powered by `includes/affilia
    - Streamlined 3-step partner screener with 3 punchy revenue pillars and progressive disclosure accordions, reducing enrollment drop-off while qualifying promotional channels.
 6. **Rule 4 & Rule 13 Monochromatic Polish (v4.9.204)**:
    - Completely purged neon styling, harsh contrast outlines, and emoji decorations in favor of soft monochromatic tonal fills (`bg-zinc-100 dark:bg-zinc-800`), clean 1.8px vector SVGs, and responsive single-column mobile card feeds.
+7. **Dynamic Affiliate Referral Tracking API & Client Attribution (v4.9.374)**:
+   - Dedicated REST endpoint: `POST /wp-json/cora/v1/referrals/track` logging impressions, referral links, UTM tags, user agents, and conversion milestones into `wp_cora_referrals`.
+   - Frontend proxy route: `cora-frontend/app/api/referral/track/route.ts` bridging public marketing visitors with backend attribution databases.
+   - Client tracking library (`cora-frontend/lib/referral.ts`) capturing URL query parameters (`cora_ref`, `ref`, `via`, `partner`), persisting to 30-day cookies and `localStorage` fallback.
+8. **Automated Checkout Coupon Discount Engine (v4.9.374)**:
+   - When users navigate to checkout via an affiliate link, `CheckoutSheet.tsx`, `FastRazorpayModal.tsx`, and `PricingSection.tsx` automatically detect the active referral code.
+   - Applies instant 10%–20% coupon discount deductions directly against plan pricing.
+   - Displays a clean monochromatic referral savings badge showing partner discount savings.
+   - Fires dual attribution hooks upon payment verification: Endorsely script tracking (`window.endorsely?.trackConversion()`) and Cora backend conversion logging.
 
 ---
 
@@ -1537,6 +1668,12 @@ When authenticated as Super Admin (`cora_admin` / `admin@cora.local`), the platf
 
 | Version | Release Date | Key Features & Enhancements |
 | :--- | :--- | :--- |
+| **v4.9.374** | Oct 2026 | Universal Edge-Docked Entry Inspector with zero-backdrop clarity, Client Timezone Engine with localized relative and absolute timestamps, Dynamic Affiliate Referral Tracking (`POST /wp-json/cora/v1/referrals/track`), multi-cookie referral attribution (`cora-frontend/lib/referral.ts`), automated checkout coupon discount deductions (10%–20% off plans in Razorpay checkout and pricing), and unified global resources hero across all resource directories |
+| **v4.9.373** | Oct 2026 | Submissions data sanitization, base64 digital signature preview rendering, table-fixed explicit layout preventing horizontal blowouts, and REST deletion endpoint (`DELETE /wp-json/cora/v1/forms/submissions/{id}`) with tenant isolation |
+| **v4.9.372** | Oct 2026 | Forms Cards Overhaul & Universal 5th Tab "All Entries" Registry (`#all-entries`): Expanded form card padding (`p-5 sm:p-6`), fully clickable form cards navigating to editor, unlocked mobile form editing across all screen widths, live interactive form preview modal with device switchers, metric summary strip, Notion-style filter toolbar, and dynamic multi-form CSV export |
+| **v4.9.370** | Oct 2026 | Pricing Page Overhaul: Webflow/Framer style hierarchy pills, information tooltips across all cards, "Free Site Migration" floating badge on Scale plan, explicit bandwidth & storage specifications (15–50GB storage, 100–500GB bandwidth), pure monochrome switcher pills, and active-voice copy |
+| **v4.9.368** | Oct 2026 | Partner & Coaching Accelerator Portal (`/vnxdigital`, `/vanshrajput`): Co-branded hero, creator social proof, and locked 3-day trial to Full Coaching Accelerator |
+| **v4.9.366** | Oct 2026 | Unified Global Resources Hero Section (`GlobalResourcesHero.tsx`) across Templates, Tools, Guides, Blog, Newsletter, and Articles with consistent search and filter chips |
 | **Marketing Reform** | Oct 2026 | Repositioned homepage hero headline to 'Build websites. Run your business, with an AI co-founder.', dual Google / Free Templates CTAs, sticky bottom AI SDR bar with automated objection handling and dynamic conversion coupons (MIGRATEFREE, CORA10), overhauled navbar to 'Tools & Templates', deployed 16+ multi-format templates and schemas at /templates (Native Pages, AI Prompts, Elementor Kits, Lovable Projects), updated autonomous AI workforce agent portraits, and overhauled executive confidence 6-feature grid with active-voice copy |
 | **v4.9.364** | Oct 2026 | Standardized AI run quotas (15K Pro / 25K Scale monthly), weekly soft-limit throttling (3,750 Pro / 6,250 Scale runs/week), Super Admin rate-limit bypass, and platform-wide Endorsely affiliate tracking integration (`app.endorsely.com/assets/affiliate-tracking.js`) with dynamic conversion attribution on checkout completion |
 | **v4.9.363** | Oct 2026 | Live static site styling parity, automated Tailwind CSS CDN injection, and CSS scope containment across Canvas previews |
@@ -1775,4 +1912,4 @@ When authenticated as Super Admin (`cora_admin` / `admin@cora.local`), the platf
 
 ---
 
-*Cora Platform v4.9.364 — Master Architectural Manual. Last updated: October 2026.*
+*Cora Platform v4.9.374 — Master Architectural Manual. Last updated: October 2026.*

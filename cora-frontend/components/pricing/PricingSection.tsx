@@ -303,7 +303,7 @@ export function PricingSection() {
                   <h3 className="font-display text-lg font-bold text-zinc-950">Starter</h3>
                   {isAnnual && (
                     <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-mono font-bold tracking-tight border border-emerald-300/70">
-                      2 MO. FREE
+                      2 MONTHS FREE
                     </span>
                   )}
                   {starterPricing.isReferralDiscount && (
@@ -474,7 +474,7 @@ export function PricingSection() {
                     <h3 className="font-display text-lg font-bold text-white">Professional</h3>
                     {!isPartner100Coupon(appliedCoupon) && isAnnual && (
                       <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-pink-950/80 text-pink-300 text-[10px] font-mono font-bold tracking-tight border border-pink-700/80">
-                        2 MO. FREE
+                        2 MONTHS FREE
                       </span>
                     )}
                     {proPricing.isReferralDiscount && (
@@ -669,7 +669,7 @@ export function PricingSection() {
                   <h3 className="font-display text-lg font-bold text-zinc-950">Scale</h3>
                   {isAnnual && (
                     <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-purple-100 text-purple-800 text-[10px] font-mono font-bold tracking-tight border border-purple-300/70">
-                      2 MO. FREE
+                      2 MONTHS FREE
                     </span>
                   )}
                   {scalePricing.isReferralDiscount && (
@@ -836,11 +836,6 @@ export function PricingSection() {
 
         </div>
 
-        {/* Tax Note */}
-        <div className="mt-8 text-center text-xs text-zinc-500 flex items-center justify-center gap-1.5 font-mono">
-          <Receipt className="w-3.5 h-3.5 text-zinc-600" />
-          <span>All prices are inclusive of 18% GST. Instant UPI &amp; card checkout with compliant tax invoices.</span>
-        </div>
 
       </div>
     </section>

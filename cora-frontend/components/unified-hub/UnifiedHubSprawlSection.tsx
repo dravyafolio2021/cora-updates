@@ -72,43 +72,43 @@ export function UnifiedHubSprawlSection() {
         </div>
 
         {/* ── 3. Three Compact Context Columns (Mobile-First Optimized) ── */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 lg:gap-8 max-w-[960px] mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 lg:gap-10 max-w-[960px] mx-auto text-center">
           
           {/* Column 1: Get enquiries */}
-          <div className="hub-col space-y-1.5 text-left pt-2 md:pt-0">
-            <div className="flex items-center gap-2">
+          <div className="hub-col space-y-1.5 flex flex-col items-center text-center pt-2 md:pt-0">
+            <div className="flex items-center justify-center gap-2">
               <Inbox className="w-4 h-4 text-zinc-900 stroke-[1.8] shrink-0" />
               <h3 className="font-display text-base sm:text-lg font-bold text-zinc-950 tracking-tight">
                 Get enquiries
               </h3>
             </div>
-            <p className="text-zinc-600 text-xs sm:text-[13px] leading-relaxed">
+            <p className="text-zinc-600 text-xs sm:text-[13px] leading-relaxed text-center max-w-[280px]">
               Collect requests and follow up with clients.
             </p>
           </div>
 
           {/* Column 2: Manage client work */}
-          <div className="hub-col space-y-1.5 text-left pt-2 md:pt-0">
-            <div className="flex items-center gap-2">
+          <div className="hub-col space-y-1.5 flex flex-col items-center text-center pt-2 md:pt-0">
+            <div className="flex items-center justify-center gap-2">
               <FolderKanban className="w-4 h-4 text-zinc-900 stroke-[1.8] shrink-0" />
               <h3 className="font-display text-base sm:text-lg font-bold text-zinc-950 tracking-tight">
                 Manage client work
               </h3>
             </div>
-            <p className="text-zinc-600 text-xs sm:text-[13px] leading-relaxed">
+            <p className="text-zinc-600 text-xs sm:text-[13px] leading-relaxed text-center max-w-[280px]">
               Keep files, feedback, and updates together.
             </p>
           </div>
 
           {/* Column 3: Track payments */}
-          <div className="hub-col space-y-1.5 text-left pt-2 md:pt-0">
-            <div className="flex items-center gap-2">
+          <div className="hub-col space-y-1.5 flex flex-col items-center text-center pt-2 md:pt-0">
+            <div className="flex items-center justify-center gap-2">
               <CreditCard className="w-4 h-4 text-zinc-900 stroke-[1.8] shrink-0" />
               <h3 className="font-display text-base sm:text-lg font-bold text-zinc-950 tracking-tight">
                 Track payments
               </h3>
             </div>
-            <p className="text-zinc-600 text-xs sm:text-[13px] leading-relaxed">
+            <p className="text-zinc-600 text-xs sm:text-[13px] leading-relaxed text-center max-w-[280px]">
               Send invoices and see who has paid.
             </p>
           </div>

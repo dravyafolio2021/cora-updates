@@ -1,8 +1,8 @@
-# Cora Platform — Canvas & Frontend Module Documentation (v4.9.364)
+# Cora Platform — Canvas & Frontend Module Documentation (v4.9.374)
 
 ## Section 1: Overview & Multi-Engine Architecture
 
-Cora Canvas is a unified frontend website and theme creation engine providing a 100% white-labeled builder experience for agencies and workspace owners. Hardened through **v4.9.364**, Canvas operates across five core architectural engines:
+Cora Canvas is a unified frontend website and theme creation engine providing a 100% white-labeled builder experience for agencies and workspace owners. Hardened through **v4.9.374**, Canvas operates across five core architectural engines:
 
 1. **Engine A: Elementor White-Labeled Engine**: Wraps native Elementor in a sandboxed, two-row monochromatic toolbar (`cora-elementor-reskin.js` and `.css`), stripping out all WordPress headers, admin bars, upsell notices, and third-party references.
 2. **Engine B: Visual HTML Canvas Engine (Lovable-Compatible)**: In-browser visual HTML editor rendering semantic HTML5/Tailwind inside an isolated sandboxed iframe (`#cora-html-canvas-iframe`) with inline `contenteditable` editing, media inventory scanning, 1-click image swapping, code-split editing, URL edit state persistence, and AI rewriting.
@@ -785,4 +785,23 @@ Prospective founders and agency developers can preview any template via `Templat
 
 ---
 
-*Cora Canvas Documentation v4.9.364 — Last updated: October 2026.*
+## Section 27: Cora Forms Embedding Suite, Live Preview Modal & Cross-Module Parity (v4.9.374)
+
+### 27.1 Universal Forms Embedding in Canvas Pages
+Enables seamless embedding of dynamic Cora Forms inside static Canvas HTML pages and Next.js headless sites:
+- **Shortcode & Iframe Generators**: Easily inject dynamic lead forms using `[cora-form id="..."]` or isolated responsive iframe embeds.
+- **Direct CRM Pipeline Routing**: Inquiries and form submissions bypass third-party webhooks, routing directly into the workspace CRM (`wp_cora_leads` and `wp_cora_form_submissions`) with automatic conversion attribution.
+
+### 27.2 Sandboxed Live Preview Modal Parity (`#cora-form-preview-modal`)
+Forms created in Form AI Architect or embedded in Canvas pages can be tested in a dedicated sandboxed preview modal:
+- **Responsive Viewport Controls**: Switch between `Desktop` (100%), `Tablet` (768px), and `Mobile` (375px) device frames.
+- **Clarity Shield & Zero Analytics Pollution**: Test submissions inside the sandbox without polluting production funnel metrics (`views`, `starts`, `submissions`).
+- **Immediate DOM Sync**: Reflects form field updates, CSS styling, and validation rules in real time.
+
+### 27.3 Static Styling Parity & Isolated CSS Containment
+- **Zero Style Leakage**: All iframe containers enforce strict shadow containment, preventing WordPress admin stylesheets and theme defaults from corrupting client-facing form elements.
+- **Notion/Shopify Design Token Compliance**: Form inputs, radio chips, progress indicators, and submit buttons adhere to Cora design tokens with soft tonal surfaces and Rule 13 zero-outline borders.
+
+---
+
+*Cora Canvas Documentation v4.9.374 — Last updated: October 2026.*

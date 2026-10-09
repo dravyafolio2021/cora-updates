@@ -13,7 +13,7 @@ import { TestimonialsSection } from '@/components/testimonials/TestimonialsSecti
 import { FAQSection } from '@/components/faq/FAQSection';
 
 export const metadata: Metadata = {
-  title: { absolute: 'Cora — Build Websites. Run Your Business, with an AI Co-Founder' },
+  title: { absolute: 'Cora — Build Websites & Your Business with an AI Co-Founder' },
   description: 'Build websites, capture leads, manage clients, and create content—all in one workspace with CRM, forms, email, and finance built in.',
   alternates: { canonical: 'https://heycora.in/' },
 };
