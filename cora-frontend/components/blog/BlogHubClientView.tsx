@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { BLOG_CATEGORIES, BlogArticle, BlogCategory, normalizeBlogCategory } from '@/lib/blog-data';
 import { ArtisticHeroBackground } from '@/components/features/ArtisticHeroBackground';
+import { GlobalResourcesHero } from '@/components/resources/GlobalResourcesHero';
 import { trackEvent } from '@/components/analytics/Analytics';
 
 interface BlogHubClientViewProps {
@@ -176,98 +177,85 @@ export function BlogHubClientView({ initialArticles, initialFeaturedArticle }: B
   return (
     <main className="min-h-screen bg-white text-zinc-950 selection:bg-zinc-200 pb-20">
       {/* ── 1. GLOBAL SIGNATURE HERO MASTHEAD ────────────────────────── */}
-      <section className="relative w-full pt-20 sm:pt-24 pb-8 sm:pb-12 overflow-hidden border-b border-zinc-200/80 bg-gradient-to-b from-[#56a2e8]/20 via-[#cae4fc]/30 to-white">
-        <ArtisticHeroBackground tone="neutral" />
-
-        <div className="relative z-10 mx-auto max-w-[1240px] px-4 sm:px-6">
-          <div className="max-w-4xl mx-auto text-center space-y-3 sm:space-y-4">
-            {/* Single Clean Center-Aligned Badge */}
-            <div className="flex justify-center">
-              <nav aria-label="Breadcrumb" className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-zinc-200/80 bg-white/90 backdrop-blur-md text-[11px] font-mono text-zinc-600 shadow-2xs">
-                <Link href="/" className="hover:text-zinc-950 transition-colors">
-                  Cora
-                </Link>
-                <ChevronRight className="w-3 h-3 text-zinc-400" />
-                <span className="text-zinc-950 font-bold">Editorial Articles</span>
-              </nav>
+      <GlobalResourcesHero
+        tone="studio"
+        badgeIcon={<Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-purple-600" />}
+        badgeText="Editorial Publication & Systems"
+        titleLine1="Cora Editorial & Blog"
+        titleLine2="Practical operating answers, client systems & AI workflows"
+        description="Focused editorial answers to client management, scope creep defence, margin protection, and autonomous workflows."
+        pillars={[
+          {
+            icon: <Check className="w-3.5 h-3.5 text-emerald-600 font-bold" />,
+            text: '100% Free Access',
+          },
+          {
+            icon: <Clock className="w-3.5 h-3.5 text-purple-600" />,
+            text: '45s Direct Answers',
+          },
+          {
+            icon: <Zap className="w-3.5 h-3.5 text-amber-500" />,
+            text: 'Actionable SOPs',
+          },
+          {
+            icon: <ShieldCheck className="w-3.5 h-3.5 text-indigo-600" />,
+            text: 'Frontier AI Frameworks',
+          },
+        ]}
+        searchProps={{
+          value: searchQuery,
+          onChange: setSearchQuery,
+          placeholder: 'Search articles e.g. Client onboarding, Scope creep, Retainer pricing, GST compliance...',
+        }}
+      >
+        {/* Email Subscribe / Automatic Article Delivery */}
+        <div className="pt-2 max-w-lg mx-auto">
+          {subscribed ? (
+            <div className="p-3.5 sm:p-4 rounded-2xl bg-white/95 border border-zinc-200/90 shadow-sm backdrop-blur-md flex items-center justify-center gap-2.5 text-xs sm:text-sm font-semibold text-zinc-950 animate-in fade-in zoom-in-95 duration-200">
+              <div className="w-5 h-5 rounded-full bg-zinc-950 text-white flex items-center justify-center shrink-0">
+                <Check className="w-3 h-3 stroke-[3]" />
+              </div>
+              <span>Subscribed! New operational systems will be delivered straight to your inbox.</span>
             </div>
-
-            {/* Clean Center Heading */}
-            <h1 className="font-display text-3xl xs:text-4xl sm:text-5xl md:text-6xl font-medium tracking-tight text-zinc-950 leading-tight max-w-3xl mx-auto">
-              Cora Blogs
-            </h1>
-
-            {/* Center Subtitle */}
-            <p className="text-xs sm:text-sm md:text-base text-zinc-600 leading-relaxed font-normal max-w-2xl mx-auto">
-              Focused editorial answers to client management, scope creep defence, margin protection, and autonomous workflows.
-            </p>
-
-            {/* High-Trust Value Pillars (Center-Aligned) */}
-            <div className="pt-0.5 flex flex-wrap items-center justify-center gap-2 text-[11px] font-medium text-zinc-700 max-w-xl mx-auto">
-              <div className="inline-flex items-center gap-1.5 bg-white/90 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-zinc-200/80 shadow-2xs whitespace-nowrap">
-                <Sparkles className="w-3.5 h-3.5 text-amber-500 fill-amber-500 shrink-0" />
-                <span>45s Direct Answers</span>
-              </div>
-              <div className="inline-flex items-center gap-1.5 bg-white/90 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-zinc-200/80 shadow-2xs whitespace-nowrap">
-                <Zap className="w-3.5 h-3.5 text-zinc-900 shrink-0" />
-                <span>Zero Fluff • No Paywall</span>
-              </div>
-              <div className="inline-flex items-center gap-1.5 bg-white/90 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-zinc-200/80 shadow-2xs whitespace-nowrap">
-                <ShieldCheck className="w-3.5 h-3.5 text-zinc-900 shrink-0" />
-                <span>Free Tools &amp; SOPs</span>
-              </div>
-            </div>
-
-            {/* Email Subscribe / Automatic Article Delivery */}
-            <div className="pt-2 max-w-lg mx-auto">
-              {subscribed ? (
-                <div className="p-3.5 sm:p-4 rounded-2xl bg-white/95 border border-zinc-200/90 shadow-sm backdrop-blur-md flex items-center justify-center gap-2.5 text-xs sm:text-sm font-semibold text-zinc-950 animate-in fade-in zoom-in-95 duration-200">
-                  <div className="w-5 h-5 rounded-full bg-zinc-950 text-white flex items-center justify-center shrink-0">
-                    <Check className="w-3 h-3 stroke-[3]" />
-                  </div>
-                  <span>Subscribed! New operational systems will be delivered straight to your inbox.</span>
+          ) : (
+            <form onSubmit={handleSubscribe} className="space-y-2">
+              <div className="flex flex-col sm:flex-row items-center gap-2 p-1.5 rounded-2xl bg-white/95 border border-zinc-200/90 shadow-sm backdrop-blur-md">
+                <div className="relative w-full flex items-center">
+                  <Mail className="w-4 h-4 text-zinc-400 absolute left-3.5 pointer-events-none" />
+                  <input
+                    type="email"
+                    required
+                    value={subscribeEmail}
+                    onChange={(e) => setSubscribeEmail(e.target.value)}
+                    placeholder="Enter your work email for new articles..."
+                    className="w-full pl-10 pr-3 py-2 text-xs sm:text-sm bg-transparent text-zinc-950 placeholder:text-zinc-400 focus:outline-none"
+                  />
                 </div>
-              ) : (
-                <form onSubmit={handleSubscribe} className="space-y-2">
-                  <div className="flex flex-col sm:flex-row items-center gap-2 p-1.5 rounded-2xl bg-white/95 border border-zinc-200/90 shadow-sm backdrop-blur-md">
-                    <div className="relative w-full flex items-center">
-                      <Mail className="w-4 h-4 text-zinc-400 absolute left-3.5 pointer-events-none" />
-                      <input
-                        type="email"
-                        required
-                        value={subscribeEmail}
-                        onChange={(e) => setSubscribeEmail(e.target.value)}
-                        placeholder="Enter your work email for new articles..."
-                        className="w-full pl-10 pr-3 py-2 text-xs sm:text-sm bg-transparent text-zinc-950 placeholder:text-zinc-400 focus:outline-none"
-                      />
-                    </div>
-                    <button
-                      type="submit"
-                      disabled={isSubscribing}
-                      className="w-full sm:w-auto shrink-0 inline-flex items-center justify-center gap-1.5 bg-zinc-950 hover:bg-black text-white px-4 py-2.5 rounded-xl text-xs font-bold transition-all shadow-2xs cursor-pointer disabled:opacity-50"
-                    >
-                      {isSubscribing ? (
-                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      ) : (
-                        <>
-                          <span>Deliver Articles</span>
-                          <ArrowRight className="w-3.5 h-3.5" />
-                        </>
-                      )}
-                    </button>
-                  </div>
-                  {subscribeError && (
-                    <p className="text-[11px] text-rose-600 font-medium">{subscribeError}</p>
+                <button
+                  type="submit"
+                  disabled={isSubscribing}
+                  className="w-full sm:w-auto shrink-0 inline-flex items-center justify-center gap-1.5 bg-zinc-950 hover:bg-black text-white px-4 py-2.5 rounded-xl text-xs font-bold transition-all shadow-2xs cursor-pointer disabled:opacity-50"
+                >
+                  {isSubscribing ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <>
+                      <span>Deliver Articles</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </>
                   )}
-                  <p className="text-[11px] font-mono text-zinc-500">
-                    Get newly published SOPs &amp; editorial answers automatically in your mail &bull; Zero spam
-                  </p>
-                </form>
+                </button>
+              </div>
+              {subscribeError && (
+                <p className="text-[11px] text-rose-600 font-medium">{subscribeError}</p>
               )}
-            </div>
-          </div>
+              <p className="text-[11px] font-mono text-zinc-500">
+                Get newly published SOPs &amp; editorial answers automatically in your mail &bull; Zero spam
+              </p>
+            </form>
+          )}
         </div>
-      </section>
+      </GlobalResourcesHero>
 
       {/* ── 2. FEATURED ARTICLE DIGITAL SHOWCASE ──────────────────────── */}
       {featuredArticle && (

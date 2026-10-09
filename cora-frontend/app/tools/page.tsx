@@ -93,13 +93,13 @@ export default function ToolsIndexPage() {
   return (
     <div className="w-full bg-white text-zinc-900 selection:bg-zinc-900 selection:text-white">
       
-      {/* ── 1. PRECISION TOOLS MATRIX HERO (CLEAN TECH CANVAS) ── */}
-      <section className="relative w-full pt-[128px] sm:pt-36 pb-12 sm:pb-20 overflow-hidden">
-        <ArtisticHeroBackground tone="tools" />
+      {/* ── 1. GLOBAL SIGNATURE TOOLS HERO (WARM STUDIO AESTHETIC) ── */}
+      <section className="relative w-full pt-[128px] sm:pt-36 pb-10 sm:pb-16 overflow-hidden">
+        <ArtisticHeroBackground tone="studio" />
 
         <div className="relative z-10 w-full max-w-[1240px] mx-auto px-4 sm:px-6 text-center">
           
-          {/* Streamlined Status Badge */}
+          {/* Status Badge */}
           <div className="mb-4 sm:mb-6">
             <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full bg-white/95 backdrop-blur-md text-zinc-900 border border-zinc-200/80 text-xs sm:text-sm font-medium shadow-2xs">
               <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-500" />
@@ -107,60 +107,40 @@ export default function ToolsIndexPage() {
             </span>
           </div>
 
-          {/* Clean 2-Line Headline (Sleek, Elegant font-semibold Typography) */}
+          {/* 2-Line Headline */}
           <h1 className="font-display text-4xl sm:text-6xl md:text-7xl font-semibold text-zinc-950 tracking-[-0.035em] leading-[1.12] sm:leading-[1.08] mb-4 sm:mb-6 max-w-[980px] mx-auto">
-            <span className="block">Free Tools to Make</span>
-            <span className="block mt-1 sm:mt-2">
-              <span className="inline-flex items-baseline justify-center gap-2 sm:gap-3.5">
-                <span className="relative inline-block font-semibold text-zinc-950 pb-1">
-                  <span>{currentItem.word}</span>
-                  <svg
-                    key={currentItem.word}
-                    className="absolute -bottom-0.5 sm:-bottom-1 left-0 w-full h-2.5 sm:h-3.5 overflow-visible pointer-events-none animate-in fade-in zoom-in-95 duration-200"
-                    viewBox="0 0 100 12"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    preserveAspectRatio="none"
-                  >
-                    <path
-                      d="M2 9C30 2 70 2 98 8"
-                      stroke={currentItem.curveColor}
-                      strokeWidth="3.5"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                </span>
-                <span>Simple</span>
-              </span>
+            <span className="block">Free Agency Micro-Tools</span>
+            <span className="block mt-1 sm:mt-2 text-zinc-600 font-normal text-2xl sm:text-4xl md:text-5xl">
+              Calculators, contracts, GST math &amp; PDF utilities
             </span>
           </h1>
 
           {/* Subtitle */}
-          <p className="text-zinc-600 text-sm sm:text-base md:text-lg font-normal leading-relaxed max-w-[620px] mx-auto mb-7 sm:mb-9 px-3">
-            Instant browser utilities for Indian GST calculations, client retainer modeling, legal agreements, and dynamic UPI QR generation.
+          <p className="text-zinc-600 text-sm sm:text-base md:text-lg font-normal leading-relaxed max-w-[680px] mx-auto mb-7 sm:mb-9 px-3">
+            Zero daily limits, zero login gates, and no credit card required. Turnkey operating utilities designed to streamline client management and compliance on autopilot.
           </p>
 
-          {/* ── High-Trust Value Pillars (Desktop-only to keep mobile ultra-clean) ── */}
-          <div className="hidden sm:flex flex-wrap items-center justify-center gap-4 sm:gap-6 mb-8 text-xs sm:text-sm font-medium text-zinc-700">
-            <div className="flex items-center gap-1.5 bg-white/70 backdrop-blur-xs px-3 py-1 rounded-full border border-zinc-200/60 shadow-2xs">
+          {/* Value Trust Pillars */}
+          <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-4 mb-8 text-xs sm:text-sm font-medium text-zinc-700">
+            <div className="flex items-center gap-1.5 bg-white/80 backdrop-blur-xs px-3 py-1 rounded-full border border-zinc-200/70 shadow-2xs">
               <Check className="w-3.5 h-3.5 text-emerald-600 font-bold" />
               <span>100% Free Forever</span>
             </div>
-            <div className="flex items-center gap-1.5 bg-white/70 backdrop-blur-xs px-3 py-1 rounded-full border border-zinc-200/60 shadow-2xs">
+            <div className="flex items-center gap-1.5 bg-white/80 backdrop-blur-xs px-3 py-1 rounded-full border border-zinc-200/70 shadow-2xs">
               <Zap className="w-3.5 h-3.5 text-amber-500" />
               <span>Zero Login Required</span>
             </div>
-            <div className="flex items-center gap-1.5 bg-white/70 backdrop-blur-xs px-3 py-1 rounded-full border border-zinc-200/60 shadow-2xs">
+            <div className="flex items-center gap-1.5 bg-white/80 backdrop-blur-xs px-3 py-1 rounded-full border border-zinc-200/70 shadow-2xs">
               <Lock className="w-3.5 h-3.5 text-blue-600" />
               <span>100% Client-Side Privacy</span>
             </div>
-            <div className="flex items-center gap-1.5 bg-white/70 backdrop-blur-xs px-3 py-1 rounded-full border border-zinc-200/60 shadow-2xs">
+            <div className="flex items-center gap-1.5 bg-white/80 backdrop-blur-xs px-3 py-1 rounded-full border border-zinc-200/70 shadow-2xs">
               <ShieldCheck className="w-3.5 h-3.5 text-indigo-600" />
               <span>Indian IT Act &amp; SAC 9983</span>
             </div>
           </div>
 
-          {/* ── Central AI Copilot Input Capsule ── */}
+          {/* Central AI Search Capsule */}
           <div className="mb-7 sm:mb-12">
             <ToolsHeroAIInput
               searchQuery={searchQuery}

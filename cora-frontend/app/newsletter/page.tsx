@@ -1,5 +1,8 @@
+import React from 'react';
 import type { Metadata } from 'next';
+import { Sparkles, Check, Clock, ShieldCheck, Mail } from 'lucide-react';
 import { NewsletterCapture } from '@/components/newsletter/NewsletterCapture';
+import { GlobalResourcesHero } from '@/components/resources/GlobalResourcesHero';
 
 const url = 'https://heycora.in/newsletter/';
 
@@ -27,27 +30,41 @@ const topics = [
 export default function NewsletterPage() {
   return (
     <main className="bg-white text-zinc-950">
-      <section className="relative overflow-hidden border-b border-zinc-200 bg-gradient-to-b from-sky-200 via-white to-white px-5 pb-16 pt-28 sm:px-8 lg:pb-24 lg:pt-36">
-        <div className="mx-auto max-w-6xl text-center">
-          <div className="inline-flex rounded-full border border-white/80 bg-white/80 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-700 shadow-sm backdrop-blur">
-            Cora Operator Brief
-          </div>
-          <h1 className="mx-auto mt-6 max-w-4xl text-balance font-display text-4xl font-semibold tracking-[-0.045em] sm:text-6xl lg:text-7xl">
-            One useful agency system every week.
-          </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-base leading-7 text-zinc-600 sm:text-lg">
-            No generic SaaS updates. Just practical systems, templates and operating ideas for running a calmer, more profitable client-service business.
-          </p>
-          <div className="mx-auto mt-10 max-w-3xl text-left">
-            <NewsletterCapture
-              source="newsletter_page"
-              eyebrow="JOIN FREE"
-              title="Get the next Operator Brief."
-              description="One useful note each week. Unsubscribe whenever it stops being useful."
-            />
-          </div>
+      <GlobalResourcesHero
+        tone="studio"
+        badgeIcon={<Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-purple-600" />}
+        badgeText="Cora Operator Brief"
+        titleLine1="Cora Operator Brief"
+        titleLine2="One useful agency operating system every week"
+        description="No generic SaaS noise or fluffy marketing updates. Just practical systems, templates, and operating architectures for running a calmer, more profitable client-service business."
+        pillars={[
+          {
+            icon: <Check className="w-3.5 h-3.5 text-emerald-600 font-bold" />,
+            text: '100% Free Weekly Brief',
+          },
+          {
+            icon: <Clock className="w-3.5 h-3.5 text-purple-600" />,
+            text: '3-Minute Read',
+          },
+          {
+            icon: <ShieldCheck className="w-3.5 h-3.5 text-indigo-600" />,
+            text: 'Zero Spam Policy',
+          },
+          {
+            icon: <Mail className="w-3.5 h-3.5 text-amber-500" />,
+            text: 'Actionable Templates Included',
+          },
+        ]}
+      >
+        <div className="mx-auto max-w-2xl text-left pt-2">
+          <NewsletterCapture
+            source="newsletter_page"
+            eyebrow="JOIN FREE"
+            title="Get the next Operator Brief."
+            description="One useful note each week. Unsubscribe whenever it stops being useful."
+          />
         </div>
-      </section>
+      </GlobalResourcesHero>
 
       <section className="px-5 py-16 sm:px-8 lg:py-24">
         <div className="mx-auto max-w-6xl">

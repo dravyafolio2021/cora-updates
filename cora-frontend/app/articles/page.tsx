@@ -1,10 +1,11 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Search, Compass, Layers, Receipt, Bot, ShieldCheck, BarChart2, Sparkles, ArrowRight } from 'lucide-react';
+import { Search, Compass, Layers, Receipt, Bot, ShieldCheck, BarChart2, Sparkles, ArrowRight, Check, BookOpen } from 'lucide-react';
 import { ARTICLES_DATA, ARTICLE_CATEGORIES, getFeaturedArticles } from '@/lib/articles-data';
 import { ArticleCard } from '@/components/articles/ArticleCard';
 import { ArticlesClientHub } from './ArticlesClientHub';
+import { GlobalResourcesHero } from '@/components/resources/GlobalResourcesHero';
 
 export const metadata: Metadata = {
   title: 'Articles & Compare — Cora Knowledge Hub',
@@ -26,24 +27,37 @@ export default function ArticlesPage() {
   const mainFeatured = featuredArticles[0] || ARTICLES_DATA[0];
 
   return (
-    <div className="min-h-screen bg-[#FBFaf7] text-zinc-900 selection:bg-zinc-950 selection:text-white pt-24 pb-20">
+    <div className="min-h-screen bg-white text-zinc-900 selection:bg-zinc-950 selection:text-white pb-20">
 
       {/* ── Top Header Hero ── */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12">
-        <div className="max-w-3xl space-y-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-100 border border-zinc-200/80 text-xs font-mono font-semibold text-zinc-800">
-            <Sparkles className="w-3.5 h-3.5 text-zinc-600" />
-            <span>KNOWLEDGE HUB &amp; COMPARISONS</span>
-          </div>
+      <GlobalResourcesHero
+        tone="studio"
+        badgeIcon={<Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-purple-600" />}
+        badgeText="Knowledge Hub & Comparisons"
+        titleLine1="Articles & Benchmarks"
+        titleLine2="Operational playbooks, GST workflows & software comparisons"
+        description="In-depth guides, operational playbooks, 18% GST tax workflows, and side-by-side software benchmarks engineered for high-growth creative studios and media agencies."
+        pillars={[
+          {
+            icon: <Check className="w-3.5 h-3.5 text-emerald-600 font-bold" />,
+            text: '100% Free Open Knowledge',
+          },
+          {
+            icon: <Receipt className="w-3.5 h-3.5 text-purple-600" />,
+            text: 'Indian GST Playbooks',
+          },
+          {
+            icon: <BarChart2 className="w-3.5 h-3.5 text-blue-600" />,
+            text: 'Software Benchmarks',
+          },
+          {
+            icon: <ShieldCheck className="w-3.5 h-3.5 text-indigo-600" />,
+            text: 'Agency SOPs',
+          },
+        ]}
+      />
 
-          <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-zinc-950 leading-[1.1]">
-            Articles, Guides &amp; Benchmarks
-          </h1>
-
-          <p className="text-base sm:text-lg text-zinc-600 font-normal leading-relaxed">
-            In-depth guides, operational playbooks, 18% GST tax workflows, and side-by-side software benchmarks engineered for high-growth creative studios and media agencies.
-          </p>
-        </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6">
 
         {/* ── Category Quick-Nav Tickers ── */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3 pt-10">
@@ -68,7 +82,7 @@ export default function ArticlesPage() {
             </Link>
           ))}
         </div>
-      </section>
+      </div>
 
       {/* ── Featured Spotlight & Design-Reference Card ── */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-14">
