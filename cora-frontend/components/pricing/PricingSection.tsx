@@ -92,13 +92,13 @@ export function PricingSection() {
                   </div>
                   <h3 className="font-display text-lg font-bold text-zinc-950">Free Forever</h3>
                 </div>
-                <span className="px-2.5 py-0.5 bg-zinc-100 text-zinc-700 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider">
+                <span className="px-2.5 py-0.5 bg-zinc-100 text-zinc-700 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider border border-zinc-200/60">
                   FREE
                 </span>
               </div>
 
               <p className="text-xs text-zinc-500 leading-relaxed mb-6">
-                Run your CRM, generate invoices, and test AI agents.
+                Run your CRM, create invoices, and test AI agents.
               </p>
 
               <div className="mb-6 pb-6 border-b border-zinc-100">
@@ -112,7 +112,7 @@ export function PricingSection() {
               <ul className="space-y-3 text-xs sm:text-sm text-zinc-700 mb-8">
                 <li className="flex items-start gap-2.5">
                   <Sparkles className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-                  <span>1,000 AI Runs / mo</span>
+                  <span>1,000 AI runs / mo</span>
                 </li>
                 <li className="flex items-start gap-2.5">
                   <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
@@ -152,7 +152,7 @@ export function PricingSection() {
                   </div>
                   <h3 className="font-display text-lg font-bold text-zinc-950">Starter</h3>
                 </div>
-                <span className="px-2.5 py-0.5 bg-emerald-50 text-emerald-800 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider">
+                <span className="px-2.5 py-0.5 bg-emerald-50 text-emerald-800 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider border border-emerald-200">
                   POPULAR
                 </span>
               </div>
@@ -176,7 +176,7 @@ export function PricingSection() {
               <ul className="space-y-3 text-xs sm:text-sm text-zinc-700 mb-8">
                 <li className="flex items-start gap-2.5">
                   <Sparkles className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-                  <span><strong>{isAnnual ? '6,000' : '5,000'}</strong> AI Runs / mo</span>
+                  <span><strong>{isAnnual ? '6,000' : '5,000'}</strong> AI runs / mo</span>
                 </li>
                 <li className="flex items-start gap-2.5">
                   <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
@@ -207,35 +207,33 @@ export function PricingSection() {
           </div>
 
           {/* ── CARD 3: PROFESSIONAL (COLUMN 3 - RECOMMENDED) ── */}
-          <div className={`text-white rounded-3xl p-6 sm:p-7 shadow-lg flex flex-col justify-between relative transform xl:-translate-y-2 transition-all ${
-            isPartner100Coupon(appliedCoupon)
-              ? 'bg-zinc-950 border-2 border-emerald-500 shadow-2xl ring-4 ring-emerald-400/20'
-              : 'bg-zinc-950 border-2 border-zinc-950'
-          }`}>
-            <div className={`absolute -top-3.5 left-1/2 -translate-x-1/2 text-[10px] font-mono font-bold px-3 py-0.5 rounded-full uppercase tracking-wider shadow-2xs ${
-              isPartner100Coupon(appliedCoupon)
-                ? 'bg-emerald-400 text-zinc-950 font-extrabold animate-pulse'
-                : 'bg-emerald-500 text-zinc-950'
-            }`}>
-              {isPartner100Coupon(appliedCoupon) ? '100% OFF PASS' : 'RECOMMENDED'}
+          <div className="bg-zinc-950 text-white rounded-3xl p-6 sm:p-7 shadow-xl flex flex-col justify-between relative transition-all border-2 border-[#be006b] overflow-visible">
+            {/* Floating Highlighted SaaS Badge - Positioned OUTSIDE the frame at the top */}
+            <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-30 whitespace-nowrap select-none pointer-events-none">
+              <div className={`inline-flex items-center gap-1.5 px-4 py-1 rounded-full text-[11px] font-mono font-bold tracking-wider uppercase shadow-md border ${
+                isPartner100Coupon(appliedCoupon)
+                  ? 'bg-emerald-500 text-zinc-950 border-emerald-300 ring-2 ring-emerald-400/30 animate-pulse'
+                  : 'bg-gradient-to-r from-[#9d0057] via-[#be006b] to-[#9d0057] text-white border-pink-300/50 ring-2 ring-pink-500/20 shadow-[0_4px_14px_rgba(190,0,107,0.35)]'
+              }`}>
+                <Sparkles className="w-3.5 h-3.5 text-pink-200 fill-pink-200/60 shrink-0" />
+                <span>{isPartner100Coupon(appliedCoupon) ? '100% OFF PASS' : 'RECOMMENDED'}</span>
+              </div>
             </div>
 
-            <div>
-              <div className="flex items-center justify-between mb-4 pt-1">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-xl bg-zinc-800 text-pink-400 flex items-center justify-center border border-zinc-700">
-                    <Sparkles className="w-4 h-4" />
+            <div className="flex-1 flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-xl bg-zinc-800 text-pink-400 flex items-center justify-center border border-zinc-700">
+                      <Sparkles className="w-4 h-4" />
+                    </div>
+                    <h3 className="font-display text-lg font-bold text-white">Professional</h3>
                   </div>
-                  <h3 className="font-display text-lg font-bold text-white">Professional</h3>
                 </div>
-                <span className="px-2.5 py-0.5 bg-zinc-800 text-emerald-400 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider">
-                  {isPartner100Coupon(appliedCoupon) ? 'FREE' : 'PRO TIER'}
-                </span>
-              </div>
 
-              <p className="text-xs text-zinc-400 leading-relaxed mb-6">
-                Automate WhatsApp alerts, add dynamic UPI QR, and unlock reasoning AI.
-              </p>
+                <p className="text-xs text-zinc-400 leading-relaxed mb-6">
+                  Automate WhatsApp updates, collect payments with UPI QR, and deploy reasoning AI.
+                </p>
 
               <div className="mb-6 pb-6 border-b border-zinc-800">
                 <div className="flex items-baseline gap-1">
@@ -263,7 +261,7 @@ export function PricingSection() {
                 </li>
                 <li className="flex items-start gap-2.5">
                   <Sparkles className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                  <span><strong>15,000</strong> AI Runs / mo</span>
+                  <span><strong>15,000</strong> AI runs / mo</span>
                 </li>
                 <li className="flex items-start gap-2.5">
                   <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
@@ -283,16 +281,13 @@ export function PricingSection() {
             <button
               type="button"
               onClick={() => handlePlanSelect('pro')}
-              className={`w-full py-3 rounded-xl text-xs sm:text-sm font-semibold transition-colors shadow-2xs cursor-pointer text-center block ${
-                isPartner100Coupon(appliedCoupon)
-                  ? 'bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold'
-                  : 'bg-white hover:bg-zinc-100 text-zinc-950'
-              }`}
+              className="w-full py-3 rounded-xl text-xs sm:text-sm font-semibold transition-colors shadow-2xs cursor-pointer text-center block bg-white hover:bg-zinc-100 text-zinc-950 font-bold"
             >
               {isPartner100Coupon(appliedCoupon)
                 ? 'Claim Free Plan'
                 : 'Get Started'}
             </button>
+            </div>
           </div>
 
           {/* ── CARD 4: SCALE (COLUMN 4) ── */}
@@ -305,7 +300,7 @@ export function PricingSection() {
                   </div>
                   <h3 className="font-display text-lg font-bold text-zinc-950">Scale</h3>
                 </div>
-                <span className="px-2.5 py-0.5 bg-purple-50 text-purple-800 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider">
+                <span className="px-2.5 py-0.5 bg-purple-50 text-purple-800 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider border border-purple-200">
                   SCALE
                 </span>
               </div>
@@ -327,17 +322,17 @@ export function PricingSection() {
               </div>
 
               <ul className="space-y-3 text-xs sm:text-sm text-zinc-700 mb-8">
-                <li className="flex items-start gap-2.5 p-1.5 rounded-lg bg-purple-50 border border-purple-200 text-purple-950 font-semibold">
+                <li className="flex items-start gap-2.5 p-2 rounded-xl bg-purple-50/80 border border-purple-200/70 text-purple-950 font-semibold">
                   <Gift className="w-4 h-4 text-purple-700 shrink-0 mt-0.5" />
                   <span>Free Website Dev or Migration</span>
                 </li>
                 <li className="flex items-start gap-2.5">
                   <Sparkles className="w-4 h-4 text-purple-600 shrink-0 mt-0.5" />
-                  <span>All Frontier AI Engines (GPT-4o, Claude 3.5)</span>
+                  <span>Frontier AI Models (GPT-4o, Claude 3.5)</span>
                 </li>
                 <li className="flex items-start gap-2.5">
                   <Sparkles className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-                  <span><strong>25,000</strong> AI Runs / mo</span>
+                  <span><strong>25,000</strong> AI runs / mo</span>
                 </li>
                 <li className="flex items-start gap-2.5">
                   <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />

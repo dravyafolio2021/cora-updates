@@ -429,14 +429,14 @@ export default function PricingPage() {
           
           {/* ── CARD 1: FREE FOREVER (COLUMN 1) ── */}
           <div className="w-full bg-white border border-zinc-200/90 rounded-2xl sm:rounded-[22px] overflow-hidden flex flex-col h-full shadow-[0_2px_10px_rgba(0,0,0,0.03)] hover:shadow-lg hover:border-zinc-300 transition-all">
-            {/* Top Header Banner */}
+            {/* Top Header Banner in Dark Charcoal */}
             <div className="bg-[#18181b] h-[160px] p-5 text-white flex flex-col justify-between relative shrink-0">
               <div className="flex items-center justify-between gap-2 h-9">
                 <div className="w-9 h-9 rounded-xl bg-zinc-800 text-zinc-100 shadow-xs flex items-center justify-center shrink-0 border border-zinc-700">
                   <Leaf className="w-4 h-4 text-emerald-400" />
                 </div>
                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-mono font-bold tracking-wide border border-emerald-500/30">
-                  100% Free
+                  FREE
                 </span>
               </div>
               <div className="space-y-1">
@@ -444,7 +444,7 @@ export default function PricingPage() {
                   Free Forever
                 </h3>
                 <p className="text-xs text-zinc-300 leading-relaxed line-clamp-2 h-[36px] flex items-start">
-                  For solo operators, freelancers &amp; creators starting out with all features.
+                  Run your CRM, create invoices, and test AI agents.
                 </p>
               </div>
             </div>
@@ -461,7 +461,7 @@ export default function PricingPage() {
                     <span className="text-xs text-zinc-500 font-medium">/ mo</span>
                   </div>
                   <div className="text-[11px] text-zinc-500 mt-1.5 flex items-center gap-1.5 h-4">
-                    <span className="text-emerald-700 font-semibold">Free forever &bull; No credit card required</span>
+                    <span className="text-emerald-700 font-semibold">Free forever &bull; No card needed</span>
                   </div>
                 </div>
 
@@ -471,7 +471,7 @@ export default function PricingPage() {
                   onClick={() => handleInitiatePlan('free')}
                   className="h-11 w-full inline-flex items-center justify-center gap-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-900 px-4 rounded-xl text-xs font-bold transition-all mb-5 cursor-pointer shrink-0 shadow-2xs group"
                 >
-                  <span>Start free forever</span>
+                  <span>Start Free Forever</span>
                   <ArrowRight className="w-3.5 h-3.5 text-zinc-500 group-hover:translate-x-0.5 transition-transform" />
                 </button>
 
@@ -483,7 +483,7 @@ export default function PricingPage() {
                   <ul className="space-y-2 text-xs text-zinc-700">
                     <li className="flex items-start gap-2.5 min-h-[20px]">
                       <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
-                      <span><strong>1,000</strong> AI Runs / mo</span>
+                      <span><strong>1,000</strong> AI runs / mo</span>
                     </li>
                     <li className="flex items-start gap-2.5 min-h-[20px]">
                       <Globe className="w-3.5 h-3.5 text-zinc-900 shrink-0 mt-0.5" />
@@ -519,13 +519,16 @@ export default function PricingPage() {
                 <div className="w-9 h-9 rounded-xl bg-[#a7f3d0] text-[#065f46] shadow-xs flex items-center justify-center shrink-0">
                   <Rocket className="w-4 h-4" />
                 </div>
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-white/20 text-white text-[10px] font-mono font-bold tracking-wide border border-white/30 backdrop-blur-xs">
+                  POPULAR
+                </span>
               </div>
               <div className="space-y-1">
                 <h3 className="font-display text-xl font-bold text-white tracking-tight leading-tight">
                   Starter
                 </h3>
                 <p className="text-xs text-emerald-50/90 leading-relaxed line-clamp-2 h-[36px] flex items-start">
-                  For independent operators establishing their brand with custom domains.
+                  Connect custom domains, send branded emails, and invite 2 teammates.
                 </p>
               </div>
             </div>
@@ -571,7 +574,7 @@ export default function PricingPage() {
                   onClick={() => handleInitiatePlan('starter')}
                   className="h-11 w-full inline-flex items-center justify-center gap-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-900 px-4 rounded-xl text-xs font-bold transition-all mb-5 cursor-pointer shrink-0 group"
                 >
-                  <span>Get started</span>
+                  <span>Get Started</span>
                   <ArrowRight className="w-3.5 h-3.5 text-zinc-500 group-hover:translate-x-0.5 transition-transform" />
                 </button>
 
@@ -583,7 +586,7 @@ export default function PricingPage() {
                   <ul className="space-y-2 text-xs text-zinc-700">
                     <li className="flex items-start gap-2.5 min-h-[20px]">
                       <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
-                      <span><strong>{billingCycle === 'annual' ? '6,000' : '5,000'}</strong> AI Runs / mo</span>
+                      <span><strong>{billingCycle === 'annual' ? '6,000' : '5,000'}</strong> AI runs / mo</span>
                     </li>
                     <li className="flex items-start gap-2.5 min-h-[20px]">
                       <Check className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0 mt-0.5" />
@@ -616,15 +619,27 @@ export default function PricingPage() {
           {/* ── CARD 3: PROFESSIONAL (RECOMMENDED - COLUMN 3) ── */}
           <div 
             id="plan-card-pro"
-            className={`w-full bg-white rounded-2xl sm:rounded-[22px] overflow-hidden flex flex-col h-full transition-all relative ${
+            className={`w-full bg-white rounded-2xl sm:rounded-[22px] flex flex-col h-full transition-all relative z-20 overflow-visible ${
               isPartner100Coupon(appliedCoupon)
                 ? 'border-2 border-emerald-500 shadow-2xl ring-4 ring-emerald-400/20'
-                : 'border border-zinc-200/90 shadow-[0_4px_16px_rgba(0,0,0,0.06)] hover:shadow-xl'
+                : 'border-2 border-[#be006b] shadow-[0_12px_36px_rgba(190,0,107,0.18)] hover:shadow-2xl'
             }`}
           >
+            {/* Floating Highlighted SaaS Badge - Positioned OUTSIDE the frame at the top */}
+            <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-30 whitespace-nowrap select-none pointer-events-none">
+              <div className={`inline-flex items-center gap-1.5 px-4 py-1 rounded-full text-[11px] font-mono font-bold tracking-wider uppercase shadow-md border ${
+                isPartner100Coupon(appliedCoupon)
+                  ? 'bg-emerald-500 text-zinc-950 border-emerald-300 ring-2 ring-emerald-400/30 animate-pulse'
+                  : 'bg-gradient-to-r from-[#9d0057] via-[#be006b] to-[#9d0057] text-white border-pink-300/50 ring-2 ring-pink-500/20 shadow-[0_4px_14px_rgba(190,0,107,0.35)]'
+              }`}>
+                <Sparkles className="w-3.5 h-3.5 text-pink-200 fill-pink-200/60 shrink-0" />
+                <span>{isPartner100Coupon(appliedCoupon) ? '100% OFF PARTNER PASS' : 'RECOMMENDED'}</span>
+              </div>
+            </div>
+
             {/* Top Header Banner in Vibrant Magenta / Fuchsia or Emerald for 100% partner pass */}
             <div 
-              className={`h-[160px] p-5 text-white flex flex-col justify-between relative shrink-0 ${
+              className={`h-[160px] p-5 text-white flex flex-col justify-between relative shrink-0 rounded-t-[14px] sm:rounded-t-[20px] overflow-hidden ${
                 isPartner100Coupon(appliedCoupon) ? 'bg-gradient-to-br from-emerald-700 via-teal-700 to-emerald-800' : 'bg-[#be006b]'
               }`}
             >
@@ -634,20 +649,13 @@ export default function PricingPage() {
                 }`}>
                   <Sparkles className="w-4 h-4" />
                 </div>
-                <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide shadow-xs ${
-                  isPartner100Coupon(appliedCoupon)
-                    ? 'bg-emerald-300 text-emerald-950 font-extrabold animate-pulse'
-                    : 'bg-white text-zinc-950'
-                }`}>
-                  {isPartner100Coupon(appliedCoupon) ? '🎉 100% OFF PARTNER PASS' : 'Recommended'}
-                </span>
               </div>
               <div className="space-y-1">
                 <h3 className="font-display text-xl font-bold text-white tracking-tight leading-tight">
                   Professional
                 </h3>
                 <p className="text-xs text-pink-50/90 leading-relaxed line-clamp-2 h-[36px] flex items-start">
-                  Autonomous backbone with advanced AI, official WhatsApp dispatch &amp; UPI QR.
+                  Automate WhatsApp updates, collect payments with UPI QR, and deploy reasoning AI.
                 </p>
               </div>
             </div>
@@ -706,7 +714,7 @@ export default function PricingPage() {
                   <span>
                     {isPartner100Coupon(appliedCoupon)
                       ? 'Claim 100% Free Professional Plan'
-                      : 'Get started with Professional'}
+                      : 'Get Started'}
                   </span>
                   <ArrowRight className="w-3.5 h-3.5 text-zinc-300 group-hover:translate-x-0.5 group-hover:text-white transition-transform" />
                 </button>
@@ -723,7 +731,7 @@ export default function PricingPage() {
                     </li>
                     <li className="flex items-start gap-2.5 min-h-[20px]">
                       <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
-                      <span><strong>15,000</strong> AI Runs / mo</span>
+                      <span><strong>15,000</strong> AI runs / mo</span>
                     </li>
                     <li className="flex items-start gap-2.5 min-h-[20px] text-zinc-950 font-medium">
                       <WhatsAppIcon className="w-3.5 h-3.5 text-[#25D366] shrink-0 mt-0.5" />
@@ -762,7 +770,7 @@ export default function PricingPage() {
                   <TrendingUp className="w-4 h-4" />
                 </div>
                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-white/20 text-white text-[10px] font-mono font-bold tracking-wide border border-white/30 backdrop-blur-xs">
-                  Agencies
+                  SCALE
                 </span>
               </div>
               <div className="space-y-1">
@@ -770,7 +778,7 @@ export default function PricingPage() {
                   Scale
                 </h3>
                 <p className="text-xs text-indigo-50/90 leading-relaxed line-clamp-2 h-[36px] flex items-start">
-                  High-throughput infrastructure with free custom website development &amp; migration.
+                  Scale your agency with unlimited seats, custom APIs, and free site migration.
                 </p>
               </div>
             </div>
@@ -816,7 +824,7 @@ export default function PricingPage() {
                   onClick={() => handleInitiatePlan('scale')}
                   className="h-11 w-full inline-flex items-center justify-center gap-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-900 px-4 rounded-xl text-xs font-bold transition-all mb-5 cursor-pointer shrink-0 group"
                 >
-                  <span>Get started with Scale</span>
+                  <span>Get Started</span>
                   <ArrowRight className="w-3.5 h-3.5 text-zinc-500 group-hover:translate-x-0.5 transition-transform" />
                 </button>
 
@@ -826,21 +834,17 @@ export default function PricingPage() {
                     Everything in Professional, plus:
                   </div>
                   <ul className="space-y-2 text-xs text-zinc-700">
-                    <li className="flex items-start gap-2.5 min-h-[20px] p-1.5 rounded-lg bg-purple-50/80 border border-purple-200/70 text-purple-950 font-semibold">
-                      <Gift className="w-3.5 h-3.5 text-purple-700 shrink-0 mt-0.5" />
-                      <span>Free Website Development or Migration</span>
+                    <li className="flex items-start gap-2.5 min-h-[20px] p-2 rounded-xl bg-purple-50/80 border border-purple-200/70 text-purple-950 font-semibold">
+                      <Gift className="w-4 h-4 text-purple-700 shrink-0 mt-0.5" />
+                      <span>Free Website Dev or Migration</span>
                     </li>
                     <li className="flex items-start gap-2.5 min-h-[20px]">
                       <Sparkles className="w-3.5 h-3.5 text-purple-600 shrink-0 mt-0.5" />
-                      <span><strong>All Frontier AI Engines (GPT-4o, Claude 3.5)</strong></span>
+                      <span><strong>Frontier AI Models (GPT-4o, Claude 3.5)</strong></span>
                     </li>
                     <li className="flex items-start gap-2.5 min-h-[20px]">
                       <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
-                      <span><strong>25,000</strong> AI Runs / mo</span>
-                    </li>
-                    <li className="flex items-start gap-2.5 min-h-[20px]">
-                      <Check className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0 mt-0.5" />
-                      <span>Autonomous AI Research Agent</span>
+                      <span><strong>25,000</strong> AI runs / mo</span>
                     </li>
                     <li className="flex items-start gap-2.5 min-h-[20px]">
                       <Check className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0 mt-0.5" />
@@ -848,18 +852,8 @@ export default function PricingPage() {
                     </li>
                     <li className="flex items-start gap-2.5 min-h-[20px]">
                       <Check className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0 mt-0.5" />
-                      <span>Custom Webhooks &amp; API access</span>
+                      <span>Custom Webhooks &amp; REST APIs</span>
                     </li>
-                    <li className="flex items-start gap-2.5 min-h-[20px]">
-                      <Check className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0 mt-0.5" />
-                      <span>Dedicated account manager &amp; SLA</span>
-                    </li>
-                    {billingCycle === 'annual' && (
-                      <li className="flex items-start gap-2.5 min-h-[20px] text-emerald-800 font-medium">
-                        <Gift className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                        <span>2 Months Free Included</span>
-                      </li>
-                    )}
                   </ul>
                 </div>
               </div>
