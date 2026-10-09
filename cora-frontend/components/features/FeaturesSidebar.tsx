@@ -102,25 +102,25 @@ export function FeaturesSidebar({
 }: FeaturesSidebarProps) {
 
   return (
-    <aside className="w-full space-y-5.5">
+    <aside className="w-full space-y-6">
       
       {/* ── 1. SEARCH INPUT ── */}
       <div>
         <div className="relative flex items-center">
-          <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 pointer-events-none" aria-hidden="true" />
+          <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true" />
           <input
             id="sidebar-search-input"
             type="text"
             placeholder="Search features..."
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full pl-9.5 pr-8 py-2.5 bg-zinc-50/80 hover:bg-zinc-100/70 focus:bg-white border border-zinc-200/90 focus:border-zinc-950 rounded-xl text-xs font-medium text-zinc-900 placeholder-zinc-400 outline-none transition-all shadow-2xs"
+            className="w-full pl-10 pr-9 py-2.5 bg-zinc-50/80 hover:bg-zinc-100/70 focus:bg-white border border-zinc-200/90 focus:border-zinc-950 rounded-xl text-xs font-medium text-zinc-900 placeholder-zinc-400 outline-none transition-all shadow-2xs"
           />
           {searchQuery && (
             <button
               type="button"
               onClick={() => onSearchChange('')}
-              className="absolute right-2.5 p-1 rounded-md text-zinc-400 hover:text-zinc-800 transition-colors cursor-pointer"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-md text-zinc-400 hover:text-zinc-800 transition-colors cursor-pointer"
               aria-label="Clear search input"
             >
               <X className="w-3.5 h-3.5" />
@@ -135,7 +135,7 @@ export function FeaturesSidebar({
           <button
             type="button"
             onClick={() => onStatusFilterChange('all')}
-            className={`flex-1 py-1.5 px-2.5 rounded-lg font-medium text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+            className={`flex-1 py-2 px-2.5 rounded-lg font-medium text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
               statusFilter === 'all'
                 ? 'bg-white text-zinc-950 shadow-2xs font-semibold'
                 : 'text-zinc-500 hover:text-zinc-900'
@@ -148,7 +148,7 @@ export function FeaturesSidebar({
           <button
             type="button"
             onClick={() => onStatusFilterChange('live')}
-            className={`flex-1 py-1.5 px-2.5 rounded-lg font-medium text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+            className={`flex-1 py-2 px-2.5 rounded-lg font-medium text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
               statusFilter === 'live'
                 ? 'bg-white text-zinc-950 shadow-2xs font-semibold'
                 : 'text-zinc-500 hover:text-zinc-900'
@@ -162,7 +162,7 @@ export function FeaturesSidebar({
           <button
             type="button"
             onClick={() => onStatusFilterChange('roadmap')}
-            className={`flex-1 py-1.5 px-2.5 rounded-lg font-medium text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+            className={`flex-1 py-2 px-2.5 rounded-lg font-medium text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
               statusFilter === 'roadmap'
                 ? 'bg-white text-zinc-950 shadow-2xs font-semibold'
                 : 'text-zinc-500 hover:text-zinc-900'
@@ -177,7 +177,7 @@ export function FeaturesSidebar({
 
       {/* ── 3. INDUSTRY WORKSPACES ── */}
       <div>
-        <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-400 mb-2 px-1 flex items-center justify-between">
+        <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-400 mb-2.5 px-1 flex items-center justify-between">
           <span>Workspaces</span>
           <span className="text-[10px] text-zinc-400 font-normal">By Industry</span>
         </div>
@@ -227,8 +227,8 @@ export function FeaturesSidebar({
       </div>
 
       {/* ── 4. CATEGORIES NAVIGATION ── */}
-      <div className="pt-4 border-t border-zinc-100">
-        <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-400 mb-2 px-1 flex items-center justify-between">
+      <div className="pt-4.5 border-t border-zinc-100">
+        <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-400 mb-2.5 px-1 flex items-center justify-between">
           <span>Categories</span>
           <span className="text-[10px] text-zinc-400 font-normal">Functional Area</span>
         </div>

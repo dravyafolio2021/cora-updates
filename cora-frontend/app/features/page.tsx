@@ -303,7 +303,7 @@ export default function FeaturesPage() {
         <div className="flex items-start gap-8 lg:gap-10 relative">
           
           {/* ── LEFT PERMANENT STICKY SIDEBAR (DESKTOP) ── */}
-          <div className="hidden lg:block w-72 shrink-0 sticky top-24 z-20 self-start max-h-[calc(100vh-110px)] overflow-y-auto pr-2 scrollbar-none">
+          <div className="hidden lg:block w-80 shrink-0 sticky top-24 z-20 self-start max-h-[calc(100vh-6.5rem)] overflow-y-auto overscroll-contain pr-3 pb-12 [scrollbar-width:thin] [scrollbar-color:rgba(0,0,0,0.12)_transparent]">
             <FeaturesSidebar
               activeCategory={activeCategory}
               onSelectCategory={setActiveCategory}
@@ -609,7 +609,7 @@ export default function FeaturesPage() {
 
             {/* Scrollable Content Body (ONLY this container scrolls) */}
             <div 
-              className="flex-1 overflow-y-auto overscroll-contain px-5 py-4 space-y-6"
+              className="flex-1 overflow-y-auto overscroll-contain px-5 py-4 pb-12 space-y-6"
               style={{ WebkitOverflowScrolling: 'touch' }}
             >
               <FeaturesSidebar 
