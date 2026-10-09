@@ -8,7 +8,8 @@ import {
   CheckCircle2,
   Send, 
   Sparkles,
-  Check
+  Check,
+  AlertCircle
 } from 'lucide-react';
 import { trackEvent } from '@/components/analytics/Analytics';
 import { useToast } from '@/components/ui/Toast';
@@ -33,10 +34,66 @@ const TOPICS = [
   'Enterprise & Custom API'
 ];
 
+// Helper validation functions
+function validateName(name: string): string | null {
+  const trimmed = name.trim();
+  if (!trimmed) return 'Please enter your name.';
+  if (trimmed.length < 2) return 'Name must be at least 2 characters long.';
+  if (!/[a-zA-Z\u00C0-\u024F\u1E00-\u1EFF]/.test(trimmed)) {
+    return 'Name should contain valid alphabetical characters.';
+  }
+  return null;
+}
+
+function validateEmail(email: string): string | null {
+  const trimmed = email.trim();
+  if (!trimmed) return 'Please enter your work email address.';
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  if (!emailRegex.test(trimmed)) {
+    return 'Please enter a valid work email (e.g. name@company.com).';
+  }
+  return null;
+}
+
+function validatePhone(phone: string): string | null {
+  const trimmed = phone.trim();
+  if (!trimmed) return 'Please enter your WhatsApp or mobile number.';
+  
+  // Check for disallowed characters (allow +, digits, spaces, parentheses, hyphens, dots)
+  if (!/^[\d\s+\-().]+$/.test(trimmed)) {
+    return 'Phone number contains invalid characters.';
+  }
+
+  const digitsOnly = trimmed.replace(/\D/g, '');
+  if (digitsOnly.length < 10) {
+    return 'Phone number must be at least 10 digits.';
+  }
+  if (digitsOnly.length > 15) {
+    return 'Phone number cannot exceed 15 digits.';
+  }
+  
+  // If 10 digits without country code, check standard Indian mobile range (6-9)
+  if (digitsOnly.length === 10 && !/^[6-9]/.test(digitsOnly)) {
+    return '10-digit mobile number must start with 6, 7, 8, or 9.';
+  }
+
+  return null;
+}
+
+function validateCompany(company: string): string | null {
+  const trimmed = company.trim();
+  if (trimmed.length > 0 && trimmed.length < 2) {
+    return 'Company name should be at least 2 characters.';
+  }
+  return null;
+}
+
 export default function ContactPage() {
   const { showToast } = useToast();
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
 
   const [formData, setFormData] = useState({
     name: '',
@@ -48,27 +105,93 @@ export default function ContactPage() {
     message: ''
   });
 
+  const handleBlur = (field: string) => {
+    setTouched(prev => ({ ...prev, [field]: true }));
+    validateField(field);
+  };
+
+  const validateField = (field: string) => {
+    let error: string | null = null;
+    if (field === 'name') error = validateName(formData.name);
+    else if (field === 'email') error = validateEmail(formData.email);
+    else if (field === 'phone') error = validatePhone(formData.phone);
+    else if (field === 'companyName') error = validateCompany(formData.companyName);
+
+    setErrors(prev => {
+      const next = { ...prev };
+      if (error) next[field] = error;
+      else delete next[field];
+      return next;
+    });
+
+    return !error;
+  };
+
+  const handleChange = (field: string, value: any) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    if (errors[field]) {
+      setErrors(prev => {
+        const next = { ...prev };
+        delete next[field];
+        return next;
+      });
+    }
+  };
+
   const toggleTopic = (topic: string) => {
-    setFormData(prev => ({
-      ...prev,
-      selectedTopics: prev.selectedTopics.includes(topic)
+    setFormData(prev => {
+      const exists = prev.selectedTopics.includes(topic);
+      const nextTopics = exists
         ? prev.selectedTopics.filter(t => t !== topic)
-        : [...prev.selectedTopics, topic]
-    }));
+        : [...prev.selectedTopics, topic];
+
+      if (errors.selectedTopics && nextTopics.length > 0) {
+        setErrors(errs => {
+          const next = { ...errs };
+          delete next.selectedTopics;
+          return next;
+        });
+      }
+      return { ...prev, selectedTopics: nextTopics };
+    });
   };
 
   const handleStep1Submit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name.trim() || !formData.email.trim() || !formData.phone.trim()) {
-      showToast('Please enter your name, work email, and WhatsApp number.');
+
+    const nameError = validateName(formData.name);
+    const emailError = validateEmail(formData.email);
+    const phoneError = validatePhone(formData.phone);
+    const companyError = validateCompany(formData.companyName);
+
+    const newErrors: Record<string, string> = {};
+    if (nameError) newErrors.name = nameError;
+    if (emailError) newErrors.email = emailError;
+    if (phoneError) newErrors.phone = phoneError;
+    if (companyError) newErrors.companyName = companyError;
+
+    setTouched({ name: true, email: true, phone: true, companyName: true });
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) {
+      const firstError = nameError || emailError || phoneError || companyError;
+      showToast(firstError || 'Please check the highlighted fields.');
       return;
     }
+
     setStep(2);
     trackEvent('contact_step_1_completed', { email: formData.email, has_whatsapp: true });
   };
 
   const handleFinalSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (formData.selectedTopics.length === 0) {
+      setErrors(prev => ({ ...prev, selectedTopics: 'Please select at least one topic.' }));
+      showToast('Please select at least one topic of interest.');
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -137,60 +260,105 @@ export default function ContactPage() {
               STEP 1: BASIC INFORMATION
           ═══════════════════════════════════════════════════════════ */}
           {step === 1 && (
-            <form onSubmit={handleStep1Submit} className="space-y-4 animate-in fade-in duration-150">
+            <form onSubmit={handleStep1Submit} noValidate className="space-y-4 animate-in fade-in duration-150">
               <div>
                 <label className="block text-xs font-medium text-zinc-700 mb-1.5">
-                  Your Name *
+                  Your Name <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="text"
-                  required
                   placeholder="Rohan Verma"
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full bg-zinc-50/70 border border-zinc-200 rounded-xl px-3.5 py-2.5 text-sm text-zinc-950 placeholder-zinc-400 focus:outline-none focus:border-zinc-950 focus:bg-white transition-colors"
+                  onChange={(e) => handleChange('name', e.target.value)}
+                  onBlur={() => handleBlur('name')}
+                  aria-invalid={!!errors.name}
+                  className={`w-full border rounded-xl px-3.5 py-2.5 text-sm text-zinc-950 placeholder-zinc-400 focus:outline-none transition-colors ${
+                    errors.name
+                      ? 'border-rose-400 bg-rose-50/20 focus:border-rose-500'
+                      : 'bg-zinc-50/70 border-zinc-200 focus:border-zinc-950 focus:bg-white'
+                  }`}
                 />
+                {errors.name && (
+                  <p className="flex items-center gap-1 text-[11px] text-rose-500 font-medium mt-1">
+                    <AlertCircle className="w-3 h-3 shrink-0" />
+                    <span>{errors.name}</span>
+                  </p>
+                )}
               </div>
 
               <div>
                 <label className="block text-xs font-medium text-zinc-700 mb-1.5">
-                  Work Email *
+                  Work Email <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="email"
-                  required
                   placeholder="name@company.com"
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full bg-zinc-50/70 border border-zinc-200 rounded-xl px-3.5 py-2.5 text-sm text-zinc-950 placeholder-zinc-400 focus:outline-none focus:border-zinc-950 focus:bg-white transition-colors"
+                  onChange={(e) => handleChange('email', e.target.value)}
+                  onBlur={() => handleBlur('email')}
+                  aria-invalid={!!errors.email}
+                  className={`w-full border rounded-xl px-3.5 py-2.5 text-sm text-zinc-950 placeholder-zinc-400 focus:outline-none transition-colors ${
+                    errors.email
+                      ? 'border-rose-400 bg-rose-50/20 focus:border-rose-500'
+                      : 'bg-zinc-50/70 border-zinc-200 focus:border-zinc-950 focus:bg-white'
+                  }`}
                 />
+                {errors.email && (
+                  <p className="flex items-center gap-1 text-[11px] text-rose-500 font-medium mt-1">
+                    <AlertCircle className="w-3 h-3 shrink-0" />
+                    <span>{errors.email}</span>
+                  </p>
+                )}
               </div>
 
               <div>
                 <label className="block text-xs font-medium text-zinc-700 mb-1.5">
-                  WhatsApp Number *
+                  WhatsApp Number <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="tel"
-                  required
                   placeholder="+91 98201 23456"
                   value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full bg-zinc-50/70 border border-zinc-200 rounded-xl px-3.5 py-2.5 text-sm text-zinc-950 placeholder-zinc-400 focus:outline-none focus:border-zinc-950 focus:bg-white transition-colors"
+                  onChange={(e) => handleChange('phone', e.target.value)}
+                  onBlur={() => handleBlur('phone')}
+                  aria-invalid={!!errors.phone}
+                  className={`w-full border rounded-xl px-3.5 py-2.5 text-sm text-zinc-950 placeholder-zinc-400 focus:outline-none transition-colors ${
+                    errors.phone
+                      ? 'border-rose-400 bg-rose-50/20 focus:border-rose-500'
+                      : 'bg-zinc-50/70 border-zinc-200 focus:border-zinc-950 focus:bg-white'
+                  }`}
                 />
+                {errors.phone && (
+                  <p className="flex items-center gap-1 text-[11px] text-rose-500 font-medium mt-1">
+                    <AlertCircle className="w-3 h-3 shrink-0" />
+                    <span>{errors.phone}</span>
+                  </p>
+                )}
               </div>
 
               <div>
                 <label className="block text-xs font-medium text-zinc-700 mb-1.5">
-                  Company / Organization Name
+                  Company / Organization Name <span className="text-zinc-400 text-[10px] font-normal">(Optional)</span>
                 </label>
                 <input
                   type="text"
                   placeholder="Acme Advisory"
                   value={formData.companyName}
-                  onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
-                  className="w-full bg-zinc-50/70 border border-zinc-200 rounded-xl px-3.5 py-2.5 text-sm text-zinc-950 placeholder-zinc-400 focus:outline-none focus:border-zinc-950 focus:bg-white transition-colors"
+                  onChange={(e) => handleChange('companyName', e.target.value)}
+                  onBlur={() => handleBlur('companyName')}
+                  aria-invalid={!!errors.companyName}
+                  className={`w-full border rounded-xl px-3.5 py-2.5 text-sm text-zinc-950 placeholder-zinc-400 focus:outline-none transition-colors ${
+                    errors.companyName
+                      ? 'border-rose-400 bg-rose-50/20 focus:border-rose-500'
+                      : 'bg-zinc-50/70 border-zinc-200 focus:border-zinc-950 focus:bg-white'
+                  }`}
                 />
+                {errors.companyName && (
+                  <p className="flex items-center gap-1 text-[11px] text-rose-500 font-medium mt-1">
+                    <AlertCircle className="w-3 h-3 shrink-0" />
+                    <span>{errors.companyName}</span>
+                  </p>
+                )}
               </div>
 
               <div className="pt-2">
@@ -209,14 +377,14 @@ export default function ContactPage() {
               STEP 2: BUSINESS & REQUIREMENTS
           ═══════════════════════════════════════════════════════════ */}
           {step === 2 && (
-            <form onSubmit={handleFinalSubmit} className="space-y-4 animate-in fade-in duration-150">
+            <form onSubmit={handleFinalSubmit} noValidate className="space-y-4 animate-in fade-in duration-150">
               <div>
                 <label className="block text-xs font-medium text-zinc-700 mb-1.5">
                   Industry / Business Domain
                 </label>
                 <select
                   value={formData.industry}
-                  onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
+                  onChange={(e) => handleChange('industry', e.target.value)}
                   className="w-full bg-zinc-50/70 border border-zinc-200 rounded-xl px-3.5 py-2.5 text-sm text-zinc-950 focus:outline-none focus:border-zinc-950 focus:bg-white transition-colors"
                 >
                   {INDUSTRIES.map(item => (
@@ -227,7 +395,7 @@ export default function ContactPage() {
 
               <div>
                 <label className="block text-xs font-medium text-zinc-700 mb-1.5">
-                  What are you interested in?
+                  What are you interested in? <span className="text-rose-500">*</span>
                 </label>
                 <div className="flex flex-wrap gap-1.5">
                   {TOPICS.map(topic => {
@@ -249,17 +417,23 @@ export default function ContactPage() {
                     );
                   })}
                 </div>
+                {errors.selectedTopics && (
+                  <p className="flex items-center gap-1 text-[11px] text-rose-500 font-medium mt-1.5">
+                    <AlertCircle className="w-3 h-3 shrink-0" />
+                    <span>{errors.selectedTopics}</span>
+                  </p>
+                )}
               </div>
 
               <div>
                 <label className="block text-xs font-medium text-zinc-700 mb-1.5">
-                  How can we help?
+                  How can we help? <span className="text-zinc-400 text-[10px] font-normal">(Optional)</span>
                 </label>
                 <textarea
                   rows={3}
                   placeholder="Tell us about your team's workflow or any questions..."
                   value={formData.message}
-                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                  onChange={(e) => handleChange('message', e.target.value)}
                   className="w-full bg-zinc-50/70 border border-zinc-200 rounded-xl p-3 text-sm text-zinc-950 placeholder-zinc-400 focus:outline-none focus:border-zinc-950 focus:bg-white transition-colors"
                 />
               </div>
@@ -332,6 +506,8 @@ export default function ContactPage() {
                   type="button"
                   onClick={() => {
                     setStep(1);
+                    setErrors({});
+                    setTouched({});
                     setFormData({
                       name: '',
                       email: '',
