@@ -883,6 +883,17 @@ export function Navbar() {
                           <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black">Contact &amp; Support</span>
                         </Link>
 
+                        <Link
+                          href="/changelog"
+                          onClick={() => setActiveDropdown(null)}
+                          className="flex items-center gap-3 p-2 rounded-xl text-xs font-semibold text-zinc-800 hover:text-black hover:bg-zinc-50 transition-all group"
+                        >
+                          <div className="w-8 h-8 rounded-lg bg-teal-500/10 text-teal-600 border border-teal-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                            <Clock className="w-4 h-4 stroke-[2]" />
+                          </div>
+                          <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black">Changelog</span>
+                        </Link>
+
                         <div className="my-1.5 border-t border-zinc-100" />
 
                         <Link
@@ -2030,6 +2041,48 @@ export function Navbar() {
                       </Link>
                     </div>
 
+                    {/* ── Sleek Monochromatic Bottom Bar for Resources ── */}
+                    <div className="-mx-6 -mb-6 sm:-mx-7 sm:-mb-7 mt-4 px-6 sm:px-7 py-3 bg-zinc-50/90 rounded-b-[28px] border-t border-zinc-100 flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                        <span className="text-xs font-semibold text-zinc-900">Developer &amp; Ecosystem Docs</span>
+                        <span className="text-zinc-300">·</span>
+                        <span className="text-xs text-zinc-500 font-medium hidden sm:inline">API schemas, articles &amp; platform integrations</span>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <Link
+                          href="/articles"
+                          onClick={() => setActiveDropdown(null)}
+                          className="text-xs font-semibold text-zinc-600 hover:text-zinc-950 transition-colors hidden md:inline"
+                        >
+                          Articles
+                        </Link>
+                        <Link
+                          href="/integrations"
+                          onClick={() => setActiveDropdown(null)}
+                          className="text-xs font-semibold text-zinc-600 hover:text-zinc-950 transition-colors hidden md:inline"
+                        >
+                          Integrations
+                        </Link>
+                        <Link
+                          href="/compare"
+                          onClick={() => setActiveDropdown(null)}
+                          className="text-xs font-semibold text-zinc-600 hover:text-zinc-950 transition-colors hidden sm:inline"
+                        >
+                          Compare
+                        </Link>
+                        <Link
+                          href="/docs"
+                          onClick={() => setActiveDropdown(null)}
+                          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-zinc-950 text-white text-xs font-semibold hover:bg-zinc-800 transition-all shadow-2xs group"
+                        >
+                          <span>Explore Docs</span>
+                          <ArrowRight className="w-3.5 h-3.5 text-zinc-400 group-hover:translate-x-0.5 transition-transform" />
+                        </Link>
+                      </div>
+                    </div>
+
                   </div>
                 )}
 
@@ -2769,7 +2822,30 @@ export function Navbar() {
                     <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:text-zinc-700 group-hover:translate-x-0.5 transition-all" />
                   </Link>
 
-                  {/* 3. Guides */}
+                  {/* 3. Documentation */}
+                  <Link
+                    href="/docs"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-3.5 p-3 rounded-2xl bg-emerald-50/60 hover:bg-emerald-50 border border-emerald-100/80 transition-all group"
+                  >
+                    <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                      <Code className="w-4.5 h-4.5 stroke-[2]" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[13px] font-bold text-zinc-950">Documentation &amp; API</span>
+                        <span className="text-[9px] font-mono font-bold text-emerald-700 bg-emerald-100/70 px-2 py-0.5 rounded-full">
+                          Docs
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-zinc-500 font-normal mt-0.5">
+                        REST API endpoints, schemas &amp; quickstart
+                      </p>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:text-zinc-700 group-hover:translate-x-0.5 transition-all" />
+                  </Link>
+
+                  {/* 4. Guides */}
                   <Link
                     href="/guides"
                     onClick={() => setMobileMenuOpen(false)}
@@ -2792,7 +2868,7 @@ export function Navbar() {
                     <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:text-zinc-700 group-hover:translate-x-0.5 transition-all" />
                   </Link>
 
-                  {/* 4. Blogs */}
+                  {/* 5. Blogs */}
                   <Link
                     href="/blog"
                     onClick={() => setMobileMenuOpen(false)}
@@ -2803,13 +2879,59 @@ export function Navbar() {
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between">
-                        <span className="text-[13px] font-bold text-zinc-950">Blogs &amp; Articles</span>
+                        <span className="text-[13px] font-bold text-zinc-950">Blogs &amp; Answers</span>
                         <span className="text-[9px] font-mono font-bold text-amber-800 bg-amber-100/70 px-2 py-0.5 rounded-full">
                           Editorial
                         </span>
                       </div>
                       <p className="text-[11px] text-zinc-500 font-normal mt-0.5">
                         Tactical answers to client &amp; workflow issues
+                      </p>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:text-zinc-700 group-hover:translate-x-0.5 transition-all" />
+                  </Link>
+
+                  {/* 6. Articles */}
+                  <Link
+                    href="/articles"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-3.5 p-3 rounded-2xl bg-zinc-50 hover:bg-zinc-100/80 border border-zinc-200/70 transition-all group"
+                  >
+                    <div className="w-9 h-9 rounded-xl bg-zinc-200/80 text-zinc-700 border border-zinc-300/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                      <FileText className="w-4.5 h-4.5 stroke-[2]" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[13px] font-bold text-zinc-950">Articles &amp; Deep Dives</span>
+                        <span className="text-[9px] font-mono font-bold text-zinc-600 bg-zinc-200 px-2 py-0.5 rounded-full">
+                          Articles
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-zinc-500 font-normal mt-0.5">
+                        In-depth operational blueprints &amp; systems
+                      </p>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:text-zinc-700 group-hover:translate-x-0.5 transition-all" />
+                  </Link>
+
+                  {/* 7. Integrations */}
+                  <Link
+                    href="/integrations"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-3.5 p-3 rounded-2xl bg-indigo-50/60 hover:bg-indigo-50 border border-indigo-100/80 transition-all group"
+                  >
+                    <div className="w-9 h-9 rounded-xl bg-indigo-500/10 text-indigo-600 border border-indigo-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                      <Zap className="w-4.5 h-4.5 stroke-[2]" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[13px] font-bold text-zinc-950">Integrations</span>
+                        <span className="text-[9px] font-mono font-bold text-indigo-700 bg-indigo-100/70 px-2 py-0.5 rounded-full">
+                          Connect
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-zinc-500 font-normal mt-0.5">
+                        WordPress, Webflow, Framer &amp; UPI webhooks
                       </p>
                     </div>
                     <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:text-zinc-700 group-hover:translate-x-0.5 transition-all" />
@@ -2838,6 +2960,14 @@ export function Navbar() {
                   <Link href="/contact" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50">
                     <div className="w-8 h-8 rounded-xl bg-purple-500/10 text-purple-600 border border-purple-500/20 flex items-center justify-center shrink-0 shadow-2xs"><MessageSquare className="w-4 h-4 stroke-[2]" /></div>
                     <div className="text-xs font-bold text-zinc-950">Contact &amp; Support</div>
+                  </Link>
+                  <Link href="/changelog" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50">
+                    <div className="w-8 h-8 rounded-xl bg-teal-500/10 text-teal-600 border border-teal-500/20 flex items-center justify-center shrink-0 shadow-2xs"><Clock className="w-4 h-4 stroke-[2]" /></div>
+                    <div className="text-xs font-bold text-zinc-950">Product Changelog</div>
+                  </Link>
+                  <Link href="/compare" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50">
+                    <div className="w-8 h-8 rounded-xl bg-rose-500/10 text-rose-600 border border-rose-500/20 flex items-center justify-center shrink-0 shadow-2xs"><Scale className="w-4 h-4 stroke-[2]" /></div>
+                    <div className="text-xs font-bold text-zinc-950">Competitor Comparisons</div>
                   </Link>
                   <Link href="/status" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-zinc-50">
                     <div className="w-8 h-8 rounded-xl bg-teal-500/10 text-teal-600 border border-teal-500/20 flex items-center justify-center shrink-0 shadow-2xs"><Zap className="w-4 h-4 stroke-[2]" /></div>
