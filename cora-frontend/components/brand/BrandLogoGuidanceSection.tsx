@@ -32,16 +32,19 @@ const AVOID_RULES = [
 
 export function BrandLogoGuidanceSection() {
   return (
-    <section className="py-16 sm:py-[100px] border-b border-zinc-100 bg-white">
+    <section className="py-14 sm:py-20 border-b border-zinc-100 bg-white">
       <div className="w-full max-w-[1100px] mx-auto px-4 sm:px-6 space-y-12 sm:space-y-16">
         
         {/* Section Header */}
         <div className="space-y-2">
+          <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-zinc-100 border border-zinc-200 text-[10.5px] font-mono font-medium text-zinc-700 uppercase">
+            <span>GOVERNANCE &amp; BOUNDARIES</span>
+          </div>
           <h2 className="font-display text-3xl sm:text-4xl font-bold text-zinc-950 tracking-tight">
-            Logo Guidance
+            Logo Guidance &amp; Clear Space
           </h2>
           <p className="text-sm sm:text-base text-zinc-600 font-normal">
-            Rules and boundaries for maintaining brand integrity across third-party partnerships.
+            Rules and boundaries for maintaining brand integrity across third-party partnerships, integrations, and media.
           </p>
         </div>
 
@@ -51,18 +54,19 @@ export function BrandLogoGuidanceSection() {
             Clear Space
           </h3>
           <p className="text-xs text-zinc-500 font-normal">
-            Always maintain minimum clear space around the logo equal to the height of the &apos;C&apos; mark.
+            Always maintain minimum clear space around the logo equal to the height of the &apos;C&apos; mark (1X padding).
           </p>
 
-          <div className="rounded-3xl border border-zinc-200 p-8 sm:p-12 bg-zinc-50/50 flex items-center justify-center">
-            <div className="relative border border-dashed border-zinc-400 p-8 sm:p-10 rounded-2xl bg-white flex items-center justify-center">
-              <span className="absolute -top-3 left-4 px-2 py-0.5 rounded bg-zinc-100 text-[10px] font-mono text-zinc-500">
+          <div className="rounded-3xl border border-zinc-200/90 p-8 sm:p-12 bg-zinc-50/50 flex items-center justify-center shadow-2xs">
+            <div className="relative border border-dashed border-zinc-400 p-8 sm:p-10 rounded-2xl bg-white flex items-center justify-center shadow-2xs">
+              <span className="absolute -top-3 left-4 px-2 py-0.5 rounded bg-zinc-100 border border-zinc-200/70 text-[10px] font-mono text-zinc-600 font-bold">
                 Min Padding: 1X
               </span>
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full border-2 border-zinc-950 flex items-center justify-center">
-                  <span className="w-2 h-2 rounded-full bg-zinc-950" />
-                </div>
+              <div className="flex items-center gap-3 select-none">
+                <svg width="36" height="36" viewBox="0 0 48 48" fill="none" className="text-zinc-950">
+                  <path d="M34 14C31.5 11.5 28 10 24 10C16.268 10 10 16.268 10 24C10 31.732 16.268 38 24 38C28 38 31.5 36.5 34 34" stroke="currentColor" strokeWidth="4.5" strokeLinecap="round"/>
+                  <circle cx="34" cy="24" r="3" fill="currentColor"/>
+                </svg>
                 <span className="font-display text-3xl font-extrabold tracking-tight text-zinc-950">
                   Cora
                 </span>

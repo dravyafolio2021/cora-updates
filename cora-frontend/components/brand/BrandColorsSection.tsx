@@ -16,18 +16,22 @@ const NEUTRAL_COLORS: ColorSwatch[] = [
   { name: 'Pure White', role: 'Background Canvas', hex: '#FFFFFF', rgb: '255 255 255', border: true, darkText: true },
   { name: 'Claude Cream', role: 'B-Roll & Video Canvas', hex: '#FBFaf7', rgb: '251 250 247', border: true, darkText: true },
   { name: 'Zinc 50', role: 'Surface Secondary', hex: '#FAFAFA', rgb: '250 250 250', border: true, darkText: true },
-  { name: 'Zinc 200', role: 'Border Stroke / Divider', hex: '#E4E4E7', rgb: '228 228 231', darkText: true },
-  { name: 'Zinc 500', role: 'Muted Typography', hex: '#71717A', rgb: '113 113 122' },
-  { name: 'Zinc 700', role: 'Secondary Body', hex: '#3F3F46', rgb: '63 63 70' },
-  { name: 'Zinc 900', role: 'Dark Surface Panel', hex: '#18181B', rgb: '24 24 27' },
-  { name: 'Zinc 950', role: 'Primary Dark / Contrast', hex: '#09090B', rgb: '9 9 11' },
+  { name: 'Zinc 100', role: 'Tonal Background / Chips', hex: '#F4F4F5', rgb: '244 244 245', border: true, darkText: true },
+  { name: 'Zinc 200', role: 'Structural Border Stroke', hex: '#E4E4E7', rgb: '228 228 231', darkText: true },
+  { name: 'Zinc 300', role: 'Dividers & Indicator Pins', hex: '#D4D4D8', rgb: '212 212 216', darkText: true },
+  { name: 'Zinc 400', role: 'Placeholder & Inactive Icons', hex: '#A1A1AA', rgb: '161 161 170' },
+  { name: 'Zinc 500', role: 'Muted Eyebrow Typography', hex: '#71717A', rgb: '113 113 122' },
+  { name: 'Zinc 700', role: 'Secondary Body Copy', hex: '#3F3F46', rgb: '63 63 70' },
+  { name: 'Zinc 900', role: 'Dark Surface Panel / Card', hex: '#18181B', rgb: '24 24 27' },
+  { name: 'Zinc 950', role: 'Primary Contrast / Text', hex: '#09090B', rgb: '9 9 11' },
   { name: 'Pure Black', role: 'True Pitch Black', hex: '#000000', rgb: '0 0 0' }
 ];
 
 const ACCENT_COLORS: ColorSwatch[] = [
-  { name: 'Active Emerald', role: 'Online / Verified State', hex: '#10B981', rgb: '16 185 129' },
-  { name: 'Pending Amber', role: 'Awaiting Action / Sign', hex: '#F59E0B', rgb: '245 158 11' },
-  { name: 'Critical Crimson', role: 'Destructive / Overdue', hex: '#EF4444', rgb: '239 68 68' }
+  { name: 'Active Emerald', role: 'Verified Retainers / Online State', hex: '#10B981', rgb: '16 185 129' },
+  { name: 'Pending Amber', role: 'Awaiting E-Sign / Scope Approval', hex: '#F59E0B', rgb: '245 158 11' },
+  { name: 'Critical Crimson', role: 'Overdue Invoice / Scope Alert', hex: '#EF4444', rgb: '239 68 68' },
+  { name: 'Telemetry Blue', role: 'REST API & Platform Webhooks', hex: '#3B82F6', rgb: '59 130 246' }
 ];
 
 export function BrandColorsSection() {
@@ -40,16 +44,19 @@ export function BrandColorsSection() {
   };
 
   return (
-    <section className="py-16 sm:py-[100px] border-b border-zinc-100 bg-white">
+    <section className="py-14 sm:py-20 border-b border-zinc-100 bg-white">
       <div className="w-full max-w-[1100px] mx-auto px-4 sm:px-6 space-y-12 sm:space-y-16">
         
         {/* Section Header */}
         <div className="space-y-2">
+          <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-zinc-100 border border-zinc-200 text-[10.5px] font-mono font-medium text-zinc-700 uppercase">
+            <span>COLOR ARCHITECTURE</span>
+          </div>
           <h2 className="font-display text-3xl sm:text-4xl font-bold text-zinc-950 tracking-tight">
-            Core Colors
+            Design Tokens &amp; Color System
           </h2>
           <p className="text-sm sm:text-base text-zinc-600 font-normal">
-            The strict monochromatic and functional neutral ramp that governs all Cora applications and media.
+            The strict monochromatic ramp and functional status accents that govern all Cora web apps and marketing canvases.
           </p>
         </div>
 
@@ -57,7 +64,7 @@ export function BrandColorsSection() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="font-display text-lg font-bold text-zinc-950">
-              Monochromatic Neutral Ramp
+              Monochromatic Neutral Ramp (12 Tokens)
             </h3>
             <span className="text-xs font-mono text-zinc-400">Click swatch to copy HEX</span>
           </div>
