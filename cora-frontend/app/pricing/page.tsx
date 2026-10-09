@@ -293,7 +293,7 @@ export default function PricingPage() {
           </p>
 
           {/* Primary Cadence Switcher with 2 Months Free badge */}
-          <div ref={topToggleRef} className="flex flex-col items-center gap-2 mt-6 shrink-0">
+          <div ref={topToggleRef} className="flex flex-col items-center gap-2 mt-6 shrink-0 select-none">
             <div className="w-fit inline-flex items-center p-1 bg-white/90 backdrop-blur-md rounded-full border border-zinc-200/90 shadow-2xs">
               <button
                 type="button"
@@ -301,7 +301,7 @@ export default function PricingPage() {
                   setBillingCycle('monthly');
                   trackEvent('pricing_cycle_change', { cycle: 'monthly' });
                 }}
-                className={`px-4 sm:px-5 py-2 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+                className={`px-4 sm:px-5 py-2 rounded-full text-xs font-semibold transition-all cursor-pointer outline-none focus:outline-none focus-visible:outline-none focus:ring-0 select-none ${
                   billingCycle === 'monthly'
                     ? 'bg-zinc-950 text-white shadow-xs'
                     : 'text-zinc-600 hover:text-zinc-950'
@@ -315,15 +315,15 @@ export default function PricingPage() {
                   setBillingCycle('annual');
                   trackEvent('pricing_cycle_change', { cycle: 'annual' });
                 }}
-                className={`px-4 sm:px-5 py-2 rounded-full text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
+                className={`px-4 sm:px-5 py-2 rounded-full text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer outline-none focus:outline-none focus-visible:outline-none focus:ring-0 select-none ${
                   billingCycle === 'annual'
                     ? 'bg-zinc-950 text-white shadow-xs'
                     : 'text-zinc-600 hover:text-zinc-950'
                 }`}
               >
                 <span>Annual Billing</span>
-                <span className="bg-emerald-500 text-white text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-full shadow-2xs">
-                  2 Mo. Free
+                <span className="bg-zinc-100 text-zinc-900 border border-zinc-200/80 font-mono text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-full shadow-2xs">
+                  Save 20%
                 </span>
               </button>
             </div>
@@ -1610,14 +1610,14 @@ export default function PricingPage() {
       ══════════════════════════════════════════════════════════════════════ */}
       {showFloatingToggle && (
         <div className="fixed bottom-4 sm:bottom-6 inset-x-0 mx-auto w-fit z-50 animate-in fade-in slide-in-from-bottom-4 duration-300">
-          <div className="inline-flex items-center p-1 sm:p-1.5 bg-white/95 backdrop-blur-xl rounded-full border border-zinc-200/90 shadow-[0_12px_40px_rgba(0,0,0,0.12)]">
+          <div className="inline-flex items-center p-1 sm:p-1.5 bg-white/95 backdrop-blur-xl rounded-full border border-zinc-200/90 shadow-[0_12px_40px_rgba(0,0,0,0.12)] select-none">
             <button
               type="button"
               onClick={() => {
                 setBillingCycle('monthly');
                 trackEvent('pricing_cycle_change_floating', { cycle: 'monthly' });
               }}
-              className={`px-4 sm:px-5 py-1.5 sm:py-2 rounded-full text-[11px] sm:text-xs font-bold transition-all cursor-pointer ${
+              className={`px-4 sm:px-5 py-1.5 sm:py-2 rounded-full text-[11px] sm:text-xs font-bold transition-all cursor-pointer outline-none focus:outline-none focus-visible:outline-none focus:ring-0 select-none ${
                 billingCycle === 'monthly'
                   ? 'bg-zinc-950 text-white shadow-xs'
                   : 'text-zinc-600 hover:text-zinc-950'
@@ -1631,15 +1631,15 @@ export default function PricingPage() {
                 setBillingCycle('annual');
                 trackEvent('pricing_cycle_change_floating', { cycle: 'annual' });
               }}
-              className={`px-4 sm:px-5 py-1.5 sm:py-2 rounded-full text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+              className={`px-4 sm:px-5 py-1.5 sm:py-2 rounded-full text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer outline-none focus:outline-none focus-visible:outline-none focus:ring-0 select-none ${
                 billingCycle === 'annual'
                   ? 'bg-zinc-950 text-white shadow-xs'
                   : 'text-zinc-600 hover:text-zinc-950'
               }`}
             >
               <span>Annual Billing</span>
-              <span className="bg-emerald-500 text-white text-[9px] sm:text-[10px] font-extrabold px-1.5 sm:px-2 py-0.5 rounded-full shadow-2xs">
-                2 Mo. Free
+              <span className="bg-zinc-100 text-zinc-900 border border-zinc-200/80 font-mono text-[9px] sm:text-[10px] font-extrabold px-1.5 sm:px-2 py-0.5 rounded-full shadow-2xs">
+                Save 20%
               </span>
             </button>
           </div>

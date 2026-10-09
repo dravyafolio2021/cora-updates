@@ -53,12 +53,12 @@ export function PricingSection() {
         </div>
 
         {/* Billing Switcher (Monthly / Annual) */}
-        <div className="flex items-center justify-center mb-12 sm:mb-16">
+        <div className="flex items-center justify-center mb-12 sm:mb-16 select-none">
           <div className="inline-flex items-center bg-zinc-100 p-1.5 rounded-2xl border border-zinc-200/80 shadow-2xs">
             <button
               type="button"
               onClick={() => setBilling('monthly')}
-              className={`px-5 py-2 text-xs sm:text-sm font-semibold rounded-xl transition-all cursor-pointer ${
+              className={`px-5 py-2 text-xs sm:text-sm font-semibold rounded-xl transition-all cursor-pointer outline-none focus:outline-none focus-visible:outline-none focus:ring-0 select-none ${
                 !isAnnual ? 'bg-zinc-950 text-white shadow-2xs' : 'text-zinc-600 hover:text-zinc-950'
               }`}
             >
@@ -67,12 +67,12 @@ export function PricingSection() {
             <button
               type="button"
               onClick={() => setBilling('annual')}
-              className={`px-5 py-2 text-xs sm:text-sm font-semibold rounded-xl transition-all flex items-center gap-1.5 cursor-pointer ${
+              className={`px-5 py-2 text-xs sm:text-sm font-semibold rounded-xl transition-all flex items-center gap-1.5 cursor-pointer outline-none focus:outline-none focus-visible:outline-none focus:ring-0 select-none ${
                 isAnnual ? 'bg-zinc-950 text-white shadow-2xs' : 'text-zinc-600 hover:text-zinc-950'
               }`}
             >
               <span>Annual</span>
-              <span className="px-2 py-0.5 text-[10px] font-bold bg-emerald-500 text-white rounded-full">
+              <span className="px-2 py-0.5 text-[9.5px] font-mono font-bold bg-white text-zinc-900 border border-zinc-200/80 rounded-full shadow-2xs">
                 Save 20%
               </span>
             </button>
