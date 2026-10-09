@@ -109,21 +109,21 @@ export function DocsClient({ currentArticle }: DocsClientProps) {
     <div className="min-h-screen bg-white text-zinc-900 flex flex-col justify-between">
       
       {/* ── INDEPENDENT DEDICATED DOCS HEADER ── */}
-      <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-zinc-200/80 px-4 sm:px-8 py-3">
-        <div className="max-w-[1440px] mx-auto flex items-center justify-between gap-4">
+      <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-zinc-200/80 px-3 sm:px-6 md:px-8 py-2.5 sm:py-3">
+        <div className="max-w-[1440px] mx-auto flex items-center justify-between gap-2 sm:gap-4">
           
           {/* Left: Brand Logo + Docs Badge + Breadcrumb Trail */}
-          <div className="flex items-center gap-3 min-w-0">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
             <button
               type="button"
               onClick={() => setMobileSidebarOpen(true)}
-              className="lg:hidden p-1.5 rounded-lg text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 transition-colors"
+              className="lg:hidden p-1.5 -ml-1 rounded-xl text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 transition-colors shrink-0"
               aria-label="Open Sidebar"
             >
               <SlidersHorizontal className="w-4 h-4" />
             </button>
 
-            <Link href="/" className="font-display text-lg font-bold text-zinc-950 tracking-tight flex items-center gap-2 hover:opacity-80 transition-opacity shrink-0">
+            <Link href="/" className="font-display text-base sm:text-lg font-bold text-zinc-950 tracking-tight flex items-center gap-1.5 hover:opacity-80 transition-opacity shrink-0">
               CORA
             </Link>
 
@@ -131,7 +131,7 @@ export function DocsClient({ currentArticle }: DocsClientProps) {
 
             <Link href="/docs" className="flex items-center gap-1.5 font-mono text-xs font-bold text-zinc-800 hover:text-black transition-colors shrink-0">
               <span>DOCS</span>
-              <span className="px-1.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 font-mono text-[10px] font-bold border border-emerald-200">
+              <span className="hidden sm:inline-flex px-1.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 font-mono text-[10px] font-bold border border-emerald-200">
                 v3.2.46
               </span>
             </Link>
@@ -150,8 +150,8 @@ export function DocsClient({ currentArticle }: DocsClientProps) {
           </div>
 
           {/* Right: Quick Links + Search Trigger + Studio OS Action */}
-          <div className="flex items-center gap-3 shrink-0">
-            <nav className="hidden md:flex items-center gap-4 text-xs font-medium text-zinc-600 mr-2">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            <nav className="hidden md:flex items-center gap-4 text-xs font-medium text-zinc-600 mr-1">
               <Link href="/" className="hover:text-zinc-950 transition-colors">
                 Main Site
               </Link>
@@ -166,9 +166,10 @@ export function DocsClient({ currentArticle }: DocsClientProps) {
             <button
               type="button"
               onClick={() => setSearchOpen(true)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200/80 text-zinc-600 hover:text-zinc-950 text-xs font-medium border border-zinc-200/60 transition-all cursor-pointer shadow-2xs"
+              className="flex items-center gap-2 p-2 sm:px-3 sm:py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200/80 text-zinc-600 hover:text-zinc-950 text-xs font-medium border border-zinc-200/60 transition-all cursor-pointer shadow-2xs shrink-0"
+              aria-label="Search documentation"
             >
-              <Search className="w-3.5 h-3.5 text-zinc-400" />
+              <Search className="w-3.5 h-3.5 text-zinc-500" />
               <span className="hidden sm:inline">Search docs...</span>
               <kbd className="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-mono font-semibold text-zinc-500 bg-white rounded-md border border-zinc-200 shadow-2xs">
                 ⌘K
@@ -177,9 +178,10 @@ export function DocsClient({ currentArticle }: DocsClientProps) {
 
             <a
               href="https://app.heycora.in/workspace/login?source=docs_header"
-              className="inline-flex items-center justify-center gap-1.5 bg-zinc-950 text-white border border-zinc-800 px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-[13px] font-semibold hover:bg-zinc-800 transition-all shadow-2xs active:translate-y-0 hover:-translate-y-0.5 whitespace-nowrap group"
+              className="inline-flex items-center justify-center gap-1.5 bg-zinc-950 text-white border border-zinc-800 px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-[13px] font-semibold hover:bg-zinc-800 transition-all shadow-2xs active:translate-y-0 whitespace-nowrap group shrink-0"
             >
-              <span>Get started for Free</span>
+              <span className="hidden sm:inline">Get started for Free</span>
+              <span className="sm:hidden">Start Free</span>
               <ArrowRight className="w-3.5 h-3.5 text-zinc-400 group-hover:translate-x-0.5 transition-transform" />
             </a>
           </div>
@@ -254,12 +256,12 @@ export function DocsClient({ currentArticle }: DocsClientProps) {
         {/* ══════════════════════════════════════════════════════════════════
             2. CENTER MAIN ARTICLE PROSE VIEW
         ══════════════════════════════════════════════════════════════════ */}
-        <main className="flex-1 min-w-0 px-6 sm:px-12 py-10 lg:py-12 pb-28 lg:pb-12 max-w-[840px] mx-auto">
+        <main className="flex-1 min-w-0 px-4 sm:px-8 md:px-12 py-8 sm:py-10 lg:py-12 pb-36 sm:pb-36 lg:pb-12 max-w-[840px] mx-auto">
           
           {/* Article Header & Metadata */}
-          <div className="space-y-3 pb-8 border-b border-zinc-100">
+          <div className="space-y-3 pb-6 sm:pb-8 border-b border-zinc-100">
             
-            <div className="flex items-center flex-wrap gap-2">
+            <div className="flex items-center flex-wrap gap-2 text-xs text-zinc-500">
               <span className="px-2.5 py-0.5 rounded-full bg-zinc-100 text-zinc-800 text-[11px] font-semibold border border-zinc-200/80">
                 {currentArticle.categoryLabel}
               </span>
@@ -268,22 +270,22 @@ export function DocsClient({ currentArticle }: DocsClientProps) {
                   {currentArticle.badge}
                 </span>
               )}
-              <span className="inline-flex items-center gap-1 text-xs text-zinc-400 font-medium">
-                <Clock className="w-3.5 h-3.5" />
+              <span className="inline-flex items-center gap-1 text-[11px] sm:text-xs text-zinc-500 font-medium">
+                <Clock className="w-3.5 h-3.5 text-zinc-400" />
                 <span>{currentArticle.readTime}</span>
               </span>
               <span className="text-zinc-300">•</span>
-              <span className="inline-flex items-center gap-1 text-xs text-zinc-400 font-medium">
-                <Calendar className="w-3.5 h-3.5" />
+              <span className="inline-flex items-center gap-1 text-[11px] sm:text-xs text-zinc-500 font-medium">
+                <Calendar className="w-3.5 h-3.5 text-zinc-400" />
                 <span>Updated {currentArticle.lastUpdated}</span>
               </span>
             </div>
 
-            <h1 className="font-display text-2xl sm:text-4xl font-bold text-zinc-950 tracking-tight leading-[1.2]">
+            <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-zinc-950 tracking-tight leading-[1.25] sm:leading-[1.2]">
               {currentArticle.title}
             </h1>
 
-            <p className="text-sm sm:text-base text-zinc-600 leading-relaxed font-normal">
+            <p className="text-xs sm:text-sm lg:text-base text-zinc-600 leading-relaxed font-normal">
               {currentArticle.description}
             </p>
           </div>
@@ -422,26 +424,28 @@ export function DocsClient({ currentArticle }: DocsClientProps) {
       {/* ══════════════════════════════════════════════════════════════════
           4. MOBILE FLOATING BOTTOM BAR (< lg)
       ══════════════════════════════════════════════════════════════════ */}
-      <div className="lg:hidden fixed bottom-4 left-4 right-4 z-40">
-        <div className="bg-zinc-950/95 text-white rounded-2xl p-2 px-3 shadow-2xl border border-zinc-800 flex items-center justify-between gap-2 backdrop-blur-md">
+      <div className="lg:hidden fixed bottom-4 left-3 right-3 sm:left-4 sm:right-4 z-40 max-w-[500px] mx-auto">
+        <div className="bg-zinc-950/95 text-white rounded-2xl p-1.5 px-2.5 sm:p-2 sm:px-3 shadow-[0_12px_36px_rgba(0,0,0,0.35)] border border-zinc-800/90 flex items-center justify-between gap-2 backdrop-blur-md">
           
           {/* Left: Open Bottom Sheet Trigger */}
           <button
             type="button"
             onClick={() => setMobileSidebarOpen(true)}
-            className="flex items-center gap-2 px-3 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-semibold transition-colors cursor-pointer max-w-[55%]"
+            className="flex items-center gap-2 px-2.5 py-2 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 text-white text-xs font-semibold transition-colors cursor-pointer min-w-0 flex-1"
           >
-            <Layers className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
-            <span className="truncate">{currentArticle.shortTitle}</span>
-            <ChevronDown className="w-3.5 h-3.5 text-zinc-500 shrink-0" />
+            <div className="w-5 h-5 rounded-md bg-zinc-800 flex items-center justify-center shrink-0 text-zinc-300">
+              <Layers className="w-3 h-3" />
+            </div>
+            <span className="truncate text-left">{currentArticle.shortTitle}</span>
+            <ChevronDown className="w-3.5 h-3.5 text-zinc-500 shrink-0 ml-auto" />
           </button>
 
           {/* Right Controls: Search + Free Start / Next */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 shrink-0">
             <button
               type="button"
               onClick={() => setSearchOpen(true)}
-              className="p-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors cursor-pointer"
+              className="p-2 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors cursor-pointer"
               aria-label="Search Documentation"
             >
               <Search className="w-4 h-4" />
@@ -450,7 +454,7 @@ export function DocsClient({ currentArticle }: DocsClientProps) {
             {nextArticle ? (
               <Link
                 href={`/docs/${nextArticle.slug}`}
-                className="flex items-center gap-1 px-3 py-2 rounded-xl bg-white text-zinc-950 hover:bg-zinc-100 text-xs font-bold transition-colors shrink-0 shadow-2xs"
+                className="flex items-center gap-1 px-3 py-2 rounded-xl bg-white text-zinc-950 hover:bg-zinc-100 text-xs font-bold transition-colors shadow-2xs"
               >
                 <span>Next</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -458,9 +462,9 @@ export function DocsClient({ currentArticle }: DocsClientProps) {
             ) : (
               <a
                 href="https://app.heycora.in/workspace/login?source=docs_bottombar"
-                className="flex items-center gap-1 px-3 py-2 rounded-xl bg-white text-zinc-950 hover:bg-zinc-100 text-xs font-bold transition-colors shrink-0 shadow-2xs"
+                className="flex items-center gap-1 px-3 py-2 rounded-xl bg-white text-zinc-950 hover:bg-zinc-100 text-xs font-bold transition-colors shadow-2xs"
               >
-                <span>Free</span>
+                <span>Start</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </a>
             )}
