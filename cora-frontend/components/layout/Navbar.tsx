@@ -93,8 +93,8 @@ export function Navbar() {
   const navRef = useRef<HTMLElement>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Dedicated independent header on Docs pages
-  if (pathname?.startsWith('/docs')) {
+  // Dedicated independent header on Docs pages & Partner Landing Pages (Menu not required)
+  if (pathname?.startsWith('/docs') || pathname?.startsWith('/vanshrajput') || pathname?.startsWith('/vnxdigital')) {
     return null;
   }
 

@@ -11,6 +11,9 @@
 |---|---|---|---|---|
 | **Core Platform** | `main` | 🟢 Stable (v4.9.364) | `cora-workspace.php`, `admin-dashboard.php` | Main Orchestrator |
 <!-- MODULE_ROWS_START -->
+| **Marketing Site Reform & Tools/Templates Ecosystem** | `feat/marketing-site-reform-2026-10-06` | 🟢 Complete & Active (Oct 2026) | `cora-frontend/app/*`, `cora-frontend/components/hero/Hero.tsx`, `cora-frontend/components/layout/Navbar.tsx` | Growth & Marketing Frontend Agent |
+| **Sticky AI SDR Bar & Objection Handling Engine** | `feat/marketing-site-reform-2026-10-06` | 🟢 Complete & Active (Oct 2026) | `cora-frontend/components/hero/HeroAIInput.tsx`, `cora-frontend/app/api/ai-preview/route.ts` | Growth AI & Sales Agent |
+| **Multi-Format Template & Asset Library (16+ Schemas)** | `feat/marketing-site-reform-2026-10-06` | 🟢 Complete & Active (Oct 2026) | `cora-frontend/app/templates/*`, `cora-frontend/lib/templates-data.ts` | Templates & Theme Ecosystem Agent |
 | **AI Run Quotas & Fair Usage Pacing** | `main` | 🟢 Complete & Active (v4.9.364) | `cora-workspace.php`, `views/view-settings-suite.php`, `admin-dashboard.php` | AI Architecture & Super Admin Agent |
 | **Endorsely Affiliate Tracking Suite** | `main` | 🟢 Complete & Active (v4.9.364) | `cora-frontend/app/layout.tsx`, `cora-frontend/components/pricing/*` | Growth & Checkout Agent |
 | **Live Static Site & Tailwind Parity Engine** | `main` | 🟢 Complete & Active (v4.9.363) | `views/view-canvas.php`, `cora-workspace.php` | Canvas Visual Engine Agent |
@@ -303,6 +306,7 @@
 
 | Version | Date | Key Changes |
 | :--- | :--- | :--- |
+| **Marketing Reform** | Oct 2026 | Repositioned homepage hero headline to 'Build websites. Run your business, with an AI co-founder.', dual Google / Free Templates CTAs, sticky bottom AI SDR bar with automated objection handling and dynamic conversion coupons (MIGRATEFREE, CORA10), overhauled navbar to 'Tools & Templates', deployed 16+ multi-format templates and schemas at /templates (Native Pages, AI Prompts, Elementor Kits, Lovable Projects), updated autonomous AI workforce agent portraits, and overhauled executive confidence 6-feature grid with active-voice copy |
 | **v4.9.364** | Oct 2026 | Standardized AI run quotas (15K Pro / 25K Scale monthly), added weekly soft-limit throttling (3,750 Pro / 6,250 Scale runs/week), Super Admin rate-limit bypass, integrated Endorsely affiliate tracking suite (`app.endorsely.com/assets/affiliate-tracking.js`) across frontend layouts and checkout sheets with dynamic conversion pinging |
 | **v4.9.363** | Oct 2026 | Guaranteed live static site styling parity, automated Tailwind CSS CDN injection, and CSS scope containment across Canvas previews |
 | **v4.9.362** | Oct 2026 | Combined fragmented editor edit actions into unified 'Edit with AI' toolbar button in Canvas Live Code Editor with instant diff previewing |

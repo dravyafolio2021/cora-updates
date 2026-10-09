@@ -64,7 +64,7 @@ const PLAN_CATALOG: Record<PlanKey, PlanDetails> = {
     annualTotalUSD: 0,
     description: 'For solo operators, solopreneurs & creators starting out.',
     features: [
-      '1,000 AI Runs / month',
+      '500 AI Runs / month',
       'Live portfolio & website on heycora.in',
       'Kanban CRM & lead funnel',
       'SHA-256 court-admissible e-signatures',
@@ -86,10 +86,9 @@ const PLAN_CATALOG: Record<PlanKey, PlanDetails> = {
     description: 'For independent operators establishing their brand with custom domains.',
     features: [
       '5,000 AI Runs / month (6,000 on annual)',
-      'Connect custom domain (.com / .in)',
+      'Free custom domain (.com / .in)',
       'Custom business email sending',
       'Up to 2 team seats',
-      '100% white-label client view',
       '2 Months Free with Annual Billing'
     ]
   },
@@ -108,8 +107,9 @@ const PLAN_CATALOG: Record<PlanKey, PlanDetails> = {
     description: 'Autonomous backbone with advanced AI, official WhatsApp dispatch & UPI QR.',
     features: [
       'Advanced AI Reasoning Engine',
-      '15,000 AI Runs / month',
-      'Official WhatsApp automated dispatch',
+      '14,000 AI Runs / month',
+      'Free custom domain (.com / .in)',
+      'Official WhatsApp automated dispatch*',
       'Dynamic UPI QR code on invoices (0% fee)',
       'Automated GST tax splits (CGST/SGST/IGST)',
       'Up to 5 team seats & granular roles',
@@ -133,7 +133,8 @@ const PLAN_CATALOG: Record<PlanKey, PlanDetails> = {
     features: [
       'Free Custom Website Development or Migration',
       'All Frontier AI Engines (GPT-4o, Claude 3.5, Gemini 1.5 Pro)',
-      '25,000 AI Runs / month',
+      '20,000 AI Runs / month',
+      'Free custom domain (.com / .in)',
       'Autonomous AI Research Agent',
       'Unlimited* team seats',
       'Custom Webhooks & REST API access',

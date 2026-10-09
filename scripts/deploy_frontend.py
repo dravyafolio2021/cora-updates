@@ -159,6 +159,8 @@ echo "Remote deployment extraction finished successfully."
         ("Embed Builder Tool (Next.js)", "https://heycora.in/tools/embed-builder/", "Website Embed"),
         ("Templates & Theme Library (Next.js)", "https://heycora.in/templates", "Templates"),
         ("Web Dev Agency Template (Next.js)", "https://heycora.in/templates/web-development-agency", "Agency"),
+        ("VNX Digital Partner Landing (Next.js)", "https://heycora.in/vanshrajput", "VNX Digital"),
+        ("VNX Digital Partner Redirect (Next.js)", "https://heycora.in/vnxdigital", "vanshrajput"),
         ("Production Workspace (WordPress)", "https://heycora.in/workspace/login", "login-form"),
         ("Staging Workspace (WordPress)", "https://stagging.heycora.in", None),
     ]

@@ -13,6 +13,7 @@ This is the operating guide for publishing useful, searchable articles without a
 ├── /integrations/                                  Integration and setup pages
 ├── /features/                                      Product capability pages
 ├── /use-cases/                                     Industry workflows
+├── /templates/                                     Frontend template & asset library
 └── /docs/                                          Technical documentation
 ```
 

@@ -318,6 +318,73 @@ High-contrast bounding boxes and heavy outline borders create visual fatigue and
 
 ---
 
+### 1.24 Marketing Site Reform & Tools & Templates Discovery Engine (Oct 2026)
+* **Repositioned Core Value Proposition**:
+  - **Headline**: "Build websites. Run your business, with an AI co-founder."
+  - **Subtitle**: "The operating system for Indian service businesses and agencies. Invoicing, lead CRM, team dispatch, client portal, and custom websites — powered by your personal AI co-founder."
+* **Dual-Track Conversion Funnel**:
+  1. **Primary High-Velocity CTA ("Sign in with Google")**: Instant OAuth registration bypassing manual credential setup, configuring agency tenant databases in under 3 seconds.
+  2. **Secondary Discovery CTA ("Explore free templates")**: Links directly to the `/use-cases` directory showcasing 16+ pre-seeded turnkey schemas with interactive live previews.
+* **Tools & Templates Architecture**:
+  - Overhauled marketing navigation into "Tools & Templates", replacing passive resources with interactive agency utilities.
+  - **Free Business Calculators**: Interactive 18% GST invoice simulator, agency retainer target margin calculator, and commercial proposal generator.
+  - **Turnkey Production Schemas (16+ Verticals)**: Photography Studios, Real Estate Brokerages, Digital Marketing Agencies, Stationery Manufacturing & Van Sales, Consulting & Professional Services, Wedding Media, Salons & Clinics, and Creator Retainers.
+  - **Universal Lead Ingestion**: Embedded forms across static theme landing pages automatically pipe inbound inquiries directly into `wp_cora_leads` with full campaign attribution.
+
+---
+
+### 1.25 Sticky AI SDR Sales Engine & Objection Handling Architecture (Oct 2026)
+* **True Viewport Docking via Portal**:
+  - Implemented in `HeroAIInput.tsx` via `createPortal(..., document.body)`.
+  - Guarantees true viewport-anchored bottom-center docking (`bottom-0 sm:bottom-4`), completely bypassing parent container clipping or relative positioning offsets.
+  - **Zero Backdrop Overlay**: The bar floats cleanly above the marketing canvas without dimming background content, ensuring frictionless browsing.
+* **Conversational AI SDR & Objection Handling Engine**:
+  - High-velocity query parser in `cora-frontend/app/api/ai-preview/route.ts` delivering crisp, query-aligned active voice answers.
+  - **Agency Routing Pills**: Instant 1-tap inquiries for Web Design & Dev, Creative & Branding, Performance & SEO, App & Software Dev, and Media & Production.
+  - **Pre-Configured Objection Vectors**:
+    1. *Notion / HoneyBook vs Cora*: Highlights Cora’s Indian SAC 9983 GST compliance, client proofing vaults, and zero multi-tool subscription sprawl.
+    2. *Website Migration*: Explains 100% white-glove migration services for agency client themes and assets.
+    3. *Annual Discounts*: Dynamically surfaces conversion coupons (`MIGRATEFREE`, `CORA10`).
+    4. *WordPress Multi-Plugin Sprawl*: Details the performance advantages of Cora’s unified single-engine architecture over fragmented 15-plugin stacks.
+    5. *AI Run Quotas*: Clarifies the 15,000 (Pro) and 25,000 (Scale) monthly run allowances with anti-burnout pacing.
+* **Dynamic Conversion Coupon Attribution**:
+  - Generates actionable promotional offer cards directly inside the conversation stream.
+  - 1-click CTA buttons (`Claim Free Migration →`, `Claim 10% Off Now →`) automatically redirect to `/pricing/?coupon={code}&plan=pro`, auto-applying the discount token into the checkout state.
+
+---
+
+### 1.26 Multi-Format Frontend Asset & Template Distribution Ecosystem (Oct 2026)
+* **Universal 4-Format Asset Directory (`/templates` and `/templates/[slug]`)**:
+  - Complete frontend asset repository featuring 16+ production-ready themes and blueprints categorized into 4 distinct distribution formats:
+    1. **Native Landing Pages (`native_page`)**: Full-bleed production landing pages built with Next.js 15 and Tailwind CSS. Delivers sub-50ms paint times, accessible ARIA focus rings, and responsive mobile bottom sheets.
+    2. **AI Section Prompts (`section_prompts`)**: Battle-tested prompt blueprints engineered for Claude 3.5 Sonnet, Cursor Composer, and ChatGPT, enabling developers to generate pixel-perfect Hero, Bento, Pricing, and Form sections with matching design tokens.
+    3. **Elementor Template Kits (`elementor_kit`)**: Downloadable and copyable Elementor JSON blueprints configured with standardized typography tokens and responsive layouts.
+    4. **Lovable & React Projects (`lovable_project`)**: Production-ready React project configurations tailored for Lovable.dev and v0.dev rapid full-stack scaffolding.
+* **Interactive Live Preview Modal (`TemplatePreviewModal.tsx`)**:
+  - Responsive preview modal with viewport controls (`Desktop`, `Tablet`, `Mobile`), full-height iframe sandboxing, and direct clipboard prompt export.
+* **Turnkey Schema Models & Lead Bridge**:
+  - Pre-seeded operational and website schemas across 16+ agency niches.
+  - Forms embedded across static landing pages automatically bridge to `wp_cora_leads` with full campaign and schema tracking.
+
+---
+
+### 1.27 Autonomous AI Workforce & Modular Agent Portfolios (Oct 2026)
+* **Specialized Domain AI Workforce**:
+  - Integrates 9 dedicated autonomous domain agents across the agency lifecycle:
+    1. **Operations Agent**: Crew call sheets, equipment custody, and task dispatch.
+    2. **Sales Agent**: Lead qualification, proposal generation, and pipeline acceleration.
+    3. **Contracts Agent**: Commercial agreements, model NDAs, and SHA-256 e-sign verification.
+    4. **Knowledge Agent**: Living RAG retrieval, agency SOP search, and memory ingestion.
+    5. **Creative Agent**: Visual asset curation, brand guideline compliance, and media proofing.
+    6. **Delivery Agent**: Client portal links, milestone tracking, and asset handoffs.
+    7. **Finance Agent**: 18% GST invoicing (SAC 9983), advance payment links, and GSTR-1 ledgers.
+    8. **Legal Agent**: Retainer terms, liability clauses, and dispute prevention.
+    9. **Marketing Agent**: SEO optimization, blog draft generation, and multichannel growth.
+* **Visual Identity & Design Continuity**:
+  - Each agent features high-resolution monochrome-first portrait assets (`cora_agent_*.jpg`), active-voice capability descriptions, and strict system prompt isolation.
+
+---
+
 ## Section 2: Core SaaS Business Modules
 
 ### 2.1 Content AI Suite & Myra Assistant
@@ -1470,6 +1537,7 @@ When authenticated as Super Admin (`cora_admin` / `admin@cora.local`), the platf
 
 | Version | Release Date | Key Features & Enhancements |
 | :--- | :--- | :--- |
+| **Marketing Reform** | Oct 2026 | Repositioned homepage hero headline to 'Build websites. Run your business, with an AI co-founder.', dual Google / Free Templates CTAs, sticky bottom AI SDR bar with automated objection handling and dynamic conversion coupons (MIGRATEFREE, CORA10), overhauled navbar to 'Tools & Templates', deployed 16+ multi-format templates and schemas at /templates (Native Pages, AI Prompts, Elementor Kits, Lovable Projects), updated autonomous AI workforce agent portraits, and overhauled executive confidence 6-feature grid with active-voice copy |
 | **v4.9.364** | Oct 2026 | Standardized AI run quotas (15K Pro / 25K Scale monthly), weekly soft-limit throttling (3,750 Pro / 6,250 Scale runs/week), Super Admin rate-limit bypass, and platform-wide Endorsely affiliate tracking integration (`app.endorsely.com/assets/affiliate-tracking.js`) with dynamic conversion attribution on checkout completion |
 | **v4.9.363** | Oct 2026 | Live static site styling parity, automated Tailwind CSS CDN injection, and CSS scope containment across Canvas previews |
 | **v4.9.362** | Oct 2026 | Unified 'Edit with AI' toolbar action in Live Code Editor with instant diff previewing and context-aware prompt execution |

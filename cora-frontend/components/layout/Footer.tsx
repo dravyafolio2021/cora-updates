@@ -103,6 +103,11 @@ export function Footer() {
     }
   };
 
+  const isPartnerPage = pathname?.startsWith('/vanshrajput') || pathname?.startsWith('/vnxdigital');
+  if (isPartnerPage) {
+    return null;
+  }
+
   const is404 = pathname === '/404' || pathname?.includes('_not-found');
   const isDocsPage = pathname?.startsWith('/docs');
   const isLegalPage = [

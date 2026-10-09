@@ -89,6 +89,11 @@ This guide defines the standardized architectural patterns, blueprints, and perf
 78. **Unified 'Edit with AI' Toolbar Architecture (v4.9.362)**: Consolidate fragmented AI editing triggers in the Live Code Editor into a unified, high-visibility "Edit with AI" action bar with context-aware prompts and instant diff previewing.
 79. **Workspace Forms Embedding Suite & Dynamic Form Interoperability (v4.9.361)**: Support embedding dynamic Cora lead capture forms into Canvas landing page themes using `[cora-form id="..."]` shortcodes or `<iframe src="...">` embed codes with responsive height autosizing and AJAX submission handling.
 80. **Live Static Site Styling Parity & CSS Scope Containment (v4.9.363)**: Guarantee 100% styling parity between preview iframes and published static sites by encapsulating Tailwind styles and preventing host stylesheet leakage.
+81. **Marketing Site Reform & Dual-CTA Discovery Architecture (Oct 2026)**: Repositioned homepage value proposition to *"Build websites. Run your business, with an AI co-founder."* Implemented dual high-velocity conversion CTAs: primary Google One-Tap onboarding and secondary "Explore free templates" linking directly to the 16+ pre-seeded schemas at `/use-cases` (Photography, Real Estate, Agency, Manufacturing, Consulting, etc.).
+82. **Tools & Templates Ecosystem & Unified Lead Attribution (Oct 2026)**: Overhauled marketing navigation into "Tools & Templates", unifying free agency calculators (18% GST calculator, retainer margin tool, proposal generator) with production website templates. Form submissions across static landing pages automatically bridge into `wp_cora_leads` with full campaign and schema attribution.
+83. **Sticky AI SDR Bar & True Viewport Portaling Architecture (Oct 2026)**: Portals the conversational AI sales co-founder directly to `document.body` for true viewport bottom-center positioning without backdrop overlay. Delivers query-aligned active voice answers, industry pills, automated objection handling, and dedicated conversion coupons (`MIGRATEFREE`, `CORA10`) linking to checkout.
+84. **Multi-Format Frontend Asset & Template Distribution Architecture (Oct 2026)**: Categorizes website assets into 4 interoperable formats at `/templates` (Native Tailwind/Next.js pages, AI Section Prompts for Claude/Cursor, Elementor JSON Kits, and Lovable React projects), with live modal previews, direct code copy triggers, and automatic lead capture bridge to `wp_cora_leads`.
+85. **Autonomous AI Workforce & Structured Domain Agents (Oct 2026)**: Deploys dedicated domain AI agent personas across Operations, Sales, Contracts, Knowledge, Creative, Delivery, Finance, Legal, and Marketing with high-resolution portraits, role-scoped permissions, and specialized system prompts.
 
 ---
 ---
@@ -965,6 +970,64 @@ When rendering and embedding custom landing pages:
    - Catches broken scripts, eliminating blank screen freezes.
 3. **Dynamic Forms Shortcode & Iframe Generator**:
    - Supports `[cora-form id="..."]` shortcodes and responsive `<iframe src="...">` embeds with instant CRM lead pipeline routing.
+
+---
+
+## 46. Marketing Site Reform & Discovery Layer Architecture (`cora-frontend`)
+
+When developing and extending marketing pages, public calculators, and use case showcases:
+1. **Unified Headline & Value Proposition**:
+   - Strictly adhere to the canonical platform positioning: *"Build websites. Run your business, with an AI co-founder."*
+2. **Dual-Track Conversion Pathways**:
+   - Primary Action: Google One-Tap onboarding with immediate tenant workspace creation.
+   - Secondary Action: "Explore free templates" linking directly to the 16+ pre-seeded turnkey schemas at `/use-cases`.
+3. **Tools & Templates Directory Architecture**:
+   - Marketing navigation must route users to interactive business calculators (GST simulator, retainer target margin calculator, proposal builder) and production website templates.
+   - Lead forms across static landing page templates must automatically submit to `/api/v1/lead` (or `wp_cora_leads`) with attribution metadata for campaign and schema tracking.
+
+---
+
+## 47. Conversational AI SDR & Conversion Coupon Engine (`HeroAIInput.tsx` & `/api/ai-preview`)
+
+When implementing and extending conversational lead acquisition components:
+1. **True Viewport Body Portaling**:
+   - Always mount floating widgets via `createPortal(..., document.body)` to avoid container bounding box clipping and scroll jitter.
+   - Maintain zero backdrop dimming overlay so visitors can continue reading marketing copy while conversing with the assistant.
+2. **Active-Voice Query Processing**:
+   - Routes user queries through `cora-frontend/app/api/ai-preview/route.ts` with domain-specific system prompts.
+   - Responses must be concise, active-voice, and under 3 sentences with clear next steps.
+3. **Automated Objection Vector Handling**:
+   - Address common switching hurdles (e.g. Notion/HoneyBook vs Cora, white-glove migration, annual discounts, WordPress multi-plugin stability).
+4. **Dynamic Promotional Offer Generation**:
+   - Attach structured `DedicatedOffer` cards (`MIGRATEFREE`, `CORA10`) that auto-apply coupon query parameters when routing to `/pricing`.
+
+---
+
+## 48. Multi-Format Template & Theme Distribution Engine (`/templates`, `lib/templates-data.ts`)
+
+When adding or updating templates in the template registry:
+1. **4 Canonical Distribution Formats**:
+   - `native_page`: Pure Tailwind CSS and Next.js 15 production page with responsive mobile bottom sheets.
+   - `section_prompts`: Engineered prompts for Claude 3.5 Sonnet and Cursor Composer with design system token references.
+   - `elementor_kit`: Standardized Elementor JSON blueprints for instant page builder import.
+   - `lovable_project`: Full-stack scaffolding blueprints tailored for Lovable.dev and v0.dev.
+2. **Interactive Modal Preview**:
+   - Provide sandboxed iframe preview with responsive viewport switchers (`desktop`, `tablet`, `mobile`).
+   - Include 1-click clipboard prompt export and raw asset download actions.
+3. **Automated CRM Pipeline Bridge**:
+   - Ensure all contact forms in landing templates post to `/api/v1/lead` (or `wp_cora_leads`) with schema attribution.
+
+---
+
+## 49. Autonomous AI Workforce & Modular Agent Portfolios
+
+When configuring domain agent behaviors and user experiences:
+1. **Domain Agent Personas**:
+   - Maintain dedicated system prompts for 9 business domains: Operations, Sales, Contracts, Knowledge, Creative, Delivery, Finance, Legal, and Marketing.
+2. **Visual Consistency**:
+   - Use standardized monochrome-first agent portrait assets located at `cora-frontend/public/images/cora_agent_*.jpg`.
+3. **Active Voice Specifications**:
+   - UI cards must use concise single-line titles and maximum 2-line active-voice descriptions.
 
 ---
 

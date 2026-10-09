@@ -23,6 +23,7 @@ import {
   QrCode,
   Building2,
   Users,
+  User,
   Send,
   LifeBuoy,
   Leaf,
@@ -32,10 +33,27 @@ import {
   Clock,
   Flame,
   HardDrive,
-  Info
+  Info,
+  GitBranch,
+  ArrowRightLeft,
+  Lock,
+  Languages,
+  UploadCloud,
+  Split,
+  Code,
+  Search,
+  Bot,
+  Headphones,
+  Webhook,
+  Mail
 } from 'lucide-react';
 import { trackEvent } from '@/components/analytics/Analytics';
-import { triggerRazorpayCheckout, useRazorpayPreload, isPartner100Coupon, PlanKey } from '@/components/pricing/FastRazorpayModal';
+import { 
+  triggerRazorpayCheckout, 
+  useRazorpayPreload, 
+  isPartner100Coupon, 
+  PlanKey 
+} from '@/components/pricing/FastRazorpayModal';
 
 // Official Vector WhatsApp SVG Icon
 const WhatsAppIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
@@ -44,10 +62,35 @@ const WhatsAppIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
   </svg>
 );
 
+// Clean high-contrast feature row with perfect typography alignment
+const PricingFeature = ({
+  icon: Icon = Check,
+  iconClass = "text-zinc-900 stroke-[2]",
+  children,
+  highlight = false,
+  textColor,
+}: {
+  icon?: React.ElementType;
+  iconClass?: string;
+  children: React.ReactNode;
+  tooltip?: string;
+  highlight?: boolean;
+  textColor?: string;
+}) => {
+  return (
+    <li className={`flex items-start gap-2.5 min-h-[22px] text-xs ${
+      textColor ? textColor : (highlight ? 'font-medium text-zinc-900' : 'text-zinc-600')
+    }`}>
+      <Icon className={`w-3.5 h-3.5 ${iconClass} shrink-0 mt-0.5`} />
+      <span className="leading-snug">{children}</span>
+    </li>
+  );
+};
+
 const FAQS = [
   {
     q: 'Is the Free Forever plan really free?',
-    a: 'Yes, absolutely free forever with no credit card required. You get 1,000 complimentary AI agent runs every month, a live portfolio website builder on your free heycora.in subdomain, Kanban CRM, unlimited* SHA-256 e-signatures, and automated GST invoicing. You only upgrade to a paid Growth plan when you want to connect a custom domain or send from your own business email.'
+    a: 'Yes, absolutely free forever with no credit card required. You get 500 complimentary AI agent runs every month, a live portfolio website builder on your free heycora.in subdomain, Kanban CRM, unlimited* SHA-256 e-signatures, and automated GST invoicing. You only upgrade to a paid Growth plan when you want to connect a custom domain or send from your own business email.'
   },
   {
     q: 'How does the 2 Months Free on Annual plans work?',
@@ -59,11 +102,11 @@ const FAQS = [
   },
   {
     q: 'Are the displayed prices inclusive or exclusive of taxes?',
-    a: 'All displayed base subscription prices are exclusive of 18% GST as per Indian Tax regulations. The exact 18% GST calculation is shown directly in the 1-step checkout before payment, and you can enter your GSTIN to claim 100% Input Tax Credit (ITC).'
+    a: 'All displayed subscription prices are 100% inclusive of 18% GST. No extra taxes or hidden fees are added at checkout. Official GST invoices with 100% Input Tax Credit (ITC) eligibility are generated automatically upon purchase.'
   },
   {
     q: 'What is the difference between Starter, Professional, and Scale?',
-    a: 'Starter (₹999/mo) powers up to 2 team seats with custom domain connection, custom email dispatch, and 5,000 AI runs. Professional (₹2,499/mo) adds Advanced Reasoning AI (20,000 runs), official WhatsApp dispatch, dynamic UPI QR codes, and 5 seats. Scale (₹4,499/mo) unlocks all Frontier AI models (60,000 runs), unlimited* seats, custom REST APIs & webhooks, dedicated SLA, and free custom website development/migration.'
+    a: 'Starter (₹999/mo) powers up to 2 team seats with custom domain connection, custom email dispatch, and 5,000 AI runs. Professional (₹2,499/mo) adds Advanced Reasoning AI (14,000 runs), official WhatsApp dispatch, dynamic UPI QR codes, and 5 seats. Scale (₹4,499/mo) unlocks all Frontier AI models (20,000 runs), unlimited* seats, custom REST APIs & webhooks, dedicated SLA, and free custom website development/migration.'
   },
   {
     q: 'Can I upgrade, downgrade, or cancel anytime?',
@@ -111,6 +154,22 @@ export default function PricingPage() {
     const secs = totalSeconds % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
+
+  // Partner 24-Hour Lock Redirect
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const lockStr = localStorage.getItem('cora_partner_lock');
+        if (lockStr) {
+          const lock = JSON.parse(lockStr);
+          if (lock?.partner === 'vanshrajput' && typeof lock?.expiry === 'number' && lock.expiry > Date.now()) {
+            window.location.replace('/vanshrajput');
+            return;
+          }
+        }
+      } catch (e) {}
+    }
+  }, []);
 
   // Dynamic Coupon & URL Parameter Detection + Confetti Blast
   useEffect(() => {
@@ -169,6 +228,21 @@ export default function PricingPage() {
             }
           }, 350);
         }
+      } else if (coupon) {
+        setAppliedCoupon(coupon.trim().toUpperCase());
+        setCurrency('INR');
+        setIsIndia(true);
+        setTimeout(async () => {
+          try {
+            const confetti = (await import('canvas-confetti')).default;
+            confetti({
+              particleCount: 120,
+              spread: 80,
+              origin: { y: 0.6 },
+              colors: ['#10b981', '#6366f1', '#f59e0b', '#000000', '#ffffff']
+            });
+          } catch (e) {}
+        }, 300);
       }
     }
   }, []);
@@ -274,12 +348,27 @@ export default function PricingPage() {
         {/* Hero Content */}
         <div className="relative z-10 w-full max-w-[1280px] mx-auto px-4 sm:px-6 flex flex-col items-center text-center">
           
-          {/* Trust Badge */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white/95 backdrop-blur-md rounded-full text-xs font-mono font-medium text-zinc-800 border border-zinc-200/90 shadow-2xs mb-5">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="font-semibold text-zinc-950">CORA CLOUD</span>
-            <span className="text-zinc-400">•</span>
-            <span>18% GST READY</span>
+          {/* Trust Badges & Action Buttons */}
+          <div className="flex flex-wrap items-center justify-center gap-2.5 mb-5">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-white/95 backdrop-blur-md rounded-full text-xs font-mono font-medium text-zinc-800 border border-zinc-200/90 shadow-2xs">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="font-semibold text-zinc-950">CORA CLOUD</span>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                const el = document.getElementById('india-only-plan');
+                if (el) {
+                  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+              }}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-gradient-to-r from-amber-50 via-white to-orange-50 hover:from-amber-100 hover:to-orange-100 text-amber-950 rounded-full text-xs font-medium border border-amber-300/80 shadow-2xs hover:shadow-xs transition-all cursor-pointer group select-none backdrop-blur-md"
+            >
+              <span className="text-xs">🇮🇳</span>
+              <span className="font-semibold">Claim Indian Startup Benefits &amp; Credits</span>
+              <ArrowRight className="w-3 h-3 text-amber-700 group-hover:translate-x-0.5 transition-transform" />
+            </button>
           </div>
 
           {/* Heading */}
@@ -291,7 +380,7 @@ export default function PricingPage() {
 
           {/* Body */}
           <p className="text-zinc-600 text-sm sm:text-base font-normal leading-relaxed max-w-[580px] mx-auto">
-            Start free forever with 1,000 monthly AI runs. Upgrade with direct 1-step checkout via UPI, Cards, and instant GST invoices.
+            Start free forever with 500 monthly AI runs. Upgrade with direct 1-step checkout via UPI, Cards, and instant GST invoices.
           </p>
 
           {/* Primary Cadence Switcher with 2 Months Free badge */}
@@ -416,6 +505,28 @@ export default function PricingPage() {
         </div>
       )}
 
+      {/* ── CUSTOM PROMO COUPON CELEBRATION TOP BANNER ── */}
+      {appliedCoupon && !isPartner100Coupon(appliedCoupon) && appliedCoupon !== 'INDIA40' && (
+        <div className="w-full max-w-[1240px] mx-auto px-3.5 sm:px-6 mb-8 -mt-6 relative z-20">
+          <div className="rounded-2xl sm:rounded-3xl bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-700 text-white p-4 sm:p-5 shadow-2xl border-2 border-emerald-300/60 flex flex-col md:flex-row items-center justify-between gap-4 animate-in fade-in slide-in-from-top-4 duration-300">
+            <div className="flex items-center gap-3 text-left">
+              <span className="text-3xl sm:text-4xl shrink-0">🎁</span>
+              <div>
+                <div className="text-sm sm:text-base font-extrabold tracking-tight flex items-center gap-2 flex-wrap">
+                  <span>DISCOUNT COUPON ACTIVE!</span>
+                  <span className="px-2 py-0.5 rounded-lg bg-black/40 font-mono text-xs border border-white/20 uppercase">
+                    CODE: {appliedCoupon}
+                  </span>
+                </div>
+                <div className="text-xs sm:text-sm text-emerald-100 font-medium mt-0.5">
+                  Coupon discount is auto-applied at checkout on all plans on top of annual savings.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ══════════════════════════════════════════════════════════════════════
           PRIMARY 4-COLUMN PRICING MATRIX WITH 2 MONTHS FREE ON ANNUAL
       ══════════════════════════════════════════════════════════════════════ */}
@@ -484,70 +595,73 @@ export default function PricingPage() {
                       Core Features Included
                     </span>
                   </div>
-                  <ul className="space-y-2.5 text-xs text-zinc-700">
-                    <li className="flex items-center justify-between gap-2 min-h-[20px] group/item">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                        <span className="truncate"><strong>1,000</strong> AI runs / mo</span>
-                      </div>
-                      <span className="text-zinc-400 group-hover/item:text-zinc-600 transition-colors shrink-0 cursor-help" title="Standard AI engine for proposals, briefs and copy generation">
-                        <Info className="w-3 h-3" />
-                      </span>
-                    </li>
-                    <li className="flex items-center justify-between gap-2 min-h-[20px] group/item">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <Globe className="w-3.5 h-3.5 text-zinc-900 shrink-0" />
-                        <span className="truncate">Website on heycora.in subdomain</span>
-                      </div>
-                      <span className="text-zinc-400 group-hover/item:text-zinc-600 transition-colors shrink-0 cursor-help" title="Live SSL-secured studio website on heycora.in">
-                        <Info className="w-3 h-3" />
-                      </span>
-                    </li>
-                    <li className="flex items-center justify-between gap-2 min-h-[20px] group/item">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <HardDrive className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0" />
-                        <span className="truncate"><strong>5 GB</strong> bandwidth &bull; <strong>1 GB</strong> storage</span>
-                      </div>
-                      <span className="text-zinc-400 group-hover/item:text-zinc-600 transition-colors shrink-0 cursor-help" title="High-speed CDN bandwidth and cloud media storage">
-                        <Info className="w-3 h-3" />
-                      </span>
-                    </li>
-                    <li className="flex items-center justify-between gap-2 min-h-[20px] group/item">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <Check className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0" />
-                        <span className="truncate">Standard Kanban CRM &amp; leads</span>
-                      </div>
-                      <span className="text-zinc-400 group-hover/item:text-zinc-600 transition-colors shrink-0 cursor-help" title="Visual pipeline and lead funnel management">
-                        <Info className="w-3 h-3" />
-                      </span>
-                    </li>
-                    <li className="flex items-center justify-between gap-2 min-h-[20px] group/item">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <Check className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0" />
-                        <span className="truncate">SHA-256 digital contracts &amp; e-sign</span>
-                      </div>
-                      <span className="text-zinc-400 group-hover/item:text-zinc-600 transition-colors shrink-0 cursor-help" title="Legally binding digital contract signing vault">
-                        <Info className="w-3 h-3" />
-                      </span>
-                    </li>
-                    <li className="flex items-center justify-between gap-2 min-h-[20px] group/item">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <Check className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0" />
-                        <span className="truncate">18% GST Invoicing &amp; PDF builder</span>
-                      </div>
-                      <span className="text-zinc-400 group-hover/item:text-zinc-600 transition-colors shrink-0 cursor-help" title="Automated GST tax calculation and instant PDF receipts">
-                        <Info className="w-3 h-3" />
-                      </span>
-                    </li>
-                    <li className="flex items-center justify-between gap-2 min-h-[20px] group/item">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <Check className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0" />
-                        <span className="truncate">1 User workspace</span>
-                      </div>
-                      <span className="text-zinc-400 group-hover/item:text-zinc-600 transition-colors shrink-0 cursor-help" title="Single seat license for solopreneurs & freelance operators">
-                        <Info className="w-3 h-3" />
-                      </span>
-                    </li>
+                  <ul className="space-y-2.5 text-xs">
+                    <PricingFeature 
+                      icon={Sparkles} 
+                      iconClass="text-amber-500" 
+                    >
+                      <span className="font-semibold text-zinc-900">500</span> CORA AI runs / mo
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={Globe} 
+                      iconClass="text-zinc-900" 
+                    >
+                      Free <span className="font-semibold text-zinc-900">heycora.in</span> subdomain
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={Layout} 
+                      iconClass="text-zinc-900" 
+                    >
+                      <span className="font-semibold text-zinc-900">1 CMS collection</span> (Portfolio &amp; Services)
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={HardDrive} 
+                      iconClass="text-zinc-900" 
+                    >
+                      <span className="font-semibold text-zinc-900">5 GB</span> bandwidth &bull; <span className="font-semibold text-zinc-900">1 GB</span> storage
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={Check} 
+                      iconClass="text-zinc-900" 
+                    >
+                      Unlimited form submissions
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={GitBranch} 
+                      iconClass="text-zinc-900" 
+                    >
+                      Branching with previews
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={ArrowRightLeft} 
+                      iconClass="text-zinc-900" 
+                    >
+                      Site redirects (301/302)
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={Lock} 
+                      iconClass="text-zinc-900" 
+                    >
+                      Password protection
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={Languages} 
+                      iconClass="text-zinc-900" 
+                    >
+                      Localization &amp; geo routing
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={Sparkles} 
+                      iconClass="text-amber-500" 
+                    >
+                      Built-in MCP server &amp; AI tools
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={User} 
+                      iconClass="text-zinc-900" 
+                    >
+                      1 Free workspace seat
+                    </PricingFeature>
                   </ul>
                 </div>
               </div>
@@ -562,14 +676,18 @@ export default function PricingPage() {
                 <div className="w-9 h-9 rounded-xl bg-[#a7f3d0] text-[#065f46] shadow-xs flex items-center justify-center shrink-0">
                   <Rocket className="w-4 h-4" />
                 </div>
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-white/20 text-white text-[10px] font-mono font-bold tracking-wide border border-white/30 backdrop-blur-xs">
-                  POPULAR
-                </span>
               </div>
               <div className="space-y-1">
-                <h3 className="font-display text-xl font-bold text-white tracking-tight leading-tight">
-                  Starter
-                </h3>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3 className="font-display text-xl font-bold text-white tracking-tight leading-tight">
+                    Starter
+                  </h3>
+                  {billingCycle === 'annual' && (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-white/20 text-white text-[10px] font-mono font-bold tracking-tight border border-white/30 backdrop-blur-xs">
+                      2 MO. FREE
+                    </span>
+                  )}
+                </div>
                 <p className="text-xs text-emerald-50/90 leading-relaxed line-clamp-2 h-[36px] flex items-start">
                   Connect custom domains, send branded emails, and invite 2 teammates.
                 </p>
@@ -580,8 +698,8 @@ export default function PricingPage() {
             <div className="p-5 sm:p-5.5 flex-1 flex flex-col justify-between">
               <div>
                 {/* Price Block */}
-                <div className="h-[68px] mb-4 flex flex-col justify-center shrink-0">
-                  <div className="h-8 flex items-baseline gap-1.5">
+                <div className="mb-4 flex flex-col justify-center shrink-0">
+                  <div className="h-8 flex items-baseline gap-1.5 flex-wrap">
                     <span className="text-3xl sm:text-[34px] font-display font-bold text-zinc-950 tracking-tight leading-none">
                       {billingCycle === 'annual'
                         ? (currency === 'INR' ? '₹833' : '$7.50')
@@ -594,19 +712,20 @@ export default function PricingPage() {
                       </span>
                     )}
                   </div>
-                  <div className="text-[11px] text-zinc-500 mt-1.5 flex items-center gap-1.5 h-4">
+                  <div className="text-[11px] text-zinc-500 mt-1.5 flex flex-col gap-0.5">
                     {billingCycle === 'annual' ? (
                       <>
-                        <span className="text-emerald-700 font-medium">
-                          {currency === 'INR' ? '₹9,990 / yr' : '$90 / yr'}
-                        </span>
-                        <span className="text-zinc-300">&bull;</span>
-                        <span className="text-zinc-500">
-                          {currency === 'INR' ? 'Save ₹1,998' : 'Save $18'}
-                        </span>
+                        <div className="flex items-center gap-1.5 font-medium text-emerald-700">
+                          <span>Billed annually: {currency === 'INR' ? '₹9,990 / yr' : '$90 / yr'}</span>
+                          <span className="text-zinc-300">&bull;</span>
+                          <span className="text-emerald-800 font-bold">{currency === 'INR' ? 'Save ₹1,998' : 'Save $18'}</span>
+                        </div>
+                        <div className="text-[10px] text-zinc-400">
+                          {currency === 'INR' ? 'Includes 18% GST (12 mos. for the price of 10)' : '12 months access for price of 10'}
+                        </div>
                       </>
                     ) : (
-                      <span className="text-zinc-400">Billed monthly &bull; + 18% GST</span>
+                      <div className="text-zinc-500 h-4 flex items-center">Billed monthly &bull; Incl. 18% GST</div>
                     )}
                   </div>
                 </div>
@@ -617,7 +736,7 @@ export default function PricingPage() {
                   onClick={() => handleInitiatePlan('starter')}
                   className="h-11 w-full inline-flex items-center justify-center gap-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-900 px-4 rounded-xl text-xs font-bold transition-all mb-5 cursor-pointer shrink-0 group"
                 >
-                  <span>Get Started</span>
+                  <span>{billingCycle === 'annual' ? 'Get Started (Annual)' : 'Get Started'}</span>
                   <ArrowRight className="w-3.5 h-3.5 text-zinc-500 group-hover:translate-x-0.5 transition-transform" />
                 </button>
 
@@ -628,68 +747,97 @@ export default function PricingPage() {
                       Everything in Free, plus:
                     </span>
                   </div>
-                  <ul className="space-y-2.5 text-xs text-zinc-700">
-                    <li className="flex items-center justify-between gap-2 min-h-[20px] group/item">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                        <span className="truncate"><strong>{billingCycle === 'annual' ? '6,000' : '5,000'}</strong> AI runs / mo</span>
-                      </div>
-                      <span className="text-zinc-400 group-hover/item:text-zinc-600 transition-colors shrink-0 cursor-help" title="AI quota for proposals, pitch decks and content creation">
-                        <Info className="w-3 h-3" />
-                      </span>
-                    </li>
-                    <li className="flex items-center justify-between gap-2 min-h-[20px] group/item">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <HardDrive className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0" />
-                        <span className="truncate"><strong>25 GB</strong> bandwidth &bull; <strong>5 GB</strong> storage</span>
-                      </div>
-                      <span className="text-zinc-400 group-hover/item:text-zinc-600 transition-colors shrink-0 cursor-help" title="Generous bandwidth & storage for client media delivery">
-                        <Info className="w-3 h-3" />
-                      </span>
-                    </li>
-                    <li className="flex items-center justify-between gap-2 min-h-[20px] group/item">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <Check className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0" />
-                        <span className="truncate">Connect custom domain (.com / .in)</span>
-                      </div>
-                      <span className="text-zinc-400 group-hover/item:text-zinc-600 transition-colors shrink-0 cursor-help" title="Full custom branded domain with automated SSL certs">
-                        <Info className="w-3 h-3" />
-                      </span>
-                    </li>
-                    <li className="flex items-center justify-between gap-2 min-h-[20px] group/item">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <Check className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0" />
-                        <span className="truncate">Custom business email sending</span>
-                      </div>
-                      <span className="text-zinc-400 group-hover/item:text-zinc-600 transition-colors shrink-0 cursor-help" title="Send system emails directly from your domain address">
-                        <Info className="w-3 h-3" />
-                      </span>
-                    </li>
-                    <li className="flex items-center justify-between gap-2 min-h-[20px] group/item">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <Check className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0" />
-                        <span className="truncate">Up to 2 team seats</span>
-                      </div>
-                      <span className="text-zinc-400 group-hover/item:text-zinc-600 transition-colors shrink-0 cursor-help" title="Add a co-pilot or team partner with dedicated access">
-                        <Info className="w-3 h-3" />
-                      </span>
-                    </li>
-                    <li className="flex items-center justify-between gap-2 min-h-[20px] group/item">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <Check className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0" />
-                        <span className="truncate">100% white-label client view</span>
-                      </div>
-                      <span className="text-zinc-400 group-hover/item:text-zinc-600 transition-colors shrink-0 cursor-help" title="No Cora badge or branding in your client-facing portal">
-                        <Info className="w-3 h-3" />
-                      </span>
-                    </li>
+                  <ul className="space-y-2.5 text-xs">
+                    <PricingFeature 
+                      icon={Sparkles} 
+                      iconClass="text-amber-500" 
+                    >
+                      <span className="font-semibold text-zinc-900">{billingCycle === 'annual' ? '6,000' : '5,000'}</span> CORA AI runs / mo
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={Globe} 
+                      iconClass="text-emerald-600 stroke-[2.2]" 
+                      highlight
+                      textColor="text-zinc-900 font-medium"
+                    >
+                      <span className="font-semibold text-emerald-950">Free custom domain</span> <span className="font-mono text-[10px] text-emerald-800 bg-emerald-100/80 border border-emerald-300/70 px-1.5 py-0.5 rounded font-bold">.com / .in</span>
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={Layout} 
+                      iconClass="text-zinc-900" 
+                    >
+                      <span className="font-semibold text-zinc-900">5 CMS collections</span> &amp; custom pages
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={HardDrive} 
+                      iconClass="text-zinc-900" 
+                    >
+                      <span className="font-semibold text-zinc-900">25 GB</span> bandwidth &bull; <span className="font-semibold text-zinc-900">5 GB</span> storage
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={UploadCloud} 
+                      iconClass="text-emerald-700" 
+                      highlight
+                      textColor="text-zinc-900 font-medium"
+                    >
+                      Form file &amp; media uploads
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={Check} 
+                      iconClass="text-zinc-900" 
+                    >
+                      Unlimited form submissions
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={GitBranch} 
+                      iconClass="text-zinc-900" 
+                    >
+                      Branching with previews
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={ArrowRightLeft} 
+                      iconClass="text-zinc-900" 
+                    >
+                      Site redirects (301/302)
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={Lock} 
+                      iconClass="text-zinc-900" 
+                    >
+                      Password protection &amp; client links
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={Languages} 
+                      iconClass="text-zinc-900" 
+                    >
+                      Localization &amp; geo routing
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={Mail} 
+                      iconClass="text-zinc-900" 
+                    >
+                      Custom business email sending
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={Sparkles} 
+                      iconClass="text-amber-500" 
+                    >
+                      Built-in MCP server &amp; AI tools
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={Users} 
+                      iconClass="text-zinc-900" 
+                    >
+                      Up to 2 team workspace seats
+                    </PricingFeature>
                     {billingCycle === 'annual' && (
-                      <li className="flex items-center justify-between gap-2 min-h-[20px] text-emerald-800 font-medium">
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <Gift className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                          <span className="truncate">2 Months Free Included</span>
-                        </div>
-                      </li>
+                      <PricingFeature 
+                        icon={Gift} 
+                        iconClass="text-emerald-600" 
+                        textColor="text-emerald-800 font-medium"
+                      >
+                        2 Months Free Included
+                      </PricingFeature>
                     )}
                   </ul>
                 </div>
@@ -732,9 +880,16 @@ export default function PricingPage() {
                 </div>
               </div>
               <div className="space-y-1">
-                <h3 className="font-display text-xl font-bold text-white tracking-tight leading-tight">
-                  Professional
-                </h3>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3 className="font-display text-xl font-bold text-white tracking-tight leading-tight">
+                    Professional
+                  </h3>
+                  {!isPartner100Coupon(appliedCoupon) && billingCycle === 'annual' && (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-white/20 text-white text-[10px] font-mono font-bold tracking-tight border border-white/30 backdrop-blur-xs">
+                      2 MO. FREE
+                    </span>
+                  )}
+                </div>
                 <p className="text-xs text-pink-50/90 leading-relaxed line-clamp-2 h-[36px] flex items-start">
                   Automate WhatsApp updates, collect payments with UPI QR, and deploy reasoning AI.
                 </p>
@@ -745,8 +900,8 @@ export default function PricingPage() {
             <div className="p-5 sm:p-5.5 flex-1 flex flex-col justify-between">
               <div>
                 {/* Price Block */}
-                <div className="h-[68px] mb-4 flex flex-col justify-center shrink-0">
-                  <div className="h-8 flex items-baseline gap-1.5">
+                <div className="mb-4 flex flex-col justify-center shrink-0">
+                  <div className="h-8 flex items-baseline gap-1.5 flex-wrap">
                     <span className="text-3xl sm:text-[34px] font-display font-bold text-zinc-950 tracking-tight leading-none">
                       {isPartner100Coupon(appliedCoupon)
                         ? '₹0'
@@ -763,21 +918,22 @@ export default function PricingPage() {
                       </span>
                     )}
                   </div>
-                  <div className="text-[11px] text-zinc-500 mt-1.5 flex items-center gap-1.5 h-4">
+                  <div className="text-[11px] text-zinc-500 mt-1.5 flex flex-col gap-0.5">
                     {isPartner100Coupon(appliedCoupon) ? (
                       <span className="text-emerald-700 font-bold">100% Partner Discount Applied • ₹0 Forever</span>
                     ) : (billingCycle === 'annual' ? (
                       <>
-                        <span className="text-emerald-700 font-medium">
-                          {currency === 'INR' ? '₹24,990 / yr' : '$240 / yr'}
-                        </span>
-                        <span className="text-zinc-300">&bull;</span>
-                        <span className="text-zinc-500">
-                          {currency === 'INR' ? 'Save ₹4,998' : 'Save $48'}
-                        </span>
+                        <div className="flex items-center gap-1.5 font-medium text-emerald-700">
+                          <span>Billed annually: {currency === 'INR' ? '₹24,990 / yr' : '$240 / yr'}</span>
+                          <span className="text-zinc-300">&bull;</span>
+                          <span className="text-emerald-800 font-bold">{currency === 'INR' ? 'Save ₹4,998' : 'Save $48'}</span>
+                        </div>
+                        <div className="text-[10px] text-zinc-400">
+                          {currency === 'INR' ? 'Includes 18% GST (12 mos. for the price of 10)' : '12 months access for price of 10'}
+                        </div>
                       </>
                     ) : (
-                      <span className="text-zinc-400">Billed monthly &bull; + 18% GST</span>
+                      <div className="text-zinc-500 h-4 flex items-center">Billed monthly &bull; Incl. 18% GST</div>
                     ))}
                   </div>
                 </div>
@@ -795,7 +951,7 @@ export default function PricingPage() {
                   <span>
                     {isPartner100Coupon(appliedCoupon)
                       ? 'Claim 100% Free Professional Plan'
-                      : 'Get Started'}
+                      : (billingCycle === 'annual' ? 'Get Started (Annual)' : 'Get Started')}
                   </span>
                   <ArrowRight className="w-3.5 h-3.5 text-zinc-300 group-hover:translate-x-0.5 group-hover:text-white transition-transform" />
                 </button>
@@ -807,77 +963,110 @@ export default function PricingPage() {
                       Everything in Starter, plus:
                     </span>
                   </div>
-                  <ul className="space-y-2.5 text-xs text-zinc-700">
-                    <li className="flex items-center justify-between gap-2 min-h-[20px] group/item font-medium text-zinc-950">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <Sparkles className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                        <span className="truncate"><strong>Advanced AI Reasoning Engine</strong></span>
-                      </div>
-                      <span className="text-zinc-400 group-hover/item:text-zinc-600 transition-colors shrink-0 cursor-help" title="Autonomous reasoning for complex proposals and research">
-                        <Info className="w-3 h-3" />
-                      </span>
-                    </li>
-                    <li className="flex items-center justify-between gap-2 min-h-[20px] group/item">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                        <span className="truncate"><strong>15,000</strong> AI runs / mo</span>
-                      </div>
-                      <span className="text-zinc-400 group-hover/item:text-zinc-600 transition-colors shrink-0 cursor-help" title="High volume automation quota for growing studios">
-                        <Info className="w-3 h-3" />
-                      </span>
-                    </li>
-                    <li className="flex items-center justify-between gap-2 min-h-[20px] group/item">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <HardDrive className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0" />
-                        <span className="truncate"><strong>50 GB</strong> bandwidth &bull; <strong>15 GB</strong> storage</span>
-                      </div>
-                      <span className="text-zinc-400 group-hover/item:text-zinc-600 transition-colors shrink-0 cursor-help" title="High-capacity media storage & fast streaming bandwidth">
-                        <Info className="w-3 h-3" />
-                      </span>
-                    </li>
-                    <li className="flex items-center justify-between gap-2 min-h-[20px] group/item text-zinc-950 font-medium">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <WhatsAppIcon className="w-3.5 h-3.5 text-[#25D366] shrink-0" />
-                        <span className="truncate">Official WhatsApp automated dispatch</span>
-                      </div>
-                      <span className="text-zinc-400 group-hover/item:text-zinc-600 transition-colors shrink-0 cursor-help" title="Automated quotes, payment reminders & project updates via WhatsApp">
-                        <Info className="w-3 h-3" />
-                      </span>
-                    </li>
-                    <li className="flex items-center justify-between gap-2 min-h-[20px] group/item">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <Check className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0" />
-                        <span className="truncate">Dynamic UPI QR code on invoices</span>
-                      </div>
-                      <span className="text-zinc-400 group-hover/item:text-zinc-600 transition-colors shrink-0 cursor-help" title="Scan & pay via PhonePe, GPay, Paytm directly on PDFs">
-                        <Info className="w-3 h-3" />
-                      </span>
-                    </li>
-                    <li className="flex items-center justify-between gap-2 min-h-[20px] group/item">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <Check className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0" />
-                        <span className="truncate">Automated GST tax splits (CGST/SGST)</span>
-                      </div>
-                      <span className="text-zinc-400 group-hover/item:text-zinc-600 transition-colors shrink-0 cursor-help" title="Automatic intra-state & inter-state GST invoice math">
-                        <Info className="w-3 h-3" />
-                      </span>
-                    </li>
-                    <li className="flex items-center justify-between gap-2 min-h-[20px] group/item">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <Check className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0" />
-                        <span className="truncate">Up to 5 team seats &amp; roles</span>
-                      </div>
-                      <span className="text-zinc-400 group-hover/item:text-zinc-600 transition-colors shrink-0 cursor-help" title="Role-based permissions for managers, creatives and accountants">
-                        <Info className="w-3 h-3" />
-                      </span>
-                    </li>
+                  <ul className="space-y-2.5 text-xs">
+                    <PricingFeature 
+                      icon={Sparkles} 
+                      iconClass="text-blue-600 stroke-[2.2]" 
+                      highlight
+                      textColor="text-zinc-900 font-medium"
+                    >
+                      <span className="font-semibold text-zinc-900">Advanced AI Reasoning Engine (CORA AI)</span>
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={Sparkles} 
+                      iconClass="text-amber-500" 
+                    >
+                      <span className="font-semibold text-zinc-900">14,000</span> CORA AI runs / mo
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={Globe} 
+                      iconClass="text-emerald-600 stroke-[2.2]" 
+                      highlight
+                      textColor="text-zinc-900 font-medium"
+                    >
+                      <span className="font-semibold text-emerald-950">Free custom domain</span> <span className="font-mono text-[10px] text-emerald-800 bg-emerald-100/80 border border-emerald-300/70 px-1.5 py-0.5 rounded font-bold">.com / .in</span>
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={HardDrive} 
+                      iconClass="text-zinc-900" 
+                    >
+                      <span className="font-semibold text-zinc-900">50 GB</span> bandwidth &bull; <span className="font-semibold text-zinc-900">15 GB</span> storage
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={Split} 
+                      iconClass="text-pink-600 stroke-[2.2]" 
+                      highlight
+                      textColor="text-zinc-900 font-medium"
+                    >
+                      A/B testing &amp; optimization
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={Search} 
+                      iconClass="text-pink-600 stroke-[2.2]" 
+                      highlight
+                      textColor="text-zinc-900 font-medium"
+                    >
+                      AI site search &amp; vector indexing
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={UploadCloud} 
+                      iconClass="text-zinc-900" 
+                    >
+                      Form file &amp; media uploads
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={GitBranch} 
+                      iconClass="text-zinc-900" 
+                    >
+                      Branching with previews
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={ArrowRightLeft} 
+                      iconClass="text-zinc-900" 
+                    >
+                      Site redirects (301/302)
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={Lock} 
+                      iconClass="text-zinc-900" 
+                    >
+                      Password protection &amp; client links
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={Languages} 
+                      iconClass="text-zinc-900" 
+                    >
+                      Localization &amp; geo routing
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={WhatsAppIcon} 
+                      iconClass="text-[#25D366]" 
+                      highlight
+                    >
+                      Official WhatsApp automated dispatch*
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={Headphones} 
+                      iconClass="text-pink-600 stroke-[2.2]" 
+                      highlight
+                      textColor="text-zinc-900 font-medium"
+                    >
+                      Priority support desk
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={Users} 
+                      iconClass="text-zinc-900" 
+                    >
+                      Up to 5 team workspace seats &amp; roles
+                    </PricingFeature>
                     {billingCycle === 'annual' && (
-                      <li className="flex items-center justify-between gap-2 min-h-[20px] text-emerald-800 font-medium">
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <Gift className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                          <span className="truncate">2 Months Free Included</span>
-                        </div>
-                      </li>
+                      <PricingFeature 
+                        icon={Gift} 
+                        iconClass="text-emerald-600" 
+                        textColor="text-emerald-800 font-medium"
+                      >
+                        2 Months Free Included
+                      </PricingFeature>
                     )}
                   </ul>
                 </div>
@@ -901,14 +1090,18 @@ export default function PricingPage() {
                 <div className="w-9 h-9 rounded-xl bg-[#ddd6fe] text-[#4c1d95] shadow-xs flex items-center justify-center shrink-0">
                   <TrendingUp className="w-4 h-4" />
                 </div>
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-white/20 text-white text-[10px] font-mono font-bold tracking-wide border border-white/30 backdrop-blur-xs">
-                  SCALE
-                </span>
               </div>
               <div className="space-y-1">
-                <h3 className="font-display text-xl font-bold text-white tracking-tight leading-tight">
-                  Scale
-                </h3>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3 className="font-display text-xl font-bold text-white tracking-tight leading-tight">
+                    Scale
+                  </h3>
+                  {billingCycle === 'annual' && (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-white/20 text-white text-[10px] font-mono font-bold tracking-tight border border-white/30 backdrop-blur-xs">
+                      2 MO. FREE
+                    </span>
+                  )}
+                </div>
                 <p className="text-xs text-indigo-50/90 leading-relaxed line-clamp-2 h-[36px] flex items-start">
                   Scale your agency with unlimited seats, custom APIs, and free site migration.
                 </p>
@@ -919,8 +1112,8 @@ export default function PricingPage() {
             <div className="p-5 sm:p-5.5 flex-1 flex flex-col justify-between">
               <div>
                 {/* Price Block */}
-                <div className="h-[68px] mb-4 flex flex-col justify-center shrink-0">
-                  <div className="h-8 flex items-baseline gap-1.5">
+                <div className="mb-4 flex flex-col justify-center shrink-0">
+                  <div className="h-8 flex items-baseline gap-1.5 flex-wrap">
                     <span className="text-3xl sm:text-[34px] font-display font-bold text-zinc-950 tracking-tight leading-none">
                       {billingCycle === 'annual'
                         ? (currency === 'INR' ? '₹3,749' : '$37.50')
@@ -933,19 +1126,20 @@ export default function PricingPage() {
                       </span>
                     )}
                   </div>
-                  <div className="text-[11px] text-zinc-500 mt-1.5 flex items-center gap-1.5 h-4">
+                  <div className="text-[11px] text-zinc-500 mt-1.5 flex flex-col gap-0.5">
                     {billingCycle === 'annual' ? (
                       <>
-                        <span className="text-emerald-700 font-medium">
-                          {currency === 'INR' ? '₹44,990 / yr' : '$450 / yr'}
-                        </span>
-                        <span className="text-zinc-300">&bull;</span>
-                        <span className="text-zinc-500">
-                          {currency === 'INR' ? 'Save ₹8,998' : 'Save $90'}
-                        </span>
+                        <div className="flex items-center gap-1.5 font-medium text-emerald-700">
+                          <span>Billed annually: {currency === 'INR' ? '₹44,990 / yr' : '$450 / yr'}</span>
+                          <span className="text-zinc-300">&bull;</span>
+                          <span className="text-emerald-800 font-bold">{currency === 'INR' ? 'Save ₹8,998' : 'Save $90'}</span>
+                        </div>
+                        <div className="text-[10px] text-zinc-400">
+                          {currency === 'INR' ? 'Includes 18% GST (12 mos. for the price of 10)' : '12 months access for price of 10'}
+                        </div>
                       </>
                     ) : (
-                      <span className="text-zinc-400">Billed monthly &bull; + 18% GST</span>
+                      <div className="text-zinc-500 h-4 flex items-center">Billed monthly &bull; Incl. 18% GST</div>
                     )}
                   </div>
                 </div>
@@ -956,7 +1150,7 @@ export default function PricingPage() {
                   onClick={() => handleInitiatePlan('scale')}
                   className="h-11 w-full inline-flex items-center justify-center gap-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-900 px-4 rounded-xl text-xs font-bold transition-all mb-5 cursor-pointer shrink-0 group"
                 >
-                  <span>Get Started</span>
+                  <span>{billingCycle === 'annual' ? 'Get Started (Annual)' : 'Get Started'}</span>
                   <ArrowRight className="w-3.5 h-3.5 text-zinc-500 group-hover:translate-x-0.5 transition-transform" />
                 </button>
 
@@ -967,68 +1161,115 @@ export default function PricingPage() {
                       Everything in Professional, plus:
                     </span>
                   </div>
-                  <ul className="space-y-2.5 text-xs text-zinc-700">
-                    <li className="flex items-center justify-between gap-2 min-h-[20px] group/item font-semibold text-purple-950">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <Gift className="w-3.5 h-3.5 text-purple-700 shrink-0" />
-                        <span className="truncate"><strong>Free Website Dev &amp; Migration</strong></span>
-                      </div>
-                      <span className="text-purple-400 group-hover/item:text-purple-700 transition-colors shrink-0 cursor-help" title="Custom website design and full site migration engineered by Cora experts">
-                        <Info className="w-3 h-3" />
-                      </span>
-                    </li>
-                    <li className="flex items-center justify-between gap-2 min-h-[20px] group/item">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <Sparkles className="w-3.5 h-3.5 text-purple-600 shrink-0" />
-                        <span className="truncate"><strong>Frontier AI Models (GPT-4o, Claude 3.5)</strong></span>
-                      </div>
-                      <span className="text-zinc-400 group-hover/item:text-zinc-600 transition-colors shrink-0 cursor-help" title="Direct access to top-tier reasoning and coding frontier models">
-                        <Info className="w-3 h-3" />
-                      </span>
-                    </li>
-                    <li className="flex items-center justify-between gap-2 min-h-[20px] group/item">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                        <span className="truncate"><strong>25,000</strong> AI runs / mo</span>
-                      </div>
-                      <span className="text-zinc-400 group-hover/item:text-zinc-600 transition-colors shrink-0 cursor-help" title="Enterprise automation quota for large agency operations">
-                        <Info className="w-3 h-3" />
-                      </span>
-                    </li>
-                    <li className="flex items-center justify-between gap-2 min-h-[20px] group/item">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <HardDrive className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0" />
-                        <span className="truncate"><strong>100 GB</strong> bandwidth &bull; <strong>30 GB</strong> storage</span>
-                      </div>
-                      <span className="text-zinc-400 group-hover/item:text-zinc-600 transition-colors shrink-0 cursor-help" title="Enterprise-grade CDN bandwidth and high-volume media storage">
-                        <Info className="w-3 h-3" />
-                      </span>
-                    </li>
-                    <li className="flex items-center justify-between gap-2 min-h-[20px] group/item">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <Check className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0" />
-                        <span className="truncate">Unlimited* team seats &amp; roles</span>
-                      </div>
-                      <span className="text-zinc-400 group-hover/item:text-zinc-600 transition-colors shrink-0 cursor-help" title="Scale your entire team without per-seat upgrade fees">
-                        <Info className="w-3 h-3" />
-                      </span>
-                    </li>
-                    <li className="flex items-center justify-between gap-2 min-h-[20px] group/item">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <Check className="w-3.5 h-3.5 text-zinc-900 stroke-[2] shrink-0" />
-                        <span className="truncate">Custom Webhooks &amp; REST APIs</span>
-                      </div>
-                      <span className="text-zinc-400 group-hover/item:text-zinc-600 transition-colors shrink-0 cursor-help" title="Integrate with custom internal tools, Zapier and external databases">
-                        <Info className="w-3 h-3" />
-                      </span>
-                    </li>
+                  <ul className="space-y-2.5 text-xs">
+                    <PricingFeature 
+                      icon={Gift} 
+                      iconClass="text-purple-600 stroke-[2.2]" 
+                      highlight
+                      textColor="text-purple-950 font-medium"
+                    >
+                      <span className="font-semibold text-purple-950">Free Website Dev &amp; Migration</span>
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={Sparkles} 
+                      iconClass="text-purple-600 stroke-[2.2]" 
+                    >
+                      <span className="font-semibold text-zinc-900">Frontier AI Models</span> (GPT-4o, Claude 3.5)
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={Sparkles} 
+                      iconClass="text-amber-500" 
+                    >
+                      <span className="font-semibold text-zinc-900">20,000</span> CORA AI runs / mo
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={Globe} 
+                      iconClass="text-emerald-600 stroke-[2.2]" 
+                      highlight
+                      textColor="text-zinc-900 font-medium"
+                    >
+                      <span className="font-semibold text-emerald-950">Free custom domain</span> <span className="font-mono text-[10px] text-emerald-800 bg-emerald-100/80 border border-emerald-300/70 px-1.5 py-0.5 rounded font-bold">.com / .in</span>
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={HardDrive} 
+                      iconClass="text-zinc-900" 
+                    >
+                      <span className="font-semibold text-zinc-900">100 GB</span> bandwidth &bull; <span className="font-semibold text-zinc-900">30 GB</span> storage
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={Split} 
+                      iconClass="text-purple-600 stroke-[2.2]" 
+                      highlight
+                      textColor="text-purple-950 font-medium"
+                    >
+                      Multi-variant A/B testing &amp; analytics
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={Search} 
+                      iconClass="text-purple-600 stroke-[2.2]" 
+                      highlight
+                      textColor="text-purple-950 font-medium"
+                    >
+                      AI site search &amp; knowledge graph
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={UploadCloud} 
+                      iconClass="text-zinc-900" 
+                    >
+                      Form file &amp; media uploads
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={GitBranch} 
+                      iconClass="text-emerald-600" 
+                    >
+                      <span className="font-medium text-zinc-900">Branching with previews &amp; staging sandbox</span>
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={ArrowRightLeft} 
+                      iconClass="text-zinc-900" 
+                    >
+                      Custom 301/302 URL redirects
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={Lock} 
+                      iconClass="text-zinc-900" 
+                    >
+                      Password protection &amp; SSO security
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={Languages} 
+                      iconClass="text-zinc-900" 
+                    >
+                      Localization &amp; multi-region routing
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={Webhook} 
+                      iconClass="text-zinc-900" 
+                    >
+                      Custom Webhooks &amp; REST APIs
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={Headphones} 
+                      iconClass="text-purple-600 stroke-[2.2]" 
+                      highlight
+                      textColor="text-purple-950 font-medium"
+                    >
+                      Priority 24/7 Slack &amp; WhatsApp support
+                    </PricingFeature>
+                    <PricingFeature 
+                      icon={Users} 
+                      iconClass="text-zinc-900" 
+                    >
+                      Unlimited* team workspace seats &amp; roles
+                    </PricingFeature>
                     {billingCycle === 'annual' && (
-                      <li className="flex items-center justify-between gap-2 min-h-[20px] text-emerald-800 font-medium">
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <Gift className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                          <span className="truncate">2 Months Free Included</span>
-                        </div>
-                      </li>
+                      <PricingFeature 
+                        icon={Gift} 
+                        iconClass="text-emerald-600" 
+                        textColor="text-emerald-800 font-medium"
+                      >
+                        2 Months Free Included
+                      </PricingFeature>
                     )}
                   </ul>
                 </div>
@@ -1038,11 +1279,11 @@ export default function PricingPage() {
 
         </div>
 
-        {/* Exclusive Tax & Fast Payment Assurance Banner */}
+        {/* Inclusive Tax & Fast Payment Assurance Banner */}
         <div className="max-w-[800px] mx-auto text-center mt-3 sm:mt-4 p-3 rounded-2xl bg-zinc-50 border border-zinc-200/80 text-xs text-zinc-600 flex flex-col sm:flex-row items-center justify-center gap-2">
           <div className="flex items-center gap-1.5 font-medium text-zinc-900">
             <Receipt className="w-3.5 h-3.5 text-emerald-600" />
-            <span>*All prices are exclusive of 18% GST.</span>
+            <span>All prices are inclusive of 18% GST.</span>
           </div>
           <span className="hidden sm:inline text-zinc-300">&bull;</span>
           <div className="text-zinc-500">
@@ -1287,10 +1528,10 @@ export default function PricingPage() {
 
                   <tr className="border-b border-zinc-100 hover:bg-zinc-50/50 transition-colors">
                     <td className="py-3.5 px-4 font-medium text-zinc-900">Monthly AI Runs</td>
-                    <td className="py-3.5 px-4 text-center font-mono text-zinc-700">1,000 / mo</td>
+                    <td className="py-3.5 px-4 text-center font-mono text-zinc-700">500 / mo</td>
                     <td className="py-3.5 px-4 text-center font-mono font-bold text-zinc-900 bg-zinc-50/40">{billingCycle === 'annual' ? '6,000' : '5,000'} / mo</td>
-                    <td className="py-3.5 px-4 text-center font-mono font-bold text-emerald-700 bg-emerald-50/20">15,000 / mo</td>
-                    <td className="py-3.5 px-4 text-center font-mono font-bold text-zinc-950">25,000 / mo</td>
+                    <td className="py-3.5 px-4 text-center font-mono font-bold text-emerald-700 bg-emerald-50/20">14,000 / mo</td>
+                    <td className="py-3.5 px-4 text-center font-mono font-bold text-zinc-950">20,000 / mo</td>
                     <td className="py-3.5 px-4 text-center font-mono font-semibold text-amber-950 bg-amber-50/20">3,500 / mo</td>
                   </tr>
 
@@ -1493,7 +1734,7 @@ export default function PricingPage() {
                   </tr>
 
                   <tr className="border-b border-zinc-100 hover:bg-zinc-50/50 transition-colors">
-                    <td className="py-3.5 px-4 font-medium text-zinc-900">WhatsApp Business Automation</td>
+                    <td className="py-3.5 px-4 font-medium text-zinc-900">WhatsApp Business Automation*</td>
                     <td className="py-3.5 px-4 text-center text-zinc-300"><Minus className="w-3.5 h-3.5 mx-auto" /></td>
                     <td className="py-3.5 px-4 text-center font-mono text-[11px] text-zinc-600 bg-zinc-50/40">Quick Dispatch</td>
                     <td className="py-3.5 px-4 text-center bg-emerald-50/20"><Check className="w-4 h-4 mx-auto text-[#25D366] stroke-[2.5]" /></td>
@@ -1517,6 +1758,108 @@ export default function PricingPage() {
                     <td className="py-3.5 px-4 text-center bg-emerald-50/20 text-zinc-300"><Minus className="w-3.5 h-3.5 mx-auto" /></td>
                     <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
                     <td className="py-3.5 px-4 text-center bg-amber-50/20 text-zinc-300"><Minus className="w-3.5 h-3.5 mx-auto" /></td>
+                  </tr>
+
+                  {/* ─────────────────────────────────────────────────────────────
+                      CATEGORY 7: DEVELOPER, HOSTING & SITE INFRASTRUCTURE
+                  ───────────────────────────────────────────────────────────── */}
+                  <tr>
+                    <td colSpan={6} className="pt-6 pb-2">
+                      <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-50/70 text-emerald-900 text-xs font-mono font-bold uppercase tracking-wider">
+                        <Code className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>DEVELOPER, HOSTING &amp; ADVANCED SITE INFRASTRUCTURE</span>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <tr className="border-b border-zinc-100 hover:bg-zinc-50/50 transition-colors">
+                    <td className="py-3.5 px-4 font-medium text-zinc-900">Branching with Previews</td>
+                    <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
+                    <td className="py-3.5 px-4 text-center bg-zinc-50/40"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
+                    <td className="py-3.5 px-4 text-center bg-emerald-50/20"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.5]" /></td>
+                    <td className="py-3.5 px-4 text-center font-bold text-purple-900">Preview &amp; Staging Sandbox</td>
+                    <td className="py-3.5 px-4 text-center bg-amber-50/20"><Check className="w-4 h-4 mx-auto text-amber-800 stroke-[2.2]" /></td>
+                  </tr>
+
+                  <tr className="border-b border-zinc-100 hover:bg-zinc-50/50 transition-colors">
+                    <td className="py-3.5 px-4 font-medium text-zinc-900">Custom 301 / 302 Site Redirects</td>
+                    <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
+                    <td className="py-3.5 px-4 text-center bg-zinc-50/40"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
+                    <td className="py-3.5 px-4 text-center bg-emerald-50/20"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.5]" /></td>
+                    <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
+                    <td className="py-3.5 px-4 text-center bg-amber-50/20"><Check className="w-4 h-4 mx-auto text-amber-800 stroke-[2.2]" /></td>
+                  </tr>
+
+                  <tr className="border-b border-zinc-100 hover:bg-zinc-50/50 transition-colors">
+                    <td className="py-3.5 px-4 font-medium text-zinc-900">Password Protection &amp; Client Access</td>
+                    <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
+                    <td className="py-3.5 px-4 text-center bg-zinc-50/40"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
+                    <td className="py-3.5 px-4 text-center bg-emerald-50/20"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.5]" /></td>
+                    <td className="py-3.5 px-4 text-center font-bold text-purple-900">SSO &amp; Granular Roles</td>
+                    <td className="py-3.5 px-4 text-center bg-amber-50/20"><Check className="w-4 h-4 mx-auto text-amber-800 stroke-[2.2]" /></td>
+                  </tr>
+
+                  <tr className="border-b border-zinc-100 hover:bg-zinc-50/50 transition-colors">
+                    <td className="py-3.5 px-4 font-medium text-zinc-900">Localization &amp; Geo-Routing</td>
+                    <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
+                    <td className="py-3.5 px-4 text-center bg-zinc-50/40"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
+                    <td className="py-3.5 px-4 text-center bg-emerald-50/20"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.5]" /></td>
+                    <td className="py-3.5 px-4 text-center font-bold text-purple-900">Multi-Region Edge</td>
+                    <td className="py-3.5 px-4 text-center bg-amber-50/20"><Check className="w-4 h-4 mx-auto text-amber-800 stroke-[2.2]" /></td>
+                  </tr>
+
+                  <tr className="border-b border-zinc-100 hover:bg-zinc-50/50 transition-colors">
+                    <td className="py-3.5 px-4 font-medium text-zinc-900">Form File &amp; Media Uploads</td>
+                    <td className="py-3.5 px-4 text-center text-zinc-300"><Minus className="w-3.5 h-3.5 mx-auto" /></td>
+                    <td className="py-3.5 px-4 text-center bg-zinc-50/40"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
+                    <td className="py-3.5 px-4 text-center bg-emerald-50/20"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.5]" /></td>
+                    <td className="py-3.5 px-4 text-center"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.2]" /></td>
+                    <td className="py-3.5 px-4 text-center bg-amber-50/20"><Check className="w-4 h-4 mx-auto text-amber-800 stroke-[2.2]" /></td>
+                  </tr>
+
+                  <tr className="border-b border-zinc-100 hover:bg-zinc-50/50 transition-colors">
+                    <td className="py-3.5 px-4 font-medium text-zinc-900">A/B Testing &amp; Conversion Optimization</td>
+                    <td className="py-3.5 px-4 text-center text-zinc-300"><Minus className="w-3.5 h-3.5 mx-auto" /></td>
+                    <td className="py-3.5 px-4 text-center text-zinc-300 bg-zinc-50/40"><Minus className="w-3.5 h-3.5 mx-auto" /></td>
+                    <td className="py-3.5 px-4 text-center bg-emerald-50/20"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.5]" /></td>
+                    <td className="py-3.5 px-4 text-center font-bold text-purple-900">Multi-Variant Testing</td>
+                    <td className="py-3.5 px-4 text-center bg-amber-50/20 text-zinc-300"><Minus className="w-3.5 h-3.5 mx-auto" /></td>
+                  </tr>
+
+                  <tr className="border-b border-zinc-100 hover:bg-zinc-50/50 transition-colors">
+                    <td className="py-3.5 px-4 font-medium text-zinc-900">Code Components &amp; Edge Scripts</td>
+                    <td className="py-3.5 px-4 text-center text-zinc-300"><Minus className="w-3.5 h-3.5 mx-auto" /></td>
+                    <td className="py-3.5 px-4 text-center text-zinc-300 bg-zinc-50/40"><Minus className="w-3.5 h-3.5 mx-auto" /></td>
+                    <td className="py-3.5 px-4 text-center bg-emerald-50/20 font-medium text-emerald-700">Custom Code Embeds</td>
+                    <td className="py-3.5 px-4 text-center font-bold text-purple-900">Enterprise Code &amp; Edge Scripts</td>
+                    <td className="py-3.5 px-4 text-center bg-amber-50/20 text-zinc-300"><Minus className="w-3.5 h-3.5 mx-auto" /></td>
+                  </tr>
+
+                  <tr className="border-b border-zinc-100 hover:bg-zinc-50/50 transition-colors">
+                    <td className="py-3.5 px-4 font-medium text-zinc-900">AI Site Search &amp; Vector Indexing</td>
+                    <td className="py-3.5 px-4 text-center text-zinc-300"><Minus className="w-3.5 h-3.5 mx-auto" /></td>
+                    <td className="py-3.5 px-4 text-center text-zinc-300 bg-zinc-50/40"><Minus className="w-3.5 h-3.5 mx-auto" /></td>
+                    <td className="py-3.5 px-4 text-center bg-emerald-50/20"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.5]" /></td>
+                    <td className="py-3.5 px-4 text-center font-bold text-purple-900">Knowledge Graph Search</td>
+                    <td className="py-3.5 px-4 text-center bg-amber-50/20 text-zinc-300"><Minus className="w-3.5 h-3.5 mx-auto" /></td>
+                  </tr>
+
+                  <tr className="border-b border-zinc-100 hover:bg-zinc-50/50 transition-colors">
+                    <td className="py-3.5 px-4 font-medium text-zinc-900">AEO Agents (Answer Engine Optimization)</td>
+                    <td className="py-3.5 px-4 text-center text-zinc-300"><Minus className="w-3.5 h-3.5 mx-auto" /></td>
+                    <td className="py-3.5 px-4 text-center text-zinc-300 bg-zinc-50/40"><Minus className="w-3.5 h-3.5 mx-auto" /></td>
+                    <td className="py-3.5 px-4 text-center bg-emerald-50/20"><Check className="w-4 h-4 mx-auto text-emerald-600 stroke-[2.5]" /></td>
+                    <td className="py-3.5 px-4 text-center font-bold text-purple-900">Autonomous Citation Monitor</td>
+                    <td className="py-3.5 px-4 text-center bg-amber-50/20 text-zinc-300"><Minus className="w-3.5 h-3.5 mx-auto" /></td>
+                  </tr>
+
+                  <tr className="border-b border-zinc-100 hover:bg-zinc-50/50 transition-colors">
+                    <td className="py-3.5 px-4 font-medium text-zinc-900">Support Level</td>
+                    <td className="py-3.5 px-4 text-center text-zinc-500 font-mono text-[11px]">Community</td>
+                    <td className="py-3.5 px-4 text-center text-zinc-700 bg-zinc-50/40 font-mono text-[11px]">Standard Email</td>
+                    <td className="py-3.5 px-4 text-center font-bold text-emerald-700 bg-emerald-50/20 font-mono text-[11px]">Priority Support Desk</td>
+                    <td className="py-3.5 px-4 text-center font-bold text-purple-900 font-mono text-[11px]">Priority 24/7 Slack &amp; WhatsApp</td>
+                    <td className="py-3.5 px-4 text-center text-amber-950 bg-amber-50/20 font-mono text-[11px]">Standard Desk</td>
                   </tr>
 
                 </tbody>
@@ -1815,8 +2158,6 @@ export default function PricingPage() {
           </div>
         </div>
       )}
-
-      {/* Floating Toggle on Mobile */}
 
     </main>
   );

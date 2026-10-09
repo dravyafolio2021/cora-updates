@@ -154,6 +154,47 @@ function cora_seed_docs_data() {
             }
         }
 
+        // ── Upsert v4.9.364+ documentation pages ─────────────────────────
+        if ( function_exists( 'cora_docs_get_new_pages_v49364' ) ) {
+            $v49_pages = cora_docs_get_new_pages_v49364();
+            foreach ( $v49_pages as $p ) {
+                $exists = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$t_pages} WHERE slug = %s", $p['slug'] ) );
+                if ( ! $exists ) {
+                    $wpdb->insert( $t_pages, array_merge( $p, array(
+                        'status'     => 'public_live',
+                        'created_by' => $author_id,
+                        'updated_by' => $author_id,
+                        'created_at' => current_time('mysql'),
+                        'updated_at' => current_time('mysql'),
+                    ) ) );
+                } else {
+                    $wpdb->update( $t_pages, array(
+                        'title'      => $p['title'],
+                        'content'    => $p['content'],
+                        'category'   => $p['category'],
+                        'updated_at' => current_time('mysql'),
+                    ), array( 'slug' => $p['slug'] ) );
+                }
+            }
+        }
+
+        // ── Upsert v4.9.364+ changelog entries ───────────────────────────
+        if ( function_exists( 'cora_docs_get_v49364_changelog_entries' ) ) {
+            $v49_entries = cora_docs_get_v49364_changelog_entries();
+            foreach ( $v49_entries as $entry ) {
+                $exists = $wpdb->get_var( $wpdb->prepare(
+                    "SELECT id FROM {$t_changelog} WHERE version = %s AND title = %s",
+                    $entry['version'], $entry['title']
+                ) );
+                if ( ! $exists ) {
+                    $wpdb->insert( $t_changelog, array_merge( $entry, array(
+                        'author_id'  => $author_id,
+                        'created_at' => current_time('mysql'),
+                    ) ) );
+                }
+            }
+        }
+
         return; // Already seeded, upserts done
     }
 
@@ -1514,3 +1555,174 @@ function cora_docs_get_pwa_changelog_entries() {
     );
 }
 }
+
+// ── 9. New Documentation Pages (v4.9.364 + Marketing Site Reform) ────────
+
+if ( ! function_exists( 'cora_docs_get_new_pages_v49364' ) ) {
+function cora_docs_get_new_pages_v49364() {
+    return array(
+        array(
+            'slug'     => 'marketing-site-reform',
+            'title'    => 'Marketing Site Reform & Tools & Templates Directory',
+            'category' => 'overview',
+            'content'  => "# Marketing Site Reform & Tools & Templates Directory\n\nCora's public marketing layer (`heycora.in`) communicates the unified platform value proposition across website generation and autonomous agency operations.\n\n## Homepage Hero Repositioning\n- **Headline**: \"Build websites. Run your business, with an AI co-founder.\"\n- **Subtitle**: \"The operating system for Indian service businesses and agencies. Invoicing, lead CRM, team dispatch, client portal, and custom websites — powered by your personal AI co-founder.\"\n- **Dual Conversion Pathways**:\n  1. **Primary High-Velocity CTA**: \"Sign in with Google\" — Fast, zero-friction OAuth onboarding creating instant production workspaces.\n  2. **Secondary Discovery CTA**: \"Explore free templates\" — Connects founders directly to the `/use-cases` directory showcasing 16+ turnkey pre-seeded website and workspace schemas.\n\n## Tools & Templates Directory\nElevated from traditional resources into a high-utility discovery layer:\n- **Free Agency Calculators**: 18% GST invoice simulator, retainer target margin calculator, and commercial proposal generator.\n- **Turnkey Website & Workspace Schemas**: Pre-seeded database and website templates across Photography Studios, Real Estate Brokerages, Marketing Agencies, Stationery & Van Sales, Consulting, Wedding Production, and Creative Retainers.\n- **Universal Lead Ingestion**: Static landing pages include embedded lead forms piping client inquiries directly into `wp_cora_leads`."
+        ),
+        array(
+            'slug'     => 'canvas-resilience-shield',
+            'title'    => 'Canvas Live HTML Preview Resilience Shield & Auto-Tailwind',
+            'category' => 'content',
+            'content'  => "# Canvas Live HTML Preview Resilience Shield & Auto-Tailwind\n\nShipped in **v4.9.358 - v4.9.363**, the Canvas Live Preview Resilience Shield provides a bulletproof editing and preview runtime for static HTML and Tailwind themes.\n\n## Automatic Tailwind CDN Injection\nWhen rendering preview iframes or exporting static bundles, the compiler scans markup for Tailwind utility classes. If a compiled stylesheet link is missing, the engine automatically injects:\n```html\n<script src=\"https://cdn.tailwindcss.com\"></script>\n```\ninto the `<head>`, guaranteeing 100% visual styling fidelity with zero Node.js compilation delay.\n\n## Iframe Error Boundaries & Zero Blank Sections\nPreview iframes are encapsulated in error boundaries. Broken JavaScript snippets, missing fonts, or malformed SVG graphics are isolated gracefully, preventing blank screen lockouts and layout freezes.\n\n## Unified 'Edit with AI' Toolbar (v4.9.362)\nThe Live Code Editor consolidates fragmented AI tools into a single, high-contrast 'Edit with AI' action bar supporting instant diff previews and 1-click code application into CodeMirror buffers.\n\n## Live Static Site Styling Parity (v4.9.363)\nPreview iframes strictly encapsulate host WordPress admin styles, ensuring that typography, grid layouts, and media queries in the editor look identical to exported production builds (`theme_{id}/out/index.html`)."
+        ),
+        array(
+            'slug'     => 'ai-quotas-pacing',
+            'title'    => 'AI Run Quotas & Fair Usage Pacing (15K Pro / 25K Scale)',
+            'category' => 'ai',
+            'content'  => "# AI Run Quotas & Fair Usage Pacing\n\nStarting in **v4.9.364**, Cora standardizes monthly AI computing quotas with weekly anti-burnout pacing to ensure consistent operational availability for agency teams.\n\n## Tiered Quota Matrix\n| Tier | Monthly AI Runs | Weekly Soft Pacing | Scope |\n|---|---|---|---|\n| Starter / Free | 500 runs/mo | 125 runs/wk | Solo founders, proof of concept |\n| Professional (Pro) | 15,000 runs/mo | 3,750 runs/wk | Growing agencies, client pipelines |\n| Scale | 25,000 runs/mo | 6,250 runs/wk | Multi-branch agencies, high-volume teams |\n| Enterprise | Custom | Unlimited | Dedicated compute clusters |\n\n## Anti-Burnout Weekly Pacing\nThe engine evaluates `ceil(\$monthly_quota / 4)`. If an agency consumes over 100% of their weekly allocation, non-blocking telemetry warning banners appear in the dashboard, preventing accidental month-end depletion.\n\n## Super Admin & Admin Role Bypass\nSuper Admins and users with `manage_options` capability are exempt from all rate limiting, weekly pacing caps, and artificial 6-hour session timeouts."
+        ),
+        array(
+            'slug'     => 'mcp-openapi-301',
+            'title'    => 'Universal Remote MCP & OpenAPI 3.0.1 Specification',
+            'category' => 'ai',
+            'content'  => "# Universal Remote MCP & OpenAPI 3.0.1 Specification\n\nCora provides a standards-compliant Model Context Protocol gateway allowing external AI assistants (ChatGPT, Claude, Google Gemini, Cursor) to securely inspect and operate workspace records.\n\n## OpenAPI 3.0.1 Upgrade & Curated 28 Tools Ceiling (v4.9.355 - v4.9.357)\n- **OpenAPI 3.0.1 Compliant**: Replaced OpenAPI 3.1.0 output in `cora_rest_mcp_openapi_handler()` to strictly comply with OpenAI Custom GPT Actions validation.\n- **Curated 28 Core Actions Ceiling**: Capped default exposed tools to 28 operations (staying safely below OpenAI's ~30 action limitation).\n- **Purged Emojis**: Descriptions and summaries are strictly alphanumeric and clean vector-safe.\n\n## Interactive OAuth 2.1 Consent Panel (v4.9.354)\nUser-friendly authorization screen featuring a master 'Universal Full Access' switch, 10 categorized permission cards, quick presets (`All Tools`, `Read-Only`, `Website Only`), and live selection counters.\n\n## Zero-Copy Native MCP File Management (v4.9.349)\nTools such as `cora_canvas_update_page_html` write directly to static distribution directories (`theme_{id}/out/index.html`) and database registries simultaneously, delivering instantaneous production publishing without rebuild delays."
+        ),
+        array(
+            'slug'     => 'endorsely-affiliate-suite',
+            'title'    => 'Endorsely Affiliate & Conversion Tracking Suite',
+            'category' => 'finance',
+            'content'  => "# Endorsely Affiliate & Conversion Tracking Suite\n\nShipped in **v4.9.364**, Cora integrates an enterprise affiliate attribution engine across public marketing funnels and workspace checkout flows.\n\n## Technical Integration\n- **Client Script**: Dynamically injected into `cora-frontend/app/layout.tsx` (`https://app.endorsely.com/assets/affiliate-tracking.js`).\n- **Affiliate ID**: `d56e72c8-89fa-47cb-bc87-920aa9e3a6bb`.\n- **Conversion Trigger**: Fired via `window.endorsely?.trackConversion()` upon successful payment capture in Razorpay modals and checkout sheets.\n\n## Partner Reward Architecture\n- **Free Signups**: +100 Free AI Runes awarded immediately on referral signup.\n- **Paid Subscriptions**: 20% Monthly / 30% Annual recurring revenue share.\n- **Milestone Bonuses**: Cash rewards at referral thresholds (₹1,000 for 10, ₹5,000 for 50, ₹10,000 for 100 paid referrals)."
+        ),
+        array(
+            'slug'     => 'forms-embedding-suite',
+            'title'    => 'Forms Embedding Suite & Static Site Lead Bridge',
+            'category' => 'client-portal',
+            'content'  => "# Forms Embedding Suite & Static Site Lead Bridge\n\nThe Forms Embedding Suite enables agency founders to embed dynamic Form AI Architect lead intake forms into any static Canvas landing page or external website.\n\n## Shortcode & Iframe Generators\n- **WordPress Shortcode**: `[cora-form id=\"{form_id}\" theme=\"light\"]`\n- **Responsive Iframe Embed**:\n```html\n<iframe src=\"https://app.heycora.in/workspace/forms/embed?id={form_id}\" class=\"w-full border-0 rounded-2xl min-h-[480px]\" loading=\"lazy\"></iframe>\n```\n\n## Automatic CRM Routing\nAll submissions automatically ingest into `wp_cora_leads`, trigger instant in-app toasts, and dispatch Web Push notifications to subscribed agency devices."
+        ),
+        array(
+            'slug'     => 'cora-ai-sdr',
+            'title'    => 'Sticky Conversational AI SDR & Objection Engine',
+            'category' => 'ai',
+            'content'  => "# Sticky Conversational AI SDR & Objection Engine\n\nMounted via React Portal into `document.body` on the public marketing site (`heycora.in`), the Cora AI SDR acts as an autonomous sales co-founder.\n\n## Portaled Viewport Docking\n- **True Viewport Docking**: Positioned sticky bottom-center (`bottom-0 sm:bottom-4`) portaled to `document.body`, eliminating parent container clipping and layout jumps.\n- **Zero Backdrop Overlay**: Floats freely above the web canvas without dimming background content.\n\n## Objection Handling & Conversion Incentives\n- **Pre-Configured Objection Vectors**: Handles common founder switching doubts (Notion/HoneyBook comparisons, white-glove site migrations, annual discount negotiation, WordPress multi-plugin stability).\n- **Dynamic Discount Coupons**: Generates actionable promotional offer cards with direct checkout links (`MIGRATEFREE`, `CORA10`) that auto-apply discount parameters into `/pricing`.\n\n## Industry Quick-Pills\nProvides 1-tap inquiries tailored for Web Design, Creative & Branding, Performance & SEO, App Dev, and Media Production."
+        ),
+        array(
+            'slug'     => 'templates-asset-library',
+            'title'    => '16+ Multi-Format Template & Theme Asset Library',
+            'category' => 'canvas',
+            'content'  => "# 16+ Multi-Format Template & Theme Asset Library\n\nThe Template & Theme Library at `/templates` provides 16+ production-grade frontend assets across 4 interoperable format standards.\n\n## 4 Distribution Formats\n1. **Native Landing Pages (`native_page`)**: Pure Tailwind CSS and Next.js 15 pages featuring sub-50ms paint times and accessible components.\n2. **AI Section Prompts (`section_prompts`)**: Token-engineered prompts for Claude 3.5 Sonnet and Cursor Composer.\n3. **Elementor Template Kits (`elementor_kit`)**: Standardized Elementor JSON blueprints for instant page builder import.\n4. **Lovable & React Projects (`lovable_project`)**: Rapid full-stack scaffolding configurations for Lovable.dev and v0.dev.\n\n## Interactive Modal Previews & Direct Code Copy\n- Sandboxed live preview with responsive viewport switchers (`Desktop`, `Tablet`, `Mobile`).\n- 1-click clipboard prompt export and raw asset download actions.\n- Direct lead capture bridge routing inquiries into `wp_cora_leads`."
+        )
+    );
+}
+}
+
+// ── 10. Latest Changelog Entries (v4.9.364 + Marketing Site Reform) ───────
+
+if ( ! function_exists( 'cora_docs_get_v49364_changelog_entries' ) ) {
+function cora_docs_get_v49364_changelog_entries() {
+    return array(
+        array(
+            'module_key'  => 'marketing',
+            'version'     => '4.9.364-sdr',
+            'status'      => 'released',
+            'title'       => 'Sticky Conversational AI SDR & Objection Handling Engine',
+            'description' => 'Portaled floating AI SDR bar to document.body for true bottom-center docking with zero backdrop overlay. Integrated automated objection handling vectors and dynamic checkout coupon generation (MIGRATEFREE, CORA10).',
+            'ticket_id'   => 'CORA-1212',
+        ),
+        array(
+            'module_key'  => 'templates',
+            'version'     => '4.9.364-tmpl',
+            'status'      => 'released',
+            'title'       => '16+ Multi-Format Template & Asset Library across 4 Standards',
+            'description' => 'Deployed full template distribution engine at /templates with 16+ production assets across Native Landing Pages, AI Section Prompts, Elementor Kits, and Lovable React projects, complete with live modal preview.',
+            'ticket_id'   => 'CORA-1213',
+        ),
+        array(
+            'module_key'  => 'marketing',
+            'version'     => '4.9.364-mkt',
+            'status'      => 'released',
+            'title'       => 'Marketing Site Reform: Homepage Hero & Tools & Templates',
+            'description' => 'Repositioned homepage hero headline to \"Build websites. Run your business, with an AI co-founder.\" Implemented dual high-velocity CTAs (Google Sign-In & Explore Free Templates). Overhauled navbar Resources card into \"Tools & Templates\" connecting directly to 16+ turnkey industry schemas at /use-cases.',
+            'ticket_id'   => 'CORA-1201',
+        ),
+        array(
+            'module_key'  => 'ai',
+            'version'     => '4.9.364',
+            'status'      => 'released',
+            'title'       => 'AI Run Quotas Standardization & Fair Usage Pacing',
+            'description' => 'Standardized monthly quotas to 15,000 runs/mo (Pro) and 25,000 runs/mo (Scale). Introduced weekly soft-limit pacing (3,750 Pro / 6,250 Scale runs/wk) to prevent token burnout. Super Admins bypass all rate limits and artificial 6-hour session timeouts.',
+            'ticket_id'   => 'CORA-1202',
+        ),
+        array(
+            'module_key'  => 'affiliates',
+            'version'     => '4.9.364',
+            'status'      => 'released',
+            'title'       => 'Endorsely Affiliate Tracking Suite & Conversion Bridge',
+            'description' => 'Integrated Endorsely affiliate script (app.endorsely.com/assets/affiliate-tracking.js) across public layouts and checkout flows. Connected window.endorsely.trackConversion() upon verified Razorpay payment capture with automatic 18% GST calculation.',
+            'ticket_id'   => 'CORA-1203',
+        ),
+        array(
+            'module_key'  => 'canvas',
+            'version'     => '4.9.363',
+            'status'      => 'released',
+            'title'       => 'Live Static Site Styling Parity & Auto-Tailwind CDN Injection',
+            'description' => 'Guaranteed 100% visual fidelity between local preview iframes and exported static bundles. Automated Tailwind CSS CDN injection and encapsulated host styles to prevent admin CSS leaks into sandboxed preview DOM.',
+            'ticket_id'   => 'CORA-1204',
+        ),
+        array(
+            'module_key'  => 'canvas',
+            'version'     => '4.9.362',
+            'status'      => 'released',
+            'title'       => 'Unified Edit with AI Toolbar in Live Code Editor',
+            'description' => 'Consolidated fragmented AI editing triggers in the Live Code Editor into a unified Edit with AI action bar with context-aware prompt parsing, instant diff previewing, and 1-click code application.',
+            'ticket_id'   => 'CORA-1205',
+        ),
+        array(
+            'module_key'  => 'canvas',
+            'version'     => '4.9.361',
+            'status'      => 'released',
+            'title'       => 'Workspace Forms Embedding Suite & Static Site Lead Bridge',
+            'description' => 'Engineered shortcode ([cora-form id=\"...\"]) and responsive iframe generator allowing founders to embed Form AI Architect forms into static landing pages with automated CRM lead ingestion.',
+            'ticket_id'   => 'CORA-1206',
+        ),
+        array(
+            'module_key'  => 'canvas',
+            'version'     => '4.9.360',
+            'status'      => 'released',
+            'title'       => 'Streamlined Live Code Editor Minimalist Header',
+            'description' => 'Eliminated redundant portrait and viewport switcher controls from Live Code Editor header bar for clean, distraction-free editing.',
+            'ticket_id'   => 'CORA-1207',
+        ),
+        array(
+            'module_key'  => 'mcp',
+            'version'     => '4.9.357',
+            'status'      => 'released',
+            'title'       => 'ChatGPT Action Discovery & Curated 28 Core Tools Ceiling',
+            'description' => 'Resolved ChatGPT custom action import validation by capping default exposed tools to 28 core actions, upgrading schema generation to OpenAPI 3.0.1, and purging emojis from all summaries.',
+            'ticket_id'   => 'CORA-1208',
+        ),
+        array(
+            'module_key'  => 'mcp',
+            'version'     => '4.9.354',
+            'status'      => 'released',
+            'title'       => 'Universal Read/Write OAuth 2.1 Consent Panel with Presets',
+            'description' => 'Deployed user-friendly OAuth 2.1 consent panel featuring a master Universal Full Access toggle, 10 categorized domain scope cards, quick presets, and live scope counters.',
+            'ticket_id'   => 'CORA-1209',
+        ),
+        array(
+            'module_key'  => 'pwa',
+            'version'     => '4.9.342',
+            'status'      => 'released',
+            'title'       => 'Universal In-App PWA Install Suite & Admin Popover Trigger',
+            'description' => 'Exposed in-app PWA install triggers in System Settings Suite and sticky sidebar admin popover with BeforeInstallPromptEvent interception and iOS WebClip guides.',
+            'ticket_id'   => 'CORA-1210',
+        ),
+        array(
+            'module_key'  => 'pwa',
+            'version'     => '4.9.341',
+            'status'      => 'released',
+            'title'       => 'Official Cora Super Admin PWA App Icon Suite with Dynamic ADMIN Badging',
+            'description' => 'Shipped dynamic ADMIN badging across 512/192/Apple/Favicon icons for Super Admins with role-scoped Web App Manifest (CORA Workspace (Admin)) and emerald active status indicator.',
+            'ticket_id'   => 'CORA-1211',
+        ),
+    );
+}
+}
+

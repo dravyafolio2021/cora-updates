@@ -39,6 +39,9 @@ export const DOCS_DATA: DocArticle[] = [
       { id: 'database-isolation', title: '3. Multi-Tenant Database Isolation' },
       { id: 'caching-performance', title: '4. LiteSpeed & PWA Caching' },
       { id: 'security-model', title: '5. Zero-Trust Security Model' },
+      { id: 'marketing-discovery', title: '6. Marketing Reform & Discovery Layer' },
+      { id: 'ai-sdr-engine', title: '7. Sticky AI SDR Sales Assistant' },
+      { id: 'template-ecosystem', title: '8. 4-Tier Template & Asset Ecosystem' },
     ],
     content: `
 Cora is engineered as an enterprise-grade autonomous operating system for Indian creative studios and agencies. It operates on a **hybrid decoupled architecture** where a high-performance Next.js marketing and documentation layer is paired with a resilient, single-plugin WordPress/PHP 8.2 backend runtime.
@@ -133,6 +136,34 @@ Cross-tenant leakage is prevented at both the database abstraction layer and the
 - **No Browser Defaults**: The system uses monochromatic custom toast banners (\`window.coraShowToast\`) and sliding drawers instead of native popup overlays.
 - **Role Capability Checks**: Every AJAX and REST handler verifies \`current_user_can()\` against a granular 30-point security matrix.
 - **SHA-256 Hashes**: Document vault agreements and audit log records include cryptographically verifiable integrity checksums.
+ 
+---
+
+## 6. Marketing Reform & Discovery Layer
+
+Cora bridges client-facing website generation and private agency management into a seamless experience:
+- **Homepage Positioning**: *"Build websites. Run your business, with an AI co-founder."*
+- **Dual Conversion Engine**: Primary "Sign in with Google" OAuth for rapid workspace creation, and secondary "Explore free templates" routing directly into the 16+ turnkey pre-seeded schemas at \`/use-cases\`.
+- **Tools & Templates Architecture**: The marketing navigation elevates free business calculators (18% GST calculator, retainer margin tool, proposal generator) alongside production website and workspace templates with instant lead capture bridge into \`wp_cora_leads\`.
+
+---
+
+## 7. Sticky AI SDR Sales Assistant
+
+Mounted via React Portal (\`createPortal\`) directly into the document root:
+- **True Viewport Docking**: Floats centered at the bottom viewport edge with zero backdrop overlay, avoiding parent container clipping or scroll interference.
+- **Objection Handling Vectors**: Addresses platform switching concerns (e.g. HoneyBook/Notion vs Cora, free white-glove site migrations, annual discount codes, and multi-plugin elimination).
+- **Dynamic Conversion Coupons**: Automatically generates actionable coupon cards (\`MIGRATEFREE\`, \`CORA10\`) with direct checkout links pre-populating discount parameters into \`/pricing\`.
+
+---
+
+## 8. 4-Tier Template & Asset Ecosystem
+
+The \`/templates\` directory provides 16+ production-grade frontend assets across 4 distinct formats:
+1. **Native Landing Pages (\`native_page\`)**: Pure Tailwind CSS and Next.js 15 pages featuring sub-50ms paint times and accessible components.
+2. **AI Section Prompts (\`section_prompts\`)**: Token-engineered prompts for Claude 3.5 Sonnet and Cursor Composer.
+3. **Elementor Template Kits (\`elementor_kit\`)**: Standardized Elementor JSON blueprints for instant page builder import.
+4. **Lovable & React Projects (\`lovable_project\`)**: Rapid full-stack scaffolding configurations for Lovable.dev and v0.dev.
     `,
   },
   {
@@ -363,6 +394,7 @@ If even a single character or metadata byte is altered post-signature, the check
       { id: 'conversational-triage', title: '2. WhatsApp-Style Founder Triage' },
       { id: 'token-quotas', title: '3. Token Quotas & AI Credit Tracking' },
       { id: 'llm-backends', title: '4. Gemini 3.5 & Claude Sonnet Backends' },
+      { id: 'marketing-sdr', title: '5. Public Conversational AI SDR & Conversion Engine' },
     ],
     content: `
 The **Cora AI Co-Founder** is a persistent, context-aware autonomous agent designed to act as your studio's chief operating officer. It handles inbound lead qualification, drafts custom commercial proposals, calculates production budgets, and triages daily operational bottlenecks.
@@ -407,6 +439,15 @@ AI execution is tracked per session with a real-time progress meter and anti-bur
 You can switch the underlying reasoning engine in the sticky administrator popover:
 - **Gemini 3.5 Flash**: Optimized for sub-second speed, audio transcription, and image analysis.
 - **Claude 3.5 Sonnet**: Optimized for complex multi-party commercial contracts and long-form narrative scriptwriting.
+
+---
+
+## 5. Public Conversational AI SDR & Conversion Engine (Oct 2026)
+
+On the public web surface, the AI Co-Founder also powers the bottom-docked sticky AI SDR assistant:
+- **Portaled Viewport Docking**: Rendered directly via \`createPortal\` into \`document.body\`, maintaining true viewport bottom centering with zero background overlay interference.
+- **Real-Time Objection Handling**: Automatically counters platform comparison queries (HoneyBook, Notion, custom WordPress multi-plugin stacks) and explains migration procedures.
+- **Automated Coupon Generation**: Surfaces dynamic promotion incentives (\`MIGRATEFREE\`, \`CORA10\`) that auto-populate into checkout query parameters upon selection.
     `,
   },
   {
@@ -603,6 +644,7 @@ Starting in **v4.9.300–v4.9.302**, lead inspection features:
       { id: 'preview-resilience', title: '7. Live Preview Resilience Shield & Auto-Tailwind' },
       { id: 'ai-edit-toolbar', title: '8. Unified "Edit with AI" Toolbar' },
       { id: 'forms-embedding', title: '9. Workspace Forms Embedding Suite' },
+      { id: 'templates-ecosystem', title: '10. Tools & Templates Ecosystem (16+ Schemas)' },
     ],
     content: `
 The **Canvas Builder** enables creative agencies to design and publish lightning-fast client landing pages, portfolio showcases, and lead-capture funnels directly inside the Cora workspace across Elementor, Visual HTML, and Next.js engines.
@@ -691,6 +733,20 @@ Connect your production Next.js repositories directly via GitHub Personal Access
 
 - **Native Embed Codes**: Generate shortcodes (\`[cora-form id="..."]\`) or responsive iframes to embed Form AI Architect forms into any static or headless page.
 - **Direct CRM Ingestion**: Submissions route automatically to \`wp_cora_leads\` with full source campaign attribution.
+
+---
+
+## 10. Tools & Templates Ecosystem (16+ Schemas)
+
+Directly integrated with the public homepage ("Explore free templates") and navigation ("Tools & Templates"):
+- **16+ Turnkey Industry Schemas at \`/use-cases\` & \`/templates\`**:
+  - Photography Studios, Real Estate Brokerages, Digital Marketing Agencies, Stationery Manufacturing & Van Sales, Consulting & Professional Services, Wedding Productions, Salons & Clinics, and Creator Retainers.
+- **4 Interoperable Distribution Formats**:
+  - Native Landing Pages (\`native_page\`), AI Section Prompts for Claude/Cursor (\`section_prompts\`), Elementor Template Kits (\`elementor_kit\`), and Lovable / React Projects (\`lovable_project\`).
+- **Interactive Live Preview Modal (\`TemplatePreviewModal.tsx\`)**:
+  - Sandboxed live preview with desktop, tablet, and mobile viewport controls, 1-click clipboard prompt copy, and direct blueprint download.
+- **Pre-Seeded Operational Models**: Each schema comes pre-configured with industry-specific SAC/GST codes, client intake forms, rate cards, pipeline stages, and static landing page templates.
+- **Automated CRM Ingestion**: Static landing pages include embedded lead capture forms that pipe visitor inquiries directly into \`wp_cora_leads\` with instant monochromatic toast feedback.
     `,
   },
   {

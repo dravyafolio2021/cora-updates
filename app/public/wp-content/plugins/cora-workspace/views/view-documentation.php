@@ -170,7 +170,7 @@ $roadmap_page = cora_find_doc_page( $all_pages, 'roadmap' );
                     <div class="space-y-3 divide-y divide-zinc-200/60 ">
                         <div class="pt-0 flex items-center justify-between text-xs">
                             <span class="text-zinc-500">Platform Version:</span>
-                            <span class="font-mono font-bold text-zinc-900 ">v2.2.1</span>
+                            <span class="font-mono font-bold text-zinc-900 ">v<?php echo defined('CORA_WORKSPACE_VERSION') ? esc_html(CORA_WORKSPACE_VERSION) : '4.9.364'; ?></span>
                         </div>
                         <div class="pt-2.5 flex items-center justify-between text-xs">
                             <span class="text-zinc-500">Foundation Stack:</span>

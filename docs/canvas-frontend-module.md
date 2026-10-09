@@ -749,4 +749,40 @@ Enforces strict CSS containment on preview iframes, preventing WordPress admin s
 
 ---
 
+## Section 25: Tools & Templates Ecosystem, 16+ Pre-Seeded Schemas & Marketing Bridge (Oct 2026)
+
+### 25.1 Marketing Discovery Bridge & Turnkey Schema Catalog
+The public marketing layer (`heycora.in`) directly integrates with Canvas via the homepage secondary call-to-action ("Explore free templates") and the main navigation's "Tools & Templates" card. This routes prospective founders straight into `/use-cases`, an interactive catalog of 16+ production-ready website and workspace schemas.
+
+### 25.2 Multi-Vertical Pre-Seeded Schemas (16+ Turnkey Niches)
+Each schema provides complete turnkey operational models and static website templates:
+1. **Photography Studio**: Full-bleed hero gallery, package pricing breakdown, client proofing portal, and shoot booking request form.
+2. **Real Estate Brokerage**: Property showcase, agent roster, virtual showing scheduler, and geocoded listing filters.
+3. **Digital Marketing Agency**: Service capability cards, client ROI case study metrics, retainer calculator, and commercial proposal intake.
+4. **Stationery Manufacturing & Van Sales**: Wholesale SKU catalog, tiered quantity volume discounts, factory dispatch overview, and retailer distributor application.
+5. **Consulting & Professional Services**: Founder credibility credentials, advisory methodology matrix, appointment booking, and contract vault link.
+6. **Additional Niches**: Wedding Cinematography, Salons & Medical Spas, Fitness Centers, Legal Practices, Accounting & Tax Advisory, Creator Retainers, and Event Production.
+
+### 25.3 Zero-Code Lead Routing & CRM Attribution
+Every pre-seeded template includes integrated contact and booking forms. Submissions automatically bridge to the backend CRM pipeline (`wp_cora_leads`), attributing the source landing page path and template schema while triggering real-time in-app toast feedback and Web Push alerts.
+
+---
+
+## Section 26: Multi-Format Asset Transformation & Distribution (Oct 2026)
+
+### 26.1 4-Tier Asset Interoperability
+Starting in October 2026, Canvas templates are distributed in 4 interoperable formats across the `/templates` directory:
+1. **Native Tailwind / Next.js Pages (`native_page`)**: Fully functional static HTML/JSX pages featuring sub-50ms paint times and accessible components.
+2. **AI Section Prompts (`section_prompts`)**: Structured, token-aware prompts for AI code assistants (Claude 3.5 Sonnet, Cursor Composer) allowing rapid generation of custom sections matching Cora design tokens.
+3. **Elementor Template Kits (`elementor_kit`)**: Standardized JSON blueprints enabling 1-click import into WordPress Elementor workflows.
+4. **Lovable & React Projects (`lovable_project`)**: Clean React project configurations designed for Lovable.dev and v0.dev rapid app prototyping.
+
+### 26.2 Interactive Modal Preview Engine
+Prospective founders and agency developers can preview any template via `TemplatePreviewModal.tsx`:
+- Sandboxed iframe preview with responsive viewport switchers (`Desktop`, `Tablet`, `Mobile`).
+- Quick-copy prompt triggers for instant use in Cursor or ChatGPT.
+- Downloadable blueprint assets.
+
+---
+
 *Cora Canvas Documentation v4.9.364 — Last updated: October 2026.*

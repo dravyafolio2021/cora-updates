@@ -113,6 +113,9 @@ cora/
 | **Equipment & Listings** | `view-equipment.php` | Camera gear custody tracking / Geocoded real estate inventory |
 | **Super Admin Multi-Tenancy Console** | `view-super-admin.php` | 11-tab administrative control center with Danger Zone workspace deletion confirmation modal (zero dark overlay, quoted IDs, cascade removal), 1-click real-time industry vertical switcher, and Web Push device telemetry |
 | **Developer Docs Portal** | `view-public-docs.php` | 3-column public documentation portal with AI Playground and Command Palette (`/docs`) |
+| **Marketing Site Reform & Discovery Engine** | `cora-frontend/app/*`, `cora-frontend/components/hero/Hero.tsx`, `cora-frontend/components/layout/Navbar.tsx` | Next.js marketing and discovery layer repositioned around "Build websites. Run your business, with an AI co-founder.", dual Google Sign-In and "Explore free templates" CTAs, "Tools & Templates" navigation card, and 16+ pre-seeded turnkey website/workspace industry schemas at `/use-cases` |
+| **Sticky AI SDR Bar & Objection Handling Engine** | `cora-frontend/components/hero/HeroAIInput.tsx`, `cora-frontend/app/api/ai-preview/route.ts` | Bottom-docked sticky AI sales co-founder portaled to `document.body` with zero backdrop overlay, crisp active-voice answers, industry pill routing, automated objection handling (Notion/HoneyBook vs Cora), and dynamic conversion coupon codes (`MIGRATEFREE`, `CORA10`) |
+| **Template & Theme Asset Ecosystem (16+ Schemas)** | `cora-frontend/app/templates/*`, `cora-frontend/lib/templates-data.ts` | 16+ production-ready frontend assets across 4 distinct formats: Native Landing Pages (Tailwind/Next.js), AI Section Prompts (Claude/Cursor), Elementor Template Kits (JSON blueprints), and Lovable/React Projects, complete with live modal preview and instant code copy |
 
 ---
 
@@ -198,6 +201,11 @@ cora/
 78. **Unified 'Edit with AI' Toolbar Architecture (v4.9.362)**: Consolidates fragmented AI editing triggers in the Live Code Editor into a unified, high-visibility "Edit with AI" action bar with context-aware prompts and instant diff previewing.
 79. **Workspace Forms Embedding Suite & Dynamic Form Interoperability (v4.9.361)**: Supports embedding dynamic Cora lead capture forms into Canvas landing page themes using `[cora-form id="..."]` shortcodes or `<iframe src="...">` embed codes with responsive height autosizing and AJAX submission handling.
 80. **Live Static Site Styling Parity & CSS Scope Containment (v4.9.363)**: Guarantees 100% styling parity between preview iframes and published static sites by encapsulating Tailwind styles and preventing host stylesheet leakage.
+81. **Marketing Site Reform & Dual-CTA Discovery Architecture (Oct 2026)**: Repositioned homepage value proposition to *"Build websites. Run your business, with an AI co-founder."* Implemented dual high-velocity conversion CTAs: primary Google One-Tap onboarding and secondary "Explore free templates" linking directly to the 16+ pre-seeded schemas at `/use-cases` (Photography, Real Estate, Agency, Manufacturing, Consulting, etc.).
+82. **Tools & Templates Ecosystem & Unified Lead Attribution (Oct 2026)**: Overhauled marketing navigation into "Tools & Templates", unifying free agency calculators (18% GST calculator, retainer margin tool, proposal generator) with production website templates. Form submissions across static landing pages automatically bridge into `wp_cora_leads` with full campaign and schema attribution.
+83. **Sticky AI SDR Bar & True Viewport Portaling Architecture (Oct 2026)**: Portals the AI SDR co-founder widget directly to `document.body` for viewport-anchored bottom-center positioning, zero background backdrop overlay, full responsive width, crisp query routing, and automated objection handling with dedicated conversion coupon incentives (`MIGRATEFREE`, `CORA10`).
+84. **Multi-Format Frontend Asset & Template Distribution Architecture (Oct 2026)**: Categorizes website assets into 4 interoperable formats at `/templates` (Native Tailwind/Next.js pages, AI Section Prompts for Claude/Cursor, Elementor JSON Kits, and Lovable React projects), with live modal previews, direct code copy triggers, and automatic lead capture bridge to `wp_cora_leads`.
+85. **Autonomous AI Workforce & Structured Domain Agents (Oct 2026)**: Deploys dedicated domain AI agent personas across Operations, Sales, Contracts, Knowledge, Creative, Delivery, Finance, Legal, and Marketing with high-resolution portraits, role-scoped permissions, and specialized system prompts.
 
 ---
 
@@ -259,4 +267,4 @@ php scripts/test_sec_audit_all.php
 
 ---
 
-*Cora Platform v4.9.357 — Architecture & Development Team.*
+*Cora Platform v4.9.364 — Architecture & Development Team. Last updated: October 2026.*
