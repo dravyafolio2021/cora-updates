@@ -51,8 +51,7 @@ export function ArtisticHeroBackground({
     );
   }
 
-  const isStudio = tone === 'studio' || tone === 'warm';
-  const resolvedImageSrc = imageSrc || (isStudio ? '/images/cora_pricing_hero_studio.jpg' : '/images/cora_pricing_pure_sky.jpg');
+  const resolvedImageSrc = imageSrc || '/images/cora_pricing_pure_sky.jpg';
 
   return (
     <div 
@@ -61,11 +60,7 @@ export function ArtisticHeroBackground({
     >
       {/* Base Tint Fallback */}
       <div 
-        className={`absolute inset-0 ${
-          isStudio 
-            ? 'bg-gradient-to-b from-[#FAF8F5] via-[#F5F2EC] to-white' 
-            : 'bg-gradient-to-b from-[#56a2e8] via-[#cae4fc] to-white'
-        }`} 
+        className="absolute inset-0 bg-gradient-to-b from-[#56a2e8] via-[#cae4fc] to-white" 
       />
 
       {/* Signature Atmospheric Background Artwork */}
@@ -74,7 +69,7 @@ export function ArtisticHeroBackground({
         alt="Cora Atmospheric Background"
         fill
         priority
-        className={`object-cover ${isStudio ? 'object-center opacity-80' : 'object-top'}`}
+        className="object-cover object-top opacity-95"
         sizes="100vw"
       />
 
@@ -82,9 +77,8 @@ export function ArtisticHeroBackground({
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: isStudio
-            ? 'linear-gradient(180deg, rgba(250, 248, 245, 0.45) 0%, rgba(250, 248, 245, 0.55) 40%, rgba(255, 255, 255, 0.90) 80%, #ffffff 100%)'
-            : 'linear-gradient(180deg, rgba(86, 162, 232, 0.14) 0%, rgba(255, 255, 255, 0.20) 35%, rgba(255, 255, 255, 0.88) 75%, #ffffff 100%)',
+          background:
+            'linear-gradient(180deg, rgba(86, 162, 232, 0.10) 0%, rgba(255, 255, 255, 0.20) 30%, rgba(255, 255, 255, 0.90) 75%, #ffffff 100%)',
         }}
       />
 

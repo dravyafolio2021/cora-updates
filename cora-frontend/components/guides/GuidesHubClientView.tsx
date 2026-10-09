@@ -144,84 +144,21 @@ export function GuidesHubClientView({ initialGuides, initialFeaturedGuide }: Gui
     <main className="min-h-screen bg-white text-zinc-950 selection:bg-zinc-200 pb-20">
       {/* ── 1. GLOBAL SIGNATURE HERO MASTHEAD ────────────────────────── */}
       <GlobalResourcesHero
-        tone="studio"
+        tone="neutral"
         badgeIcon={<Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-purple-600" />}
         badgeText="Chaptered Digital Books & SOPs"
         titleLine1="Guides & Playbooks"
         titleLine2="Operating frameworks, scope defense & margin systems"
         description="In-depth chaptered digital books, battle-tested SOP blueprints, and downloadable Excel calculators to onboard high-ticket clients, defend retainers, and scale agency delivery."
-        pillars={[
-          {
-            icon: <Check className="w-3.5 h-3.5 text-emerald-600 font-bold" />,
-            text: '100% Free Forever',
-          },
-          {
-            icon: <BookOpen className="w-3.5 h-3.5 text-purple-600" />,
-            text: 'Chaptered Interactive Books',
-          },
-          {
-            icon: <Download className="w-3.5 h-3.5 text-blue-600" />,
-            text: 'Downloadable SOP Packs',
-          },
-          {
-            icon: <ShieldCheck className="w-3.5 h-3.5 text-indigo-600" />,
-            text: 'Excel Margin Calculators',
-          },
-        ]}
+        emailSource="guides_hub_hero"
+        emailPlaceholder="Enter your work email for new guides..."
+        emailButtonText="Deliver Guides"
         searchProps={{
           value: searchQuery,
           onChange: setSearchQuery,
           placeholder: 'Search playbooks & SOPs e.g. Client onboarding, Scope creep defence, Retainer proposal...',
         }}
-      >
-        {/* Email Subscribe / Automatic Guide Delivery Option */}
-        <div className="pt-2 max-w-lg mx-auto">
-          {subscribed ? (
-            <div className="p-3.5 sm:p-4 rounded-2xl bg-white/95 border border-zinc-200/90 shadow-sm backdrop-blur-md flex items-center justify-center gap-2.5 text-xs sm:text-sm font-semibold text-zinc-950 animate-in fade-in zoom-in-95 duration-200">
-              <div className="w-5 h-5 rounded-full bg-zinc-950 text-white flex items-center justify-center shrink-0">
-                <Check className="w-3 h-3 stroke-[3]" />
-              </div>
-              <span>Subscribed! New playbooks &amp; guides will be delivered straight to your inbox.</span>
-            </div>
-          ) : (
-            <form onSubmit={handleSubscribe} className="space-y-2">
-              <div className="flex flex-col sm:flex-row items-center gap-2 p-1.5 rounded-2xl bg-white/95 border border-zinc-200/90 shadow-sm backdrop-blur-md">
-                <div className="relative w-full flex items-center">
-                  <Mail className="w-4 h-4 text-zinc-400 absolute left-3.5 pointer-events-none" />
-                  <input
-                    type="email"
-                    required
-                    value={subscribeEmail}
-                    onChange={(e) => setSubscribeEmail(e.target.value)}
-                    placeholder="Enter your work email for new guides..."
-                    className="w-full pl-10 pr-3 py-2 text-xs sm:text-sm bg-transparent text-zinc-950 placeholder:text-zinc-400 focus:outline-none"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  disabled={isSubscribing}
-                  className="w-full sm:w-auto shrink-0 inline-flex items-center justify-center gap-1.5 bg-zinc-950 hover:bg-black text-white px-4 py-2.5 rounded-xl text-xs font-bold transition-all shadow-2xs cursor-pointer disabled:opacity-50"
-                >
-                  {isSubscribing ? (
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  ) : (
-                    <>
-                      <span>Deliver Guides</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </>
-                  )}
-                </button>
-              </div>
-              {subscribeError && (
-                <p className="text-[11px] text-rose-600 font-medium">{subscribeError}</p>
-              )}
-              <p className="text-[11px] font-mono text-zinc-500">
-                Get newly published SOPs &amp; playbooks automatically in your mail &bull; Zero spam
-              </p>
-            </form>
-          )}
-        </div>
-      </GlobalResourcesHero>
+      />
 
       {/* ── 2. FEATURED GUIDE DIGITAL BOOK SHOWCASE ──────────────────── */}
       {featuredGuide && (

@@ -4780,7 +4780,7 @@ function cora_get_sparkline_points( $history, $type ) {
      ╚═══════════════════════════════════════════════════════════╝ -->
 <style>
 #atw{font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',system-ui,sans-serif;}
-#atw *{box-sizing:border-box;margin:0;padding:0;}
+#atw, #atw *{box-sizing:border-box;}
 .atw-card{transition:transform .2s cubic-bezier(.4,0,.2,1),box-shadow .2s cubic-bezier(.4,0,.2,1),border-color .15s,background-color .15s;will-change:transform;}
 .atw-card:hover{transform:translateY(-3px);box-shadow:0 12px 36px rgba(0,0,0,.09),0 4px 12px rgba(0,0,0,.05)!important;}
 .atw-card:hover .atw-thumb{transform:scale(1.03);}
@@ -4789,9 +4789,34 @@ function cora_get_sparkline_points( $history, $type ) {
 .atw-card.atw-sel-e{background:#f4f4f5!important;border-color:#18181b!important;box-shadow:0 0 0 2px rgba(24,24,27,.12),0 6px 24px rgba(0,0,0,.08)!important;}
 .atw-card.atw-sel-n{background:#f4f4f5!important;border-color:#18181b!important;box-shadow:0 0 0 2px rgba(24,24,27,.12),0 6px 24px rgba(0,0,0,.08)!important;}
 .atw-card.atw-sel-l{background:#faf5ff!important;border-color:#7c3aed!important;box-shadow:0 0 0 2px rgba(124,58,237,.15),0 6px 24px rgba(124,58,237,.08)!important;}
-.atw-template-card{background:#ffffff;border:1.5px solid #e4e4e7;border-radius:16px;transition:all .2s cubic-bezier(.4,0,.2,1);cursor:pointer;overflow:hidden;}
-.atw-template-card:hover{border-color:#a1a1aa!important;transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.06)!important;}
-.atw-template-card.atw-sel-t{background:#fafafa!important;border-color:#18181b!important;box-shadow:0 0 0 2px rgba(24,24,27,.12),0 8px 28px rgba(0,0,0,.08)!important;}
+#atw .atw-template-card{background:#ffffff!important;border:1px solid #e4e4e7!important;border-radius:16px!important;padding:0!important;overflow:hidden!important;transition:all .2s cubic-bezier(.16,1,.3,1)!important;cursor:pointer!important;display:flex!important;flex-direction:column!important;box-shadow:0 1px 3px rgba(0,0,0,.04)!important;position:relative!important;}
+#atw .atw-template-card:hover{border-color:#d4d4d8!important;transform:translateY(-2px)!important;box-shadow:0 10px 28px rgba(0,0,0,.07)!important;}
+#atw .atw-template-card.atw-sel-t{background:#ffffff!important;border-color:#18181b!important;box-shadow:0 0 0 2px #18181b,0 8px 20px rgba(0,0,0,.06)!important;}
+#atw .atw-tcard-media{position:relative!important;width:100%!important;height:160px!important;background:#18181b!important;overflow:hidden!important;border-bottom:1px solid #f4f4f5!important;cursor:pointer!important;user-select:none!important;margin:0!important;padding:0!important;}
+#atw .atw-tcard-img{width:100%!important;height:100%!important;object-fit:cover!important;object-position:top center!important;transition:transform .4s cubic-bezier(.16,1,.3,1)!important;display:block!important;margin:0!important;padding:0!important;}
+#atw .atw-template-card:hover .atw-tcard-img{transform:scale(1.04)!important;}
+#atw .atw-tcard-top-bar{position:absolute!important;top:10px!important;left:10px!important;right:10px!important;display:flex!important;align-items:center!important;justify-content:space-between!important;z-index:10!important;pointer-events:none!important;margin:0!important;padding:0!important;}
+#atw .atw-tcard-format-pill{font-size:9px!important;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace!important;font-weight:700!important;text-transform:uppercase!important;letter-spacing:.04em!important;color:#18181b!important;background:rgba(255,255,255,.94)!important;backdrop-filter:blur(8px)!important;-webkit-backdrop-filter:blur(8px)!important;padding:3.5px 8px!important;border-radius:6px!important;border:1px solid rgba(228,228,231,.9)!important;box-shadow:0 2px 6px rgba(0,0,0,.06)!important;display:inline-flex!important;align-items:center!important;gap:4.5px!important;margin:0!important;}
+#atw .atw-tcard-badge-pill{font-size:8.5px!important;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace!important;font-weight:700!important;letter-spacing:.05em!important;color:#ffffff!important;background:rgba(9,9,11,.8)!important;backdrop-filter:blur(8px)!important;-webkit-backdrop-filter:blur(8px)!important;padding:3px 8px!important;border-radius:6px!important;border:1px solid rgba(255,255,255,.15)!important;box-shadow:0 2px 6px rgba(0,0,0,.12)!important;margin:0!important;}
+#atw .atw-tcard-hover-overlay{position:absolute!important;inset:0!important;background:rgba(9,9,11,.5)!important;backdrop-filter:blur(2px)!important;-webkit-backdrop-filter:blur(2px)!important;opacity:0!important;transition:opacity .18s ease!important;display:flex!important;align-items:flex-end!important;justify-content:space-between!important;padding:12px!important;z-index:20!important;margin:0!important;}
+#atw .atw-template-card:hover .atw-tcard-hover-overlay{opacity:1!important;}
+#atw .atw-tcard-hover-btn-preview{height:30px!important;padding:0 12px!important;border-radius:7px!important;background:rgba(255,255,255,.95)!important;color:#18181b!important;font-size:11px!important;font-weight:700!important;border:none!important;cursor:pointer!important;display:inline-flex!important;align-items:center!important;gap:5px!important;box-shadow:0 2px 8px rgba(0,0,0,.15)!important;transition:all .15s!important;font-family:inherit!important;margin:0!important;}
+#atw .atw-tcard-hover-btn-preview:hover{background:#ffffff!important;transform:scale(1.03)!important;}
+#atw .atw-tcard-hover-btn-copy{height:30px!important;padding:0 12px!important;border-radius:7px!important;background:#18181b!important;color:#ffffff!important;font-size:11px!important;font-weight:700!important;border:1px solid rgba(255,255,255,.2)!important;cursor:pointer!important;display:inline-flex!important;align-items:center!important;gap:5px!important;box-shadow:0 2px 8px rgba(0,0,0,.2)!important;transition:all .15s!important;font-family:inherit!important;margin:0!important;}
+#atw .atw-tcard-hover-btn-copy:hover{background:#000000!important;transform:scale(1.03)!important;}
+#atw .atw-tcard-body{padding:16px 18px 18px!important;display:flex!important;flex-direction:column!important;gap:10px!important;background:#ffffff!important;box-sizing:border-box!important;width:100%!important;}
+#atw .atw-tcard-stats-row{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:6px!important;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace!important;font-size:11px!important;color:#71717a!important;margin:0!important;padding:0!important;}
+#atw .atw-tcard-stats-left{display:flex!important;align-items:center!important;gap:8px!important;margin:0!important;padding:0!important;}
+#atw .atw-stat-item{display:inline-flex!important;align-items:center!important;gap:3.5px!important;color:#71717a!important;font-weight:500!important;font-size:10.5px!important;margin:0!important;padding:0!important;}
+#atw .atw-stat-item svg{color:#a1a1aa!important;}
+#atw .atw-stat-item:first-child svg{color:#8b5cf6!important;}
+#atw .atw-stat-rating{font-weight:700!important;color:#18181b!important;background:#f4f4f5!important;padding:1.5px 6px!important;border-radius:4px!important;font-size:10.5px!important;margin:0!important;}
+#atw .atw-tcard-title{font-size:14px!important;font-weight:700!important;color:#18181b!important;letter-spacing:-0.015em!important;line-height:1.35!important;margin:2px 0 0 0!important;padding:0!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;}
+#atw .atw-tcard-footer{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:8px!important;margin:4px 0 0 0!important;padding:0!important;}
+#atw .atw-btn-copy-prompt{flex:1!important;height:34px!important;padding:0 10px!important;background:#ffffff!important;border:1px solid #e4e4e7!important;border-radius:8px!important;font-size:11.5px!important;font-weight:600!important;color:#27272a!important;cursor:pointer!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:4.5px!important;transition:all .15s!important;font-family:inherit!important;margin:0!important;}
+#atw .atw-btn-copy-prompt:hover{background:#f4f4f5!important;border-color:#d4d4d8!important;color:#09090b!important;}
+#atw .atw-btn-use-template{flex:1!important;height:34px!important;padding:0 12px!important;background:#18181b!important;border:1px solid #18181b!important;border-radius:8px!important;font-size:11.5px!important;font-weight:700!important;color:#ffffff!important;cursor:pointer!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:4.5px!important;transition:all .15s!important;font-family:inherit!important;box-shadow:0 1px 3px rgba(0,0,0,.08)!important;margin:0!important;}
+#atw .atw-btn-use-template:hover{background:#000000!important;border-color:#000000!important;transform:translateY(-1px)!important;box-shadow:0 3px 8px rgba(0,0,0,.15)!important;}
 .atw-tab{transition:all .15s;border:none;cursor:pointer;font-size:11.5px;font-weight:700;font-family:inherit;}
 .atw-tab.atw-tab-on{background:white;color:#18181b;border:1px solid #e4e4e7!important;box-shadow:0 1px 3px rgba(0,0,0,.08);border-radius:9px;}
 .atw-tab.atw-tab-off{background:transparent;color:#71717a;border:1px solid transparent!important;border-radius:9px;}
@@ -5092,7 +5117,7 @@ function cora_get_sparkline_points( $history, $type ) {
                         <span style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:white;">Claude & ChatGPT Master Prompts</span>
                     </div>
                     <h2 style="font-size:22px;font-weight:900;color:#18181b;letter-spacing:-.03em;line-height:1.2;">Choose a Business Template Prompt or Connect Code</h2>
-                    <p style="font-size:12px;color:#71717a;margin-top:2px;">Select from 6 curated master prompts, or switch tabs to paste your custom HTML code directly.</p>
+                    <p style="font-size:12px;color:#71717a;margin-top:2px;">Select from 9 curated master prompts, or switch tabs to paste your custom HTML code directly.</p>
                 </div>
                 <!-- Marketing Site Redirect Banner/Link -->
                 <a href="https://heycora.in/templates" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:#f4f4f5;border:1.5px solid #e4e4e7;border-radius:10px;font-size:11.5px;font-weight:700;color:#18181b;text-decoration:none;transition:all .15s;box-shadow:0 1px 3px rgba(0,0,0,.04);" onmouseover="this.style.background='#e4e4e7'" onmouseout="this.style.background='#f4f4f5'">
@@ -5114,7 +5139,7 @@ function cora_get_sparkline_points( $history, $type ) {
                 <div style="display:inline-flex;background:#e4e4e7;border-radius:10px;padding:3px;gap:3px;">
                     <button type="button" onclick="window.wizardSetHtmlStepTab('templates')" id="wiz-step2-tab-templates" class="atw-tab atw-tab-on" style="padding:6px 14px;font-size:11.5px;font-weight:700;display:inline-flex;align-items:center;gap:6px;">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                        <span>1. Pick AI Template Prompt (6)</span>
+                        <span>1. Pick AI Template Prompt (9)</span>
                     </button>
                     <button type="button" onclick="window.wizardSetHtmlStepTab('paste')" id="wiz-step2-tab-paste" class="atw-tab atw-tab-off" style="padding:6px 14px;font-size:11.5px;font-weight:700;display:inline-flex;align-items:center;gap:6px;">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
@@ -5128,206 +5153,503 @@ function cora_get_sparkline_points( $history, $type ) {
             </div>
 
             <!-- ════════════════════════════════════════════════════════════════
-                 TAB 1: 6 Curated Production Template Prompts Matrix
+                 TAB 1: Curated Production Template Prompts Matrix (9 Templates)
                  ════════════════════════════════════════════════════════════════ -->
             <div id="wiz-step2-templates-view" style="width:100%;">
                 <div class="atw-prompts-grid" id="wiz-templates-container">
 
                     <!-- 1. Creative Agency & Video Studio -->
-                    <div onclick="window.selectHtmlTemplate('agency', 'Creative Agency & Video Studio')" id="wiz-tcard-agency" data-template-name="Creative Agency & Video Studio agency video portfolio production" class="atw-template-card atw-sel-t" style="display:flex;flex-direction:column;justify-content:space-between;padding:14px;border-radius:14px;background:white;border:1.5px solid #18181b;">
-                        <div>
-                            <!-- Visual Preview Thumbnail -->
-                            <div style="height:108px;border-radius:10px;background:#18181b;display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:10px;overflow:hidden;border:1px solid #27272a;">
-                                <img src="<?php echo esc_url( plugin_dir_url(dirname(__FILE__)) . 'assets/img/tmpl_agency_preview.jpg?v=' . (defined('CORA_WORKSPACE_VERSION') ? CORA_WORKSPACE_VERSION : time()) ); ?>" alt="Creative Agency" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" loading="lazy">
-                                <span style="position:absolute;top:6px;right:6px;font-size:8px;font-weight:800;color:#10b981;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);padding:2px 6px;border-radius:4px;border:1px solid rgba(16,185,129,0.4);">Dark Minimal</span>
+                    <div onclick="window.selectHtmlTemplate('agency', 'Creative Agency & Video Studio')" id="wiz-tcard-agency" data-template-name="Creative Agency & Video Studio agency video portfolio production dark minimal" class="group atw-template-card atw-sel-t">
+                        <div class="atw-tcard-media" onclick="event.stopPropagation(); window.previewTemplatePrompt('agency');">
+                            <img src="<?php echo esc_url( plugin_dir_url(dirname(__FILE__)) . 'assets/img/tmpl_agency_preview.jpg?v=' . (defined('CORA_WORKSPACE_VERSION') ? CORA_WORKSPACE_VERSION : time()) ); ?>" alt="Creative Agency" class="atw-tcard-img" loading="lazy" onerror="this.onerror=null;this.src='<?php echo esc_url( plugin_dir_url(dirname(__FILE__)) . 'assets/img/wizard-html-ai-thumb.jpg' ); ?>';">
+                            <div class="atw-tcard-top-bar">
+                                <span class="atw-tcard-format-pill">
+                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                                    <span>HTML + TAILWIND CDN</span>
+                                </span>
+                                <span class="atw-tcard-badge-pill" style="color:#34d399;border-color:rgba(52,211,153,0.3);">DARK MINIMAL</span>
                             </div>
-
-                            <h3 style="font-size:13px;font-weight:800;color:#18181b;letter-spacing:-0.02em;margin-bottom:4px;display:flex;align-items:center;gap:5px;">
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                                <span>Creative Agency & Video Studio</span>
-                            </h3>
-                            <p style="font-size:11px;color:#71717a;line-height:1.4;margin-bottom:8px;">Tailwind CDN, dark minimalist aesthetic, video reel hero, portfolio showcase, services matrix, and native lead consultation form.</p>
-                            
-                            <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;">
-                                <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Tailwind CDN</span>
-                                <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Native Lead Form</span>
-                                <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Mobile 100%</span>
+                            <div class="atw-tcard-hover-overlay">
+                                <button type="button" onclick="event.stopPropagation(); window.previewTemplatePrompt('agency');" class="atw-tcard-hover-btn-preview">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    <span>Preview</span>
+                                </button>
+                                <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('agency');" class="atw-tcard-hover-btn-copy" id="wiz-tcard-hover-copy-agency">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                    <span>Use Prompt</span>
+                                </button>
                             </div>
                         </div>
 
-                        <div style="display:flex;flex-direction:column;gap:5px;border-top:1px solid #f4f4f5;padding-top:8px;">
-                            <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('agency');" style="width:100%;padding:6px 10px;background:#f4f4f5;border:1px solid #e4e4e7;border-radius:7px;font-size:10.5px;font-weight:700;color:#18181b;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;">
-                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                                <span>Copy Prompt for Claude / ChatGPT</span>
-                            </button>
-                            <button type="button" onclick="event.stopPropagation(); window.useTemplateAndSwitchToCode('agency', 'Creative Agency & Video Studio');" style="width:100%;padding:6px 10px;background:#18181b;border:none;border-radius:7px;font-size:10.5px;font-weight:700;color:white;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;">
-                                <span>Use Template & Connect Code →</span>
-                            </button>
+                        <div class="atw-tcard-body" style="padding:16px 18px 18px!important;">
+                            <div class="atw-tcard-stats-row">
+                                <div class="atw-tcard-stats-left">
+                                    <span class="atw-stat-item">
+                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"/></svg>
+                                        <span>580 copies</span>
+                                    </span>
+                                    <span class="atw-stat-item">
+                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                        <span>3.8k views</span>
+                                    </span>
+                                </div>
+                                <span class="atw-stat-rating">★ 4.96</span>
+                            </div>
+
+                            <h3 class="atw-tcard-title" title="Creative Agency & Video Studio">
+                                <span>Creative Agency & Video Studio</span>
+                            </h3>
+
+                            <div class="atw-tcard-footer">
+                                <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('agency');" id="wiz-btn-copy-agency" class="atw-btn-copy-prompt" title="Copy Prompt for Claude / ChatGPT">
+                                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                    <span>Copy Prompt</span>
+                                </button>
+                                <button type="button" onclick="event.stopPropagation(); window.useTemplateAndSwitchToCode('agency', 'Creative Agency & Video Studio');" class="atw-btn-use-template">
+                                    <span>Use Template</span>
+                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
                     <!-- 2. AI SaaS & Software Landing -->
-                    <div onclick="window.selectHtmlTemplate('saas', 'AI SaaS & Software Landing')" id="wiz-tcard-saas" data-template-name="AI SaaS & Software Landing saas software platform app tech" class="atw-template-card" style="display:flex;flex-direction:column;justify-content:space-between;padding:14px;border-radius:14px;background:white;border:1.5px solid #e4e4e7;">
-                        <div>
-                            <!-- Visual Preview Thumbnail -->
-                            <div style="height:108px;border-radius:10px;background:#18181b;display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:10px;overflow:hidden;border:1px solid #27272a;">
-                                <img src="<?php echo esc_url( plugin_dir_url(dirname(__FILE__)) . 'assets/img/tmpl_saas_preview.jpg?v=' . (defined('CORA_WORKSPACE_VERSION') ? CORA_WORKSPACE_VERSION : time()) ); ?>" alt="AI SaaS Platform" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" loading="lazy">
-                                <span style="position:absolute;top:6px;right:6px;font-size:8px;font-weight:800;color:#a78bfa;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);padding:2px 6px;border-radius:4px;border:1px solid rgba(167,139,250,0.4);">High Tech</span>
+                    <div onclick="window.selectHtmlTemplate('saas', 'AI SaaS & Software Landing')" id="wiz-tcard-saas" data-template-name="AI SaaS & Software Landing saas software platform app tech high tech" class="group atw-template-card">
+                        <div class="atw-tcard-media" onclick="event.stopPropagation(); window.previewTemplatePrompt('saas');">
+                            <img src="<?php echo esc_url( plugin_dir_url(dirname(__FILE__)) . 'assets/img/tmpl_saas_preview.jpg?v=' . (defined('CORA_WORKSPACE_VERSION') ? CORA_WORKSPACE_VERSION : time()) ); ?>" alt="AI SaaS Platform" class="atw-tcard-img" loading="lazy" onerror="this.onerror=null;this.src='<?php echo esc_url( plugin_dir_url(dirname(__FILE__)) . 'assets/img/wizard-html-ai-thumb.jpg' ); ?>';">
+                            <div class="atw-tcard-top-bar">
+                                <span class="atw-tcard-format-pill">
+                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                                    <span>HTML + TAILWIND CDN</span>
+                                </span>
+                                <span class="atw-tcard-badge-pill" style="color:#a78bfa;border-color:rgba(167,139,250,0.3);">HIGH TECH</span>
                             </div>
-
-                            <h3 style="font-size:13px;font-weight:800;color:#18181b;letter-spacing:-0.02em;margin-bottom:4px;display:flex;align-items:center;gap:5px;">
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                                <span>AI SaaS & Software Landing</span>
-                            </h3>
-                            <p style="font-size:11px;color:#71717a;line-height:1.4;margin-bottom:8px;">Modern tech layout, live status pill, interactive feature grid, pricing tiers with toggle, and native product demo form.</p>
-                            
-                            <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;">
-                                <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Tailwind CDN</span>
-                                <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Native Lead Form</span>
-                                <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Pricing Toggle</span>
+                            <div class="atw-tcard-hover-overlay">
+                                <button type="button" onclick="event.stopPropagation(); window.previewTemplatePrompt('saas');" class="atw-tcard-hover-btn-preview">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    <span>Preview</span>
+                                </button>
+                                <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('saas');" class="atw-tcard-hover-btn-copy" id="wiz-tcard-hover-copy-saas">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                    <span>Use Prompt</span>
+                                </button>
                             </div>
                         </div>
 
-                        <div style="display:flex;flex-direction:column;gap:5px;border-top:1px solid #f4f4f5;padding-top:8px;">
-                            <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('saas');" style="width:100%;padding:6px 10px;background:#f4f4f5;border:1px solid #e4e4e7;border-radius:7px;font-size:10.5px;font-weight:700;color:#18181b;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;">
-                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                                <span>Copy Prompt for Claude / ChatGPT</span>
-                            </button>
-                            <button type="button" onclick="event.stopPropagation(); window.useTemplateAndSwitchToCode('saas', 'AI SaaS & Software Landing');" style="width:100%;padding:6px 10px;background:#18181b;border:none;border-radius:7px;font-size:10.5px;font-weight:700;color:white;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;">
-                                <span>Use Template & Connect Code →</span>
-                            </button>
+                        <div class="atw-tcard-body" style="padding:16px 18px 18px!important;">
+                            <div class="atw-tcard-stats-row">
+                                <div class="atw-tcard-stats-left">
+                                    <span class="atw-stat-item">
+                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"/></svg>
+                                        <span>642 copies</span>
+                                    </span>
+                                    <span class="atw-stat-item">
+                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                        <span>4.2k views</span>
+                                    </span>
+                                </div>
+                                <span class="atw-stat-rating">★ 4.94</span>
+                            </div>
+
+                            <h3 class="atw-tcard-title" title="AI SaaS & Software Landing">
+                                <span>AI SaaS & Software Landing</span>
+                            </h3>
+
+                            <div class="atw-tcard-footer">
+                                <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('saas');" id="wiz-btn-copy-saas" class="atw-btn-copy-prompt" title="Copy Prompt for Claude / ChatGPT">
+                                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                    <span>Copy Prompt</span>
+                                </button>
+                                <button type="button" onclick="event.stopPropagation(); window.useTemplateAndSwitchToCode('saas', 'AI SaaS & Software Landing');" class="atw-btn-use-template">
+                                    <span>Use Template</span>
+                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
                     <!-- 3. B2B Advisory & Management Consulting -->
-                    <div onclick="window.selectHtmlTemplate('consulting', 'B2B Advisory & Management Consulting')" id="wiz-tcard-consulting" data-template-name="B2B Advisory & Management Consulting consulting b2b corporate finance executive" class="atw-template-card" style="display:flex;flex-direction:column;justify-content:space-between;padding:14px;border-radius:14px;background:white;border:1.5px solid #e4e4e7;">
-                        <div>
-                            <!-- Visual Preview Thumbnail -->
-                            <div style="height:108px;border-radius:10px;background:#18181b;display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:10px;overflow:hidden;border:1px solid #27272a;">
-                                <img src="<?php echo esc_url( plugin_dir_url(dirname(__FILE__)) . 'assets/img/tmpl_consulting_preview.jpg?v=' . (defined('CORA_WORKSPACE_VERSION') ? CORA_WORKSPACE_VERSION : time()) ); ?>" alt="B2B Advisory" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" loading="lazy">
-                                <span style="position:absolute;top:6px;right:6px;font-size:8px;font-weight:800;color:#fbbf24;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);padding:2px 6px;border-radius:4px;border:1px solid rgba(251,191,36,0.4);">Editorial Luxury</span>
+                    <div onclick="window.selectHtmlTemplate('consulting', 'B2B Advisory & Management Consulting')" id="wiz-tcard-consulting" data-template-name="B2B Advisory & Management Consulting consulting b2b corporate finance executive editorial luxury" class="group atw-template-card">
+                        <div class="atw-tcard-media" onclick="event.stopPropagation(); window.previewTemplatePrompt('consulting');">
+                            <img src="<?php echo esc_url( plugin_dir_url(dirname(__FILE__)) . 'assets/img/tmpl_consulting_preview.jpg?v=' . (defined('CORA_WORKSPACE_VERSION') ? CORA_WORKSPACE_VERSION : time()) ); ?>" alt="B2B Advisory" class="atw-tcard-img" loading="lazy" onerror="this.onerror=null;this.src='<?php echo esc_url( plugin_dir_url(dirname(__FILE__)) . 'assets/img/wizard-html-ai-thumb.jpg' ); ?>';">
+                            <div class="atw-tcard-top-bar">
+                                <span class="atw-tcard-format-pill">
+                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                                    <span>HTML + TAILWIND CDN</span>
+                                </span>
+                                <span class="atw-tcard-badge-pill" style="color:#fbbf24;border-color:rgba(251,191,36,0.3);">EDITORIAL LUXURY</span>
                             </div>
-
-                            <h3 style="font-size:13px;font-weight:800;color:#18181b;letter-spacing:-0.02em;margin-bottom:4px;display:flex;align-items:center;gap:5px;">
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-                                <span>B2B Advisory & Consulting</span>
-                            </h3>
-                            <p style="font-size:11px;color:#71717a;line-height:1.4;margin-bottom:8px;">Editorial layout, client partner logos, strategic services breakdown, case study metrics, and native executive audit form.</p>
-                            
-                            <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;">
-                                <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Tailwind CDN</span>
-                                <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Native Lead Form</span>
-                                <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Case Studies</span>
+                            <div class="atw-tcard-hover-overlay">
+                                <button type="button" onclick="event.stopPropagation(); window.previewTemplatePrompt('consulting');" class="atw-tcard-hover-btn-preview">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    <span>Preview</span>
+                                </button>
+                                <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('consulting');" class="atw-tcard-hover-btn-copy" id="wiz-tcard-hover-copy-consulting">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                    <span>Use Prompt</span>
+                                </button>
                             </div>
                         </div>
 
-                        <div style="display:flex;flex-direction:column;gap:5px;border-top:1px solid #f4f4f5;padding-top:8px;">
-                            <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('consulting');" style="width:100%;padding:6px 10px;background:#f4f4f5;border:1px solid #e4e4e7;border-radius:7px;font-size:10.5px;font-weight:700;color:#18181b;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;">
-                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                                <span>Copy Prompt for Claude / ChatGPT</span>
-                            </button>
-                            <button type="button" onclick="event.stopPropagation(); window.useTemplateAndSwitchToCode('consulting', 'B2B Advisory & Management Consulting');" style="width:100%;padding:6px 10px;background:#18181b;border:none;border-radius:7px;font-size:10.5px;font-weight:700;color:white;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;">
-                                <span>Use Template & Connect Code →</span>
-                            </button>
+                        <div class="atw-tcard-body" style="padding:16px 18px 18px!important;">
+                            <div class="atw-tcard-stats-row">
+                                <div class="atw-tcard-stats-left">
+                                    <span class="atw-stat-item">
+                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"/></svg>
+                                        <span>490 copies</span>
+                                    </span>
+                                    <span class="atw-stat-item">
+                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                        <span>2.9k views</span>
+                                    </span>
+                                </div>
+                                <span class="atw-stat-rating">★ 4.92</span>
+                            </div>
+
+                            <h3 class="atw-tcard-title" title="B2B Advisory & Consulting">
+                                <span>B2B Advisory & Consulting</span>
+                            </h3>
+
+                            <div class="atw-tcard-footer">
+                                <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('consulting');" id="wiz-btn-copy-consulting" class="atw-btn-copy-prompt" title="Copy Prompt for Claude / ChatGPT">
+                                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                    <span>Copy Prompt</span>
+                                </button>
+                                <button type="button" onclick="event.stopPropagation(); window.useTemplateAndSwitchToCode('consulting', 'B2B Advisory & Management Consulting');" class="atw-btn-use-template">
+                                    <span>Use Template</span>
+                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
                     <!-- 4. Photography Studio & Production House -->
-                    <div onclick="window.selectHtmlTemplate('photography', 'Photography Studio & Production House')" id="wiz-tcard-photography" data-template-name="Photography Studio & Production House photo studio photography gallery creative" class="atw-template-card" style="display:flex;flex-direction:column;justify-content:space-between;padding:14px;border-radius:14px;background:white;border:1.5px solid #e4e4e7;">
-                        <div>
-                            <!-- Visual Preview Thumbnail -->
-                            <div style="height:108px;border-radius:10px;background:#18181b;display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:10px;overflow:hidden;border:1px solid #27272a;">
-                                <img src="<?php echo esc_url( plugin_dir_url(dirname(__FILE__)) . 'assets/img/tmpl_photography_preview.jpg?v=' . (defined('CORA_WORKSPACE_VERSION') ? CORA_WORKSPACE_VERSION : time()) ); ?>" alt="Photography Studio" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" loading="lazy">
-                                <span style="position:absolute;top:6px;right:6px;font-size:8px;font-weight:800;color:#38bdf8;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);padding:2px 6px;border-radius:4px;border:1px solid rgba(56,189,248,0.4);">Visual Gallery</span>
+                    <div onclick="window.selectHtmlTemplate('photography', 'Photography Studio & Production House')" id="wiz-tcard-photography" data-template-name="Photography Studio & Production House photo studio photography gallery creative visual gallery" class="group atw-template-card">
+                        <div class="atw-tcard-media" onclick="event.stopPropagation(); window.previewTemplatePrompt('photography');">
+                            <img src="<?php echo esc_url( plugin_dir_url(dirname(__FILE__)) . 'assets/img/tmpl_photography_preview.jpg?v=' . (defined('CORA_WORKSPACE_VERSION') ? CORA_WORKSPACE_VERSION : time()) ); ?>" alt="Photography Studio" class="atw-tcard-img" loading="lazy" onerror="this.onerror=null;this.src='<?php echo esc_url( plugin_dir_url(dirname(__FILE__)) . 'assets/img/wizard-html-ai-thumb.jpg' ); ?>';">
+                            <div class="atw-tcard-top-bar">
+                                <span class="atw-tcard-format-pill">
+                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                                    <span>HTML + TAILWIND CDN</span>
+                                </span>
+                                <span class="atw-tcard-badge-pill" style="color:#38bdf8;border-color:rgba(56,189,248,0.3);">VISUAL GALLERY</span>
                             </div>
-
-                            <h3 style="font-size:13px;font-weight:800;color:#18181b;letter-spacing:-0.02em;margin-bottom:4px;display:flex;align-items:center;gap:5px;">
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                                <span>Photography Studio & Production</span>
-                            </h3>
-                            <p style="font-size:11px;color:#71717a;line-height:1.4;margin-bottom:8px;">High-end visual gallery, package cards with GST breakdown, studio space specs, and native booking inquiry form.</p>
-                            
-                            <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;">
-                                <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Tailwind CDN</span>
-                                <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Native Lead Form</span>
-                                <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Photo Gallery</span>
+                            <div class="atw-tcard-hover-overlay">
+                                <button type="button" onclick="event.stopPropagation(); window.previewTemplatePrompt('photography');" class="atw-tcard-hover-btn-preview">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    <span>Preview</span>
+                                </button>
+                                <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('photography');" class="atw-tcard-hover-btn-copy" id="wiz-tcard-hover-copy-photography">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                    <span>Use Prompt</span>
+                                </button>
                             </div>
                         </div>
 
-                        <div style="display:flex;flex-direction:column;gap:5px;border-top:1px solid #f4f4f5;padding-top:8px;">
-                            <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('photography');" style="width:100%;padding:6px 10px;background:#f4f4f5;border:1px solid #e4e4e7;border-radius:7px;font-size:10.5px;font-weight:700;color:#18181b;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;">
-                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                                <span>Copy Prompt for Claude / ChatGPT</span>
-                            </button>
-                            <button type="button" onclick="event.stopPropagation(); window.useTemplateAndSwitchToCode('photography', 'Photography Studio & Production House');" style="width:100%;padding:6px 10px;background:#18181b;border:none;border-radius:7px;font-size:10.5px;font-weight:700;color:white;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;">
-                                <span>Use Template & Connect Code →</span>
-                            </button>
+                        <div class="atw-tcard-body" style="padding:16px 18px 18px!important;">
+                            <div class="atw-tcard-stats-row">
+                                <div class="atw-tcard-stats-left">
+                                    <span class="atw-stat-item">
+                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"/></svg>
+                                        <span>530 copies</span>
+                                    </span>
+                                    <span class="atw-stat-item">
+                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                        <span>3.5k views</span>
+                                    </span>
+                                </div>
+                                <span class="atw-stat-rating">★ 4.97</span>
+                            </div>
+
+                            <h3 class="atw-tcard-title" title="Photography Studio & Production">
+                                <span>Photography Studio & Production</span>
+                            </h3>
+
+                            <div class="atw-tcard-footer">
+                                <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('photography');" id="wiz-btn-copy-photography" class="atw-btn-copy-prompt" title="Copy Prompt for Claude / ChatGPT">
+                                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                    <span>Copy Prompt</span>
+                                </button>
+                                <button type="button" onclick="event.stopPropagation(); window.useTemplateAndSwitchToCode('photography', 'Photography Studio & Production House');" class="atw-btn-use-template">
+                                    <span>Use Template</span>
+                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
                     <!-- 5. Luxury Real Estate & Property Showcase -->
-                    <div onclick="window.selectHtmlTemplate('realestate', 'Luxury Real Estate & Property Showcase')" id="wiz-tcard-realestate" data-template-name="Luxury Real Estate & Property Showcase real estate property architecture luxury home" class="atw-template-card" style="display:flex;flex-direction:column;justify-content:space-between;padding:14px;border-radius:14px;background:white;border:1.5px solid #e4e4e7;">
-                        <div>
-                            <!-- Visual Preview Thumbnail -->
-                            <div style="height:108px;border-radius:10px;background:#18181b;display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:10px;overflow:hidden;border:1px solid #27272a;">
-                                <img src="<?php echo esc_url( plugin_dir_url(dirname(__FILE__)) . 'assets/img/tmpl_realestate_preview.jpg?v=' . (defined('CORA_WORKSPACE_VERSION') ? CORA_WORKSPACE_VERSION : time()) ); ?>" alt="Luxury Real Estate" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" loading="lazy">
-                                <span style="position:absolute;top:6px;right:6px;font-size:8px;font-weight:800;color:#34d399;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);padding:2px 6px;border-radius:4px;border:1px solid rgba(52,211,153,0.4);">Luxury Estates</span>
+                    <div onclick="window.selectHtmlTemplate('realestate', 'Luxury Real Estate & Property Showcase')" id="wiz-tcard-realestate" data-template-name="Luxury Real Estate & Property Showcase real estate property architecture luxury home luxury estates" class="group atw-template-card">
+                        <div class="atw-tcard-media" onclick="event.stopPropagation(); window.previewTemplatePrompt('realestate');">
+                            <img src="<?php echo esc_url( plugin_dir_url(dirname(__FILE__)) . 'assets/img/tmpl_realestate_preview.jpg?v=' . (defined('CORA_WORKSPACE_VERSION') ? CORA_WORKSPACE_VERSION : time()) ); ?>" alt="Luxury Real Estate" class="atw-tcard-img" loading="lazy" onerror="this.onerror=null;this.src='<?php echo esc_url( plugin_dir_url(dirname(__FILE__)) . 'assets/img/wizard-html-ai-thumb.jpg' ); ?>';">
+                            <div class="atw-tcard-top-bar">
+                                <span class="atw-tcard-format-pill">
+                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                                    <span>HTML + TAILWIND CDN</span>
+                                </span>
+                                <span class="atw-tcard-badge-pill" style="color:#34d399;border-color:rgba(52,211,153,0.3);">LUXURY ESTATES</span>
                             </div>
-
-                            <h3 style="font-size:13px;font-weight:800;color:#18181b;letter-spacing:-0.02em;margin-bottom:4px;display:flex;align-items:center;gap:5px;">
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-                                <span>Luxury Real Estate Showcase</span>
-                            </h3>
-                            <p style="font-size:11px;color:#71717a;line-height:1.4;margin-bottom:8px;">Architectural luxury layout, property grid with filters, interactive neighborhood map specs, and VIP tour scheduling form.</p>
-                            
-                            <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;">
-                                <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Tailwind CDN</span>
-                                <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Native Lead Form</span>
-                                <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Property Grid</span>
+                            <div class="atw-tcard-hover-overlay">
+                                <button type="button" onclick="event.stopPropagation(); window.previewTemplatePrompt('realestate');" class="atw-tcard-hover-btn-preview">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    <span>Preview</span>
+                                </button>
+                                <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('realestate');" class="atw-tcard-hover-btn-copy" id="wiz-tcard-hover-copy-realestate">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                    <span>Use Prompt</span>
+                                </button>
                             </div>
                         </div>
 
-                        <div style="display:flex;flex-direction:column;gap:5px;border-top:1px solid #f4f4f5;padding-top:8px;">
-                            <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('realestate');" style="width:100%;padding:6px 10px;background:#f4f4f5;border:1px solid #e4e4e7;border-radius:7px;font-size:10.5px;font-weight:700;color:#18181b;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;">
-                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                                <span>Copy Prompt for Claude / ChatGPT</span>
-                            </button>
-                            <button type="button" onclick="event.stopPropagation(); window.useTemplateAndSwitchToCode('realestate', 'Luxury Real Estate & Property Showcase');" style="width:100%;padding:6px 10px;background:#18181b;border:none;border-radius:7px;font-size:10.5px;font-weight:700;color:white;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;">
-                                <span>Use Template & Connect Code →</span>
-                            </button>
+                        <div class="atw-tcard-body" style="padding:16px 18px 18px!important;">
+                            <div class="atw-tcard-stats-row">
+                                <div class="atw-tcard-stats-left">
+                                    <span class="atw-stat-item">
+                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"/></svg>
+                                        <span>510 copies</span>
+                                    </span>
+                                    <span class="atw-stat-item">
+                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                        <span>3.1k views</span>
+                                    </span>
+                                </div>
+                                <span class="atw-stat-rating">★ 4.95</span>
+                            </div>
+
+                            <h3 class="atw-tcard-title" title="Luxury Real Estate Showcase">
+                                <span>Luxury Real Estate Showcase</span>
+                            </h3>
+
+                            <div class="atw-tcard-footer">
+                                <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('realestate');" id="wiz-btn-copy-realestate" class="atw-btn-copy-prompt" title="Copy Prompt for Claude / ChatGPT">
+                                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                    <span>Copy Prompt</span>
+                                </button>
+                                <button type="button" onclick="event.stopPropagation(); window.useTemplateAndSwitchToCode('realestate', 'Luxury Real Estate & Property Showcase');" class="atw-btn-use-template">
+                                    <span>Use Template</span>
+                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
                     <!-- 6. Modern E-Commerce & DTC Brand -->
-                    <div onclick="window.selectHtmlTemplate('ecommerce', 'Modern E-Commerce & DTC Brand')" id="wiz-tcard-ecommerce" data-template-name="Modern E-Commerce & DTC Brand ecommerce store dtc shop product brand" class="atw-template-card" style="display:flex;flex-direction:column;justify-content:space-between;padding:14px;border-radius:14px;background:white;border:1.5px solid #e4e4e7;">
-                        <div>
-                            <!-- Visual Preview Thumbnail -->
-                            <div style="height:108px;border-radius:10px;background:#18181b;display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:10px;overflow:hidden;border:1px solid #27272a;">
-                                <img src="<?php echo esc_url( plugin_dir_url(dirname(__FILE__)) . 'assets/img/tmpl_ecommerce_preview.jpg?v=' . (defined('CORA_WORKSPACE_VERSION') ? CORA_WORKSPACE_VERSION : time()) ); ?>" alt="Modern E-Commerce" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" loading="lazy">
-                                <span style="position:absolute;top:6px;right:6px;font-size:8px;font-weight:800;color:#f472b6;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);padding:2px 6px;border-radius:4px;border:1px solid rgba(244,114,182,0.4);">DTC Shop</span>
+                    <div onclick="window.selectHtmlTemplate('ecommerce', 'Modern E-Commerce & DTC Brand')" id="wiz-tcard-ecommerce" data-template-name="Modern E-Commerce & DTC Brand ecommerce store dtc shop product brand" class="group atw-template-card">
+                        <div class="atw-tcard-media" onclick="event.stopPropagation(); window.previewTemplatePrompt('ecommerce');">
+                            <img src="<?php echo esc_url( plugin_dir_url(dirname(__FILE__)) . 'assets/img/tmpl_ecommerce_preview.jpg?v=' . (defined('CORA_WORKSPACE_VERSION') ? CORA_WORKSPACE_VERSION : time()) ); ?>" alt="Modern E-Commerce" class="atw-tcard-img" loading="lazy" onerror="this.onerror=null;this.src='<?php echo esc_url( plugin_dir_url(dirname(__FILE__)) . 'assets/img/wizard-html-ai-thumb.jpg' ); ?>';">
+                            <div class="atw-tcard-top-bar">
+                                <span class="atw-tcard-format-pill">
+                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                                    <span>HTML + TAILWIND CDN</span>
+                                </span>
+                                <span class="atw-tcard-badge-pill" style="color:#f472b6;border-color:rgba(244,114,182,0.3);">DTC SHOP</span>
                             </div>
-
-                            <h3 style="font-size:13px;font-weight:800;color:#18181b;letter-spacing:-0.02em;margin-bottom:4px;display:flex;align-items:center;gap:5px;">
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
-                                <span>Modern E-Commerce & DTC Brand</span>
-                            </h3>
-                            <p style="font-size:11px;color:#71717a;line-height:1.4;margin-bottom:8px;">High-converting product showcase, feature highlights, customer review rating, and direct order / checkout inquiry form.</p>
-                            
-                            <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;">
-                                <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Tailwind CDN</span>
-                                <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Native Lead Form</span>
-                                <span style="font-size:8px;font-weight:700;background:#f4f4f5;color:#52525b;padding:2px 6px;border-radius:4px;">Product Showcase</span>
+                            <div class="atw-tcard-hover-overlay">
+                                <button type="button" onclick="event.stopPropagation(); window.previewTemplatePrompt('ecommerce');" class="atw-tcard-hover-btn-preview">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    <span>Preview</span>
+                                </button>
+                                <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('ecommerce');" class="atw-tcard-hover-btn-copy" id="wiz-tcard-hover-copy-ecommerce">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                    <span>Use Prompt</span>
+                                </button>
                             </div>
                         </div>
 
-                        <div style="display:flex;flex-direction:column;gap:5px;border-top:1px solid #f4f4f5;padding-top:8px;">
-                            <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('ecommerce');" style="width:100%;padding:6px 10px;background:#f4f4f5;border:1px solid #e4e4e7;border-radius:7px;font-size:10.5px;font-weight:700;color:#18181b;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;">
-                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                                <span>Copy Prompt for Claude / ChatGPT</span>
-                            </button>
-                            <button type="button" onclick="event.stopPropagation(); window.useTemplateAndSwitchToCode('ecommerce', 'Modern E-Commerce & DTC Brand');" style="width:100%;padding:6px 10px;background:#18181b;border:none;border-radius:7px;font-size:10.5px;font-weight:700;color:white;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;">
-                                <span>Use Template & Connect Code →</span>
-                            </button>
+                        <div class="atw-tcard-body" style="padding:16px 18px 18px!important;">
+                            <div class="atw-tcard-stats-row">
+                                <div class="atw-tcard-stats-left">
+                                    <span class="atw-stat-item">
+                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"/></svg>
+                                        <span>475 copies</span>
+                                    </span>
+                                    <span class="atw-stat-item">
+                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                        <span>2.7k views</span>
+                                    </span>
+                                </div>
+                                <span class="atw-stat-rating">★ 4.91</span>
+                            </div>
+
+                            <h3 class="atw-tcard-title" title="Modern E-Commerce & DTC Brand">
+                                <span>Modern E-Commerce & DTC Brand</span>
+                            </h3>
+
+                            <div class="atw-tcard-footer">
+                                <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('ecommerce');" id="wiz-btn-copy-ecommerce" class="atw-btn-copy-prompt" title="Copy Prompt for Claude / ChatGPT">
+                                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                    <span>Copy Prompt</span>
+                                </button>
+                                <button type="button" onclick="event.stopPropagation(); window.useTemplateAndSwitchToCode('ecommerce', 'Modern E-Commerce & DTC Brand');" class="atw-btn-use-template">
+                                    <span>Use Template</span>
+                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 7. Animated Landing Page: One Product Hero -->
+                    <div onclick="window.selectHtmlTemplate('animated_hero', 'Animated Landing Page: One Product Hero')" id="wiz-tcard-animated_hero" data-template-name="Animated Landing Page: One Product Hero animated landing page hero system minimal kinetic" class="group atw-template-card">
+                        <div class="atw-tcard-media" onclick="event.stopPropagation(); window.previewTemplatePrompt('animated_hero');">
+                            <img src="<?php echo esc_url( plugin_dir_url(dirname(__FILE__)) . 'assets/img/wizard-html-ai-thumb.jpg?v=' . (defined('CORA_WORKSPACE_VERSION') ? CORA_WORKSPACE_VERSION : time()) ); ?>" alt="Animated One Product Hero" class="atw-tcard-img" loading="lazy" onerror="this.onerror=null;this.src='<?php echo esc_url( plugin_dir_url(dirname(__FILE__)) . 'assets/img/tmpl_agency_preview.jpg' ); ?>';">
+                            <div class="atw-tcard-top-bar">
+                                <span class="atw-tcard-format-pill">
+                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                                    <span>HTML + TAILWIND CDN</span>
+                                </span>
+                                <span class="atw-tcard-badge-pill" style="color:#ffffff;border-color:rgba(255,255,255,0.3);">HERO SYSTEM</span>
+                            </div>
+                            <div class="atw-tcard-hover-overlay">
+                                <button type="button" onclick="event.stopPropagation(); window.previewTemplatePrompt('animated_hero');" class="atw-tcard-hover-btn-preview">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    <span>Preview</span>
+                                </button>
+                                <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('animated_hero');" class="atw-tcard-hover-btn-copy" id="wiz-tcard-hover-copy-animated_hero">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                    <span>Use Prompt</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="atw-tcard-body" style="padding:16px 18px 18px!important;">
+                            <div class="atw-tcard-stats-row">
+                                <div class="atw-tcard-stats-left">
+                                    <span class="atw-stat-item">
+                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"/></svg>
+                                        <span>567 copies</span>
+                                    </span>
+                                    <span class="atw-stat-item">
+                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                        <span>3.9k views</span>
+                                    </span>
+                                </div>
+                                <span class="atw-stat-rating">★ 4.93</span>
+                            </div>
+
+                            <h3 class="atw-tcard-title" title="Animated Landing Page: One Product">
+                                <span>Animated Landing Page: One Product</span>
+                            </h3>
+
+                            <div class="atw-tcard-footer">
+                                <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('animated_hero');" id="wiz-btn-copy-animated_hero" class="atw-btn-copy-prompt" title="Copy Prompt for Claude / ChatGPT">
+                                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                    <span>Copy Prompt</span>
+                                </button>
+                                <button type="button" onclick="event.stopPropagation(); window.useTemplateAndSwitchToCode('animated_hero', 'Animated Landing Page: One Product Hero');" class="atw-btn-use-template">
+                                    <span>Use Template</span>
+                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 8. Lumina Scalable SaaS Landing -->
+                    <div onclick="window.selectHtmlTemplate('lumina_saas', 'Lumina Scalable SaaS Landing')" id="wiz-tcard-lumina_saas" data-template-name="Lumina Scalable SaaS Landing lumina saas platform scale your chaos into revenue yellow high contrast" class="group atw-template-card">
+                        <div class="atw-tcard-media" onclick="event.stopPropagation(); window.previewTemplatePrompt('lumina_saas');">
+                            <img src="<?php echo esc_url( plugin_dir_url(dirname(__FILE__)) . 'assets/img/wizard-lovable-thumb.jpg?v=' . (defined('CORA_WORKSPACE_VERSION') ? CORA_WORKSPACE_VERSION : time()) ); ?>" alt="Lumina SaaS" class="atw-tcard-img" loading="lazy" onerror="this.onerror=null;this.src='<?php echo esc_url( plugin_dir_url(dirname(__FILE__)) . 'assets/img/tmpl_saas_preview.jpg' ); ?>';">
+                            <div class="atw-tcard-top-bar">
+                                <span class="atw-tcard-format-pill">
+                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                                    <span>HTML + TAILWIND CDN</span>
+                                </span>
+                                <span class="atw-tcard-badge-pill" style="color:#fbbf24;border-color:rgba(251,191,36,0.3);">SCALE SYSTEM</span>
+                            </div>
+                            <div class="atw-tcard-hover-overlay">
+                                <button type="button" onclick="event.stopPropagation(); window.previewTemplatePrompt('lumina_saas');" class="atw-tcard-hover-btn-preview">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    <span>Preview</span>
+                                </button>
+                                <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('lumina_saas');" class="atw-tcard-hover-btn-copy" id="wiz-tcard-hover-copy-lumina_saas">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                    <span>Use Prompt</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="atw-tcard-body" style="padding:16px 18px 18px!important;">
+                            <div class="atw-tcard-stats-row">
+                                <div class="atw-tcard-stats-left">
+                                    <span class="atw-stat-item">
+                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"/></svg>
+                                        <span>554 copies</span>
+                                    </span>
+                                    <span class="atw-stat-item">
+                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                        <span>3.5k views</span>
+                                    </span>
+                                </div>
+                                <span class="atw-stat-rating">★ 4.91</span>
+                            </div>
+
+                            <h3 class="atw-tcard-title" title="Lumina SaaS Landing Page">
+                                <span>Lumina SaaS Landing Page</span>
+                            </h3>
+
+                            <div class="atw-tcard-footer">
+                                <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('lumina_saas');" id="wiz-btn-copy-lumina_saas" class="atw-btn-copy-prompt" title="Copy Prompt for Claude / ChatGPT">
+                                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                    <span>Copy Prompt</span>
+                                </button>
+                                <button type="button" onclick="event.stopPropagation(); window.useTemplateAndSwitchToCode('lumina_saas', 'Lumina Scalable SaaS Landing');" class="atw-btn-use-template">
+                                    <span>Use Template</span>
+                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 9. SuperDesign Dark Design Intelligence -->
+                    <div onclick="window.selectHtmlTemplate('superdesign', 'SuperDesign: Dark Design Intelligence')" id="wiz-tcard-superdesign" data-template-name="SuperDesign: Dark Design Intelligence superdesign design intelligence tokens future dark modern" class="group atw-template-card">
+                        <div class="atw-tcard-media" onclick="event.stopPropagation(); window.previewTemplatePrompt('superdesign');">
+                            <img src="<?php echo esc_url( plugin_dir_url(dirname(__FILE__)) . 'assets/img/wizard-nextjs-thumb.jpg?v=' . (defined('CORA_WORKSPACE_VERSION') ? CORA_WORKSPACE_VERSION : time()) ); ?>" alt="SuperDesign Platform" class="atw-tcard-img" loading="lazy" onerror="this.onerror=null;this.src='<?php echo esc_url( plugin_dir_url(dirname(__FILE__)) . 'assets/img/tmpl_saas_preview.jpg' ); ?>';">
+                            <div class="atw-tcard-top-bar">
+                                <span class="atw-tcard-format-pill">
+                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                                    <span>HTML + TAILWIND CDN</span>
+                                </span>
+                                <span class="atw-tcard-badge-pill" style="color:#fb7185;border-color:rgba(251,113,133,0.3);">DESIGN TOKENS</span>
+                            </div>
+                            <div class="atw-tcard-hover-overlay">
+                                <button type="button" onclick="event.stopPropagation(); window.previewTemplatePrompt('superdesign');" class="atw-tcard-hover-btn-preview">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    <span>Preview</span>
+                                </button>
+                                <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('superdesign');" class="atw-tcard-hover-btn-copy" id="wiz-tcard-hover-copy-superdesign">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                    <span>Use Prompt</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="atw-tcard-body" style="padding:16px 18px 18px!important;">
+                            <div class="atw-tcard-stats-row">
+                                <div class="atw-tcard-stats-left">
+                                    <span class="atw-stat-item">
+                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"/></svg>
+                                        <span>612 copies</span>
+                                    </span>
+                                    <span class="atw-stat-item">
+                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                        <span>4.1k views</span>
+                                    </span>
+                                </div>
+                                <span class="atw-stat-rating">★ 4.98</span>
+                            </div>
+
+                            <h3 class="atw-tcard-title" title="SuperDesign: Design Intelligence">
+                                <span>SuperDesign: Design Intelligence</span>
+                            </h3>
+
+                            <div class="atw-tcard-footer">
+                                <button type="button" onclick="event.stopPropagation(); window.copyTemplatePrompt('superdesign');" id="wiz-btn-copy-superdesign" class="atw-btn-copy-prompt" title="Copy Prompt for Claude / ChatGPT">
+                                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                    <span>Copy Prompt</span>
+                                </button>
+                                <button type="button" onclick="event.stopPropagation(); window.useTemplateAndSwitchToCode('superdesign', 'SuperDesign: Dark Design Intelligence');" class="atw-btn-use-template">
+                                    <span>Use Template</span>
+                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -13237,7 +13559,73 @@ SECTIONS TO INCLUDE:
    - High-converting submit button.
 7. Footer: Brand philosophy, guarantees (30-day money-back, 24/7 support), payment icons, and legal links.
 
-Return ONLY clean, complete, standalone HTML inside an <!DOCTYPE html> document.`
+Return ONLY clean, complete, standalone HTML inside an <!DOCTYPE html> document.`,
+
+        animated_hero: `You are an expert Frontend Engineer and UI/UX Designer.
+Create a complete, single-file, production-ready HTML5 landing page for an "Animated Product Landing Page: Product That Travels Down The Page" (named "Aero X1 Flagship Acoustics").
+
+STRICT TECHNICAL & DESIGN REQUIREMENTS:
+1. Include Tailwind CSS CDN: <script src="https://cdn.tailwindcss.com"><\/script>
+2. Google Fonts: Inter and JetBrains Mono for numbers/tags.
+3. USE PURE TAILWIND CSS UTILITY CLASSES ON EVERY ELEMENT (e.g. grid grid-cols-1 md:grid-cols-3 gap-6, bg-zinc-900/60, border border-zinc-800, rounded-2xl, p-6).
+4. ZERO EMPTY PLACEHOLDERS: Always provide complete, self-contained SVG icons or high-res Unsplash imagery.
+5. ALL SECTIONS 100% VISIBLE: Ensure every section (Sticky Header, Hero Section, Feature Breakdown, Interactive Sound Stage, Tech Specs Grid, Testimonials, Inquiry Form, Footer) is 100% visible and beautifully styled.
+6. Fully responsive on mobile, tablet, and desktop.
+
+SECTIONS TO INCLUDE:
+1. Header: Sleek navbar with brand mark, product navigation (Acoustics, Noise Cancelling, Tech Specs, Reviews), and "Pre-Order Now" button.
+2. Hero Section: High-impact headline ("Acoustic Precision in Pure Titanium"), floating hero product showcase card, key specs (48-Hour Battery, Spatial Audio, Lossless DAC), and dual CTAs.
+3. Interactive Product Breakdown: 3 spotlight cards highlighting Acoustic Chamber, Precision Driver, and Adaptive ANC.
+4. Technical Specifications Grid: 6 structured cards with battery life, frequency response, weight, wireless protocol, and materials.
+5. Reviews & Ratings: 3 customer review cards with 5-star badges and verified buyer tags.
+6. Native Consultation & Order Form: Complete interactive form targeting /wp-admin/admin-ajax.php with cora_ajax_submit_lead.
+7. Footer: Brand philosophy, warranty policy, and legal links.
+
+Return ONLY clean, complete, standalone HTML inside an <!DOCTYPE html> document.`,
+
+        lumina_saas: `You are an elite SaaS UI/UX engineer.
+Create a complete, single-file, production-ready HTML5 landing page for a "Modern Cloud Intelligence & Scale Platform" (named "Lumina Scale Intelligence").
+
+STRICT TECHNICAL & DESIGN REQUIREMENTS:
+1. Include Tailwind CSS CDN: <script src="https://cdn.tailwindcss.com"><\/script>
+2. Google Fonts: Inter and JetBrains Mono.
+3. USE PURE TAILWIND CSS UTILITY CLASSES ON EVERY ELEMENT.
+4. ZERO EMPTY PLACEHOLDERS: Always provide complete SVG icons, interactive dashboard previews, and verified metric badges.
+5. ALL SECTIONS 100% VISIBLE: Ensure every section (Header, Hero with Metric Counters, Feature Matrix, Live Pipeline Monitor, 3-Tier Pricing, FAQ Accordion, Demo Form, Footer) has full content.
+6. Fully responsive layout.
+
+SECTIONS TO INCLUDE:
+1. Header: Frosted navigation bar with product status badge, links (Architecture, Features, Pricing, Docs), and "Get Started Free" button.
+2. Hero Section: Headline ("Unified Observability & Intelligence For High-Velocity Teams"), live status pill ("🟢 99.999% Global Uptime"), metrics bar ($12B+ Events Processed, 4.9/5 CSAT), and interactive Dashboard UI preview card.
+3. Feature Matrix: 6 cards featuring AI Anomaly Detection, Sub-Millisecond Trace Engine, RBAC Governance, Edge Log Streaming, Webhook Automation, and Incident Auto-Remediation.
+4. Pricing Tier Matrix: 3 cards (Starter $49/mo, Scale $199/mo, Enterprise Custom) with feature checklists.
+5. Interactive FAQ Accordion: 5 collapsible answers.
+6. Native Demo Request Form: Complete form with Full Name, Work Email, Company Size, Cloud Provider dropdown, and Submit button.
+7. Footer: Platform links, security certifications, and social links.
+
+Return ONLY clean, valid, standalone HTML in an <!DOCTYPE html> document.`,
+
+        superdesign: `You are an elite Design Systems Architect.
+Create a complete, single-file, production-ready HTML5 landing page for an "AI-Powered Design Intelligence & Token Studio" (named "SuperDesign Studio").
+
+STRICT TECHNICAL & DESIGN REQUIREMENTS:
+1. Include Tailwind CSS CDN: <script src="https://cdn.tailwindcss.com"><\/script>
+2. Google Fonts: Inter, Space Grotesk, and JetBrains Mono.
+3. USE PURE TAILWIND CSS UTILITY CLASSES ON EVERY ELEMENT.
+4. ZERO EMPTY PLACEHOLDERS: Always provide complete UI design tokens, component previews, and typography scales.
+5. ALL SECTIONS 100% VISIBLE: Ensure every section (Header, Hero, Design Token Inspector, Component Gallery, Multi-Framework Export Grid, Pricing, Lead Form, Footer) has full content.
+6. Fully responsive layout.
+
+SECTIONS TO INCLUDE:
+1. Header: Refined navigation with token explorer, component library links, and "Explore Design Tokens" CTA.
+2. Hero Section: Headline ("Design Intelligence for Modern Engineering Teams"), live token preview card, and instant copy buttons.
+3. Token Inspector & Component Matrix: Interactive cards for Typography Scales, Neutral Color Ramps (zinc-50 to zinc-950), Elevation Shadows, and Button Primitives.
+4. Framework Export Matrix: Figma -> Tailwind, React, Vue, Svelte, iOS Swift, and Android Compose.
+5. Customer Testimonials & Metrics: 50,000+ Components Generated, 4.9/5 Rating from 1,200+ Design Teams.
+6. Native Consultation Form: Form with Name, Email, Organization, Design Tool stack, and Submit CTA.
+7. Footer: Studio links, token manifest docs, and copyright.
+
+Return ONLY clean, standalone HTML in an <!DOCTYPE html> document.`
     };
 
     // ── Prompt Copy & Template Selection ────────────────────────
@@ -13249,18 +13637,58 @@ Return ONLY clean, complete, standalone HTML inside an <!DOCTYPE html> document.
             consulting: 'B2B Advisory & Consulting',
             photography: 'Photography Studio & Production',
             realestate: 'Luxury Real Estate Showcase',
-            ecommerce: 'Modern E-Commerce & DTC Brand'
+            ecommerce: 'Modern E-Commerce & DTC Brand',
+            animated_hero: 'Animated Landing Page: One Product',
+            lumina_saas: 'Lumina SaaS Landing Page',
+            superdesign: 'SuperDesign Design Intelligence'
         };
         var name = templateNames[templateKey] || 'Template';
 
+        var triggerVisualFeedback = function() {
+            var btnBottom = document.getElementById('wiz-btn-copy-' + templateKey);
+            var btnHover = document.getElementById('wiz-tcard-hover-copy-' + templateKey);
+            
+            if (btnBottom) {
+                var origBottom = btnBottom.innerHTML;
+                btnBottom.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> <span>Copied!</span>';
+                btnBottom.style.background = '#18181b';
+                btnBottom.style.borderColor = '#18181b';
+                btnBottom.style.color = '#ffffff';
+                setTimeout(function() {
+                    btnBottom.innerHTML = origBottom;
+                    btnBottom.style.background = '';
+                    btnBottom.style.borderColor = '';
+                    btnBottom.style.color = '';
+                }, 2000);
+            }
+            if (btnHover) {
+                var origHover = btnHover.innerHTML;
+                btnHover.innerHTML = '<span style="color:#34d399;">✓ Copied!</span>';
+                setTimeout(function() {
+                    btnHover.innerHTML = origHover;
+                }, 2000);
+            }
+        };
+
+        var notifySuccess = function() {
+            triggerVisualFeedback();
+            if (window.coraShowToast) {
+                window.coraShowToast(name + ' prompt copied! Paste into Claude or ChatGPT.', 'success');
+            } else if (typeof showToast === 'function') {
+                showToast(name + ' prompt copied! Paste into Claude or ChatGPT.', 'success');
+            }
+        };
+
         if (navigator.clipboard && navigator.clipboard.writeText) {
             navigator.clipboard.writeText(prompt).then(function() {
-                showToast(name + ' prompt copied to clipboard! Paste into Claude or ChatGPT.', 'success');
+                notifySuccess();
             }).catch(function() {
                 wizFallbackCopyPrompt(prompt, name);
+                triggerVisualFeedback();
             });
         } else {
             wizFallbackCopyPrompt(prompt, name);
+            triggerVisualFeedback();
         }
     };
 
@@ -13274,12 +13702,169 @@ Return ONLY clean, complete, standalone HTML inside an <!DOCTYPE html> document.
         ta.select();
         try {
             document.execCommand('copy');
-            showToast(name + ' prompt copied to clipboard!', 'success');
+            if (window.coraShowToast) {
+                window.coraShowToast(name + ' prompt copied to clipboard!', 'success');
+            } else if (typeof showToast === 'function') {
+                showToast(name + ' prompt copied to clipboard!', 'success');
+            }
         } catch(e) {
-            showToast('Could not copy automatically. Please select prompt manually.', 'warning');
+            if (window.coraShowToast) {
+                window.coraShowToast('Could not copy automatically. Please select prompt manually.', 'warning');
+            } else if (typeof showToast === 'function') {
+                showToast('Could not copy automatically. Please select prompt manually.', 'warning');
+            }
         }
         document.body.removeChild(ta);
     }
+
+    // ── Template Live HTML Preview ──────────────────────────────
+    window.previewTemplatePrompt = function(templateKey) {
+        var templateNames = {
+            agency: 'Creative Agency & Video Studio',
+            saas: 'AI SaaS & Software Landing',
+            consulting: 'B2B Advisory & Consulting',
+            photography: 'Photography Studio & Production',
+            realestate: 'Luxury Real Estate Showcase',
+            ecommerce: 'Modern E-Commerce & DTC Brand',
+            animated_hero: 'Animated Landing Page: One Product',
+            lumina_saas: 'Lumina SaaS Landing Page',
+            superdesign: 'SuperDesign Design Intelligence'
+        };
+        var title = templateNames[templateKey] || 'Template Preview';
+        var prompt = CORA_HTML_AI_MASTER_PROMPTS[templateKey] || CORA_HTML_AI_MASTER_PROMPTS.agency;
+
+        var sampleHtml = `<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${title} — Cora AI Template Preview</title>
+    <script src="https://cdn.tailwindcss.com"><\/script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-zinc-950 text-zinc-100 font-sans antialiased selection:bg-zinc-800 selection:text-white min-h-screen flex flex-col">
+    <!-- Top Announcement Bar -->
+    <div class="w-full bg-zinc-900/90 border-b border-zinc-800/80 px-4 py-2 text-center text-xs text-zinc-400 flex items-center justify-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span class="font-medium">Live Sandboxed Template Preview: <strong class="text-zinc-200">${title}</strong></span>
+    </div>
+
+    <!-- Navigation -->
+    <header class="sticky top-0 z-50 backdrop-blur-md bg-zinc-950/80 border-b border-zinc-800/80 px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-xl bg-white text-zinc-950 flex items-center justify-center font-black text-sm shadow-md">C</div>
+            <span class="font-bold text-sm text-white tracking-tight">${title}</span>
+        </div>
+        <div class="hidden md:flex items-center gap-6 text-xs text-zinc-400 font-medium">
+            <a href="#overview" class="hover:text-white transition-colors">Overview</a>
+            <a href="#features" class="hover:text-white transition-colors">Architecture</a>
+            <a href="#prompt" class="hover:text-white transition-colors">AI Prompt</a>
+            <a href="#contact" class="hover:text-white transition-colors">Contact Form</a>
+        </div>
+        <div class="flex items-center gap-2">
+            <button onclick="parent.copyTemplatePrompt('${templateKey}')" class="px-3.5 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-semibold rounded-lg border border-zinc-700 transition-colors">
+                Copy AI Prompt
+            </button>
+            <button onclick="parent.useTemplateAndSwitchToCode('${templateKey}', '${title}')" class="px-3.5 py-1.5 bg-white hover:bg-zinc-200 text-zinc-950 text-xs font-bold rounded-lg transition-colors">
+                Use Template →
+            </button>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <main class="flex-1 max-w-5xl w-full mx-auto px-6 py-12">
+        <div class="text-center max-w-3xl mx-auto mb-12">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-[11px] text-zinc-300 font-mono mb-4">
+                <span>⚡ 100% Standalone HTML + Tailwind CSS CDN</span>
+            </div>
+            <h1 class="text-3xl md:text-5xl font-black text-white tracking-tight leading-tight mb-4">
+                ${title}
+            </h1>
+            <p class="text-sm md:text-base text-zinc-400 leading-relaxed mb-8">
+                Engineered with high-converting layouts, responsive container grids, embedded lead forms, and zero setup dependencies.
+            </p>
+            <div class="flex flex-wrap items-center justify-center gap-3">
+                <button onclick="parent.useTemplateAndSwitchToCode('${templateKey}', '${title}')" class="px-6 py-3 bg-white hover:bg-zinc-200 text-zinc-950 font-bold text-xs rounded-xl shadow-lg transition-all">
+                    Connect Code to Canvas →
+                </button>
+                <button onclick="parent.copyTemplatePrompt('${templateKey}')" class="px-6 py-3 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 font-semibold text-xs rounded-xl border border-zinc-800 transition-all">
+                    Copy Claude & ChatGPT Prompt
+                </button>
+            </div>
+        </div>
+
+        <!-- Master AI Prompt Inspection Card -->
+        <div class="bg-zinc-900/70 border border-zinc-800 rounded-2xl p-6 mb-12 shadow-2xl">
+            <div class="flex items-center justify-between pb-4 mb-4 border-b border-zinc-800">
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-mono font-bold uppercase tracking-wider text-zinc-300">Claude & ChatGPT Master Prompt</span>
+                </div>
+                <span class="px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 text-[10px] font-mono">Ready to Paste</span>
+            </div>
+            <pre class="text-xs font-mono text-zinc-300 bg-zinc-950 p-4 rounded-xl border border-zinc-850 overflow-x-auto whitespace-pre-wrap leading-relaxed max-h-72 overflow-y-auto">${prompt.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>
+        </div>
+
+        <!-- Embedded Interactive Workspace Form Sandbox -->
+        <div class="max-w-lg mx-auto bg-zinc-900 border border-zinc-800 rounded-2xl p-6 shadow-2xl text-left font-sans">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span class="text-xs font-mono font-bold uppercase tracking-wider text-zinc-300">Live Consultation Sandbox</span>
+                </div>
+                <span class="px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 text-[10.5px] font-mono">AJAX Active</span>
+            </div>
+            <form class="space-y-4" method="POST" action="/wp-json/cora-canvas/v1/nextjs/forms/submit">
+                <div>
+                    <label class="block text-xs font-semibold text-zinc-300 mb-1">Full Name</label>
+                    <input type="text" name="name" required placeholder="Aarav Mehta" class="w-full px-3.5 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-xs placeholder:text-zinc-600 focus:border-zinc-500 outline-none transition-all">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-zinc-300 mb-1">Work Email</label>
+                    <input type="email" name="email" required placeholder="aarav@example.com" class="w-full px-3.5 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-xs placeholder:text-zinc-600 focus:border-zinc-500 outline-none transition-all">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-zinc-300 mb-1">Project Requirements</label>
+                    <textarea name="message" rows="3" placeholder="Describe your project scope..." class="w-full px-3.5 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-white text-xs placeholder:text-zinc-600 focus:border-zinc-500 outline-none transition-all resize-none"></textarea>
+                </div>
+                <button type="submit" class="w-full py-3 bg-white hover:bg-zinc-200 text-zinc-950 font-bold text-xs rounded-xl transition-all cursor-pointer shadow-md">
+                    Test Form Submission
+                </button>
+            </form>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-auto border-t border-zinc-850 px-6 py-6 text-center text-xs text-zinc-500">
+        <p>Cora Canvas & Theme Engine · Standalone Single-File Architecture</p>
+    </footer>
+</body>
+</html>`;
+
+        var modal = document.getElementById('wiz-html-preview-modal');
+        var iframe = document.getElementById('wiz-html-preview-iframe');
+        var tag = document.getElementById('wiz-html-preview-tag');
+        if (tag) {
+            tag.textContent = title;
+        }
+        if (iframe) {
+            iframe.srcdoc = window.coraEnhancePreviewHtml(sampleHtml, { clickBridge: false });
+        }
+        if (modal) {
+            modal.style.display = 'flex';
+            requestAnimationFrame(function() {
+                modal.style.opacity = '1';
+                modal.classList.remove('opacity-0');
+                var card = document.getElementById('wiz-html-preview-modal-card');
+                if (card) {
+                    card.classList.remove('scale-95');
+                    card.classList.add('scale-100');
+                }
+            });
+            document.body.style.overflow = 'hidden';
+        }
+    };
 
     window.coraEnhancePreviewHtml = function(html, opts) {
         opts = opts || {};
@@ -13574,7 +14159,7 @@ Return ONLY clean, complete, standalone HTML inside an <!DOCTYPE html> document.
         _wizSelectedTemplateKey = templateKey;
 
         // Update card active states
-        ['agency', 'saas', 'consulting', 'photography', 'realestate', 'ecommerce'].forEach(function(k) {
+        ['agency', 'saas', 'consulting', 'photography', 'realestate', 'ecommerce', 'animated_hero', 'lumina_saas', 'superdesign'].forEach(function(k) {
             var el = document.getElementById('wiz-tcard-' + k);
             if (el) {
                 if (k === templateKey) {
@@ -13591,7 +14176,8 @@ Return ONLY clean, complete, standalone HTML inside an <!DOCTYPE html> document.
             var defaultNames = [
                 '', 'Creative Agency & Video Studio', 'AI SaaS & Software Landing', 
                 'B2B Advisory & Management Consulting', 'Photography Studio & Production House', 
-                'Luxury Real Estate & Property Showcase', 'Modern E-Commerce & DTC Brand', 'Custom AI Theme'
+                'Luxury Real Estate & Property Showcase', 'Modern E-Commerce & DTC Brand', 
+                'Animated Landing Page: One Product', 'Lumina SaaS Landing Page', 'SuperDesign Design Intelligence', 'Custom AI Theme'
             ];
             if (defaultNames.includes(nameInput.value.trim())) {
                 nameInput.value = title || 'Custom AI Theme';

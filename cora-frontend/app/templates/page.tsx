@@ -95,97 +95,72 @@ export default function TemplatesHubPage() {
   return (
     <div className="w-full bg-white text-zinc-900 selection:bg-zinc-900 selection:text-white">
       
-      {/* ── 1. HERO WITH SEARCH & PILLS ── */}
-      <TemplateHero
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        totalTemplatesCount={TEMPLATES_DATA.length}
-      />
+      {/* ── 1. HERO ── */}
+      <TemplateHero />
 
-      {/* ── 2. METRICS RIBBON ── */}
-      <section className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 -mt-4 sm:-mt-6 mb-10 sm:mb-14 relative z-10">
-        <div className="rounded-2xl sm:rounded-3xl bg-white border border-zinc-200/90 p-4 sm:p-6 shadow-[0_4px_24px_rgba(0,0,0,0.03)]">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 items-center divide-y sm:divide-y-0 sm:divide-x divide-zinc-100">
-            
-            <div className="flex items-center gap-3 pt-2 sm:pt-0 sm:px-4">
-              <div className="font-display text-xl sm:text-3xl font-extrabold text-zinc-950 tracking-tight">
-                16+
-              </div>
-              <div className="text-left">
-                <span className="block text-xs font-bold text-zinc-900 leading-tight">Frontend Kits</span>
-                <span className="block text-[11px] text-zinc-500 leading-tight">Native &amp; AI Formats</span>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 pt-2 sm:pt-0 sm:px-4">
-              <div className="font-display text-xl sm:text-3xl font-extrabold text-zinc-950 tracking-tight">
-                4 Formats
-              </div>
-              <div className="text-left">
-                <span className="block text-xs font-bold text-zinc-900 leading-tight">Tailwind &amp; Next.js</span>
-                <span className="block text-[11px] text-zinc-500 leading-tight">Elementor, Lovable &amp; AI</span>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 pt-2 sm:pt-0 sm:px-4">
-              <div className="font-display text-xl sm:text-3xl font-extrabold text-zinc-950 tracking-tight">
-                1-Click
-              </div>
-              <div className="text-left">
-                <span className="block text-xs font-bold text-zinc-900 leading-tight">Prompt Copy</span>
-                <span className="block text-[11px] text-zinc-500 leading-tight">Cursor &amp; Claude Ready</span>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 pt-2 sm:pt-0 sm:px-4">
-              <div className="font-display text-xl sm:text-3xl font-extrabold text-zinc-950 tracking-tight">
-                $0
-              </div>
-              <div className="text-left">
-                <span className="block text-xs font-bold text-zinc-900 leading-tight">Free Forever</span>
-                <span className="block text-[11px] text-zinc-500 leading-tight">Zero Paywalls</span>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* ── 3. DIRECTORY & FILTER MATRIX ── */}
-      <section id="templates-directory" className="w-full py-6 sm:py-8 max-w-[1240px] mx-auto px-4 sm:px-6">
+      {/* ── 2. DIRECTORY & FILTER MATRIX ── */}
+      <section id="templates-directory" className="w-full py-8 sm:py-12 max-w-[1240px] mx-auto px-4 sm:px-6">
         
-        {/* Category Filter Tabs & Results Count */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 sm:mb-8 pb-4 border-b border-zinc-100">
-          <div>
-            <h2 className="font-display text-xl sm:text-2xl font-bold text-zinc-950 tracking-tight">
-              Explore Frontend Assets
-            </h2>
-            <span className="text-xs text-zinc-500">
-              Showing {filteredTemplates.length} of {TEMPLATES_DATA.length} landing pages, AI prompt packs, Elementor kits &amp; Lovable projects
-            </span>
+        {/* Sleek Search & Category Filter Toolbar */}
+        <div className="flex flex-col gap-5 mb-8 pb-6 border-b border-zinc-200/80">
+          
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h2 className="font-display text-xl sm:text-2xl lg:text-3xl font-bold text-zinc-950 tracking-tight">
+                Discover Design Prompts &amp; Templates
+              </h2>
+              <p className="text-xs sm:text-sm text-zinc-500 mt-1">
+                Showing {filteredTemplates.length} of {TEMPLATES_DATA.length} production-ready standalone HTML templates and prompts
+              </p>
+            </div>
+
+            {/* Direct Search Input (Positioned right at the library) */}
+            <div className="relative w-full md:w-80 shrink-0">
+              <div className="relative flex items-center bg-zinc-50 hover:bg-zinc-100/80 focus-within:bg-white focus-within:ring-2 focus-within:ring-zinc-950/10 border border-zinc-200/90 rounded-2xl px-3.5 py-2.5 transition-all shadow-2xs">
+                <Search className="w-4 h-4 text-zinc-400 mr-2.5 shrink-0" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search prompts e.g. Hero, Dock, Bento..."
+                  className="w-full bg-transparent text-xs sm:text-sm text-zinc-950 placeholder:text-zinc-400 focus:outline-none font-sans"
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery('')}
+                    className="text-xs font-mono text-zinc-400 hover:text-zinc-900 px-1.5 py-0.5 rounded cursor-pointer"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
 
-          <div className="flex items-center gap-1.5 overflow-x-auto whitespace-nowrap scrollbar-none w-full sm:w-auto py-1">
+          {/* Category Filter Pills Bar */}
+          <div className="flex items-center gap-2 overflow-x-auto whitespace-nowrap scrollbar-none py-1">
             {TEMPLATE_CATEGORIES.map((cat) => {
               const isActive = activeCategory === cat.id;
               return (
                 <button
                   key={cat.id}
                   onClick={() => setActiveCategory(cat.id)}
-                  className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                     isActive
                       ? 'bg-zinc-950 text-white shadow-xs'
-                      : 'bg-zinc-50 text-zinc-700 border border-zinc-200 hover:bg-zinc-100 hover:text-zinc-950'
+                      : 'bg-white text-zinc-700 border border-zinc-200/90 hover:bg-zinc-100 hover:text-zinc-950'
                   }`}
                 >
                   <span>{cat.label}</span>
-                  <span className={`text-[10px] font-mono rounded-full px-1.5 py-0.2 ${isActive ? 'bg-zinc-800 text-zinc-300' : 'bg-zinc-200/70 text-zinc-600'}`}>
+                  <span className={`text-[10px] font-mono rounded-full px-2 py-0.5 ${isActive ? 'bg-zinc-800 text-zinc-300' : 'bg-zinc-100 text-zinc-600'}`}>
                     {cat.count}
                   </span>
                 </button>
               );
             })}
           </div>
+
         </div>
 
         {/* Templates Cards Grid */}

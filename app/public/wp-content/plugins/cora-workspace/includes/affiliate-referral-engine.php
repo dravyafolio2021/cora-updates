@@ -181,6 +181,53 @@ class Cora_Affiliate_Referral_Engine {
     }
 
     /**
+     * Record a click or unique visit for a referral code
+     */
+    public static function track_click( $ref, $is_unique = true ) {
+        $ref = sanitize_text_field( trim( (string) $ref ) );
+        if ( empty( $ref ) ) {
+            return false;
+        }
+
+        global $wpdb;
+        $table = $wpdb->prefix . 'cora_referral_links';
+
+        $record = $wpdb->get_row( $wpdb->prepare(
+            "SELECT * FROM $table WHERE ref_code = %s OR custom_slug = %s LIMIT 1",
+            $ref,
+            $ref
+        ) );
+
+        if ( ! $record ) {
+            return false;
+        }
+
+        $now = current_time( 'mysql' );
+        if ( $is_unique ) {
+            $wpdb->query( $wpdb->prepare(
+                "UPDATE $table SET clicks_count = clicks_count + 1, unique_visits = unique_visits + 1, updated_at = %s WHERE id = %d",
+                $now,
+                $record->id
+            ) );
+        } else {
+            $wpdb->query( $wpdb->prepare(
+                "UPDATE $table SET clicks_count = clicks_count + 1, updated_at = %s WHERE id = %d",
+                $now,
+                $record->id
+            ) );
+        }
+
+        return array(
+            'id'            => (int) $record->id,
+            'user_id'       => (int) $record->user_id,
+            'ref_code'      => $record->ref_code,
+            'custom_slug'   => $record->custom_slug,
+            'clicks_count'  => (int) $record->clicks_count + 1,
+            'unique_visits' => $is_unique ? (int) $record->unique_visits + 1 : (int) $record->unique_visits,
+        );
+    }
+
+    /**
      * Capture referral query parameter and set attribution cookie
      */
     public static function capture_referral_cookie() {
@@ -213,10 +260,7 @@ class Cora_Affiliate_Referral_Engine {
 
         if ( $record ) {
             $is_unique = ! isset( $_COOKIE[ self::COOKIE_NAME ] ) || $_COOKIE[ self::COOKIE_NAME ] !== $record->ref_code;
-            
-            // Increment clicks count
-            $update_sql = "UPDATE $table SET clicks_count = clicks_count + 1" . ( $is_unique ? ", unique_visits = unique_visits + 1" : "" ) . ", updated_at = %s WHERE id = %d";
-            $wpdb->query( $wpdb->prepare( $update_sql, current_time( 'mysql' ), $record->id ) );
+            self::track_click( $record->ref_code, $is_unique );
 
             // Set 30-day cookie
             if ( ! headers_sent() ) {
@@ -618,9 +662,15 @@ class Cora_Affiliate_Referral_Engine {
             wp_send_json_error( array( 'message' => 'Unauthorized session.' ) );
         }
 
-        $new_slug = isset( $_POST['custom_slug'] ) ? sanitize_title( wp_unslash( $_POST['custom_slug'] ) ) : '';
+        $raw_slug = isset( $_POST['custom_slug'] ) ? sanitize_text_field( wp_unslash( $_POST['custom_slug'] ) ) : '';
+        $new_slug = strtolower( trim( preg_replace( '/[^a-z0-9-_]/i', '', $raw_slug ) ) );
+
         if ( strlen( $new_slug ) < 3 || strlen( $new_slug ) > 32 ) {
             wp_send_json_error( array( 'message' => 'Referral slug must be between 3 and 32 alphanumeric characters.' ) );
+        }
+
+        if ( ! preg_match( '/^[a-z0-9-_]+$/', $new_slug ) ) {
+            wp_send_json_error( array( 'message' => 'Referral slug can only contain lowercase letters, numbers, hyphens, and underscores.' ) );
         }
 
         global $wpdb;
@@ -636,6 +686,12 @@ class Cora_Affiliate_Referral_Engine {
 
         if ( $conflict ) {
             wp_send_json_error( array( 'message' => 'That custom referral code is already taken. Please choose another.' ) );
+        }
+
+        // Ensure user has a record
+        $existing = $wpdb->get_row( $wpdb->prepare( "SELECT id FROM $table WHERE user_id = %d LIMIT 1", $user_id ) );
+        if ( ! $existing ) {
+            self::get_or_create_ref_code( $user_id );
         }
 
         $wpdb->update(
@@ -864,6 +920,78 @@ class Cora_Affiliate_Referral_Engine {
                 return is_user_logged_in();
             }
         ) );
+
+        register_rest_route( 'cora-affiliate/v1', '/track-click', array(
+            'methods'             => array( 'GET', 'POST' ),
+            'callback'            => array( __CLASS__, 'rest_track_click' ),
+            'permission_callback' => '__return_true',
+        ) );
+    }
+
+    /**
+     * REST Handler for Referral Click Tracking (External / Next.js marketing site)
+     */
+    public static function rest_track_click( $request ) {
+        // Handle CORS for external Next.js marketing site
+        if ( ! headers_sent() ) {
+            header( 'Access-Control-Allow-Origin: *' );
+            header( 'Access-Control-Allow-Methods: GET, POST, OPTIONS' );
+            header( 'Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With' );
+        }
+
+        $ref = '';
+        if ( is_object( $request ) && method_exists( $request, 'get_param' ) ) {
+            $ref = (string) ( $request->get_param( 'ref' ) ?: ( $request->get_param( 'ref_code' ) ?: $request->get_param( 'slug' ) ) );
+        } elseif ( is_array( $request ) ) {
+            $ref = (string) ( $request['ref'] ?? ( $request['ref_code'] ?? ( $request['slug'] ?? '' ) ) );
+        }
+
+        if ( empty( $ref ) ) {
+            $ref = isset( $_REQUEST['ref'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['ref'] ) ) : '';
+        }
+        if ( empty( $ref ) ) {
+            $ref = isset( $_REQUEST['ref_code'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['ref_code'] ) ) : '';
+        }
+        if ( empty( $ref ) ) {
+            $ref = isset( $_REQUEST['slug'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['slug'] ) ) : '';
+        }
+
+        if ( empty( $ref ) ) {
+            return new WP_REST_Response( array(
+                'success' => false,
+                'tracked' => false,
+                'message' => 'Missing referral code parameter (ref, ref_code, or slug).'
+            ), 400 );
+        }
+
+        $is_unique = true;
+        if ( is_object( $request ) && method_exists( $request, 'get_param' ) ) {
+            $unique_param = $request->get_param( 'unique' );
+            if ( $unique_param !== null ) {
+                $is_unique = filter_var( $unique_param, FILTER_VALIDATE_BOOLEAN );
+            }
+        }
+
+        $result = self::track_click( $ref, $is_unique );
+        if ( ! $result ) {
+            return new WP_REST_Response( array(
+                'success' => false,
+                'tracked' => false,
+                'message' => 'Referral code not found in active partner directory.'
+            ), 404 );
+        }
+
+        return new WP_REST_Response( array(
+            'success'       => true,
+            'tracked'       => true,
+            'ref_code'      => $result['ref_code'],
+            'custom_slug'   => $result['custom_slug'],
+            'clicks_count'  => $result['clicks_count'],
+            'unique_visits' => $result['unique_visits'],
+            'cookie_name'   => self::COOKIE_NAME,
+            'cookie_days'   => self::COOKIE_DAYS,
+            'message'       => 'Referral click tracked successfully.'
+        ), 200 );
     }
 }
 

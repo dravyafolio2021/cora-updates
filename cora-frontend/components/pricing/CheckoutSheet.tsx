@@ -20,6 +20,7 @@ import {
   ChevronUp
 } from 'lucide-react';
 import { trackEvent } from '@/components/analytics/Analytics';
+import { getActiveReferralCode } from '@/lib/referral';
 
 export type PlanKey = 'free' | 'starter' | 'pro' | 'scale';
 export type BillingCycle = 'monthly' | 'annual';
@@ -157,6 +158,7 @@ export function CheckoutSheet({
   const [businessName, setBusinessName] = useState('');
   const [taxState, setTaxState] = useState<'intra' | 'inter'>('intra');
   const [showTaxBreakdown, setShowTaxBreakdown] = useState(true);
+  const [activeReferral, setActiveReferral] = useState<string>('');
 
   // Sync state when props change
   useEffect(() => {
@@ -166,6 +168,11 @@ export function CheckoutSheet({
   useEffect(() => {
     if (initialBilling) setBillingCycle(initialBilling);
   }, [initialBilling]);
+
+  useEffect(() => {
+    const ref = getActiveReferralCode();
+    if (ref) setActiveReferral(ref);
+  }, []);
 
   // Lock body scroll when drawer is open
   useEffect(() => {
@@ -212,22 +219,28 @@ export function CheckoutSheet({
     }
   }
 
+  // 10% Referral Discount on base price if active referral code exists
+  const referralDiscount = (!isFree && activeReferral) ? Math.round(basePrice * 0.10) : 0;
+  const taxableSubtotal = basePrice - referralDiscount;
+
   // 18% GST (Standard Indian B2B SaaS Tax rate)
   const gstRate = 0.18;
-  const totalTax = isFree ? 0 : basePrice * gstRate;
+  const totalTax = isFree ? 0 : taxableSubtotal * gstRate;
   const cgst = isFree ? 0 : totalTax / 2; // 9%
   const sgst = isFree ? 0 : totalTax / 2; // 9%
   const igst = isFree ? 0 : totalTax;     // 18%
-  const grandTotal = basePrice + totalTax;
+  const grandTotal = taxableSubtotal + totalTax;
 
   const handleProceed = () => {
     trackEvent('checkout_proceed', {
       plan: selectedPlan,
       billing: billingCycle,
       basePrice,
+      referralDiscount,
       totalTax,
       grandTotal,
-      currency
+      currency,
+      referral: activeReferral
     });
 
     const params = new URLSearchParams({
@@ -236,6 +249,12 @@ export function CheckoutSheet({
       currency,
       tax_state: taxState
     });
+
+    if (activeReferral) {
+      params.set('ref', activeReferral);
+      params.set('cora_referral_code', activeReferral);
+      params.set('endorsely_referral', activeReferral);
+    }
 
     if (hasGstin && gstinNumber) {
       params.set('gstin', gstinNumber.trim().toUpperCase());
@@ -288,6 +307,19 @@ export function CheckoutSheet({
         {/* Drawer Scrollable Content */}
         <div className="px-5 py-4 sm:px-7 sm:py-6 overflow-y-auto flex-1 space-y-5">
           
+          {/* Active Referral Pill */}
+          {activeReferral && (
+            <div className="p-3 rounded-2xl bg-zinc-900 text-white flex items-center justify-between text-xs font-mono shadow-sm">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span>Partner @{activeReferral}</span>
+              </div>
+              <span className="px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-200 text-[10px] font-bold">
+                10% Referral Discount
+              </span>
+            </div>
+          )}
+
           {/* 1. Plan Selector Pills */}
           <div className="space-y-2">
             <label className="text-xs font-semibold text-zinc-700 block">
@@ -487,9 +519,28 @@ export function CheckoutSheet({
                 )}
 
                 <div className="flex justify-between text-zinc-700">
-                  <span>Taxable Base Subtotal:</span>
+                  <span>Base Plan Price:</span>
                   <span className="font-semibold text-zinc-950">
                     {isINR ? `₹${basePrice.toLocaleString('en-IN')}` : `$${basePrice}`}
+                  </span>
+                </div>
+
+                {referralDiscount > 0 && (
+                  <div className="flex justify-between text-emerald-700 font-semibold bg-emerald-50 p-2 rounded-xl border border-emerald-200/60">
+                    <span className="flex items-center gap-1">
+                      <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>Partner Referral Discount (10% OFF via @{activeReferral}):</span>
+                    </span>
+                    <span>
+                      -{isINR ? `₹${referralDiscount.toLocaleString('en-IN')}` : `$${referralDiscount}`}
+                    </span>
+                  </div>
+                )}
+
+                <div className="flex justify-between text-zinc-700">
+                  <span>Taxable Subtotal:</span>
+                  <span className="font-semibold text-zinc-950">
+                    {isINR ? `₹${taxableSubtotal.toLocaleString('en-IN')}` : `$${taxableSubtotal}`}
                   </span>
                 </div>
 

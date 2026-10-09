@@ -26,10 +26,18 @@ import {
   Webhook,
   User,
   Users,
-  Mail
+  Mail,
+  Tag
 } from 'lucide-react';
 import { trackEvent } from '../analytics/Analytics';
-import { triggerRazorpayCheckout, useRazorpayPreload, isPartner100Coupon, PlanKey } from './FastRazorpayModal';
+import { 
+  triggerRazorpayCheckout, 
+  useRazorpayPreload, 
+  isPartner100Coupon, 
+  calculateDiscountedPrice,
+  PlanKey 
+} from './FastRazorpayModal';
+import { getActiveReferralCode, initReferralTracking } from '@/lib/referral';
 
 // Official Vector WhatsApp SVG Icon
 const WhatsAppIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
@@ -66,13 +74,22 @@ const PricingFeature = ({
 export function PricingSection() {
   const [billing, setBilling] = useState<'monthly' | 'annual'>('annual');
   const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
+  const [activeReferral, setActiveReferral] = useState<string>('');
   const isAnnual = billing === 'annual';
 
-  // Preload Razorpay checkout script
+  // Preload Razorpay checkout script & referral tracking
   useRazorpayPreload();
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      const tracking = initReferralTracking();
+      if (tracking.code) {
+        setActiveReferral(tracking.code);
+      } else {
+        const ref = getActiveReferralCode();
+        if (ref) setActiveReferral(ref);
+      }
+
       const params = new URLSearchParams(window.location.search);
       const coupon = params.get('coupon') || params.get('code') || params.get('discount');
       if (coupon) {
@@ -82,13 +99,19 @@ export function PricingSection() {
   }, []);
 
   const handlePlanSelect = (plan: PlanKey) => {
-    trackEvent('plan_selected', { plan, billing, coupon: appliedCoupon });
+    trackEvent('plan_selected', { plan, billing, coupon: appliedCoupon, referral: activeReferral });
     triggerRazorpayCheckout({
       planKey: plan,
       billingCycle: billing,
-      appliedCoupon
+      appliedCoupon,
+      referralCode: activeReferral
     });
   };
+
+  // Pricing math calculations
+  const starterPricing = calculateDiscountedPrice('starter', billing, appliedCoupon, activeReferral);
+  const proPricing = calculateDiscountedPrice('pro', billing, appliedCoupon, activeReferral);
+  const scalePricing = calculateDiscountedPrice('scale', billing, appliedCoupon, activeReferral);
 
   return (
     <section id="pricing" className="py-16 sm:py-[100px] relative z-10 bg-white">
@@ -110,6 +133,14 @@ export function PricingSection() {
               <ArrowRight className="w-3 h-3 text-amber-700 group-hover:translate-x-0.5 transition-transform" />
             </a>
           </div>
+
+          {/* Active Referral Announcement Pill */}
+          {activeReferral && (
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-zinc-950 text-white rounded-full text-xs font-mono font-medium shadow-md mb-4 border border-zinc-800 animate-in fade-in duration-200">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span>⚡ 10% Referral Discount Applied via Partner @{activeReferral} — All plans discounted at checkout!</span>
+            </div>
+          )}
 
           <h2 className="font-display text-3xl xs:text-4xl sm:text-5xl font-bold leading-[1.15] tracking-[-0.03em] text-zinc-950 mb-3 text-center">
             Simple, honest pricing.
@@ -275,6 +306,11 @@ export function PricingSection() {
                       2 MO. FREE
                     </span>
                   )}
+                  {starterPricing.isReferralDiscount && (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-zinc-950 text-white text-[9.5px] font-mono font-bold tracking-tight">
+                      10% REF OFF
+                    </span>
+                  )}
                 </div>
               </div>
 
@@ -285,17 +321,24 @@ export function PricingSection() {
               <div className="mb-6 pb-6 border-b border-zinc-100">
                 <div className="flex items-baseline gap-1.5 flex-wrap">
                   <span className="font-display text-4xl sm:text-5xl font-bold text-zinc-950">
-                    ₹{isAnnual ? '833' : '999'}
+                    ₹{starterPricing.effectiveMonthlyRate.toLocaleString('en-IN')}
                   </span>
                   <span className="text-xs text-zinc-500 font-medium">/ month</span>
+                  {starterPricing.discountPercentage > 0 && (
+                    <span className="text-xs text-zinc-400 line-through ml-1 font-mono">
+                      ₹{isAnnual ? '833' : '999'}
+                    </span>
+                  )}
                 </div>
                 <div className="text-[11px] text-zinc-500 mt-2 flex flex-col gap-0.5">
                   {isAnnual ? (
                     <>
                       <div className="flex items-center gap-1.5 font-medium text-emerald-700">
-                        <span>Billed annually: ₹9,990/yr</span>
+                        <span>Billed annually: ₹{starterPricing.grandTotal.toLocaleString('en-IN')}/yr</span>
                         <span className="text-zinc-300">&bull;</span>
-                        <span className="text-emerald-800 font-bold">Save ₹1,998</span>
+                        <span className="text-emerald-800 font-bold">
+                          Save ₹{(starterPricing.standardFullRate - starterPricing.grandTotal).toLocaleString('en-IN')}
+                        </span>
                       </div>
                       <div className="text-[10px] text-zinc-400">
                         Includes 18% GST (12 mos. access for 10)
@@ -434,6 +477,11 @@ export function PricingSection() {
                         2 MO. FREE
                       </span>
                     )}
+                    {proPricing.isReferralDiscount && (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-pink-500 text-white text-[9.5px] font-mono font-bold tracking-tight">
+                        10% REF OFF
+                      </span>
+                    )}
                   </div>
                 </div>
 
@@ -444,10 +492,12 @@ export function PricingSection() {
               <div className="mb-6 pb-6 border-b border-zinc-800">
                 <div className="flex items-baseline gap-1.5 flex-wrap">
                   <span className="font-display text-4xl sm:text-5xl font-bold text-white">
-                    {isPartner100Coupon(appliedCoupon) ? '₹0' : (isAnnual ? '₹2,083' : '₹2,499')}
+                    {isPartner100Coupon(appliedCoupon) 
+                      ? '₹0' 
+                      : `₹${proPricing.effectiveMonthlyRate.toLocaleString('en-IN')}`}
                   </span>
                   <span className="text-xs text-zinc-400 font-medium">/ month</span>
-                  {isPartner100Coupon(appliedCoupon) && (
+                  {(isPartner100Coupon(appliedCoupon) || proPricing.discountPercentage > 0) && (
                     <span className="text-xs text-zinc-500 line-through ml-2 font-mono">
                       ₹{isAnnual ? '2,083' : '2,499'}
                     </span>
@@ -459,9 +509,11 @@ export function PricingSection() {
                   ) : isAnnual ? (
                     <>
                       <div className="flex items-center gap-1.5 font-medium text-emerald-400">
-                        <span>Billed annually: ₹24,990/yr</span>
+                        <span>Billed annually: ₹{proPricing.grandTotal.toLocaleString('en-IN')}/yr</span>
                         <span className="text-zinc-600">&bull;</span>
-                        <span className="text-emerald-300 font-bold">Save ₹4,998</span>
+                        <span className="text-emerald-300 font-bold">
+                          Save ₹{(proPricing.standardFullRate - proPricing.grandTotal).toLocaleString('en-IN')}
+                        </span>
                       </div>
                       <div className="text-[10px] text-zinc-500">
                         Includes 18% GST (12 mos. access for 10)
@@ -620,6 +672,11 @@ export function PricingSection() {
                       2 MO. FREE
                     </span>
                   )}
+                  {scalePricing.isReferralDiscount && (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-zinc-950 text-white text-[9.5px] font-mono font-bold tracking-tight">
+                      10% REF OFF
+                    </span>
+                  )}
                 </div>
               </div>
 
@@ -630,17 +687,24 @@ export function PricingSection() {
               <div className="mb-6 pb-6 border-b border-zinc-100">
                 <div className="flex items-baseline gap-1.5 flex-wrap">
                   <span className="font-display text-4xl sm:text-5xl font-bold text-zinc-950">
-                    ₹{isAnnual ? '3,749' : '4,499'}
+                    ₹{scalePricing.effectiveMonthlyRate.toLocaleString('en-IN')}
                   </span>
                   <span className="text-xs text-zinc-500 font-medium">/ month</span>
+                  {scalePricing.discountPercentage > 0 && (
+                    <span className="text-xs text-zinc-400 line-through ml-1 font-mono">
+                      ₹{isAnnual ? '3,749' : '4,499'}
+                    </span>
+                  )}
                 </div>
                 <div className="text-[11px] text-zinc-500 mt-2 flex flex-col gap-0.5">
                   {isAnnual ? (
                     <>
                       <div className="flex items-center gap-1.5 font-medium text-emerald-700">
-                        <span>Billed annually: ₹44,990/yr</span>
+                        <span>Billed annually: ₹{scalePricing.grandTotal.toLocaleString('en-IN')}/yr</span>
                         <span className="text-zinc-300">&bull;</span>
-                        <span className="text-emerald-800 font-bold">Save ₹8,998</span>
+                        <span className="text-emerald-800 font-bold">
+                          Save ₹{(scalePricing.standardFullRate - scalePricing.grandTotal).toLocaleString('en-IN')}
+                        </span>
                       </div>
                       <div className="text-[10px] text-zinc-400">
                         Includes 18% GST (12 mos. access for 10)

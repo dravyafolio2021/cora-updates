@@ -30,6 +30,61 @@ $cora_team_users = get_users( array( 'fields' => array( 'ID', 'display_name', 'u
 #cora-forms-module { position: relative; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* Universal Entry Inspector Drawer - Starts from Screen Edge, Tab Menu Behind */
+#cora-entry-inspector {
+    position: fixed !important;
+    z-index: 99999 !important;
+    background-color: #ffffff;
+    box-shadow: -4px 0 24px -4px rgba(9, 9, 11, 0.15), 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box !important;
+}
+.dark #cora-entry-inspector {
+    background-color: #18181b;
+    box-shadow: -4px 0 24px -4px rgba(0, 0, 0, 0.5);
+}
+@media (min-width: 768px) {
+    #cora-entry-inspector {
+        top: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        height: 100vh !important;
+        max-height: 100vh !important;
+        width: 480px !important;
+        max-width: 90vw !important;
+        border-left: 1px solid rgba(228, 228, 231, 0.8) !important;
+        border-top: 0 !important;
+        border-right: 0 !important;
+        border-bottom: 0 !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+    }
+    .dark #cora-entry-inspector {
+        border-left-color: #27272a !important;
+    }
+}
+@media (max-width: 767px) {
+    #cora-entry-inspector {
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        top: auto !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        height: 85vh !important;
+        max-height: 85vh !important;
+        border-top-left-radius: 1.5rem !important;
+        border-top-right-radius: 1.5rem !important;
+        border-top: 1px solid rgba(228, 228, 231, 0.8) !important;
+        border-left: 0 !important;
+        border-right: 0 !important;
+        border-bottom: 0 !important;
+        margin: 0 !important;
+    }
+    .dark #cora-entry-inspector {
+        border-top-color: #27272a !important;
+    }
+}
+
 /* Form Builder Full-Viewport Activation */
 body.cora-form-builder-active {
     overflow: hidden !important;
@@ -113,6 +168,16 @@ $forms_header_args = array(
             'active'       => false,
             'onclick'      => "window.location.hash='#settings'",
         ),
+        array(
+            'id'           => 'all-entries',
+            'dom_id'       => 'tab-all-entries',
+            'label'        => 'All Entries',
+            'mobile_label' => 'Entries',
+            'icon'         => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>',
+            'badge'        => ( $total_submissions_cnt > 0 ? '<span class="ml-1 px-1.5 py-0.5 bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 text-[9px] font-bold rounded-full" id="tab-all-entries-badge">' . esc_html( $total_submissions_cnt ) . '</span>' : '' ),
+            'active'       => false,
+            'onclick'      => "window.location.hash='#all-entries'",
+        ),
     ),
 );
 
@@ -189,10 +254,10 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         $camp_tag = ! empty( $pf_settings['custom_campaign_tag'] ) ? $pf_settings['custom_campaign_tag'] : $pf['title'];
                         $camp_stage = ! empty( $pf_settings['target_crm_stage'] ) ? $pf_settings['target_crm_stage'] : 'New Lead';
                     ?>
-                    <div class="form-card bg-white border border-zinc-200/80 rounded-xl p-5 flex flex-col gap-4 shadow-sm hover:shadow-md hover:border-zinc-300 transition-all group" data-form-id="<?php echo esc_attr( $pf['id'] ); ?>" data-is-campaign="<?php echo $is_campaign ? '1' : '0'; ?>" data-campaign-tag="<?php echo esc_attr( $camp_tag ); ?>" data-title="<?php echo esc_attr( $pf['title'] ); ?>">
+                    <div class="form-card bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl p-5 sm:p-6 flex flex-col justify-between gap-4.5 shadow-2xs hover:shadow-md hover:border-zinc-300 dark:hover:border-zinc-700 transition-all group cursor-pointer" data-form-id="<?php echo esc_attr( $pf['id'] ); ?>" data-is-campaign="<?php echo $is_campaign ? '1' : '0'; ?>" data-campaign-tag="<?php echo esc_attr( $camp_tag ); ?>" data-title="<?php echo esc_attr( $pf['title'] ); ?>">
                         <div class="flex items-start justify-between gap-3">
-                            <div class="flex items-center gap-2.5 min-w-0">
-                                <div class="w-9 h-9 rounded-lg <?php echo $is_campaign ? 'bg-zinc-950 text-white' : 'bg-zinc-100 text-zinc-500'; ?> flex items-center justify-center shrink-0 shadow-2xs">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <div class="w-10 h-10 rounded-xl <?php echo $is_campaign ? 'bg-zinc-950 text-white dark:bg-white dark:text-zinc-950' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300'; ?> flex items-center justify-center shrink-0 shadow-2xs">
                                     <?php if ( $is_campaign ) : ?>
                                         <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
                                     <?php else : ?>
@@ -200,66 +265,66 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                                     <?php endif; ?>
                                 </div>
                                 <div class="min-w-0">
-                                    <h4 class="text-[13px] font-semibold text-zinc-900 truncate leading-tight"><?php echo esc_html( $pf['title'] ); ?></h4>
-                                    <p class="text-[10px] text-zinc-400 mt-0.5"><?php echo esc_html( $pf_created ); ?></p>
+                                    <h4 class="text-[13.5px] font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-black dark:group-hover:text-white transition-colors truncate leading-snug card-title cursor-pointer" data-id="<?php echo esc_attr( $pf['id'] ); ?>"><?php echo esc_html( $pf['title'] ); ?></h4>
+                                    <p class="text-[10.5px] text-zinc-400 dark:text-zinc-500 mt-0.5"><?php echo esc_html( $pf_created ); ?></p>
                                 </div>
                             </div>
-                            <span class="px-2 py-0.5 rounded-full text-[9px] font-bold shrink-0 <?php echo esc_attr( $pf_status_class ); ?>"><?php echo esc_html( strtoupper( $pf_status ) ); ?></span>
+                            <span class="px-2.5 py-1 rounded-full text-[9px] font-bold shrink-0 uppercase tracking-wide <?php echo esc_attr( $pf_status_class ); ?>"><?php echo esc_html( strtoupper( $pf_status ) ); ?></span>
                         </div>
 
-                        <!-- Campaign Classification Badge -->
-                        <div class="flex items-center gap-2">
-                            <?php if ( $is_campaign ) : ?>
-                                <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-zinc-100/90 text-zinc-800 text-[10px] font-medium border border-zinc-200/80 w-full truncate">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
-                                    <span class="font-bold text-zinc-950 truncate">🎯 <?php echo esc_html( $camp_tag ); ?></span>
-                                    <span class="text-zinc-400 text-[9px]">→</span>
-                                    <span class="text-zinc-600 font-medium text-[9.5px] truncate"><?php echo esc_html( $camp_stage ); ?></span>
-                                </div>
-                            <?php else : ?>
-                                <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-zinc-50 text-zinc-500 text-[10px] font-medium border border-zinc-200/60 w-full">
-                                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400 shrink-0"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line></svg>
-                                    <span>Standard Form (Vault Only)</span>
-                                </div>
-                            <?php endif; ?>
-                        </div>
-
-                        <div class="flex items-center justify-between text-[11px] text-zinc-500 pt-1">
-                            <div class="flex items-center gap-1.5">
-                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>
-                                <span class="font-medium"><?php echo esc_html( $pf_subs . ' response' . ( $pf_subs !== 1 ? 's' : '' ) ); ?></span>
+                        <!-- Card Information Section with Generous Internal Padding -->
+                        <div class="p-3.5 bg-zinc-50/80 dark:bg-zinc-800/40 rounded-xl border border-zinc-200/60 dark:border-zinc-800/80 flex flex-col gap-2.5">
+                            <!-- Campaign Classification Badge -->
+                            <div class="flex items-center gap-2">
+                                <?php if ( $is_campaign ) : ?>
+                                    <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 text-[11px] font-medium border border-zinc-200/70 dark:border-zinc-700/80 w-full truncate">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
+                                        <span class="font-bold text-zinc-950 dark:text-white truncate">🎯 <?php echo esc_html( $camp_tag ); ?></span>
+                                        <span class="text-zinc-400 text-[9px]">→</span>
+                                        <span class="text-zinc-600 dark:text-zinc-400 font-medium text-[10px] truncate"><?php echo esc_html( $camp_stage ); ?></span>
+                                    </div>
+                                <?php else : ?>
+                                    <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 text-[11px] font-medium border border-zinc-200/60 dark:border-zinc-800 w-full">
+                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400 shrink-0"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line></svg>
+                                        <span>Standard Form (Vault Only)</span>
+                                    </div>
+                                <?php endif; ?>
                             </div>
-                            <?php if ( $is_campaign ) : ?>
-                                <span class="text-[9.5px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60">Auto-CRM Sync</span>
-                            <?php endif; ?>
+
+                            <div class="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400 px-0.5">
+                                <div class="flex items-center gap-1.5 font-medium">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>
+                                    <span><?php echo esc_html( $pf_subs . ' response' . ( $pf_subs !== 1 ? 's' : '' ) ); ?></span>
+                                </div>
+                                <?php if ( $is_campaign ) : ?>
+                                    <span class="text-[9.5px] font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-full border border-emerald-200/60 dark:border-emerald-800">Auto-CRM Sync</span>
+                                <?php endif; ?>
+                            </div>
                         </div>
 
-                        <div class="flex items-center gap-1.5 pt-3 border-t border-zinc-100">
-                            <button class="btn-edit-form hidden sm:flex h-8 flex-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white text-[11px] font-semibold items-center justify-center gap-1.5 transition-all cursor-pointer border-0 shadow-2xs" data-id="<?php echo esc_attr( $pf['id'] ); ?>" title="Edit Form in Customizer (Desktop)">
+                        <!-- Card Action Buttons -->
+                        <div class="flex items-center gap-1.5 pt-3 border-t border-zinc-100 dark:border-zinc-800/80">
+                            <button class="btn-edit-form h-8 flex-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-900 text-[11px] font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer border-0 shadow-2xs" data-id="<?php echo esc_attr( $pf['id'] ); ?>" title="Edit Form in Customizer">
                                 <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                                Edit
+                                <span>Edit</span>
                             </button>
-                            <button class="btn-edit-ai-mobile sm:hidden h-8 flex-1 rounded-lg bg-zinc-950 text-white text-[11px] font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer border-0" data-id="<?php echo esc_attr( $pf['id'] ); ?>" title="Edit Form with AI">
-                                <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><path d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/></svg>
-                                Edit AI
-                            </button>
-                            <button class="btn-view-subs h-8 px-3 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700 hover:text-zinc-950 text-[11px] font-medium flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-2xs" data-id="<?php echo esc_attr( $pf['id'] ); ?>" title="View Submissions">
+                            <button class="btn-view-subs h-8 px-3 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 text-[11px] font-medium flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-2xs" data-id="<?php echo esc_attr( $pf['id'] ); ?>" title="View Submissions">
                                 <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>
-                                Entries
+                                <span>Entries</span>
                             </button>
                             <?php if ( $is_campaign ) : ?>
-                                <a href="<?php echo esc_url( home_url( '/workspace/dashboard?page=leads&search=' . urlencode( $camp_tag ) ) ); ?>" class="btn-view-crm-leads h-8 px-2.5 rounded-lg border border-zinc-900 bg-zinc-900 hover:bg-zinc-800 text-white text-[11px] font-semibold flex items-center justify-center gap-1 transition-all no-underline shadow-2xs" title="View Leads in CRM Kanban">
+                                <a href="<?php echo esc_url( home_url( '/workspace/dashboard?page=leads&search=' . urlencode( $camp_tag ) ) ); ?>" class="btn-view-crm-leads h-8 px-2.5 rounded-lg border border-zinc-900 dark:border-zinc-700 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-white text-[11px] font-semibold flex items-center justify-center gap-1 transition-all no-underline shadow-2xs" title="View Leads in CRM Kanban">
                                     <span>Leads</span>
                                     <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M7 17l9.2-9.2M17 17V8H8"/></svg>
                                 </a>
                             <?php endif; ?>
-                            <button class="btn-view-live h-8 w-8 rounded-lg bg-transparent hover:bg-zinc-100 text-zinc-400 hover:text-zinc-900 flex items-center justify-center transition-all cursor-pointer shrink-0 border-0" data-id="<?php echo esc_attr( $pf['id'] ); ?>" title="View Live Form">
+                            <button class="btn-view-live h-8 w-8 rounded-lg bg-transparent hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-400 hover:text-zinc-900 dark:hover:text-white flex items-center justify-center transition-all cursor-pointer shrink-0 border-0" data-id="<?php echo esc_attr( $pf['id'] ); ?>" title="Live Preview">
                                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                             </button>
-                            <button class="btn-share-form h-8 w-8 rounded-lg bg-transparent hover:bg-zinc-100 text-zinc-400 hover:text-zinc-900 flex items-center justify-center transition-all cursor-pointer shrink-0 border-0" data-id="<?php echo esc_attr( $pf['id'] ); ?>" title="Copy Share Link">
+                            <button class="btn-share-form h-8 w-8 rounded-lg bg-transparent hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-400 hover:text-zinc-900 dark:hover:text-white flex items-center justify-center transition-all cursor-pointer shrink-0 border-0" data-id="<?php echo esc_attr( $pf['id'] ); ?>" title="Copy Share Link">
                                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
                             </button>
-                            <button class="btn-delete-form h-8 w-8 rounded-lg bg-transparent hover:bg-red-50 text-zinc-400 hover:text-red-600 flex items-center justify-center transition-all cursor-pointer shrink-0 border-0" data-id="<?php echo esc_attr( $pf['id'] ); ?>" title="Delete Form">
+                            <button class="btn-delete-form h-8 w-8 rounded-lg bg-transparent hover:bg-red-50 dark:hover:bg-red-950/40 text-zinc-400 hover:text-red-600 flex items-center justify-center transition-all cursor-pointer shrink-0 border-0" data-id="<?php echo esc_attr( $pf['id'] ); ?>" title="Delete Form">
                                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
                             </button>
                         </div>
@@ -874,6 +939,116 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
             </div>
         </div>
     </div>
+
+        <!-- TAB CONTENT: ALL FORM ENTRIES & SUBMISSIONS (UNIFIED REGISTRY) -->
+        <div id="forms-all-entries-tab-content" class="hidden flex-col gap-5 mt-4 pb-48 md:pb-64">
+            <!-- Metrics Row -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3.5 sm:p-4 flex flex-col gap-1 shadow-2xs">
+                    <span class="text-[9.5px] sm:text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Total Submissions</span>
+                    <span id="all-entries-metric-total" class="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-100"><?php echo esc_html( $total_submissions_cnt ); ?></span>
+                </div>
+                <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3.5 sm:p-4 flex flex-col gap-1 shadow-2xs">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[9.5px] sm:text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Active Forms</span>
+                        <span class="inline-flex items-center px-1.5 py-0.2 rounded-full text-[8.5px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200/60 dark:border-zinc-700">Vault</span>
+                    </div>
+                    <span id="all-entries-metric-forms" class="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-100"><?php echo esc_html( $total_forms_cnt ); ?></span>
+                </div>
+                <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3.5 sm:p-4 flex flex-col gap-1 shadow-2xs">
+                    <span class="text-[9.5px] sm:text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Completion Rate</span>
+                    <span id="all-entries-metric-completion" class="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-100"><?php echo esc_html( $completion_rate_pct . '%' ); ?></span>
+                </div>
+                <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3.5 sm:p-4 flex flex-col gap-1 shadow-2xs">
+                    <span class="text-[9.5px] sm:text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Latest Activity</span>
+                    <span id="all-entries-metric-latest" class="text-xs sm:text-sm font-semibold text-zinc-700 dark:text-zinc-300 truncate mt-1">Checking...</span>
+                </div>
+            </div>
+
+            <!-- Filter & Action Toolbar -->
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3 sm:p-4 shadow-2xs flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+                <div class="flex items-center gap-2.5 flex-1 flex-wrap sm:flex-nowrap">
+                    <!-- Search Input -->
+                    <div class="relative flex-1 sm:max-w-xs w-full">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <input type="text" id="all-entries-search-input" placeholder="Search by name, email, form..." class="h-9 w-full pl-9 pr-3 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-xs text-zinc-900 dark:text-white placeholder:text-zinc-400 outline-none focus:border-zinc-400 transition-all shadow-2xs">
+                    </div>
+
+                    <!-- Filter by Form -->
+                    <div class="relative flex-1 sm:flex-none min-w-[170px]">
+                        <select id="all-entries-form-filter" class="h-9 w-full pl-3 pr-8 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 text-xs font-semibold focus:border-zinc-400 focus:outline-none cursor-pointer shadow-2xs appearance-none">
+                            <option value="all">All Forms</option>
+                            <?php foreach ( $prepopulated_forms as $pf ) : ?>
+                                <option value="<?php echo esc_attr( $pf['id'] ); ?>"><?php echo esc_html( $pf['title'] ); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <svg class="w-3.5 h-3.5 text-zinc-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
+
+                    <!-- Filter by Status -->
+                    <div class="relative flex-1 sm:flex-none min-w-[130px]">
+                        <select id="all-entries-status-filter" class="h-9 w-full pl-3 pr-8 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 text-xs font-semibold focus:border-zinc-400 focus:outline-none cursor-pointer shadow-2xs appearance-none">
+                            <option value="all">All Statuses</option>
+                            <option value="completed">Completed</option>
+                            <option value="partial">Partial</option>
+                        </select>
+                        <svg class="w-3.5 h-3.5 text-zinc-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
+                </div>
+
+                <!-- Right Actions: Export CSV & Refresh -->
+                <div class="flex items-center gap-2 shrink-0 self-end lg:self-auto">
+                    <span id="all-entries-count-indicator" class="text-xs text-zinc-400 font-mono hidden sm:inline mr-1">0 entries</span>
+                    <button type="button" id="btn-refresh-all-entries" class="h-9 px-3 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer" title="Refresh Entries">
+                        <svg id="refresh-entries-spinner" viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                        <span class="hidden sm:inline">Refresh</span>
+                    </button>
+                    <button type="button" id="btn-export-all-entries-csv" class="h-9 px-3.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 text-xs font-semibold transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer border-0">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        <span>Export CSV</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Notion-Styled Entries Data Table Container -->
+            <div id="all-entries-container" class="w-full">
+                <div id="all-entries-loading" class="py-20 text-center flex flex-col items-center justify-center gap-3">
+                    <div class="w-7 h-7 border-2 border-zinc-200 border-t-zinc-900 dark:border-zinc-800 dark:border-t-white rounded-full animate-spin"></div>
+                    <span class="text-xs text-zinc-400 font-medium">Loading workspace form entries...</span>
+                </div>
+                <div id="all-entries-table-wrapper" class="hidden">
+                    <!-- Desktop Table -->
+                    <div class="hidden md:block overflow-x-auto rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xs">
+                        <table class="w-full text-left border-collapse text-xs table-fixed">
+                            <thead>
+                                <tr class="border-b border-zinc-200/80 dark:border-zinc-800 text-zinc-400 dark:text-zinc-500 font-semibold bg-zinc-50/70 dark:bg-zinc-800/40 select-none">
+                                    <th class="px-3.5 py-3.5 w-14 font-mono">#</th>
+                                    <th class="px-3.5 py-3.5 w-48 md:w-56">Form</th>
+                                    <th class="px-3.5 py-3.5 w-auto">Submitter / Data</th>
+                                    <th class="px-3.5 py-3.5 w-24">Status</th>
+                                    <th class="px-3.5 py-3.5 w-36 font-mono">Submitted At</th>
+                                    <th class="px-3.5 py-3.5 w-28 font-mono">IP Address</th>
+                                    <th class="px-3.5 py-3.5 text-right w-24">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="all-entries-table-tbody" class="divide-y divide-zinc-100 dark:divide-zinc-800">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Mobile Card List -->
+                    <div id="all-entries-mobile-cards" class="flex md:hidden flex-col gap-3">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+                <!-- Empty State -->
+                <div id="all-entries-empty" class="hidden py-16 text-center bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl p-8">
+                    <svg viewBox="0 0 24 24" width="40" height="40" stroke="currentColor" stroke-width="1.2" fill="none" class="mx-auto text-zinc-300 dark:text-zinc-600 mb-3"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>
+                    <h4 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">No form submissions found</h4>
+                    <p class="text-xs text-zinc-400 mt-1 max-w-sm mx-auto">When clients fill out any of your forms, their responses will appear right here in real time.</p>
+                </div>
+            </div>
+        </div>
 
     <!-- STATE 2: FULL-PAGE INTERACTIVE FORM BUILDER VIEW -->
     <div id="form-editor-state" class="hidden fixed inset-0 z-[99999] flex-col h-full min-h-0 border-0 rounded-none bg-[#FBFaf7] dark:bg-[#0c0c0e] overflow-hidden font-sans" style="z-index: 99999 !important; position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important; width: 100vw !important; height: 100vh !important;">
@@ -1868,8 +2043,8 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         </div>
     </div>
 
-    <!-- BACKDROP FOR SUBMISSIONS BOTTOM SHEET -->
-    <div id="cora-submissions-backdrop" onclick="closeSubmissionsDrawer()" class="hidden fixed inset-0 bg-zinc-950/45 backdrop-blur-xs z-[90] transition-opacity duration-300 opacity-0 pointer-events-none cursor-pointer" style="display:none; pointer-events:none;"></div>
+    <!-- BACKDROP FOR SUBMISSIONS BOTTOM SHEET & UNIVERSAL INSPECTOR -->
+    <div id="cora-submissions-backdrop" onclick="handleSubmissionsBackdropClick()" class="hidden fixed inset-0 bg-zinc-950/45 backdrop-blur-xs z-[90] transition-opacity duration-300 opacity-0 pointer-events-none cursor-pointer" style="display:none; pointer-events:none;"></div>
 
     <!-- STATE 3: SUBMISSIONS LIST BOTTOM SHEET DASHBOARD -->
     <div id="cora-submissions-drawer" class="hidden pointer-events-none fixed bottom-0 left-0 right-0 w-full max-w-6xl mx-auto h-[82vh] max-h-[85vh] bg-white shadow-2xl rounded-t-3xl border-t border-x border-zinc-200/80 z-[100] transform translate-y-full transition-transform duration-350 ease-[cubic-bezier(0.16,1,0.3,1)] flex flex-col overflow-hidden font-sans" style="display:none; pointer-events:none;">
@@ -1925,30 +2100,101 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         <div class="flex-1 overflow-y-auto p-4 sm:p-6 relative" id="submissions-drawer-content">
             <!-- Dynamic entries table goes here -->
         </div>
+    </div>
 
-        <!-- RIGHT SLIDE-OVER ENTRY INSPECTOR DRAWER -->
-        <div id="cora-entry-inspector" class="hidden absolute top-0 right-0 bottom-0 w-full sm:w-[480px] bg-white border-l border-zinc-200 shadow-2xl z-30 flex flex-col font-sans rounded-tr-3xl overflow-hidden transform translate-x-full transition-transform duration-300">
-            <!-- Inspector Header -->
-            <div class="px-5 sm:px-6 py-3.5 sm:py-4 border-b border-zinc-200/80 flex items-center justify-between bg-zinc-50/70 shrink-0">
-                <div class="flex items-center gap-2.5">
-                    <div class="w-8 h-8 rounded-lg bg-zinc-950 text-white flex items-center justify-center font-bold text-xs shadow-xs">
-                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-                    </div>
-                    <div>
-                        <div class="flex items-center gap-2">
-                            <h4 class="text-xs sm:text-sm font-bold text-zinc-950" id="inspector-entry-id">Entry #000</h4>
-                            <span id="inspector-status-badge" class="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-emerald-50 text-emerald-700">Completed</span>
-                        </div>
-                        <p class="text-[10px] sm:text-[10.5px] text-zinc-400 font-mono mt-0.5" id="inspector-submitted-at">Submitted --</p>
-                    </div>
+    <!-- ENTRY INSPECTOR SHEET (Universal: Works from Submissions Drawer & All Entries Tab) -->
+    <div id="cora-entry-inspector" class="hidden pointer-events-none fixed transition-transform duration-300 ease-out bg-white dark:bg-zinc-900 shadow-2xl border-zinc-200/80 dark:border-zinc-800 flex flex-col font-sans overflow-hidden" style="display:none; pointer-events:none; z-index:99999;">
+        <!-- Mobile Grab Handle -->
+        <div class="flex md:hidden justify-center pt-3 pb-1 shrink-0 select-none">
+            <div class="w-10 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700"></div>
+        </div>
+
+        <!-- Inspector Header -->
+        <div class="px-5 sm:px-6 py-3.5 sm:py-4 border-b border-zinc-200/80 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/70 dark:bg-zinc-800/40 shrink-0">
+            <div class="flex items-center gap-2.5 min-w-0">
+                <div class="w-8 h-8 rounded-lg bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
                 </div>
-                <button onclick="closeEntryInspector()" class="h-7 w-7 rounded-lg hover:bg-zinc-200/60 flex items-center justify-center text-zinc-500 hover:text-zinc-900 cursor-pointer border-0 bg-transparent">
-                    <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                <div class="min-w-0">
+                    <div class="flex items-center gap-2">
+                        <h4 class="text-xs sm:text-sm font-bold text-zinc-950 dark:text-zinc-100 truncate" id="inspector-entry-id">Entry #000</h4>
+                        <span id="inspector-status-badge" class="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 shrink-0">Completed</span>
+                    </div>
+                    <p class="text-[10px] sm:text-[10.5px] text-zinc-400 dark:text-zinc-500 font-mono mt-0.5 truncate" id="inspector-submitted-at">Submitted --</p>
+                </div>
+            </div>
+            <button onclick="closeEntryInspector()" class="h-8 w-8 rounded-lg hover:bg-zinc-200/60 dark:hover:bg-zinc-800 flex items-center justify-center text-zinc-500 hover:text-zinc-900 dark:hover:text-white cursor-pointer border-0 bg-transparent shrink-0" title="Close">
+                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+
+        <!-- Submitter Quick Overview Card -->
+        <div id="inspector-submitter-strip" class="px-5 sm:px-6 py-3 border-b border-zinc-100 dark:border-zinc-800/80 bg-white dark:bg-zinc-900 flex items-center justify-between gap-3 shrink-0">
+            <div class="min-w-0">
+                <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Submitter</div>
+                <div class="text-xs font-bold text-zinc-900 dark:text-zinc-100 truncate mt-0.5" id="inspector-submitter-name">Anonymous Submitter</div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0 text-right">
+                <div class="text-[11px] text-zinc-500 dark:text-zinc-400 font-mono truncate" id="inspector-submitter-contact">—</div>
+            </div>
+        </div>
+
+        <!-- Inspector Body -->
+        <div class="flex-1 overflow-y-auto p-5 sm:p-6 space-y-3.5" id="inspector-body-content">
+            <!-- Question & Answer Notion Cards -->
+        </div>
+
+        <!-- Inspector Footer -->
+        <div class="p-3.5 sm:p-4 border-t border-zinc-200/80 dark:border-zinc-800 bg-zinc-50/70 dark:bg-zinc-800/40 flex items-center justify-between gap-2 shrink-0">
+            <button type="button" id="btn-inspector-copy-json" class="h-8 px-3 rounded-lg border border-zinc-200/80 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs">
+                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                <span>Copy JSON</span>
+            </button>
+            <div class="flex items-center gap-2">
+                <button type="button" id="btn-inspector-delete" class="h-8 px-2.5 rounded-lg border border-transparent text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer">
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                    <span>Delete</span>
+                </button>
+                <button type="button" onclick="closeEntryInspector()" class="h-8 px-4 rounded-lg bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 text-xs font-semibold transition-all cursor-pointer border-0 shadow-2xs">
+                    Done
                 </button>
             </div>
-            <!-- Inspector Body -->
-            <div class="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4" id="inspector-body-content">
-                <!-- Question & Answer Notion Cards -->
+        </div>
+    </div>
+
+    <!-- IN-APP FORM LIVE PREVIEW MODAL -->
+    <div id="cora-form-preview-backdrop" onclick="closeFormLivePreviewModal()" class="hidden fixed inset-0 bg-zinc-950/60 backdrop-blur-xs z-[130] transition-opacity duration-300 opacity-0 pointer-events-none cursor-pointer" style="display:none; pointer-events:none;"></div>
+    <div id="cora-form-preview-modal" class="hidden pointer-events-none fixed inset-0 z-[135] flex items-center justify-center p-3 sm:p-6 opacity-0 transform scale-95 transition-all duration-300" style="display:none; pointer-events:none;">
+        <div class="relative w-full max-w-4xl h-[92vh] max-h-[880px] bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-zinc-200/80 dark:border-zinc-800 flex flex-col overflow-hidden pointer-events-auto">
+            <!-- Header -->
+            <div class="px-5 py-3 border-b border-zinc-200/80 dark:border-zinc-800 flex items-center justify-between gap-3 bg-zinc-50/70 dark:bg-zinc-800/40 shrink-0">
+                <div class="flex items-center gap-2.5 min-w-0">
+                    <div class="w-8 h-8 rounded-lg bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 flex items-center justify-center shrink-0">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    </div>
+                    <div class="min-w-0">
+                        <h4 id="preview-modal-form-title" class="text-xs sm:text-sm font-bold text-zinc-900 dark:text-zinc-100 truncate">Form Live Preview</h4>
+                        <span id="preview-modal-form-key" class="text-[10px] font-mono text-zinc-400 dark:text-zinc-500">Shared Preview</span>
+                    </div>
+                </div>
+                <!-- Controls -->
+                <div class="flex items-center gap-2 shrink-0">
+                    <div class="hidden sm:inline-flex items-center gap-0.5 p-0.5 bg-zinc-200/70 dark:bg-zinc-800 rounded-lg">
+                        <button type="button" id="btn-preview-viewport-desktop" class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white shadow-2xs border-0 cursor-pointer">Desktop</button>
+                        <button type="button" id="btn-preview-viewport-mobile" class="px-2.5 py-1 rounded-md text-[10px] font-medium text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white bg-transparent border-0 cursor-pointer">Mobile</button>
+                    </div>
+                    <a id="preview-modal-open-link" href="#" target="_blank" class="h-8 px-2.5 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold flex items-center gap-1 no-underline transition-all">
+                        <span>New Tab</span>
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                    </a>
+                    <button type="button" onclick="closeFormLivePreviewModal()" class="h-8 w-8 rounded-lg hover:bg-zinc-200/60 dark:hover:bg-zinc-800 flex items-center justify-center text-zinc-500 hover:text-zinc-900 dark:hover:text-white cursor-pointer border-0 bg-transparent" title="Close Preview">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
+            </div>
+            <!-- Iframe container -->
+            <div id="preview-iframe-wrapper" class="flex-1 bg-zinc-100 dark:bg-zinc-950 p-2 sm:p-4 flex items-center justify-center overflow-hidden">
+                <iframe id="cora-form-preview-iframe" src="about:blank" class="w-full h-full bg-white dark:bg-zinc-900 rounded-xl shadow-xs border border-zinc-200/80 dark:border-zinc-800 transition-all duration-300"></iframe>
             </div>
         </div>
     </div>
@@ -2387,6 +2633,73 @@ document.addEventListener('DOMContentLoaded', function() {
         if (path.startsWith('/')) path = path.slice(1);
         return base + path;
     }
+
+    // Robust UTC-to-Local Date & Time Formatter (Converts UTC DB timestamps to user's local timezone)
+    function parseSubmissionDate(dateStr) {
+        if (!dateStr || dateStr === '—') return null;
+        if (dateStr instanceof Date) return isNaN(dateStr.getTime()) ? null : dateStr;
+        let s = String(dateStr).trim();
+        // If string already has timezone offset like +05:30 or Z, parse as-is
+        if (/Z|[+-]\d{2}:\d{2}$/.test(s)) {
+            const d = new Date(s);
+            return isNaN(d.getTime()) ? null : d;
+        }
+        // MySQL datetime string "YYYY-MM-DD HH:MM:SS": stored in UTC, treat as UTC
+        if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(s)) {
+            s = s.replace(' ', 'T') + 'Z';
+        } else if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/.test(s)) {
+            s = s + 'Z';
+        }
+        const d = new Date(s);
+        return isNaN(d.getTime()) ? null : d;
+    }
+
+    function formatSubmissionDateTime(dateStr, style = 'table') {
+        const d = parseSubmissionDate(dateStr);
+        if (!d) return dateStr || '—';
+
+        const now = new Date();
+        const isToday = d.toDateString() === now.toDateString();
+
+        const yesterday = new Date();
+        yesterday.setDate(now.getDate() - 1);
+        const isYesterday = d.toDateString() === yesterday.toDateString();
+
+        // 12-hour local time format with AM/PM (e.g. "12:43 PM")
+        const timeStr = d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
+
+        const pad = n => String(n).padStart(2, '0');
+        const localIso = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+
+        if (style === 'compact-iso') return localIso;
+
+        if (style === 'metric') {
+            if (isToday) return `Today, ${timeStr}`;
+            if (isYesterday) return `Yesterday, ${timeStr}`;
+            return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + `, ${timeStr}`;
+        }
+
+        if (style === 'full') {
+            if (isToday) return `Today at ${timeStr}`;
+            if (isYesterday) return `Yesterday at ${timeStr}`;
+            return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) + ` at ${timeStr}`;
+        }
+
+        // Default 'table': clean, readable locale date
+        if (isToday) return `Today, ${timeStr}`;
+        if (isYesterday) return `Yesterday, ${timeStr}`;
+        return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) + ` • ${timeStr}`;
+    }
+
+    function getLocalIsoTimestamp(dateStr) {
+        const d = parseSubmissionDate(dateStr);
+        if (!d) return dateStr || '';
+        const pad = n => String(n).padStart(2, '0');
+        return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+    }
+
+    window.formatSubmissionDateTime = formatSubmissionDateTime;
+    window.getLocalIsoTimestamp = getLocalIsoTimestamp;
 
     // --- Type Meta ---
     const TYPE_META = {
@@ -3464,7 +3777,8 @@ function renderAuditLogs(logs) {
             }
 
             const ipVal = l.ip_address || '127.0.0.1';
-            const dateVal = l.created_at || '—';
+            const dateVal = formatSubmissionDateTime(l.created_at, 'table');
+            const localIso = getLocalIsoTimestamp(l.created_at);
 
             // 1. Desktop Table Row
             if (body) {
@@ -3488,8 +3802,8 @@ function renderAuditLogs(logs) {
                     <td class="px-4 py-3 align-middle font-mono text-zinc-500 dark:text-zinc-400 whitespace-nowrap">
                         ${ipVal}
                     </td>
-                    <td class="px-4 py-3 align-middle text-zinc-500 dark:text-zinc-400 text-right whitespace-nowrap">
-                        ${dateVal}
+                    <td class="px-4 py-3 align-middle text-zinc-600 dark:text-zinc-300 text-right whitespace-nowrap text-xs" title="${localIso} (Local Time)">
+                        <span class="font-medium">${dateVal}</span>
                     </td>
                 `;
                 body.appendChild(row);
@@ -3509,7 +3823,7 @@ function renderAuditLogs(logs) {
                                 ${l.action_type || 'ACTIVITY'}
                             </span>
                         </div>
-                        <span class="text-[10.5px] text-zinc-400 dark:text-zinc-500 shrink-0 font-mono">${dateVal}</span>
+                        <span class="text-[10.5px] text-zinc-500 dark:text-zinc-400 shrink-0 font-medium" title="${localIso} (Local Time)">${dateVal}</span>
                     </div>
                     
                     <div class="text-xs text-zinc-800 dark:text-zinc-200 flex items-center gap-1.5 flex-wrap">
@@ -3577,7 +3891,10 @@ function deleteForm(id) {
     let currentSubmissionsList = [];
     let currentSubmissionsFormTitle = 'Form Submissions';
 
-    function renderSubmissionsTable(filterText = '') {
+    let currentInspectedSub = null;
+    let currentInspectedEntryNum = null;
+
+    function renderDrawerSubmissionsTable(filterText = '') {
         const content = document.getElementById('submissions-drawer-content');
         if (!content) return;
 
@@ -3600,14 +3917,14 @@ function deleteForm(id) {
         let html = `
             <!-- DESKTOP TABLE (hidden md:block) -->
             <div class="hidden md:block overflow-x-auto rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xs">
-                <table class="w-full text-left border-collapse text-xs">
+                <table class="w-full text-left border-collapse text-xs table-fixed">
                     <thead>
-                        <tr class="border-b border-zinc-200 dark:border-zinc-800 text-zinc-400 dark:text-zinc-500 font-semibold bg-zinc-50/70 dark:bg-zinc-800/40">
-                            <th class="px-4 py-3">ID</th>
-                            <th class="px-4 py-3">IP Address</th>
-                            <th class="px-4 py-3">Status</th>
-                            <th class="px-4 py-3">Submitted At</th>
-                            <th class="px-4 py-3 text-right">Actions</th>
+                        <tr class="border-b border-zinc-200 dark:border-zinc-800 text-zinc-400 dark:text-zinc-500 font-semibold bg-zinc-50/70 dark:bg-zinc-800/40 select-none">
+                            <th class="px-3.5 py-3 w-20 font-mono">ID</th>
+                            <th class="px-3.5 py-3 w-32 font-mono">IP Address</th>
+                            <th class="px-3.5 py-3 w-24">Status</th>
+                            <th class="px-3.5 py-3 w-40 font-mono">Submitted At</th>
+                            <th class="px-3.5 py-3 text-right w-24">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
@@ -3622,15 +3939,17 @@ function deleteForm(id) {
                 : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400';
             
             html += `
-                <tr class="hover:bg-zinc-50/60 dark:hover:bg-zinc-800/40 transition-all">
-                    <td class="px-4 py-3.5 font-semibold text-zinc-900 dark:text-zinc-100">Entry #${entryNum}</td>
-                    <td class="px-4 py-3.5 font-mono text-zinc-500 dark:text-zinc-400">${sub.ip_address || 'Unknown'}</td>
-                    <td class="px-4 py-3.5">
+                <tr class="hover:bg-zinc-50/60 dark:hover:bg-zinc-800/40 transition-all cursor-pointer" onclick="openEntryInspector(currentSubmissionsList[${originalIdx !== -1 ? originalIdx : idx}], ${entryNum})">
+                    <td class="px-3.5 py-3 font-semibold text-zinc-900 dark:text-zinc-100 font-mono">Entry #${entryNum}</td>
+                    <td class="px-3.5 py-3 font-mono text-zinc-500 dark:text-zinc-400 truncate">${sub.ip_address || 'Unknown'}</td>
+                    <td class="px-3.5 py-3">
                         <span class="px-2.5 py-0.5 rounded text-[9px] font-bold uppercase ${badgeClass}">${label}</span>
                     </td>
-                    <td class="px-4 py-3.5 text-zinc-500 dark:text-zinc-400">${sub.created_at}</td>
-                    <td class="px-4 py-3.5 text-right">
-                        <button class="btn-inspect-entry h-7 px-2.5 rounded-lg border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white cursor-pointer transition-all text-xs font-semibold shadow-2xs" data-idx="${originalIdx !== -1 ? originalIdx : idx}">
+                    <td class="px-3.5 py-3 text-zinc-600 dark:text-zinc-300 text-xs truncate" title="${getLocalIsoTimestamp(sub.created_at)} (Local Time)">
+                        <span class="font-medium">${formatSubmissionDateTime(sub.created_at, 'table')}</span>
+                    </td>
+                    <td class="px-3.5 py-3 text-right">
+                        <button type="button" class="btn-inspect-entry h-7 px-2.5 rounded-lg border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white cursor-pointer transition-all text-xs font-semibold shadow-2xs" data-idx="${originalIdx !== -1 ? originalIdx : idx}" onclick="event.stopPropagation(); openEntryInspector(currentSubmissionsList[${originalIdx !== -1 ? originalIdx : idx}], ${entryNum});">
                             Inspect
                         </button>
                     </td>
@@ -3656,20 +3975,20 @@ function deleteForm(id) {
                 : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400';
             
             html += `
-                <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3.5 flex flex-col gap-2.5 shadow-2xs">
+                <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3.5 flex flex-col gap-2.5 shadow-2xs cursor-pointer" onclick="openEntryInspector(currentSubmissionsList[${originalIdx !== -1 ? originalIdx : idx}], ${entryNum})">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-2">
                             <span class="font-bold text-zinc-900 dark:text-zinc-100 text-xs">Entry #${entryNum}</span>
                             <span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase ${badgeClass}">${label}</span>
                         </div>
-                        <span class="text-[10.5px] text-zinc-400 dark:text-zinc-500 font-mono">${sub.created_at}</span>
+                        <span class="text-[10.5px] text-zinc-500 dark:text-zinc-400 font-medium" title="${getLocalIsoTimestamp(sub.created_at)} (Local Time)">${formatSubmissionDateTime(sub.created_at, 'table')}</span>
                     </div>
                     <div class="flex items-center justify-between pt-1 border-t border-zinc-100 dark:border-zinc-800/80">
                         <span class="text-[11px] font-mono text-zinc-500 dark:text-zinc-400 flex items-center gap-1">
                             <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
                             ${sub.ip_address || 'Unknown'}
                         </span>
-                        <button class="btn-inspect-entry h-7 px-2.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-white cursor-pointer transition-all text-xs font-semibold shadow-2xs flex items-center gap-1" data-idx="${originalIdx !== -1 ? originalIdx : idx}">
+                        <button type="button" class="btn-inspect-entry h-7 px-2.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-white cursor-pointer transition-all text-xs font-semibold shadow-2xs flex items-center gap-1" data-idx="${originalIdx !== -1 ? originalIdx : idx}" onclick="event.stopPropagation(); openEntryInspector(currentSubmissionsList[${originalIdx !== -1 ? originalIdx : idx}], ${entryNum});">
                             <span>Inspect</span>
                             <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
                         </button>
@@ -3679,17 +3998,7 @@ function deleteForm(id) {
         });
 
         html += `</div>`;
-
         content.innerHTML = html;
-
-        // Attach entry inspectors click
-        jQuery('.btn-inspect-entry').off('click').on('click', function() {
-            const idx = jQuery(this).data('idx');
-            const sub = currentSubmissionsList[idx];
-            if (sub) {
-                openEntryInspector(sub, currentSubmissionsList.length - idx);
-            }
-        });
     }
 
     window.openSubmissionsDrawer = function(formId) {
@@ -3707,6 +4016,7 @@ function deleteForm(id) {
         const backdrop = document.getElementById('cora-submissions-backdrop');
         const drawer = document.getElementById('cora-submissions-drawer');
         if (backdrop) {
+            backdrop.style.display = 'block';
             backdrop.classList.remove('hidden', 'pointer-events-none');
             requestAnimationFrame(() => {
                 backdrop.classList.remove('opacity-0');
@@ -3714,6 +4024,7 @@ function deleteForm(id) {
             });
         }
         if (drawer) {
+            drawer.style.display = 'flex';
             drawer.classList.remove('hidden', 'pointer-events-none');
             drawer.classList.add('pointer-events-auto');
             drawer.offsetHeight;
@@ -3734,7 +4045,7 @@ function deleteForm(id) {
                 currentSubmissionsList = submissions || [];
                 const countEl = document.getElementById('drawer-responses-count');
                 if (countEl) countEl.textContent = currentSubmissionsList.length + ' Entries';
-                renderSubmissionsTable('');
+                renderDrawerSubmissionsTable('');
             },
             error: function() {
                 if (content) content.innerHTML = '<div class="text-xs text-red-500 text-center py-16">Failed to load submissions.</div>';
@@ -3743,15 +4054,18 @@ function deleteForm(id) {
     };
 
     window.closeSubmissionsDrawer = function() {
+        // If inspector is open, close it first
+        closeEntryInspector();
+
         const backdrop = document.getElementById('cora-submissions-backdrop');
         const drawer = document.getElementById('cora-submissions-drawer');
-        const inspector = document.getElementById('cora-entry-inspector');
         
         if (drawer) {
             drawer.classList.remove('translate-y-0', 'pointer-events-auto');
             drawer.classList.add('translate-y-full', 'pointer-events-none');
             setTimeout(() => {
                 drawer.classList.add('hidden');
+                drawer.style.display = 'none';
             }, 350);
         }
         if (backdrop) {
@@ -3759,20 +4073,23 @@ function deleteForm(id) {
             backdrop.classList.add('opacity-0', 'pointer-events-none');
             setTimeout(() => {
                 backdrop.classList.add('hidden');
+                backdrop.style.display = 'none';
             }, 300);
         }
-        if (inspector) {
-            inspector.classList.remove('pointer-events-auto');
-            inspector.classList.add('translate-x-full', 'pointer-events-none');
-            setTimeout(() => {
-                inspector.classList.add('hidden');
-            }, 300);
+    };
+
+    window.handleSubmissionsBackdropClick = function() {
+        const inspector = document.getElementById('cora-entry-inspector');
+        if (inspector && inspector.style.display !== 'none' && !inspector.classList.contains('hidden')) {
+            closeEntryInspector();
+        } else {
+            closeSubmissionsDrawer();
         }
     };
 
     // Live search in submissions
     jQuery(document).on('input', '#submissions-search-input', function() {
-        renderSubmissionsTable(jQuery(this).val());
+        renderDrawerSubmissionsTable(jQuery(this).val());
     });
 
     // Export CSV handler
@@ -3796,7 +4113,7 @@ function deleteForm(id) {
         currentSubmissionsList.forEach((sub, idx) => {
             const entryId = `Entry #${currentSubmissionsList.length - idx}`;
             const status = sub.is_partial == '1' ? 'Partial' : 'Completed';
-            const submittedAt = sub.created_at || '';
+            const submittedAt = getLocalIsoTimestamp(sub.created_at) || sub.created_at || '';
             const ip = sub.ip_address || '';
             const data = sub.submitted_data || {};
             const fieldVals = fieldKeyArr.map(k => {
@@ -3823,6 +4140,11 @@ function deleteForm(id) {
     // Global ESC key listener for modals
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
+            const inspector = document.getElementById('cora-entry-inspector');
+            if (inspector && inspector.style.display !== 'none' && !inspector.classList.contains('hidden')) {
+                closeEntryInspector();
+                return;
+            }
             const drawer = document.getElementById('cora-submissions-drawer');
             if (drawer && !drawer.classList.contains('hidden') && !drawer.classList.contains('translate-y-full')) {
                 closeSubmissionsDrawer();
@@ -3831,65 +4153,330 @@ function deleteForm(id) {
     });
 
     window.openEntryInspector = function(sub, entryNumber) {
+        if (!sub) return;
+        currentInspectedSub = sub;
+        currentInspectedEntryNum = entryNumber;
+
         const idEl = document.getElementById('inspector-entry-id');
         if (idEl) idEl.textContent = `Entry #${entryNumber}`;
+
+        const formTitle = sub.form_title || (formsData && formsData.find(f => f.id == sub.form_id)?.title) || `Form #${sub.form_id}`;
         const timeEl = document.getElementById('inspector-submitted-at');
-        if (timeEl) timeEl.textContent = `Submitted ${sub.created_at} (${sub.ip_address || 'no IP'})`;
+        if (timeEl) {
+            const formattedTime = formatSubmissionDateTime(sub.created_at, 'full');
+            timeEl.textContent = `${formTitle} • Submitted ${formattedTime}${sub.ip_address ? ' • ' + sub.ip_address : ''}`;
+            timeEl.setAttribute('title', `${getLocalIsoTimestamp(sub.created_at)} (Local Time)`);
+        }
         
         const badge = document.getElementById('inspector-status-badge');
         if (badge) {
             if (sub.is_partial == '1') {
                 badge.textContent = 'Partial';
-                badge.className = 'px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-zinc-100 text-zinc-650';
+                badge.className = 'px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-zinc-100 text-zinc-650 shrink-0';
             } else {
                 badge.textContent = 'Completed';
-                badge.className = 'px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-emerald-50 text-emerald-700';
+                badge.className = 'px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 shrink-0';
             }
+        }
+
+        // Submitter strip
+        const summary = getSubmitterSummary(sub);
+        const nameEl = document.getElementById('inspector-submitter-name');
+        const contactEl = document.getElementById('inspector-submitter-contact');
+        if (nameEl) nameEl.textContent = summary.name || 'Anonymous Submitter';
+        if (contactEl) {
+            const contactText = summary.email || summary.phone || 'No contact provided';
+            contactEl.textContent = contactText;
         }
 
         const bodyContent = document.getElementById('inspector-body-content');
         if (bodyContent) {
             bodyContent.innerHTML = '';
             
-            const data = sub.submitted_data || {};
+            let data = sub.submitted_data || {};
+            if (typeof data === 'string') {
+                try { data = JSON.parse(data); } catch(e) { data = {}; }
+            }
             const keys = Object.keys(data);
             
             if (keys.length === 0) {
-                bodyContent.innerHTML = '<div class="text-xs text-zinc-400 text-center py-6">No data fields submitted in this entry.</div>';
+                bodyContent.innerHTML = '<div class="text-xs text-zinc-400 text-center py-10">No response data fields recorded for this entry.</div>';
             } else {
                 keys.forEach(k => {
                     const val = data[k];
+                    let isImage = false;
+                    let displayVal = val;
+                    if (typeof val === 'string' && (val.startsWith('data:image/') || val.startsWith('data:application/pdf;base64'))) {
+                        isImage = true;
+                    } else if (val !== undefined && val !== null) {
+                        if (typeof val === 'object') {
+                            displayVal = JSON.stringify(val, null, 2);
+                        }
+                    }
+
                     const card = document.createElement('div');
-                    card.className = 'p-3.5 bg-zinc-50/50 border border-zinc-150 rounded-xl flex flex-col gap-1';
-                    card.innerHTML = `
-                        <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">${k}</span>
-                        <span class="text-xs font-medium text-zinc-800 leading-relaxed whitespace-pre-wrap">${val !== undefined && val !== null && val !== '' ? val : '<span class="text-zinc-300 italic">Empty</span>'}</span>
-                    `;
+                    card.className = 'p-3.5 bg-zinc-50/80 dark:bg-zinc-800/40 border border-zinc-200/60 dark:border-zinc-800 rounded-xl flex flex-col gap-1.5 overflow-hidden';
+                    
+                    if (isImage) {
+                        card.innerHTML = `
+                            <div class="flex items-center justify-between">
+                                <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">${k}</span>
+                                <span class="text-[9px] font-mono text-zinc-400">Digital Signature / Attachment</span>
+                            </div>
+                            <div class="p-2 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200/60 dark:border-zinc-700/60 flex items-center justify-center">
+                                <img src="${val}" alt="${k}" class="max-h-36 w-auto max-w-full object-contain" />
+                            </div>
+                        `;
+                    } else {
+                        const valText = displayVal !== undefined && displayVal !== null && displayVal !== '' ? String(displayVal) : '<span class="text-zinc-400 italic">Empty</span>';
+                        card.innerHTML = `
+                            <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">${k}</span>
+                            <div class="text-xs font-medium text-zinc-900 dark:text-zinc-100 leading-relaxed break-words whitespace-pre-wrap max-h-48 overflow-y-auto">${valText}</div>
+                        `;
+                    }
                     bodyContent.appendChild(card);
                 });
             }
         }
 
+        // Open inspector without overlay so background stays clear and unobstructed
         const inspector = document.getElementById('cora-entry-inspector');
         if (inspector) {
+            // Guarantee inspector is attached directly to document.body so it escapes all parent stacking contexts and scroll containers
+            if (inspector.parentElement !== document.body) {
+                document.body.appendChild(inspector);
+            }
+
+            const isMd = window.matchMedia('(min-width: 768px)').matches;
+            inspector.style.display = 'flex';
+            inspector.style.zIndex = '99999';
             inspector.classList.remove('hidden', 'pointer-events-none');
             inspector.classList.add('pointer-events-auto');
-            // Force redraw/reflow for transition
-            inspector.offsetHeight;
-            inspector.classList.remove('translate-x-full');
+
+            // Set base class list
+            inspector.className = 'fixed transition-transform duration-300 ease-out bg-white dark:bg-zinc-900 shadow-2xl border-zinc-200/80 dark:border-zinc-800 flex flex-col font-sans pointer-events-auto overflow-hidden';
+
+            if (isMd) {
+                inspector.style.top = '0px';
+                inspector.style.right = '0px';
+                inspector.style.bottom = '0px';
+                inspector.style.left = 'auto';
+                inspector.style.height = '100vh';
+                inspector.style.maxHeight = '100vh';
+                inspector.style.width = '480px';
+                inspector.style.maxWidth = '90vw';
+                inspector.classList.add('border-l', 'translate-x-full');
+            } else {
+                inspector.style.top = 'auto';
+                inspector.style.bottom = '0px';
+                inspector.style.left = '0px';
+                inspector.style.right = '0px';
+                inspector.style.width = '100%';
+                inspector.style.height = '85vh';
+                inspector.style.maxHeight = '85vh';
+                inspector.classList.add('rounded-t-3xl', 'border-t', 'translate-y-full');
+            }
+
+            // Force layout reflow then transition smoothly into view
+            requestAnimationFrame(() => {
+                if (isMd) {
+                    inspector.classList.remove('translate-x-full');
+                    inspector.classList.add('translate-x-0');
+                } else {
+                    inspector.classList.remove('translate-y-full');
+                    inspector.classList.add('translate-y-0');
+                }
+            });
         }
     };
 
     window.closeEntryInspector = function() {
         const inspector = document.getElementById('cora-entry-inspector');
+        const drawer = document.getElementById('cora-submissions-drawer');
+        const isDrawerOpen = drawer && !drawer.classList.contains('hidden') && !drawer.classList.contains('translate-y-full') && drawer.style.display !== 'none';
+        const isMd = window.matchMedia('(min-width: 768px)').matches;
+
         if (inspector) {
             inspector.classList.remove('pointer-events-auto');
-            inspector.classList.add('translate-x-full', 'pointer-events-none');
+            inspector.classList.add('pointer-events-none');
+            if (isMd) {
+                inspector.classList.remove('translate-x-0');
+                inspector.classList.add('translate-x-full');
+            } else {
+                inspector.classList.remove('translate-y-0');
+                inspector.classList.add('translate-y-full');
+            }
             setTimeout(() => {
                 inspector.classList.add('hidden');
+                inspector.style.display = 'none';
             }, 300);
         }
+
+        // If submissions drawer is not open, ensure backdrop is hidden
+        if (!isDrawerOpen) {
+            const backdrop = document.getElementById('cora-submissions-backdrop');
+            if (backdrop) {
+                backdrop.classList.remove('opacity-100', 'pointer-events-auto');
+                backdrop.classList.add('opacity-0', 'pointer-events-none');
+                setTimeout(() => {
+                    backdrop.classList.add('hidden');
+                    backdrop.style.display = 'none';
+                }, 300);
+            }
+        }
     };
+
+    // Close inspector on outside click (when clicking on background or outside inspector)
+    document.addEventListener('click', function(e) {
+        const inspector = document.getElementById('cora-entry-inspector');
+        if (inspector && inspector.style.display !== 'none' && !inspector.classList.contains('hidden')) {
+            // Check if click was outside the inspector and not on an inspector trigger
+            if (!inspector.contains(e.target) && !e.target.closest('.btn-inspect-workspace-entry, .workspace-entry-row, .workspace-entry-card, .btn-inspect-entry, #btn-inspector-delete, #btn-inspector-copy-json')) {
+                closeEntryInspector();
+            }
+        }
+    });
+
+    // Inspector copy JSON handler
+    jQuery(document).on('click', '#btn-inspector-copy-json', function(e) {
+        e.stopPropagation();
+        if (!currentInspectedSub) return;
+        const jsonStr = JSON.stringify(currentInspectedSub.submitted_data || {}, null, 2);
+        const fallbackCopy = (text) => {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            try {
+                document.execCommand('copy');
+                if (window.coraShowToast) window.coraShowToast('JSON payload copied to clipboard!', 'success');
+            } catch (err) {
+                if (window.coraShowToast) window.coraShowToast('Failed to copy JSON.', 'error');
+            }
+            document.body.removeChild(ta);
+        };
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(jsonStr).then(() => {
+                if (window.coraShowToast) window.coraShowToast('JSON payload copied to clipboard!', 'success');
+            }).catch(() => {
+                fallbackCopy(jsonStr);
+            });
+        } else {
+            fallbackCopy(jsonStr);
+        }
+    });
+
+    // Inspector delete entry handler
+    jQuery(document).on('click', '#btn-inspector-delete', function(e) {
+        e.stopPropagation();
+        if (!currentInspectedSub) return;
+        const subId = currentInspectedSub.id;
+        coraConfirmAction("Are you sure you want to delete this submission entry? This action cannot be undone.", function() {
+            jQuery.ajax({
+                url: getCoraRestUrl(`cora/v1/forms/submissions/${subId}`),
+                method: 'DELETE',
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-WP-Nonce', wpNonce);
+                },
+                success: function() {
+                    if (window.coraShowToast) window.coraShowToast('Entry deleted successfully.', 'success');
+                    allWorkspaceSubmissions = allWorkspaceSubmissions.filter(s => s.id != subId);
+                    currentSubmissionsList = currentSubmissionsList.filter(s => s.id != subId);
+                    renderAllEntriesTable();
+                    renderDrawerSubmissionsTable();
+                    const elTotal = document.getElementById('all-entries-metric-total');
+                    if (elTotal) elTotal.textContent = allWorkspaceSubmissions.length;
+                    const badgeEl = document.getElementById('tab-all-entries-badge');
+                    if (badgeEl) badgeEl.textContent = allWorkspaceSubmissions.length;
+                    const countEl = document.getElementById('drawer-responses-count');
+                    if (countEl) countEl.textContent = currentSubmissionsList.length + ' Entries';
+                    closeEntryInspector();
+                },
+                error: function() {
+                    if (window.coraShowToast) window.coraShowToast('Failed to delete entry.', 'error');
+                }
+            });
+        });
+    });
+
+    window.openFormLivePreviewModal = function(formId, formKey, formTitle) {
+        const backdrop = document.getElementById('cora-form-preview-backdrop');
+        const modal = document.getElementById('cora-form-preview-modal');
+        const titleEl = document.getElementById('preview-modal-form-title');
+        const keyEl = document.getElementById('preview-modal-form-key');
+        const linkEl = document.getElementById('preview-modal-open-link');
+        const iframe = document.getElementById('cora-form-preview-iframe');
+
+        let siteUrl = (typeof coraREData !== 'undefined' && coraREData.siteUrl) ? coraREData.siteUrl : window.location.origin;
+        if (siteUrl.endsWith('/')) siteUrl = siteUrl.slice(0, -1);
+        const targetUrl = siteUrl + '/shared-form/' + (formKey || formId);
+
+        if (titleEl) titleEl.textContent = formTitle || 'Form Preview';
+        if (keyEl) keyEl.textContent = formKey ? `#${formKey}` : `#${formId}`;
+        if (linkEl) linkEl.href = targetUrl;
+        if (iframe) iframe.src = targetUrl;
+
+        if (backdrop) {
+            backdrop.style.display = 'block';
+            backdrop.classList.remove('hidden', 'pointer-events-none');
+            requestAnimationFrame(() => {
+                backdrop.classList.remove('opacity-0');
+                backdrop.classList.add('opacity-100', 'pointer-events-auto');
+            });
+        }
+        if (modal) {
+            modal.style.display = 'flex';
+            modal.classList.remove('hidden', 'pointer-events-none');
+            requestAnimationFrame(() => {
+                modal.classList.remove('opacity-0', 'scale-95');
+                modal.classList.add('opacity-100', 'scale-100', 'pointer-events-auto');
+            });
+        }
+    };
+
+    window.closeFormLivePreviewModal = function() {
+        const backdrop = document.getElementById('cora-form-preview-backdrop');
+        const modal = document.getElementById('cora-form-preview-modal');
+        const iframe = document.getElementById('cora-form-preview-iframe');
+
+        if (modal) {
+            modal.classList.remove('opacity-100', 'scale-100', 'pointer-events-auto');
+            modal.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+        }
+        if (backdrop) {
+            backdrop.classList.remove('opacity-100', 'pointer-events-auto');
+            backdrop.classList.add('opacity-0', 'pointer-events-none');
+        }
+        setTimeout(() => {
+            if (modal) { modal.classList.add('hidden'); modal.style.display = 'none'; }
+            if (backdrop) { backdrop.classList.add('hidden'); backdrop.style.display = 'none'; }
+            if (iframe) iframe.src = 'about:blank';
+        }, 300);
+    };
+
+    // Preview device viewports toggle
+    jQuery(document).on('click', '#btn-preview-viewport-desktop', function() {
+        jQuery('#btn-preview-viewport-desktop').removeClass('text-zinc-500 dark:text-zinc-400 bg-transparent').addClass('bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white shadow-2xs font-bold');
+        jQuery('#btn-preview-viewport-mobile').removeClass('bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white shadow-2xs font-bold').addClass('text-zinc-500 dark:text-zinc-400 bg-transparent font-medium');
+        const iframe = document.getElementById('cora-form-preview-iframe');
+        if (iframe) {
+            iframe.style.maxWidth = '100%';
+            iframe.style.width = '100%';
+        }
+    });
+
+    jQuery(document).on('click', '#btn-preview-viewport-mobile', function() {
+        jQuery('#btn-preview-viewport-mobile').removeClass('text-zinc-500 dark:text-zinc-400 bg-transparent').addClass('bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white shadow-2xs font-bold');
+        jQuery('#btn-preview-viewport-desktop').removeClass('bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white shadow-2xs font-bold').addClass('text-zinc-500 dark:text-zinc-400 bg-transparent font-medium');
+        const iframe = document.getElementById('cora-form-preview-iframe');
+        if (iframe) {
+            iframe.style.maxWidth = '390px';
+            iframe.style.width = '390px';
+        }
+    });
 
 function getSelectedFormIds() {
     const ids = [];
@@ -4020,83 +4607,82 @@ let currentFormFilter = 'all';
             const statusText = (form.status || 'draft').toUpperCase();
 
             const card = document.createElement('div');
-            card.className = 'form-card bg-white border border-zinc-200/80 rounded-xl p-5 flex flex-col gap-4 shadow-sm hover:shadow-md hover:border-zinc-300 transition-all group';
+            card.className = 'form-card bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl p-5 sm:p-6 flex flex-col justify-between gap-4.5 shadow-2xs hover:shadow-md hover:border-zinc-300 dark:hover:border-zinc-700 transition-all group cursor-pointer';
             card.setAttribute('data-form-id', form.id);
             card.setAttribute('data-is-campaign', isCampaign ? '1' : '0');
             card.setAttribute('data-campaign-tag', campTag);
             card.setAttribute('data-title', form.title);
 
-            let siteUrl = (typeof coraREData !== 'undefined' && coraREData.siteUrl) ? coraREData.siteUrl : '';
+            let siteUrl = (typeof coraREData !== 'undefined' && coraREData.siteUrl) ? coraREData.siteUrl : window.location.origin;
             if (siteUrl.endsWith('/')) siteUrl = siteUrl.slice(0, -1);
             const crmDeepLink = `${siteUrl}/workspace/dashboard?page=leads&search=${encodeURIComponent(campTag)}`;
 
             card.innerHTML = `
                 <div class="flex items-start justify-between gap-3">
-                    <div class="flex items-center gap-2.5 min-w-0">
-                        <div class="w-9 h-9 rounded-lg ${isCampaign ? 'bg-zinc-950 text-white' : 'bg-zinc-100 text-zinc-500'} flex items-center justify-center shrink-0 shadow-2xs">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <div class="w-10 h-10 rounded-xl ${isCampaign ? 'bg-zinc-950 text-white dark:bg-white dark:text-zinc-950' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300'} flex items-center justify-center shrink-0 shadow-2xs">
                             ${isCampaign 
-                                ? '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>'
-                                : '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>'
+                                ? '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="2" r="2"></circle></svg>'
+                                : '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>'
                             }
                         </div>
                         <div class="min-w-0">
-                            <h4 class="text-[13px] font-semibold text-zinc-900 truncate leading-tight">${form.title}</h4>
-                            <p class="text-[10px] text-zinc-400 mt-0.5">${created}</p>
+                            <h4 class="text-[13.5px] font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-black dark:group-hover:text-white transition-colors truncate leading-snug card-title cursor-pointer" data-id="${form.id}">${form.title}</h4>
+                            <p class="text-[10.5px] text-zinc-400 dark:text-zinc-500 mt-0.5">${created}</p>
                         </div>
                     </div>
-                    <span class="px-2 py-0.5 rounded-full text-[9px] font-bold shrink-0 ${statusClass}">${statusText}</span>
+                    <span class="px-2.5 py-1 rounded-full text-[9px] font-bold shrink-0 uppercase tracking-wide ${statusClass}">${statusText}</span>
                 </div>
 
-                <!-- Campaign Classification Badge -->
-                <div class="flex items-center gap-2">
-                    ${isCampaign 
-                        ? `<div class="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-zinc-100/90 text-zinc-800 text-[10px] font-medium border border-zinc-200/80 w-full truncate">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
-                            <span class="font-bold text-zinc-950 truncate">🎯 ${campTag}</span>
-                            <span class="text-zinc-400 text-[9px]">→</span>
-                            <span class="text-zinc-600 font-medium text-[9.5px] truncate">${targetStage}</span>
-                        </div>`
-                        : `<div class="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-zinc-50 text-zinc-500 text-[10px] font-medium border border-zinc-200/60 w-full">
-                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400 shrink-0"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line></svg>
-                            <span>Standard Form (Vault Only)</span>
-                        </div>`
-                    }
-                </div>
-
-                <div class="flex items-center justify-between text-[11px] text-zinc-500 pt-1">
-                    <div class="flex items-center gap-1.5">
-                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>
-                        <span class="font-medium">${responses} response${responses !== 1 ? 's' : ''}</span>
+                <!-- Card Information Section with Generous Internal Padding -->
+                <div class="p-3.5 bg-zinc-50/80 dark:bg-zinc-800/40 rounded-xl border border-zinc-200/60 dark:border-zinc-800/80 flex flex-col gap-2.5">
+                    <div class="flex items-center gap-2">
+                        ${isCampaign 
+                            ? `<div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 text-[11px] font-medium border border-zinc-200/70 dark:border-zinc-700/80 w-full truncate">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
+                                <span class="font-bold text-zinc-950 dark:text-white truncate">🎯 ${campTag}</span>
+                                <span class="text-zinc-400 text-[9px]">→</span>
+                                <span class="text-zinc-600 dark:text-zinc-400 font-medium text-[10px] truncate">${targetStage}</span>
+                            </div>`
+                            : `<div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 text-[11px] font-medium border border-zinc-200/60 dark:border-zinc-800 w-full">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400 shrink-0"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line></svg>
+                                <span>Standard Form (Vault Only)</span>
+                            </div>`
+                        }
                     </div>
-                    ${isCampaign ? '<span class="text-[9.5px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60">Auto-CRM Sync</span>' : ''}
+
+                    <div class="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400 px-0.5">
+                        <div class="flex items-center gap-1.5 font-medium">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>
+                            <span>${responses} response${responses !== 1 ? 's' : ''}</span>
+                        </div>
+                        ${isCampaign ? '<span class="text-[9.5px] font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-full border border-emerald-200/60 dark:border-emerald-800">Auto-CRM Sync</span>' : ''}
+                    </div>
                 </div>
 
-                <div class="flex items-center gap-1.5 pt-3 border-t border-zinc-100">
-                    <button class="btn-edit-form hidden lg:flex h-8 flex-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white text-[11px] font-semibold items-center justify-center gap-1.5 transition-all cursor-pointer border-0 shadow-2xs" data-id="${form.id}" title="Edit Form in Customizer (Desktop)">
+                <!-- Card Action Buttons -->
+                <div class="flex items-center gap-1.5 pt-3 border-t border-zinc-100 dark:border-zinc-800/80">
+                    <button class="btn-edit-form h-8 flex-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-900 text-[11px] font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer border-0 shadow-2xs" data-id="${form.id}" title="Edit Form in Customizer">
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                        Edit
+                        <span>Edit</span>
                     </button>
-                    <button class="btn-edit-ai-mobile lg:hidden h-8 flex-1 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 text-[11px] font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer border-0" data-id="${form.id}" title="Edit Form with AI">
-                        <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><path d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/></svg>
-                        Edit with AI
-                    </button>
-                    <button class="btn-view-subs h-8 px-3 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700 hover:text-zinc-950 text-[11px] font-medium flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-2xs" data-id="${form.id}" title="View Submissions">
+                    <button class="btn-view-subs h-8 px-3 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 text-[11px] font-medium flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-2xs" data-id="${form.id}" title="View Submissions">
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="1.8" fill="none"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>
-                        Entries
+                        <span>Entries</span>
                     </button>
                     ${isCampaign ? `
-                        <a href="${crmDeepLink}" class="btn-view-crm-leads h-8 px-2.5 rounded-lg border border-zinc-900 bg-zinc-900 hover:bg-zinc-800 text-white text-[11px] font-semibold flex items-center justify-center gap-1 transition-all no-underline shadow-2xs" title="View Leads in CRM Kanban">
+                        <a href="${crmDeepLink}" class="btn-view-crm-leads h-8 px-2.5 rounded-lg border border-zinc-900 dark:border-zinc-700 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-white text-[11px] font-semibold flex items-center justify-center gap-1 transition-all no-underline shadow-2xs" title="View Leads in CRM Kanban">
                             <span>Leads</span>
                             <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M7 17l9.2-9.2M17 17V8H8"/></svg>
                         </a>` : ''
                     }
-                    <button class="btn-view-live h-8 w-8 rounded-lg bg-transparent hover:bg-zinc-100 text-zinc-400 hover:text-zinc-900 flex items-center justify-center transition-all cursor-pointer shrink-0 border-0" data-id="${form.id}" title="View Live Form">
+                    <button class="btn-view-live h-8 w-8 rounded-lg bg-transparent hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-400 hover:text-zinc-900 dark:hover:text-white flex items-center justify-center transition-all cursor-pointer shrink-0 border-0" data-id="${form.id}" title="Live Preview">
                         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                     </button>
-                    <button class="btn-share-form h-8 w-8 rounded-lg bg-transparent hover:bg-zinc-100 text-zinc-400 hover:text-zinc-900 flex items-center justify-center transition-all cursor-pointer shrink-0 border-0" data-id="${form.id}" title="Copy Share Link">
+                    <button class="btn-share-form h-8 w-8 rounded-lg bg-transparent hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-400 hover:text-zinc-900 dark:hover:text-white flex items-center justify-center transition-all cursor-pointer shrink-0 border-0" data-id="${form.id}" title="Copy Share Link">
                         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
                     </button>
-                    <button class="btn-delete-form h-8 w-8 rounded-lg bg-transparent hover:bg-red-50 text-zinc-400 hover:text-red-600 flex items-center justify-center transition-all cursor-pointer shrink-0 border-0" data-id="${form.id}" title="Delete Form">
+                    <button class="btn-delete-form h-8 w-8 rounded-lg bg-transparent hover:bg-red-50 dark:hover:bg-red-950/40 text-zinc-400 hover:text-red-600 flex items-center justify-center transition-all cursor-pointer shrink-0 border-0" data-id="${form.id}" title="Delete Form">
                         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
                     </button>
                 </div>
@@ -4105,7 +4691,8 @@ let currentFormFilter = 'all';
         });
 
         // Attach action listeners
-        jQuery('.btn-edit-ai-mobile').on('click', function() {
+        jQuery('.btn-edit-ai-mobile').off('click').on('click', function(e) {
+            e.stopPropagation();
             const id = jQuery(this).data('id');
             const formObj = (formsData || []).find(f => f.id == id);
             const title = (formObj && formObj.title) ? formObj.title : 'Form #' + id;
@@ -4113,16 +4700,24 @@ let currentFormFilter = 'all';
                 window.coraPromptFormAI(id, title);
             }
         });
-        jQuery('.btn-view-live').on('click', function() {
+
+        jQuery('.btn-view-live').off('click').on('click', function(e) {
+            e.stopPropagation();
             const id = jQuery(this).data('id');
             const formObj = (formsData || []).find(f => f.id == id);
             const key = (formObj && formObj.form_key) ? formObj.form_key : id;
-            let siteUrl = coraREData.siteUrl || '';
-            if (siteUrl.endsWith('/')) siteUrl = siteUrl.slice(0, -1);
-            window.open(siteUrl + '/shared-form/' + key, '_blank');
+            const title = (formObj && formObj.title) ? formObj.title : 'Form Preview';
+            if (typeof openFormLivePreviewModal === 'function') {
+                openFormLivePreviewModal(id, key, title);
+            } else {
+                let siteUrl = (typeof coraREData !== 'undefined' && coraREData.siteUrl) ? coraREData.siteUrl : window.location.origin;
+                if (siteUrl.endsWith('/')) siteUrl = siteUrl.slice(0, -1);
+                window.open(siteUrl + '/shared-form/' + key, '_blank');
+            }
         });
 
-        jQuery('.btn-share-form').on('click', function() {
+        jQuery('.btn-share-form').off('click').on('click', function(e) {
+            e.stopPropagation();
             const id = jQuery(this).data('id');
             const formObj = (formsData || []).find(f => f.id == id);
             if (formObj) {
@@ -4130,16 +4725,10 @@ let currentFormFilter = 'all';
             }
         });
 
-        jQuery('.btn-edit-form').on('click', function() {
+        jQuery('.btn-edit-form').off('click').on('click', function(e) {
+            e.stopPropagation();
             const id = jQuery(this).data('id');
-            if (window.innerWidth < 1024) {
-                const formObj = (formsData || []).find(f => f.id == id);
-                const title = (formObj && formObj.title) ? formObj.title : 'Form #' + id;
-                if (typeof window.coraPromptFormAI === 'function') {
-                    window.coraPromptFormAI(id, title);
-                }
-                return;
-            }
+            if (!id) return;
             const targetHash = '#edit/' + id;
             if (window.location.hash === targetHash) {
                 loadFormIntoEditor(id);
@@ -4148,18 +4737,40 @@ let currentFormFilter = 'all';
             }
         });
 
-        jQuery('.btn-view-subs').on('click', function() {
+        jQuery('.btn-view-subs').off('click').on('click', function(e) {
+            e.stopPropagation();
             const id = jQuery(this).data('id');
             openSubmissionsDrawer(id);
         });
 
-        jQuery('.btn-delete-form').on('click', function() {
+        jQuery('.btn-delete-form').off('click').on('click', function(e) {
+            e.stopPropagation();
             const id = jQuery(this).data('id');
             coraConfirmAction("Are you sure you want to delete this form and all responses? This action is permanent.", function() {
                 deleteForm(id);
             });
         });
     }
+
+    // Delegated card click: clicking anywhere on card container opens the editor/form
+    jQuery(document).off('click', '.form-card').on('click', '.form-card', function(e) {
+        if (e.target.closest('button, a, input, select, .btn-no-bubble')) {
+            return;
+        }
+        const formId = jQuery(this).data('form-id');
+        if (formId) {
+            window.location.hash = '#edit/' + formId;
+        }
+    });
+
+    // Delegated card title click
+    jQuery(document).off('click', '.card-title').on('click', '.card-title', function(e) {
+        e.stopPropagation();
+        const id = jQuery(this).data('id') || jQuery(this).closest('.form-card').data('form-id');
+        if (id) {
+            window.location.hash = '#edit/' + id;
+        }
+    });
 
     // Filter toolbar toggle clicks
     jQuery(document).on('click', '.forms-filter-btn', function() {
@@ -4191,27 +4802,474 @@ let currentFormFilter = 'all';
         }
     });
 
+    // ==========================================
+    // ALL WORKSPACE ENTRIES / SUBMISSIONS ENGINE
+    // ==========================================
+    let allWorkspaceSubmissions = [];
+    let allEntriesFilterFormId = 'all';
+    let allEntriesFilterStatus = 'all';
+    let allEntriesSearchQuery = '';
+    let allEntriesIsLoading = false;
+
+    function formatValueForSummary(val) {
+        if (val === undefined || val === null) return '';
+        if (typeof val === 'string') {
+            if (val.startsWith('data:image/') || val.startsWith('data:application/')) {
+                return '[Uploaded File / Signature]';
+            }
+            if (val.length > 40) {
+                return val.slice(0, 37) + '...';
+            }
+            return val;
+        }
+        if (typeof val === 'object') {
+            return '[Object]';
+        }
+        return String(val);
+    }
+
+    function getSubmitterSummary(sub) {
+        if (!sub) return { name: 'Anonymous Submitter', email: '', phone: '', snippet: '' };
+        let data = sub.submitted_data;
+        if (typeof data === 'string') {
+            try { data = JSON.parse(data); } catch(e) { data = {}; }
+        }
+        if (!data || typeof data !== 'object') {
+            return { name: 'Anonymous Submitter', email: '', phone: '', snippet: '' };
+        }
+        
+        let name = data.full_name || data.name || data.client_name || data.first_name || data.contact_name || '';
+        if (data.first_name && data.last_name) {
+            name = data.first_name + ' ' + data.last_name;
+        }
+        let email = data.email || data.client_email || data.contact_email || data.user_email || '';
+        let phone = data.phone || data.mobile || data.contact_number || data.phone_number || data.whatsapp || '';
+        
+        let snippet = '';
+        const keys = Object.keys(data);
+        if (!name && !email && !phone && keys.length > 0) {
+            snippet = keys.slice(0, 2).map(k => `${k}: ${formatValueForSummary(data[k])}`).join(' • ');
+        }
+        
+        // Clean name if it accidentally captured a raw signature or base64 blob
+        if (typeof name === 'string') {
+            if (name.startsWith('data:image/') || name.length > 60) {
+                name = 'Response Data';
+            }
+        }
+        
+        return {
+            name: name || (email ? email.split('@')[0] : (keys.length > 0 ? (snippet || 'Response Data') : 'Anonymous Submitter')),
+            email: typeof email === 'string' && email.length < 100 ? email : '',
+            phone: typeof phone === 'string' && phone.length < 50 ? phone : '',
+            snippet: snippet
+        };
+    }
+
+    function loadAllWorkspaceSubmissions(forceRefresh) {
+        if (allEntriesIsLoading && !forceRefresh) return;
+        allEntriesIsLoading = true;
+
+        const loadingEl = document.getElementById('all-entries-loading');
+        const tableWrapper = document.getElementById('all-entries-table-wrapper');
+        const emptyEl = document.getElementById('all-entries-empty');
+        const refreshSpinner = document.getElementById('refresh-entries-spinner');
+
+        if (refreshSpinner) refreshSpinner.classList.add('animate-spin');
+        if (!allWorkspaceSubmissions.length || forceRefresh) {
+            if (loadingEl) loadingEl.classList.remove('hidden');
+            if (tableWrapper) tableWrapper.classList.add('hidden');
+            if (emptyEl) emptyEl.classList.add('hidden');
+        }
+
+        jQuery.ajax({
+            url: getCoraRestUrl('cora/v1/forms/submissions'),
+            method: 'GET',
+            cache: false,
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-WP-Nonce', wpNonce);
+            },
+            success: function(submissions) {
+                allEntriesIsLoading = false;
+                if (refreshSpinner) refreshSpinner.classList.remove('animate-spin');
+                if (loadingEl) loadingEl.classList.add('hidden');
+
+                allWorkspaceSubmissions = Array.isArray(submissions) ? submissions : [];
+
+                // Update Metric Summary
+                const total = allWorkspaceSubmissions.length;
+                const elTotal = document.getElementById('all-entries-metric-total');
+                if (elTotal) elTotal.textContent = total;
+
+                // Unique forms represented
+                const formsSet = new Set(allWorkspaceSubmissions.map(s => s.form_id).filter(Boolean));
+                const elForms = document.getElementById('all-entries-metric-forms');
+                if (elForms) elForms.textContent = formsSet.size || (formsData || []).length || 0;
+
+                // Completion rate
+                const completedCount = allWorkspaceSubmissions.filter(s => s.is_partial != '1').length;
+                const rate = total > 0 ? Math.round((completedCount / total) * 100) : 100;
+                const elRate = document.getElementById('all-entries-metric-completion');
+                if (elRate) elRate.textContent = rate + '%';
+
+                // Latest Activity
+                const elLatest = document.getElementById('all-entries-metric-latest');
+                if (elLatest) {
+                    if (total > 0 && allWorkspaceSubmissions[0].created_at) {
+                        const rawDate = allWorkspaceSubmissions[0].created_at;
+                        elLatest.textContent = formatSubmissionDateTime(rawDate, 'metric');
+                        elLatest.setAttribute('title', `${getLocalIsoTimestamp(rawDate)} (Local Time)`);
+                    } else {
+                        elLatest.textContent = 'No submissions yet';
+                    }
+                }
+
+                // Update header badge
+                const badgeEl = document.getElementById('tab-all-entries-badge');
+                if (badgeEl) {
+                    badgeEl.textContent = total;
+                }
+
+                // Sync Form Filter options
+                syncAllEntriesFormFilterOptions();
+
+                // Render table
+                renderAllEntriesTable();
+            },
+            error: function(err) {
+                allEntriesIsLoading = false;
+                if (refreshSpinner) refreshSpinner.classList.remove('animate-spin');
+                if (loadingEl) loadingEl.classList.add('hidden');
+                if (window.coraShowToast) window.coraShowToast('Failed to load workspace submissions.', 'error');
+                renderAllEntriesTable();
+            }
+        });
+    }
+
+    function syncAllEntriesFormFilterOptions() {
+        const select = document.getElementById('all-entries-form-filter');
+        if (!select) return;
+
+        const currentVal = select.value;
+        const formsMap = new Map();
+
+        (formsData || []).forEach(f => {
+            if (f && f.id) formsMap.set(String(f.id), f.title || `Form #${f.id}`);
+        });
+        allWorkspaceSubmissions.forEach(s => {
+            if (s && s.form_id && !formsMap.has(String(s.form_id))) {
+                formsMap.set(String(s.form_id), s.form_title || `Form #${s.form_id}`);
+            }
+        });
+
+        let optsHtml = `<option value="all">All Forms (${allWorkspaceSubmissions.length})</option>`;
+        formsMap.forEach((title, id) => {
+            const count = allWorkspaceSubmissions.filter(s => String(s.form_id) === String(id)).length;
+            const selected = (String(currentVal) === String(id)) ? 'selected' : '';
+            optsHtml += `<option value="${id}" ${selected}>${title} (${count})</option>`;
+        });
+
+        select.innerHTML = optsHtml;
+    }
+
+    function renderAllEntriesTable() {
+        const tbody = document.getElementById('all-entries-table-tbody');
+        const mobileCards = document.getElementById('all-entries-mobile-cards');
+        const tableWrapper = document.getElementById('all-entries-table-wrapper');
+        const emptyEl = document.getElementById('all-entries-empty');
+        const countIndicator = document.getElementById('all-entries-count-indicator');
+
+        if (!tbody || !mobileCards) return;
+
+        // Filter submissions
+        const filtered = allWorkspaceSubmissions.filter(sub => {
+            // Form filter
+            if (allEntriesFilterFormId !== 'all' && String(sub.form_id) !== String(allEntriesFilterFormId)) {
+                return false;
+            }
+
+            // Status filter
+            if (allEntriesFilterStatus === 'completed' && sub.is_partial == '1') return false;
+            if (allEntriesFilterStatus === 'partial' && sub.is_partial != '1') return false;
+
+            // Search Query
+            if (allEntriesSearchQuery) {
+                const summary = getSubmitterSummary(sub);
+                const formTitle = (sub.form_title || '').toLowerCase();
+                const ip = (sub.ip_address || '').toLowerCase();
+                const dataStr = (typeof sub.submitted_data === 'string' ? sub.submitted_data : JSON.stringify(sub.submitted_data || {})).toLowerCase();
+                const q = allEntriesSearchQuery.toLowerCase();
+                const dateTable = formatSubmissionDateTime(sub.created_at, 'table').toLowerCase();
+                const dateIso = getLocalIsoTimestamp(sub.created_at).toLowerCase();
+
+                const matches = formTitle.includes(q) ||
+                                summary.name.toLowerCase().includes(q) ||
+                                summary.email.toLowerCase().includes(q) ||
+                                summary.phone.toLowerCase().includes(q) ||
+                                summary.snippet.toLowerCase().includes(q) ||
+                                ip.includes(q) ||
+                                dataStr.includes(q) ||
+                                dateTable.includes(q) ||
+                                dateIso.includes(q) ||
+                                (sub.created_at || '').toLowerCase().includes(q) ||
+                                String(sub.id).includes(q);
+                if (!matches) return false;
+            }
+
+            return true;
+        });
+
+        if (countIndicator) {
+            countIndicator.textContent = `${filtered.length} of ${allWorkspaceSubmissions.length} entries`;
+        }
+
+        if (filtered.length === 0) {
+            if (tableWrapper) tableWrapper.classList.add('hidden');
+            if (emptyEl) emptyEl.classList.remove('hidden');
+            tbody.innerHTML = '';
+            mobileCards.innerHTML = '';
+            return;
+        }
+
+        if (emptyEl) emptyEl.classList.add('hidden');
+        if (tableWrapper) tableWrapper.classList.remove('hidden');
+
+        // Render Desktop Rows
+        let desktopHtml = '';
+        filtered.forEach((sub, idx) => {
+            const originalIdx = allWorkspaceSubmissions.indexOf(sub);
+            const entryNum = allWorkspaceSubmissions.length - (originalIdx !== -1 ? originalIdx : idx);
+            const summary = getSubmitterSummary(sub);
+            const isPartial = sub.is_partial == '1';
+            const badgeClass = isPartial 
+                ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-650 dark:text-zinc-300' 
+                : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400';
+            const badgeText = isPartial ? 'Partial' : 'Completed';
+            const formTitle = sub.form_title || (formsData && formsData.find(f => f.id == sub.form_id)?.title) || `Form #${sub.form_id}`;
+            const formattedDate = formatSubmissionDateTime(sub.created_at, 'table');
+            const localIso = getLocalIsoTimestamp(sub.created_at);
+
+            desktopHtml += `
+                <tr class="hover:bg-zinc-50/70 dark:hover:bg-zinc-800/40 transition-all cursor-pointer workspace-entry-row" data-sub-id="${sub.id}">
+                    <td class="px-3.5 py-3 font-semibold text-zinc-900 dark:text-zinc-100 whitespace-nowrap font-mono">#${entryNum}</td>
+                    <td class="px-3.5 py-3 truncate max-w-[200px]">
+                        <div class="flex items-center gap-2 truncate">
+                            <span class="w-2 h-2 rounded-full ${isPartial ? 'bg-zinc-400' : 'bg-emerald-500'} shrink-0"></span>
+                            <span class="font-semibold text-zinc-900 dark:text-zinc-100 truncate block" title="${formTitle}">${formTitle}</span>
+                        </div>
+                    </td>
+                    <td class="px-3.5 py-3 min-w-0 max-w-full">
+                        <div class="flex flex-col min-w-0 max-w-full truncate">
+                            <span class="font-semibold text-zinc-900 dark:text-zinc-100 truncate block">${summary.name}</span>
+                            ${summary.email ? `<span class="text-[11px] text-zinc-400 truncate block">${summary.email}</span>` : ''}
+                            ${summary.phone && !summary.email ? `<span class="text-[11px] text-zinc-400 truncate font-mono block">${summary.phone}</span>` : ''}
+                            ${summary.snippet && !summary.email && !summary.phone ? `<span class="text-[10px] text-zinc-400 truncate block">${summary.snippet}</span>` : ''}
+                        </div>
+                    </td>
+                    <td class="px-3.5 py-3 whitespace-nowrap">
+                        <span class="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${badgeClass}">${badgeText}</span>
+                    </td>
+                    <td class="px-3.5 py-3 text-zinc-600 dark:text-zinc-300 whitespace-nowrap text-xs truncate" title="${localIso} (Local Time)">
+                        <span class="font-medium">${formattedDate}</span>
+                    </td>
+                    <td class="px-3.5 py-3 text-zinc-500 dark:text-zinc-400 whitespace-nowrap font-mono text-[11px] truncate">${sub.ip_address || '—'}</td>
+                    <td class="px-3.5 py-3 text-right whitespace-nowrap">
+                        <div class="inline-flex items-center gap-1 justify-end">
+                            <button type="button" class="btn-inspect-workspace-entry h-7 px-2.5 rounded-lg border border-zinc-200/80 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 text-xs font-semibold hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-all cursor-pointer shadow-2xs" data-sub-id="${sub.id}" title="Inspect Submission">
+                                Inspect
+                            </button>
+                            <button type="button" class="btn-delete-workspace-entry h-7 w-7 rounded-lg text-zinc-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 transition-all flex items-center justify-center cursor-pointer border-0 bg-transparent" data-sub-id="${sub.id}" title="Delete Submission">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        });
+        tbody.innerHTML = desktopHtml;
+
+        // Render Mobile Cards
+        let mobileHtml = '';
+        filtered.forEach((sub, idx) => {
+            const originalIdx = allWorkspaceSubmissions.indexOf(sub);
+            const entryNum = allWorkspaceSubmissions.length - (originalIdx !== -1 ? originalIdx : idx);
+            const summary = getSubmitterSummary(sub);
+            const isPartial = sub.is_partial == '1';
+            const badgeClass = isPartial 
+                ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-650 dark:text-zinc-300' 
+                : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400';
+            const badgeText = isPartial ? 'Partial' : 'Completed';
+            const formTitle = sub.form_title || (formsData && formsData.find(f => f.id == sub.form_id)?.title) || `Form #${sub.form_id}`;
+
+            mobileHtml += `
+                <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-4 flex flex-col gap-3 shadow-2xs workspace-entry-card" data-sub-id="${sub.id}">
+                    <div class="flex items-start justify-between gap-2">
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-1.5">
+                                <span class="font-bold text-zinc-900 dark:text-zinc-100 text-xs">Entry #${entryNum}</span>
+                                <span class="text-zinc-300 dark:text-zinc-600">•</span>
+                                <span class="text-[11px] font-medium text-zinc-600 dark:text-zinc-300 truncate">${formTitle}</span>
+                            </div>
+                            <div class="mt-1">
+                                <div class="font-semibold text-xs text-zinc-900 dark:text-zinc-100 truncate">${summary.name}</div>
+                                ${summary.email ? `<div class="text-[10.5px] text-zinc-400 truncate">${summary.email}</div>` : ''}
+                            </div>
+                        </div>
+                        <span class="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase ${badgeClass} shrink-0">${badgeText}</span>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-2 border-t border-zinc-100 dark:border-zinc-800/80 text-[10.5px] text-zinc-400">
+                        <span class="text-zinc-500 dark:text-zinc-400 font-medium" title="${getLocalIsoTimestamp(sub.created_at)} (Local Time)">${formatSubmissionDateTime(sub.created_at, 'table')}</span>
+                        <div class="flex items-center gap-1.5">
+                            <button type="button" class="btn-inspect-workspace-entry h-7 px-2.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-semibold text-xs transition-all cursor-pointer" data-sub-id="${sub.id}">
+                                Inspect
+                            </button>
+                            <button type="button" class="btn-delete-workspace-entry h-7 w-7 rounded-lg text-zinc-400 hover:text-red-600 transition-all flex items-center justify-center cursor-pointer border-0 bg-transparent" data-sub-id="${sub.id}">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        mobileCards.innerHTML = mobileHtml;
+    }
+
+    function exportAllEntriesCsv() {
+        if (!allWorkspaceSubmissions || allWorkspaceSubmissions.length === 0) {
+            if (window.coraShowToast) window.coraShowToast('No submissions available to export.', 'info');
+            return;
+        }
+
+        const allFieldKeys = new Set();
+        allWorkspaceSubmissions.forEach(s => {
+            let d = s.submitted_data;
+            if (typeof d === 'string') {
+                try { d = JSON.parse(d); } catch(e) { d = {}; }
+            }
+            if (d && typeof d === 'object') {
+                Object.keys(d).forEach(k => allFieldKeys.add(k));
+            }
+        });
+        const fieldKeyArr = Array.from(allFieldKeys);
+
+        const headers = ['Entry ID', 'Form Title', 'Status', 'Submitted At', 'IP Address', ...fieldKeyArr];
+        const rows = [headers];
+
+        allWorkspaceSubmissions.forEach((sub, idx) => {
+            const entryId = `Entry #${allWorkspaceSubmissions.length - idx}`;
+            const formTitle = sub.form_title || `Form #${sub.form_id}`;
+            const status = sub.is_partial == '1' ? 'Partial' : 'Completed';
+            const submittedAt = getLocalIsoTimestamp(sub.created_at) || sub.created_at || '';
+            const ip = sub.ip_address || '';
+
+            let data = sub.submitted_data || {};
+            if (typeof data === 'string') {
+                try { data = JSON.parse(data); } catch(e) { data = {}; }
+            }
+
+            const fieldVals = fieldKeyArr.map(k => {
+                let v = data[k];
+                if (v === undefined || v === null) return '';
+                if (typeof v === 'object') return JSON.stringify(v);
+                return String(v).replace(/"/g, '""');
+            });
+
+            rows.push([entryId, formTitle, status, submittedAt, ip, ...fieldVals]);
+        });
+
+        const csvContent = "data:text/csv;charset=utf-8," + rows.map(r => r.map(c => `"${c}"`).join(",")).join("\n");
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `workspace_all_form_entries_${new Date().toISOString().slice(0,10)}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        if (window.coraShowToast) {
+            window.coraShowToast(`Exported ${allWorkspaceSubmissions.length} entries to CSV successfully.`, 'success');
+        }
+    }
+
+    // All Entries Toolbar listeners
+    jQuery(document).on('input', '#all-entries-search-input', function(e) {
+        allEntriesSearchQuery = (e.target.value || '').trim();
+        renderAllEntriesTable();
+    });
+
+    jQuery(document).on('change', '#all-entries-form-filter', function(e) {
+        allEntriesFilterFormId = e.target.value || 'all';
+        renderAllEntriesTable();
+    });
+
+    jQuery(document).on('change', '#all-entries-status-filter', function(e) {
+        allEntriesFilterStatus = e.target.value || 'all';
+        renderAllEntriesTable();
+    });
+
+    jQuery(document).on('click', '#btn-refresh-all-entries', function() {
+        loadAllWorkspaceSubmissions(true);
+    });
+
+    jQuery(document).on('click', '#btn-export-all-entries-csv', function() {
+        exportAllEntriesCsv();
+    });
+
+    // Delegated inspector triggers for All Entries table & cards
+    jQuery(document).on('click', '.btn-inspect-workspace-entry', function(e) {
+        e.stopPropagation();
+        const subId = jQuery(this).data('sub-id');
+        const sub = allWorkspaceSubmissions.find(s => s.id == subId);
+        if (sub) {
+            const idx = allWorkspaceSubmissions.indexOf(sub);
+            const entryNum = allWorkspaceSubmissions.length - idx;
+            openEntryInspector(sub, entryNum);
+        }
+    });
+
+    jQuery(document).on('click', '.workspace-entry-row, .workspace-entry-card', function(e) {
+        if (e.target.closest('button, a, input, select')) return;
+        const subId = jQuery(this).data('sub-id');
+        const sub = allWorkspaceSubmissions.find(s => s.id == subId);
+        if (sub) {
+            const idx = allWorkspaceSubmissions.indexOf(sub);
+            const entryNum = allWorkspaceSubmissions.length - idx;
+            openEntryInspector(sub, entryNum);
+        }
+    });
+
+    // Delegated delete entry from All Entries
+    jQuery(document).on('click', '.btn-delete-workspace-entry', function(e) {
+        e.stopPropagation();
+        const subId = jQuery(this).data('sub-id');
+        coraConfirmAction("Are you sure you want to delete this submission entry? This action cannot be undone.", function() {
+            jQuery.ajax({
+                url: getCoraRestUrl(`cora/v1/forms/submissions/${subId}`),
+                method: 'DELETE',
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-WP-Nonce', wpNonce);
+                },
+                success: function() {
+                    if (window.coraShowToast) window.coraShowToast('Entry deleted successfully.', 'success');
+                    allWorkspaceSubmissions = allWorkspaceSubmissions.filter(s => s.id != subId);
+                    renderAllEntriesTable();
+                    const elTotal = document.getElementById('all-entries-metric-total');
+                    if (elTotal) elTotal.textContent = allWorkspaceSubmissions.length;
+                    const badgeEl = document.getElementById('tab-all-entries-badge');
+                    if (badgeEl) badgeEl.textContent = allWorkspaceSubmissions.length;
+                },
+                error: function() {
+                    if (window.coraShowToast) window.coraShowToast('Failed to delete entry.', 'error');
+                }
+            });
+        });
+    });
+
     // --- Routing ---
     function handleRouting() {
         try {
             const hash = window.location.hash || '#list';
-
-            // Intercept mobile/tablet editor access (< 1024px) - AI Builder Mode
-            if (window.innerWidth < 1024 && (hash.startsWith('#edit/') || hash === '#new')) {
-                window.location.hash = '#list';
-                if (hash === '#new') {
-                    window.coraPromptFormAI('', 'Create a new Notion-style lead capture form for my workspace. Add recommended fields, multi-step flow, and conditional logic.');
-                } else {
-                    const id = hash.split('/')[1];
-                    const formObj = (Array.isArray(formsData) ? formsData : []).find(f => f && f.id == id);
-                    const title = formObj ? formObj.title : 'Form #' + id;
-                    window.coraPromptFormAI(id, title);
-                }
-                if (window.coraShowToast) {
-                    window.coraShowToast('Form AI Assistant activated for mobile & tablet mode.', 'info');
-                }
-                return;
-            }
 
             // Remove loading overlay if present when not editing
             if (!hash.startsWith('#edit/')) {
@@ -4227,6 +5285,7 @@ let currentFormFilter = 'all';
             const curClausesTabContent = document.getElementById('forms-clauses-tab-content');
             const curAuditTabContent = document.getElementById('forms-audit-tab-content');
             const curSettingsTabContent = document.getElementById('forms-settings-tab-content');
+            const curAllEntriesTabContent = document.getElementById('forms-all-entries-tab-content');
             
             if (curListState) { curListState.classList.add('hidden'); curListState.classList.remove('flex'); }
             if (curEditorState) { curEditorState.classList.add('hidden'); curEditorState.classList.remove('flex'); }
@@ -4236,6 +5295,7 @@ let currentFormFilter = 'all';
             if (curClausesTabContent) { curClausesTabContent.classList.add('hidden'); curClausesTabContent.classList.remove('flex'); }
             if (curAuditTabContent) { curAuditTabContent.classList.add('hidden'); curAuditTabContent.classList.remove('flex'); }
             if (curSettingsTabContent) { curSettingsTabContent.classList.add('hidden'); curSettingsTabContent.classList.remove('flex'); }
+            if (curAllEntriesTabContent) { curAllEntriesTabContent.classList.add('hidden'); curAllEntriesTabContent.classList.remove('flex'); }
             
             const activeTabKey = hash.replace('#', '') || 'list';
             document.querySelectorAll('#cora-forms-tabs .cora-sub-tab, .cora-sub-tabs-container .cora-sub-tab').forEach(t => {
@@ -4286,6 +5346,13 @@ let currentFormFilter = 'all';
                 if (curListState) { curListState.classList.remove('hidden'); curListState.classList.add('flex'); }
                 if (typeof loadFormsGlobalSettings === 'function') {
                     loadFormsGlobalSettings();
+                }
+            } else if (hash === '#all-entries' || hash === '#entries') {
+                document.body.classList.remove('cora-form-builder-active');
+                if (curAllEntriesTabContent) { curAllEntriesTabContent.classList.remove('hidden'); curAllEntriesTabContent.classList.add('flex'); }
+                if (curListState) { curListState.classList.remove('hidden'); curListState.classList.add('flex'); }
+                if (typeof loadAllWorkspaceSubmissions === 'function') {
+                    loadAllWorkspaceSubmissions();
                 }
             } else if (hash.startsWith('#edit/')) {
                 document.body.classList.add('cora-form-builder-active');
@@ -4638,20 +5705,6 @@ let currentFormFilter = 'all';
     }
 
     function loadFormIntoEditor(id) {
-        if (window.innerWidth < 1024) {
-            document.body.classList.remove('cora-form-builder-active');
-            const f = (Array.isArray(formsData) ? formsData : []).find(x => x && x.id == id);
-            const formTitle = f ? f.title : 'Form #' + id;
-            if (typeof window.coraPromptFormAI === 'function') {
-                window.coraPromptFormAI(id, formTitle);
-            } else if (window.coraShowToast) {
-                window.coraShowToast('Opening Form AI Assistant for ' + formTitle, 'info');
-            }
-            const overlay = document.getElementById('forms-loading-overlay');
-            if (overlay) overlay.remove();
-            return;
-        }
-
         jQuery.ajax({
             url: getCoraRestUrl(`cora/v1/forms/${id}`),
             method: 'GET',

@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.364
+ * Version:           4.9.374
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.364' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.374' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -5519,6 +5519,12 @@ add_action( 'rest_api_init', function () {
     register_rest_route( 'cora/v1', '/forms/submissions', array(
         'methods'             => 'GET',
         'callback'            => 'cora_rest_get_all_form_submissions',
+        'permission_callback' => 'cora_forms_rest_permission_check',
+    ) );
+
+    register_rest_route( 'cora/v1', '/forms/submissions/(?P<id>\d+)', array(
+        'methods'             => 'DELETE',
+        'callback'            => 'cora_rest_delete_form_submission',
         'permission_callback' => 'cora_forms_rest_permission_check',
     ) );
 
@@ -46491,6 +46497,9 @@ function cora_rest_get_form_submissions( $request ) {
     if ( is_array( $subs ) ) {
         foreach ( $subs as &$sub ) {
             $sub['submitted_data'] = json_decode( $sub['submitted_data'], true ) ?: array();
+            if ( ! empty( $sub['created_at'] ) ) {
+                $sub['created_at_iso'] = gmdate( 'Y-m-d\TH:i:s\Z', strtotime( $sub['created_at'] . ' UTC' ) );
+            }
         }
     } else {
         $subs = array();
@@ -46512,7 +46521,7 @@ function cora_rest_get_all_form_submissions( $request ) {
     if ( $user_agency !== 'super' ) {
         $agency_id = cora_db_get_agency_id();
         $subs = $wpdb->get_results( $wpdb->prepare(
-            "SELECT s.* 
+            "SELECT s.*, f.title as form_title, f.form_key, f.settings as form_settings
              FROM {$wpdb->prefix}cora_form_submissions s
              INNER JOIN {$wpdb->prefix}cora_forms f ON s.form_id = f.id
              WHERE f.agency_id = %d
@@ -46520,17 +46529,41 @@ function cora_rest_get_all_form_submissions( $request ) {
             $agency_id
         ), ARRAY_A );
     } else {
-        $subs = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}cora_form_submissions ORDER BY id DESC", ARRAY_A );
+        $subs = $wpdb->get_results(
+            "SELECT s.*, f.title as form_title, f.form_key, f.settings as form_settings
+             FROM {$wpdb->prefix}cora_form_submissions s
+             LEFT JOIN {$wpdb->prefix}cora_forms f ON s.form_id = f.id
+             ORDER BY s.id DESC",
+            ARRAY_A
+        );
     }
     
     if ( is_array( $subs ) ) {
         foreach ( $subs as &$sub ) {
             $sub['submitted_data'] = json_decode( $sub['submitted_data'], true ) ?: array();
+            if ( empty( $sub['form_title'] ) ) {
+                $sub['form_title'] = 'Form #' . $sub['form_id'];
+            }
+            if ( ! empty( $sub['created_at'] ) ) {
+                $sub['created_at_iso'] = gmdate( 'Y-m-d\TH:i:s\Z', strtotime( $sub['created_at'] . ' UTC' ) );
+            }
         }
     } else {
         $subs = array();
     }
     return rest_ensure_response( $subs );
+}
+}
+
+if ( ! function_exists( 'cora_rest_delete_form_submission' ) ) {
+function cora_rest_delete_form_submission( $request ) {
+    global $wpdb;
+    $id = intval( $request['id'] );
+    if ( ! $id ) {
+        return new WP_Error( 'invalid_id', 'Invalid submission ID', array( 'status' => 400 ) );
+    }
+    $wpdb->delete( $wpdb->prefix . 'cora_form_submissions', array( 'id' => $id ) );
+    return rest_ensure_response( array( 'success' => true, 'id' => $id ) );
 }
 }
 
@@ -46720,7 +46753,7 @@ function cora_rest_submit_form( $request ) {
             'submitted_data' => json_encode( $submitted_data ),
             'ip_address'     => $ip,
             'is_partial'     => $is_partial,
-            'created_at'     => current_time('mysql')
+            'created_at'     => current_time( 'mysql', true )
         )
     );
     $submission_id = $wpdb->insert_id;

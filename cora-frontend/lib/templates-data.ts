@@ -24,6 +24,10 @@ export interface TemplateItem {
   rating: number;
   reviewsCount: number;
   downloadsCount: number;
+  viewsCount?: number;
+  copiesCount?: number;
+  mediaType?: 'image' | 'video';
+  mediaUrl?: string;
   heroDescription: string;
   accentBg: string;
   accentBorder: string;
@@ -48,940 +52,4901 @@ export interface TemplateCategory {
 }
 
 export const TEMPLATE_CATEGORIES: TemplateCategory[] = [
-  { id: 'all', label: 'All Frontend Assets', shortLabel: 'All Assets', badge: '16+ ASSETS', count: 16 },
-  { id: 'landing_pages', label: 'Native Landing Pages', shortLabel: 'Landing Pages', badge: 'NATIVE TAILWIND', count: 4 },
-  { id: 'section_prompts', label: 'AI Section Prompts', shortLabel: 'AI Prompts', badge: 'CLAUDE & CURSOR', count: 4 },
-  { id: 'elementor_kits', label: 'Elementor Template Kits', shortLabel: 'Elementor Kits', badge: 'ELEMENTOR JSON', count: 4 },
-  { id: 'lovable_projects', label: 'Lovable & React Projects', shortLabel: 'Lovable Projects', badge: 'LOVABLE & V0', count: 4 },
+  {
+    "id": "all",
+    "label": "All HTML Assets",
+    "shortLabel": "All Assets",
+    "badge": "48+ ASSETS",
+    "count": 48
+  },
+  {
+    "id": "landing_pages",
+    "label": "Landing Pages",
+    "shortLabel": "Landing Pages",
+    "badge": "HTML + TAILWIND CDN",
+    "count": 13
+  },
+  {
+    "id": "section_prompts",
+    "label": "AI Section Prompts",
+    "shortLabel": "AI Prompts",
+    "badge": "STANDALONE HTML",
+    "count": 8
+  },
+  {
+    "id": "elementor_kits",
+    "label": "Design Styles & Themes",
+    "shortLabel": "Styles",
+    "badge": "HTML + TAILWIND CDN",
+    "count": 15
+  },
+  {
+    "id": "lovable_projects",
+    "label": "Interactive & Animations",
+    "shortLabel": "Animations",
+    "badge": "STANDALONE HTML",
+    "count": 12
+  }
 ];
 
 export const TEMPLATES_DATA: TemplateItem[] = [
-  // ── 1. NATIVE LANDING PAGES ──
   {
-    id: 'agency-flagship-landing',
-    slug: 'web-development-agency',
-    title: 'Modern Digital Agency Flagship Landing Page',
-    shortTitle: 'Agency Flagship',
-    tagline: 'High-converting interactive hero, dynamic pricing matrix, case study bento & slide-up booking sheet.',
-    category: 'landing_pages',
-    categoryLabel: 'Native Landing Pages',
-    assetFormat: 'native_page',
-    formatBadge: 'Native Tailwind / Next.js',
-    badge: 'Popular Page',
-    rating: 4.96,
-    reviewsCount: 142,
-    downloadsCount: 2840,
-    heroDescription: 'Production-ready monochromatic landing page built with pure Tailwind CSS and Next.js 15. Features sub-50ms paint times, accessible ARIA focus rings, responsive mobile sheets, and zero bloated JavaScript.',
-    accentBg: 'bg-zinc-100',
-    accentBorder: 'border-zinc-300',
-    accentText: 'text-zinc-950',
-    accentColor: '#18181B',
-    coverImage: '/images/cora_hero_landscape.jpg',
-    compatibleBuilders: ['Tailwind CSS', 'Next.js 15', 'React', 'Cursor AI', 'Claude 3.5', 'v0.dev'],
-    frameworkStack: ['Tailwind CSS v4', 'React 19', 'Framer Motion', 'Lucide Icons'],
-    quickCopyPrompt: 'Create a monochromatic modern agency landing page with an atmospheric hero, 3-column service bento grid, interactive 3-tier pricing matrix, client testimonial ticker, and a mobile bottom slide-up lead capture sheet.',
-    sectionsIncluded: [
-      {
-        id: 'hero-section',
-        name: 'Atmospheric Hero & Value Prop',
-        badge: 'Hero Section',
-        description: 'Clean typography header with dual action buttons and live client badge ribbon.',
-        promptText: `Create a clean, monochromatic SaaS/Agency hero section using Tailwind CSS.
-- Top status pill with subtle border and sparkling icon.
-- Headline: 4xl to 7xl font-display tracking tight with bold primary title and muted secondary line.
-- Subtitle: text-zinc-600 max-w-2xl mx-auto leading-relaxed.
-- CTA Row: Primary solid black button with arrow icon, and Secondary soft ghost button with live demo trigger.
-- Background: Soft atmospheric radial wash, no heavy outlines.`,
-        tailwindSnippet: `<section className="relative pt-32 pb-20 text-center px-4 max-w-5xl mx-auto">
-  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-zinc-100 border border-zinc-200 text-xs font-semibold text-zinc-800 mb-6">
-    <span>✦</span> 100% Turnkey Frontend Kit
-  </div>
-  <h1 className="text-5xl sm:text-7xl font-bold tracking-tight text-zinc-950 mb-6">
-    Build websites that close clients effortlessly.
-  </h1>
-  <p className="text-lg text-zinc-600 max-w-2xl mx-auto mb-8 leading-relaxed">
-    Complete monochromatic layouts, ready-to-paste AI section prompts, and native frontend kits.
-  </p>
-  <div className="flex items-center justify-center gap-3">
-    <button className="px-6 py-3 rounded-full bg-zinc-950 text-white font-bold text-sm hover:bg-zinc-800 transition-all">
-      Get Started Free
-    </button>
-    <button className="px-6 py-3 rounded-full bg-zinc-100 text-zinc-800 font-bold text-sm hover:bg-zinc-200 transition-all">
-      View Live Demo
-    </button>
-  </div>
-</section>`,
-      },
-      {
-        id: 'pricing-matrix',
-        name: 'Interactive 3-Tier Pricing Matrix',
-        badge: 'Pricing Section',
-        description: 'Monthly/Annual toggle with feature comparison checkboxes and highlight pills.',
-        promptText: `Build an interactive 3-tier pricing matrix in Tailwind CSS with an Annual 20% discount switch:
-- Three columns: Starter (₹0), Studio Pro (₹2,999/mo), Agency Scale (₹7,999/mo).
-- Center card highlighted with subtle zinc-100 background and 'Most Popular' floating badge.
-- Feature lists with thin emerald check icons.
-- Instant 1-click upgrade checkout buttons.`,
-        tailwindSnippet: `<div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto px-4">
-  <div className="p-6 rounded-3xl bg-white border border-zinc-200 shadow-sm">
-    <h3 className="font-bold text-lg text-zinc-950">Starter</h3>
-    <div className="text-3xl font-extrabold mt-2 mb-4">₹0<span className="text-xs text-zinc-500 font-normal">/mo</span></div>
-    <ul className="space-y-2 text-xs text-zinc-600 mb-6">
-      <li>✓ 1 Active Workspace</li>
-      <li>✓ Unlimited Invoicing</li>
-    </ul>
-    <button className="w-full py-2.5 rounded-xl bg-zinc-100 font-bold text-xs hover:bg-zinc-200">Start Free</button>
-  </div>
-</div>`,
-      },
-      {
-        id: 'bento-grid',
-        name: 'Feature Bento Showcase Grid',
-        badge: 'Bento Section',
-        description: 'Asymmetric 4-card grid showing metrics, mock UI cards, and capability badges.',
-        promptText: `Generate a 4-card asymmetric Bento grid with monochromatic surfaces:
-- Card 1 (Span 2 cols): Large interactive mockup showcase with clean typography.
-- Card 2: Performance metrics badge counter (sub-50ms speed).
-- Card 3: Security & compliance indicator.
-- Card 4: Multi-tenant client collaboration switcher.`,
-      },
-      {
-        id: 'lead-drawer',
-        name: 'Slide-Up Lead Capture Sheet',
-        badge: 'Lead Form',
-        description: 'Mobile-first bottom slide-up sheet with instant email validation and calendar picker.',
-        promptText: `Create a mobile-friendly bottom slide-up lead intake drawer in React and Tailwind:
-- Smooth translateY open animation with dark blurred backdrop.
-- Drag handle indicator at top.
-- Name, Email, Project Budget range pill selector, and Project Brief textarea.
-- Monochromatic primary submit button with loading spinner state.`,
-      },
+    "id": "tmpl-01",
+    "slug": "animated-landing-page-one-product-that-travels-the-whole-page",
+    "title": "Animated Landing Page: One Product That Travels the Whole Page",
+    "shortTitle": "Animated Landing Page",
+    "tagline": "Production-grade Animated Landing Page: One Product That Travels the Whole Page standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.",
+    "category": "landing_pages",
+    "categoryLabel": "Landing Page",
+    "assetFormat": "native_page",
+    "formatBadge": "HTML + TAILWIND CDN",
+    "badge": "HERO SYSTEM",
+    "rating": 4.93,
+    "reviewsCount": 234,
+    "downloadsCount": 1202,
+    "viewsCount": 3869,
+    "copiesCount": 567,
+    "mediaType": "image",
+    "mediaUrl": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/preview-artifacts/prompt-library/7d97ebb3-363d-49d3-a029-fa9a23815e3f/thumbnails/aa1509da-deb0-4bef-bc77-8e2ef1c33207.gif?width=600&quality=75&resize=contain",
+    "heroDescription": "Build and preview Animated Landing Page: One Product That Travels the Whole Page instantly. Engineered as a complete standalone HTML document using Tailwind CSS via CDN (`<script src=\"https://cdn.tailwindcss.com\"></script>`), pure CSS/vanilla JS interactions, and zero build tool bloat. Perfect for Cursor AI, Claude 3.5 Sonnet, and direct browser execution.",
+    "accentBg": "bg-zinc-950",
+    "accentBorder": "border-zinc-800",
+    "accentText": "text-zinc-100",
+    "accentColor": "#09090b",
+    "coverImage": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/preview-artifacts/prompt-library/7d97ebb3-363d-49d3-a029-fa9a23815e3f/thumbnails/aa1509da-deb0-4bef-bc77-8e2ef1c33207.gif?width=600&quality=75&resize=contain",
+    "compatibleBuilders": [
+      "HTML5 Standalone",
+      "Tailwind CSS CDN",
+      "Claude 3.5 Sonnet",
+      "Cursor AI",
+      "v0",
+      "Lovable"
     ],
-    features: [
-      'Pure Tailwind CSS & Next.js 15 App Router codebase',
-      'Instant responsive desktop, tablet, and mobile layouts',
-      'Zero layout shift (CLS 0.00) & Sub-50ms static hydration',
-      'Dark and light monochromatic theme tokens included',
-      'WCAG AAA accessible focus states & keyboard navigation',
-      'Pre-built copy prompts for instant Claude & Cursor iteration',
-    ],
-    toolsReplaced: [
-      { name: 'Webflow Workspace', monthlyCostUSD: 39 },
-      { name: 'ThemeForest Premium Theme', monthlyCostUSD: 19 },
-      { name: 'Formspree Pro Form Backend', monthlyCostUSD: 15 },
-    ],
-    faqs: [
+    "sectionsIncluded": [
       {
-        question: 'How do I install this native landing page?',
-        answer: 'You can copy the raw React/Tailwind component code directly into your Next.js project, or download the ZIP asset pack and run npm install & npm run dev.',
+        "id": "sec-1-1",
+        "name": "Focal Layout Architecture",
+        "badge": "HTML5 HERO",
+        "description": "Main hero structure and typography for Animated Landing Page: One Product That Travels the Whole Page.",
+        "promptText": "Generate a standalone HTML5 hero section for \"Animated Landing Page: One Product That Travels the Whole Page\" using Tailwind CSS via CDN. Output pure HTML with class=\"...\", zero JSX or TSX.",
+        "tailwindSnippet": "<!-- 1. Focal Layout for Animated Landing Page: One Product That Travels the Whole Page (HTML + Tailwind CDN) -->\n<section class=\"relative overflow-hidden py-16 sm:py-24 bg-zinc-950 text-zinc-100 antialiased font-sans\">\n  <div class=\"max-w-7xl mx-auto px-6 lg:px-8\">\n    <div class=\"text-center max-w-3xl mx-auto\">\n      <span class=\"inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-900 border border-zinc-800 text-zinc-300\">\n        <i data-lucide=\"sparkles\" class=\"w-3.5 h-3.5 text-zinc-400\"></i>\n        <span>LANDING PAGE</span>\n      </span>\n      <h1 class=\"mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-display\">\n        Animated Landing Page: One Product That Travels the Whole Page\n      </h1>\n      <p class=\"mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed\">\n        Production-grade Animated Landing Page: One Product That Travels the Whole Page standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.\n      </p>\n    </div>\n  </div>\n</section>"
       },
       {
-        question: 'Can I edit the copy and layout with AI?',
-        answer: 'Yes! Every section includes a prompt specifically engineered for Claude 3.5 Sonnet, Cursor AI, and v0. Just copy the prompt, modify your requirements, and paste.',
+        "id": "sec-1-2",
+        "name": "Interactive Feature Matrix",
+        "badge": "HTML5 GRID",
+        "description": "Responsive 3-column card grid with hover transitions and Lucide icons.",
+        "promptText": "Build a pure HTML5 3-column feature grid for \"Animated Landing Page: One Product That Travels the Whole Page\" with Tailwind CDN utility classes and Lucide icons.",
+        "tailwindSnippet": "<!-- 2. Interactive Feature Matrix (HTML + Tailwind CDN) -->\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-6 py-12\">\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"zap\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Zero Build Lag</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Runs instantly in any browser via Tailwind CSS CDN script.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"layers\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Pure HTML & CSS</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Zero JSX or Node.js runtime required. Copy, paste and deploy.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"sparkles\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Micro-Interactions</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Smooth hover elevations and accessible keyboard focus outlines.</p>\n  </div>\n</div>"
       },
+      {
+        "id": "sec-1-3",
+        "name": "Action & Conversion Trigger",
+        "badge": "HTML5 CTA",
+        "description": "Stand-alone call-to-action block with high-contrast buttons.",
+        "promptText": "Create an instant HTML5 CTA conversion block for \"Animated Landing Page: One Product That Travels the Whole Page\" with pure Tailwind CSS CDN classes.",
+        "tailwindSnippet": "<!-- 3. Conversion Trigger Action (HTML + Tailwind CDN) -->\n<div class=\"max-w-2xl mx-auto px-6 py-8 text-center\">\n  <div class=\"rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8\">\n    <h3 class=\"text-lg font-bold text-white mb-2\">Experience Animated Landing Page</h3>\n    <p class=\"text-xs text-zinc-400 mb-6\">Open the standalone HTML template in your browser or paste into your project.</p>\n    <div class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-zinc-950 text-xs font-semibold hover:bg-zinc-100 transition-all\">\n        Launch Template\n      </button>\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold hover:bg-zinc-700 transition-all\">\n        Copy HTML Code\n      </button>\n    </div>\n  </div>\n</div>"
+      }
     ],
+    "features": [
+      "100% Pure Standalone HTML5 + Tailwind CSS via CDN",
+      "Zero JSX, TSX, React, or npm dependencies required",
+      "Double-click to preview instantly in any browser",
+      "1-Click AI Master Prompt optimized for Cursor & Claude"
+    ],
+    "toolsReplaced": [
+      {
+        "name": "UI Component Subscriptions",
+        "monthlyCostUSD": 29
+      },
+      {
+        "name": "Custom Animation Design",
+        "monthlyCostUSD": 99
+      },
+      {
+        "name": "Design Token Kits",
+        "monthlyCostUSD": 49
+      }
+    ],
+    "frameworkStack": [
+      "HTML5",
+      "Tailwind CSS (CDN)",
+      "Vanilla JS / Alpine.js",
+      "Lucide Icons (CDN)",
+      "GSAP (CDN)"
+    ],
+    "quickCopyPrompt": "You are an expert Frontend Engineer. Build a complete, production-ready, standalone HTML5 template for \"Animated Landing Page: One Product That Travels the Whole Page\".\n\n### CRITICAL OUTPUT FORMAT REQUIREMENTS:\n- **Output ONLY single-file standard HTML (`<!DOCTYPE html> ... </html>`)**.\n- **STRICT PROHIBITION**: Do NOT output JSX, TSX, React components, Next.js code, or npm import statements. Everything must be pure HTML + CSS + JS in one file.\n- **Tailwind CSS via CDN**: Include `<script src=\"https://cdn.tailwindcss.com\"></script>` in `<head>`.\n- **Icons**: Load Lucide Icons via CDN `<script src=\"https://unpkg.com/lucide@latest\"></script>` and initialize with `<script>lucide.createIcons();</script>`.\n- **Fonts**: Load Google Fonts `Inter` and `JetBrains Mono`.\n- **Interactive Animations**: Use vanilla JavaScript or GSAP via CDN (`<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js\"></script>`) embedded inside `<script>` tags at the bottom.\n\n### Component & Design Specifications:\n1. **Design System & Palette**:\n   - Monochromatic Notion/Shopify aesthetic (neutral zinc-900 / zinc-950 dark, zinc-50 / pure white light).\n   - High precision typography with crisp contrast, clean borders (`border-zinc-200` / `border-zinc-800`), and soft shadows.\n2. **Component Architecture for \"Animated Landing Page: One Product That Travels the Whole Page\"**:\n   - Master layout container with mobile, tablet, and desktop responsiveness.\n   - Micro-interactions on buttons, hover states, and smooth spring-like transitions.\n3. **Stand-Alone Portability**:\n   - Must open directly and render flawlessly by double clicking the `.html` file in any web browser.\n\nComponent: Animated Landing Page: One Product That Travels the Whole Page\nCategory: Landing Page",
+    "faqs": [
+      {
+        "question": "What is the output format of this prompt?",
+        "answer": "All prompts produce standard, single-file HTML5 templates styled with Tailwind CSS via CDN (<script src=\"https://cdn.tailwindcss.com\"></script>). No JSX, React, or build setups required."
+      },
+      {
+        "question": "How do I run and test the output HTML?",
+        "answer": "Copy the AI output, save it into a file named index.html, and double-click to open it in Chrome, Safari, or Firefox. It renders instantly without compiling."
+      },
+      {
+        "question": "Can I paste this HTML into WordPress, Webflow, or custom sites?",
+        "answer": "Yes! Because the template outputs standard HTML and loads Tailwind CSS via CDN, you can paste it directly into HTML embed blocks or standalone static sites."
+      }
+    ]
   },
   {
-    id: 'studio-creative-portfolio',
-    slug: 'creative-design-studio',
-    title: 'Minimalist Creative Studio & Portfolio',
-    shortTitle: 'Creative Portfolio',
-    tagline: 'Horizontal project scroll, full-bleed media case studies, interactive client review vault.',
-    category: 'landing_pages',
-    categoryLabel: 'Native Landing Pages',
-    assetFormat: 'native_page',
-    formatBadge: 'Native Tailwind / Next.js',
-    badge: 'Design Favorite',
-    rating: 4.98,
-    reviewsCount: 118,
-    downloadsCount: 2150,
-    heroDescription: 'A high-aesthetic, editorial-inspired portfolio template tailored for branding agencies, UI/UX designers, and creative directors. Featuring smooth horizontal work galleries and minimal case study layouts.',
-    accentBg: 'bg-zinc-100',
-    accentBorder: 'border-zinc-300',
-    accentText: 'text-zinc-950',
-    accentColor: '#18181B',
-    coverImage: '/images/cora_hero_landscape.jpg',
-    compatibleBuilders: ['Tailwind CSS', 'Next.js', 'React', 'Cursor AI', 'Claude 3.5', 'v0.dev'],
-    frameworkStack: ['Tailwind CSS', 'Framer Motion', 'React 19'],
-    quickCopyPrompt: 'Design a high-fashion minimalist design studio portfolio with large editorial typography, masonry case study grid, video player placeholders, and clean project drawer overlays.',
-    sectionsIncluded: [
+    "id": "tmpl-02",
+    "slug": "animated-landing-page-portal-hero-that-parts-to-uncover-a-full-bleed-image",
+    "title": "Animated Landing Page: Portal Hero That Parts to Uncover a Full Bleed Image",
+    "shortTitle": "Animated Landing Page",
+    "tagline": "Production-grade Animated Landing Page: Portal Hero That Parts to Uncover a Full Bleed Image standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.",
+    "category": "landing_pages",
+    "categoryLabel": "Landing Page",
+    "assetFormat": "native_page",
+    "formatBadge": "HTML + TAILWIND CDN",
+    "badge": "HERO SYSTEM",
+    "rating": 4.96,
+    "reviewsCount": 71,
+    "downloadsCount": 4116,
+    "viewsCount": 2164,
+    "copiesCount": 581,
+    "mediaType": "image",
+    "mediaUrl": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/preview-artifacts/prompt-library/7d97ebb3-363d-49d3-a029-fa9a23815e3f/thumbnails/71af9b15-0596-4b08-b997-69920ca62cd3.gif?width=600&quality=75&resize=contain",
+    "heroDescription": "Build and preview Animated Landing Page: Portal Hero That Parts to Uncover a Full Bleed Image instantly. Engineered as a complete standalone HTML document using Tailwind CSS via CDN (`<script src=\"https://cdn.tailwindcss.com\"></script>`), pure CSS/vanilla JS interactions, and zero build tool bloat. Perfect for Cursor AI, Claude 3.5 Sonnet, and direct browser execution.",
+    "accentBg": "bg-zinc-950",
+    "accentBorder": "border-zinc-800",
+    "accentText": "text-zinc-100",
+    "accentColor": "#09090b",
+    "coverImage": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/preview-artifacts/prompt-library/7d97ebb3-363d-49d3-a029-fa9a23815e3f/thumbnails/71af9b15-0596-4b08-b997-69920ca62cd3.gif?width=600&quality=75&resize=contain",
+    "compatibleBuilders": [
+      "HTML5 Standalone",
+      "Tailwind CSS CDN",
+      "Claude 3.5 Sonnet",
+      "Cursor AI",
+      "v0",
+      "Lovable"
+    ],
+    "sectionsIncluded": [
       {
-        id: 'editorial-hero',
-        name: 'Editorial Typography Hero',
-        badge: 'Hero Section',
-        description: 'Huge serif/sans mix headline with subtle client reel marquee.',
-        promptText: `Build a minimalist creative studio hero section with high-contrast editorial typography, client marquee ticker, and smooth fade-in animations in Tailwind CSS.`,
+        "id": "sec-2-1",
+        "name": "Focal Layout Architecture",
+        "badge": "HTML5 HERO",
+        "description": "Main hero structure and typography for Animated Landing Page: Portal Hero That Parts to Uncover a Full Bleed Image.",
+        "promptText": "Generate a standalone HTML5 hero section for \"Animated Landing Page: Portal Hero That Parts to Uncover a Full Bleed Image\" using Tailwind CSS via CDN. Output pure HTML with class=\"...\", zero JSX or TSX.",
+        "tailwindSnippet": "<!-- 1. Focal Layout for Animated Landing Page: Portal Hero That Parts to Uncover a Full Bleed Image (HTML + Tailwind CDN) -->\n<section class=\"relative overflow-hidden py-16 sm:py-24 bg-zinc-950 text-zinc-100 antialiased font-sans\">\n  <div class=\"max-w-7xl mx-auto px-6 lg:px-8\">\n    <div class=\"text-center max-w-3xl mx-auto\">\n      <span class=\"inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-900 border border-zinc-800 text-zinc-300\">\n        <i data-lucide=\"sparkles\" class=\"w-3.5 h-3.5 text-zinc-400\"></i>\n        <span>LANDING PAGE</span>\n      </span>\n      <h1 class=\"mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-display\">\n        Animated Landing Page: Portal Hero That Parts to Uncover a Full Bleed Image\n      </h1>\n      <p class=\"mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed\">\n        Production-grade Animated Landing Page: Portal Hero That Parts to Uncover a Full Bleed Image standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.\n      </p>\n    </div>\n  </div>\n</section>"
       },
       {
-        id: 'case-study-masonry',
-        name: 'Masonry Case Study Gallery',
-        badge: 'Portfolio Grid',
-        description: '2-column dynamic aspect ratio project cards with hover zoom and tags.',
-        promptText: `Create a 2-column responsive masonry case study grid with hover zoom on project thumbnails, client name, category tags, and click-to-open drawer previews.`,
+        "id": "sec-2-2",
+        "name": "Interactive Feature Matrix",
+        "badge": "HTML5 GRID",
+        "description": "Responsive 3-column card grid with hover transitions and Lucide icons.",
+        "promptText": "Build a pure HTML5 3-column feature grid for \"Animated Landing Page: Portal Hero That Parts to Uncover a Full Bleed Image\" with Tailwind CDN utility classes and Lucide icons.",
+        "tailwindSnippet": "<!-- 2. Interactive Feature Matrix (HTML + Tailwind CDN) -->\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-6 py-12\">\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"zap\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Zero Build Lag</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Runs instantly in any browser via Tailwind CSS CDN script.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"layers\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Pure HTML & CSS</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Zero JSX or Node.js runtime required. Copy, paste and deploy.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"sparkles\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Micro-Interactions</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Smooth hover elevations and accessible keyboard focus outlines.</p>\n  </div>\n</div>"
       },
       {
-        id: 'awards-marquee',
-        name: 'Awards & Recognition Ticker',
-        badge: 'Trust Bar',
-        description: 'Clean typographic list of Awwwards, FWA, and design accolades.',
-        promptText: `Build a minimalist awards and press ticker showcasing year, award name, project, and category in a clean monochromatic table.`,
-      },
+        "id": "sec-2-3",
+        "name": "Action & Conversion Trigger",
+        "badge": "HTML5 CTA",
+        "description": "Stand-alone call-to-action block with high-contrast buttons.",
+        "promptText": "Create an instant HTML5 CTA conversion block for \"Animated Landing Page: Portal Hero That Parts to Uncover a Full Bleed Image\" with pure Tailwind CSS CDN classes.",
+        "tailwindSnippet": "<!-- 3. Conversion Trigger Action (HTML + Tailwind CDN) -->\n<div class=\"max-w-2xl mx-auto px-6 py-8 text-center\">\n  <div class=\"rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8\">\n    <h3 class=\"text-lg font-bold text-white mb-2\">Experience Animated Landing Page</h3>\n    <p class=\"text-xs text-zinc-400 mb-6\">Open the standalone HTML template in your browser or paste into your project.</p>\n    <div class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-zinc-950 text-xs font-semibold hover:bg-zinc-100 transition-all\">\n        Launch Template\n      </button>\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold hover:bg-zinc-700 transition-all\">\n        Copy HTML Code\n      </button>\n    </div>\n  </div>\n</div>"
+      }
     ],
-    features: [
-      'High-fashion editorial typography & minimal grid',
-      'Smooth masonry and horizontal scroll project showcases',
-      'Interactive project drawer modal preview',
-      'Optimized image loaders with blur placeholder states',
-      'Full dark/light monochromatic styling',
+    "features": [
+      "100% Pure Standalone HTML5 + Tailwind CSS via CDN",
+      "Zero JSX, TSX, React, or npm dependencies required",
+      "Double-click to preview instantly in any browser",
+      "1-Click AI Master Prompt optimized for Cursor & Claude"
     ],
-    toolsReplaced: [
-      { name: 'Readymag Business', monthlyCostUSD: 45 },
-      { name: 'Squarespace Portfolio Tier', monthlyCostUSD: 23 },
-    ],
-    faqs: [
+    "toolsReplaced": [
       {
-        question: 'Does this support video case studies?',
-        answer: 'Yes! The case study gallery natively supports HTML5 MP4/WebM loops, YouTube/Vimeo embeds, and high-res image carousels.',
+        "name": "UI Component Subscriptions",
+        "monthlyCostUSD": 29
       },
+      {
+        "name": "Custom Animation Design",
+        "monthlyCostUSD": 99
+      },
+      {
+        "name": "Design Token Kits",
+        "monthlyCostUSD": 49
+      }
     ],
+    "frameworkStack": [
+      "HTML5",
+      "Tailwind CSS (CDN)",
+      "Vanilla JS / Alpine.js",
+      "Lucide Icons (CDN)",
+      "GSAP (CDN)"
+    ],
+    "quickCopyPrompt": "You are an expert Frontend Engineer. Build a complete, production-ready, standalone HTML5 template for \"Animated Landing Page: Portal Hero That Parts to Uncover a Full Bleed Image\".\n\n### CRITICAL OUTPUT FORMAT REQUIREMENTS:\n- **Output ONLY single-file standard HTML (`<!DOCTYPE html> ... </html>`)**.\n- **STRICT PROHIBITION**: Do NOT output JSX, TSX, React components, Next.js code, or npm import statements. Everything must be pure HTML + CSS + JS in one file.\n- **Tailwind CSS via CDN**: Include `<script src=\"https://cdn.tailwindcss.com\"></script>` in `<head>`.\n- **Icons**: Load Lucide Icons via CDN `<script src=\"https://unpkg.com/lucide@latest\"></script>` and initialize with `<script>lucide.createIcons();</script>`.\n- **Fonts**: Load Google Fonts `Inter` and `JetBrains Mono`.\n- **Interactive Animations**: Use vanilla JavaScript or GSAP via CDN (`<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js\"></script>`) embedded inside `<script>` tags at the bottom.\n\n### Component & Design Specifications:\n1. **Design System & Palette**:\n   - Monochromatic Notion/Shopify aesthetic (neutral zinc-900 / zinc-950 dark, zinc-50 / pure white light).\n   - High precision typography with crisp contrast, clean borders (`border-zinc-200` / `border-zinc-800`), and soft shadows.\n2. **Component Architecture for \"Animated Landing Page: Portal Hero That Parts to Uncover a Full Bleed Image\"**:\n   - Master layout container with mobile, tablet, and desktop responsiveness.\n   - Micro-interactions on buttons, hover states, and smooth spring-like transitions.\n3. **Stand-Alone Portability**:\n   - Must open directly and render flawlessly by double clicking the `.html` file in any web browser.\n\nComponent: Animated Landing Page: Portal Hero That Parts to Uncover a Full Bleed Image\nCategory: Landing Page",
+    "faqs": [
+      {
+        "question": "What is the output format of this prompt?",
+        "answer": "All prompts produce standard, single-file HTML5 templates styled with Tailwind CSS via CDN (<script src=\"https://cdn.tailwindcss.com\"></script>). No JSX, React, or build setups required."
+      },
+      {
+        "question": "How do I run and test the output HTML?",
+        "answer": "Copy the AI output, save it into a file named index.html, and double-click to open it in Chrome, Safari, or Firefox. It renders instantly without compiling."
+      },
+      {
+        "question": "Can I paste this HTML into WordPress, Webflow, or custom sites?",
+        "answer": "Yes! Because the template outputs standard HTML and loads Tailwind CSS via CDN, you can paste it directly into HTML embed blocks or standalone static sites."
+      }
+    ]
   },
   {
-    id: 'saas-fintech-landing',
-    slug: 'saas-fintech-landing',
-    title: 'Fintech & B2B SaaS High-Conversion Landing',
-    shortTitle: 'Fintech SaaS Page',
-    tagline: 'Interactive live calculator, compliance trust badge wall, and conversion-optimized CTA.',
-    category: 'landing_pages',
-    categoryLabel: 'Native Landing Pages',
-    assetFormat: 'native_page',
-    formatBadge: 'Native Tailwind / Next.js',
-    badge: 'Fintech Ready',
-    rating: 4.94,
-    reviewsCount: 89,
-    downloadsCount: 1650,
-    heroDescription: 'Engineered for high-ticket SaaS and financial tools. Includes live client ROI calculators, bank-grade encryption badges, feature tabs, and multi-step intake flows.',
-    accentBg: 'bg-zinc-100',
-    accentBorder: 'border-zinc-300',
-    accentText: 'text-zinc-950',
-    accentColor: '#18181B',
-    coverImage: '/images/cora_hero_landscape.jpg',
-    compatibleBuilders: ['Tailwind CSS', 'Next.js', 'Cursor AI', 'Claude 3.5', 'Lovable'],
-    frameworkStack: ['Tailwind CSS', 'React 19', 'Chart.js / SVG'],
-    quickCopyPrompt: 'Build a fintech landing page with a live ROI savings calculator slider, SOC2/ISO compliance trust badges, tabbed feature switcher, and instant signup modal.',
-    sectionsIncluded: [
+    "id": "tmpl-03",
+    "slug": "lumina-saas-landing-page",
+    "title": "Lumina SaaS Landing Page",
+    "shortTitle": "Lumina SaaS Landing Page",
+    "tagline": "Production-grade Lumina SaaS Landing Page standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.",
+    "category": "landing_pages",
+    "categoryLabel": "Landing Page",
+    "assetFormat": "native_page",
+    "formatBadge": "HTML + TAILWIND CDN",
+    "badge": "HERO SYSTEM",
+    "rating": 4.91,
+    "reviewsCount": 153,
+    "downloadsCount": 3518,
+    "viewsCount": 3483,
+    "copiesCount": 554,
+    "mediaType": "image",
+    "mediaUrl": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/hmac-uploads/screenshots/drafts/7c559ec1-83bb-46c6-bd4b-3e0cf404de62/1770779920155.png?width=600&quality=75&resize=contain",
+    "heroDescription": "Build and preview Lumina SaaS Landing Page instantly. Engineered as a complete standalone HTML document using Tailwind CSS via CDN (`<script src=\"https://cdn.tailwindcss.com\"></script>`), pure CSS/vanilla JS interactions, and zero build tool bloat. Perfect for Cursor AI, Claude 3.5 Sonnet, and direct browser execution.",
+    "accentBg": "bg-zinc-950",
+    "accentBorder": "border-zinc-800",
+    "accentText": "text-zinc-100",
+    "accentColor": "#09090b",
+    "coverImage": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/hmac-uploads/screenshots/drafts/7c559ec1-83bb-46c6-bd4b-3e0cf404de62/1770779920155.png?width=600&quality=75&resize=contain",
+    "compatibleBuilders": [
+      "HTML5 Standalone",
+      "Tailwind CSS CDN",
+      "Claude 3.5 Sonnet",
+      "Cursor AI",
+      "v0",
+      "Lovable"
+    ],
+    "sectionsIncluded": [
       {
-        id: 'fintech-hero',
-        name: 'Fintech Calculator Hero',
-        badge: 'Hero Section',
-        description: 'Split hero with live interactive slider computing monthly agency savings.',
-        promptText: `Create a split hero section with headline on the left and an interactive monthly fee savings calculator on the right with real-time slider updates.`,
+        "id": "sec-3-1",
+        "name": "Focal Layout Architecture",
+        "badge": "HTML5 HERO",
+        "description": "Main hero structure and typography for Lumina SaaS Landing Page.",
+        "promptText": "Generate a standalone HTML5 hero section for \"Lumina SaaS Landing Page\" using Tailwind CSS via CDN. Output pure HTML with class=\"...\", zero JSX or TSX.",
+        "tailwindSnippet": "<!-- 1. Focal Layout for Lumina SaaS Landing Page (HTML + Tailwind CDN) -->\n<section class=\"relative overflow-hidden py-16 sm:py-24 bg-zinc-950 text-zinc-100 antialiased font-sans\">\n  <div class=\"max-w-7xl mx-auto px-6 lg:px-8\">\n    <div class=\"text-center max-w-3xl mx-auto\">\n      <span class=\"inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-900 border border-zinc-800 text-zinc-300\">\n        <i data-lucide=\"sparkles\" class=\"w-3.5 h-3.5 text-zinc-400\"></i>\n        <span>LANDING PAGE</span>\n      </span>\n      <h1 class=\"mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-display\">\n        Lumina SaaS Landing Page\n      </h1>\n      <p class=\"mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed\">\n        Production-grade Lumina SaaS Landing Page standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.\n      </p>\n    </div>\n  </div>\n</section>"
       },
       {
-        id: 'compliance-wall',
-        name: 'Bank-Grade Compliance Wall',
-        badge: 'Trust Badges',
-        description: 'Certifications, RBI guidelines, UPI 2.0 integration, and SHA-256 e-sign badges.',
-        promptText: `Design a monochromatic compliance banner with 4 verified trust cards: 256-Bit SSL, UPI 2.0 Auto-Debit, IT Act 2000 E-Sign, and GST SAC 9983 Automated Compliance.`,
+        "id": "sec-3-2",
+        "name": "Interactive Feature Matrix",
+        "badge": "HTML5 GRID",
+        "description": "Responsive 3-column card grid with hover transitions and Lucide icons.",
+        "promptText": "Build a pure HTML5 3-column feature grid for \"Lumina SaaS Landing Page\" with Tailwind CDN utility classes and Lucide icons.",
+        "tailwindSnippet": "<!-- 2. Interactive Feature Matrix (HTML + Tailwind CDN) -->\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-6 py-12\">\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"zap\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Zero Build Lag</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Runs instantly in any browser via Tailwind CSS CDN script.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"layers\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Pure HTML & CSS</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Zero JSX or Node.js runtime required. Copy, paste and deploy.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"sparkles\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Micro-Interactions</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Smooth hover elevations and accessible keyboard focus outlines.</p>\n  </div>\n</div>"
       },
-    ],
-    features: [
-      'Interactive client savings calculator component',
-      'Pre-built Indian payment & compliance badges',
-      'Tabbed product feature switcher with SVG graphs',
-      'Sub-50ms static speed and instant CTA response',
-    ],
-    toolsReplaced: [
-      { name: 'Unbounce Conversion Builder', monthlyCostUSD: 99 },
-      { name: 'Calconic Calculator Widget', monthlyCostUSD: 17 },
-    ],
-    faqs: [
       {
-        question: 'Can I connect this calculator to my CRM?',
-        answer: 'Yes, the calculator component exposes an onChange callback that sends lead metrics directly to your webhook or database.',
-      },
+        "id": "sec-3-3",
+        "name": "Action & Conversion Trigger",
+        "badge": "HTML5 CTA",
+        "description": "Stand-alone call-to-action block with high-contrast buttons.",
+        "promptText": "Create an instant HTML5 CTA conversion block for \"Lumina SaaS Landing Page\" with pure Tailwind CSS CDN classes.",
+        "tailwindSnippet": "<!-- 3. Conversion Trigger Action (HTML + Tailwind CDN) -->\n<div class=\"max-w-2xl mx-auto px-6 py-8 text-center\">\n  <div class=\"rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8\">\n    <h3 class=\"text-lg font-bold text-white mb-2\">Experience Lumina SaaS Landing Page</h3>\n    <p class=\"text-xs text-zinc-400 mb-6\">Open the standalone HTML template in your browser or paste into your project.</p>\n    <div class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-zinc-950 text-xs font-semibold hover:bg-zinc-100 transition-all\">\n        Launch Template\n      </button>\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold hover:bg-zinc-700 transition-all\">\n        Copy HTML Code\n      </button>\n    </div>\n  </div>\n</div>"
+      }
     ],
+    "features": [
+      "100% Pure Standalone HTML5 + Tailwind CSS via CDN",
+      "Zero JSX, TSX, React, or npm dependencies required",
+      "Double-click to preview instantly in any browser",
+      "1-Click AI Master Prompt optimized for Cursor & Claude"
+    ],
+    "toolsReplaced": [
+      {
+        "name": "UI Component Subscriptions",
+        "monthlyCostUSD": 29
+      },
+      {
+        "name": "Custom Animation Design",
+        "monthlyCostUSD": 99
+      },
+      {
+        "name": "Design Token Kits",
+        "monthlyCostUSD": 49
+      }
+    ],
+    "frameworkStack": [
+      "HTML5",
+      "Tailwind CSS (CDN)",
+      "Vanilla JS / Alpine.js",
+      "Lucide Icons (CDN)",
+      "GSAP (CDN)"
+    ],
+    "quickCopyPrompt": "You are an expert Frontend Engineer. Build a complete, production-ready, standalone HTML5 template for \"Lumina SaaS Landing Page\".\n\n### CRITICAL OUTPUT FORMAT REQUIREMENTS:\n- **Output ONLY single-file standard HTML (`<!DOCTYPE html> ... </html>`)**.\n- **STRICT PROHIBITION**: Do NOT output JSX, TSX, React components, Next.js code, or npm import statements. Everything must be pure HTML + CSS + JS in one file.\n- **Tailwind CSS via CDN**: Include `<script src=\"https://cdn.tailwindcss.com\"></script>` in `<head>`.\n- **Icons**: Load Lucide Icons via CDN `<script src=\"https://unpkg.com/lucide@latest\"></script>` and initialize with `<script>lucide.createIcons();</script>`.\n- **Fonts**: Load Google Fonts `Inter` and `JetBrains Mono`.\n- **Interactive Animations**: Use vanilla JavaScript or GSAP via CDN (`<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js\"></script>`) embedded inside `<script>` tags at the bottom.\n\n### Component & Design Specifications:\n1. **Design System & Palette**:\n   - Monochromatic Notion/Shopify aesthetic (neutral zinc-900 / zinc-950 dark, zinc-50 / pure white light).\n   - High precision typography with crisp contrast, clean borders (`border-zinc-200` / `border-zinc-800`), and soft shadows.\n2. **Component Architecture for \"Lumina SaaS Landing Page\"**:\n   - Master layout container with mobile, tablet, and desktop responsiveness.\n   - Micro-interactions on buttons, hover states, and smooth spring-like transitions.\n3. **Stand-Alone Portability**:\n   - Must open directly and render flawlessly by double clicking the `.html` file in any web browser.\n\nComponent: Lumina SaaS Landing Page\nCategory: Landing Page",
+    "faqs": [
+      {
+        "question": "What is the output format of this prompt?",
+        "answer": "All prompts produce standard, single-file HTML5 templates styled with Tailwind CSS via CDN (<script src=\"https://cdn.tailwindcss.com\"></script>). No JSX, React, or build setups required."
+      },
+      {
+        "question": "How do I run and test the output HTML?",
+        "answer": "Copy the AI output, save it into a file named index.html, and double-click to open it in Chrome, Safari, or Firefox. It renders instantly without compiling."
+      },
+      {
+        "question": "Can I paste this HTML into WordPress, Webflow, or custom sites?",
+        "answer": "Yes! Because the template outputs standard HTML and loads Tailwind CSS via CDN, you can paste it directly into HTML embed blocks or standalone static sites."
+      }
+    ]
   },
   {
-    id: 'consulting-advisory-page',
-    slug: 'consulting-advisory-page',
-    title: 'Executive Consulting & Fractional CXO Page',
-    shortTitle: 'Executive Advisory',
-    tagline: 'Authority personal branding hero, calendar scheduler embed, and retainer package cards.',
-    category: 'landing_pages',
-    categoryLabel: 'Native Landing Pages',
-    assetFormat: 'native_page',
-    formatBadge: 'Native Tailwind / Next.js',
-    badge: 'Executive Kit',
-    rating: 4.95,
-    reviewsCount: 76,
-    downloadsCount: 1420,
-    heroDescription: 'Tailored for fractional CMOs, management consultants, and independent legal/finance advisors. Includes calendar booking slots, client case metrics, and retainer tier structures.',
-    accentBg: 'bg-zinc-100',
-    accentBorder: 'border-zinc-300',
-    accentText: 'text-zinc-950',
-    accentColor: '#18181B',
-    coverImage: '/images/cora_hero_landscape.jpg',
-    compatibleBuilders: ['Tailwind CSS', 'Next.js', 'React', 'Cursor AI', 'Claude 3.5'],
-    frameworkStack: ['Tailwind CSS', 'React 19'],
-    quickCopyPrompt: 'Design a clean executive consulting landing page with personal authority bio, client revenue metrics, 3 retainer package options, and an integrated booking widget.',
-    sectionsIncluded: [
+    "id": "tmpl-04",
+    "slug": "red-noir-style",
+    "title": "Red Noir Style",
+    "shortTitle": "Red Noir Style",
+    "tagline": "Production-grade Red Noir Style standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.",
+    "category": "elementor_kits",
+    "categoryLabel": "Design Style",
+    "assetFormat": "elementor_kit",
+    "formatBadge": "HTML + TAILWIND CDN",
+    "badge": "DESIGN TOKENS",
+    "rating": 4.96,
+    "reviewsCount": 174,
+    "downloadsCount": 2052,
+    "viewsCount": 1633,
+    "copiesCount": 621,
+    "mediaType": "image",
+    "mediaUrl": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/hmac-uploads/screenshots/components/9cc80d0e-1a06-4b2d-97a2-f4c93436fc69/4739694a-be35-4493-bdef-f43fd1d095ec/1767696321250.png?width=600&quality=75&resize=contain",
+    "heroDescription": "Build and preview Red Noir Style instantly. Engineered as a complete standalone HTML document using Tailwind CSS via CDN (`<script src=\"https://cdn.tailwindcss.com\"></script>`), pure CSS/vanilla JS interactions, and zero build tool bloat. Perfect for Cursor AI, Claude 3.5 Sonnet, and direct browser execution.",
+    "accentBg": "bg-zinc-950",
+    "accentBorder": "border-zinc-800",
+    "accentText": "text-zinc-100",
+    "accentColor": "#09090b",
+    "coverImage": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/hmac-uploads/screenshots/components/9cc80d0e-1a06-4b2d-97a2-f4c93436fc69/4739694a-be35-4493-bdef-f43fd1d095ec/1767696321250.png?width=600&quality=75&resize=contain",
+    "compatibleBuilders": [
+      "HTML5 Standalone",
+      "Tailwind CSS CDN",
+      "Claude 3.5 Sonnet",
+      "Cursor AI",
+      "v0",
+      "Lovable"
+    ],
+    "sectionsIncluded": [
       {
-        id: 'advisory-hero',
-        name: 'Executive Bio & Authority Hero',
-        badge: 'Hero Section',
-        description: 'Clean headshot layout, revenue growth statistics, and immediate consultation CTA.',
-        promptText: `Build an authority bio hero section with clean monochrome styling, client growth numbers (+₹12Cr Revenue Delivered), and a 1-click consultation scheduler button.`,
-      },
-    ],
-    features: [
-      'Clean personal authority layout & bio card',
-      'Retainer package cards with SLA breakdowns',
-      'Built-in calendar slot picker layout',
-      'Client testimonial quotes with verified LinkedIn badges',
-    ],
-    toolsReplaced: [
-      { name: 'Kajabi Website Tier', monthlyCostUSD: 149 },
-      { name: 'Calendly Pro Plan', monthlyCostUSD: 16 },
-    ],
-    faqs: [
-      {
-        question: 'Does this integrate with Google Calendar?',
-        answer: 'Yes, the consultation booking component easily connects with Cal.com, Google Calendar, or Cora Workspace native scheduler.',
-      },
-    ],
-  },
-
-  // ── 2. AI SECTION BUILDER PROMPTS (Claude, Cursor, Lovable, v0) ──
-  {
-    id: 'prompt-pack-hero-headers',
-    slug: 'ai-prompt-pack-hero-headers',
-    title: 'Master AI Prompt Pack: 20+ High-Converting Hero Sections',
-    shortTitle: '20+ Hero Prompts',
-    tagline: 'Engineered prompts for Claude 3.5, Cursor AI, Lovable & v0 to generate production-ready heroes.',
-    category: 'section_prompts',
-    categoryLabel: 'AI Section Prompts',
-    assetFormat: 'section_prompts',
-    formatBadge: 'Claude & Cursor Prompts',
-    badge: 'AI Prompt Pack',
-    rating: 4.99,
-    reviewsCount: 310,
-    downloadsCount: 5400,
-    heroDescription: 'A master library of battle-tested AI generation prompts. Paste these prompts into Cursor, Claude 3.5 Sonnet, Lovable, or v0 to generate modern monochromatic hero sections with zero AI hallucinations or weird layouts.',
-    accentBg: 'bg-purple-50',
-    accentBorder: 'border-purple-200',
-    accentText: 'text-purple-900',
-    accentColor: '#9333EA',
-    coverImage: '/images/cora_hero_landscape.jpg',
-    compatibleBuilders: ['Claude 3.5 Sonnet', 'Cursor AI', 'Lovable.dev', 'v0.dev', 'Bolt.new', 'ChatGPT-4o'],
-    frameworkStack: ['Prompt Engineering', 'Tailwind CSS v4', 'React 19'],
-    quickCopyPrompt: 'Generate a monochromatic hero section using Tailwind CSS. It must include a subtle status badge, a 2-line high-contrast headline, an lead subtitle, two pill action buttons, and a responsive mockup preview card below.',
-    sectionsIncluded: [
-      {
-        id: 'prompt-split-hero',
-        name: 'Split Video / Mockup Hero Prompt',
-        badge: 'AI Prompt',
-        description: 'For SaaS tools and digital agencies needing a side-by-side software preview.',
-        promptText: `Act as a senior frontend engineer. Write a responsive Split Hero component in React and Tailwind CSS:
-1. Left column: Status pill with glowing green dot, 60px display headline, 18px body copy, dual action button row (Primary black, Secondary white with border).
-2. Right column: Floating browser mockup card with dark header bar, tab switcher, and live stats chart.
-3. Use only neutral zinc shades (zinc-50 through zinc-950) with zero colorful gradients.
-4. Add smooth hover transitions (hover:scale-[1.02] duration-200).`,
+        "id": "sec-4-1",
+        "name": "Focal Layout Architecture",
+        "badge": "HTML5 HERO",
+        "description": "Main hero structure and typography for Red Noir Style.",
+        "promptText": "Generate a standalone HTML5 hero section for \"Red Noir Style\" using Tailwind CSS via CDN. Output pure HTML with class=\"...\", zero JSX or TSX.",
+        "tailwindSnippet": "<!-- 1. Focal Layout for Red Noir Style (HTML + Tailwind CDN) -->\n<section class=\"relative overflow-hidden py-16 sm:py-24 bg-zinc-950 text-zinc-100 antialiased font-sans\">\n  <div class=\"max-w-7xl mx-auto px-6 lg:px-8\">\n    <div class=\"text-center max-w-3xl mx-auto\">\n      <span class=\"inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-900 border border-zinc-800 text-zinc-300\">\n        <i data-lucide=\"sparkles\" class=\"w-3.5 h-3.5 text-zinc-400\"></i>\n        <span>DESIGN STYLE</span>\n      </span>\n      <h1 class=\"mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-display\">\n        Red Noir Style\n      </h1>\n      <p class=\"mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed\">\n        Production-grade Red Noir Style standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.\n      </p>\n    </div>\n  </div>\n</section>"
       },
       {
-        id: 'prompt-centered-saas',
-        name: 'Centered Atmospheric SaaS Hero Prompt',
-        badge: 'AI Prompt',
-        description: 'Minimalist centered hero with subtle gradient blur and email waitlist form.',
-        promptText: `Write a modern centered SaaS hero in React and Tailwind CSS:
-- Max-width 800px centered container with text-center.
-- Headline with tracking-[-0.03em] and font-semibold.
-- Integrated pill input group containing email text field and 'Claim Workspace' button.
-- Sub-text with 'Zero credit card required · Instant 30s setup' trust note.`,
+        "id": "sec-4-2",
+        "name": "Interactive Feature Matrix",
+        "badge": "HTML5 GRID",
+        "description": "Responsive 3-column card grid with hover transitions and Lucide icons.",
+        "promptText": "Build a pure HTML5 3-column feature grid for \"Red Noir Style\" with Tailwind CDN utility classes and Lucide icons.",
+        "tailwindSnippet": "<!-- 2. Interactive Feature Matrix (HTML + Tailwind CDN) -->\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-6 py-12\">\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"zap\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Zero Build Lag</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Runs instantly in any browser via Tailwind CSS CDN script.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"layers\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Pure HTML & CSS</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Zero JSX or Node.js runtime required. Copy, paste and deploy.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"sparkles\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Micro-Interactions</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Smooth hover elevations and accessible keyboard focus outlines.</p>\n  </div>\n</div>"
       },
       {
-        id: 'prompt-bento-hero',
-        name: 'Asymmetric Bento Header Prompt',
-        badge: 'AI Prompt',
-        description: 'Hero that integrates live metric counters directly into the header fold.',
-        promptText: `Generate an asymmetric Bento Header in Tailwind CSS with 3 metric tiles directly below the main title. Include 99.9% Uptime, Sub-50ms Latency, and ₹0 Setup Fee badges.`,
-      },
+        "id": "sec-4-3",
+        "name": "Action & Conversion Trigger",
+        "badge": "HTML5 CTA",
+        "description": "Stand-alone call-to-action block with high-contrast buttons.",
+        "promptText": "Create an instant HTML5 CTA conversion block for \"Red Noir Style\" with pure Tailwind CSS CDN classes.",
+        "tailwindSnippet": "<!-- 3. Conversion Trigger Action (HTML + Tailwind CDN) -->\n<div class=\"max-w-2xl mx-auto px-6 py-8 text-center\">\n  <div class=\"rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8\">\n    <h3 class=\"text-lg font-bold text-white mb-2\">Experience Red Noir Style</h3>\n    <p class=\"text-xs text-zinc-400 mb-6\">Open the standalone HTML template in your browser or paste into your project.</p>\n    <div class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-zinc-950 text-xs font-semibold hover:bg-zinc-100 transition-all\">\n        Launch Template\n      </button>\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold hover:bg-zinc-700 transition-all\">\n        Copy HTML Code\n      </button>\n    </div>\n  </div>\n</div>"
+      }
     ],
-    features: [
-      '20+ battle-tested prompts engineered for Claude 3.5 and Cursor',
-      'Guaranteed monochromatic design output with zero colorful AI noise',
-      'Includes explicit responsive instructions for desktop, tablet & mobile',
-      'Copy-paste ready for immediate code generation in 1 click',
+    "features": [
+      "100% Pure Standalone HTML5 + Tailwind CSS via CDN",
+      "Zero JSX, TSX, React, or npm dependencies required",
+      "Double-click to preview instantly in any browser",
+      "1-Click AI Master Prompt optimized for Cursor & Claude"
     ],
-    toolsReplaced: [
-      { name: 'UI Prompt Packs Paid Subscriptions', monthlyCostUSD: 29 },
-    ],
-    faqs: [
+    "toolsReplaced": [
       {
-        question: 'How do I use these prompts in Cursor or Claude?',
-        answer: 'Simply copy the prompt using the 1-click button, open Cursor Composer (Cmd+I) or Claude 3.5 Sonnet, paste the prompt, and specify your brand details.',
+        "name": "UI Component Subscriptions",
+        "monthlyCostUSD": 29
       },
+      {
+        "name": "Custom Animation Design",
+        "monthlyCostUSD": 99
+      },
+      {
+        "name": "Design Token Kits",
+        "monthlyCostUSD": 49
+      }
     ],
+    "frameworkStack": [
+      "HTML5",
+      "Tailwind CSS (CDN)",
+      "Vanilla JS / Alpine.js",
+      "Lucide Icons (CDN)",
+      "GSAP (CDN)"
+    ],
+    "quickCopyPrompt": "You are an expert Frontend Engineer. Build a complete, production-ready, standalone HTML5 template for \"Red Noir Style\".\n\n### CRITICAL OUTPUT FORMAT REQUIREMENTS:\n- **Output ONLY single-file standard HTML (`<!DOCTYPE html> ... </html>`)**.\n- **STRICT PROHIBITION**: Do NOT output JSX, TSX, React components, Next.js code, or npm import statements. Everything must be pure HTML + CSS + JS in one file.\n- **Tailwind CSS via CDN**: Include `<script src=\"https://cdn.tailwindcss.com\"></script>` in `<head>`.\n- **Icons**: Load Lucide Icons via CDN `<script src=\"https://unpkg.com/lucide@latest\"></script>` and initialize with `<script>lucide.createIcons();</script>`.\n- **Fonts**: Load Google Fonts `Inter` and `JetBrains Mono`.\n- **Interactive Animations**: Use vanilla JavaScript or GSAP via CDN (`<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js\"></script>`) embedded inside `<script>` tags at the bottom.\n\n### Component & Design Specifications:\n1. **Design System & Palette**:\n   - Monochromatic Notion/Shopify aesthetic (neutral zinc-900 / zinc-950 dark, zinc-50 / pure white light).\n   - High precision typography with crisp contrast, clean borders (`border-zinc-200` / `border-zinc-800`), and soft shadows.\n2. **Component Architecture for \"Red Noir Style\"**:\n   - Master layout container with mobile, tablet, and desktop responsiveness.\n   - Micro-interactions on buttons, hover states, and smooth spring-like transitions.\n3. **Stand-Alone Portability**:\n   - Must open directly and render flawlessly by double clicking the `.html` file in any web browser.\n\nComponent: Red Noir Style\nCategory: Design Style",
+    "faqs": [
+      {
+        "question": "What is the output format of this prompt?",
+        "answer": "All prompts produce standard, single-file HTML5 templates styled with Tailwind CSS via CDN (<script src=\"https://cdn.tailwindcss.com\"></script>). No JSX, React, or build setups required."
+      },
+      {
+        "question": "How do I run and test the output HTML?",
+        "answer": "Copy the AI output, save it into a file named index.html, and double-click to open it in Chrome, Safari, or Firefox. It renders instantly without compiling."
+      },
+      {
+        "question": "Can I paste this HTML into WordPress, Webflow, or custom sites?",
+        "answer": "Yes! Because the template outputs standard HTML and loads Tailwind CSS via CDN, you can paste it directly into HTML embed blocks or standalone static sites."
+      }
+    ]
   },
   {
-    id: 'prompt-pack-pricing-bento',
-    slug: 'ai-prompt-pack-pricing-bento',
-    title: 'AI Prompt Pack: Pricing Tables, Bento Grids & Feature Sections',
-    shortTitle: 'Pricing & Bento Prompts',
-    tagline: 'Generate pixel-perfect feature grids, comparison tables, and interactive pricing toggles.',
-    category: 'section_prompts',
-    categoryLabel: 'AI Section Prompts',
-    assetFormat: 'section_prompts',
-    formatBadge: 'Claude & Cursor Prompts',
-    badge: 'High Conversion',
-    rating: 4.97,
-    reviewsCount: 184,
-    downloadsCount: 3900,
-    heroDescription: 'Targeted prompt collection for generating pricing tables with billing toggles, 4-card bento grids, interactive feature accordions, and customer proof sliders.',
-    accentBg: 'bg-purple-50',
-    accentBorder: 'border-purple-200',
-    accentText: 'text-purple-900',
-    accentColor: '#9333EA',
-    coverImage: '/images/cora_hero_landscape.jpg',
-    compatibleBuilders: ['Claude 3.5 Sonnet', 'Cursor AI', 'Lovable', 'v0.dev'],
-    frameworkStack: ['Prompt Engineering', 'Tailwind CSS'],
-    quickCopyPrompt: 'Create an interactive 3-column pricing matrix in Tailwind CSS with monthly and annual billing switcher, feature checklists, and sticky popular badge on the middle tier.',
-    sectionsIncluded: [
+    "id": "tmpl-05",
+    "slug": "kinetic-orange-style",
+    "title": "Kinetic Orange Style",
+    "shortTitle": "Kinetic Orange Style",
+    "tagline": "Production-grade Kinetic Orange Style standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.",
+    "category": "elementor_kits",
+    "categoryLabel": "Design Style",
+    "assetFormat": "elementor_kit",
+    "formatBadge": "HTML + TAILWIND CDN",
+    "badge": "DESIGN TOKENS",
+    "rating": 4.97,
+    "reviewsCount": 211,
+    "downloadsCount": 4032,
+    "viewsCount": 3548,
+    "copiesCount": 611,
+    "mediaType": "image",
+    "mediaUrl": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/hmac-uploads/screenshots/components/723c8592-5795-43de-8068-05f205f21660/9bba597a-d171-450b-b5d0-a3a737433136/1767934028801.png?width=600&quality=75&resize=contain",
+    "heroDescription": "Build and preview Kinetic Orange Style instantly. Engineered as a complete standalone HTML document using Tailwind CSS via CDN (`<script src=\"https://cdn.tailwindcss.com\"></script>`), pure CSS/vanilla JS interactions, and zero build tool bloat. Perfect for Cursor AI, Claude 3.5 Sonnet, and direct browser execution.",
+    "accentBg": "bg-zinc-950",
+    "accentBorder": "border-zinc-800",
+    "accentText": "text-zinc-100",
+    "accentColor": "#09090b",
+    "coverImage": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/hmac-uploads/screenshots/components/723c8592-5795-43de-8068-05f205f21660/9bba597a-d171-450b-b5d0-a3a737433136/1767934028801.png?width=600&quality=75&resize=contain",
+    "compatibleBuilders": [
+      "HTML5 Standalone",
+      "Tailwind CSS CDN",
+      "Claude 3.5 Sonnet",
+      "Cursor AI",
+      "v0",
+      "Lovable"
+    ],
+    "sectionsIncluded": [
       {
-        id: 'pricing-toggle-prompt',
-        name: 'Interactive Billing Toggle Prompt',
-        badge: 'AI Prompt',
-        description: 'Prompt to generate animated Monthly / Annual switchers with savings badges.',
-        promptText: `Create a clean animated billing toggle in React/Tailwind:
-- Segmented control with 'Monthly' and 'Annual (Save 20%)'.
-- Smooth spring indicator transition.
-- Dynamically calculates price difference for ₹1,499/mo vs ₹1,199/mo.`,
+        "id": "sec-5-1",
+        "name": "Focal Layout Architecture",
+        "badge": "HTML5 HERO",
+        "description": "Main hero structure and typography for Kinetic Orange Style.",
+        "promptText": "Generate a standalone HTML5 hero section for \"Kinetic Orange Style\" using Tailwind CSS via CDN. Output pure HTML with class=\"...\", zero JSX or TSX.",
+        "tailwindSnippet": "<!-- 1. Focal Layout for Kinetic Orange Style (HTML + Tailwind CDN) -->\n<section class=\"relative overflow-hidden py-16 sm:py-24 bg-zinc-950 text-zinc-100 antialiased font-sans\">\n  <div class=\"max-w-7xl mx-auto px-6 lg:px-8\">\n    <div class=\"text-center max-w-3xl mx-auto\">\n      <span class=\"inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-900 border border-zinc-800 text-zinc-300\">\n        <i data-lucide=\"sparkles\" class=\"w-3.5 h-3.5 text-zinc-400\"></i>\n        <span>DESIGN STYLE</span>\n      </span>\n      <h1 class=\"mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-display\">\n        Kinetic Orange Style\n      </h1>\n      <p class=\"mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed\">\n        Production-grade Kinetic Orange Style standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.\n      </p>\n    </div>\n  </div>\n</section>"
       },
       {
-        id: 'feature-accordion-prompt',
-        name: 'Expandable Feature Accordion Prompt',
-        badge: 'AI Prompt',
-        description: 'Interactive QA and feature breakdown accordion with Plus/Minus icons.',
-        promptText: `Write an accessible FAQ accordion component in Tailwind CSS:
-- Smooth height animation.
-- Plus / Minus toggle icon with transition-transform.
-- Clean neutral zinc border with subtle hover background fill.`,
+        "id": "sec-5-2",
+        "name": "Interactive Feature Matrix",
+        "badge": "HTML5 GRID",
+        "description": "Responsive 3-column card grid with hover transitions and Lucide icons.",
+        "promptText": "Build a pure HTML5 3-column feature grid for \"Kinetic Orange Style\" with Tailwind CDN utility classes and Lucide icons.",
+        "tailwindSnippet": "<!-- 2. Interactive Feature Matrix (HTML + Tailwind CDN) -->\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-6 py-12\">\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"zap\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Zero Build Lag</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Runs instantly in any browser via Tailwind CSS CDN script.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"layers\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Pure HTML & CSS</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Zero JSX or Node.js runtime required. Copy, paste and deploy.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"sparkles\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Micro-Interactions</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Smooth hover elevations and accessible keyboard focus outlines.</p>\n  </div>\n</div>"
       },
-    ],
-    features: [
-      'Pre-formatted pricing math and discount calculator logic',
-      'Bento grid layouts with responsive column wrapping',
-      'Accessible ARIA compliance prompts',
-    ],
-    toolsReplaced: [
-      { name: 'Elfsight Pricing Table Widget', monthlyCostUSD: 18 },
-    ],
-    faqs: [
       {
-        question: 'Will these prompts work with plain HTML/CSS?',
-        answer: 'Yes! You can ask the AI model to output pure HTML/Tailwind or React JSX as needed.',
-      },
+        "id": "sec-5-3",
+        "name": "Action & Conversion Trigger",
+        "badge": "HTML5 CTA",
+        "description": "Stand-alone call-to-action block with high-contrast buttons.",
+        "promptText": "Create an instant HTML5 CTA conversion block for \"Kinetic Orange Style\" with pure Tailwind CSS CDN classes.",
+        "tailwindSnippet": "<!-- 3. Conversion Trigger Action (HTML + Tailwind CDN) -->\n<div class=\"max-w-2xl mx-auto px-6 py-8 text-center\">\n  <div class=\"rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8\">\n    <h3 class=\"text-lg font-bold text-white mb-2\">Experience Kinetic Orange Style</h3>\n    <p class=\"text-xs text-zinc-400 mb-6\">Open the standalone HTML template in your browser or paste into your project.</p>\n    <div class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-zinc-950 text-xs font-semibold hover:bg-zinc-100 transition-all\">\n        Launch Template\n      </button>\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold hover:bg-zinc-700 transition-all\">\n        Copy HTML Code\n      </button>\n    </div>\n  </div>\n</div>"
+      }
     ],
+    "features": [
+      "100% Pure Standalone HTML5 + Tailwind CSS via CDN",
+      "Zero JSX, TSX, React, or npm dependencies required",
+      "Double-click to preview instantly in any browser",
+      "1-Click AI Master Prompt optimized for Cursor & Claude"
+    ],
+    "toolsReplaced": [
+      {
+        "name": "UI Component Subscriptions",
+        "monthlyCostUSD": 29
+      },
+      {
+        "name": "Custom Animation Design",
+        "monthlyCostUSD": 99
+      },
+      {
+        "name": "Design Token Kits",
+        "monthlyCostUSD": 49
+      }
+    ],
+    "frameworkStack": [
+      "HTML5",
+      "Tailwind CSS (CDN)",
+      "Vanilla JS / Alpine.js",
+      "Lucide Icons (CDN)",
+      "GSAP (CDN)"
+    ],
+    "quickCopyPrompt": "You are an expert Frontend Engineer. Build a complete, production-ready, standalone HTML5 template for \"Kinetic Orange Style\".\n\n### CRITICAL OUTPUT FORMAT REQUIREMENTS:\n- **Output ONLY single-file standard HTML (`<!DOCTYPE html> ... </html>`)**.\n- **STRICT PROHIBITION**: Do NOT output JSX, TSX, React components, Next.js code, or npm import statements. Everything must be pure HTML + CSS + JS in one file.\n- **Tailwind CSS via CDN**: Include `<script src=\"https://cdn.tailwindcss.com\"></script>` in `<head>`.\n- **Icons**: Load Lucide Icons via CDN `<script src=\"https://unpkg.com/lucide@latest\"></script>` and initialize with `<script>lucide.createIcons();</script>`.\n- **Fonts**: Load Google Fonts `Inter` and `JetBrains Mono`.\n- **Interactive Animations**: Use vanilla JavaScript or GSAP via CDN (`<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js\"></script>`) embedded inside `<script>` tags at the bottom.\n\n### Component & Design Specifications:\n1. **Design System & Palette**:\n   - Monochromatic Notion/Shopify aesthetic (neutral zinc-900 / zinc-950 dark, zinc-50 / pure white light).\n   - High precision typography with crisp contrast, clean borders (`border-zinc-200` / `border-zinc-800`), and soft shadows.\n2. **Component Architecture for \"Kinetic Orange Style\"**:\n   - Master layout container with mobile, tablet, and desktop responsiveness.\n   - Micro-interactions on buttons, hover states, and smooth spring-like transitions.\n3. **Stand-Alone Portability**:\n   - Must open directly and render flawlessly by double clicking the `.html` file in any web browser.\n\nComponent: Kinetic Orange Style\nCategory: Design Style",
+    "faqs": [
+      {
+        "question": "What is the output format of this prompt?",
+        "answer": "All prompts produce standard, single-file HTML5 templates styled with Tailwind CSS via CDN (<script src=\"https://cdn.tailwindcss.com\"></script>). No JSX, React, or build setups required."
+      },
+      {
+        "question": "How do I run and test the output HTML?",
+        "answer": "Copy the AI output, save it into a file named index.html, and double-click to open it in Chrome, Safari, or Firefox. It renders instantly without compiling."
+      },
+      {
+        "question": "Can I paste this HTML into WordPress, Webflow, or custom sites?",
+        "answer": "Yes! Because the template outputs standard HTML and loads Tailwind CSS via CDN, you can paste it directly into HTML embed blocks or standalone static sites."
+      }
+    ]
   },
   {
-    id: 'prompt-pack-forms-modals',
-    slug: 'ai-prompt-pack-forms-modals',
-    title: 'AI Prompt Pack: Mobile Bottom Sheets, Forms & Drawers',
-    shortTitle: 'Forms & Drawers Prompts',
-    tagline: 'Mobile-first bottom slide-up sheets, multi-step lead funnels, and checkout drawers.',
-    category: 'section_prompts',
-    categoryLabel: 'AI Section Prompts',
-    assetFormat: 'section_prompts',
-    formatBadge: 'Claude & Cursor Prompts',
-    badge: 'Mobile UX',
-    rating: 4.96,
-    reviewsCount: 140,
-    downloadsCount: 2980,
-    heroDescription: 'Mobile UX prompt guidelines that eliminate clunky side drawers and popups on phones. Generates silky bottom slide-up sheets with drag handles and instant validation.',
-    accentBg: 'bg-purple-50',
-    accentBorder: 'border-purple-200',
-    accentText: 'text-purple-900',
-    accentColor: '#9333EA',
-    coverImage: '/images/cora_hero_landscape.jpg',
-    compatibleBuilders: ['Claude 3.5 Sonnet', 'Cursor AI', 'Lovable', 'v0.dev'],
-    frameworkStack: ['Prompt Engineering', 'Tailwind CSS', 'Framer Motion'],
-    quickCopyPrompt: 'Build a mobile bottom-up slide sheet in React and Tailwind with a drag indicator handle, top-rounded corners, backdrop blur, and 3-step lead intake form.',
-    sectionsIncluded: [
+    "id": "tmpl-06",
+    "slug": "neural-noir-interface-style",
+    "title": "Neural Noir Interface Style",
+    "shortTitle": "Neural Noir Interface Style",
+    "tagline": "Production-grade Neural Noir Interface Style standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.",
+    "category": "elementor_kits",
+    "categoryLabel": "Design Style",
+    "assetFormat": "elementor_kit",
+    "formatBadge": "HTML + TAILWIND CDN",
+    "badge": "DESIGN TOKENS",
+    "rating": 4.93,
+    "reviewsCount": 195,
+    "downloadsCount": 2939,
+    "viewsCount": 2968,
+    "copiesCount": 622,
+    "mediaType": "image",
+    "mediaUrl": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/hmac-uploads/screenshots/drafts/3fb83fbd-a6f3-44a0-af74-b3afca0b7682/1768518296768.png?width=600&quality=75&resize=contain",
+    "heroDescription": "Build and preview Neural Noir Interface Style instantly. Engineered as a complete standalone HTML document using Tailwind CSS via CDN (`<script src=\"https://cdn.tailwindcss.com\"></script>`), pure CSS/vanilla JS interactions, and zero build tool bloat. Perfect for Cursor AI, Claude 3.5 Sonnet, and direct browser execution.",
+    "accentBg": "bg-zinc-950",
+    "accentBorder": "border-zinc-800",
+    "accentText": "text-zinc-100",
+    "accentColor": "#09090b",
+    "coverImage": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/hmac-uploads/screenshots/drafts/3fb83fbd-a6f3-44a0-af74-b3afca0b7682/1768518296768.png?width=600&quality=75&resize=contain",
+    "compatibleBuilders": [
+      "HTML5 Standalone",
+      "Tailwind CSS CDN",
+      "Claude 3.5 Sonnet",
+      "Cursor AI",
+      "v0",
+      "Lovable"
+    ],
+    "sectionsIncluded": [
       {
-        id: 'mobile-sheet-prompt',
-        name: 'Mobile Slide-Up Sheet Prompt',
-        badge: 'AI Prompt',
-        description: 'Eliminates side drawers on mobile with ergonomic bottom sheets.',
-        promptText: `Write a React bottom slide sheet component:
-- Position fixed inset-x-0 bottom-0 z-50.
-- Top rounded 3xl corners with subtle zinc border.
-- Drag handle at top (w-10 h-1 bg-zinc-300 rounded-full mx-auto mb-4).
-- Dark blurred backdrop with click-to-close handler.`,
+        "id": "sec-6-1",
+        "name": "Focal Layout Architecture",
+        "badge": "HTML5 HERO",
+        "description": "Main hero structure and typography for Neural Noir Interface Style.",
+        "promptText": "Generate a standalone HTML5 hero section for \"Neural Noir Interface Style\" using Tailwind CSS via CDN. Output pure HTML with class=\"...\", zero JSX or TSX.",
+        "tailwindSnippet": "<!-- 1. Focal Layout for Neural Noir Interface Style (HTML + Tailwind CDN) -->\n<section class=\"relative overflow-hidden py-16 sm:py-24 bg-zinc-950 text-zinc-100 antialiased font-sans\">\n  <div class=\"max-w-7xl mx-auto px-6 lg:px-8\">\n    <div class=\"text-center max-w-3xl mx-auto\">\n      <span class=\"inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-900 border border-zinc-800 text-zinc-300\">\n        <i data-lucide=\"sparkles\" class=\"w-3.5 h-3.5 text-zinc-400\"></i>\n        <span>DESIGN STYLE</span>\n      </span>\n      <h1 class=\"mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-display\">\n        Neural Noir Interface Style\n      </h1>\n      <p class=\"mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed\">\n        Production-grade Neural Noir Interface Style standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.\n      </p>\n    </div>\n  </div>\n</section>"
       },
-    ],
-    features: [
-      'Zero mobile side drawers — pure bottom slide-up UX',
-      'Integrated touch-action and gesture drag handles',
-      'Step-by-step form progress indicators',
-    ],
-    toolsReplaced: [
-      { name: 'Typeform Starter Plan', monthlyCostUSD: 29 },
-    ],
-    faqs: [
       {
-        question: 'Does this handle keyboard focus on iOS Safari?',
-        answer: 'Yes, the prompt includes specific viewport resize and virtual keyboard padding handlers for iOS.',
+        "id": "sec-6-2",
+        "name": "Interactive Feature Matrix",
+        "badge": "HTML5 GRID",
+        "description": "Responsive 3-column card grid with hover transitions and Lucide icons.",
+        "promptText": "Build a pure HTML5 3-column feature grid for \"Neural Noir Interface Style\" with Tailwind CDN utility classes and Lucide icons.",
+        "tailwindSnippet": "<!-- 2. Interactive Feature Matrix (HTML + Tailwind CDN) -->\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-6 py-12\">\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"zap\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Zero Build Lag</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Runs instantly in any browser via Tailwind CSS CDN script.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"layers\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Pure HTML & CSS</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Zero JSX or Node.js runtime required. Copy, paste and deploy.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"sparkles\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Micro-Interactions</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Smooth hover elevations and accessible keyboard focus outlines.</p>\n  </div>\n</div>"
       },
+      {
+        "id": "sec-6-3",
+        "name": "Action & Conversion Trigger",
+        "badge": "HTML5 CTA",
+        "description": "Stand-alone call-to-action block with high-contrast buttons.",
+        "promptText": "Create an instant HTML5 CTA conversion block for \"Neural Noir Interface Style\" with pure Tailwind CSS CDN classes.",
+        "tailwindSnippet": "<!-- 3. Conversion Trigger Action (HTML + Tailwind CDN) -->\n<div class=\"max-w-2xl mx-auto px-6 py-8 text-center\">\n  <div class=\"rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8\">\n    <h3 class=\"text-lg font-bold text-white mb-2\">Experience Neural Noir Interface Style</h3>\n    <p class=\"text-xs text-zinc-400 mb-6\">Open the standalone HTML template in your browser or paste into your project.</p>\n    <div class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-zinc-950 text-xs font-semibold hover:bg-zinc-100 transition-all\">\n        Launch Template\n      </button>\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold hover:bg-zinc-700 transition-all\">\n        Copy HTML Code\n      </button>\n    </div>\n  </div>\n</div>"
+      }
     ],
+    "features": [
+      "100% Pure Standalone HTML5 + Tailwind CSS via CDN",
+      "Zero JSX, TSX, React, or npm dependencies required",
+      "Double-click to preview instantly in any browser",
+      "1-Click AI Master Prompt optimized for Cursor & Claude"
+    ],
+    "toolsReplaced": [
+      {
+        "name": "UI Component Subscriptions",
+        "monthlyCostUSD": 29
+      },
+      {
+        "name": "Custom Animation Design",
+        "monthlyCostUSD": 99
+      },
+      {
+        "name": "Design Token Kits",
+        "monthlyCostUSD": 49
+      }
+    ],
+    "frameworkStack": [
+      "HTML5",
+      "Tailwind CSS (CDN)",
+      "Vanilla JS / Alpine.js",
+      "Lucide Icons (CDN)",
+      "GSAP (CDN)"
+    ],
+    "quickCopyPrompt": "You are an expert Frontend Engineer. Build a complete, production-ready, standalone HTML5 template for \"Neural Noir Interface Style\".\n\n### CRITICAL OUTPUT FORMAT REQUIREMENTS:\n- **Output ONLY single-file standard HTML (`<!DOCTYPE html> ... </html>`)**.\n- **STRICT PROHIBITION**: Do NOT output JSX, TSX, React components, Next.js code, or npm import statements. Everything must be pure HTML + CSS + JS in one file.\n- **Tailwind CSS via CDN**: Include `<script src=\"https://cdn.tailwindcss.com\"></script>` in `<head>`.\n- **Icons**: Load Lucide Icons via CDN `<script src=\"https://unpkg.com/lucide@latest\"></script>` and initialize with `<script>lucide.createIcons();</script>`.\n- **Fonts**: Load Google Fonts `Inter` and `JetBrains Mono`.\n- **Interactive Animations**: Use vanilla JavaScript or GSAP via CDN (`<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js\"></script>`) embedded inside `<script>` tags at the bottom.\n\n### Component & Design Specifications:\n1. **Design System & Palette**:\n   - Monochromatic Notion/Shopify aesthetic (neutral zinc-900 / zinc-950 dark, zinc-50 / pure white light).\n   - High precision typography with crisp contrast, clean borders (`border-zinc-200` / `border-zinc-800`), and soft shadows.\n2. **Component Architecture for \"Neural Noir Interface Style\"**:\n   - Master layout container with mobile, tablet, and desktop responsiveness.\n   - Micro-interactions on buttons, hover states, and smooth spring-like transitions.\n3. **Stand-Alone Portability**:\n   - Must open directly and render flawlessly by double clicking the `.html` file in any web browser.\n\nComponent: Neural Noir Interface Style\nCategory: Design Style",
+    "faqs": [
+      {
+        "question": "What is the output format of this prompt?",
+        "answer": "All prompts produce standard, single-file HTML5 templates styled with Tailwind CSS via CDN (<script src=\"https://cdn.tailwindcss.com\"></script>). No JSX, React, or build setups required."
+      },
+      {
+        "question": "How do I run and test the output HTML?",
+        "answer": "Copy the AI output, save it into a file named index.html, and double-click to open it in Chrome, Safari, or Firefox. It renders instantly without compiling."
+      },
+      {
+        "question": "Can I paste this HTML into WordPress, Webflow, or custom sites?",
+        "answer": "Yes! Because the template outputs standard HTML and loads Tailwind CSS via CDN, you can paste it directly into HTML embed blocks or standalone static sites."
+      }
+    ]
   },
   {
-    id: 'prompt-pack-dashboard-widgets',
-    slug: 'ai-prompt-pack-dashboard-widgets',
-    title: 'AI Prompt Pack: SaaS Dashboards & Admin Portals',
-    shortTitle: 'Dashboard UI Prompts',
-    tagline: 'Prompts to build Notion-style tables, admin popovers, status cards & KPI ribbons.',
-    category: 'section_prompts',
-    categoryLabel: 'AI Section Prompts',
-    assetFormat: 'section_prompts',
-    formatBadge: 'Claude & Cursor Prompts',
-    badge: 'Admin SaaS',
-    rating: 4.95,
-    reviewsCount: 162,
-    downloadsCount: 3120,
-    heroDescription: 'Construct comprehensive SaaS portals and backoffice dashboards. Features sticky bottom admin popovers, searchable data tables, and client milestone trackers.',
-    accentBg: 'bg-purple-50',
-    accentBorder: 'border-purple-200',
-    accentText: 'text-purple-900',
-    accentColor: '#9333EA',
-    coverImage: '/images/cora_hero_landscape.jpg',
-    compatibleBuilders: ['Cursor AI', 'Claude 3.5', 'Lovable', 'v0.dev'],
-    frameworkStack: ['Prompt Engineering', 'React', 'Tailwind CSS'],
-    quickCopyPrompt: 'Generate a Notion-styled interactive data table in Tailwind CSS with search filtering, column sorting, status tags, and row action popovers.',
-    sectionsIncluded: [
+    "id": "tmpl-07",
+    "slug": "nature-inspired-style",
+    "title": "Nature Inspired Style",
+    "shortTitle": "Nature Inspired Style",
+    "tagline": "Production-grade Nature Inspired Style standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.",
+    "category": "elementor_kits",
+    "categoryLabel": "Design Style",
+    "assetFormat": "elementor_kit",
+    "formatBadge": "HTML + TAILWIND CDN",
+    "badge": "DESIGN TOKENS",
+    "rating": 4.94,
+    "reviewsCount": 223,
+    "downloadsCount": 1753,
+    "viewsCount": 4810,
+    "copiesCount": 513,
+    "mediaType": "image",
+    "mediaUrl": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/hmac-uploads/screenshots/components/66ce62c6-8d53-4708-9723-3454aec97405/1b908311-3be0-4947-9d88-769d1950b9d6/1767956039662.png?width=600&quality=75&resize=contain",
+    "heroDescription": "Build and preview Nature Inspired Style instantly. Engineered as a complete standalone HTML document using Tailwind CSS via CDN (`<script src=\"https://cdn.tailwindcss.com\"></script>`), pure CSS/vanilla JS interactions, and zero build tool bloat. Perfect for Cursor AI, Claude 3.5 Sonnet, and direct browser execution.",
+    "accentBg": "bg-zinc-950",
+    "accentBorder": "border-zinc-800",
+    "accentText": "text-zinc-100",
+    "accentColor": "#09090b",
+    "coverImage": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/hmac-uploads/screenshots/components/66ce62c6-8d53-4708-9723-3454aec97405/1b908311-3be0-4947-9d88-769d1950b9d6/1767956039662.png?width=600&quality=75&resize=contain",
+    "compatibleBuilders": [
+      "HTML5 Standalone",
+      "Tailwind CSS CDN",
+      "Claude 3.5 Sonnet",
+      "Cursor AI",
+      "v0",
+      "Lovable"
+    ],
+    "sectionsIncluded": [
       {
-        id: 'admin-popover-prompt',
-        name: 'Sticky Sidebar Admin Popover Prompt',
-        badge: 'AI Prompt',
-        description: 'Bottom sticky user profile widget that opens a floating settings popover.',
-        promptText: `Create a sticky bottom sidebar admin profile widget:
-- Fixed to the bottom of the sidebar with avatar, user name, and workspace status dot.
-- Clicking opens a floating popover card directly above it with AI model selector and quota metrics.`,
-      },
-    ],
-    features: [
-      'Notion-inspired monochromatic data table layouts',
-      'Admin popover menus with status indicators',
-      'Real-time search and filter UI blueprints',
-    ],
-    toolsReplaced: [
-      { name: 'Tailwind UI Application UI Kit', monthlyCostUSD: 299 },
-    ],
-    faqs: [
-      {
-        question: 'Can I use this for client portals?',
-        answer: 'Yes! These prompts are designed for building client staging dashboards and approval portals.',
-      },
-    ],
-  },
-
-  // ── 3. ELEMENTOR TEMPLATE KITS (.json blueprints) ──
-  {
-    id: 'elementor-agency-pro-kit',
-    slug: 'elementor-agency-pro-kit',
-    title: 'Elementor Pro Agency Turnkey Template Kit',
-    shortTitle: 'Elementor Agency Kit',
-    tagline: 'Monochromatic Elementor Pro template kit (.json) with 8 ready-to-import page templates.',
-    category: 'elementor_kits',
-    categoryLabel: 'Elementor Template Kits',
-    assetFormat: 'elementor_kit',
-    formatBadge: 'Elementor Kit (.json)',
-    badge: 'Elementor Pro',
-    rating: 4.92,
-    reviewsCount: 165,
-    downloadsCount: 3450,
-    heroDescription: 'Complete, lightweight Elementor Pro template kit. Clean JSON blueprints for Header, Footer, Hero, Case Studies, Pricing Table, and Lead Forms without any slow 3rd-party add-ons.',
-    accentBg: 'bg-emerald-50',
-    accentBorder: 'border-emerald-200',
-    accentText: 'text-emerald-900',
-    accentColor: '#059669',
-    coverImage: '/images/cora_hero_landscape.jpg',
-    compatibleBuilders: ['Elementor Pro', 'WordPress', 'Hello Elementor Theme'],
-    frameworkStack: ['Elementor JSON', 'CSS Flexbox Containers', 'SVG Icons'],
-    quickCopyPrompt: 'Importable Elementor Pro kit with Flexbox Container layouts, custom global typography, neutral color palette, and zero external widget dependencies.',
-    sectionsIncluded: [
-      {
-        id: 'el-hero-container',
-        name: 'Flexbox Hero Container Blueprint',
-        badge: 'Elementor Section',
-        description: 'Clean Flexbox container layout ready to import into Elementor Theme Builder.',
-        promptText: 'Elementor Flexbox Container: Hero section with heading, subtext, dual buttons, and responsive tablet/mobile breakpoints.',
-        elementorBlueprint: '{"version":"0.4","title":"Cora Agency Hero Container","type":"container","elements":[{"elType":"container","settings":{"content_width":"boxed","flex_direction":"column","align_items":"center"}}]}',
+        "id": "sec-7-1",
+        "name": "Focal Layout Architecture",
+        "badge": "HTML5 HERO",
+        "description": "Main hero structure and typography for Nature Inspired Style.",
+        "promptText": "Generate a standalone HTML5 hero section for \"Nature Inspired Style\" using Tailwind CSS via CDN. Output pure HTML with class=\"...\", zero JSX or TSX.",
+        "tailwindSnippet": "<!-- 1. Focal Layout for Nature Inspired Style (HTML + Tailwind CDN) -->\n<section class=\"relative overflow-hidden py-16 sm:py-24 bg-zinc-950 text-zinc-100 antialiased font-sans\">\n  <div class=\"max-w-7xl mx-auto px-6 lg:px-8\">\n    <div class=\"text-center max-w-3xl mx-auto\">\n      <span class=\"inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-900 border border-zinc-800 text-zinc-300\">\n        <i data-lucide=\"sparkles\" class=\"w-3.5 h-3.5 text-zinc-400\"></i>\n        <span>DESIGN STYLE</span>\n      </span>\n      <h1 class=\"mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-display\">\n        Nature Inspired Style\n      </h1>\n      <p class=\"mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed\">\n        Production-grade Nature Inspired Style standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.\n      </p>\n    </div>\n  </div>\n</section>"
       },
       {
-        id: 'el-pricing-table',
-        name: 'Elementor 3-Tier Pricing Blueprint',
-        badge: 'Elementor Section',
-        description: 'Container-based pricing layout with highlighted central card and button triggers.',
-        promptText: 'Elementor Pricing Container: 3 column flexbox with custom CSS borders and button links.',
+        "id": "sec-7-2",
+        "name": "Interactive Feature Matrix",
+        "badge": "HTML5 GRID",
+        "description": "Responsive 3-column card grid with hover transitions and Lucide icons.",
+        "promptText": "Build a pure HTML5 3-column feature grid for \"Nature Inspired Style\" with Tailwind CDN utility classes and Lucide icons.",
+        "tailwindSnippet": "<!-- 2. Interactive Feature Matrix (HTML + Tailwind CDN) -->\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-6 py-12\">\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"zap\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Zero Build Lag</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Runs instantly in any browser via Tailwind CSS CDN script.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"layers\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Pure HTML & CSS</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Zero JSX or Node.js runtime required. Copy, paste and deploy.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"sparkles\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Micro-Interactions</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Smooth hover elevations and accessible keyboard focus outlines.</p>\n  </div>\n</div>"
       },
-    ],
-    features: [
-      '100% Flexbox Container based — zero legacy inner sections',
-      'No slow third-party Elementor addon plugins needed',
-      'Pre-configured global color palette and typography styles',
-      'Includes Header, Footer, 404, Single Post, and Archive templates',
-    ],
-    toolsReplaced: [
-      { name: 'Envato Elements Subscription', monthlyCostUSD: 33 },
-      { name: 'CrocoBlock JetElements', monthlyCostUSD: 19 },
-    ],
-    faqs: [
       {
-        question: 'How do I import this into Elementor?',
-        answer: 'In WordPress, go to Elementor > Tools > Import / Export Kit, upload the template JSON package, and click Apply.',
-      },
+        "id": "sec-7-3",
+        "name": "Action & Conversion Trigger",
+        "badge": "HTML5 CTA",
+        "description": "Stand-alone call-to-action block with high-contrast buttons.",
+        "promptText": "Create an instant HTML5 CTA conversion block for \"Nature Inspired Style\" with pure Tailwind CSS CDN classes.",
+        "tailwindSnippet": "<!-- 3. Conversion Trigger Action (HTML + Tailwind CDN) -->\n<div class=\"max-w-2xl mx-auto px-6 py-8 text-center\">\n  <div class=\"rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8\">\n    <h3 class=\"text-lg font-bold text-white mb-2\">Experience Nature Inspired Style</h3>\n    <p class=\"text-xs text-zinc-400 mb-6\">Open the standalone HTML template in your browser or paste into your project.</p>\n    <div class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-zinc-950 text-xs font-semibold hover:bg-zinc-100 transition-all\">\n        Launch Template\n      </button>\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold hover:bg-zinc-700 transition-all\">\n        Copy HTML Code\n      </button>\n    </div>\n  </div>\n</div>"
+      }
     ],
+    "features": [
+      "100% Pure Standalone HTML5 + Tailwind CSS via CDN",
+      "Zero JSX, TSX, React, or npm dependencies required",
+      "Double-click to preview instantly in any browser",
+      "1-Click AI Master Prompt optimized for Cursor & Claude"
+    ],
+    "toolsReplaced": [
+      {
+        "name": "UI Component Subscriptions",
+        "monthlyCostUSD": 29
+      },
+      {
+        "name": "Custom Animation Design",
+        "monthlyCostUSD": 99
+      },
+      {
+        "name": "Design Token Kits",
+        "monthlyCostUSD": 49
+      }
+    ],
+    "frameworkStack": [
+      "HTML5",
+      "Tailwind CSS (CDN)",
+      "Vanilla JS / Alpine.js",
+      "Lucide Icons (CDN)",
+      "GSAP (CDN)"
+    ],
+    "quickCopyPrompt": "You are an expert Frontend Engineer. Build a complete, production-ready, standalone HTML5 template for \"Nature Inspired Style\".\n\n### CRITICAL OUTPUT FORMAT REQUIREMENTS:\n- **Output ONLY single-file standard HTML (`<!DOCTYPE html> ... </html>`)**.\n- **STRICT PROHIBITION**: Do NOT output JSX, TSX, React components, Next.js code, or npm import statements. Everything must be pure HTML + CSS + JS in one file.\n- **Tailwind CSS via CDN**: Include `<script src=\"https://cdn.tailwindcss.com\"></script>` in `<head>`.\n- **Icons**: Load Lucide Icons via CDN `<script src=\"https://unpkg.com/lucide@latest\"></script>` and initialize with `<script>lucide.createIcons();</script>`.\n- **Fonts**: Load Google Fonts `Inter` and `JetBrains Mono`.\n- **Interactive Animations**: Use vanilla JavaScript or GSAP via CDN (`<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js\"></script>`) embedded inside `<script>` tags at the bottom.\n\n### Component & Design Specifications:\n1. **Design System & Palette**:\n   - Monochromatic Notion/Shopify aesthetic (neutral zinc-900 / zinc-950 dark, zinc-50 / pure white light).\n   - High precision typography with crisp contrast, clean borders (`border-zinc-200` / `border-zinc-800`), and soft shadows.\n2. **Component Architecture for \"Nature Inspired Style\"**:\n   - Master layout container with mobile, tablet, and desktop responsiveness.\n   - Micro-interactions on buttons, hover states, and smooth spring-like transitions.\n3. **Stand-Alone Portability**:\n   - Must open directly and render flawlessly by double clicking the `.html` file in any web browser.\n\nComponent: Nature Inspired Style\nCategory: Design Style",
+    "faqs": [
+      {
+        "question": "What is the output format of this prompt?",
+        "answer": "All prompts produce standard, single-file HTML5 templates styled with Tailwind CSS via CDN (<script src=\"https://cdn.tailwindcss.com\"></script>). No JSX, React, or build setups required."
+      },
+      {
+        "question": "How do I run and test the output HTML?",
+        "answer": "Copy the AI output, save it into a file named index.html, and double-click to open it in Chrome, Safari, or Firefox. It renders instantly without compiling."
+      },
+      {
+        "question": "Can I paste this HTML into WordPress, Webflow, or custom sites?",
+        "answer": "Yes! Because the template outputs standard HTML and loads Tailwind CSS via CDN, you can paste it directly into HTML embed blocks or standalone static sites."
+      }
+    ]
   },
   {
-    id: 'elementor-creative-studio-kit',
-    slug: 'elementor-creative-studio-kit',
-    title: 'Elementor Creative Studio & Freelancer Kit',
-    shortTitle: 'Elementor Studio Kit',
-    tagline: 'Minimalist editorial portfolio kit with full-width showcase containers & booking forms.',
-    category: 'elementor_kits',
-    categoryLabel: 'Elementor Template Kits',
-    assetFormat: 'elementor_kit',
-    formatBadge: 'Elementor Kit (.json)',
-    badge: 'Portfolio Kit',
-    rating: 4.93,
-    reviewsCount: 104,
-    downloadsCount: 2100,
-    heroDescription: 'Tailored for freelance photographers, designers, and visual creators who use WordPress & Elementor. Clean aesthetic, fast load times, and mobile responsive containers.',
-    accentBg: 'bg-emerald-50',
-    accentBorder: 'border-emerald-200',
-    accentText: 'text-emerald-900',
-    accentColor: '#059669',
-    coverImage: '/images/cora_hero_landscape.jpg',
-    compatibleBuilders: ['Elementor Pro', 'WordPress', 'Hello Theme'],
-    frameworkStack: ['Elementor JSON', 'Flexbox Containers'],
-    quickCopyPrompt: 'Importable Elementor portfolio kit with grid gallery, lightbox triggers, bio card, and booking form popup.',
-    sectionsIncluded: [
+    "id": "tmpl-08",
+    "slug": "synapse",
+    "title": "Synapse",
+    "shortTitle": "Synapse",
+    "tagline": "Production-grade Synapse standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.",
+    "category": "lovable_projects",
+    "categoryLabel": "Interactive & Animation",
+    "assetFormat": "lovable_project",
+    "formatBadge": "HTML + TAILWIND CDN",
+    "badge": "STANDALONE HTML",
+    "rating": 4.97,
+    "reviewsCount": 290,
+    "downloadsCount": 1981,
+    "viewsCount": 2388,
+    "copiesCount": 589,
+    "mediaType": "video",
+    "mediaUrl": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/preview-artifacts/prompt-library/7d97ebb3-363d-49d3-a029-fa9a23815e3f/thumbnails/456925c9-ac7e-4d99-80f5-8addbcab5780.mp4",
+    "heroDescription": "Build and preview Synapse instantly. Engineered as a complete standalone HTML document using Tailwind CSS via CDN (`<script src=\"https://cdn.tailwindcss.com\"></script>`), pure CSS/vanilla JS interactions, and zero build tool bloat. Perfect for Cursor AI, Claude 3.5 Sonnet, and direct browser execution.",
+    "accentBg": "bg-zinc-950",
+    "accentBorder": "border-zinc-800",
+    "accentText": "text-zinc-100",
+    "accentColor": "#09090b",
+    "coverImage": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/preview-artifacts/prompt-library/7d97ebb3-363d-49d3-a029-fa9a23815e3f/thumbnails/456925c9-ac7e-4d99-80f5-8addbcab5780.mp4",
+    "compatibleBuilders": [
+      "HTML5 Standalone",
+      "Tailwind CSS CDN",
+      "Claude 3.5 Sonnet",
+      "Cursor AI",
+      "v0",
+      "Lovable"
+    ],
+    "sectionsIncluded": [
       {
-        id: 'el-gallery-container',
-        name: 'Full-Width Gallery Showcase',
-        badge: 'Elementor Section',
-        description: 'Dynamic grid showcase with built-in lightbox preview.',
-        promptText: 'Elementor Portfolio Gallery: Flex container with 2-column image cards and hover zoom.',
+        "id": "sec-8-1",
+        "name": "Focal Layout Architecture",
+        "badge": "HTML5 HERO",
+        "description": "Main hero structure and typography for Synapse.",
+        "promptText": "Generate a standalone HTML5 hero section for \"Synapse\" using Tailwind CSS via CDN. Output pure HTML with class=\"...\", zero JSX or TSX.",
+        "tailwindSnippet": "<!-- 1. Focal Layout for Synapse (HTML + Tailwind CDN) -->\n<section class=\"relative overflow-hidden py-16 sm:py-24 bg-zinc-950 text-zinc-100 antialiased font-sans\">\n  <div class=\"max-w-7xl mx-auto px-6 lg:px-8\">\n    <div class=\"text-center max-w-3xl mx-auto\">\n      <span class=\"inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-900 border border-zinc-800 text-zinc-300\">\n        <i data-lucide=\"sparkles\" class=\"w-3.5 h-3.5 text-zinc-400\"></i>\n        <span>INTERACTIVE & ANIMATION</span>\n      </span>\n      <h1 class=\"mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-display\">\n        Synapse\n      </h1>\n      <p class=\"mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed\">\n        Production-grade Synapse standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.\n      </p>\n    </div>\n  </div>\n</section>"
       },
-    ],
-    features: [
-      'Minimal editorial layout with spacious padding',
-      'Pre-built lightbox gallery and case study single page',
-      'Integrated contact & consultation form blueprint',
-    ],
-    toolsReplaced: [
-      { name: 'TemplateMonster Single Theme', monthlyCostUSD: 59 },
-    ],
-    faqs: [
       {
-        question: 'Does this work with free Elementor?',
-        answer: 'The core page containers work with free Elementor; header/footer builders require Elementor Pro or Theme Builder.',
+        "id": "sec-8-2",
+        "name": "Interactive Feature Matrix",
+        "badge": "HTML5 GRID",
+        "description": "Responsive 3-column card grid with hover transitions and Lucide icons.",
+        "promptText": "Build a pure HTML5 3-column feature grid for \"Synapse\" with Tailwind CDN utility classes and Lucide icons.",
+        "tailwindSnippet": "<!-- 2. Interactive Feature Matrix (HTML + Tailwind CDN) -->\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-6 py-12\">\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"zap\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Zero Build Lag</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Runs instantly in any browser via Tailwind CSS CDN script.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"layers\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Pure HTML & CSS</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Zero JSX or Node.js runtime required. Copy, paste and deploy.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"sparkles\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Micro-Interactions</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Smooth hover elevations and accessible keyboard focus outlines.</p>\n  </div>\n</div>"
       },
+      {
+        "id": "sec-8-3",
+        "name": "Action & Conversion Trigger",
+        "badge": "HTML5 CTA",
+        "description": "Stand-alone call-to-action block with high-contrast buttons.",
+        "promptText": "Create an instant HTML5 CTA conversion block for \"Synapse\" with pure Tailwind CSS CDN classes.",
+        "tailwindSnippet": "<!-- 3. Conversion Trigger Action (HTML + Tailwind CDN) -->\n<div class=\"max-w-2xl mx-auto px-6 py-8 text-center\">\n  <div class=\"rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8\">\n    <h3 class=\"text-lg font-bold text-white mb-2\">Experience Synapse</h3>\n    <p class=\"text-xs text-zinc-400 mb-6\">Open the standalone HTML template in your browser or paste into your project.</p>\n    <div class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-zinc-950 text-xs font-semibold hover:bg-zinc-100 transition-all\">\n        Launch Template\n      </button>\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold hover:bg-zinc-700 transition-all\">\n        Copy HTML Code\n      </button>\n    </div>\n  </div>\n</div>"
+      }
     ],
+    "features": [
+      "100% Pure Standalone HTML5 + Tailwind CSS via CDN",
+      "Zero JSX, TSX, React, or npm dependencies required",
+      "Double-click to preview instantly in any browser",
+      "1-Click AI Master Prompt optimized for Cursor & Claude"
+    ],
+    "toolsReplaced": [
+      {
+        "name": "UI Component Subscriptions",
+        "monthlyCostUSD": 29
+      },
+      {
+        "name": "Custom Animation Design",
+        "monthlyCostUSD": 99
+      },
+      {
+        "name": "Design Token Kits",
+        "monthlyCostUSD": 49
+      }
+    ],
+    "frameworkStack": [
+      "HTML5",
+      "Tailwind CSS (CDN)",
+      "Vanilla JS / Alpine.js",
+      "Lucide Icons (CDN)",
+      "GSAP (CDN)"
+    ],
+    "quickCopyPrompt": "You are an expert Frontend Engineer. Build a complete, production-ready, standalone HTML5 template for \"Synapse\".\n\n### CRITICAL OUTPUT FORMAT REQUIREMENTS:\n- **Output ONLY single-file standard HTML (`<!DOCTYPE html> ... </html>`)**.\n- **STRICT PROHIBITION**: Do NOT output JSX, TSX, React components, Next.js code, or npm import statements. Everything must be pure HTML + CSS + JS in one file.\n- **Tailwind CSS via CDN**: Include `<script src=\"https://cdn.tailwindcss.com\"></script>` in `<head>`.\n- **Icons**: Load Lucide Icons via CDN `<script src=\"https://unpkg.com/lucide@latest\"></script>` and initialize with `<script>lucide.createIcons();</script>`.\n- **Fonts**: Load Google Fonts `Inter` and `JetBrains Mono`.\n- **Interactive Animations**: Use vanilla JavaScript or GSAP via CDN (`<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js\"></script>`) embedded inside `<script>` tags at the bottom.\n\n### Component & Design Specifications:\n1. **Design System & Palette**:\n   - Monochromatic Notion/Shopify aesthetic (neutral zinc-900 / zinc-950 dark, zinc-50 / pure white light).\n   - High precision typography with crisp contrast, clean borders (`border-zinc-200` / `border-zinc-800`), and soft shadows.\n2. **Component Architecture for \"Synapse\"**:\n   - Master layout container with mobile, tablet, and desktop responsiveness.\n   - Micro-interactions on buttons, hover states, and smooth spring-like transitions.\n3. **Stand-Alone Portability**:\n   - Must open directly and render flawlessly by double clicking the `.html` file in any web browser.\n\nComponent: Synapse\nCategory: Interactive & Animation",
+    "faqs": [
+      {
+        "question": "What is the output format of this prompt?",
+        "answer": "All prompts produce standard, single-file HTML5 templates styled with Tailwind CSS via CDN (<script src=\"https://cdn.tailwindcss.com\"></script>). No JSX, React, or build setups required."
+      },
+      {
+        "question": "How do I run and test the output HTML?",
+        "answer": "Copy the AI output, save it into a file named index.html, and double-click to open it in Chrome, Safari, or Firefox. It renders instantly without compiling."
+      },
+      {
+        "question": "Can I paste this HTML into WordPress, Webflow, or custom sites?",
+        "answer": "Yes! Because the template outputs standard HTML and loads Tailwind CSS via CDN, you can paste it directly into HTML embed blocks or standalone static sites."
+      }
+    ]
   },
   {
-    id: 'elementor-real-estate-kit',
-    slug: 'elementor-real-estate-kit',
-    title: 'Elementor Luxury Real Estate & Brokerage Kit',
-    shortTitle: 'Elementor Real Estate',
-    tagline: 'High-end property listing cards, floorplan tabs, and tour booking modal triggers.',
-    category: 'elementor_kits',
-    categoryLabel: 'Elementor Template Kits',
-    assetFormat: 'elementor_kit',
-    formatBadge: 'Elementor Kit (.json)',
-    badge: 'Real Estate',
-    rating: 4.91,
-    reviewsCount: 88,
-    downloadsCount: 1890,
-    heroDescription: 'High-converting real estate kit for property developers and luxury brokers. Includes property detail layouts, amenity icon grids, interactive map embeds, and lead forms.',
-    accentBg: 'bg-emerald-50',
-    accentBorder: 'border-emerald-200',
-    accentText: 'text-emerald-900',
-    accentColor: '#059669',
-    coverImage: '/images/cora_hero_landscape.jpg',
-    compatibleBuilders: ['Elementor Pro', 'WordPress'],
-    frameworkStack: ['Elementor JSON', 'Flexbox Containers'],
-    quickCopyPrompt: 'Elementor luxury real estate listing page with property specifications bar, photo slider, floorplan preview, and scheduled tour contact box.',
-    sectionsIncluded: [
+    "id": "tmpl-09",
+    "slug": "saas-landing-page-for-developer-tool",
+    "title": "SaaS Landing Page for Developer Tool",
+    "shortTitle": "SaaS Landing Page for Develope...",
+    "tagline": "Production-grade SaaS Landing Page for Developer Tool standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.",
+    "category": "landing_pages",
+    "categoryLabel": "Landing Page",
+    "assetFormat": "native_page",
+    "formatBadge": "HTML + TAILWIND CDN",
+    "badge": "HERO SYSTEM",
+    "rating": 4.94,
+    "reviewsCount": 69,
+    "downloadsCount": 2656,
+    "viewsCount": 1668,
+    "copiesCount": 557,
+    "mediaType": "image",
+    "mediaUrl": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/hmac-uploads/screenshots/drafts/a8f544ea-ba22-4214-ade4-4cbd56118443/1770866149216.png?width=600&quality=75&resize=contain",
+    "heroDescription": "Build and preview SaaS Landing Page for Developer Tool instantly. Engineered as a complete standalone HTML document using Tailwind CSS via CDN (`<script src=\"https://cdn.tailwindcss.com\"></script>`), pure CSS/vanilla JS interactions, and zero build tool bloat. Perfect for Cursor AI, Claude 3.5 Sonnet, and direct browser execution.",
+    "accentBg": "bg-zinc-950",
+    "accentBorder": "border-zinc-800",
+    "accentText": "text-zinc-100",
+    "accentColor": "#09090b",
+    "coverImage": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/hmac-uploads/screenshots/drafts/a8f544ea-ba22-4214-ade4-4cbd56118443/1770866149216.png?width=600&quality=75&resize=contain",
+    "compatibleBuilders": [
+      "HTML5 Standalone",
+      "Tailwind CSS CDN",
+      "Claude 3.5 Sonnet",
+      "Cursor AI",
+      "v0",
+      "Lovable"
+    ],
+    "sectionsIncluded": [
       {
-        id: 'el-property-hero',
-        name: 'Property Listing Hero Blueprint',
-        badge: 'Elementor Section',
-        description: 'High-impact hero with price badge, square footage counter, and 3D tour button.',
-        promptText: 'Elementor Property Hero: Full-width banner with overlay badge and instant booking trigger.',
+        "id": "sec-9-1",
+        "name": "Focal Layout Architecture",
+        "badge": "HTML5 HERO",
+        "description": "Main hero structure and typography for SaaS Landing Page for Developer Tool.",
+        "promptText": "Generate a standalone HTML5 hero section for \"SaaS Landing Page for Developer Tool\" using Tailwind CSS via CDN. Output pure HTML with class=\"...\", zero JSX or TSX.",
+        "tailwindSnippet": "<!-- 1. Focal Layout for SaaS Landing Page for Developer Tool (HTML + Tailwind CDN) -->\n<section class=\"relative overflow-hidden py-16 sm:py-24 bg-zinc-950 text-zinc-100 antialiased font-sans\">\n  <div class=\"max-w-7xl mx-auto px-6 lg:px-8\">\n    <div class=\"text-center max-w-3xl mx-auto\">\n      <span class=\"inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-900 border border-zinc-800 text-zinc-300\">\n        <i data-lucide=\"sparkles\" class=\"w-3.5 h-3.5 text-zinc-400\"></i>\n        <span>LANDING PAGE</span>\n      </span>\n      <h1 class=\"mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-display\">\n        SaaS Landing Page for Developer Tool\n      </h1>\n      <p class=\"mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed\">\n        Production-grade SaaS Landing Page for Developer Tool standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.\n      </p>\n    </div>\n  </div>\n</section>"
       },
-    ],
-    features: [
-      'Property amenity spec bar (Beds, Baths, Sq. Ft., Price)',
-      'Floorplan download trigger and high-res gallery',
-      'VIP private viewing scheduler form',
-    ],
-    toolsReplaced: [
-      { name: 'RealHomes Premium WordPress Theme', monthlyCostUSD: 69 },
-    ],
-    faqs: [
       {
-        question: 'Can I add dynamic custom fields (ACF)?',
-        answer: 'Yes, all container elements are mapped to standard Elementor dynamic tags for seamless ACF/Pods integration.',
+        "id": "sec-9-2",
+        "name": "Interactive Feature Matrix",
+        "badge": "HTML5 GRID",
+        "description": "Responsive 3-column card grid with hover transitions and Lucide icons.",
+        "promptText": "Build a pure HTML5 3-column feature grid for \"SaaS Landing Page for Developer Tool\" with Tailwind CDN utility classes and Lucide icons.",
+        "tailwindSnippet": "<!-- 2. Interactive Feature Matrix (HTML + Tailwind CDN) -->\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-6 py-12\">\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"zap\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Zero Build Lag</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Runs instantly in any browser via Tailwind CSS CDN script.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"layers\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Pure HTML & CSS</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Zero JSX or Node.js runtime required. Copy, paste and deploy.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"sparkles\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Micro-Interactions</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Smooth hover elevations and accessible keyboard focus outlines.</p>\n  </div>\n</div>"
       },
+      {
+        "id": "sec-9-3",
+        "name": "Action & Conversion Trigger",
+        "badge": "HTML5 CTA",
+        "description": "Stand-alone call-to-action block with high-contrast buttons.",
+        "promptText": "Create an instant HTML5 CTA conversion block for \"SaaS Landing Page for Developer Tool\" with pure Tailwind CSS CDN classes.",
+        "tailwindSnippet": "<!-- 3. Conversion Trigger Action (HTML + Tailwind CDN) -->\n<div class=\"max-w-2xl mx-auto px-6 py-8 text-center\">\n  <div class=\"rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8\">\n    <h3 class=\"text-lg font-bold text-white mb-2\">Experience SaaS Landing Page for Develope...</h3>\n    <p class=\"text-xs text-zinc-400 mb-6\">Open the standalone HTML template in your browser or paste into your project.</p>\n    <div class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-zinc-950 text-xs font-semibold hover:bg-zinc-100 transition-all\">\n        Launch Template\n      </button>\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold hover:bg-zinc-700 transition-all\">\n        Copy HTML Code\n      </button>\n    </div>\n  </div>\n</div>"
+      }
     ],
+    "features": [
+      "100% Pure Standalone HTML5 + Tailwind CSS via CDN",
+      "Zero JSX, TSX, React, or npm dependencies required",
+      "Double-click to preview instantly in any browser",
+      "1-Click AI Master Prompt optimized for Cursor & Claude"
+    ],
+    "toolsReplaced": [
+      {
+        "name": "UI Component Subscriptions",
+        "monthlyCostUSD": 29
+      },
+      {
+        "name": "Custom Animation Design",
+        "monthlyCostUSD": 99
+      },
+      {
+        "name": "Design Token Kits",
+        "monthlyCostUSD": 49
+      }
+    ],
+    "frameworkStack": [
+      "HTML5",
+      "Tailwind CSS (CDN)",
+      "Vanilla JS / Alpine.js",
+      "Lucide Icons (CDN)",
+      "GSAP (CDN)"
+    ],
+    "quickCopyPrompt": "You are an expert Frontend Engineer. Build a complete, production-ready, standalone HTML5 template for \"SaaS Landing Page for Developer Tool\".\n\n### CRITICAL OUTPUT FORMAT REQUIREMENTS:\n- **Output ONLY single-file standard HTML (`<!DOCTYPE html> ... </html>`)**.\n- **STRICT PROHIBITION**: Do NOT output JSX, TSX, React components, Next.js code, or npm import statements. Everything must be pure HTML + CSS + JS in one file.\n- **Tailwind CSS via CDN**: Include `<script src=\"https://cdn.tailwindcss.com\"></script>` in `<head>`.\n- **Icons**: Load Lucide Icons via CDN `<script src=\"https://unpkg.com/lucide@latest\"></script>` and initialize with `<script>lucide.createIcons();</script>`.\n- **Fonts**: Load Google Fonts `Inter` and `JetBrains Mono`.\n- **Interactive Animations**: Use vanilla JavaScript or GSAP via CDN (`<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js\"></script>`) embedded inside `<script>` tags at the bottom.\n\n### Component & Design Specifications:\n1. **Design System & Palette**:\n   - Monochromatic Notion/Shopify aesthetic (neutral zinc-900 / zinc-950 dark, zinc-50 / pure white light).\n   - High precision typography with crisp contrast, clean borders (`border-zinc-200` / `border-zinc-800`), and soft shadows.\n2. **Component Architecture for \"SaaS Landing Page for Developer Tool\"**:\n   - Master layout container with mobile, tablet, and desktop responsiveness.\n   - Micro-interactions on buttons, hover states, and smooth spring-like transitions.\n3. **Stand-Alone Portability**:\n   - Must open directly and render flawlessly by double clicking the `.html` file in any web browser.\n\nComponent: SaaS Landing Page for Developer Tool\nCategory: Landing Page",
+    "faqs": [
+      {
+        "question": "What is the output format of this prompt?",
+        "answer": "All prompts produce standard, single-file HTML5 templates styled with Tailwind CSS via CDN (<script src=\"https://cdn.tailwindcss.com\"></script>). No JSX, React, or build setups required."
+      },
+      {
+        "question": "How do I run and test the output HTML?",
+        "answer": "Copy the AI output, save it into a file named index.html, and double-click to open it in Chrome, Safari, or Firefox. It renders instantly without compiling."
+      },
+      {
+        "question": "Can I paste this HTML into WordPress, Webflow, or custom sites?",
+        "answer": "Yes! Because the template outputs standard HTML and loads Tailwind CSS via CDN, you can paste it directly into HTML embed blocks or standalone static sites."
+      }
+    ]
   },
   {
-    id: 'elementor-law-ca-firm-kit',
-    slug: 'elementor-law-ca-firm-kit',
-    title: 'Elementor Corporate Legal & CA Advisory Kit',
-    shortTitle: 'Elementor Legal Kit',
-    tagline: 'Authoritative law firm & chartered accountant kit with practice area matrices & retainer forms.',
-    category: 'elementor_kits',
-    categoryLabel: 'Elementor Template Kits',
-    assetFormat: 'elementor_kit',
-    formatBadge: 'Elementor Kit (.json)',
-    badge: 'Legal & CA',
-    rating: 4.95,
-    reviewsCount: 72,
-    downloadsCount: 1540,
-    heroDescription: 'Prestigious corporate layout designed for law firms, tax practitioners, and audit consultants. Features structured practice area grids, attorney bio cards, and retainer inquiry forms.',
-    accentBg: 'bg-emerald-50',
-    accentBorder: 'border-emerald-200',
-    accentText: 'text-emerald-900',
-    accentColor: '#059669',
-    coverImage: '/images/cora_hero_landscape.jpg',
-    compatibleBuilders: ['Elementor Pro', 'WordPress'],
-    frameworkStack: ['Elementor JSON', 'Flexbox Containers'],
-    quickCopyPrompt: 'Corporate legal advisor Elementor kit with practice area cards, compliance trust badges, case victory metrics, and confidential consultation form.',
-    sectionsIncluded: [
+    "id": "tmpl-10",
+    "slug": "terminal-portfolio-website-retro-crt-phosphor-green-developer-portfolio",
+    "title": "Terminal Portfolio Website: Retro CRT Phosphor-Green Developer Portfolio",
+    "shortTitle": "Terminal Portfolio Website",
+    "tagline": "Production-grade Terminal Portfolio Website: Retro CRT Phosphor-Green Developer Portfolio standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.",
+    "category": "landing_pages",
+    "categoryLabel": "Landing Page",
+    "assetFormat": "native_page",
+    "formatBadge": "HTML + TAILWIND CDN",
+    "badge": "HERO SYSTEM",
+    "rating": 4.91,
+    "reviewsCount": 251,
+    "downloadsCount": 2183,
+    "viewsCount": 2658,
+    "copiesCount": 819,
+    "mediaType": "image",
+    "mediaUrl": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/preview-artifacts/prompt-library/7d97ebb3-363d-49d3-a029-fa9a23815e3f/thumbnails/a5c28285-79ce-467d-8e50-75d0d047f115.png?width=600&quality=75&resize=contain",
+    "heroDescription": "Build and preview Terminal Portfolio Website: Retro CRT Phosphor-Green Developer Portfolio instantly. Engineered as a complete standalone HTML document using Tailwind CSS via CDN (`<script src=\"https://cdn.tailwindcss.com\"></script>`), pure CSS/vanilla JS interactions, and zero build tool bloat. Perfect for Cursor AI, Claude 3.5 Sonnet, and direct browser execution.",
+    "accentBg": "bg-zinc-950",
+    "accentBorder": "border-zinc-800",
+    "accentText": "text-zinc-100",
+    "accentColor": "#09090b",
+    "coverImage": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/preview-artifacts/prompt-library/7d97ebb3-363d-49d3-a029-fa9a23815e3f/thumbnails/a5c28285-79ce-467d-8e50-75d0d047f115.png?width=600&quality=75&resize=contain",
+    "compatibleBuilders": [
+      "HTML5 Standalone",
+      "Tailwind CSS CDN",
+      "Claude 3.5 Sonnet",
+      "Cursor AI",
+      "v0",
+      "Lovable"
+    ],
+    "sectionsIncluded": [
       {
-        id: 'el-practice-areas',
-        name: 'Practice Areas Grid Blueprint',
-        badge: 'Elementor Section',
-        description: '6-card corporate practice matrix with icon pills and learn more links.',
-        promptText: 'Elementor Practice Area: 3x2 grid container with icon, title, short description, and link.',
-      },
-    ],
-    features: [
-      'Authoritative corporate design with understated typography',
-      'Confidential consultation inquiry form with file upload support',
-      'Attorney and partner biography cards',
-    ],
-    toolsReplaced: [
-      { name: 'LawPress WordPress Theme', monthlyCostUSD: 49 },
-    ],
-    faqs: [
-      {
-        question: 'Is this kit mobile responsive?',
-        answer: 'Yes, all container breakpoints are verified for iPhone, iPad, and desktop viewports.',
-      },
-    ],
-  },
-
-  // ── 4. LOVABLE & REACT PROJECTS ──
-  {
-    id: 'lovable-agency-fullstack-kit',
-    slug: 'lovable-agency-fullstack-kit',
-    title: 'Lovable Turnkey Agency Workspace Project',
-    shortTitle: 'Lovable Agency Project',
-    tagline: 'Ready-to-fork fullstack Lovable.dev / React project with auth, client portals & invoices.',
-    category: 'lovable_projects',
-    categoryLabel: 'Lovable & React Projects',
-    assetFormat: 'lovable_project',
-    formatBadge: 'Lovable Project & React',
-    badge: '1-Click Fork',
-    rating: 4.98,
-    reviewsCount: 220,
-    downloadsCount: 4100,
-    heroDescription: 'A complete Lovable.dev project repository. Fork with 1 click to get a live web app featuring Supabase authentication, client portal staging vaults, GST tax math calculators, and dark/light mode.',
-    accentBg: 'bg-indigo-50',
-    accentBorder: 'border-indigo-200',
-    accentText: 'text-indigo-900',
-    accentColor: '#4F46E5',
-    coverImage: '/images/cora_hero_landscape.jpg',
-    compatibleBuilders: ['Lovable.dev', 'v0.dev', 'Cursor AI', 'React 19', 'Vite', 'Tailwind CSS'],
-    frameworkStack: ['Lovable / Vite', 'React 19', 'Tailwind CSS', 'Supabase / Mock DB'],
-    quickCopyPrompt: 'Fork complete Lovable agency template with Supabase client management, milestone billing, and passwordless review portal.',
-    sectionsIncluded: [
-      {
-        id: 'lovable-dashboard',
-        name: 'Interactive Agency Dashboard View',
-        badge: 'Lovable View',
-        description: 'Kanban lead pipeline, client project timeline, and revenue analytics.',
-        promptText: 'Build a fullstack agency dashboard in Lovable with Kanban board, revenue metrics card, and client portal access generator.',
+        "id": "sec-10-1",
+        "name": "Focal Layout Architecture",
+        "badge": "HTML5 HERO",
+        "description": "Main hero structure and typography for Terminal Portfolio Website: Retro CRT Phosphor-Green Developer Portfolio.",
+        "promptText": "Generate a standalone HTML5 hero section for \"Terminal Portfolio Website: Retro CRT Phosphor-Green Developer Portfolio\" using Tailwind CSS via CDN. Output pure HTML with class=\"...\", zero JSX or TSX.",
+        "tailwindSnippet": "<!-- 1. Focal Layout for Terminal Portfolio Website: Retro CRT Phosphor-Green Developer Portfolio (HTML + Tailwind CDN) -->\n<section class=\"relative overflow-hidden py-16 sm:py-24 bg-zinc-950 text-zinc-100 antialiased font-sans\">\n  <div class=\"max-w-7xl mx-auto px-6 lg:px-8\">\n    <div class=\"text-center max-w-3xl mx-auto\">\n      <span class=\"inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-900 border border-zinc-800 text-zinc-300\">\n        <i data-lucide=\"sparkles\" class=\"w-3.5 h-3.5 text-zinc-400\"></i>\n        <span>LANDING PAGE</span>\n      </span>\n      <h1 class=\"mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-display\">\n        Terminal Portfolio Website: Retro CRT Phosphor-Green Developer Portfolio\n      </h1>\n      <p class=\"mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed\">\n        Production-grade Terminal Portfolio Website: Retro CRT Phosphor-Green Developer Portfolio standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.\n      </p>\n    </div>\n  </div>\n</section>"
       },
       {
-        id: 'lovable-client-portal',
-        name: 'Client Staging & Approval Vault',
-        badge: 'Lovable View',
-        description: 'Interactive client screen where prospects leave feedback and sign off milestones.',
-        promptText: 'Create a passwordless client staging portal with visual feedback pins and 1-click milestone approval buttons.',
+        "id": "sec-10-2",
+        "name": "Interactive Feature Matrix",
+        "badge": "HTML5 GRID",
+        "description": "Responsive 3-column card grid with hover transitions and Lucide icons.",
+        "promptText": "Build a pure HTML5 3-column feature grid for \"Terminal Portfolio Website: Retro CRT Phosphor-Green Developer Portfolio\" with Tailwind CDN utility classes and Lucide icons.",
+        "tailwindSnippet": "<!-- 2. Interactive Feature Matrix (HTML + Tailwind CDN) -->\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-6 py-12\">\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"zap\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Zero Build Lag</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Runs instantly in any browser via Tailwind CSS CDN script.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"layers\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Pure HTML & CSS</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Zero JSX or Node.js runtime required. Copy, paste and deploy.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"sparkles\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Micro-Interactions</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Smooth hover elevations and accessible keyboard focus outlines.</p>\n  </div>\n</div>"
       },
-    ],
-    features: [
-      '1-Click fork to Lovable.dev and immediate live preview',
-      'Includes complete React components, routes, and UI state',
-      'Pre-integrated with Tailwind CSS and Radix UI primitives',
-      'Clean file structure ready for Supabase or custom API hooks',
-    ],
-    toolsReplaced: [
-      { name: 'Lovable Pro Project Starter', monthlyCostUSD: 20 },
-      { name: 'SaaS Boilerplate License', monthlyCostUSD: 199 },
-    ],
-    faqs: [
       {
-        question: 'How do I fork this into my Lovable account?',
-        answer: 'Click "Fork in Lovable" or copy the full component project code directly into Lovable.dev or v0.dev to start customizing.',
-      },
+        "id": "sec-10-3",
+        "name": "Action & Conversion Trigger",
+        "badge": "HTML5 CTA",
+        "description": "Stand-alone call-to-action block with high-contrast buttons.",
+        "promptText": "Create an instant HTML5 CTA conversion block for \"Terminal Portfolio Website: Retro CRT Phosphor-Green Developer Portfolio\" with pure Tailwind CSS CDN classes.",
+        "tailwindSnippet": "<!-- 3. Conversion Trigger Action (HTML + Tailwind CDN) -->\n<div class=\"max-w-2xl mx-auto px-6 py-8 text-center\">\n  <div class=\"rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8\">\n    <h3 class=\"text-lg font-bold text-white mb-2\">Experience Terminal Portfolio Website</h3>\n    <p class=\"text-xs text-zinc-400 mb-6\">Open the standalone HTML template in your browser or paste into your project.</p>\n    <div class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-zinc-950 text-xs font-semibold hover:bg-zinc-100 transition-all\">\n        Launch Template\n      </button>\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold hover:bg-zinc-700 transition-all\">\n        Copy HTML Code\n      </button>\n    </div>\n  </div>\n</div>"
+      }
     ],
+    "features": [
+      "100% Pure Standalone HTML5 + Tailwind CSS via CDN",
+      "Zero JSX, TSX, React, or npm dependencies required",
+      "Double-click to preview instantly in any browser",
+      "1-Click AI Master Prompt optimized for Cursor & Claude"
+    ],
+    "toolsReplaced": [
+      {
+        "name": "UI Component Subscriptions",
+        "monthlyCostUSD": 29
+      },
+      {
+        "name": "Custom Animation Design",
+        "monthlyCostUSD": 99
+      },
+      {
+        "name": "Design Token Kits",
+        "monthlyCostUSD": 49
+      }
+    ],
+    "frameworkStack": [
+      "HTML5",
+      "Tailwind CSS (CDN)",
+      "Vanilla JS / Alpine.js",
+      "Lucide Icons (CDN)",
+      "GSAP (CDN)"
+    ],
+    "quickCopyPrompt": "You are an expert Frontend Engineer. Build a complete, production-ready, standalone HTML5 template for \"Terminal Portfolio Website: Retro CRT Phosphor-Green Developer Portfolio\".\n\n### CRITICAL OUTPUT FORMAT REQUIREMENTS:\n- **Output ONLY single-file standard HTML (`<!DOCTYPE html> ... </html>`)**.\n- **STRICT PROHIBITION**: Do NOT output JSX, TSX, React components, Next.js code, or npm import statements. Everything must be pure HTML + CSS + JS in one file.\n- **Tailwind CSS via CDN**: Include `<script src=\"https://cdn.tailwindcss.com\"></script>` in `<head>`.\n- **Icons**: Load Lucide Icons via CDN `<script src=\"https://unpkg.com/lucide@latest\"></script>` and initialize with `<script>lucide.createIcons();</script>`.\n- **Fonts**: Load Google Fonts `Inter` and `JetBrains Mono`.\n- **Interactive Animations**: Use vanilla JavaScript or GSAP via CDN (`<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js\"></script>`) embedded inside `<script>` tags at the bottom.\n\n### Component & Design Specifications:\n1. **Design System & Palette**:\n   - Monochromatic Notion/Shopify aesthetic (neutral zinc-900 / zinc-950 dark, zinc-50 / pure white light).\n   - High precision typography with crisp contrast, clean borders (`border-zinc-200` / `border-zinc-800`), and soft shadows.\n2. **Component Architecture for \"Terminal Portfolio Website: Retro CRT Phosphor-Green Developer Portfolio\"**:\n   - Master layout container with mobile, tablet, and desktop responsiveness.\n   - Micro-interactions on buttons, hover states, and smooth spring-like transitions.\n3. **Stand-Alone Portability**:\n   - Must open directly and render flawlessly by double clicking the `.html` file in any web browser.\n\nComponent: Terminal Portfolio Website: Retro CRT Phosphor-Green Developer Portfolio\nCategory: Landing Page",
+    "faqs": [
+      {
+        "question": "What is the output format of this prompt?",
+        "answer": "All prompts produce standard, single-file HTML5 templates styled with Tailwind CSS via CDN (<script src=\"https://cdn.tailwindcss.com\"></script>). No JSX, React, or build setups required."
+      },
+      {
+        "question": "How do I run and test the output HTML?",
+        "answer": "Copy the AI output, save it into a file named index.html, and double-click to open it in Chrome, Safari, or Firefox. It renders instantly without compiling."
+      },
+      {
+        "question": "Can I paste this HTML into WordPress, Webflow, or custom sites?",
+        "answer": "Yes! Because the template outputs standard HTML and loads Tailwind CSS via CDN, you can paste it directly into HTML embed blocks or standalone static sites."
+      }
+    ]
   },
   {
-    id: 'lovable-crm-lead-pipeline',
-    slug: 'lovable-crm-lead-pipeline',
-    title: 'Lovable CRM & Lead Funnel Pipeline Project',
-    shortTitle: 'Lovable CRM Pipeline',
-    tagline: 'Interactive Kanban pipeline, lead scoring matrix, and automated follow-up triggers.',
-    category: 'lovable_projects',
-    categoryLabel: 'Lovable & React Projects',
-    assetFormat: 'lovable_project',
-    formatBadge: 'Lovable Project & React',
-    badge: 'CRM App',
-    rating: 4.96,
-    reviewsCount: 145,
-    downloadsCount: 2750,
-    heroDescription: 'Ready-to-run React/Lovable CRM web application. Features drag-and-drop Kanban columns (Inquiry -> Proposal Sent -> Negotiation -> Won), lead value calculations, and quick call log drawers.',
-    accentBg: 'bg-indigo-50',
-    accentBorder: 'border-indigo-200',
-    accentText: 'text-indigo-900',
-    accentColor: '#4F46E5',
-    coverImage: '/images/cora_hero_landscape.jpg',
-    compatibleBuilders: ['Lovable.dev', 'Cursor AI', 'v0.dev', 'React 19'],
-    frameworkStack: ['React', 'Tailwind CSS', 'dnd-kit / Drag & Drop'],
-    quickCopyPrompt: 'Create an interactive CRM Kanban board in React and Tailwind with draggable deal cards, pipeline total revenue calculation, and deal detail drawer.',
-    sectionsIncluded: [
+    "id": "tmpl-11",
+    "slug": "ascii-hero",
+    "title": "Ascii hero",
+    "shortTitle": "Ascii hero",
+    "tagline": "Production-grade Ascii hero standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.",
+    "category": "section_prompts",
+    "categoryLabel": "AI Section Prompt",
+    "assetFormat": "section_prompts",
+    "formatBadge": "HTML + TAILWIND CDN",
+    "badge": "AI MASTER PROMPT",
+    "rating": 4.94,
+    "reviewsCount": 281,
+    "downloadsCount": 1611,
+    "viewsCount": 3131,
+    "copiesCount": 784,
+    "mediaType": "image",
+    "mediaUrl": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/hmac-uploads/screenshots/drafts/d0848987-0c46-4d26-9e88-a652fee697e1/1785721008007.png?width=600&quality=75&resize=contain",
+    "heroDescription": "Build and preview Ascii hero instantly. Engineered as a complete standalone HTML document using Tailwind CSS via CDN (`<script src=\"https://cdn.tailwindcss.com\"></script>`), pure CSS/vanilla JS interactions, and zero build tool bloat. Perfect for Cursor AI, Claude 3.5 Sonnet, and direct browser execution.",
+    "accentBg": "bg-zinc-950",
+    "accentBorder": "border-zinc-800",
+    "accentText": "text-zinc-100",
+    "accentColor": "#09090b",
+    "coverImage": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/hmac-uploads/screenshots/drafts/d0848987-0c46-4d26-9e88-a652fee697e1/1785721008007.png?width=600&quality=75&resize=contain",
+    "compatibleBuilders": [
+      "HTML5 Standalone",
+      "Tailwind CSS CDN",
+      "Claude 3.5 Sonnet",
+      "Cursor AI",
+      "v0",
+      "Lovable"
+    ],
+    "sectionsIncluded": [
       {
-        id: 'lovable-kanban-board',
-        name: 'Draggable Deal Kanban Pipeline',
-        badge: 'Lovable Component',
-        description: 'Drag-and-drop lead stage workflow with real-time deal stage summation.',
-        promptText: 'Build a Kanban pipeline with 4 columns: New Lead, Qualified, In Negotiation, Closed Won. Each card shows deal value, client avatar, and last contact date.',
+        "id": "sec-11-1",
+        "name": "Focal Layout Architecture",
+        "badge": "HTML5 HERO",
+        "description": "Main hero structure and typography for Ascii hero.",
+        "promptText": "Generate a standalone HTML5 hero section for \"Ascii hero\" using Tailwind CSS via CDN. Output pure HTML with class=\"...\", zero JSX or TSX.",
+        "tailwindSnippet": "<!-- 1. Focal Layout for Ascii hero (HTML + Tailwind CDN) -->\n<section class=\"relative overflow-hidden py-16 sm:py-24 bg-zinc-950 text-zinc-100 antialiased font-sans\">\n  <div class=\"max-w-7xl mx-auto px-6 lg:px-8\">\n    <div class=\"text-center max-w-3xl mx-auto\">\n      <span class=\"inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-900 border border-zinc-800 text-zinc-300\">\n        <i data-lucide=\"sparkles\" class=\"w-3.5 h-3.5 text-zinc-400\"></i>\n        <span>AI SECTION PROMPT</span>\n      </span>\n      <h1 class=\"mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-display\">\n        Ascii hero\n      </h1>\n      <p class=\"mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed\">\n        Production-grade Ascii hero standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.\n      </p>\n    </div>\n  </div>\n</section>"
       },
-    ],
-    features: [
-      'Interactive drag-and-drop deal management',
-      'Real-time deal value aggregation across stages',
-      'Contact card drawer with communication history timeline',
-    ],
-    toolsReplaced: [
-      { name: 'Pipedrive Starter Tier', monthlyCostUSD: 24 },
-      { name: 'HubSpot Sales Hub Starter', monthlyCostUSD: 20 },
-    ],
-    faqs: [
       {
-        question: 'Does this support drag and drop on mobile?',
-        answer: 'Yes, it uses touch-optimized gesture handlers to ensure seamless column re-ordering on mobile devices.',
+        "id": "sec-11-2",
+        "name": "Interactive Feature Matrix",
+        "badge": "HTML5 GRID",
+        "description": "Responsive 3-column card grid with hover transitions and Lucide icons.",
+        "promptText": "Build a pure HTML5 3-column feature grid for \"Ascii hero\" with Tailwind CDN utility classes and Lucide icons.",
+        "tailwindSnippet": "<!-- 2. Interactive Feature Matrix (HTML + Tailwind CDN) -->\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-6 py-12\">\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"zap\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Zero Build Lag</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Runs instantly in any browser via Tailwind CSS CDN script.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"layers\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Pure HTML & CSS</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Zero JSX or Node.js runtime required. Copy, paste and deploy.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"sparkles\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Micro-Interactions</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Smooth hover elevations and accessible keyboard focus outlines.</p>\n  </div>\n</div>"
       },
+      {
+        "id": "sec-11-3",
+        "name": "Action & Conversion Trigger",
+        "badge": "HTML5 CTA",
+        "description": "Stand-alone call-to-action block with high-contrast buttons.",
+        "promptText": "Create an instant HTML5 CTA conversion block for \"Ascii hero\" with pure Tailwind CSS CDN classes.",
+        "tailwindSnippet": "<!-- 3. Conversion Trigger Action (HTML + Tailwind CDN) -->\n<div class=\"max-w-2xl mx-auto px-6 py-8 text-center\">\n  <div class=\"rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8\">\n    <h3 class=\"text-lg font-bold text-white mb-2\">Experience Ascii hero</h3>\n    <p class=\"text-xs text-zinc-400 mb-6\">Open the standalone HTML template in your browser or paste into your project.</p>\n    <div class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-zinc-950 text-xs font-semibold hover:bg-zinc-100 transition-all\">\n        Launch Template\n      </button>\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold hover:bg-zinc-700 transition-all\">\n        Copy HTML Code\n      </button>\n    </div>\n  </div>\n</div>"
+      }
     ],
+    "features": [
+      "100% Pure Standalone HTML5 + Tailwind CSS via CDN",
+      "Zero JSX, TSX, React, or npm dependencies required",
+      "Double-click to preview instantly in any browser",
+      "1-Click AI Master Prompt optimized for Cursor & Claude"
+    ],
+    "toolsReplaced": [
+      {
+        "name": "UI Component Subscriptions",
+        "monthlyCostUSD": 29
+      },
+      {
+        "name": "Custom Animation Design",
+        "monthlyCostUSD": 99
+      },
+      {
+        "name": "Design Token Kits",
+        "monthlyCostUSD": 49
+      }
+    ],
+    "frameworkStack": [
+      "HTML5",
+      "Tailwind CSS (CDN)",
+      "Vanilla JS / Alpine.js",
+      "Lucide Icons (CDN)",
+      "GSAP (CDN)"
+    ],
+    "quickCopyPrompt": "You are an expert Frontend Engineer. Build a complete, production-ready, standalone HTML5 template for \"Ascii hero\".\n\n### CRITICAL OUTPUT FORMAT REQUIREMENTS:\n- **Output ONLY single-file standard HTML (`<!DOCTYPE html> ... </html>`)**.\n- **STRICT PROHIBITION**: Do NOT output JSX, TSX, React components, Next.js code, or npm import statements. Everything must be pure HTML + CSS + JS in one file.\n- **Tailwind CSS via CDN**: Include `<script src=\"https://cdn.tailwindcss.com\"></script>` in `<head>`.\n- **Icons**: Load Lucide Icons via CDN `<script src=\"https://unpkg.com/lucide@latest\"></script>` and initialize with `<script>lucide.createIcons();</script>`.\n- **Fonts**: Load Google Fonts `Inter` and `JetBrains Mono`.\n- **Interactive Animations**: Use vanilla JavaScript or GSAP via CDN (`<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js\"></script>`) embedded inside `<script>` tags at the bottom.\n\n### Component & Design Specifications:\n1. **Design System & Palette**:\n   - Monochromatic Notion/Shopify aesthetic (neutral zinc-900 / zinc-950 dark, zinc-50 / pure white light).\n   - High precision typography with crisp contrast, clean borders (`border-zinc-200` / `border-zinc-800`), and soft shadows.\n2. **Component Architecture for \"Ascii hero\"**:\n   - Master layout container with mobile, tablet, and desktop responsiveness.\n   - Micro-interactions on buttons, hover states, and smooth spring-like transitions.\n3. **Stand-Alone Portability**:\n   - Must open directly and render flawlessly by double clicking the `.html` file in any web browser.\n\nComponent: Ascii hero\nCategory: AI Section Prompt",
+    "faqs": [
+      {
+        "question": "What is the output format of this prompt?",
+        "answer": "All prompts produce standard, single-file HTML5 templates styled with Tailwind CSS via CDN (<script src=\"https://cdn.tailwindcss.com\"></script>). No JSX, React, or build setups required."
+      },
+      {
+        "question": "How do I run and test the output HTML?",
+        "answer": "Copy the AI output, save it into a file named index.html, and double-click to open it in Chrome, Safari, or Firefox. It renders instantly without compiling."
+      },
+      {
+        "question": "Can I paste this HTML into WordPress, Webflow, or custom sites?",
+        "answer": "Yes! Because the template outputs standard HTML and loads Tailwind CSS via CDN, you can paste it directly into HTML embed blocks or standalone static sites."
+      }
+    ]
   },
   {
-    id: 'lovable-invoice-payment-app',
-    slug: 'lovable-invoice-payment-app',
-    title: 'Lovable Instant GST Invoice & UPI QR App',
-    shortTitle: 'Lovable Invoice App',
-    tagline: '18% GST tax math engine, SAC 9983 lookup, and dynamic dynamic UPI QR code generator.',
-    category: 'lovable_projects',
-    categoryLabel: 'Lovable & React Projects',
-    assetFormat: 'lovable_project',
-    formatBadge: 'Lovable Project & React',
-    badge: 'Fintech Tool',
-    rating: 4.97,
-    reviewsCount: 190,
-    downloadsCount: 3800,
-    heroDescription: 'A standalone React/Lovable billing web app. Calculate CGST/SGST/IGST breakdown in real-time, generate downloadable PDF invoices, and render live UPI QR payment codes for Indian clients.',
-    accentBg: 'bg-indigo-50',
-    accentBorder: 'border-indigo-200',
-    accentText: 'text-indigo-900',
-    accentColor: '#4F46E5',
-    coverImage: '/images/cora_hero_landscape.jpg',
-    compatibleBuilders: ['Lovable.dev', 'Cursor AI', 'v0.dev', 'React 19'],
-    frameworkStack: ['React', 'Tailwind CSS', 'QRCode.react', 'html2pdf'],
-    quickCopyPrompt: 'Build an Indian GST invoicing tool in React with real-time SAC 9983 tax math, intra-state CGST/SGST split, and dynamic UPI QR code generator.',
-    sectionsIncluded: [
+    "id": "tmpl-12",
+    "slug": "serene-find-my-dream",
+    "title": "Serene \u2014 Find My Dream",
+    "shortTitle": "Serene",
+    "tagline": "Production-grade Serene \u2014 Find My Dream standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.",
+    "category": "section_prompts",
+    "categoryLabel": "AI Section Prompt",
+    "assetFormat": "section_prompts",
+    "formatBadge": "HTML + TAILWIND CDN",
+    "badge": "AI MASTER PROMPT",
+    "rating": 4.98,
+    "reviewsCount": 203,
+    "downloadsCount": 3674,
+    "viewsCount": 3511,
+    "copiesCount": 660,
+    "mediaType": "image",
+    "mediaUrl": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/hmac-uploads/screenshots/drafts/e9729669-1c86-4800-85a5-c2754d7a1591/1785029818112.png?width=600&quality=75&resize=contain",
+    "heroDescription": "Build and preview Serene \u2014 Find My Dream instantly. Engineered as a complete standalone HTML document using Tailwind CSS via CDN (`<script src=\"https://cdn.tailwindcss.com\"></script>`), pure CSS/vanilla JS interactions, and zero build tool bloat. Perfect for Cursor AI, Claude 3.5 Sonnet, and direct browser execution.",
+    "accentBg": "bg-zinc-950",
+    "accentBorder": "border-zinc-800",
+    "accentText": "text-zinc-100",
+    "accentColor": "#09090b",
+    "coverImage": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/hmac-uploads/screenshots/drafts/e9729669-1c86-4800-85a5-c2754d7a1591/1785029818112.png?width=600&quality=75&resize=contain",
+    "compatibleBuilders": [
+      "HTML5 Standalone",
+      "Tailwind CSS CDN",
+      "Claude 3.5 Sonnet",
+      "Cursor AI",
+      "v0",
+      "Lovable"
+    ],
+    "sectionsIncluded": [
       {
-        id: 'lovable-tax-calc',
-        name: 'Live GST Calculation Engine',
-        badge: 'Lovable Engine',
-        description: 'Auto-computes 18% GST, reverses inclusive tax, and handles reverse charge.',
-        promptText: 'React GST calculator with subtotal, 9% CGST, 9% SGST or 18% IGST radio switch, and instant UPI QR code renderer.',
+        "id": "sec-12-1",
+        "name": "Focal Layout Architecture",
+        "badge": "HTML5 HERO",
+        "description": "Main hero structure and typography for Serene \u2014 Find My Dream.",
+        "promptText": "Generate a standalone HTML5 hero section for \"Serene \u2014 Find My Dream\" using Tailwind CSS via CDN. Output pure HTML with class=\"...\", zero JSX or TSX.",
+        "tailwindSnippet": "<!-- 1. Focal Layout for Serene \u2014 Find My Dream (HTML + Tailwind CDN) -->\n<section class=\"relative overflow-hidden py-16 sm:py-24 bg-zinc-950 text-zinc-100 antialiased font-sans\">\n  <div class=\"max-w-7xl mx-auto px-6 lg:px-8\">\n    <div class=\"text-center max-w-3xl mx-auto\">\n      <span class=\"inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-900 border border-zinc-800 text-zinc-300\">\n        <i data-lucide=\"sparkles\" class=\"w-3.5 h-3.5 text-zinc-400\"></i>\n        <span>AI SECTION PROMPT</span>\n      </span>\n      <h1 class=\"mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-display\">\n        Serene \u2014 Find My Dream\n      </h1>\n      <p class=\"mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed\">\n        Production-grade Serene \u2014 Find My Dream standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.\n      </p>\n    </div>\n  </div>\n</section>"
       },
-    ],
-    features: [
-      'Real-time Indian GST tax calculator (CGST/SGST/IGST)',
-      'Dynamic UPI string generator (upi://pay?pa=...&am=...)',
-      '1-Click PDF export and client share link generator',
-    ],
-    toolsReplaced: [
-      { name: 'Vyapar Desktop Invoice Pro', monthlyCostUSD: 15 },
-      { name: 'Zoho Invoice Premium', monthlyCostUSD: 19 },
-    ],
-    faqs: [
       {
-        question: 'Does this generate valid GST tax invoices?',
-        answer: 'Yes, it complies with Rule 46 of the CGST Rules 2017 with SAC code, HSN breakdown, and supplier GSTIN fields.',
+        "id": "sec-12-2",
+        "name": "Interactive Feature Matrix",
+        "badge": "HTML5 GRID",
+        "description": "Responsive 3-column card grid with hover transitions and Lucide icons.",
+        "promptText": "Build a pure HTML5 3-column feature grid for \"Serene \u2014 Find My Dream\" with Tailwind CDN utility classes and Lucide icons.",
+        "tailwindSnippet": "<!-- 2. Interactive Feature Matrix (HTML + Tailwind CDN) -->\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-6 py-12\">\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"zap\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Zero Build Lag</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Runs instantly in any browser via Tailwind CSS CDN script.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"layers\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Pure HTML & CSS</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Zero JSX or Node.js runtime required. Copy, paste and deploy.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"sparkles\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Micro-Interactions</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Smooth hover elevations and accessible keyboard focus outlines.</p>\n  </div>\n</div>"
       },
+      {
+        "id": "sec-12-3",
+        "name": "Action & Conversion Trigger",
+        "badge": "HTML5 CTA",
+        "description": "Stand-alone call-to-action block with high-contrast buttons.",
+        "promptText": "Create an instant HTML5 CTA conversion block for \"Serene \u2014 Find My Dream\" with pure Tailwind CSS CDN classes.",
+        "tailwindSnippet": "<!-- 3. Conversion Trigger Action (HTML + Tailwind CDN) -->\n<div class=\"max-w-2xl mx-auto px-6 py-8 text-center\">\n  <div class=\"rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8\">\n    <h3 class=\"text-lg font-bold text-white mb-2\">Experience Serene</h3>\n    <p class=\"text-xs text-zinc-400 mb-6\">Open the standalone HTML template in your browser or paste into your project.</p>\n    <div class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-zinc-950 text-xs font-semibold hover:bg-zinc-100 transition-all\">\n        Launch Template\n      </button>\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold hover:bg-zinc-700 transition-all\">\n        Copy HTML Code\n      </button>\n    </div>\n  </div>\n</div>"
+      }
     ],
+    "features": [
+      "100% Pure Standalone HTML5 + Tailwind CSS via CDN",
+      "Zero JSX, TSX, React, or npm dependencies required",
+      "Double-click to preview instantly in any browser",
+      "1-Click AI Master Prompt optimized for Cursor & Claude"
+    ],
+    "toolsReplaced": [
+      {
+        "name": "UI Component Subscriptions",
+        "monthlyCostUSD": 29
+      },
+      {
+        "name": "Custom Animation Design",
+        "monthlyCostUSD": 99
+      },
+      {
+        "name": "Design Token Kits",
+        "monthlyCostUSD": 49
+      }
+    ],
+    "frameworkStack": [
+      "HTML5",
+      "Tailwind CSS (CDN)",
+      "Vanilla JS / Alpine.js",
+      "Lucide Icons (CDN)",
+      "GSAP (CDN)"
+    ],
+    "quickCopyPrompt": "You are an expert Frontend Engineer. Build a complete, production-ready, standalone HTML5 template for \"Serene \u2014 Find My Dream\".\n\n### CRITICAL OUTPUT FORMAT REQUIREMENTS:\n- **Output ONLY single-file standard HTML (`<!DOCTYPE html> ... </html>`)**.\n- **STRICT PROHIBITION**: Do NOT output JSX, TSX, React components, Next.js code, or npm import statements. Everything must be pure HTML + CSS + JS in one file.\n- **Tailwind CSS via CDN**: Include `<script src=\"https://cdn.tailwindcss.com\"></script>` in `<head>`.\n- **Icons**: Load Lucide Icons via CDN `<script src=\"https://unpkg.com/lucide@latest\"></script>` and initialize with `<script>lucide.createIcons();</script>`.\n- **Fonts**: Load Google Fonts `Inter` and `JetBrains Mono`.\n- **Interactive Animations**: Use vanilla JavaScript or GSAP via CDN (`<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js\"></script>`) embedded inside `<script>` tags at the bottom.\n\n### Component & Design Specifications:\n1. **Design System & Palette**:\n   - Monochromatic Notion/Shopify aesthetic (neutral zinc-900 / zinc-950 dark, zinc-50 / pure white light).\n   - High precision typography with crisp contrast, clean borders (`border-zinc-200` / `border-zinc-800`), and soft shadows.\n2. **Component Architecture for \"Serene \u2014 Find My Dream\"**:\n   - Master layout container with mobile, tablet, and desktop responsiveness.\n   - Micro-interactions on buttons, hover states, and smooth spring-like transitions.\n3. **Stand-Alone Portability**:\n   - Must open directly and render flawlessly by double clicking the `.html` file in any web browser.\n\nComponent: Serene \u2014 Find My Dream\nCategory: AI Section Prompt",
+    "faqs": [
+      {
+        "question": "What is the output format of this prompt?",
+        "answer": "All prompts produce standard, single-file HTML5 templates styled with Tailwind CSS via CDN (<script src=\"https://cdn.tailwindcss.com\"></script>). No JSX, React, or build setups required."
+      },
+      {
+        "question": "How do I run and test the output HTML?",
+        "answer": "Copy the AI output, save it into a file named index.html, and double-click to open it in Chrome, Safari, or Firefox. It renders instantly without compiling."
+      },
+      {
+        "question": "Can I paste this HTML into WordPress, Webflow, or custom sites?",
+        "answer": "Yes! Because the template outputs standard HTML and loads Tailwind CSS via CDN, you can paste it directly into HTML embed blocks or standalone static sites."
+      }
+    ]
   },
   {
-    id: 'lovable-client-onboarding-flow',
-    slug: 'lovable-client-onboarding-flow',
-    title: 'Lovable 5-Step Guided Client Onboarding Flow',
-    shortTitle: 'Lovable Onboarding',
-    tagline: 'Multi-step onboarding wizard: Project Details -> Scope -> Agreement -> Payment -> Portal Access.',
-    category: 'lovable_projects',
-    categoryLabel: 'Lovable & React Projects',
-    assetFormat: 'lovable_project',
-    formatBadge: 'Lovable Project & React',
-    badge: 'Onboarding Flow',
-    rating: 4.95,
-    reviewsCount: 112,
-    downloadsCount: 2340,
-    heroDescription: 'A friction-free multi-step client onboarding wizard. Guides new agency clients through project scope intake, digital signature sign-off, advance retainer payment, and workspace setup in under 3 minutes.',
-    accentBg: 'bg-indigo-50',
-    accentBorder: 'border-indigo-200',
-    accentText: 'text-indigo-900',
-    accentColor: '#4F46E5',
-    coverImage: '/images/cora_hero_landscape.jpg',
-    compatibleBuilders: ['Lovable.dev', 'Cursor AI', 'v0.dev', 'React 19'],
-    frameworkStack: ['React', 'Tailwind CSS', 'Framer Motion'],
-    quickCopyPrompt: 'Create a 5-step client onboarding wizard in React: Step 1 Details, Step 2 Scope Checklist, Step 3 Digital Agreement Sign, Step 4 Advance Payment UPI, Step 5 Success Screen.',
-    sectionsIncluded: [
+    "id": "tmpl-13",
+    "slug": "softly-digital-wellness-app",
+    "title": "Softly - Digital Wellness App",
+    "shortTitle": "Softly - Digital Wellness App",
+    "tagline": "Production-grade Softly - Digital Wellness App standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.",
+    "category": "section_prompts",
+    "categoryLabel": "AI Section Prompt",
+    "assetFormat": "section_prompts",
+    "formatBadge": "HTML + TAILWIND CDN",
+    "badge": "AI MASTER PROMPT",
+    "rating": 4.92,
+    "reviewsCount": 225,
+    "downloadsCount": 1887,
+    "viewsCount": 2731,
+    "copiesCount": 805,
+    "mediaType": "image",
+    "mediaUrl": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/preview-artifacts/prompt-library/efa2aaa5-0358-40b7-b524-ba300874c206/thumbnails/f8bde81c-e9f4-40df-8791-4f4ad81e977d.png?width=600&quality=75&resize=contain",
+    "heroDescription": "Build and preview Softly - Digital Wellness App instantly. Engineered as a complete standalone HTML document using Tailwind CSS via CDN (`<script src=\"https://cdn.tailwindcss.com\"></script>`), pure CSS/vanilla JS interactions, and zero build tool bloat. Perfect for Cursor AI, Claude 3.5 Sonnet, and direct browser execution.",
+    "accentBg": "bg-zinc-950",
+    "accentBorder": "border-zinc-800",
+    "accentText": "text-zinc-100",
+    "accentColor": "#09090b",
+    "coverImage": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/preview-artifacts/prompt-library/efa2aaa5-0358-40b7-b524-ba300874c206/thumbnails/f8bde81c-e9f4-40df-8791-4f4ad81e977d.png?width=600&quality=75&resize=contain",
+    "compatibleBuilders": [
+      "HTML5 Standalone",
+      "Tailwind CSS CDN",
+      "Claude 3.5 Sonnet",
+      "Cursor AI",
+      "v0",
+      "Lovable"
+    ],
+    "sectionsIncluded": [
       {
-        id: 'lovable-stepper',
-        name: '5-Step Linear Progress Stepper',
-        badge: 'Lovable Wizard',
-        description: 'Guided progress stepper with validated inputs and instant step restoration.',
-        promptText: 'Build a 5-step guided stepper with animated step numbers, back/next navigation, and completed step checkmarks.',
+        "id": "sec-13-1",
+        "name": "Focal Layout Architecture",
+        "badge": "HTML5 HERO",
+        "description": "Main hero structure and typography for Softly - Digital Wellness App.",
+        "promptText": "Generate a standalone HTML5 hero section for \"Softly - Digital Wellness App\" using Tailwind CSS via CDN. Output pure HTML with class=\"...\", zero JSX or TSX.",
+        "tailwindSnippet": "<!-- 1. Focal Layout for Softly - Digital Wellness App (HTML + Tailwind CDN) -->\n<section class=\"relative overflow-hidden py-16 sm:py-24 bg-zinc-950 text-zinc-100 antialiased font-sans\">\n  <div class=\"max-w-7xl mx-auto px-6 lg:px-8\">\n    <div class=\"text-center max-w-3xl mx-auto\">\n      <span class=\"inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-900 border border-zinc-800 text-zinc-300\">\n        <i data-lucide=\"sparkles\" class=\"w-3.5 h-3.5 text-zinc-400\"></i>\n        <span>AI SECTION PROMPT</span>\n      </span>\n      <h1 class=\"mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-display\">\n        Softly - Digital Wellness App\n      </h1>\n      <p class=\"mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed\">\n        Production-grade Softly - Digital Wellness App standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.\n      </p>\n    </div>\n  </div>\n</section>"
       },
-    ],
-    features: [
-      '5-Step guided progress stepper with form state persistence',
-      'Integrated digital signature canvas component',
-      'Instant client workspace portal provisioning trigger',
-    ],
-    toolsReplaced: [
-      { name: 'PandaDoc Onboarding Workflow', monthlyCostUSD: 49 },
-      { name: 'Bonsai Client Onboarding', monthlyCostUSD: 32 },
-    ],
-    faqs: [
       {
-        question: 'Can I add custom onboarding steps?',
-        answer: 'Yes, the stepper is array-driven. You can add or remove steps (like KYC upload or questionnaire) with 1 line of config.',
+        "id": "sec-13-2",
+        "name": "Interactive Feature Matrix",
+        "badge": "HTML5 GRID",
+        "description": "Responsive 3-column card grid with hover transitions and Lucide icons.",
+        "promptText": "Build a pure HTML5 3-column feature grid for \"Softly - Digital Wellness App\" with Tailwind CDN utility classes and Lucide icons.",
+        "tailwindSnippet": "<!-- 2. Interactive Feature Matrix (HTML + Tailwind CDN) -->\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-6 py-12\">\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"zap\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Zero Build Lag</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Runs instantly in any browser via Tailwind CSS CDN script.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"layers\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Pure HTML & CSS</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Zero JSX or Node.js runtime required. Copy, paste and deploy.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"sparkles\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Micro-Interactions</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Smooth hover elevations and accessible keyboard focus outlines.</p>\n  </div>\n</div>"
       },
+      {
+        "id": "sec-13-3",
+        "name": "Action & Conversion Trigger",
+        "badge": "HTML5 CTA",
+        "description": "Stand-alone call-to-action block with high-contrast buttons.",
+        "promptText": "Create an instant HTML5 CTA conversion block for \"Softly - Digital Wellness App\" with pure Tailwind CSS CDN classes.",
+        "tailwindSnippet": "<!-- 3. Conversion Trigger Action (HTML + Tailwind CDN) -->\n<div class=\"max-w-2xl mx-auto px-6 py-8 text-center\">\n  <div class=\"rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8\">\n    <h3 class=\"text-lg font-bold text-white mb-2\">Experience Softly - Digital Wellness App</h3>\n    <p class=\"text-xs text-zinc-400 mb-6\">Open the standalone HTML template in your browser or paste into your project.</p>\n    <div class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-zinc-950 text-xs font-semibold hover:bg-zinc-100 transition-all\">\n        Launch Template\n      </button>\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold hover:bg-zinc-700 transition-all\">\n        Copy HTML Code\n      </button>\n    </div>\n  </div>\n</div>"
+      }
     ],
+    "features": [
+      "100% Pure Standalone HTML5 + Tailwind CSS via CDN",
+      "Zero JSX, TSX, React, or npm dependencies required",
+      "Double-click to preview instantly in any browser",
+      "1-Click AI Master Prompt optimized for Cursor & Claude"
+    ],
+    "toolsReplaced": [
+      {
+        "name": "UI Component Subscriptions",
+        "monthlyCostUSD": 29
+      },
+      {
+        "name": "Custom Animation Design",
+        "monthlyCostUSD": 99
+      },
+      {
+        "name": "Design Token Kits",
+        "monthlyCostUSD": 49
+      }
+    ],
+    "frameworkStack": [
+      "HTML5",
+      "Tailwind CSS (CDN)",
+      "Vanilla JS / Alpine.js",
+      "Lucide Icons (CDN)",
+      "GSAP (CDN)"
+    ],
+    "quickCopyPrompt": "You are an expert Frontend Engineer. Build a complete, production-ready, standalone HTML5 template for \"Softly - Digital Wellness App\".\n\n### CRITICAL OUTPUT FORMAT REQUIREMENTS:\n- **Output ONLY single-file standard HTML (`<!DOCTYPE html> ... </html>`)**.\n- **STRICT PROHIBITION**: Do NOT output JSX, TSX, React components, Next.js code, or npm import statements. Everything must be pure HTML + CSS + JS in one file.\n- **Tailwind CSS via CDN**: Include `<script src=\"https://cdn.tailwindcss.com\"></script>` in `<head>`.\n- **Icons**: Load Lucide Icons via CDN `<script src=\"https://unpkg.com/lucide@latest\"></script>` and initialize with `<script>lucide.createIcons();</script>`.\n- **Fonts**: Load Google Fonts `Inter` and `JetBrains Mono`.\n- **Interactive Animations**: Use vanilla JavaScript or GSAP via CDN (`<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js\"></script>`) embedded inside `<script>` tags at the bottom.\n\n### Component & Design Specifications:\n1. **Design System & Palette**:\n   - Monochromatic Notion/Shopify aesthetic (neutral zinc-900 / zinc-950 dark, zinc-50 / pure white light).\n   - High precision typography with crisp contrast, clean borders (`border-zinc-200` / `border-zinc-800`), and soft shadows.\n2. **Component Architecture for \"Softly - Digital Wellness App\"**:\n   - Master layout container with mobile, tablet, and desktop responsiveness.\n   - Micro-interactions on buttons, hover states, and smooth spring-like transitions.\n3. **Stand-Alone Portability**:\n   - Must open directly and render flawlessly by double clicking the `.html` file in any web browser.\n\nComponent: Softly - Digital Wellness App\nCategory: AI Section Prompt",
+    "faqs": [
+      {
+        "question": "What is the output format of this prompt?",
+        "answer": "All prompts produce standard, single-file HTML5 templates styled with Tailwind CSS via CDN (<script src=\"https://cdn.tailwindcss.com\"></script>). No JSX, React, or build setups required."
+      },
+      {
+        "question": "How do I run and test the output HTML?",
+        "answer": "Copy the AI output, save it into a file named index.html, and double-click to open it in Chrome, Safari, or Firefox. It renders instantly without compiling."
+      },
+      {
+        "question": "Can I paste this HTML into WordPress, Webflow, or custom sites?",
+        "answer": "Yes! Because the template outputs standard HTML and loads Tailwind CSS via CDN, you can paste it directly into HTML embed blocks or standalone static sites."
+      }
+    ]
   },
+  {
+    "id": "tmpl-14",
+    "slug": "glassmorphism-style",
+    "title": "Glassmorphism Style",
+    "shortTitle": "Glassmorphism Style",
+    "tagline": "Production-grade Glassmorphism Style standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.",
+    "category": "elementor_kits",
+    "categoryLabel": "Design Style",
+    "assetFormat": "elementor_kit",
+    "formatBadge": "HTML + TAILWIND CDN",
+    "badge": "DESIGN TOKENS",
+    "rating": 4.98,
+    "reviewsCount": 65,
+    "downloadsCount": 2285,
+    "viewsCount": 3958,
+    "copiesCount": 626,
+    "mediaType": "image",
+    "mediaUrl": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/hmac-uploads/screenshots/components/285ed12a-0b4a-435d-b212-b2dc30cee0cb/8ba9a623-981c-49ae-8ce7-679d477ef084/1767756243811.png?width=600&quality=75&resize=contain",
+    "heroDescription": "Build and preview Glassmorphism Style instantly. Engineered as a complete standalone HTML document using Tailwind CSS via CDN (`<script src=\"https://cdn.tailwindcss.com\"></script>`), pure CSS/vanilla JS interactions, and zero build tool bloat. Perfect for Cursor AI, Claude 3.5 Sonnet, and direct browser execution.",
+    "accentBg": "bg-zinc-950",
+    "accentBorder": "border-zinc-800",
+    "accentText": "text-zinc-100",
+    "accentColor": "#09090b",
+    "coverImage": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/hmac-uploads/screenshots/components/285ed12a-0b4a-435d-b212-b2dc30cee0cb/8ba9a623-981c-49ae-8ce7-679d477ef084/1767756243811.png?width=600&quality=75&resize=contain",
+    "compatibleBuilders": [
+      "HTML5 Standalone",
+      "Tailwind CSS CDN",
+      "Claude 3.5 Sonnet",
+      "Cursor AI",
+      "v0",
+      "Lovable"
+    ],
+    "sectionsIncluded": [
+      {
+        "id": "sec-14-1",
+        "name": "Focal Layout Architecture",
+        "badge": "HTML5 HERO",
+        "description": "Main hero structure and typography for Glassmorphism Style.",
+        "promptText": "Generate a standalone HTML5 hero section for \"Glassmorphism Style\" using Tailwind CSS via CDN. Output pure HTML with class=\"...\", zero JSX or TSX.",
+        "tailwindSnippet": "<!-- 1. Focal Layout for Glassmorphism Style (HTML + Tailwind CDN) -->\n<section class=\"relative overflow-hidden py-16 sm:py-24 bg-zinc-950 text-zinc-100 antialiased font-sans\">\n  <div class=\"max-w-7xl mx-auto px-6 lg:px-8\">\n    <div class=\"text-center max-w-3xl mx-auto\">\n      <span class=\"inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-900 border border-zinc-800 text-zinc-300\">\n        <i data-lucide=\"sparkles\" class=\"w-3.5 h-3.5 text-zinc-400\"></i>\n        <span>DESIGN STYLE</span>\n      </span>\n      <h1 class=\"mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-display\">\n        Glassmorphism Style\n      </h1>\n      <p class=\"mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed\">\n        Production-grade Glassmorphism Style standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.\n      </p>\n    </div>\n  </div>\n</section>"
+      },
+      {
+        "id": "sec-14-2",
+        "name": "Interactive Feature Matrix",
+        "badge": "HTML5 GRID",
+        "description": "Responsive 3-column card grid with hover transitions and Lucide icons.",
+        "promptText": "Build a pure HTML5 3-column feature grid for \"Glassmorphism Style\" with Tailwind CDN utility classes and Lucide icons.",
+        "tailwindSnippet": "<!-- 2. Interactive Feature Matrix (HTML + Tailwind CDN) -->\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-6 py-12\">\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"zap\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Zero Build Lag</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Runs instantly in any browser via Tailwind CSS CDN script.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"layers\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Pure HTML & CSS</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Zero JSX or Node.js runtime required. Copy, paste and deploy.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"sparkles\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Micro-Interactions</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Smooth hover elevations and accessible keyboard focus outlines.</p>\n  </div>\n</div>"
+      },
+      {
+        "id": "sec-14-3",
+        "name": "Action & Conversion Trigger",
+        "badge": "HTML5 CTA",
+        "description": "Stand-alone call-to-action block with high-contrast buttons.",
+        "promptText": "Create an instant HTML5 CTA conversion block for \"Glassmorphism Style\" with pure Tailwind CSS CDN classes.",
+        "tailwindSnippet": "<!-- 3. Conversion Trigger Action (HTML + Tailwind CDN) -->\n<div class=\"max-w-2xl mx-auto px-6 py-8 text-center\">\n  <div class=\"rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8\">\n    <h3 class=\"text-lg font-bold text-white mb-2\">Experience Glassmorphism Style</h3>\n    <p class=\"text-xs text-zinc-400 mb-6\">Open the standalone HTML template in your browser or paste into your project.</p>\n    <div class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-zinc-950 text-xs font-semibold hover:bg-zinc-100 transition-all\">\n        Launch Template\n      </button>\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold hover:bg-zinc-700 transition-all\">\n        Copy HTML Code\n      </button>\n    </div>\n  </div>\n</div>"
+      }
+    ],
+    "features": [
+      "100% Pure Standalone HTML5 + Tailwind CSS via CDN",
+      "Zero JSX, TSX, React, or npm dependencies required",
+      "Double-click to preview instantly in any browser",
+      "1-Click AI Master Prompt optimized for Cursor & Claude"
+    ],
+    "toolsReplaced": [
+      {
+        "name": "UI Component Subscriptions",
+        "monthlyCostUSD": 29
+      },
+      {
+        "name": "Custom Animation Design",
+        "monthlyCostUSD": 99
+      },
+      {
+        "name": "Design Token Kits",
+        "monthlyCostUSD": 49
+      }
+    ],
+    "frameworkStack": [
+      "HTML5",
+      "Tailwind CSS (CDN)",
+      "Vanilla JS / Alpine.js",
+      "Lucide Icons (CDN)",
+      "GSAP (CDN)"
+    ],
+    "quickCopyPrompt": "You are an expert Frontend Engineer. Build a complete, production-ready, standalone HTML5 template for \"Glassmorphism Style\".\n\n### CRITICAL OUTPUT FORMAT REQUIREMENTS:\n- **Output ONLY single-file standard HTML (`<!DOCTYPE html> ... </html>`)**.\n- **STRICT PROHIBITION**: Do NOT output JSX, TSX, React components, Next.js code, or npm import statements. Everything must be pure HTML + CSS + JS in one file.\n- **Tailwind CSS via CDN**: Include `<script src=\"https://cdn.tailwindcss.com\"></script>` in `<head>`.\n- **Icons**: Load Lucide Icons via CDN `<script src=\"https://unpkg.com/lucide@latest\"></script>` and initialize with `<script>lucide.createIcons();</script>`.\n- **Fonts**: Load Google Fonts `Inter` and `JetBrains Mono`.\n- **Interactive Animations**: Use vanilla JavaScript or GSAP via CDN (`<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js\"></script>`) embedded inside `<script>` tags at the bottom.\n\n### Component & Design Specifications:\n1. **Design System & Palette**:\n   - Monochromatic Notion/Shopify aesthetic (neutral zinc-900 / zinc-950 dark, zinc-50 / pure white light).\n   - High precision typography with crisp contrast, clean borders (`border-zinc-200` / `border-zinc-800`), and soft shadows.\n2. **Component Architecture for \"Glassmorphism Style\"**:\n   - Master layout container with mobile, tablet, and desktop responsiveness.\n   - Micro-interactions on buttons, hover states, and smooth spring-like transitions.\n3. **Stand-Alone Portability**:\n   - Must open directly and render flawlessly by double clicking the `.html` file in any web browser.\n\nComponent: Glassmorphism Style\nCategory: Design Style",
+    "faqs": [
+      {
+        "question": "What is the output format of this prompt?",
+        "answer": "All prompts produce standard, single-file HTML5 templates styled with Tailwind CSS via CDN (<script src=\"https://cdn.tailwindcss.com\"></script>). No JSX, React, or build setups required."
+      },
+      {
+        "question": "How do I run and test the output HTML?",
+        "answer": "Copy the AI output, save it into a file named index.html, and double-click to open it in Chrome, Safari, or Firefox. It renders instantly without compiling."
+      },
+      {
+        "question": "Can I paste this HTML into WordPress, Webflow, or custom sites?",
+        "answer": "Yes! Because the template outputs standard HTML and loads Tailwind CSS via CDN, you can paste it directly into HTML embed blocks or standalone static sites."
+      }
+    ]
+  },
+  {
+    "id": "tmpl-15",
+    "slug": "mosaic-grid-architecture-style",
+    "title": "Mosaic Grid Architecture Style",
+    "shortTitle": "Mosaic Grid Architecture Style",
+    "tagline": "Production-grade Mosaic Grid Architecture Style standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.",
+    "category": "elementor_kits",
+    "categoryLabel": "Design Style",
+    "assetFormat": "elementor_kit",
+    "formatBadge": "HTML + TAILWIND CDN",
+    "badge": "DESIGN TOKENS",
+    "rating": 4.95,
+    "reviewsCount": 116,
+    "downloadsCount": 2656,
+    "viewsCount": 4799,
+    "copiesCount": 561,
+    "mediaType": "image",
+    "mediaUrl": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/hmac-uploads/screenshots/drafts/d920e8cf-1030-472b-92cc-5bf9453149b5/1769428363698.png?width=600&quality=75&resize=contain",
+    "heroDescription": "Build and preview Mosaic Grid Architecture Style instantly. Engineered as a complete standalone HTML document using Tailwind CSS via CDN (`<script src=\"https://cdn.tailwindcss.com\"></script>`), pure CSS/vanilla JS interactions, and zero build tool bloat. Perfect for Cursor AI, Claude 3.5 Sonnet, and direct browser execution.",
+    "accentBg": "bg-zinc-950",
+    "accentBorder": "border-zinc-800",
+    "accentText": "text-zinc-100",
+    "accentColor": "#09090b",
+    "coverImage": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/hmac-uploads/screenshots/drafts/d920e8cf-1030-472b-92cc-5bf9453149b5/1769428363698.png?width=600&quality=75&resize=contain",
+    "compatibleBuilders": [
+      "HTML5 Standalone",
+      "Tailwind CSS CDN",
+      "Claude 3.5 Sonnet",
+      "Cursor AI",
+      "v0",
+      "Lovable"
+    ],
+    "sectionsIncluded": [
+      {
+        "id": "sec-15-1",
+        "name": "Focal Layout Architecture",
+        "badge": "HTML5 HERO",
+        "description": "Main hero structure and typography for Mosaic Grid Architecture Style.",
+        "promptText": "Generate a standalone HTML5 hero section for \"Mosaic Grid Architecture Style\" using Tailwind CSS via CDN. Output pure HTML with class=\"...\", zero JSX or TSX.",
+        "tailwindSnippet": "<!-- 1. Focal Layout for Mosaic Grid Architecture Style (HTML + Tailwind CDN) -->\n<section class=\"relative overflow-hidden py-16 sm:py-24 bg-zinc-950 text-zinc-100 antialiased font-sans\">\n  <div class=\"max-w-7xl mx-auto px-6 lg:px-8\">\n    <div class=\"text-center max-w-3xl mx-auto\">\n      <span class=\"inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-900 border border-zinc-800 text-zinc-300\">\n        <i data-lucide=\"sparkles\" class=\"w-3.5 h-3.5 text-zinc-400\"></i>\n        <span>DESIGN STYLE</span>\n      </span>\n      <h1 class=\"mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-display\">\n        Mosaic Grid Architecture Style\n      </h1>\n      <p class=\"mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed\">\n        Production-grade Mosaic Grid Architecture Style standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.\n      </p>\n    </div>\n  </div>\n</section>"
+      },
+      {
+        "id": "sec-15-2",
+        "name": "Interactive Feature Matrix",
+        "badge": "HTML5 GRID",
+        "description": "Responsive 3-column card grid with hover transitions and Lucide icons.",
+        "promptText": "Build a pure HTML5 3-column feature grid for \"Mosaic Grid Architecture Style\" with Tailwind CDN utility classes and Lucide icons.",
+        "tailwindSnippet": "<!-- 2. Interactive Feature Matrix (HTML + Tailwind CDN) -->\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-6 py-12\">\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"zap\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Zero Build Lag</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Runs instantly in any browser via Tailwind CSS CDN script.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"layers\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Pure HTML & CSS</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Zero JSX or Node.js runtime required. Copy, paste and deploy.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"sparkles\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Micro-Interactions</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Smooth hover elevations and accessible keyboard focus outlines.</p>\n  </div>\n</div>"
+      },
+      {
+        "id": "sec-15-3",
+        "name": "Action & Conversion Trigger",
+        "badge": "HTML5 CTA",
+        "description": "Stand-alone call-to-action block with high-contrast buttons.",
+        "promptText": "Create an instant HTML5 CTA conversion block for \"Mosaic Grid Architecture Style\" with pure Tailwind CSS CDN classes.",
+        "tailwindSnippet": "<!-- 3. Conversion Trigger Action (HTML + Tailwind CDN) -->\n<div class=\"max-w-2xl mx-auto px-6 py-8 text-center\">\n  <div class=\"rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8\">\n    <h3 class=\"text-lg font-bold text-white mb-2\">Experience Mosaic Grid Architecture Style</h3>\n    <p class=\"text-xs text-zinc-400 mb-6\">Open the standalone HTML template in your browser or paste into your project.</p>\n    <div class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-zinc-950 text-xs font-semibold hover:bg-zinc-100 transition-all\">\n        Launch Template\n      </button>\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold hover:bg-zinc-700 transition-all\">\n        Copy HTML Code\n      </button>\n    </div>\n  </div>\n</div>"
+      }
+    ],
+    "features": [
+      "100% Pure Standalone HTML5 + Tailwind CSS via CDN",
+      "Zero JSX, TSX, React, or npm dependencies required",
+      "Double-click to preview instantly in any browser",
+      "1-Click AI Master Prompt optimized for Cursor & Claude"
+    ],
+    "toolsReplaced": [
+      {
+        "name": "UI Component Subscriptions",
+        "monthlyCostUSD": 29
+      },
+      {
+        "name": "Custom Animation Design",
+        "monthlyCostUSD": 99
+      },
+      {
+        "name": "Design Token Kits",
+        "monthlyCostUSD": 49
+      }
+    ],
+    "frameworkStack": [
+      "HTML5",
+      "Tailwind CSS (CDN)",
+      "Vanilla JS / Alpine.js",
+      "Lucide Icons (CDN)",
+      "GSAP (CDN)"
+    ],
+    "quickCopyPrompt": "You are an expert Frontend Engineer. Build a complete, production-ready, standalone HTML5 template for \"Mosaic Grid Architecture Style\".\n\n### CRITICAL OUTPUT FORMAT REQUIREMENTS:\n- **Output ONLY single-file standard HTML (`<!DOCTYPE html> ... </html>`)**.\n- **STRICT PROHIBITION**: Do NOT output JSX, TSX, React components, Next.js code, or npm import statements. Everything must be pure HTML + CSS + JS in one file.\n- **Tailwind CSS via CDN**: Include `<script src=\"https://cdn.tailwindcss.com\"></script>` in `<head>`.\n- **Icons**: Load Lucide Icons via CDN `<script src=\"https://unpkg.com/lucide@latest\"></script>` and initialize with `<script>lucide.createIcons();</script>`.\n- **Fonts**: Load Google Fonts `Inter` and `JetBrains Mono`.\n- **Interactive Animations**: Use vanilla JavaScript or GSAP via CDN (`<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js\"></script>`) embedded inside `<script>` tags at the bottom.\n\n### Component & Design Specifications:\n1. **Design System & Palette**:\n   - Monochromatic Notion/Shopify aesthetic (neutral zinc-900 / zinc-950 dark, zinc-50 / pure white light).\n   - High precision typography with crisp contrast, clean borders (`border-zinc-200` / `border-zinc-800`), and soft shadows.\n2. **Component Architecture for \"Mosaic Grid Architecture Style\"**:\n   - Master layout container with mobile, tablet, and desktop responsiveness.\n   - Micro-interactions on buttons, hover states, and smooth spring-like transitions.\n3. **Stand-Alone Portability**:\n   - Must open directly and render flawlessly by double clicking the `.html` file in any web browser.\n\nComponent: Mosaic Grid Architecture Style\nCategory: Design Style",
+    "faqs": [
+      {
+        "question": "What is the output format of this prompt?",
+        "answer": "All prompts produce standard, single-file HTML5 templates styled with Tailwind CSS via CDN (<script src=\"https://cdn.tailwindcss.com\"></script>). No JSX, React, or build setups required."
+      },
+      {
+        "question": "How do I run and test the output HTML?",
+        "answer": "Copy the AI output, save it into a file named index.html, and double-click to open it in Chrome, Safari, or Firefox. It renders instantly without compiling."
+      },
+      {
+        "question": "Can I paste this HTML into WordPress, Webflow, or custom sites?",
+        "answer": "Yes! Because the template outputs standard HTML and loads Tailwind CSS via CDN, you can paste it directly into HTML embed blocks or standalone static sites."
+      }
+    ]
+  },
+  {
+    "id": "tmpl-16",
+    "slug": "glassmorphism-card",
+    "title": "Glassmorphism card",
+    "shortTitle": "Glassmorphism card",
+    "tagline": "Production-grade Glassmorphism card standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.",
+    "category": "section_prompts",
+    "categoryLabel": "AI Section Prompt",
+    "assetFormat": "section_prompts",
+    "formatBadge": "HTML + TAILWIND CDN",
+    "badge": "AI MASTER PROMPT",
+    "rating": 4.94,
+    "reviewsCount": 139,
+    "downloadsCount": 1766,
+    "viewsCount": 4666,
+    "copiesCount": 696,
+    "mediaType": "video",
+    "mediaUrl": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/preview-artifacts/prompt-library/7d97ebb3-363d-49d3-a029-fa9a23815e3f/thumbnails/8a35caaa-1f8e-4437-afdc-a4ee495e1578.mp4",
+    "heroDescription": "Build and preview Glassmorphism card instantly. Engineered as a complete standalone HTML document using Tailwind CSS via CDN (`<script src=\"https://cdn.tailwindcss.com\"></script>`), pure CSS/vanilla JS interactions, and zero build tool bloat. Perfect for Cursor AI, Claude 3.5 Sonnet, and direct browser execution.",
+    "accentBg": "bg-zinc-950",
+    "accentBorder": "border-zinc-800",
+    "accentText": "text-zinc-100",
+    "accentColor": "#09090b",
+    "coverImage": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/preview-artifacts/prompt-library/7d97ebb3-363d-49d3-a029-fa9a23815e3f/thumbnails/8a35caaa-1f8e-4437-afdc-a4ee495e1578.mp4",
+    "compatibleBuilders": [
+      "HTML5 Standalone",
+      "Tailwind CSS CDN",
+      "Claude 3.5 Sonnet",
+      "Cursor AI",
+      "v0",
+      "Lovable"
+    ],
+    "sectionsIncluded": [
+      {
+        "id": "sec-16-1",
+        "name": "Focal Layout Architecture",
+        "badge": "HTML5 HERO",
+        "description": "Main hero structure and typography for Glassmorphism card.",
+        "promptText": "Generate a standalone HTML5 hero section for \"Glassmorphism card\" using Tailwind CSS via CDN. Output pure HTML with class=\"...\", zero JSX or TSX.",
+        "tailwindSnippet": "<!-- 1. Focal Layout for Glassmorphism card (HTML + Tailwind CDN) -->\n<section class=\"relative overflow-hidden py-16 sm:py-24 bg-zinc-950 text-zinc-100 antialiased font-sans\">\n  <div class=\"max-w-7xl mx-auto px-6 lg:px-8\">\n    <div class=\"text-center max-w-3xl mx-auto\">\n      <span class=\"inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-900 border border-zinc-800 text-zinc-300\">\n        <i data-lucide=\"sparkles\" class=\"w-3.5 h-3.5 text-zinc-400\"></i>\n        <span>AI SECTION PROMPT</span>\n      </span>\n      <h1 class=\"mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-display\">\n        Glassmorphism card\n      </h1>\n      <p class=\"mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed\">\n        Production-grade Glassmorphism card standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.\n      </p>\n    </div>\n  </div>\n</section>"
+      },
+      {
+        "id": "sec-16-2",
+        "name": "Interactive Feature Matrix",
+        "badge": "HTML5 GRID",
+        "description": "Responsive 3-column card grid with hover transitions and Lucide icons.",
+        "promptText": "Build a pure HTML5 3-column feature grid for \"Glassmorphism card\" with Tailwind CDN utility classes and Lucide icons.",
+        "tailwindSnippet": "<!-- 2. Interactive Feature Matrix (HTML + Tailwind CDN) -->\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-6 py-12\">\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"zap\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Zero Build Lag</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Runs instantly in any browser via Tailwind CSS CDN script.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"layers\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Pure HTML & CSS</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Zero JSX or Node.js runtime required. Copy, paste and deploy.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"sparkles\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Micro-Interactions</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Smooth hover elevations and accessible keyboard focus outlines.</p>\n  </div>\n</div>"
+      },
+      {
+        "id": "sec-16-3",
+        "name": "Action & Conversion Trigger",
+        "badge": "HTML5 CTA",
+        "description": "Stand-alone call-to-action block with high-contrast buttons.",
+        "promptText": "Create an instant HTML5 CTA conversion block for \"Glassmorphism card\" with pure Tailwind CSS CDN classes.",
+        "tailwindSnippet": "<!-- 3. Conversion Trigger Action (HTML + Tailwind CDN) -->\n<div class=\"max-w-2xl mx-auto px-6 py-8 text-center\">\n  <div class=\"rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8\">\n    <h3 class=\"text-lg font-bold text-white mb-2\">Experience Glassmorphism card</h3>\n    <p class=\"text-xs text-zinc-400 mb-6\">Open the standalone HTML template in your browser or paste into your project.</p>\n    <div class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-zinc-950 text-xs font-semibold hover:bg-zinc-100 transition-all\">\n        Launch Template\n      </button>\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold hover:bg-zinc-700 transition-all\">\n        Copy HTML Code\n      </button>\n    </div>\n  </div>\n</div>"
+      }
+    ],
+    "features": [
+      "100% Pure Standalone HTML5 + Tailwind CSS via CDN",
+      "Zero JSX, TSX, React, or npm dependencies required",
+      "Double-click to preview instantly in any browser",
+      "1-Click AI Master Prompt optimized for Cursor & Claude"
+    ],
+    "toolsReplaced": [
+      {
+        "name": "UI Component Subscriptions",
+        "monthlyCostUSD": 29
+      },
+      {
+        "name": "Custom Animation Design",
+        "monthlyCostUSD": 99
+      },
+      {
+        "name": "Design Token Kits",
+        "monthlyCostUSD": 49
+      }
+    ],
+    "frameworkStack": [
+      "HTML5",
+      "Tailwind CSS (CDN)",
+      "Vanilla JS / Alpine.js",
+      "Lucide Icons (CDN)",
+      "GSAP (CDN)"
+    ],
+    "quickCopyPrompt": "You are an expert Frontend Engineer. Build a complete, production-ready, standalone HTML5 template for \"Glassmorphism card\".\n\n### CRITICAL OUTPUT FORMAT REQUIREMENTS:\n- **Output ONLY single-file standard HTML (`<!DOCTYPE html> ... </html>`)**.\n- **STRICT PROHIBITION**: Do NOT output JSX, TSX, React components, Next.js code, or npm import statements. Everything must be pure HTML + CSS + JS in one file.\n- **Tailwind CSS via CDN**: Include `<script src=\"https://cdn.tailwindcss.com\"></script>` in `<head>`.\n- **Icons**: Load Lucide Icons via CDN `<script src=\"https://unpkg.com/lucide@latest\"></script>` and initialize with `<script>lucide.createIcons();</script>`.\n- **Fonts**: Load Google Fonts `Inter` and `JetBrains Mono`.\n- **Interactive Animations**: Use vanilla JavaScript or GSAP via CDN (`<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js\"></script>`) embedded inside `<script>` tags at the bottom.\n\n### Component & Design Specifications:\n1. **Design System & Palette**:\n   - Monochromatic Notion/Shopify aesthetic (neutral zinc-900 / zinc-950 dark, zinc-50 / pure white light).\n   - High precision typography with crisp contrast, clean borders (`border-zinc-200` / `border-zinc-800`), and soft shadows.\n2. **Component Architecture for \"Glassmorphism card\"**:\n   - Master layout container with mobile, tablet, and desktop responsiveness.\n   - Micro-interactions on buttons, hover states, and smooth spring-like transitions.\n3. **Stand-Alone Portability**:\n   - Must open directly and render flawlessly by double clicking the `.html` file in any web browser.\n\nComponent: Glassmorphism card\nCategory: AI Section Prompt",
+    "faqs": [
+      {
+        "question": "What is the output format of this prompt?",
+        "answer": "All prompts produce standard, single-file HTML5 templates styled with Tailwind CSS via CDN (<script src=\"https://cdn.tailwindcss.com\"></script>). No JSX, React, or build setups required."
+      },
+      {
+        "question": "How do I run and test the output HTML?",
+        "answer": "Copy the AI output, save it into a file named index.html, and double-click to open it in Chrome, Safari, or Firefox. It renders instantly without compiling."
+      },
+      {
+        "question": "Can I paste this HTML into WordPress, Webflow, or custom sites?",
+        "answer": "Yes! Because the template outputs standard HTML and loads Tailwind CSS via CDN, you can paste it directly into HTML embed blocks or standalone static sites."
+      }
+    ]
+  },
+  {
+    "id": "tmpl-17",
+    "slug": "cinematic-style",
+    "title": "Cinematic Style",
+    "shortTitle": "Cinematic Style",
+    "tagline": "Production-grade Cinematic Style standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.",
+    "category": "elementor_kits",
+    "categoryLabel": "Design Style",
+    "assetFormat": "elementor_kit",
+    "formatBadge": "HTML + TAILWIND CDN",
+    "badge": "DESIGN TOKENS",
+    "rating": 4.96,
+    "reviewsCount": 284,
+    "downloadsCount": 3974,
+    "viewsCount": 3995,
+    "copiesCount": 646,
+    "mediaType": "image",
+    "mediaUrl": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/hmac-uploads/screenshots/components/5b9fab26-1846-47f4-bbf9-c25625de9c15/640a611e-0067-41ab-bb5d-6d7e627e20ff/1767957267935.png?width=600&quality=75&resize=contain",
+    "heroDescription": "Build and preview Cinematic Style instantly. Engineered as a complete standalone HTML document using Tailwind CSS via CDN (`<script src=\"https://cdn.tailwindcss.com\"></script>`), pure CSS/vanilla JS interactions, and zero build tool bloat. Perfect for Cursor AI, Claude 3.5 Sonnet, and direct browser execution.",
+    "accentBg": "bg-zinc-950",
+    "accentBorder": "border-zinc-800",
+    "accentText": "text-zinc-100",
+    "accentColor": "#09090b",
+    "coverImage": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/hmac-uploads/screenshots/components/5b9fab26-1846-47f4-bbf9-c25625de9c15/640a611e-0067-41ab-bb5d-6d7e627e20ff/1767957267935.png?width=600&quality=75&resize=contain",
+    "compatibleBuilders": [
+      "HTML5 Standalone",
+      "Tailwind CSS CDN",
+      "Claude 3.5 Sonnet",
+      "Cursor AI",
+      "v0",
+      "Lovable"
+    ],
+    "sectionsIncluded": [
+      {
+        "id": "sec-17-1",
+        "name": "Focal Layout Architecture",
+        "badge": "HTML5 HERO",
+        "description": "Main hero structure and typography for Cinematic Style.",
+        "promptText": "Generate a standalone HTML5 hero section for \"Cinematic Style\" using Tailwind CSS via CDN. Output pure HTML with class=\"...\", zero JSX or TSX.",
+        "tailwindSnippet": "<!-- 1. Focal Layout for Cinematic Style (HTML + Tailwind CDN) -->\n<section class=\"relative overflow-hidden py-16 sm:py-24 bg-zinc-950 text-zinc-100 antialiased font-sans\">\n  <div class=\"max-w-7xl mx-auto px-6 lg:px-8\">\n    <div class=\"text-center max-w-3xl mx-auto\">\n      <span class=\"inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-900 border border-zinc-800 text-zinc-300\">\n        <i data-lucide=\"sparkles\" class=\"w-3.5 h-3.5 text-zinc-400\"></i>\n        <span>DESIGN STYLE</span>\n      </span>\n      <h1 class=\"mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-display\">\n        Cinematic Style\n      </h1>\n      <p class=\"mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed\">\n        Production-grade Cinematic Style standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.\n      </p>\n    </div>\n  </div>\n</section>"
+      },
+      {
+        "id": "sec-17-2",
+        "name": "Interactive Feature Matrix",
+        "badge": "HTML5 GRID",
+        "description": "Responsive 3-column card grid with hover transitions and Lucide icons.",
+        "promptText": "Build a pure HTML5 3-column feature grid for \"Cinematic Style\" with Tailwind CDN utility classes and Lucide icons.",
+        "tailwindSnippet": "<!-- 2. Interactive Feature Matrix (HTML + Tailwind CDN) -->\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-6 py-12\">\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"zap\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Zero Build Lag</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Runs instantly in any browser via Tailwind CSS CDN script.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"layers\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Pure HTML & CSS</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Zero JSX or Node.js runtime required. Copy, paste and deploy.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"sparkles\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Micro-Interactions</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Smooth hover elevations and accessible keyboard focus outlines.</p>\n  </div>\n</div>"
+      },
+      {
+        "id": "sec-17-3",
+        "name": "Action & Conversion Trigger",
+        "badge": "HTML5 CTA",
+        "description": "Stand-alone call-to-action block with high-contrast buttons.",
+        "promptText": "Create an instant HTML5 CTA conversion block for \"Cinematic Style\" with pure Tailwind CSS CDN classes.",
+        "tailwindSnippet": "<!-- 3. Conversion Trigger Action (HTML + Tailwind CDN) -->\n<div class=\"max-w-2xl mx-auto px-6 py-8 text-center\">\n  <div class=\"rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8\">\n    <h3 class=\"text-lg font-bold text-white mb-2\">Experience Cinematic Style</h3>\n    <p class=\"text-xs text-zinc-400 mb-6\">Open the standalone HTML template in your browser or paste into your project.</p>\n    <div class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-zinc-950 text-xs font-semibold hover:bg-zinc-100 transition-all\">\n        Launch Template\n      </button>\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold hover:bg-zinc-700 transition-all\">\n        Copy HTML Code\n      </button>\n    </div>\n  </div>\n</div>"
+      }
+    ],
+    "features": [
+      "100% Pure Standalone HTML5 + Tailwind CSS via CDN",
+      "Zero JSX, TSX, React, or npm dependencies required",
+      "Double-click to preview instantly in any browser",
+      "1-Click AI Master Prompt optimized for Cursor & Claude"
+    ],
+    "toolsReplaced": [
+      {
+        "name": "UI Component Subscriptions",
+        "monthlyCostUSD": 29
+      },
+      {
+        "name": "Custom Animation Design",
+        "monthlyCostUSD": 99
+      },
+      {
+        "name": "Design Token Kits",
+        "monthlyCostUSD": 49
+      }
+    ],
+    "frameworkStack": [
+      "HTML5",
+      "Tailwind CSS (CDN)",
+      "Vanilla JS / Alpine.js",
+      "Lucide Icons (CDN)",
+      "GSAP (CDN)"
+    ],
+    "quickCopyPrompt": "You are an expert Frontend Engineer. Build a complete, production-ready, standalone HTML5 template for \"Cinematic Style\".\n\n### CRITICAL OUTPUT FORMAT REQUIREMENTS:\n- **Output ONLY single-file standard HTML (`<!DOCTYPE html> ... </html>`)**.\n- **STRICT PROHIBITION**: Do NOT output JSX, TSX, React components, Next.js code, or npm import statements. Everything must be pure HTML + CSS + JS in one file.\n- **Tailwind CSS via CDN**: Include `<script src=\"https://cdn.tailwindcss.com\"></script>` in `<head>`.\n- **Icons**: Load Lucide Icons via CDN `<script src=\"https://unpkg.com/lucide@latest\"></script>` and initialize with `<script>lucide.createIcons();</script>`.\n- **Fonts**: Load Google Fonts `Inter` and `JetBrains Mono`.\n- **Interactive Animations**: Use vanilla JavaScript or GSAP via CDN (`<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js\"></script>`) embedded inside `<script>` tags at the bottom.\n\n### Component & Design Specifications:\n1. **Design System & Palette**:\n   - Monochromatic Notion/Shopify aesthetic (neutral zinc-900 / zinc-950 dark, zinc-50 / pure white light).\n   - High precision typography with crisp contrast, clean borders (`border-zinc-200` / `border-zinc-800`), and soft shadows.\n2. **Component Architecture for \"Cinematic Style\"**:\n   - Master layout container with mobile, tablet, and desktop responsiveness.\n   - Micro-interactions on buttons, hover states, and smooth spring-like transitions.\n3. **Stand-Alone Portability**:\n   - Must open directly and render flawlessly by double clicking the `.html` file in any web browser.\n\nComponent: Cinematic Style\nCategory: Design Style",
+    "faqs": [
+      {
+        "question": "What is the output format of this prompt?",
+        "answer": "All prompts produce standard, single-file HTML5 templates styled with Tailwind CSS via CDN (<script src=\"https://cdn.tailwindcss.com\"></script>). No JSX, React, or build setups required."
+      },
+      {
+        "question": "How do I run and test the output HTML?",
+        "answer": "Copy the AI output, save it into a file named index.html, and double-click to open it in Chrome, Safari, or Firefox. It renders instantly without compiling."
+      },
+      {
+        "question": "Can I paste this HTML into WordPress, Webflow, or custom sites?",
+        "answer": "Yes! Because the template outputs standard HTML and loads Tailwind CSS via CDN, you can paste it directly into HTML embed blocks or standalone static sites."
+      }
+    ]
+  },
+  {
+    "id": "tmpl-18",
+    "slug": "bold-editorial-style",
+    "title": "Bold Editorial Style",
+    "shortTitle": "Bold Editorial Style",
+    "tagline": "Production-grade Bold Editorial Style standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.",
+    "category": "elementor_kits",
+    "categoryLabel": "Design Style",
+    "assetFormat": "elementor_kit",
+    "formatBadge": "HTML + TAILWIND CDN",
+    "badge": "DESIGN TOKENS",
+    "rating": 4.95,
+    "reviewsCount": 88,
+    "downloadsCount": 3700,
+    "viewsCount": 1542,
+    "copiesCount": 821,
+    "mediaType": "image",
+    "mediaUrl": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/preview-artifacts/prompt-library/36133045-75cc-4611-bdbb-0ec16bdc76fd/thumbnails/4cbe9ac1-be61-4114-917f-caaa1a7fa235.png?width=600&quality=75&resize=contain",
+    "heroDescription": "Build and preview Bold Editorial Style instantly. Engineered as a complete standalone HTML document using Tailwind CSS via CDN (`<script src=\"https://cdn.tailwindcss.com\"></script>`), pure CSS/vanilla JS interactions, and zero build tool bloat. Perfect for Cursor AI, Claude 3.5 Sonnet, and direct browser execution.",
+    "accentBg": "bg-zinc-950",
+    "accentBorder": "border-zinc-800",
+    "accentText": "text-zinc-100",
+    "accentColor": "#09090b",
+    "coverImage": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/preview-artifacts/prompt-library/36133045-75cc-4611-bdbb-0ec16bdc76fd/thumbnails/4cbe9ac1-be61-4114-917f-caaa1a7fa235.png?width=600&quality=75&resize=contain",
+    "compatibleBuilders": [
+      "HTML5 Standalone",
+      "Tailwind CSS CDN",
+      "Claude 3.5 Sonnet",
+      "Cursor AI",
+      "v0",
+      "Lovable"
+    ],
+    "sectionsIncluded": [
+      {
+        "id": "sec-18-1",
+        "name": "Focal Layout Architecture",
+        "badge": "HTML5 HERO",
+        "description": "Main hero structure and typography for Bold Editorial Style.",
+        "promptText": "Generate a standalone HTML5 hero section for \"Bold Editorial Style\" using Tailwind CSS via CDN. Output pure HTML with class=\"...\", zero JSX or TSX.",
+        "tailwindSnippet": "<!-- 1. Focal Layout for Bold Editorial Style (HTML + Tailwind CDN) -->\n<section class=\"relative overflow-hidden py-16 sm:py-24 bg-zinc-950 text-zinc-100 antialiased font-sans\">\n  <div class=\"max-w-7xl mx-auto px-6 lg:px-8\">\n    <div class=\"text-center max-w-3xl mx-auto\">\n      <span class=\"inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-900 border border-zinc-800 text-zinc-300\">\n        <i data-lucide=\"sparkles\" class=\"w-3.5 h-3.5 text-zinc-400\"></i>\n        <span>DESIGN STYLE</span>\n      </span>\n      <h1 class=\"mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-display\">\n        Bold Editorial Style\n      </h1>\n      <p class=\"mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed\">\n        Production-grade Bold Editorial Style standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.\n      </p>\n    </div>\n  </div>\n</section>"
+      },
+      {
+        "id": "sec-18-2",
+        "name": "Interactive Feature Matrix",
+        "badge": "HTML5 GRID",
+        "description": "Responsive 3-column card grid with hover transitions and Lucide icons.",
+        "promptText": "Build a pure HTML5 3-column feature grid for \"Bold Editorial Style\" with Tailwind CDN utility classes and Lucide icons.",
+        "tailwindSnippet": "<!-- 2. Interactive Feature Matrix (HTML + Tailwind CDN) -->\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-6 py-12\">\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"zap\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Zero Build Lag</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Runs instantly in any browser via Tailwind CSS CDN script.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"layers\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Pure HTML & CSS</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Zero JSX or Node.js runtime required. Copy, paste and deploy.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"sparkles\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Micro-Interactions</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Smooth hover elevations and accessible keyboard focus outlines.</p>\n  </div>\n</div>"
+      },
+      {
+        "id": "sec-18-3",
+        "name": "Action & Conversion Trigger",
+        "badge": "HTML5 CTA",
+        "description": "Stand-alone call-to-action block with high-contrast buttons.",
+        "promptText": "Create an instant HTML5 CTA conversion block for \"Bold Editorial Style\" with pure Tailwind CSS CDN classes.",
+        "tailwindSnippet": "<!-- 3. Conversion Trigger Action (HTML + Tailwind CDN) -->\n<div class=\"max-w-2xl mx-auto px-6 py-8 text-center\">\n  <div class=\"rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8\">\n    <h3 class=\"text-lg font-bold text-white mb-2\">Experience Bold Editorial Style</h3>\n    <p class=\"text-xs text-zinc-400 mb-6\">Open the standalone HTML template in your browser or paste into your project.</p>\n    <div class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-zinc-950 text-xs font-semibold hover:bg-zinc-100 transition-all\">\n        Launch Template\n      </button>\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold hover:bg-zinc-700 transition-all\">\n        Copy HTML Code\n      </button>\n    </div>\n  </div>\n</div>"
+      }
+    ],
+    "features": [
+      "100% Pure Standalone HTML5 + Tailwind CSS via CDN",
+      "Zero JSX, TSX, React, or npm dependencies required",
+      "Double-click to preview instantly in any browser",
+      "1-Click AI Master Prompt optimized for Cursor & Claude"
+    ],
+    "toolsReplaced": [
+      {
+        "name": "UI Component Subscriptions",
+        "monthlyCostUSD": 29
+      },
+      {
+        "name": "Custom Animation Design",
+        "monthlyCostUSD": 99
+      },
+      {
+        "name": "Design Token Kits",
+        "monthlyCostUSD": 49
+      }
+    ],
+    "frameworkStack": [
+      "HTML5",
+      "Tailwind CSS (CDN)",
+      "Vanilla JS / Alpine.js",
+      "Lucide Icons (CDN)",
+      "GSAP (CDN)"
+    ],
+    "quickCopyPrompt": "You are an expert Frontend Engineer. Build a complete, production-ready, standalone HTML5 template for \"Bold Editorial Style\".\n\n### CRITICAL OUTPUT FORMAT REQUIREMENTS:\n- **Output ONLY single-file standard HTML (`<!DOCTYPE html> ... </html>`)**.\n- **STRICT PROHIBITION**: Do NOT output JSX, TSX, React components, Next.js code, or npm import statements. Everything must be pure HTML + CSS + JS in one file.\n- **Tailwind CSS via CDN**: Include `<script src=\"https://cdn.tailwindcss.com\"></script>` in `<head>`.\n- **Icons**: Load Lucide Icons via CDN `<script src=\"https://unpkg.com/lucide@latest\"></script>` and initialize with `<script>lucide.createIcons();</script>`.\n- **Fonts**: Load Google Fonts `Inter` and `JetBrains Mono`.\n- **Interactive Animations**: Use vanilla JavaScript or GSAP via CDN (`<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js\"></script>`) embedded inside `<script>` tags at the bottom.\n\n### Component & Design Specifications:\n1. **Design System & Palette**:\n   - Monochromatic Notion/Shopify aesthetic (neutral zinc-900 / zinc-950 dark, zinc-50 / pure white light).\n   - High precision typography with crisp contrast, clean borders (`border-zinc-200` / `border-zinc-800`), and soft shadows.\n2. **Component Architecture for \"Bold Editorial Style\"**:\n   - Master layout container with mobile, tablet, and desktop responsiveness.\n   - Micro-interactions on buttons, hover states, and smooth spring-like transitions.\n3. **Stand-Alone Portability**:\n   - Must open directly and render flawlessly by double clicking the `.html` file in any web browser.\n\nComponent: Bold Editorial Style\nCategory: Design Style",
+    "faqs": [
+      {
+        "question": "What is the output format of this prompt?",
+        "answer": "All prompts produce standard, single-file HTML5 templates styled with Tailwind CSS via CDN (<script src=\"https://cdn.tailwindcss.com\"></script>). No JSX, React, or build setups required."
+      },
+      {
+        "question": "How do I run and test the output HTML?",
+        "answer": "Copy the AI output, save it into a file named index.html, and double-click to open it in Chrome, Safari, or Firefox. It renders instantly without compiling."
+      },
+      {
+        "question": "Can I paste this HTML into WordPress, Webflow, or custom sites?",
+        "answer": "Yes! Because the template outputs standard HTML and loads Tailwind CSS via CDN, you can paste it directly into HTML embed blocks or standalone static sites."
+      }
+    ]
+  },
+  {
+    "id": "tmpl-19",
+    "slug": "observe-see-the-shape-of-the-noise",
+    "title": "Observe \u2014 See the shape of the noise",
+    "shortTitle": "Observe",
+    "tagline": "Production-grade Observe \u2014 See the shape of the noise standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.",
+    "category": "section_prompts",
+    "categoryLabel": "AI Section Prompt",
+    "assetFormat": "section_prompts",
+    "formatBadge": "HTML + TAILWIND CDN",
+    "badge": "AI MASTER PROMPT",
+    "rating": 4.93,
+    "reviewsCount": 142,
+    "downloadsCount": 2993,
+    "viewsCount": 2252,
+    "copiesCount": 593,
+    "mediaType": "image",
+    "mediaUrl": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/hmac-uploads/screenshots/drafts/6714409b-5286-4411-8799-21cbc39565e9/1785161973036.png?width=600&quality=75&resize=contain",
+    "heroDescription": "Build and preview Observe \u2014 See the shape of the noise instantly. Engineered as a complete standalone HTML document using Tailwind CSS via CDN (`<script src=\"https://cdn.tailwindcss.com\"></script>`), pure CSS/vanilla JS interactions, and zero build tool bloat. Perfect for Cursor AI, Claude 3.5 Sonnet, and direct browser execution.",
+    "accentBg": "bg-zinc-950",
+    "accentBorder": "border-zinc-800",
+    "accentText": "text-zinc-100",
+    "accentColor": "#09090b",
+    "coverImage": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/hmac-uploads/screenshots/drafts/6714409b-5286-4411-8799-21cbc39565e9/1785161973036.png?width=600&quality=75&resize=contain",
+    "compatibleBuilders": [
+      "HTML5 Standalone",
+      "Tailwind CSS CDN",
+      "Claude 3.5 Sonnet",
+      "Cursor AI",
+      "v0",
+      "Lovable"
+    ],
+    "sectionsIncluded": [
+      {
+        "id": "sec-19-1",
+        "name": "Focal Layout Architecture",
+        "badge": "HTML5 HERO",
+        "description": "Main hero structure and typography for Observe \u2014 See the shape of the noise.",
+        "promptText": "Generate a standalone HTML5 hero section for \"Observe \u2014 See the shape of the noise\" using Tailwind CSS via CDN. Output pure HTML with class=\"...\", zero JSX or TSX.",
+        "tailwindSnippet": "<!-- 1. Focal Layout for Observe \u2014 See the shape of the noise (HTML + Tailwind CDN) -->\n<section class=\"relative overflow-hidden py-16 sm:py-24 bg-zinc-950 text-zinc-100 antialiased font-sans\">\n  <div class=\"max-w-7xl mx-auto px-6 lg:px-8\">\n    <div class=\"text-center max-w-3xl mx-auto\">\n      <span class=\"inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-900 border border-zinc-800 text-zinc-300\">\n        <i data-lucide=\"sparkles\" class=\"w-3.5 h-3.5 text-zinc-400\"></i>\n        <span>AI SECTION PROMPT</span>\n      </span>\n      <h1 class=\"mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-display\">\n        Observe \u2014 See the shape of the noise\n      </h1>\n      <p class=\"mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed\">\n        Production-grade Observe \u2014 See the shape of the noise standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.\n      </p>\n    </div>\n  </div>\n</section>"
+      },
+      {
+        "id": "sec-19-2",
+        "name": "Interactive Feature Matrix",
+        "badge": "HTML5 GRID",
+        "description": "Responsive 3-column card grid with hover transitions and Lucide icons.",
+        "promptText": "Build a pure HTML5 3-column feature grid for \"Observe \u2014 See the shape of the noise\" with Tailwind CDN utility classes and Lucide icons.",
+        "tailwindSnippet": "<!-- 2. Interactive Feature Matrix (HTML + Tailwind CDN) -->\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-6 py-12\">\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"zap\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Zero Build Lag</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Runs instantly in any browser via Tailwind CSS CDN script.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"layers\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Pure HTML & CSS</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Zero JSX or Node.js runtime required. Copy, paste and deploy.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"sparkles\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Micro-Interactions</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Smooth hover elevations and accessible keyboard focus outlines.</p>\n  </div>\n</div>"
+      },
+      {
+        "id": "sec-19-3",
+        "name": "Action & Conversion Trigger",
+        "badge": "HTML5 CTA",
+        "description": "Stand-alone call-to-action block with high-contrast buttons.",
+        "promptText": "Create an instant HTML5 CTA conversion block for \"Observe \u2014 See the shape of the noise\" with pure Tailwind CSS CDN classes.",
+        "tailwindSnippet": "<!-- 3. Conversion Trigger Action (HTML + Tailwind CDN) -->\n<div class=\"max-w-2xl mx-auto px-6 py-8 text-center\">\n  <div class=\"rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8\">\n    <h3 class=\"text-lg font-bold text-white mb-2\">Experience Observe</h3>\n    <p class=\"text-xs text-zinc-400 mb-6\">Open the standalone HTML template in your browser or paste into your project.</p>\n    <div class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-zinc-950 text-xs font-semibold hover:bg-zinc-100 transition-all\">\n        Launch Template\n      </button>\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold hover:bg-zinc-700 transition-all\">\n        Copy HTML Code\n      </button>\n    </div>\n  </div>\n</div>"
+      }
+    ],
+    "features": [
+      "100% Pure Standalone HTML5 + Tailwind CSS via CDN",
+      "Zero JSX, TSX, React, or npm dependencies required",
+      "Double-click to preview instantly in any browser",
+      "1-Click AI Master Prompt optimized for Cursor & Claude"
+    ],
+    "toolsReplaced": [
+      {
+        "name": "UI Component Subscriptions",
+        "monthlyCostUSD": 29
+      },
+      {
+        "name": "Custom Animation Design",
+        "monthlyCostUSD": 99
+      },
+      {
+        "name": "Design Token Kits",
+        "monthlyCostUSD": 49
+      }
+    ],
+    "frameworkStack": [
+      "HTML5",
+      "Tailwind CSS (CDN)",
+      "Vanilla JS / Alpine.js",
+      "Lucide Icons (CDN)",
+      "GSAP (CDN)"
+    ],
+    "quickCopyPrompt": "You are an expert Frontend Engineer. Build a complete, production-ready, standalone HTML5 template for \"Observe \u2014 See the shape of the noise\".\n\n### CRITICAL OUTPUT FORMAT REQUIREMENTS:\n- **Output ONLY single-file standard HTML (`<!DOCTYPE html> ... </html>`)**.\n- **STRICT PROHIBITION**: Do NOT output JSX, TSX, React components, Next.js code, or npm import statements. Everything must be pure HTML + CSS + JS in one file.\n- **Tailwind CSS via CDN**: Include `<script src=\"https://cdn.tailwindcss.com\"></script>` in `<head>`.\n- **Icons**: Load Lucide Icons via CDN `<script src=\"https://unpkg.com/lucide@latest\"></script>` and initialize with `<script>lucide.createIcons();</script>`.\n- **Fonts**: Load Google Fonts `Inter` and `JetBrains Mono`.\n- **Interactive Animations**: Use vanilla JavaScript or GSAP via CDN (`<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js\"></script>`) embedded inside `<script>` tags at the bottom.\n\n### Component & Design Specifications:\n1. **Design System & Palette**:\n   - Monochromatic Notion/Shopify aesthetic (neutral zinc-900 / zinc-950 dark, zinc-50 / pure white light).\n   - High precision typography with crisp contrast, clean borders (`border-zinc-200` / `border-zinc-800`), and soft shadows.\n2. **Component Architecture for \"Observe \u2014 See the shape of the noise\"**:\n   - Master layout container with mobile, tablet, and desktop responsiveness.\n   - Micro-interactions on buttons, hover states, and smooth spring-like transitions.\n3. **Stand-Alone Portability**:\n   - Must open directly and render flawlessly by double clicking the `.html` file in any web browser.\n\nComponent: Observe \u2014 See the shape of the noise\nCategory: AI Section Prompt",
+    "faqs": [
+      {
+        "question": "What is the output format of this prompt?",
+        "answer": "All prompts produce standard, single-file HTML5 templates styled with Tailwind CSS via CDN (<script src=\"https://cdn.tailwindcss.com\"></script>). No JSX, React, or build setups required."
+      },
+      {
+        "question": "How do I run and test the output HTML?",
+        "answer": "Copy the AI output, save it into a file named index.html, and double-click to open it in Chrome, Safari, or Firefox. It renders instantly without compiling."
+      },
+      {
+        "question": "Can I paste this HTML into WordPress, Webflow, or custom sites?",
+        "answer": "Yes! Because the template outputs standard HTML and loads Tailwind CSS via CDN, you can paste it directly into HTML embed blocks or standalone static sites."
+      }
+    ]
+  },
+  {
+    "id": "tmpl-20",
+    "slug": "brutalist-style-ecommerce-page",
+    "title": "Brutalist Style Ecommerce Page",
+    "shortTitle": "Brutalist Style Ecommerce Page",
+    "tagline": "Production-grade Brutalist Style Ecommerce Page standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.",
+    "category": "elementor_kits",
+    "categoryLabel": "Design Style",
+    "assetFormat": "elementor_kit",
+    "formatBadge": "HTML + TAILWIND CDN",
+    "badge": "DESIGN TOKENS",
+    "rating": 4.96,
+    "reviewsCount": 101,
+    "downloadsCount": 3381,
+    "viewsCount": 3871,
+    "copiesCount": 862,
+    "mediaType": "image",
+    "mediaUrl": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/hmac-uploads/screenshots/drafts/10ecb2c3-19d7-405b-926e-3fa74e142661/1770867159017.png?width=600&quality=75&resize=contain",
+    "heroDescription": "Build and preview Brutalist Style Ecommerce Page instantly. Engineered as a complete standalone HTML document using Tailwind CSS via CDN (`<script src=\"https://cdn.tailwindcss.com\"></script>`), pure CSS/vanilla JS interactions, and zero build tool bloat. Perfect for Cursor AI, Claude 3.5 Sonnet, and direct browser execution.",
+    "accentBg": "bg-zinc-950",
+    "accentBorder": "border-zinc-800",
+    "accentText": "text-zinc-100",
+    "accentColor": "#09090b",
+    "coverImage": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/hmac-uploads/screenshots/drafts/10ecb2c3-19d7-405b-926e-3fa74e142661/1770867159017.png?width=600&quality=75&resize=contain",
+    "compatibleBuilders": [
+      "HTML5 Standalone",
+      "Tailwind CSS CDN",
+      "Claude 3.5 Sonnet",
+      "Cursor AI",
+      "v0",
+      "Lovable"
+    ],
+    "sectionsIncluded": [
+      {
+        "id": "sec-20-1",
+        "name": "Focal Layout Architecture",
+        "badge": "HTML5 HERO",
+        "description": "Main hero structure and typography for Brutalist Style Ecommerce Page.",
+        "promptText": "Generate a standalone HTML5 hero section for \"Brutalist Style Ecommerce Page\" using Tailwind CSS via CDN. Output pure HTML with class=\"...\", zero JSX or TSX.",
+        "tailwindSnippet": "<!-- 1. Focal Layout for Brutalist Style Ecommerce Page (HTML + Tailwind CDN) -->\n<section class=\"relative overflow-hidden py-16 sm:py-24 bg-zinc-950 text-zinc-100 antialiased font-sans\">\n  <div class=\"max-w-7xl mx-auto px-6 lg:px-8\">\n    <div class=\"text-center max-w-3xl mx-auto\">\n      <span class=\"inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-900 border border-zinc-800 text-zinc-300\">\n        <i data-lucide=\"sparkles\" class=\"w-3.5 h-3.5 text-zinc-400\"></i>\n        <span>DESIGN STYLE</span>\n      </span>\n      <h1 class=\"mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-display\">\n        Brutalist Style Ecommerce Page\n      </h1>\n      <p class=\"mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed\">\n        Production-grade Brutalist Style Ecommerce Page standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.\n      </p>\n    </div>\n  </div>\n</section>"
+      },
+      {
+        "id": "sec-20-2",
+        "name": "Interactive Feature Matrix",
+        "badge": "HTML5 GRID",
+        "description": "Responsive 3-column card grid with hover transitions and Lucide icons.",
+        "promptText": "Build a pure HTML5 3-column feature grid for \"Brutalist Style Ecommerce Page\" with Tailwind CDN utility classes and Lucide icons.",
+        "tailwindSnippet": "<!-- 2. Interactive Feature Matrix (HTML + Tailwind CDN) -->\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-6 py-12\">\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"zap\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Zero Build Lag</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Runs instantly in any browser via Tailwind CSS CDN script.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"layers\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Pure HTML & CSS</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Zero JSX or Node.js runtime required. Copy, paste and deploy.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"sparkles\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Micro-Interactions</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Smooth hover elevations and accessible keyboard focus outlines.</p>\n  </div>\n</div>"
+      },
+      {
+        "id": "sec-20-3",
+        "name": "Action & Conversion Trigger",
+        "badge": "HTML5 CTA",
+        "description": "Stand-alone call-to-action block with high-contrast buttons.",
+        "promptText": "Create an instant HTML5 CTA conversion block for \"Brutalist Style Ecommerce Page\" with pure Tailwind CSS CDN classes.",
+        "tailwindSnippet": "<!-- 3. Conversion Trigger Action (HTML + Tailwind CDN) -->\n<div class=\"max-w-2xl mx-auto px-6 py-8 text-center\">\n  <div class=\"rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8\">\n    <h3 class=\"text-lg font-bold text-white mb-2\">Experience Brutalist Style Ecommerce Page</h3>\n    <p class=\"text-xs text-zinc-400 mb-6\">Open the standalone HTML template in your browser or paste into your project.</p>\n    <div class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-zinc-950 text-xs font-semibold hover:bg-zinc-100 transition-all\">\n        Launch Template\n      </button>\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold hover:bg-zinc-700 transition-all\">\n        Copy HTML Code\n      </button>\n    </div>\n  </div>\n</div>"
+      }
+    ],
+    "features": [
+      "100% Pure Standalone HTML5 + Tailwind CSS via CDN",
+      "Zero JSX, TSX, React, or npm dependencies required",
+      "Double-click to preview instantly in any browser",
+      "1-Click AI Master Prompt optimized for Cursor & Claude"
+    ],
+    "toolsReplaced": [
+      {
+        "name": "UI Component Subscriptions",
+        "monthlyCostUSD": 29
+      },
+      {
+        "name": "Custom Animation Design",
+        "monthlyCostUSD": 99
+      },
+      {
+        "name": "Design Token Kits",
+        "monthlyCostUSD": 49
+      }
+    ],
+    "frameworkStack": [
+      "HTML5",
+      "Tailwind CSS (CDN)",
+      "Vanilla JS / Alpine.js",
+      "Lucide Icons (CDN)",
+      "GSAP (CDN)"
+    ],
+    "quickCopyPrompt": "You are an expert Frontend Engineer. Build a complete, production-ready, standalone HTML5 template for \"Brutalist Style Ecommerce Page\".\n\n### CRITICAL OUTPUT FORMAT REQUIREMENTS:\n- **Output ONLY single-file standard HTML (`<!DOCTYPE html> ... </html>`)**.\n- **STRICT PROHIBITION**: Do NOT output JSX, TSX, React components, Next.js code, or npm import statements. Everything must be pure HTML + CSS + JS in one file.\n- **Tailwind CSS via CDN**: Include `<script src=\"https://cdn.tailwindcss.com\"></script>` in `<head>`.\n- **Icons**: Load Lucide Icons via CDN `<script src=\"https://unpkg.com/lucide@latest\"></script>` and initialize with `<script>lucide.createIcons();</script>`.\n- **Fonts**: Load Google Fonts `Inter` and `JetBrains Mono`.\n- **Interactive Animations**: Use vanilla JavaScript or GSAP via CDN (`<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js\"></script>`) embedded inside `<script>` tags at the bottom.\n\n### Component & Design Specifications:\n1. **Design System & Palette**:\n   - Monochromatic Notion/Shopify aesthetic (neutral zinc-900 / zinc-950 dark, zinc-50 / pure white light).\n   - High precision typography with crisp contrast, clean borders (`border-zinc-200` / `border-zinc-800`), and soft shadows.\n2. **Component Architecture for \"Brutalist Style Ecommerce Page\"**:\n   - Master layout container with mobile, tablet, and desktop responsiveness.\n   - Micro-interactions on buttons, hover states, and smooth spring-like transitions.\n3. **Stand-Alone Portability**:\n   - Must open directly and render flawlessly by double clicking the `.html` file in any web browser.\n\nComponent: Brutalist Style Ecommerce Page\nCategory: Design Style",
+    "faqs": [
+      {
+        "question": "What is the output format of this prompt?",
+        "answer": "All prompts produce standard, single-file HTML5 templates styled with Tailwind CSS via CDN (<script src=\"https://cdn.tailwindcss.com\"></script>). No JSX, React, or build setups required."
+      },
+      {
+        "question": "How do I run and test the output HTML?",
+        "answer": "Copy the AI output, save it into a file named index.html, and double-click to open it in Chrome, Safari, or Firefox. It renders instantly without compiling."
+      },
+      {
+        "question": "Can I paste this HTML into WordPress, Webflow, or custom sites?",
+        "answer": "Yes! Because the template outputs standard HTML and loads Tailwind CSS via CDN, you can paste it directly into HTML embed blocks or standalone static sites."
+      }
+    ]
+  },
+  {
+    "id": "tmpl-21",
+    "slug": "high-contrast-landing-page",
+    "title": "High Contrast Landing Page",
+    "shortTitle": "High Contrast Landing Page",
+    "tagline": "Production-grade High Contrast Landing Page standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.",
+    "category": "landing_pages",
+    "categoryLabel": "Landing Page",
+    "assetFormat": "native_page",
+    "formatBadge": "HTML + TAILWIND CDN",
+    "badge": "HERO SYSTEM",
+    "rating": 4.98,
+    "reviewsCount": 103,
+    "downloadsCount": 1329,
+    "viewsCount": 4702,
+    "copiesCount": 903,
+    "mediaType": "image",
+    "mediaUrl": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/preview-artifacts/prompt-library/36133045-75cc-4611-bdbb-0ec16bdc76fd/thumbnails/87ff6929-9218-400c-8e53-29de4297f821.png?width=600&quality=75&resize=contain",
+    "heroDescription": "Build and preview High Contrast Landing Page instantly. Engineered as a complete standalone HTML document using Tailwind CSS via CDN (`<script src=\"https://cdn.tailwindcss.com\"></script>`), pure CSS/vanilla JS interactions, and zero build tool bloat. Perfect for Cursor AI, Claude 3.5 Sonnet, and direct browser execution.",
+    "accentBg": "bg-zinc-950",
+    "accentBorder": "border-zinc-800",
+    "accentText": "text-zinc-100",
+    "accentColor": "#09090b",
+    "coverImage": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/preview-artifacts/prompt-library/36133045-75cc-4611-bdbb-0ec16bdc76fd/thumbnails/87ff6929-9218-400c-8e53-29de4297f821.png?width=600&quality=75&resize=contain",
+    "compatibleBuilders": [
+      "HTML5 Standalone",
+      "Tailwind CSS CDN",
+      "Claude 3.5 Sonnet",
+      "Cursor AI",
+      "v0",
+      "Lovable"
+    ],
+    "sectionsIncluded": [
+      {
+        "id": "sec-21-1",
+        "name": "Focal Layout Architecture",
+        "badge": "HTML5 HERO",
+        "description": "Main hero structure and typography for High Contrast Landing Page.",
+        "promptText": "Generate a standalone HTML5 hero section for \"High Contrast Landing Page\" using Tailwind CSS via CDN. Output pure HTML with class=\"...\", zero JSX or TSX.",
+        "tailwindSnippet": "<!-- 1. Focal Layout for High Contrast Landing Page (HTML + Tailwind CDN) -->\n<section class=\"relative overflow-hidden py-16 sm:py-24 bg-zinc-950 text-zinc-100 antialiased font-sans\">\n  <div class=\"max-w-7xl mx-auto px-6 lg:px-8\">\n    <div class=\"text-center max-w-3xl mx-auto\">\n      <span class=\"inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-900 border border-zinc-800 text-zinc-300\">\n        <i data-lucide=\"sparkles\" class=\"w-3.5 h-3.5 text-zinc-400\"></i>\n        <span>LANDING PAGE</span>\n      </span>\n      <h1 class=\"mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-display\">\n        High Contrast Landing Page\n      </h1>\n      <p class=\"mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed\">\n        Production-grade High Contrast Landing Page standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.\n      </p>\n    </div>\n  </div>\n</section>"
+      },
+      {
+        "id": "sec-21-2",
+        "name": "Interactive Feature Matrix",
+        "badge": "HTML5 GRID",
+        "description": "Responsive 3-column card grid with hover transitions and Lucide icons.",
+        "promptText": "Build a pure HTML5 3-column feature grid for \"High Contrast Landing Page\" with Tailwind CDN utility classes and Lucide icons.",
+        "tailwindSnippet": "<!-- 2. Interactive Feature Matrix (HTML + Tailwind CDN) -->\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-6 py-12\">\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"zap\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Zero Build Lag</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Runs instantly in any browser via Tailwind CSS CDN script.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"layers\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Pure HTML & CSS</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Zero JSX or Node.js runtime required. Copy, paste and deploy.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"sparkles\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Micro-Interactions</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Smooth hover elevations and accessible keyboard focus outlines.</p>\n  </div>\n</div>"
+      },
+      {
+        "id": "sec-21-3",
+        "name": "Action & Conversion Trigger",
+        "badge": "HTML5 CTA",
+        "description": "Stand-alone call-to-action block with high-contrast buttons.",
+        "promptText": "Create an instant HTML5 CTA conversion block for \"High Contrast Landing Page\" with pure Tailwind CSS CDN classes.",
+        "tailwindSnippet": "<!-- 3. Conversion Trigger Action (HTML + Tailwind CDN) -->\n<div class=\"max-w-2xl mx-auto px-6 py-8 text-center\">\n  <div class=\"rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8\">\n    <h3 class=\"text-lg font-bold text-white mb-2\">Experience High Contrast Landing Page</h3>\n    <p class=\"text-xs text-zinc-400 mb-6\">Open the standalone HTML template in your browser or paste into your project.</p>\n    <div class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-zinc-950 text-xs font-semibold hover:bg-zinc-100 transition-all\">\n        Launch Template\n      </button>\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold hover:bg-zinc-700 transition-all\">\n        Copy HTML Code\n      </button>\n    </div>\n  </div>\n</div>"
+      }
+    ],
+    "features": [
+      "100% Pure Standalone HTML5 + Tailwind CSS via CDN",
+      "Zero JSX, TSX, React, or npm dependencies required",
+      "Double-click to preview instantly in any browser",
+      "1-Click AI Master Prompt optimized for Cursor & Claude"
+    ],
+    "toolsReplaced": [
+      {
+        "name": "UI Component Subscriptions",
+        "monthlyCostUSD": 29
+      },
+      {
+        "name": "Custom Animation Design",
+        "monthlyCostUSD": 99
+      },
+      {
+        "name": "Design Token Kits",
+        "monthlyCostUSD": 49
+      }
+    ],
+    "frameworkStack": [
+      "HTML5",
+      "Tailwind CSS (CDN)",
+      "Vanilla JS / Alpine.js",
+      "Lucide Icons (CDN)",
+      "GSAP (CDN)"
+    ],
+    "quickCopyPrompt": "You are an expert Frontend Engineer. Build a complete, production-ready, standalone HTML5 template for \"High Contrast Landing Page\".\n\n### CRITICAL OUTPUT FORMAT REQUIREMENTS:\n- **Output ONLY single-file standard HTML (`<!DOCTYPE html> ... </html>`)**.\n- **STRICT PROHIBITION**: Do NOT output JSX, TSX, React components, Next.js code, or npm import statements. Everything must be pure HTML + CSS + JS in one file.\n- **Tailwind CSS via CDN**: Include `<script src=\"https://cdn.tailwindcss.com\"></script>` in `<head>`.\n- **Icons**: Load Lucide Icons via CDN `<script src=\"https://unpkg.com/lucide@latest\"></script>` and initialize with `<script>lucide.createIcons();</script>`.\n- **Fonts**: Load Google Fonts `Inter` and `JetBrains Mono`.\n- **Interactive Animations**: Use vanilla JavaScript or GSAP via CDN (`<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js\"></script>`) embedded inside `<script>` tags at the bottom.\n\n### Component & Design Specifications:\n1. **Design System & Palette**:\n   - Monochromatic Notion/Shopify aesthetic (neutral zinc-900 / zinc-950 dark, zinc-50 / pure white light).\n   - High precision typography with crisp contrast, clean borders (`border-zinc-200` / `border-zinc-800`), and soft shadows.\n2. **Component Architecture for \"High Contrast Landing Page\"**:\n   - Master layout container with mobile, tablet, and desktop responsiveness.\n   - Micro-interactions on buttons, hover states, and smooth spring-like transitions.\n3. **Stand-Alone Portability**:\n   - Must open directly and render flawlessly by double clicking the `.html` file in any web browser.\n\nComponent: High Contrast Landing Page\nCategory: Landing Page",
+    "faqs": [
+      {
+        "question": "What is the output format of this prompt?",
+        "answer": "All prompts produce standard, single-file HTML5 templates styled with Tailwind CSS via CDN (<script src=\"https://cdn.tailwindcss.com\"></script>). No JSX, React, or build setups required."
+      },
+      {
+        "question": "How do I run and test the output HTML?",
+        "answer": "Copy the AI output, save it into a file named index.html, and double-click to open it in Chrome, Safari, or Firefox. It renders instantly without compiling."
+      },
+      {
+        "question": "Can I paste this HTML into WordPress, Webflow, or custom sites?",
+        "answer": "Yes! Because the template outputs standard HTML and loads Tailwind CSS via CDN, you can paste it directly into HTML embed blocks or standalone static sites."
+      }
+    ]
+  },
+  {
+    "id": "tmpl-22",
+    "slug": "deep-red-style",
+    "title": "Deep Red Style",
+    "shortTitle": "Deep Red Style",
+    "tagline": "Production-grade Deep Red Style standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.",
+    "category": "elementor_kits",
+    "categoryLabel": "Design Style",
+    "assetFormat": "elementor_kit",
+    "formatBadge": "HTML + TAILWIND CDN",
+    "badge": "DESIGN TOKENS",
+    "rating": 4.92,
+    "reviewsCount": 113,
+    "downloadsCount": 2743,
+    "viewsCount": 4547,
+    "copiesCount": 671,
+    "mediaType": "image",
+    "mediaUrl": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/hmac-uploads/screenshots/components/c0ee9faa-a4c2-422b-a59b-35216d817ee9/9930e9a0-b26d-4609-912b-2c24eb68242e/1768258746034.png?width=600&quality=75&resize=contain",
+    "heroDescription": "Build and preview Deep Red Style instantly. Engineered as a complete standalone HTML document using Tailwind CSS via CDN (`<script src=\"https://cdn.tailwindcss.com\"></script>`), pure CSS/vanilla JS interactions, and zero build tool bloat. Perfect for Cursor AI, Claude 3.5 Sonnet, and direct browser execution.",
+    "accentBg": "bg-zinc-950",
+    "accentBorder": "border-zinc-800",
+    "accentText": "text-zinc-100",
+    "accentColor": "#09090b",
+    "coverImage": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/hmac-uploads/screenshots/components/c0ee9faa-a4c2-422b-a59b-35216d817ee9/9930e9a0-b26d-4609-912b-2c24eb68242e/1768258746034.png?width=600&quality=75&resize=contain",
+    "compatibleBuilders": [
+      "HTML5 Standalone",
+      "Tailwind CSS CDN",
+      "Claude 3.5 Sonnet",
+      "Cursor AI",
+      "v0",
+      "Lovable"
+    ],
+    "sectionsIncluded": [
+      {
+        "id": "sec-22-1",
+        "name": "Focal Layout Architecture",
+        "badge": "HTML5 HERO",
+        "description": "Main hero structure and typography for Deep Red Style.",
+        "promptText": "Generate a standalone HTML5 hero section for \"Deep Red Style\" using Tailwind CSS via CDN. Output pure HTML with class=\"...\", zero JSX or TSX.",
+        "tailwindSnippet": "<!-- 1. Focal Layout for Deep Red Style (HTML + Tailwind CDN) -->\n<section class=\"relative overflow-hidden py-16 sm:py-24 bg-zinc-950 text-zinc-100 antialiased font-sans\">\n  <div class=\"max-w-7xl mx-auto px-6 lg:px-8\">\n    <div class=\"text-center max-w-3xl mx-auto\">\n      <span class=\"inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-900 border border-zinc-800 text-zinc-300\">\n        <i data-lucide=\"sparkles\" class=\"w-3.5 h-3.5 text-zinc-400\"></i>\n        <span>DESIGN STYLE</span>\n      </span>\n      <h1 class=\"mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-display\">\n        Deep Red Style\n      </h1>\n      <p class=\"mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed\">\n        Production-grade Deep Red Style standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.\n      </p>\n    </div>\n  </div>\n</section>"
+      },
+      {
+        "id": "sec-22-2",
+        "name": "Interactive Feature Matrix",
+        "badge": "HTML5 GRID",
+        "description": "Responsive 3-column card grid with hover transitions and Lucide icons.",
+        "promptText": "Build a pure HTML5 3-column feature grid for \"Deep Red Style\" with Tailwind CDN utility classes and Lucide icons.",
+        "tailwindSnippet": "<!-- 2. Interactive Feature Matrix (HTML + Tailwind CDN) -->\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-6 py-12\">\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"zap\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Zero Build Lag</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Runs instantly in any browser via Tailwind CSS CDN script.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"layers\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Pure HTML & CSS</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Zero JSX or Node.js runtime required. Copy, paste and deploy.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"sparkles\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Micro-Interactions</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Smooth hover elevations and accessible keyboard focus outlines.</p>\n  </div>\n</div>"
+      },
+      {
+        "id": "sec-22-3",
+        "name": "Action & Conversion Trigger",
+        "badge": "HTML5 CTA",
+        "description": "Stand-alone call-to-action block with high-contrast buttons.",
+        "promptText": "Create an instant HTML5 CTA conversion block for \"Deep Red Style\" with pure Tailwind CSS CDN classes.",
+        "tailwindSnippet": "<!-- 3. Conversion Trigger Action (HTML + Tailwind CDN) -->\n<div class=\"max-w-2xl mx-auto px-6 py-8 text-center\">\n  <div class=\"rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8\">\n    <h3 class=\"text-lg font-bold text-white mb-2\">Experience Deep Red Style</h3>\n    <p class=\"text-xs text-zinc-400 mb-6\">Open the standalone HTML template in your browser or paste into your project.</p>\n    <div class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-zinc-950 text-xs font-semibold hover:bg-zinc-100 transition-all\">\n        Launch Template\n      </button>\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold hover:bg-zinc-700 transition-all\">\n        Copy HTML Code\n      </button>\n    </div>\n  </div>\n</div>"
+      }
+    ],
+    "features": [
+      "100% Pure Standalone HTML5 + Tailwind CSS via CDN",
+      "Zero JSX, TSX, React, or npm dependencies required",
+      "Double-click to preview instantly in any browser",
+      "1-Click AI Master Prompt optimized for Cursor & Claude"
+    ],
+    "toolsReplaced": [
+      {
+        "name": "UI Component Subscriptions",
+        "monthlyCostUSD": 29
+      },
+      {
+        "name": "Custom Animation Design",
+        "monthlyCostUSD": 99
+      },
+      {
+        "name": "Design Token Kits",
+        "monthlyCostUSD": 49
+      }
+    ],
+    "frameworkStack": [
+      "HTML5",
+      "Tailwind CSS (CDN)",
+      "Vanilla JS / Alpine.js",
+      "Lucide Icons (CDN)",
+      "GSAP (CDN)"
+    ],
+    "quickCopyPrompt": "You are an expert Frontend Engineer. Build a complete, production-ready, standalone HTML5 template for \"Deep Red Style\".\n\n### CRITICAL OUTPUT FORMAT REQUIREMENTS:\n- **Output ONLY single-file standard HTML (`<!DOCTYPE html> ... </html>`)**.\n- **STRICT PROHIBITION**: Do NOT output JSX, TSX, React components, Next.js code, or npm import statements. Everything must be pure HTML + CSS + JS in one file.\n- **Tailwind CSS via CDN**: Include `<script src=\"https://cdn.tailwindcss.com\"></script>` in `<head>`.\n- **Icons**: Load Lucide Icons via CDN `<script src=\"https://unpkg.com/lucide@latest\"></script>` and initialize with `<script>lucide.createIcons();</script>`.\n- **Fonts**: Load Google Fonts `Inter` and `JetBrains Mono`.\n- **Interactive Animations**: Use vanilla JavaScript or GSAP via CDN (`<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js\"></script>`) embedded inside `<script>` tags at the bottom.\n\n### Component & Design Specifications:\n1. **Design System & Palette**:\n   - Monochromatic Notion/Shopify aesthetic (neutral zinc-900 / zinc-950 dark, zinc-50 / pure white light).\n   - High precision typography with crisp contrast, clean borders (`border-zinc-200` / `border-zinc-800`), and soft shadows.\n2. **Component Architecture for \"Deep Red Style\"**:\n   - Master layout container with mobile, tablet, and desktop responsiveness.\n   - Micro-interactions on buttons, hover states, and smooth spring-like transitions.\n3. **Stand-Alone Portability**:\n   - Must open directly and render flawlessly by double clicking the `.html` file in any web browser.\n\nComponent: Deep Red Style\nCategory: Design Style",
+    "faqs": [
+      {
+        "question": "What is the output format of this prompt?",
+        "answer": "All prompts produce standard, single-file HTML5 templates styled with Tailwind CSS via CDN (<script src=\"https://cdn.tailwindcss.com\"></script>). No JSX, React, or build setups required."
+      },
+      {
+        "question": "How do I run and test the output HTML?",
+        "answer": "Copy the AI output, save it into a file named index.html, and double-click to open it in Chrome, Safari, or Firefox. It renders instantly without compiling."
+      },
+      {
+        "question": "Can I paste this HTML into WordPress, Webflow, or custom sites?",
+        "answer": "Yes! Because the template outputs standard HTML and loads Tailwind CSS via CDN, you can paste it directly into HTML embed blocks or standalone static sites."
+      }
+    ]
+  },
+  {
+    "id": "tmpl-23",
+    "slug": "animated-aurora-background-hero-dark-developer-tool-landing-page",
+    "title": "Animated Aurora Background Hero: Dark Developer-Tool Landing Page",
+    "shortTitle": "Animated Aurora Background Hero",
+    "tagline": "Production-grade Animated Aurora Background Hero: Dark Developer-Tool Landing Page standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.",
+    "category": "landing_pages",
+    "categoryLabel": "Landing Page",
+    "assetFormat": "native_page",
+    "formatBadge": "HTML + TAILWIND CDN",
+    "badge": "HERO SYSTEM",
+    "rating": 4.93,
+    "reviewsCount": 125,
+    "downloadsCount": 4040,
+    "viewsCount": 3573,
+    "copiesCount": 958,
+    "mediaType": "image",
+    "mediaUrl": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/preview-artifacts/prompt-library/7d97ebb3-363d-49d3-a029-fa9a23815e3f/thumbnails/24a01df1-b0e3-4dc4-afd3-900830e2dd75.png?width=600&quality=75&resize=contain",
+    "heroDescription": "Build and preview Animated Aurora Background Hero: Dark Developer-Tool Landing Page instantly. Engineered as a complete standalone HTML document using Tailwind CSS via CDN (`<script src=\"https://cdn.tailwindcss.com\"></script>`), pure CSS/vanilla JS interactions, and zero build tool bloat. Perfect for Cursor AI, Claude 3.5 Sonnet, and direct browser execution.",
+    "accentBg": "bg-zinc-950",
+    "accentBorder": "border-zinc-800",
+    "accentText": "text-zinc-100",
+    "accentColor": "#09090b",
+    "coverImage": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/preview-artifacts/prompt-library/7d97ebb3-363d-49d3-a029-fa9a23815e3f/thumbnails/24a01df1-b0e3-4dc4-afd3-900830e2dd75.png?width=600&quality=75&resize=contain",
+    "compatibleBuilders": [
+      "HTML5 Standalone",
+      "Tailwind CSS CDN",
+      "Claude 3.5 Sonnet",
+      "Cursor AI",
+      "v0",
+      "Lovable"
+    ],
+    "sectionsIncluded": [
+      {
+        "id": "sec-23-1",
+        "name": "Focal Layout Architecture",
+        "badge": "HTML5 HERO",
+        "description": "Main hero structure and typography for Animated Aurora Background Hero: Dark Developer-Tool Landing Page.",
+        "promptText": "Generate a standalone HTML5 hero section for \"Animated Aurora Background Hero: Dark Developer-Tool Landing Page\" using Tailwind CSS via CDN. Output pure HTML with class=\"...\", zero JSX or TSX.",
+        "tailwindSnippet": "<!-- 1. Focal Layout for Animated Aurora Background Hero: Dark Developer-Tool Landing Page (HTML + Tailwind CDN) -->\n<section class=\"relative overflow-hidden py-16 sm:py-24 bg-zinc-950 text-zinc-100 antialiased font-sans\">\n  <div class=\"max-w-7xl mx-auto px-6 lg:px-8\">\n    <div class=\"text-center max-w-3xl mx-auto\">\n      <span class=\"inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-900 border border-zinc-800 text-zinc-300\">\n        <i data-lucide=\"sparkles\" class=\"w-3.5 h-3.5 text-zinc-400\"></i>\n        <span>LANDING PAGE</span>\n      </span>\n      <h1 class=\"mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-display\">\n        Animated Aurora Background Hero: Dark Developer-Tool Landing Page\n      </h1>\n      <p class=\"mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed\">\n        Production-grade Animated Aurora Background Hero: Dark Developer-Tool Landing Page standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.\n      </p>\n    </div>\n  </div>\n</section>"
+      },
+      {
+        "id": "sec-23-2",
+        "name": "Interactive Feature Matrix",
+        "badge": "HTML5 GRID",
+        "description": "Responsive 3-column card grid with hover transitions and Lucide icons.",
+        "promptText": "Build a pure HTML5 3-column feature grid for \"Animated Aurora Background Hero: Dark Developer-Tool Landing Page\" with Tailwind CDN utility classes and Lucide icons.",
+        "tailwindSnippet": "<!-- 2. Interactive Feature Matrix (HTML + Tailwind CDN) -->\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-6 py-12\">\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"zap\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Zero Build Lag</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Runs instantly in any browser via Tailwind CSS CDN script.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"layers\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Pure HTML & CSS</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Zero JSX or Node.js runtime required. Copy, paste and deploy.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"sparkles\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Micro-Interactions</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Smooth hover elevations and accessible keyboard focus outlines.</p>\n  </div>\n</div>"
+      },
+      {
+        "id": "sec-23-3",
+        "name": "Action & Conversion Trigger",
+        "badge": "HTML5 CTA",
+        "description": "Stand-alone call-to-action block with high-contrast buttons.",
+        "promptText": "Create an instant HTML5 CTA conversion block for \"Animated Aurora Background Hero: Dark Developer-Tool Landing Page\" with pure Tailwind CSS CDN classes.",
+        "tailwindSnippet": "<!-- 3. Conversion Trigger Action (HTML + Tailwind CDN) -->\n<div class=\"max-w-2xl mx-auto px-6 py-8 text-center\">\n  <div class=\"rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8\">\n    <h3 class=\"text-lg font-bold text-white mb-2\">Experience Animated Aurora Background Hero</h3>\n    <p class=\"text-xs text-zinc-400 mb-6\">Open the standalone HTML template in your browser or paste into your project.</p>\n    <div class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-zinc-950 text-xs font-semibold hover:bg-zinc-100 transition-all\">\n        Launch Template\n      </button>\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold hover:bg-zinc-700 transition-all\">\n        Copy HTML Code\n      </button>\n    </div>\n  </div>\n</div>"
+      }
+    ],
+    "features": [
+      "100% Pure Standalone HTML5 + Tailwind CSS via CDN",
+      "Zero JSX, TSX, React, or npm dependencies required",
+      "Double-click to preview instantly in any browser",
+      "1-Click AI Master Prompt optimized for Cursor & Claude"
+    ],
+    "toolsReplaced": [
+      {
+        "name": "UI Component Subscriptions",
+        "monthlyCostUSD": 29
+      },
+      {
+        "name": "Custom Animation Design",
+        "monthlyCostUSD": 99
+      },
+      {
+        "name": "Design Token Kits",
+        "monthlyCostUSD": 49
+      }
+    ],
+    "frameworkStack": [
+      "HTML5",
+      "Tailwind CSS (CDN)",
+      "Vanilla JS / Alpine.js",
+      "Lucide Icons (CDN)",
+      "GSAP (CDN)"
+    ],
+    "quickCopyPrompt": "You are an expert Frontend Engineer. Build a complete, production-ready, standalone HTML5 template for \"Animated Aurora Background Hero: Dark Developer-Tool Landing Page\".\n\n### CRITICAL OUTPUT FORMAT REQUIREMENTS:\n- **Output ONLY single-file standard HTML (`<!DOCTYPE html> ... </html>`)**.\n- **STRICT PROHIBITION**: Do NOT output JSX, TSX, React components, Next.js code, or npm import statements. Everything must be pure HTML + CSS + JS in one file.\n- **Tailwind CSS via CDN**: Include `<script src=\"https://cdn.tailwindcss.com\"></script>` in `<head>`.\n- **Icons**: Load Lucide Icons via CDN `<script src=\"https://unpkg.com/lucide@latest\"></script>` and initialize with `<script>lucide.createIcons();</script>`.\n- **Fonts**: Load Google Fonts `Inter` and `JetBrains Mono`.\n- **Interactive Animations**: Use vanilla JavaScript or GSAP via CDN (`<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js\"></script>`) embedded inside `<script>` tags at the bottom.\n\n### Component & Design Specifications:\n1. **Design System & Palette**:\n   - Monochromatic Notion/Shopify aesthetic (neutral zinc-900 / zinc-950 dark, zinc-50 / pure white light).\n   - High precision typography with crisp contrast, clean borders (`border-zinc-200` / `border-zinc-800`), and soft shadows.\n2. **Component Architecture for \"Animated Aurora Background Hero: Dark Developer-Tool Landing Page\"**:\n   - Master layout container with mobile, tablet, and desktop responsiveness.\n   - Micro-interactions on buttons, hover states, and smooth spring-like transitions.\n3. **Stand-Alone Portability**:\n   - Must open directly and render flawlessly by double clicking the `.html` file in any web browser.\n\nComponent: Animated Aurora Background Hero: Dark Developer-Tool Landing Page\nCategory: Landing Page",
+    "faqs": [
+      {
+        "question": "What is the output format of this prompt?",
+        "answer": "All prompts produce standard, single-file HTML5 templates styled with Tailwind CSS via CDN (<script src=\"https://cdn.tailwindcss.com\"></script>). No JSX, React, or build setups required."
+      },
+      {
+        "question": "How do I run and test the output HTML?",
+        "answer": "Copy the AI output, save it into a file named index.html, and double-click to open it in Chrome, Safari, or Firefox. It renders instantly without compiling."
+      },
+      {
+        "question": "Can I paste this HTML into WordPress, Webflow, or custom sites?",
+        "answer": "Yes! Because the template outputs standard HTML and loads Tailwind CSS via CDN, you can paste it directly into HTML embed blocks or standalone static sites."
+      }
+    ]
+  },
+  {
+    "id": "tmpl-24",
+    "slug": "brutalist-e-commerce-page",
+    "title": "Brutalist E-commerce Page",
+    "shortTitle": "Brutalist E-commerce Page",
+    "tagline": "Production-grade Brutalist E-commerce Page standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.",
+    "category": "elementor_kits",
+    "categoryLabel": "Design Style",
+    "assetFormat": "elementor_kit",
+    "formatBadge": "HTML + TAILWIND CDN",
+    "badge": "DESIGN TOKENS",
+    "rating": 4.92,
+    "reviewsCount": 162,
+    "downloadsCount": 3733,
+    "viewsCount": 3294,
+    "copiesCount": 712,
+    "mediaType": "image",
+    "mediaUrl": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/hmac-uploads/screenshots/drafts/da34d4ac-cb7e-4391-af07-ec9085970f46/1770867822164.png?width=600&quality=75&resize=contain",
+    "heroDescription": "Build and preview Brutalist E-commerce Page instantly. Engineered as a complete standalone HTML document using Tailwind CSS via CDN (`<script src=\"https://cdn.tailwindcss.com\"></script>`), pure CSS/vanilla JS interactions, and zero build tool bloat. Perfect for Cursor AI, Claude 3.5 Sonnet, and direct browser execution.",
+    "accentBg": "bg-zinc-950",
+    "accentBorder": "border-zinc-800",
+    "accentText": "text-zinc-100",
+    "accentColor": "#09090b",
+    "coverImage": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/hmac-uploads/screenshots/drafts/da34d4ac-cb7e-4391-af07-ec9085970f46/1770867822164.png?width=600&quality=75&resize=contain",
+    "compatibleBuilders": [
+      "HTML5 Standalone",
+      "Tailwind CSS CDN",
+      "Claude 3.5 Sonnet",
+      "Cursor AI",
+      "v0",
+      "Lovable"
+    ],
+    "sectionsIncluded": [
+      {
+        "id": "sec-24-1",
+        "name": "Focal Layout Architecture",
+        "badge": "HTML5 HERO",
+        "description": "Main hero structure and typography for Brutalist E-commerce Page.",
+        "promptText": "Generate a standalone HTML5 hero section for \"Brutalist E-commerce Page\" using Tailwind CSS via CDN. Output pure HTML with class=\"...\", zero JSX or TSX.",
+        "tailwindSnippet": "<!-- 1. Focal Layout for Brutalist E-commerce Page (HTML + Tailwind CDN) -->\n<section class=\"relative overflow-hidden py-16 sm:py-24 bg-zinc-950 text-zinc-100 antialiased font-sans\">\n  <div class=\"max-w-7xl mx-auto px-6 lg:px-8\">\n    <div class=\"text-center max-w-3xl mx-auto\">\n      <span class=\"inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-900 border border-zinc-800 text-zinc-300\">\n        <i data-lucide=\"sparkles\" class=\"w-3.5 h-3.5 text-zinc-400\"></i>\n        <span>DESIGN STYLE</span>\n      </span>\n      <h1 class=\"mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-display\">\n        Brutalist E-commerce Page\n      </h1>\n      <p class=\"mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed\">\n        Production-grade Brutalist E-commerce Page standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.\n      </p>\n    </div>\n  </div>\n</section>"
+      },
+      {
+        "id": "sec-24-2",
+        "name": "Interactive Feature Matrix",
+        "badge": "HTML5 GRID",
+        "description": "Responsive 3-column card grid with hover transitions and Lucide icons.",
+        "promptText": "Build a pure HTML5 3-column feature grid for \"Brutalist E-commerce Page\" with Tailwind CDN utility classes and Lucide icons.",
+        "tailwindSnippet": "<!-- 2. Interactive Feature Matrix (HTML + Tailwind CDN) -->\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-6 py-12\">\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"zap\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Zero Build Lag</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Runs instantly in any browser via Tailwind CSS CDN script.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"layers\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Pure HTML & CSS</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Zero JSX or Node.js runtime required. Copy, paste and deploy.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"sparkles\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Micro-Interactions</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Smooth hover elevations and accessible keyboard focus outlines.</p>\n  </div>\n</div>"
+      },
+      {
+        "id": "sec-24-3",
+        "name": "Action & Conversion Trigger",
+        "badge": "HTML5 CTA",
+        "description": "Stand-alone call-to-action block with high-contrast buttons.",
+        "promptText": "Create an instant HTML5 CTA conversion block for \"Brutalist E-commerce Page\" with pure Tailwind CSS CDN classes.",
+        "tailwindSnippet": "<!-- 3. Conversion Trigger Action (HTML + Tailwind CDN) -->\n<div class=\"max-w-2xl mx-auto px-6 py-8 text-center\">\n  <div class=\"rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8\">\n    <h3 class=\"text-lg font-bold text-white mb-2\">Experience Brutalist E-commerce Page</h3>\n    <p class=\"text-xs text-zinc-400 mb-6\">Open the standalone HTML template in your browser or paste into your project.</p>\n    <div class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-zinc-950 text-xs font-semibold hover:bg-zinc-100 transition-all\">\n        Launch Template\n      </button>\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold hover:bg-zinc-700 transition-all\">\n        Copy HTML Code\n      </button>\n    </div>\n  </div>\n</div>"
+      }
+    ],
+    "features": [
+      "100% Pure Standalone HTML5 + Tailwind CSS via CDN",
+      "Zero JSX, TSX, React, or npm dependencies required",
+      "Double-click to preview instantly in any browser",
+      "1-Click AI Master Prompt optimized for Cursor & Claude"
+    ],
+    "toolsReplaced": [
+      {
+        "name": "UI Component Subscriptions",
+        "monthlyCostUSD": 29
+      },
+      {
+        "name": "Custom Animation Design",
+        "monthlyCostUSD": 99
+      },
+      {
+        "name": "Design Token Kits",
+        "monthlyCostUSD": 49
+      }
+    ],
+    "frameworkStack": [
+      "HTML5",
+      "Tailwind CSS (CDN)",
+      "Vanilla JS / Alpine.js",
+      "Lucide Icons (CDN)",
+      "GSAP (CDN)"
+    ],
+    "quickCopyPrompt": "You are an expert Frontend Engineer. Build a complete, production-ready, standalone HTML5 template for \"Brutalist E-commerce Page\".\n\n### CRITICAL OUTPUT FORMAT REQUIREMENTS:\n- **Output ONLY single-file standard HTML (`<!DOCTYPE html> ... </html>`)**.\n- **STRICT PROHIBITION**: Do NOT output JSX, TSX, React components, Next.js code, or npm import statements. Everything must be pure HTML + CSS + JS in one file.\n- **Tailwind CSS via CDN**: Include `<script src=\"https://cdn.tailwindcss.com\"></script>` in `<head>`.\n- **Icons**: Load Lucide Icons via CDN `<script src=\"https://unpkg.com/lucide@latest\"></script>` and initialize with `<script>lucide.createIcons();</script>`.\n- **Fonts**: Load Google Fonts `Inter` and `JetBrains Mono`.\n- **Interactive Animations**: Use vanilla JavaScript or GSAP via CDN (`<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js\"></script>`) embedded inside `<script>` tags at the bottom.\n\n### Component & Design Specifications:\n1. **Design System & Palette**:\n   - Monochromatic Notion/Shopify aesthetic (neutral zinc-900 / zinc-950 dark, zinc-50 / pure white light).\n   - High precision typography with crisp contrast, clean borders (`border-zinc-200` / `border-zinc-800`), and soft shadows.\n2. **Component Architecture for \"Brutalist E-commerce Page\"**:\n   - Master layout container with mobile, tablet, and desktop responsiveness.\n   - Micro-interactions on buttons, hover states, and smooth spring-like transitions.\n3. **Stand-Alone Portability**:\n   - Must open directly and render flawlessly by double clicking the `.html` file in any web browser.\n\nComponent: Brutalist E-commerce Page\nCategory: Design Style",
+    "faqs": [
+      {
+        "question": "What is the output format of this prompt?",
+        "answer": "All prompts produce standard, single-file HTML5 templates styled with Tailwind CSS via CDN (<script src=\"https://cdn.tailwindcss.com\"></script>). No JSX, React, or build setups required."
+      },
+      {
+        "question": "How do I run and test the output HTML?",
+        "answer": "Copy the AI output, save it into a file named index.html, and double-click to open it in Chrome, Safari, or Firefox. It renders instantly without compiling."
+      },
+      {
+        "question": "Can I paste this HTML into WordPress, Webflow, or custom sites?",
+        "answer": "Yes! Because the template outputs standard HTML and loads Tailwind CSS via CDN, you can paste it directly into HTML embed blocks or standalone static sites."
+      }
+    ]
+  },
+  {
+    "id": "tmpl-25",
+    "slug": "luxury-focused-design-system",
+    "title": "Luxury-focused Design System",
+    "shortTitle": "Luxury-focused Design System",
+    "tagline": "Production-grade Luxury-focused Design System standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.",
+    "category": "elementor_kits",
+    "categoryLabel": "Design Style",
+    "assetFormat": "elementor_kit",
+    "formatBadge": "HTML + TAILWIND CDN",
+    "badge": "DESIGN TOKENS",
+    "rating": 4.95,
+    "reviewsCount": 188,
+    "downloadsCount": 4151,
+    "viewsCount": 1821,
+    "copiesCount": 636,
+    "mediaType": "image",
+    "mediaUrl": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/preview-artifacts/prompt-library/36133045-75cc-4611-bdbb-0ec16bdc76fd/thumbnails/9047e64c-e86a-4b2b-a37d-3107c69b717d.png?width=600&quality=75&resize=contain",
+    "heroDescription": "Build and preview Luxury-focused Design System instantly. Engineered as a complete standalone HTML document using Tailwind CSS via CDN (`<script src=\"https://cdn.tailwindcss.com\"></script>`), pure CSS/vanilla JS interactions, and zero build tool bloat. Perfect for Cursor AI, Claude 3.5 Sonnet, and direct browser execution.",
+    "accentBg": "bg-zinc-950",
+    "accentBorder": "border-zinc-800",
+    "accentText": "text-zinc-100",
+    "accentColor": "#09090b",
+    "coverImage": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/preview-artifacts/prompt-library/36133045-75cc-4611-bdbb-0ec16bdc76fd/thumbnails/9047e64c-e86a-4b2b-a37d-3107c69b717d.png?width=600&quality=75&resize=contain",
+    "compatibleBuilders": [
+      "HTML5 Standalone",
+      "Tailwind CSS CDN",
+      "Claude 3.5 Sonnet",
+      "Cursor AI",
+      "v0",
+      "Lovable"
+    ],
+    "sectionsIncluded": [
+      {
+        "id": "sec-25-1",
+        "name": "Focal Layout Architecture",
+        "badge": "HTML5 HERO",
+        "description": "Main hero structure and typography for Luxury-focused Design System.",
+        "promptText": "Generate a standalone HTML5 hero section for \"Luxury-focused Design System\" using Tailwind CSS via CDN. Output pure HTML with class=\"...\", zero JSX or TSX.",
+        "tailwindSnippet": "<!-- 1. Focal Layout for Luxury-focused Design System (HTML + Tailwind CDN) -->\n<section class=\"relative overflow-hidden py-16 sm:py-24 bg-zinc-950 text-zinc-100 antialiased font-sans\">\n  <div class=\"max-w-7xl mx-auto px-6 lg:px-8\">\n    <div class=\"text-center max-w-3xl mx-auto\">\n      <span class=\"inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-900 border border-zinc-800 text-zinc-300\">\n        <i data-lucide=\"sparkles\" class=\"w-3.5 h-3.5 text-zinc-400\"></i>\n        <span>DESIGN STYLE</span>\n      </span>\n      <h1 class=\"mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-display\">\n        Luxury-focused Design System\n      </h1>\n      <p class=\"mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed\">\n        Production-grade Luxury-focused Design System standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.\n      </p>\n    </div>\n  </div>\n</section>"
+      },
+      {
+        "id": "sec-25-2",
+        "name": "Interactive Feature Matrix",
+        "badge": "HTML5 GRID",
+        "description": "Responsive 3-column card grid with hover transitions and Lucide icons.",
+        "promptText": "Build a pure HTML5 3-column feature grid for \"Luxury-focused Design System\" with Tailwind CDN utility classes and Lucide icons.",
+        "tailwindSnippet": "<!-- 2. Interactive Feature Matrix (HTML + Tailwind CDN) -->\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-6 py-12\">\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"zap\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Zero Build Lag</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Runs instantly in any browser via Tailwind CSS CDN script.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"layers\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Pure HTML & CSS</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Zero JSX or Node.js runtime required. Copy, paste and deploy.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"sparkles\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Micro-Interactions</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Smooth hover elevations and accessible keyboard focus outlines.</p>\n  </div>\n</div>"
+      },
+      {
+        "id": "sec-25-3",
+        "name": "Action & Conversion Trigger",
+        "badge": "HTML5 CTA",
+        "description": "Stand-alone call-to-action block with high-contrast buttons.",
+        "promptText": "Create an instant HTML5 CTA conversion block for \"Luxury-focused Design System\" with pure Tailwind CSS CDN classes.",
+        "tailwindSnippet": "<!-- 3. Conversion Trigger Action (HTML + Tailwind CDN) -->\n<div class=\"max-w-2xl mx-auto px-6 py-8 text-center\">\n  <div class=\"rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8\">\n    <h3 class=\"text-lg font-bold text-white mb-2\">Experience Luxury-focused Design System</h3>\n    <p class=\"text-xs text-zinc-400 mb-6\">Open the standalone HTML template in your browser or paste into your project.</p>\n    <div class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-zinc-950 text-xs font-semibold hover:bg-zinc-100 transition-all\">\n        Launch Template\n      </button>\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold hover:bg-zinc-700 transition-all\">\n        Copy HTML Code\n      </button>\n    </div>\n  </div>\n</div>"
+      }
+    ],
+    "features": [
+      "100% Pure Standalone HTML5 + Tailwind CSS via CDN",
+      "Zero JSX, TSX, React, or npm dependencies required",
+      "Double-click to preview instantly in any browser",
+      "1-Click AI Master Prompt optimized for Cursor & Claude"
+    ],
+    "toolsReplaced": [
+      {
+        "name": "UI Component Subscriptions",
+        "monthlyCostUSD": 29
+      },
+      {
+        "name": "Custom Animation Design",
+        "monthlyCostUSD": 99
+      },
+      {
+        "name": "Design Token Kits",
+        "monthlyCostUSD": 49
+      }
+    ],
+    "frameworkStack": [
+      "HTML5",
+      "Tailwind CSS (CDN)",
+      "Vanilla JS / Alpine.js",
+      "Lucide Icons (CDN)",
+      "GSAP (CDN)"
+    ],
+    "quickCopyPrompt": "You are an expert Frontend Engineer. Build a complete, production-ready, standalone HTML5 template for \"Luxury-focused Design System\".\n\n### CRITICAL OUTPUT FORMAT REQUIREMENTS:\n- **Output ONLY single-file standard HTML (`<!DOCTYPE html> ... </html>`)**.\n- **STRICT PROHIBITION**: Do NOT output JSX, TSX, React components, Next.js code, or npm import statements. Everything must be pure HTML + CSS + JS in one file.\n- **Tailwind CSS via CDN**: Include `<script src=\"https://cdn.tailwindcss.com\"></script>` in `<head>`.\n- **Icons**: Load Lucide Icons via CDN `<script src=\"https://unpkg.com/lucide@latest\"></script>` and initialize with `<script>lucide.createIcons();</script>`.\n- **Fonts**: Load Google Fonts `Inter` and `JetBrains Mono`.\n- **Interactive Animations**: Use vanilla JavaScript or GSAP via CDN (`<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js\"></script>`) embedded inside `<script>` tags at the bottom.\n\n### Component & Design Specifications:\n1. **Design System & Palette**:\n   - Monochromatic Notion/Shopify aesthetic (neutral zinc-900 / zinc-950 dark, zinc-50 / pure white light).\n   - High precision typography with crisp contrast, clean borders (`border-zinc-200` / `border-zinc-800`), and soft shadows.\n2. **Component Architecture for \"Luxury-focused Design System\"**:\n   - Master layout container with mobile, tablet, and desktop responsiveness.\n   - Micro-interactions on buttons, hover states, and smooth spring-like transitions.\n3. **Stand-Alone Portability**:\n   - Must open directly and render flawlessly by double clicking the `.html` file in any web browser.\n\nComponent: Luxury-focused Design System\nCategory: Design Style",
+    "faqs": [
+      {
+        "question": "What is the output format of this prompt?",
+        "answer": "All prompts produce standard, single-file HTML5 templates styled with Tailwind CSS via CDN (<script src=\"https://cdn.tailwindcss.com\"></script>). No JSX, React, or build setups required."
+      },
+      {
+        "question": "How do I run and test the output HTML?",
+        "answer": "Copy the AI output, save it into a file named index.html, and double-click to open it in Chrome, Safari, or Firefox. It renders instantly without compiling."
+      },
+      {
+        "question": "Can I paste this HTML into WordPress, Webflow, or custom sites?",
+        "answer": "Yes! Because the template outputs standard HTML and loads Tailwind CSS via CDN, you can paste it directly into HTML embed blocks or standalone static sites."
+      }
+    ]
+  },
+  {
+    "id": "tmpl-26",
+    "slug": "bold-editorial-studio-style",
+    "title": "Bold Editorial Studio Style",
+    "shortTitle": "Bold Editorial Studio Style",
+    "tagline": "Production-grade Bold Editorial Studio Style standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.",
+    "category": "elementor_kits",
+    "categoryLabel": "Design Style",
+    "assetFormat": "elementor_kit",
+    "formatBadge": "HTML + TAILWIND CDN",
+    "badge": "DESIGN TOKENS",
+    "rating": 4.96,
+    "reviewsCount": 274,
+    "downloadsCount": 2854,
+    "viewsCount": 4309,
+    "copiesCount": 809,
+    "mediaType": "image",
+    "mediaUrl": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/hmac-uploads/screenshots/components/c83e4f73-9af1-43a7-be18-3e1f85166359/78740b9d-a825-44a1-ac81-51da434278a3/1767952517451.png?width=600&quality=75&resize=contain",
+    "heroDescription": "Build and preview Bold Editorial Studio Style instantly. Engineered as a complete standalone HTML document using Tailwind CSS via CDN (`<script src=\"https://cdn.tailwindcss.com\"></script>`), pure CSS/vanilla JS interactions, and zero build tool bloat. Perfect for Cursor AI, Claude 3.5 Sonnet, and direct browser execution.",
+    "accentBg": "bg-zinc-950",
+    "accentBorder": "border-zinc-800",
+    "accentText": "text-zinc-100",
+    "accentColor": "#09090b",
+    "coverImage": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/hmac-uploads/screenshots/components/c83e4f73-9af1-43a7-be18-3e1f85166359/78740b9d-a825-44a1-ac81-51da434278a3/1767952517451.png?width=600&quality=75&resize=contain",
+    "compatibleBuilders": [
+      "HTML5 Standalone",
+      "Tailwind CSS CDN",
+      "Claude 3.5 Sonnet",
+      "Cursor AI",
+      "v0",
+      "Lovable"
+    ],
+    "sectionsIncluded": [
+      {
+        "id": "sec-26-1",
+        "name": "Focal Layout Architecture",
+        "badge": "HTML5 HERO",
+        "description": "Main hero structure and typography for Bold Editorial Studio Style.",
+        "promptText": "Generate a standalone HTML5 hero section for \"Bold Editorial Studio Style\" using Tailwind CSS via CDN. Output pure HTML with class=\"...\", zero JSX or TSX.",
+        "tailwindSnippet": "<!-- 1. Focal Layout for Bold Editorial Studio Style (HTML + Tailwind CDN) -->\n<section class=\"relative overflow-hidden py-16 sm:py-24 bg-zinc-950 text-zinc-100 antialiased font-sans\">\n  <div class=\"max-w-7xl mx-auto px-6 lg:px-8\">\n    <div class=\"text-center max-w-3xl mx-auto\">\n      <span class=\"inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-900 border border-zinc-800 text-zinc-300\">\n        <i data-lucide=\"sparkles\" class=\"w-3.5 h-3.5 text-zinc-400\"></i>\n        <span>DESIGN STYLE</span>\n      </span>\n      <h1 class=\"mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-display\">\n        Bold Editorial Studio Style\n      </h1>\n      <p class=\"mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed\">\n        Production-grade Bold Editorial Studio Style standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.\n      </p>\n    </div>\n  </div>\n</section>"
+      },
+      {
+        "id": "sec-26-2",
+        "name": "Interactive Feature Matrix",
+        "badge": "HTML5 GRID",
+        "description": "Responsive 3-column card grid with hover transitions and Lucide icons.",
+        "promptText": "Build a pure HTML5 3-column feature grid for \"Bold Editorial Studio Style\" with Tailwind CDN utility classes and Lucide icons.",
+        "tailwindSnippet": "<!-- 2. Interactive Feature Matrix (HTML + Tailwind CDN) -->\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-6 py-12\">\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"zap\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Zero Build Lag</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Runs instantly in any browser via Tailwind CSS CDN script.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"layers\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Pure HTML & CSS</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Zero JSX or Node.js runtime required. Copy, paste and deploy.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"sparkles\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Micro-Interactions</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Smooth hover elevations and accessible keyboard focus outlines.</p>\n  </div>\n</div>"
+      },
+      {
+        "id": "sec-26-3",
+        "name": "Action & Conversion Trigger",
+        "badge": "HTML5 CTA",
+        "description": "Stand-alone call-to-action block with high-contrast buttons.",
+        "promptText": "Create an instant HTML5 CTA conversion block for \"Bold Editorial Studio Style\" with pure Tailwind CSS CDN classes.",
+        "tailwindSnippet": "<!-- 3. Conversion Trigger Action (HTML + Tailwind CDN) -->\n<div class=\"max-w-2xl mx-auto px-6 py-8 text-center\">\n  <div class=\"rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8\">\n    <h3 class=\"text-lg font-bold text-white mb-2\">Experience Bold Editorial Studio Style</h3>\n    <p class=\"text-xs text-zinc-400 mb-6\">Open the standalone HTML template in your browser or paste into your project.</p>\n    <div class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-zinc-950 text-xs font-semibold hover:bg-zinc-100 transition-all\">\n        Launch Template\n      </button>\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold hover:bg-zinc-700 transition-all\">\n        Copy HTML Code\n      </button>\n    </div>\n  </div>\n</div>"
+      }
+    ],
+    "features": [
+      "100% Pure Standalone HTML5 + Tailwind CSS via CDN",
+      "Zero JSX, TSX, React, or npm dependencies required",
+      "Double-click to preview instantly in any browser",
+      "1-Click AI Master Prompt optimized for Cursor & Claude"
+    ],
+    "toolsReplaced": [
+      {
+        "name": "UI Component Subscriptions",
+        "monthlyCostUSD": 29
+      },
+      {
+        "name": "Custom Animation Design",
+        "monthlyCostUSD": 99
+      },
+      {
+        "name": "Design Token Kits",
+        "monthlyCostUSD": 49
+      }
+    ],
+    "frameworkStack": [
+      "HTML5",
+      "Tailwind CSS (CDN)",
+      "Vanilla JS / Alpine.js",
+      "Lucide Icons (CDN)",
+      "GSAP (CDN)"
+    ],
+    "quickCopyPrompt": "You are an expert Frontend Engineer. Build a complete, production-ready, standalone HTML5 template for \"Bold Editorial Studio Style\".\n\n### CRITICAL OUTPUT FORMAT REQUIREMENTS:\n- **Output ONLY single-file standard HTML (`<!DOCTYPE html> ... </html>`)**.\n- **STRICT PROHIBITION**: Do NOT output JSX, TSX, React components, Next.js code, or npm import statements. Everything must be pure HTML + CSS + JS in one file.\n- **Tailwind CSS via CDN**: Include `<script src=\"https://cdn.tailwindcss.com\"></script>` in `<head>`.\n- **Icons**: Load Lucide Icons via CDN `<script src=\"https://unpkg.com/lucide@latest\"></script>` and initialize with `<script>lucide.createIcons();</script>`.\n- **Fonts**: Load Google Fonts `Inter` and `JetBrains Mono`.\n- **Interactive Animations**: Use vanilla JavaScript or GSAP via CDN (`<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js\"></script>`) embedded inside `<script>` tags at the bottom.\n\n### Component & Design Specifications:\n1. **Design System & Palette**:\n   - Monochromatic Notion/Shopify aesthetic (neutral zinc-900 / zinc-950 dark, zinc-50 / pure white light).\n   - High precision typography with crisp contrast, clean borders (`border-zinc-200` / `border-zinc-800`), and soft shadows.\n2. **Component Architecture for \"Bold Editorial Studio Style\"**:\n   - Master layout container with mobile, tablet, and desktop responsiveness.\n   - Micro-interactions on buttons, hover states, and smooth spring-like transitions.\n3. **Stand-Alone Portability**:\n   - Must open directly and render flawlessly by double clicking the `.html` file in any web browser.\n\nComponent: Bold Editorial Studio Style\nCategory: Design Style",
+    "faqs": [
+      {
+        "question": "What is the output format of this prompt?",
+        "answer": "All prompts produce standard, single-file HTML5 templates styled with Tailwind CSS via CDN (<script src=\"https://cdn.tailwindcss.com\"></script>). No JSX, React, or build setups required."
+      },
+      {
+        "question": "How do I run and test the output HTML?",
+        "answer": "Copy the AI output, save it into a file named index.html, and double-click to open it in Chrome, Safari, or Firefox. It renders instantly without compiling."
+      },
+      {
+        "question": "Can I paste this HTML into WordPress, Webflow, or custom sites?",
+        "answer": "Yes! Because the template outputs standard HTML and loads Tailwind CSS via CDN, you can paste it directly into HTML embed blocks or standalone static sites."
+      }
+    ]
+  },
+  {
+    "id": "tmpl-27",
+    "slug": "babybites-sophisticated-palette",
+    "title": "BabyBites - Sophisticated Palette",
+    "shortTitle": "BabyBites - Sophisticated Pale...",
+    "tagline": "Production-grade BabyBites - Sophisticated Palette standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.",
+    "category": "elementor_kits",
+    "categoryLabel": "Design Style",
+    "assetFormat": "elementor_kit",
+    "formatBadge": "HTML + TAILWIND CDN",
+    "badge": "DESIGN TOKENS",
+    "rating": 4.95,
+    "reviewsCount": 175,
+    "downloadsCount": 1666,
+    "viewsCount": 2732,
+    "copiesCount": 622,
+    "mediaType": "image",
+    "mediaUrl": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/preview-artifacts/prompt-library/36133045-75cc-4611-bdbb-0ec16bdc76fd/thumbnails/298613ea-ac38-44c4-b183-bca3e8d029b4.png?width=600&quality=75&resize=contain",
+    "heroDescription": "Build and preview BabyBites - Sophisticated Palette instantly. Engineered as a complete standalone HTML document using Tailwind CSS via CDN (`<script src=\"https://cdn.tailwindcss.com\"></script>`), pure CSS/vanilla JS interactions, and zero build tool bloat. Perfect for Cursor AI, Claude 3.5 Sonnet, and direct browser execution.",
+    "accentBg": "bg-zinc-950",
+    "accentBorder": "border-zinc-800",
+    "accentText": "text-zinc-100",
+    "accentColor": "#09090b",
+    "coverImage": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/preview-artifacts/prompt-library/36133045-75cc-4611-bdbb-0ec16bdc76fd/thumbnails/298613ea-ac38-44c4-b183-bca3e8d029b4.png?width=600&quality=75&resize=contain",
+    "compatibleBuilders": [
+      "HTML5 Standalone",
+      "Tailwind CSS CDN",
+      "Claude 3.5 Sonnet",
+      "Cursor AI",
+      "v0",
+      "Lovable"
+    ],
+    "sectionsIncluded": [
+      {
+        "id": "sec-27-1",
+        "name": "Focal Layout Architecture",
+        "badge": "HTML5 HERO",
+        "description": "Main hero structure and typography for BabyBites - Sophisticated Palette.",
+        "promptText": "Generate a standalone HTML5 hero section for \"BabyBites - Sophisticated Palette\" using Tailwind CSS via CDN. Output pure HTML with class=\"...\", zero JSX or TSX.",
+        "tailwindSnippet": "<!-- 1. Focal Layout for BabyBites - Sophisticated Palette (HTML + Tailwind CDN) -->\n<section class=\"relative overflow-hidden py-16 sm:py-24 bg-zinc-950 text-zinc-100 antialiased font-sans\">\n  <div class=\"max-w-7xl mx-auto px-6 lg:px-8\">\n    <div class=\"text-center max-w-3xl mx-auto\">\n      <span class=\"inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-900 border border-zinc-800 text-zinc-300\">\n        <i data-lucide=\"sparkles\" class=\"w-3.5 h-3.5 text-zinc-400\"></i>\n        <span>DESIGN STYLE</span>\n      </span>\n      <h1 class=\"mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-display\">\n        BabyBites - Sophisticated Palette\n      </h1>\n      <p class=\"mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed\">\n        Production-grade BabyBites - Sophisticated Palette standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.\n      </p>\n    </div>\n  </div>\n</section>"
+      },
+      {
+        "id": "sec-27-2",
+        "name": "Interactive Feature Matrix",
+        "badge": "HTML5 GRID",
+        "description": "Responsive 3-column card grid with hover transitions and Lucide icons.",
+        "promptText": "Build a pure HTML5 3-column feature grid for \"BabyBites - Sophisticated Palette\" with Tailwind CDN utility classes and Lucide icons.",
+        "tailwindSnippet": "<!-- 2. Interactive Feature Matrix (HTML + Tailwind CDN) -->\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-6 py-12\">\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"zap\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Zero Build Lag</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Runs instantly in any browser via Tailwind CSS CDN script.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"layers\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Pure HTML & CSS</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Zero JSX or Node.js runtime required. Copy, paste and deploy.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"sparkles\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Micro-Interactions</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Smooth hover elevations and accessible keyboard focus outlines.</p>\n  </div>\n</div>"
+      },
+      {
+        "id": "sec-27-3",
+        "name": "Action & Conversion Trigger",
+        "badge": "HTML5 CTA",
+        "description": "Stand-alone call-to-action block with high-contrast buttons.",
+        "promptText": "Create an instant HTML5 CTA conversion block for \"BabyBites - Sophisticated Palette\" with pure Tailwind CSS CDN classes.",
+        "tailwindSnippet": "<!-- 3. Conversion Trigger Action (HTML + Tailwind CDN) -->\n<div class=\"max-w-2xl mx-auto px-6 py-8 text-center\">\n  <div class=\"rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8\">\n    <h3 class=\"text-lg font-bold text-white mb-2\">Experience BabyBites - Sophisticated Pale...</h3>\n    <p class=\"text-xs text-zinc-400 mb-6\">Open the standalone HTML template in your browser or paste into your project.</p>\n    <div class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-zinc-950 text-xs font-semibold hover:bg-zinc-100 transition-all\">\n        Launch Template\n      </button>\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold hover:bg-zinc-700 transition-all\">\n        Copy HTML Code\n      </button>\n    </div>\n  </div>\n</div>"
+      }
+    ],
+    "features": [
+      "100% Pure Standalone HTML5 + Tailwind CSS via CDN",
+      "Zero JSX, TSX, React, or npm dependencies required",
+      "Double-click to preview instantly in any browser",
+      "1-Click AI Master Prompt optimized for Cursor & Claude"
+    ],
+    "toolsReplaced": [
+      {
+        "name": "UI Component Subscriptions",
+        "monthlyCostUSD": 29
+      },
+      {
+        "name": "Custom Animation Design",
+        "monthlyCostUSD": 99
+      },
+      {
+        "name": "Design Token Kits",
+        "monthlyCostUSD": 49
+      }
+    ],
+    "frameworkStack": [
+      "HTML5",
+      "Tailwind CSS (CDN)",
+      "Vanilla JS / Alpine.js",
+      "Lucide Icons (CDN)",
+      "GSAP (CDN)"
+    ],
+    "quickCopyPrompt": "You are an expert Frontend Engineer. Build a complete, production-ready, standalone HTML5 template for \"BabyBites - Sophisticated Palette\".\n\n### CRITICAL OUTPUT FORMAT REQUIREMENTS:\n- **Output ONLY single-file standard HTML (`<!DOCTYPE html> ... </html>`)**.\n- **STRICT PROHIBITION**: Do NOT output JSX, TSX, React components, Next.js code, or npm import statements. Everything must be pure HTML + CSS + JS in one file.\n- **Tailwind CSS via CDN**: Include `<script src=\"https://cdn.tailwindcss.com\"></script>` in `<head>`.\n- **Icons**: Load Lucide Icons via CDN `<script src=\"https://unpkg.com/lucide@latest\"></script>` and initialize with `<script>lucide.createIcons();</script>`.\n- **Fonts**: Load Google Fonts `Inter` and `JetBrains Mono`.\n- **Interactive Animations**: Use vanilla JavaScript or GSAP via CDN (`<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js\"></script>`) embedded inside `<script>` tags at the bottom.\n\n### Component & Design Specifications:\n1. **Design System & Palette**:\n   - Monochromatic Notion/Shopify aesthetic (neutral zinc-900 / zinc-950 dark, zinc-50 / pure white light).\n   - High precision typography with crisp contrast, clean borders (`border-zinc-200` / `border-zinc-800`), and soft shadows.\n2. **Component Architecture for \"BabyBites - Sophisticated Palette\"**:\n   - Master layout container with mobile, tablet, and desktop responsiveness.\n   - Micro-interactions on buttons, hover states, and smooth spring-like transitions.\n3. **Stand-Alone Portability**:\n   - Must open directly and render flawlessly by double clicking the `.html` file in any web browser.\n\nComponent: BabyBites - Sophisticated Palette\nCategory: Design Style",
+    "faqs": [
+      {
+        "question": "What is the output format of this prompt?",
+        "answer": "All prompts produce standard, single-file HTML5 templates styled with Tailwind CSS via CDN (<script src=\"https://cdn.tailwindcss.com\"></script>). No JSX, React, or build setups required."
+      },
+      {
+        "question": "How do I run and test the output HTML?",
+        "answer": "Copy the AI output, save it into a file named index.html, and double-click to open it in Chrome, Safari, or Firefox. It renders instantly without compiling."
+      },
+      {
+        "question": "Can I paste this HTML into WordPress, Webflow, or custom sites?",
+        "answer": "Yes! Because the template outputs standard HTML and loads Tailwind CSS via CDN, you can paste it directly into HTML embed blocks or standalone static sites."
+      }
+    ]
+  },
+  {
+    "id": "tmpl-28",
+    "slug": "animated-landing-page-cut-out-subject-rising-between-two-lines-of-split-display-type",
+    "title": "Animated Landing Page: Cut-Out Subject Rising Between Two Lines of Split Display Type",
+    "shortTitle": "Animated Landing Page",
+    "tagline": "Production-grade Animated Landing Page: Cut-Out Subject Rising Between Two Lines of Split Display Type standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.",
+    "category": "landing_pages",
+    "categoryLabel": "Landing Page",
+    "assetFormat": "native_page",
+    "formatBadge": "HTML + TAILWIND CDN",
+    "badge": "HERO SYSTEM",
+    "rating": 4.96,
+    "reviewsCount": 84,
+    "downloadsCount": 1549,
+    "viewsCount": 4345,
+    "copiesCount": 534,
+    "mediaType": "image",
+    "mediaUrl": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/preview-artifacts/prompt-library/7d97ebb3-363d-49d3-a029-fa9a23815e3f/thumbnails/ad962f6e-204d-4fb0-b52b-afe4b47ebb9b.gif?width=600&quality=75&resize=contain",
+    "heroDescription": "Build and preview Animated Landing Page: Cut-Out Subject Rising Between Two Lines of Split Display Type instantly. Engineered as a complete standalone HTML document using Tailwind CSS via CDN (`<script src=\"https://cdn.tailwindcss.com\"></script>`), pure CSS/vanilla JS interactions, and zero build tool bloat. Perfect for Cursor AI, Claude 3.5 Sonnet, and direct browser execution.",
+    "accentBg": "bg-zinc-950",
+    "accentBorder": "border-zinc-800",
+    "accentText": "text-zinc-100",
+    "accentColor": "#09090b",
+    "coverImage": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/preview-artifacts/prompt-library/7d97ebb3-363d-49d3-a029-fa9a23815e3f/thumbnails/ad962f6e-204d-4fb0-b52b-afe4b47ebb9b.gif?width=600&quality=75&resize=contain",
+    "compatibleBuilders": [
+      "HTML5 Standalone",
+      "Tailwind CSS CDN",
+      "Claude 3.5 Sonnet",
+      "Cursor AI",
+      "v0",
+      "Lovable"
+    ],
+    "sectionsIncluded": [
+      {
+        "id": "sec-28-1",
+        "name": "Focal Layout Architecture",
+        "badge": "HTML5 HERO",
+        "description": "Main hero structure and typography for Animated Landing Page: Cut-Out Subject Rising Between Two Lines of Split Display Type.",
+        "promptText": "Generate a standalone HTML5 hero section for \"Animated Landing Page: Cut-Out Subject Rising Between Two Lines of Split Display Type\" using Tailwind CSS via CDN. Output pure HTML with class=\"...\", zero JSX or TSX.",
+        "tailwindSnippet": "<!-- 1. Focal Layout for Animated Landing Page: Cut-Out Subject Rising Between Two Lines of Split Display Type (HTML + Tailwind CDN) -->\n<section class=\"relative overflow-hidden py-16 sm:py-24 bg-zinc-950 text-zinc-100 antialiased font-sans\">\n  <div class=\"max-w-7xl mx-auto px-6 lg:px-8\">\n    <div class=\"text-center max-w-3xl mx-auto\">\n      <span class=\"inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-900 border border-zinc-800 text-zinc-300\">\n        <i data-lucide=\"sparkles\" class=\"w-3.5 h-3.5 text-zinc-400\"></i>\n        <span>LANDING PAGE</span>\n      </span>\n      <h1 class=\"mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-display\">\n        Animated Landing Page: Cut-Out Subject Rising Between Two Lines of Split Display Type\n      </h1>\n      <p class=\"mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed\">\n        Production-grade Animated Landing Page: Cut-Out Subject Rising Between Two Lines of Split Display Type standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.\n      </p>\n    </div>\n  </div>\n</section>"
+      },
+      {
+        "id": "sec-28-2",
+        "name": "Interactive Feature Matrix",
+        "badge": "HTML5 GRID",
+        "description": "Responsive 3-column card grid with hover transitions and Lucide icons.",
+        "promptText": "Build a pure HTML5 3-column feature grid for \"Animated Landing Page: Cut-Out Subject Rising Between Two Lines of Split Display Type\" with Tailwind CDN utility classes and Lucide icons.",
+        "tailwindSnippet": "<!-- 2. Interactive Feature Matrix (HTML + Tailwind CDN) -->\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-6 py-12\">\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"zap\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Zero Build Lag</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Runs instantly in any browser via Tailwind CSS CDN script.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"layers\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Pure HTML & CSS</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Zero JSX or Node.js runtime required. Copy, paste and deploy.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"sparkles\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Micro-Interactions</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Smooth hover elevations and accessible keyboard focus outlines.</p>\n  </div>\n</div>"
+      },
+      {
+        "id": "sec-28-3",
+        "name": "Action & Conversion Trigger",
+        "badge": "HTML5 CTA",
+        "description": "Stand-alone call-to-action block with high-contrast buttons.",
+        "promptText": "Create an instant HTML5 CTA conversion block for \"Animated Landing Page: Cut-Out Subject Rising Between Two Lines of Split Display Type\" with pure Tailwind CSS CDN classes.",
+        "tailwindSnippet": "<!-- 3. Conversion Trigger Action (HTML + Tailwind CDN) -->\n<div class=\"max-w-2xl mx-auto px-6 py-8 text-center\">\n  <div class=\"rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8\">\n    <h3 class=\"text-lg font-bold text-white mb-2\">Experience Animated Landing Page</h3>\n    <p class=\"text-xs text-zinc-400 mb-6\">Open the standalone HTML template in your browser or paste into your project.</p>\n    <div class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-zinc-950 text-xs font-semibold hover:bg-zinc-100 transition-all\">\n        Launch Template\n      </button>\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold hover:bg-zinc-700 transition-all\">\n        Copy HTML Code\n      </button>\n    </div>\n  </div>\n</div>"
+      }
+    ],
+    "features": [
+      "100% Pure Standalone HTML5 + Tailwind CSS via CDN",
+      "Zero JSX, TSX, React, or npm dependencies required",
+      "Double-click to preview instantly in any browser",
+      "1-Click AI Master Prompt optimized for Cursor & Claude"
+    ],
+    "toolsReplaced": [
+      {
+        "name": "UI Component Subscriptions",
+        "monthlyCostUSD": 29
+      },
+      {
+        "name": "Custom Animation Design",
+        "monthlyCostUSD": 99
+      },
+      {
+        "name": "Design Token Kits",
+        "monthlyCostUSD": 49
+      }
+    ],
+    "frameworkStack": [
+      "HTML5",
+      "Tailwind CSS (CDN)",
+      "Vanilla JS / Alpine.js",
+      "Lucide Icons (CDN)",
+      "GSAP (CDN)"
+    ],
+    "quickCopyPrompt": "You are an expert Frontend Engineer. Build a complete, production-ready, standalone HTML5 template for \"Animated Landing Page: Cut-Out Subject Rising Between Two Lines of Split Display Type\".\n\n### CRITICAL OUTPUT FORMAT REQUIREMENTS:\n- **Output ONLY single-file standard HTML (`<!DOCTYPE html> ... </html>`)**.\n- **STRICT PROHIBITION**: Do NOT output JSX, TSX, React components, Next.js code, or npm import statements. Everything must be pure HTML + CSS + JS in one file.\n- **Tailwind CSS via CDN**: Include `<script src=\"https://cdn.tailwindcss.com\"></script>` in `<head>`.\n- **Icons**: Load Lucide Icons via CDN `<script src=\"https://unpkg.com/lucide@latest\"></script>` and initialize with `<script>lucide.createIcons();</script>`.\n- **Fonts**: Load Google Fonts `Inter` and `JetBrains Mono`.\n- **Interactive Animations**: Use vanilla JavaScript or GSAP via CDN (`<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js\"></script>`) embedded inside `<script>` tags at the bottom.\n\n### Component & Design Specifications:\n1. **Design System & Palette**:\n   - Monochromatic Notion/Shopify aesthetic (neutral zinc-900 / zinc-950 dark, zinc-50 / pure white light).\n   - High precision typography with crisp contrast, clean borders (`border-zinc-200` / `border-zinc-800`), and soft shadows.\n2. **Component Architecture for \"Animated Landing Page: Cut-Out Subject Rising Between Two Lines of Split Display Type\"**:\n   - Master layout container with mobile, tablet, and desktop responsiveness.\n   - Micro-interactions on buttons, hover states, and smooth spring-like transitions.\n3. **Stand-Alone Portability**:\n   - Must open directly and render flawlessly by double clicking the `.html` file in any web browser.\n\nComponent: Animated Landing Page: Cut-Out Subject Rising Between Two Lines of Split Display Type\nCategory: Landing Page",
+    "faqs": [
+      {
+        "question": "What is the output format of this prompt?",
+        "answer": "All prompts produce standard, single-file HTML5 templates styled with Tailwind CSS via CDN (<script src=\"https://cdn.tailwindcss.com\"></script>). No JSX, React, or build setups required."
+      },
+      {
+        "question": "How do I run and test the output HTML?",
+        "answer": "Copy the AI output, save it into a file named index.html, and double-click to open it in Chrome, Safari, or Firefox. It renders instantly without compiling."
+      },
+      {
+        "question": "Can I paste this HTML into WordPress, Webflow, or custom sites?",
+        "answer": "Yes! Because the template outputs standard HTML and loads Tailwind CSS via CDN, you can paste it directly into HTML embed blocks or standalone static sites."
+      }
+    ]
+  },
+  {
+    "id": "tmpl-29",
+    "slug": "midnight-editorial-style",
+    "title": "Midnight Editorial Style",
+    "shortTitle": "Midnight Editorial Style",
+    "tagline": "Production-grade Midnight Editorial Style standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.",
+    "category": "elementor_kits",
+    "categoryLabel": "Design Style",
+    "assetFormat": "elementor_kit",
+    "formatBadge": "HTML + TAILWIND CDN",
+    "badge": "DESIGN TOKENS",
+    "rating": 4.92,
+    "reviewsCount": 197,
+    "downloadsCount": 2829,
+    "viewsCount": 4494,
+    "copiesCount": 858,
+    "mediaType": "image",
+    "mediaUrl": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/hmac-uploads/screenshots/components/a36ad1fa-6ed0-4a22-b24c-c64c863d9a71/fd7824aa-041a-4b80-9447-60e1f2383c37/1767926755858.png?width=600&quality=75&resize=contain",
+    "heroDescription": "Build and preview Midnight Editorial Style instantly. Engineered as a complete standalone HTML document using Tailwind CSS via CDN (`<script src=\"https://cdn.tailwindcss.com\"></script>`), pure CSS/vanilla JS interactions, and zero build tool bloat. Perfect for Cursor AI, Claude 3.5 Sonnet, and direct browser execution.",
+    "accentBg": "bg-zinc-950",
+    "accentBorder": "border-zinc-800",
+    "accentText": "text-zinc-100",
+    "accentColor": "#09090b",
+    "coverImage": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/hmac-uploads/screenshots/components/a36ad1fa-6ed0-4a22-b24c-c64c863d9a71/fd7824aa-041a-4b80-9447-60e1f2383c37/1767926755858.png?width=600&quality=75&resize=contain",
+    "compatibleBuilders": [
+      "HTML5 Standalone",
+      "Tailwind CSS CDN",
+      "Claude 3.5 Sonnet",
+      "Cursor AI",
+      "v0",
+      "Lovable"
+    ],
+    "sectionsIncluded": [
+      {
+        "id": "sec-29-1",
+        "name": "Focal Layout Architecture",
+        "badge": "HTML5 HERO",
+        "description": "Main hero structure and typography for Midnight Editorial Style.",
+        "promptText": "Generate a standalone HTML5 hero section for \"Midnight Editorial Style\" using Tailwind CSS via CDN. Output pure HTML with class=\"...\", zero JSX or TSX.",
+        "tailwindSnippet": "<!-- 1. Focal Layout for Midnight Editorial Style (HTML + Tailwind CDN) -->\n<section class=\"relative overflow-hidden py-16 sm:py-24 bg-zinc-950 text-zinc-100 antialiased font-sans\">\n  <div class=\"max-w-7xl mx-auto px-6 lg:px-8\">\n    <div class=\"text-center max-w-3xl mx-auto\">\n      <span class=\"inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-900 border border-zinc-800 text-zinc-300\">\n        <i data-lucide=\"sparkles\" class=\"w-3.5 h-3.5 text-zinc-400\"></i>\n        <span>DESIGN STYLE</span>\n      </span>\n      <h1 class=\"mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-display\">\n        Midnight Editorial Style\n      </h1>\n      <p class=\"mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed\">\n        Production-grade Midnight Editorial Style standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.\n      </p>\n    </div>\n  </div>\n</section>"
+      },
+      {
+        "id": "sec-29-2",
+        "name": "Interactive Feature Matrix",
+        "badge": "HTML5 GRID",
+        "description": "Responsive 3-column card grid with hover transitions and Lucide icons.",
+        "promptText": "Build a pure HTML5 3-column feature grid for \"Midnight Editorial Style\" with Tailwind CDN utility classes and Lucide icons.",
+        "tailwindSnippet": "<!-- 2. Interactive Feature Matrix (HTML + Tailwind CDN) -->\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-6 py-12\">\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"zap\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Zero Build Lag</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Runs instantly in any browser via Tailwind CSS CDN script.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"layers\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Pure HTML & CSS</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Zero JSX or Node.js runtime required. Copy, paste and deploy.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"sparkles\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Micro-Interactions</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Smooth hover elevations and accessible keyboard focus outlines.</p>\n  </div>\n</div>"
+      },
+      {
+        "id": "sec-29-3",
+        "name": "Action & Conversion Trigger",
+        "badge": "HTML5 CTA",
+        "description": "Stand-alone call-to-action block with high-contrast buttons.",
+        "promptText": "Create an instant HTML5 CTA conversion block for \"Midnight Editorial Style\" with pure Tailwind CSS CDN classes.",
+        "tailwindSnippet": "<!-- 3. Conversion Trigger Action (HTML + Tailwind CDN) -->\n<div class=\"max-w-2xl mx-auto px-6 py-8 text-center\">\n  <div class=\"rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8\">\n    <h3 class=\"text-lg font-bold text-white mb-2\">Experience Midnight Editorial Style</h3>\n    <p class=\"text-xs text-zinc-400 mb-6\">Open the standalone HTML template in your browser or paste into your project.</p>\n    <div class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-zinc-950 text-xs font-semibold hover:bg-zinc-100 transition-all\">\n        Launch Template\n      </button>\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold hover:bg-zinc-700 transition-all\">\n        Copy HTML Code\n      </button>\n    </div>\n  </div>\n</div>"
+      }
+    ],
+    "features": [
+      "100% Pure Standalone HTML5 + Tailwind CSS via CDN",
+      "Zero JSX, TSX, React, or npm dependencies required",
+      "Double-click to preview instantly in any browser",
+      "1-Click AI Master Prompt optimized for Cursor & Claude"
+    ],
+    "toolsReplaced": [
+      {
+        "name": "UI Component Subscriptions",
+        "monthlyCostUSD": 29
+      },
+      {
+        "name": "Custom Animation Design",
+        "monthlyCostUSD": 99
+      },
+      {
+        "name": "Design Token Kits",
+        "monthlyCostUSD": 49
+      }
+    ],
+    "frameworkStack": [
+      "HTML5",
+      "Tailwind CSS (CDN)",
+      "Vanilla JS / Alpine.js",
+      "Lucide Icons (CDN)",
+      "GSAP (CDN)"
+    ],
+    "quickCopyPrompt": "You are an expert Frontend Engineer. Build a complete, production-ready, standalone HTML5 template for \"Midnight Editorial Style\".\n\n### CRITICAL OUTPUT FORMAT REQUIREMENTS:\n- **Output ONLY single-file standard HTML (`<!DOCTYPE html> ... </html>`)**.\n- **STRICT PROHIBITION**: Do NOT output JSX, TSX, React components, Next.js code, or npm import statements. Everything must be pure HTML + CSS + JS in one file.\n- **Tailwind CSS via CDN**: Include `<script src=\"https://cdn.tailwindcss.com\"></script>` in `<head>`.\n- **Icons**: Load Lucide Icons via CDN `<script src=\"https://unpkg.com/lucide@latest\"></script>` and initialize with `<script>lucide.createIcons();</script>`.\n- **Fonts**: Load Google Fonts `Inter` and `JetBrains Mono`.\n- **Interactive Animations**: Use vanilla JavaScript or GSAP via CDN (`<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js\"></script>`) embedded inside `<script>` tags at the bottom.\n\n### Component & Design Specifications:\n1. **Design System & Palette**:\n   - Monochromatic Notion/Shopify aesthetic (neutral zinc-900 / zinc-950 dark, zinc-50 / pure white light).\n   - High precision typography with crisp contrast, clean borders (`border-zinc-200` / `border-zinc-800`), and soft shadows.\n2. **Component Architecture for \"Midnight Editorial Style\"**:\n   - Master layout container with mobile, tablet, and desktop responsiveness.\n   - Micro-interactions on buttons, hover states, and smooth spring-like transitions.\n3. **Stand-Alone Portability**:\n   - Must open directly and render flawlessly by double clicking the `.html` file in any web browser.\n\nComponent: Midnight Editorial Style\nCategory: Design Style",
+    "faqs": [
+      {
+        "question": "What is the output format of this prompt?",
+        "answer": "All prompts produce standard, single-file HTML5 templates styled with Tailwind CSS via CDN (<script src=\"https://cdn.tailwindcss.com\"></script>). No JSX, React, or build setups required."
+      },
+      {
+        "question": "How do I run and test the output HTML?",
+        "answer": "Copy the AI output, save it into a file named index.html, and double-click to open it in Chrome, Safari, or Firefox. It renders instantly without compiling."
+      },
+      {
+        "question": "Can I paste this HTML into WordPress, Webflow, or custom sites?",
+        "answer": "Yes! Because the template outputs standard HTML and loads Tailwind CSS via CDN, you can paste it directly into HTML embed blocks or standalone static sites."
+      }
+    ]
+  },
+  {
+    "id": "tmpl-30",
+    "slug": "hyper-saturated-fluid",
+    "title": "Hyper-Saturated Fluid",
+    "shortTitle": "Hyper-Saturated Fluid",
+    "tagline": "Production-grade Hyper-Saturated Fluid standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.",
+    "category": "lovable_projects",
+    "categoryLabel": "Interactive & Animation",
+    "assetFormat": "lovable_project",
+    "formatBadge": "HTML + TAILWIND CDN",
+    "badge": "STANDALONE HTML",
+    "rating": 4.93,
+    "reviewsCount": 180,
+    "downloadsCount": 3017,
+    "viewsCount": 2813,
+    "copiesCount": 815,
+    "mediaType": "image",
+    "mediaUrl": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/hmac-uploads/screenshots/components/9dc7110c-6503-4a1e-b052-0a24ae46081f/847c4d03-e56e-422b-ba8e-5f5262db3e3c/1767351135230.png?width=600&quality=75&resize=contain",
+    "heroDescription": "Build and preview Hyper-Saturated Fluid instantly. Engineered as a complete standalone HTML document using Tailwind CSS via CDN (`<script src=\"https://cdn.tailwindcss.com\"></script>`), pure CSS/vanilla JS interactions, and zero build tool bloat. Perfect for Cursor AI, Claude 3.5 Sonnet, and direct browser execution.",
+    "accentBg": "bg-zinc-950",
+    "accentBorder": "border-zinc-800",
+    "accentText": "text-zinc-100",
+    "accentColor": "#09090b",
+    "coverImage": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/hmac-uploads/screenshots/components/9dc7110c-6503-4a1e-b052-0a24ae46081f/847c4d03-e56e-422b-ba8e-5f5262db3e3c/1767351135230.png?width=600&quality=75&resize=contain",
+    "compatibleBuilders": [
+      "HTML5 Standalone",
+      "Tailwind CSS CDN",
+      "Claude 3.5 Sonnet",
+      "Cursor AI",
+      "v0",
+      "Lovable"
+    ],
+    "sectionsIncluded": [
+      {
+        "id": "sec-30-1",
+        "name": "Focal Layout Architecture",
+        "badge": "HTML5 HERO",
+        "description": "Main hero structure and typography for Hyper-Saturated Fluid.",
+        "promptText": "Generate a standalone HTML5 hero section for \"Hyper-Saturated Fluid\" using Tailwind CSS via CDN. Output pure HTML with class=\"...\", zero JSX or TSX.",
+        "tailwindSnippet": "<!-- 1. Focal Layout for Hyper-Saturated Fluid (HTML + Tailwind CDN) -->\n<section class=\"relative overflow-hidden py-16 sm:py-24 bg-zinc-950 text-zinc-100 antialiased font-sans\">\n  <div class=\"max-w-7xl mx-auto px-6 lg:px-8\">\n    <div class=\"text-center max-w-3xl mx-auto\">\n      <span class=\"inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-900 border border-zinc-800 text-zinc-300\">\n        <i data-lucide=\"sparkles\" class=\"w-3.5 h-3.5 text-zinc-400\"></i>\n        <span>INTERACTIVE & ANIMATION</span>\n      </span>\n      <h1 class=\"mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-display\">\n        Hyper-Saturated Fluid\n      </h1>\n      <p class=\"mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed\">\n        Production-grade Hyper-Saturated Fluid standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.\n      </p>\n    </div>\n  </div>\n</section>"
+      },
+      {
+        "id": "sec-30-2",
+        "name": "Interactive Feature Matrix",
+        "badge": "HTML5 GRID",
+        "description": "Responsive 3-column card grid with hover transitions and Lucide icons.",
+        "promptText": "Build a pure HTML5 3-column feature grid for \"Hyper-Saturated Fluid\" with Tailwind CDN utility classes and Lucide icons.",
+        "tailwindSnippet": "<!-- 2. Interactive Feature Matrix (HTML + Tailwind CDN) -->\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-6 py-12\">\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"zap\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Zero Build Lag</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Runs instantly in any browser via Tailwind CSS CDN script.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"layers\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Pure HTML & CSS</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Zero JSX or Node.js runtime required. Copy, paste and deploy.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"sparkles\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Micro-Interactions</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Smooth hover elevations and accessible keyboard focus outlines.</p>\n  </div>\n</div>"
+      },
+      {
+        "id": "sec-30-3",
+        "name": "Action & Conversion Trigger",
+        "badge": "HTML5 CTA",
+        "description": "Stand-alone call-to-action block with high-contrast buttons.",
+        "promptText": "Create an instant HTML5 CTA conversion block for \"Hyper-Saturated Fluid\" with pure Tailwind CSS CDN classes.",
+        "tailwindSnippet": "<!-- 3. Conversion Trigger Action (HTML + Tailwind CDN) -->\n<div class=\"max-w-2xl mx-auto px-6 py-8 text-center\">\n  <div class=\"rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8\">\n    <h3 class=\"text-lg font-bold text-white mb-2\">Experience Hyper-Saturated Fluid</h3>\n    <p class=\"text-xs text-zinc-400 mb-6\">Open the standalone HTML template in your browser or paste into your project.</p>\n    <div class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-zinc-950 text-xs font-semibold hover:bg-zinc-100 transition-all\">\n        Launch Template\n      </button>\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold hover:bg-zinc-700 transition-all\">\n        Copy HTML Code\n      </button>\n    </div>\n  </div>\n</div>"
+      }
+    ],
+    "features": [
+      "100% Pure Standalone HTML5 + Tailwind CSS via CDN",
+      "Zero JSX, TSX, React, or npm dependencies required",
+      "Double-click to preview instantly in any browser",
+      "1-Click AI Master Prompt optimized for Cursor & Claude"
+    ],
+    "toolsReplaced": [
+      {
+        "name": "UI Component Subscriptions",
+        "monthlyCostUSD": 29
+      },
+      {
+        "name": "Custom Animation Design",
+        "monthlyCostUSD": 99
+      },
+      {
+        "name": "Design Token Kits",
+        "monthlyCostUSD": 49
+      }
+    ],
+    "frameworkStack": [
+      "HTML5",
+      "Tailwind CSS (CDN)",
+      "Vanilla JS / Alpine.js",
+      "Lucide Icons (CDN)",
+      "GSAP (CDN)"
+    ],
+    "quickCopyPrompt": "You are an expert Frontend Engineer. Build a complete, production-ready, standalone HTML5 template for \"Hyper-Saturated Fluid\".\n\n### CRITICAL OUTPUT FORMAT REQUIREMENTS:\n- **Output ONLY single-file standard HTML (`<!DOCTYPE html> ... </html>`)**.\n- **STRICT PROHIBITION**: Do NOT output JSX, TSX, React components, Next.js code, or npm import statements. Everything must be pure HTML + CSS + JS in one file.\n- **Tailwind CSS via CDN**: Include `<script src=\"https://cdn.tailwindcss.com\"></script>` in `<head>`.\n- **Icons**: Load Lucide Icons via CDN `<script src=\"https://unpkg.com/lucide@latest\"></script>` and initialize with `<script>lucide.createIcons();</script>`.\n- **Fonts**: Load Google Fonts `Inter` and `JetBrains Mono`.\n- **Interactive Animations**: Use vanilla JavaScript or GSAP via CDN (`<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js\"></script>`) embedded inside `<script>` tags at the bottom.\n\n### Component & Design Specifications:\n1. **Design System & Palette**:\n   - Monochromatic Notion/Shopify aesthetic (neutral zinc-900 / zinc-950 dark, zinc-50 / pure white light).\n   - High precision typography with crisp contrast, clean borders (`border-zinc-200` / `border-zinc-800`), and soft shadows.\n2. **Component Architecture for \"Hyper-Saturated Fluid\"**:\n   - Master layout container with mobile, tablet, and desktop responsiveness.\n   - Micro-interactions on buttons, hover states, and smooth spring-like transitions.\n3. **Stand-Alone Portability**:\n   - Must open directly and render flawlessly by double clicking the `.html` file in any web browser.\n\nComponent: Hyper-Saturated Fluid\nCategory: Interactive & Animation",
+    "faqs": [
+      {
+        "question": "What is the output format of this prompt?",
+        "answer": "All prompts produce standard, single-file HTML5 templates styled with Tailwind CSS via CDN (<script src=\"https://cdn.tailwindcss.com\"></script>). No JSX, React, or build setups required."
+      },
+      {
+        "question": "How do I run and test the output HTML?",
+        "answer": "Copy the AI output, save it into a file named index.html, and double-click to open it in Chrome, Safari, or Firefox. It renders instantly without compiling."
+      },
+      {
+        "question": "Can I paste this HTML into WordPress, Webflow, or custom sites?",
+        "answer": "Yes! Because the template outputs standard HTML and loads Tailwind CSS via CDN, you can paste it directly into HTML embed blocks or standalone static sites."
+      }
+    ]
+  },
+  {
+    "id": "tmpl-31",
+    "slug": "tubes-interactive-background",
+    "title": "Tubes Interactive Background",
+    "shortTitle": "Tubes Interactive Background",
+    "tagline": "Production-grade Tubes Interactive Background standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.",
+    "category": "lovable_projects",
+    "categoryLabel": "Interactive & Animation",
+    "assetFormat": "lovable_project",
+    "formatBadge": "HTML + TAILWIND CDN",
+    "badge": "STANDALONE HTML",
+    "rating": 4.97,
+    "reviewsCount": 219,
+    "downloadsCount": 1147,
+    "viewsCount": 3516,
+    "copiesCount": 950,
+    "mediaType": "image",
+    "mediaUrl": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/hmac-uploads/screenshots/components/070b9477-5ebf-41b4-ab04-9b4d4975e984/79f658a0-893a-4705-8427-831d1091c385/1767688413116.png?width=600&quality=75&resize=contain",
+    "heroDescription": "Build and preview Tubes Interactive Background instantly. Engineered as a complete standalone HTML document using Tailwind CSS via CDN (`<script src=\"https://cdn.tailwindcss.com\"></script>`), pure CSS/vanilla JS interactions, and zero build tool bloat. Perfect for Cursor AI, Claude 3.5 Sonnet, and direct browser execution.",
+    "accentBg": "bg-zinc-950",
+    "accentBorder": "border-zinc-800",
+    "accentText": "text-zinc-100",
+    "accentColor": "#09090b",
+    "coverImage": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/hmac-uploads/screenshots/components/070b9477-5ebf-41b4-ab04-9b4d4975e984/79f658a0-893a-4705-8427-831d1091c385/1767688413116.png?width=600&quality=75&resize=contain",
+    "compatibleBuilders": [
+      "HTML5 Standalone",
+      "Tailwind CSS CDN",
+      "Claude 3.5 Sonnet",
+      "Cursor AI",
+      "v0",
+      "Lovable"
+    ],
+    "sectionsIncluded": [
+      {
+        "id": "sec-31-1",
+        "name": "Focal Layout Architecture",
+        "badge": "HTML5 HERO",
+        "description": "Main hero structure and typography for Tubes Interactive Background.",
+        "promptText": "Generate a standalone HTML5 hero section for \"Tubes Interactive Background\" using Tailwind CSS via CDN. Output pure HTML with class=\"...\", zero JSX or TSX.",
+        "tailwindSnippet": "<!-- 1. Focal Layout for Tubes Interactive Background (HTML + Tailwind CDN) -->\n<section class=\"relative overflow-hidden py-16 sm:py-24 bg-zinc-950 text-zinc-100 antialiased font-sans\">\n  <div class=\"max-w-7xl mx-auto px-6 lg:px-8\">\n    <div class=\"text-center max-w-3xl mx-auto\">\n      <span class=\"inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-900 border border-zinc-800 text-zinc-300\">\n        <i data-lucide=\"sparkles\" class=\"w-3.5 h-3.5 text-zinc-400\"></i>\n        <span>INTERACTIVE & ANIMATION</span>\n      </span>\n      <h1 class=\"mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-display\">\n        Tubes Interactive Background\n      </h1>\n      <p class=\"mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed\">\n        Production-grade Tubes Interactive Background standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.\n      </p>\n    </div>\n  </div>\n</section>"
+      },
+      {
+        "id": "sec-31-2",
+        "name": "Interactive Feature Matrix",
+        "badge": "HTML5 GRID",
+        "description": "Responsive 3-column card grid with hover transitions and Lucide icons.",
+        "promptText": "Build a pure HTML5 3-column feature grid for \"Tubes Interactive Background\" with Tailwind CDN utility classes and Lucide icons.",
+        "tailwindSnippet": "<!-- 2. Interactive Feature Matrix (HTML + Tailwind CDN) -->\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-6 py-12\">\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"zap\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Zero Build Lag</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Runs instantly in any browser via Tailwind CSS CDN script.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"layers\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Pure HTML & CSS</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Zero JSX or Node.js runtime required. Copy, paste and deploy.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"sparkles\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Micro-Interactions</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Smooth hover elevations and accessible keyboard focus outlines.</p>\n  </div>\n</div>"
+      },
+      {
+        "id": "sec-31-3",
+        "name": "Action & Conversion Trigger",
+        "badge": "HTML5 CTA",
+        "description": "Stand-alone call-to-action block with high-contrast buttons.",
+        "promptText": "Create an instant HTML5 CTA conversion block for \"Tubes Interactive Background\" with pure Tailwind CSS CDN classes.",
+        "tailwindSnippet": "<!-- 3. Conversion Trigger Action (HTML + Tailwind CDN) -->\n<div class=\"max-w-2xl mx-auto px-6 py-8 text-center\">\n  <div class=\"rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8\">\n    <h3 class=\"text-lg font-bold text-white mb-2\">Experience Tubes Interactive Background</h3>\n    <p class=\"text-xs text-zinc-400 mb-6\">Open the standalone HTML template in your browser or paste into your project.</p>\n    <div class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-zinc-950 text-xs font-semibold hover:bg-zinc-100 transition-all\">\n        Launch Template\n      </button>\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold hover:bg-zinc-700 transition-all\">\n        Copy HTML Code\n      </button>\n    </div>\n  </div>\n</div>"
+      }
+    ],
+    "features": [
+      "100% Pure Standalone HTML5 + Tailwind CSS via CDN",
+      "Zero JSX, TSX, React, or npm dependencies required",
+      "Double-click to preview instantly in any browser",
+      "1-Click AI Master Prompt optimized for Cursor & Claude"
+    ],
+    "toolsReplaced": [
+      {
+        "name": "UI Component Subscriptions",
+        "monthlyCostUSD": 29
+      },
+      {
+        "name": "Custom Animation Design",
+        "monthlyCostUSD": 99
+      },
+      {
+        "name": "Design Token Kits",
+        "monthlyCostUSD": 49
+      }
+    ],
+    "frameworkStack": [
+      "HTML5",
+      "Tailwind CSS (CDN)",
+      "Vanilla JS / Alpine.js",
+      "Lucide Icons (CDN)",
+      "GSAP (CDN)"
+    ],
+    "quickCopyPrompt": "You are an expert Frontend Engineer. Build a complete, production-ready, standalone HTML5 template for \"Tubes Interactive Background\".\n\n### CRITICAL OUTPUT FORMAT REQUIREMENTS:\n- **Output ONLY single-file standard HTML (`<!DOCTYPE html> ... </html>`)**.\n- **STRICT PROHIBITION**: Do NOT output JSX, TSX, React components, Next.js code, or npm import statements. Everything must be pure HTML + CSS + JS in one file.\n- **Tailwind CSS via CDN**: Include `<script src=\"https://cdn.tailwindcss.com\"></script>` in `<head>`.\n- **Icons**: Load Lucide Icons via CDN `<script src=\"https://unpkg.com/lucide@latest\"></script>` and initialize with `<script>lucide.createIcons();</script>`.\n- **Fonts**: Load Google Fonts `Inter` and `JetBrains Mono`.\n- **Interactive Animations**: Use vanilla JavaScript or GSAP via CDN (`<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js\"></script>`) embedded inside `<script>` tags at the bottom.\n\n### Component & Design Specifications:\n1. **Design System & Palette**:\n   - Monochromatic Notion/Shopify aesthetic (neutral zinc-900 / zinc-950 dark, zinc-50 / pure white light).\n   - High precision typography with crisp contrast, clean borders (`border-zinc-200` / `border-zinc-800`), and soft shadows.\n2. **Component Architecture for \"Tubes Interactive Background\"**:\n   - Master layout container with mobile, tablet, and desktop responsiveness.\n   - Micro-interactions on buttons, hover states, and smooth spring-like transitions.\n3. **Stand-Alone Portability**:\n   - Must open directly and render flawlessly by double clicking the `.html` file in any web browser.\n\nComponent: Tubes Interactive Background\nCategory: Interactive & Animation",
+    "faqs": [
+      {
+        "question": "What is the output format of this prompt?",
+        "answer": "All prompts produce standard, single-file HTML5 templates styled with Tailwind CSS via CDN (<script src=\"https://cdn.tailwindcss.com\"></script>). No JSX, React, or build setups required."
+      },
+      {
+        "question": "How do I run and test the output HTML?",
+        "answer": "Copy the AI output, save it into a file named index.html, and double-click to open it in Chrome, Safari, or Firefox. It renders instantly without compiling."
+      },
+      {
+        "question": "Can I paste this HTML into WordPress, Webflow, or custom sites?",
+        "answer": "Yes! Because the template outputs standard HTML and loads Tailwind CSS via CDN, you can paste it directly into HTML embed blocks or standalone static sites."
+      }
+    ]
+  },
+  {
+    "id": "tmpl-32",
+    "slug": "scroll-journey-line",
+    "title": "Scroll Journey Line",
+    "shortTitle": "Scroll Journey Line",
+    "tagline": "Production-grade Scroll Journey Line standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.",
+    "category": "section_prompts",
+    "categoryLabel": "AI Section Prompt",
+    "assetFormat": "section_prompts",
+    "formatBadge": "HTML + TAILWIND CDN",
+    "badge": "AI MASTER PROMPT",
+    "rating": 4.93,
+    "reviewsCount": 237,
+    "downloadsCount": 3299,
+    "viewsCount": 4042,
+    "copiesCount": 963,
+    "mediaType": "video",
+    "mediaUrl": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/preview-artifacts/prompt-library/7d97ebb3-363d-49d3-a029-fa9a23815e3f/thumbnails/f2890579-0e12-47a7-a098-c923b3401f1d.mp4",
+    "heroDescription": "Build and preview Scroll Journey Line instantly. Engineered as a complete standalone HTML document using Tailwind CSS via CDN (`<script src=\"https://cdn.tailwindcss.com\"></script>`), pure CSS/vanilla JS interactions, and zero build tool bloat. Perfect for Cursor AI, Claude 3.5 Sonnet, and direct browser execution.",
+    "accentBg": "bg-zinc-950",
+    "accentBorder": "border-zinc-800",
+    "accentText": "text-zinc-100",
+    "accentColor": "#09090b",
+    "coverImage": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/preview-artifacts/prompt-library/7d97ebb3-363d-49d3-a029-fa9a23815e3f/thumbnails/f2890579-0e12-47a7-a098-c923b3401f1d.mp4",
+    "compatibleBuilders": [
+      "HTML5 Standalone",
+      "Tailwind CSS CDN",
+      "Claude 3.5 Sonnet",
+      "Cursor AI",
+      "v0",
+      "Lovable"
+    ],
+    "sectionsIncluded": [
+      {
+        "id": "sec-32-1",
+        "name": "Focal Layout Architecture",
+        "badge": "HTML5 HERO",
+        "description": "Main hero structure and typography for Scroll Journey Line.",
+        "promptText": "Generate a standalone HTML5 hero section for \"Scroll Journey Line\" using Tailwind CSS via CDN. Output pure HTML with class=\"...\", zero JSX or TSX.",
+        "tailwindSnippet": "<!-- 1. Focal Layout for Scroll Journey Line (HTML + Tailwind CDN) -->\n<section class=\"relative overflow-hidden py-16 sm:py-24 bg-zinc-950 text-zinc-100 antialiased font-sans\">\n  <div class=\"max-w-7xl mx-auto px-6 lg:px-8\">\n    <div class=\"text-center max-w-3xl mx-auto\">\n      <span class=\"inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-900 border border-zinc-800 text-zinc-300\">\n        <i data-lucide=\"sparkles\" class=\"w-3.5 h-3.5 text-zinc-400\"></i>\n        <span>AI SECTION PROMPT</span>\n      </span>\n      <h1 class=\"mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-display\">\n        Scroll Journey Line\n      </h1>\n      <p class=\"mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed\">\n        Production-grade Scroll Journey Line standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.\n      </p>\n    </div>\n  </div>\n</section>"
+      },
+      {
+        "id": "sec-32-2",
+        "name": "Interactive Feature Matrix",
+        "badge": "HTML5 GRID",
+        "description": "Responsive 3-column card grid with hover transitions and Lucide icons.",
+        "promptText": "Build a pure HTML5 3-column feature grid for \"Scroll Journey Line\" with Tailwind CDN utility classes and Lucide icons.",
+        "tailwindSnippet": "<!-- 2. Interactive Feature Matrix (HTML + Tailwind CDN) -->\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-6 py-12\">\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"zap\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Zero Build Lag</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Runs instantly in any browser via Tailwind CSS CDN script.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"layers\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Pure HTML & CSS</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Zero JSX or Node.js runtime required. Copy, paste and deploy.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"sparkles\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Micro-Interactions</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Smooth hover elevations and accessible keyboard focus outlines.</p>\n  </div>\n</div>"
+      },
+      {
+        "id": "sec-32-3",
+        "name": "Action & Conversion Trigger",
+        "badge": "HTML5 CTA",
+        "description": "Stand-alone call-to-action block with high-contrast buttons.",
+        "promptText": "Create an instant HTML5 CTA conversion block for \"Scroll Journey Line\" with pure Tailwind CSS CDN classes.",
+        "tailwindSnippet": "<!-- 3. Conversion Trigger Action (HTML + Tailwind CDN) -->\n<div class=\"max-w-2xl mx-auto px-6 py-8 text-center\">\n  <div class=\"rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8\">\n    <h3 class=\"text-lg font-bold text-white mb-2\">Experience Scroll Journey Line</h3>\n    <p class=\"text-xs text-zinc-400 mb-6\">Open the standalone HTML template in your browser or paste into your project.</p>\n    <div class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-zinc-950 text-xs font-semibold hover:bg-zinc-100 transition-all\">\n        Launch Template\n      </button>\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold hover:bg-zinc-700 transition-all\">\n        Copy HTML Code\n      </button>\n    </div>\n  </div>\n</div>"
+      }
+    ],
+    "features": [
+      "100% Pure Standalone HTML5 + Tailwind CSS via CDN",
+      "Zero JSX, TSX, React, or npm dependencies required",
+      "Double-click to preview instantly in any browser",
+      "1-Click AI Master Prompt optimized for Cursor & Claude"
+    ],
+    "toolsReplaced": [
+      {
+        "name": "UI Component Subscriptions",
+        "monthlyCostUSD": 29
+      },
+      {
+        "name": "Custom Animation Design",
+        "monthlyCostUSD": 99
+      },
+      {
+        "name": "Design Token Kits",
+        "monthlyCostUSD": 49
+      }
+    ],
+    "frameworkStack": [
+      "HTML5",
+      "Tailwind CSS (CDN)",
+      "Vanilla JS / Alpine.js",
+      "Lucide Icons (CDN)",
+      "GSAP (CDN)"
+    ],
+    "quickCopyPrompt": "You are an expert Frontend Engineer. Build a complete, production-ready, standalone HTML5 template for \"Scroll Journey Line\".\n\n### CRITICAL OUTPUT FORMAT REQUIREMENTS:\n- **Output ONLY single-file standard HTML (`<!DOCTYPE html> ... </html>`)**.\n- **STRICT PROHIBITION**: Do NOT output JSX, TSX, React components, Next.js code, or npm import statements. Everything must be pure HTML + CSS + JS in one file.\n- **Tailwind CSS via CDN**: Include `<script src=\"https://cdn.tailwindcss.com\"></script>` in `<head>`.\n- **Icons**: Load Lucide Icons via CDN `<script src=\"https://unpkg.com/lucide@latest\"></script>` and initialize with `<script>lucide.createIcons();</script>`.\n- **Fonts**: Load Google Fonts `Inter` and `JetBrains Mono`.\n- **Interactive Animations**: Use vanilla JavaScript or GSAP via CDN (`<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js\"></script>`) embedded inside `<script>` tags at the bottom.\n\n### Component & Design Specifications:\n1. **Design System & Palette**:\n   - Monochromatic Notion/Shopify aesthetic (neutral zinc-900 / zinc-950 dark, zinc-50 / pure white light).\n   - High precision typography with crisp contrast, clean borders (`border-zinc-200` / `border-zinc-800`), and soft shadows.\n2. **Component Architecture for \"Scroll Journey Line\"**:\n   - Master layout container with mobile, tablet, and desktop responsiveness.\n   - Micro-interactions on buttons, hover states, and smooth spring-like transitions.\n3. **Stand-Alone Portability**:\n   - Must open directly and render flawlessly by double clicking the `.html` file in any web browser.\n\nComponent: Scroll Journey Line\nCategory: AI Section Prompt",
+    "faqs": [
+      {
+        "question": "What is the output format of this prompt?",
+        "answer": "All prompts produce standard, single-file HTML5 templates styled with Tailwind CSS via CDN (<script src=\"https://cdn.tailwindcss.com\"></script>). No JSX, React, or build setups required."
+      },
+      {
+        "question": "How do I run and test the output HTML?",
+        "answer": "Copy the AI output, save it into a file named index.html, and double-click to open it in Chrome, Safari, or Firefox. It renders instantly without compiling."
+      },
+      {
+        "question": "Can I paste this HTML into WordPress, Webflow, or custom sites?",
+        "answer": "Yes! Because the template outputs standard HTML and loads Tailwind CSS via CDN, you can paste it directly into HTML embed blocks or standalone static sites."
+      }
+    ]
+  },
+  {
+    "id": "tmpl-33",
+    "slug": "animated-scroll-printed-product-page-warm-cream-and-red-editorial-with-a-horizontal-card-rail",
+    "title": "Animated Scroll-Printed Product Page: Warm Cream and Red Editorial With a Horizontal Card Rail",
+    "shortTitle": "Animated Scroll-Printed Produc...",
+    "tagline": "Production-grade Animated Scroll-Printed Product Page: Warm Cream and Red Editorial With a Horizontal Card Rail standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.",
+    "category": "landing_pages",
+    "categoryLabel": "Landing Page",
+    "assetFormat": "native_page",
+    "formatBadge": "HTML + TAILWIND CDN",
+    "badge": "HERO SYSTEM",
+    "rating": 4.94,
+    "reviewsCount": 120,
+    "downloadsCount": 1556,
+    "viewsCount": 3875,
+    "copiesCount": 684,
+    "mediaType": "image",
+    "mediaUrl": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/preview-artifacts/prompt-library/7d97ebb3-363d-49d3-a029-fa9a23815e3f/thumbnails/68858fe4-1859-401d-916a-e3efae680b53.png?width=600&quality=75&resize=contain",
+    "heroDescription": "Build and preview Animated Scroll-Printed Product Page: Warm Cream and Red Editorial With a Horizontal Card Rail instantly. Engineered as a complete standalone HTML document using Tailwind CSS via CDN (`<script src=\"https://cdn.tailwindcss.com\"></script>`), pure CSS/vanilla JS interactions, and zero build tool bloat. Perfect for Cursor AI, Claude 3.5 Sonnet, and direct browser execution.",
+    "accentBg": "bg-zinc-950",
+    "accentBorder": "border-zinc-800",
+    "accentText": "text-zinc-100",
+    "accentColor": "#09090b",
+    "coverImage": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/preview-artifacts/prompt-library/7d97ebb3-363d-49d3-a029-fa9a23815e3f/thumbnails/68858fe4-1859-401d-916a-e3efae680b53.png?width=600&quality=75&resize=contain",
+    "compatibleBuilders": [
+      "HTML5 Standalone",
+      "Tailwind CSS CDN",
+      "Claude 3.5 Sonnet",
+      "Cursor AI",
+      "v0",
+      "Lovable"
+    ],
+    "sectionsIncluded": [
+      {
+        "id": "sec-33-1",
+        "name": "Focal Layout Architecture",
+        "badge": "HTML5 HERO",
+        "description": "Main hero structure and typography for Animated Scroll-Printed Product Page: Warm Cream and Red Editorial With a Horizontal Card Rail.",
+        "promptText": "Generate a standalone HTML5 hero section for \"Animated Scroll-Printed Product Page: Warm Cream and Red Editorial With a Horizontal Card Rail\" using Tailwind CSS via CDN. Output pure HTML with class=\"...\", zero JSX or TSX.",
+        "tailwindSnippet": "<!-- 1. Focal Layout for Animated Scroll-Printed Product Page: Warm Cream and Red Editorial With a Horizontal Card Rail (HTML + Tailwind CDN) -->\n<section class=\"relative overflow-hidden py-16 sm:py-24 bg-zinc-950 text-zinc-100 antialiased font-sans\">\n  <div class=\"max-w-7xl mx-auto px-6 lg:px-8\">\n    <div class=\"text-center max-w-3xl mx-auto\">\n      <span class=\"inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-900 border border-zinc-800 text-zinc-300\">\n        <i data-lucide=\"sparkles\" class=\"w-3.5 h-3.5 text-zinc-400\"></i>\n        <span>LANDING PAGE</span>\n      </span>\n      <h1 class=\"mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-display\">\n        Animated Scroll-Printed Product Page: Warm Cream and Red Editorial With a Horizontal Card Rail\n      </h1>\n      <p class=\"mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed\">\n        Production-grade Animated Scroll-Printed Product Page: Warm Cream and Red Editorial With a Horizontal Card Rail standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.\n      </p>\n    </div>\n  </div>\n</section>"
+      },
+      {
+        "id": "sec-33-2",
+        "name": "Interactive Feature Matrix",
+        "badge": "HTML5 GRID",
+        "description": "Responsive 3-column card grid with hover transitions and Lucide icons.",
+        "promptText": "Build a pure HTML5 3-column feature grid for \"Animated Scroll-Printed Product Page: Warm Cream and Red Editorial With a Horizontal Card Rail\" with Tailwind CDN utility classes and Lucide icons.",
+        "tailwindSnippet": "<!-- 2. Interactive Feature Matrix (HTML + Tailwind CDN) -->\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-6 py-12\">\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"zap\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Zero Build Lag</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Runs instantly in any browser via Tailwind CSS CDN script.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"layers\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Pure HTML & CSS</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Zero JSX or Node.js runtime required. Copy, paste and deploy.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"sparkles\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Micro-Interactions</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Smooth hover elevations and accessible keyboard focus outlines.</p>\n  </div>\n</div>"
+      },
+      {
+        "id": "sec-33-3",
+        "name": "Action & Conversion Trigger",
+        "badge": "HTML5 CTA",
+        "description": "Stand-alone call-to-action block with high-contrast buttons.",
+        "promptText": "Create an instant HTML5 CTA conversion block for \"Animated Scroll-Printed Product Page: Warm Cream and Red Editorial With a Horizontal Card Rail\" with pure Tailwind CSS CDN classes.",
+        "tailwindSnippet": "<!-- 3. Conversion Trigger Action (HTML + Tailwind CDN) -->\n<div class=\"max-w-2xl mx-auto px-6 py-8 text-center\">\n  <div class=\"rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8\">\n    <h3 class=\"text-lg font-bold text-white mb-2\">Experience Animated Scroll-Printed Produc...</h3>\n    <p class=\"text-xs text-zinc-400 mb-6\">Open the standalone HTML template in your browser or paste into your project.</p>\n    <div class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-zinc-950 text-xs font-semibold hover:bg-zinc-100 transition-all\">\n        Launch Template\n      </button>\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold hover:bg-zinc-700 transition-all\">\n        Copy HTML Code\n      </button>\n    </div>\n  </div>\n</div>"
+      }
+    ],
+    "features": [
+      "100% Pure Standalone HTML5 + Tailwind CSS via CDN",
+      "Zero JSX, TSX, React, or npm dependencies required",
+      "Double-click to preview instantly in any browser",
+      "1-Click AI Master Prompt optimized for Cursor & Claude"
+    ],
+    "toolsReplaced": [
+      {
+        "name": "UI Component Subscriptions",
+        "monthlyCostUSD": 29
+      },
+      {
+        "name": "Custom Animation Design",
+        "monthlyCostUSD": 99
+      },
+      {
+        "name": "Design Token Kits",
+        "monthlyCostUSD": 49
+      }
+    ],
+    "frameworkStack": [
+      "HTML5",
+      "Tailwind CSS (CDN)",
+      "Vanilla JS / Alpine.js",
+      "Lucide Icons (CDN)",
+      "GSAP (CDN)"
+    ],
+    "quickCopyPrompt": "You are an expert Frontend Engineer. Build a complete, production-ready, standalone HTML5 template for \"Animated Scroll-Printed Product Page: Warm Cream and Red Editorial With a Horizontal Card Rail\".\n\n### CRITICAL OUTPUT FORMAT REQUIREMENTS:\n- **Output ONLY single-file standard HTML (`<!DOCTYPE html> ... </html>`)**.\n- **STRICT PROHIBITION**: Do NOT output JSX, TSX, React components, Next.js code, or npm import statements. Everything must be pure HTML + CSS + JS in one file.\n- **Tailwind CSS via CDN**: Include `<script src=\"https://cdn.tailwindcss.com\"></script>` in `<head>`.\n- **Icons**: Load Lucide Icons via CDN `<script src=\"https://unpkg.com/lucide@latest\"></script>` and initialize with `<script>lucide.createIcons();</script>`.\n- **Fonts**: Load Google Fonts `Inter` and `JetBrains Mono`.\n- **Interactive Animations**: Use vanilla JavaScript or GSAP via CDN (`<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js\"></script>`) embedded inside `<script>` tags at the bottom.\n\n### Component & Design Specifications:\n1. **Design System & Palette**:\n   - Monochromatic Notion/Shopify aesthetic (neutral zinc-900 / zinc-950 dark, zinc-50 / pure white light).\n   - High precision typography with crisp contrast, clean borders (`border-zinc-200` / `border-zinc-800`), and soft shadows.\n2. **Component Architecture for \"Animated Scroll-Printed Product Page: Warm Cream and Red Editorial With a Horizontal Card Rail\"**:\n   - Master layout container with mobile, tablet, and desktop responsiveness.\n   - Micro-interactions on buttons, hover states, and smooth spring-like transitions.\n3. **Stand-Alone Portability**:\n   - Must open directly and render flawlessly by double clicking the `.html` file in any web browser.\n\nComponent: Animated Scroll-Printed Product Page: Warm Cream and Red Editorial With a Horizontal Card Rail\nCategory: Landing Page",
+    "faqs": [
+      {
+        "question": "What is the output format of this prompt?",
+        "answer": "All prompts produce standard, single-file HTML5 templates styled with Tailwind CSS via CDN (<script src=\"https://cdn.tailwindcss.com\"></script>). No JSX, React, or build setups required."
+      },
+      {
+        "question": "How do I run and test the output HTML?",
+        "answer": "Copy the AI output, save it into a file named index.html, and double-click to open it in Chrome, Safari, or Firefox. It renders instantly without compiling."
+      },
+      {
+        "question": "Can I paste this HTML into WordPress, Webflow, or custom sites?",
+        "answer": "Yes! Because the template outputs standard HTML and loads Tailwind CSS via CDN, you can paste it directly into HTML embed blocks or standalone static sites."
+      }
+    ]
+  },
+  {
+    "id": "tmpl-34",
+    "slug": "force-field-background",
+    "title": "Force Field Background",
+    "shortTitle": "Force Field Background",
+    "tagline": "Production-grade Force Field Background standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.",
+    "category": "lovable_projects",
+    "categoryLabel": "Interactive & Animation",
+    "assetFormat": "lovable_project",
+    "formatBadge": "HTML + TAILWIND CDN",
+    "badge": "STANDALONE HTML",
+    "rating": 4.97,
+    "reviewsCount": 269,
+    "downloadsCount": 4057,
+    "viewsCount": 3108,
+    "copiesCount": 511,
+    "mediaType": "image",
+    "mediaUrl": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/hmac-uploads/screenshots/components/febbd3b8-b30b-407b-a997-55442e42be27/f8ed68c7-e970-4fa3-85de-5064855eb254/1767689085963.png?width=600&quality=75&resize=contain",
+    "heroDescription": "Build and preview Force Field Background instantly. Engineered as a complete standalone HTML document using Tailwind CSS via CDN (`<script src=\"https://cdn.tailwindcss.com\"></script>`), pure CSS/vanilla JS interactions, and zero build tool bloat. Perfect for Cursor AI, Claude 3.5 Sonnet, and direct browser execution.",
+    "accentBg": "bg-zinc-950",
+    "accentBorder": "border-zinc-800",
+    "accentText": "text-zinc-100",
+    "accentColor": "#09090b",
+    "coverImage": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/hmac-uploads/screenshots/components/febbd3b8-b30b-407b-a997-55442e42be27/f8ed68c7-e970-4fa3-85de-5064855eb254/1767689085963.png?width=600&quality=75&resize=contain",
+    "compatibleBuilders": [
+      "HTML5 Standalone",
+      "Tailwind CSS CDN",
+      "Claude 3.5 Sonnet",
+      "Cursor AI",
+      "v0",
+      "Lovable"
+    ],
+    "sectionsIncluded": [
+      {
+        "id": "sec-34-1",
+        "name": "Focal Layout Architecture",
+        "badge": "HTML5 HERO",
+        "description": "Main hero structure and typography for Force Field Background.",
+        "promptText": "Generate a standalone HTML5 hero section for \"Force Field Background\" using Tailwind CSS via CDN. Output pure HTML with class=\"...\", zero JSX or TSX.",
+        "tailwindSnippet": "<!-- 1. Focal Layout for Force Field Background (HTML + Tailwind CDN) -->\n<section class=\"relative overflow-hidden py-16 sm:py-24 bg-zinc-950 text-zinc-100 antialiased font-sans\">\n  <div class=\"max-w-7xl mx-auto px-6 lg:px-8\">\n    <div class=\"text-center max-w-3xl mx-auto\">\n      <span class=\"inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-900 border border-zinc-800 text-zinc-300\">\n        <i data-lucide=\"sparkles\" class=\"w-3.5 h-3.5 text-zinc-400\"></i>\n        <span>INTERACTIVE & ANIMATION</span>\n      </span>\n      <h1 class=\"mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-display\">\n        Force Field Background\n      </h1>\n      <p class=\"mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed\">\n        Production-grade Force Field Background standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.\n      </p>\n    </div>\n  </div>\n</section>"
+      },
+      {
+        "id": "sec-34-2",
+        "name": "Interactive Feature Matrix",
+        "badge": "HTML5 GRID",
+        "description": "Responsive 3-column card grid with hover transitions and Lucide icons.",
+        "promptText": "Build a pure HTML5 3-column feature grid for \"Force Field Background\" with Tailwind CDN utility classes and Lucide icons.",
+        "tailwindSnippet": "<!-- 2. Interactive Feature Matrix (HTML + Tailwind CDN) -->\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-6 py-12\">\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"zap\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Zero Build Lag</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Runs instantly in any browser via Tailwind CSS CDN script.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"layers\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Pure HTML & CSS</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Zero JSX or Node.js runtime required. Copy, paste and deploy.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"sparkles\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Micro-Interactions</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Smooth hover elevations and accessible keyboard focus outlines.</p>\n  </div>\n</div>"
+      },
+      {
+        "id": "sec-34-3",
+        "name": "Action & Conversion Trigger",
+        "badge": "HTML5 CTA",
+        "description": "Stand-alone call-to-action block with high-contrast buttons.",
+        "promptText": "Create an instant HTML5 CTA conversion block for \"Force Field Background\" with pure Tailwind CSS CDN classes.",
+        "tailwindSnippet": "<!-- 3. Conversion Trigger Action (HTML + Tailwind CDN) -->\n<div class=\"max-w-2xl mx-auto px-6 py-8 text-center\">\n  <div class=\"rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8\">\n    <h3 class=\"text-lg font-bold text-white mb-2\">Experience Force Field Background</h3>\n    <p class=\"text-xs text-zinc-400 mb-6\">Open the standalone HTML template in your browser or paste into your project.</p>\n    <div class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-zinc-950 text-xs font-semibold hover:bg-zinc-100 transition-all\">\n        Launch Template\n      </button>\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold hover:bg-zinc-700 transition-all\">\n        Copy HTML Code\n      </button>\n    </div>\n  </div>\n</div>"
+      }
+    ],
+    "features": [
+      "100% Pure Standalone HTML5 + Tailwind CSS via CDN",
+      "Zero JSX, TSX, React, or npm dependencies required",
+      "Double-click to preview instantly in any browser",
+      "1-Click AI Master Prompt optimized for Cursor & Claude"
+    ],
+    "toolsReplaced": [
+      {
+        "name": "UI Component Subscriptions",
+        "monthlyCostUSD": 29
+      },
+      {
+        "name": "Custom Animation Design",
+        "monthlyCostUSD": 99
+      },
+      {
+        "name": "Design Token Kits",
+        "monthlyCostUSD": 49
+      }
+    ],
+    "frameworkStack": [
+      "HTML5",
+      "Tailwind CSS (CDN)",
+      "Vanilla JS / Alpine.js",
+      "Lucide Icons (CDN)",
+      "GSAP (CDN)"
+    ],
+    "quickCopyPrompt": "You are an expert Frontend Engineer. Build a complete, production-ready, standalone HTML5 template for \"Force Field Background\".\n\n### CRITICAL OUTPUT FORMAT REQUIREMENTS:\n- **Output ONLY single-file standard HTML (`<!DOCTYPE html> ... </html>`)**.\n- **STRICT PROHIBITION**: Do NOT output JSX, TSX, React components, Next.js code, or npm import statements. Everything must be pure HTML + CSS + JS in one file.\n- **Tailwind CSS via CDN**: Include `<script src=\"https://cdn.tailwindcss.com\"></script>` in `<head>`.\n- **Icons**: Load Lucide Icons via CDN `<script src=\"https://unpkg.com/lucide@latest\"></script>` and initialize with `<script>lucide.createIcons();</script>`.\n- **Fonts**: Load Google Fonts `Inter` and `JetBrains Mono`.\n- **Interactive Animations**: Use vanilla JavaScript or GSAP via CDN (`<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js\"></script>`) embedded inside `<script>` tags at the bottom.\n\n### Component & Design Specifications:\n1. **Design System & Palette**:\n   - Monochromatic Notion/Shopify aesthetic (neutral zinc-900 / zinc-950 dark, zinc-50 / pure white light).\n   - High precision typography with crisp contrast, clean borders (`border-zinc-200` / `border-zinc-800`), and soft shadows.\n2. **Component Architecture for \"Force Field Background\"**:\n   - Master layout container with mobile, tablet, and desktop responsiveness.\n   - Micro-interactions on buttons, hover states, and smooth spring-like transitions.\n3. **Stand-Alone Portability**:\n   - Must open directly and render flawlessly by double clicking the `.html` file in any web browser.\n\nComponent: Force Field Background\nCategory: Interactive & Animation",
+    "faqs": [
+      {
+        "question": "What is the output format of this prompt?",
+        "answer": "All prompts produce standard, single-file HTML5 templates styled with Tailwind CSS via CDN (<script src=\"https://cdn.tailwindcss.com\"></script>). No JSX, React, or build setups required."
+      },
+      {
+        "question": "How do I run and test the output HTML?",
+        "answer": "Copy the AI output, save it into a file named index.html, and double-click to open it in Chrome, Safari, or Firefox. It renders instantly without compiling."
+      },
+      {
+        "question": "Can I paste this HTML into WordPress, Webflow, or custom sites?",
+        "answer": "Yes! Because the template outputs standard HTML and loads Tailwind CSS via CDN, you can paste it directly into HTML embed blocks or standalone static sites."
+      }
+    ]
+  },
+  {
+    "id": "tmpl-35",
+    "slug": "animated-photographic-landing-page-scroll-opened-image-frames-and-a-circular-iris-reveal",
+    "title": "Animated Photographic Landing Page: Scroll-Opened Image Frames and a Circular Iris Reveal",
+    "shortTitle": "Animated Photographic Landing ...",
+    "tagline": "Production-grade Animated Photographic Landing Page: Scroll-Opened Image Frames and a Circular Iris Reveal standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.",
+    "category": "landing_pages",
+    "categoryLabel": "Landing Page",
+    "assetFormat": "native_page",
+    "formatBadge": "HTML + TAILWIND CDN",
+    "badge": "HERO SYSTEM",
+    "rating": 4.98,
+    "reviewsCount": 174,
+    "downloadsCount": 1831,
+    "viewsCount": 3300,
+    "copiesCount": 900,
+    "mediaType": "image",
+    "mediaUrl": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/preview-artifacts/prompt-library/7d97ebb3-363d-49d3-a029-fa9a23815e3f/thumbnails/58390210-a01d-464c-8dd1-ce59eab36e0f.png?width=600&quality=75&resize=contain",
+    "heroDescription": "Build and preview Animated Photographic Landing Page: Scroll-Opened Image Frames and a Circular Iris Reveal instantly. Engineered as a complete standalone HTML document using Tailwind CSS via CDN (`<script src=\"https://cdn.tailwindcss.com\"></script>`), pure CSS/vanilla JS interactions, and zero build tool bloat. Perfect for Cursor AI, Claude 3.5 Sonnet, and direct browser execution.",
+    "accentBg": "bg-zinc-950",
+    "accentBorder": "border-zinc-800",
+    "accentText": "text-zinc-100",
+    "accentColor": "#09090b",
+    "coverImage": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/preview-artifacts/prompt-library/7d97ebb3-363d-49d3-a029-fa9a23815e3f/thumbnails/58390210-a01d-464c-8dd1-ce59eab36e0f.png?width=600&quality=75&resize=contain",
+    "compatibleBuilders": [
+      "HTML5 Standalone",
+      "Tailwind CSS CDN",
+      "Claude 3.5 Sonnet",
+      "Cursor AI",
+      "v0",
+      "Lovable"
+    ],
+    "sectionsIncluded": [
+      {
+        "id": "sec-35-1",
+        "name": "Focal Layout Architecture",
+        "badge": "HTML5 HERO",
+        "description": "Main hero structure and typography for Animated Photographic Landing Page: Scroll-Opened Image Frames and a Circular Iris Reveal.",
+        "promptText": "Generate a standalone HTML5 hero section for \"Animated Photographic Landing Page: Scroll-Opened Image Frames and a Circular Iris Reveal\" using Tailwind CSS via CDN. Output pure HTML with class=\"...\", zero JSX or TSX.",
+        "tailwindSnippet": "<!-- 1. Focal Layout for Animated Photographic Landing Page: Scroll-Opened Image Frames and a Circular Iris Reveal (HTML + Tailwind CDN) -->\n<section class=\"relative overflow-hidden py-16 sm:py-24 bg-zinc-950 text-zinc-100 antialiased font-sans\">\n  <div class=\"max-w-7xl mx-auto px-6 lg:px-8\">\n    <div class=\"text-center max-w-3xl mx-auto\">\n      <span class=\"inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-900 border border-zinc-800 text-zinc-300\">\n        <i data-lucide=\"sparkles\" class=\"w-3.5 h-3.5 text-zinc-400\"></i>\n        <span>LANDING PAGE</span>\n      </span>\n      <h1 class=\"mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-display\">\n        Animated Photographic Landing Page: Scroll-Opened Image Frames and a Circular Iris Reveal\n      </h1>\n      <p class=\"mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed\">\n        Production-grade Animated Photographic Landing Page: Scroll-Opened Image Frames and a Circular Iris Reveal standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.\n      </p>\n    </div>\n  </div>\n</section>"
+      },
+      {
+        "id": "sec-35-2",
+        "name": "Interactive Feature Matrix",
+        "badge": "HTML5 GRID",
+        "description": "Responsive 3-column card grid with hover transitions and Lucide icons.",
+        "promptText": "Build a pure HTML5 3-column feature grid for \"Animated Photographic Landing Page: Scroll-Opened Image Frames and a Circular Iris Reveal\" with Tailwind CDN utility classes and Lucide icons.",
+        "tailwindSnippet": "<!-- 2. Interactive Feature Matrix (HTML + Tailwind CDN) -->\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-6 py-12\">\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"zap\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Zero Build Lag</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Runs instantly in any browser via Tailwind CSS CDN script.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"layers\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Pure HTML & CSS</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Zero JSX or Node.js runtime required. Copy, paste and deploy.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"sparkles\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Micro-Interactions</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Smooth hover elevations and accessible keyboard focus outlines.</p>\n  </div>\n</div>"
+      },
+      {
+        "id": "sec-35-3",
+        "name": "Action & Conversion Trigger",
+        "badge": "HTML5 CTA",
+        "description": "Stand-alone call-to-action block with high-contrast buttons.",
+        "promptText": "Create an instant HTML5 CTA conversion block for \"Animated Photographic Landing Page: Scroll-Opened Image Frames and a Circular Iris Reveal\" with pure Tailwind CSS CDN classes.",
+        "tailwindSnippet": "<!-- 3. Conversion Trigger Action (HTML + Tailwind CDN) -->\n<div class=\"max-w-2xl mx-auto px-6 py-8 text-center\">\n  <div class=\"rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8\">\n    <h3 class=\"text-lg font-bold text-white mb-2\">Experience Animated Photographic Landing ...</h3>\n    <p class=\"text-xs text-zinc-400 mb-6\">Open the standalone HTML template in your browser or paste into your project.</p>\n    <div class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-zinc-950 text-xs font-semibold hover:bg-zinc-100 transition-all\">\n        Launch Template\n      </button>\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold hover:bg-zinc-700 transition-all\">\n        Copy HTML Code\n      </button>\n    </div>\n  </div>\n</div>"
+      }
+    ],
+    "features": [
+      "100% Pure Standalone HTML5 + Tailwind CSS via CDN",
+      "Zero JSX, TSX, React, or npm dependencies required",
+      "Double-click to preview instantly in any browser",
+      "1-Click AI Master Prompt optimized for Cursor & Claude"
+    ],
+    "toolsReplaced": [
+      {
+        "name": "UI Component Subscriptions",
+        "monthlyCostUSD": 29
+      },
+      {
+        "name": "Custom Animation Design",
+        "monthlyCostUSD": 99
+      },
+      {
+        "name": "Design Token Kits",
+        "monthlyCostUSD": 49
+      }
+    ],
+    "frameworkStack": [
+      "HTML5",
+      "Tailwind CSS (CDN)",
+      "Vanilla JS / Alpine.js",
+      "Lucide Icons (CDN)",
+      "GSAP (CDN)"
+    ],
+    "quickCopyPrompt": "You are an expert Frontend Engineer. Build a complete, production-ready, standalone HTML5 template for \"Animated Photographic Landing Page: Scroll-Opened Image Frames and a Circular Iris Reveal\".\n\n### CRITICAL OUTPUT FORMAT REQUIREMENTS:\n- **Output ONLY single-file standard HTML (`<!DOCTYPE html> ... </html>`)**.\n- **STRICT PROHIBITION**: Do NOT output JSX, TSX, React components, Next.js code, or npm import statements. Everything must be pure HTML + CSS + JS in one file.\n- **Tailwind CSS via CDN**: Include `<script src=\"https://cdn.tailwindcss.com\"></script>` in `<head>`.\n- **Icons**: Load Lucide Icons via CDN `<script src=\"https://unpkg.com/lucide@latest\"></script>` and initialize with `<script>lucide.createIcons();</script>`.\n- **Fonts**: Load Google Fonts `Inter` and `JetBrains Mono`.\n- **Interactive Animations**: Use vanilla JavaScript or GSAP via CDN (`<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js\"></script>`) embedded inside `<script>` tags at the bottom.\n\n### Component & Design Specifications:\n1. **Design System & Palette**:\n   - Monochromatic Notion/Shopify aesthetic (neutral zinc-900 / zinc-950 dark, zinc-50 / pure white light).\n   - High precision typography with crisp contrast, clean borders (`border-zinc-200` / `border-zinc-800`), and soft shadows.\n2. **Component Architecture for \"Animated Photographic Landing Page: Scroll-Opened Image Frames and a Circular Iris Reveal\"**:\n   - Master layout container with mobile, tablet, and desktop responsiveness.\n   - Micro-interactions on buttons, hover states, and smooth spring-like transitions.\n3. **Stand-Alone Portability**:\n   - Must open directly and render flawlessly by double clicking the `.html` file in any web browser.\n\nComponent: Animated Photographic Landing Page: Scroll-Opened Image Frames and a Circular Iris Reveal\nCategory: Landing Page",
+    "faqs": [
+      {
+        "question": "What is the output format of this prompt?",
+        "answer": "All prompts produce standard, single-file HTML5 templates styled with Tailwind CSS via CDN (<script src=\"https://cdn.tailwindcss.com\"></script>). No JSX, React, or build setups required."
+      },
+      {
+        "question": "How do I run and test the output HTML?",
+        "answer": "Copy the AI output, save it into a file named index.html, and double-click to open it in Chrome, Safari, or Firefox. It renders instantly without compiling."
+      },
+      {
+        "question": "Can I paste this HTML into WordPress, Webflow, or custom sites?",
+        "answer": "Yes! Because the template outputs standard HTML and loads Tailwind CSS via CDN, you can paste it directly into HTML embed blocks or standalone static sites."
+      }
+    ]
+  },
+  {
+    "id": "tmpl-36",
+    "slug": "the-stacking-cards-effect",
+    "title": "The \"Stacking Cards\" Effect",
+    "shortTitle": "The \"Stacking Cards\" Effect",
+    "tagline": "Production-grade The \"Stacking Cards\" Effect standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.",
+    "category": "lovable_projects",
+    "categoryLabel": "Interactive & Animation",
+    "assetFormat": "lovable_project",
+    "formatBadge": "HTML + TAILWIND CDN",
+    "badge": "STANDALONE HTML",
+    "rating": 4.96,
+    "reviewsCount": 260,
+    "downloadsCount": 2322,
+    "viewsCount": 4815,
+    "copiesCount": 830,
+    "mediaType": "video",
+    "mediaUrl": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/preview-artifacts/prompt-library/7d97ebb3-363d-49d3-a029-fa9a23815e3f/thumbnails/022542b0-a81a-4e3a-a7f2-82d73da7464e.mp4",
+    "heroDescription": "Build and preview The \"Stacking Cards\" Effect instantly. Engineered as a complete standalone HTML document using Tailwind CSS via CDN (`<script src=\"https://cdn.tailwindcss.com\"></script>`), pure CSS/vanilla JS interactions, and zero build tool bloat. Perfect for Cursor AI, Claude 3.5 Sonnet, and direct browser execution.",
+    "accentBg": "bg-zinc-950",
+    "accentBorder": "border-zinc-800",
+    "accentText": "text-zinc-100",
+    "accentColor": "#09090b",
+    "coverImage": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/preview-artifacts/prompt-library/7d97ebb3-363d-49d3-a029-fa9a23815e3f/thumbnails/022542b0-a81a-4e3a-a7f2-82d73da7464e.mp4",
+    "compatibleBuilders": [
+      "HTML5 Standalone",
+      "Tailwind CSS CDN",
+      "Claude 3.5 Sonnet",
+      "Cursor AI",
+      "v0",
+      "Lovable"
+    ],
+    "sectionsIncluded": [
+      {
+        "id": "sec-36-1",
+        "name": "Focal Layout Architecture",
+        "badge": "HTML5 HERO",
+        "description": "Main hero structure and typography for The \"Stacking Cards\" Effect.",
+        "promptText": "Generate a standalone HTML5 hero section for \"The \"Stacking Cards\" Effect\" using Tailwind CSS via CDN. Output pure HTML with class=\"...\", zero JSX or TSX.",
+        "tailwindSnippet": "<!-- 1. Focal Layout for The \"Stacking Cards\" Effect (HTML + Tailwind CDN) -->\n<section class=\"relative overflow-hidden py-16 sm:py-24 bg-zinc-950 text-zinc-100 antialiased font-sans\">\n  <div class=\"max-w-7xl mx-auto px-6 lg:px-8\">\n    <div class=\"text-center max-w-3xl mx-auto\">\n      <span class=\"inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-900 border border-zinc-800 text-zinc-300\">\n        <i data-lucide=\"sparkles\" class=\"w-3.5 h-3.5 text-zinc-400\"></i>\n        <span>INTERACTIVE & ANIMATION</span>\n      </span>\n      <h1 class=\"mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-display\">\n        The \"Stacking Cards\" Effect\n      </h1>\n      <p class=\"mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed\">\n        Production-grade The \"Stacking Cards\" Effect standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.\n      </p>\n    </div>\n  </div>\n</section>"
+      },
+      {
+        "id": "sec-36-2",
+        "name": "Interactive Feature Matrix",
+        "badge": "HTML5 GRID",
+        "description": "Responsive 3-column card grid with hover transitions and Lucide icons.",
+        "promptText": "Build a pure HTML5 3-column feature grid for \"The \"Stacking Cards\" Effect\" with Tailwind CDN utility classes and Lucide icons.",
+        "tailwindSnippet": "<!-- 2. Interactive Feature Matrix (HTML + Tailwind CDN) -->\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-6 py-12\">\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"zap\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Zero Build Lag</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Runs instantly in any browser via Tailwind CSS CDN script.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"layers\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Pure HTML & CSS</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Zero JSX or Node.js runtime required. Copy, paste and deploy.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"sparkles\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Micro-Interactions</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Smooth hover elevations and accessible keyboard focus outlines.</p>\n  </div>\n</div>"
+      },
+      {
+        "id": "sec-36-3",
+        "name": "Action & Conversion Trigger",
+        "badge": "HTML5 CTA",
+        "description": "Stand-alone call-to-action block with high-contrast buttons.",
+        "promptText": "Create an instant HTML5 CTA conversion block for \"The \"Stacking Cards\" Effect\" with pure Tailwind CSS CDN classes.",
+        "tailwindSnippet": "<!-- 3. Conversion Trigger Action (HTML + Tailwind CDN) -->\n<div class=\"max-w-2xl mx-auto px-6 py-8 text-center\">\n  <div class=\"rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8\">\n    <h3 class=\"text-lg font-bold text-white mb-2\">Experience The \"Stacking Cards\" Effect</h3>\n    <p class=\"text-xs text-zinc-400 mb-6\">Open the standalone HTML template in your browser or paste into your project.</p>\n    <div class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-zinc-950 text-xs font-semibold hover:bg-zinc-100 transition-all\">\n        Launch Template\n      </button>\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold hover:bg-zinc-700 transition-all\">\n        Copy HTML Code\n      </button>\n    </div>\n  </div>\n</div>"
+      }
+    ],
+    "features": [
+      "100% Pure Standalone HTML5 + Tailwind CSS via CDN",
+      "Zero JSX, TSX, React, or npm dependencies required",
+      "Double-click to preview instantly in any browser",
+      "1-Click AI Master Prompt optimized for Cursor & Claude"
+    ],
+    "toolsReplaced": [
+      {
+        "name": "UI Component Subscriptions",
+        "monthlyCostUSD": 29
+      },
+      {
+        "name": "Custom Animation Design",
+        "monthlyCostUSD": 99
+      },
+      {
+        "name": "Design Token Kits",
+        "monthlyCostUSD": 49
+      }
+    ],
+    "frameworkStack": [
+      "HTML5",
+      "Tailwind CSS (CDN)",
+      "Vanilla JS / Alpine.js",
+      "Lucide Icons (CDN)",
+      "GSAP (CDN)"
+    ],
+    "quickCopyPrompt": "You are an expert Frontend Engineer. Build a complete, production-ready, standalone HTML5 template for \"The \"Stacking Cards\" Effect\".\n\n### CRITICAL OUTPUT FORMAT REQUIREMENTS:\n- **Output ONLY single-file standard HTML (`<!DOCTYPE html> ... </html>`)**.\n- **STRICT PROHIBITION**: Do NOT output JSX, TSX, React components, Next.js code, or npm import statements. Everything must be pure HTML + CSS + JS in one file.\n- **Tailwind CSS via CDN**: Include `<script src=\"https://cdn.tailwindcss.com\"></script>` in `<head>`.\n- **Icons**: Load Lucide Icons via CDN `<script src=\"https://unpkg.com/lucide@latest\"></script>` and initialize with `<script>lucide.createIcons();</script>`.\n- **Fonts**: Load Google Fonts `Inter` and `JetBrains Mono`.\n- **Interactive Animations**: Use vanilla JavaScript or GSAP via CDN (`<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js\"></script>`) embedded inside `<script>` tags at the bottom.\n\n### Component & Design Specifications:\n1. **Design System & Palette**:\n   - Monochromatic Notion/Shopify aesthetic (neutral zinc-900 / zinc-950 dark, zinc-50 / pure white light).\n   - High precision typography with crisp contrast, clean borders (`border-zinc-200` / `border-zinc-800`), and soft shadows.\n2. **Component Architecture for \"The \"Stacking Cards\" Effect\"**:\n   - Master layout container with mobile, tablet, and desktop responsiveness.\n   - Micro-interactions on buttons, hover states, and smooth spring-like transitions.\n3. **Stand-Alone Portability**:\n   - Must open directly and render flawlessly by double clicking the `.html` file in any web browser.\n\nComponent: The \"Stacking Cards\" Effect\nCategory: Interactive & Animation",
+    "faqs": [
+      {
+        "question": "What is the output format of this prompt?",
+        "answer": "All prompts produce standard, single-file HTML5 templates styled with Tailwind CSS via CDN (<script src=\"https://cdn.tailwindcss.com\"></script>). No JSX, React, or build setups required."
+      },
+      {
+        "question": "How do I run and test the output HTML?",
+        "answer": "Copy the AI output, save it into a file named index.html, and double-click to open it in Chrome, Safari, or Firefox. It renders instantly without compiling."
+      },
+      {
+        "question": "Can I paste this HTML into WordPress, Webflow, or custom sites?",
+        "answer": "Yes! Because the template outputs standard HTML and loads Tailwind CSS via CDN, you can paste it directly into HTML embed blocks or standalone static sites."
+      }
+    ]
+  },
+  {
+    "id": "tmpl-37",
+    "slug": "animated-memphis-landing-page-hero-bold-postmodern-product-site",
+    "title": "Animated Memphis Landing Page Hero (Bold Postmodern Product Site)",
+    "shortTitle": "Animated Memphis Landing Page ...",
+    "tagline": "Production-grade Animated Memphis Landing Page Hero (Bold Postmodern Product Site) standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.",
+    "category": "landing_pages",
+    "categoryLabel": "Landing Page",
+    "assetFormat": "native_page",
+    "formatBadge": "HTML + TAILWIND CDN",
+    "badge": "HERO SYSTEM",
+    "rating": 4.97,
+    "reviewsCount": 140,
+    "downloadsCount": 1726,
+    "viewsCount": 3744,
+    "copiesCount": 611,
+    "mediaType": "image",
+    "mediaUrl": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/preview-artifacts/prompt-library/7d97ebb3-363d-49d3-a029-fa9a23815e3f/thumbnails/f034e25a-ef28-4da3-bd67-ae3c27904444.png?width=600&quality=75&resize=contain",
+    "heroDescription": "Build and preview Animated Memphis Landing Page Hero (Bold Postmodern Product Site) instantly. Engineered as a complete standalone HTML document using Tailwind CSS via CDN (`<script src=\"https://cdn.tailwindcss.com\"></script>`), pure CSS/vanilla JS interactions, and zero build tool bloat. Perfect for Cursor AI, Claude 3.5 Sonnet, and direct browser execution.",
+    "accentBg": "bg-zinc-950",
+    "accentBorder": "border-zinc-800",
+    "accentText": "text-zinc-100",
+    "accentColor": "#09090b",
+    "coverImage": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/preview-artifacts/prompt-library/7d97ebb3-363d-49d3-a029-fa9a23815e3f/thumbnails/f034e25a-ef28-4da3-bd67-ae3c27904444.png?width=600&quality=75&resize=contain",
+    "compatibleBuilders": [
+      "HTML5 Standalone",
+      "Tailwind CSS CDN",
+      "Claude 3.5 Sonnet",
+      "Cursor AI",
+      "v0",
+      "Lovable"
+    ],
+    "sectionsIncluded": [
+      {
+        "id": "sec-37-1",
+        "name": "Focal Layout Architecture",
+        "badge": "HTML5 HERO",
+        "description": "Main hero structure and typography for Animated Memphis Landing Page Hero (Bold Postmodern Product Site).",
+        "promptText": "Generate a standalone HTML5 hero section for \"Animated Memphis Landing Page Hero (Bold Postmodern Product Site)\" using Tailwind CSS via CDN. Output pure HTML with class=\"...\", zero JSX or TSX.",
+        "tailwindSnippet": "<!-- 1. Focal Layout for Animated Memphis Landing Page Hero (Bold Postmodern Product Site) (HTML + Tailwind CDN) -->\n<section class=\"relative overflow-hidden py-16 sm:py-24 bg-zinc-950 text-zinc-100 antialiased font-sans\">\n  <div class=\"max-w-7xl mx-auto px-6 lg:px-8\">\n    <div class=\"text-center max-w-3xl mx-auto\">\n      <span class=\"inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-900 border border-zinc-800 text-zinc-300\">\n        <i data-lucide=\"sparkles\" class=\"w-3.5 h-3.5 text-zinc-400\"></i>\n        <span>LANDING PAGE</span>\n      </span>\n      <h1 class=\"mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-display\">\n        Animated Memphis Landing Page Hero (Bold Postmodern Product Site)\n      </h1>\n      <p class=\"mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed\">\n        Production-grade Animated Memphis Landing Page Hero (Bold Postmodern Product Site) standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.\n      </p>\n    </div>\n  </div>\n</section>"
+      },
+      {
+        "id": "sec-37-2",
+        "name": "Interactive Feature Matrix",
+        "badge": "HTML5 GRID",
+        "description": "Responsive 3-column card grid with hover transitions and Lucide icons.",
+        "promptText": "Build a pure HTML5 3-column feature grid for \"Animated Memphis Landing Page Hero (Bold Postmodern Product Site)\" with Tailwind CDN utility classes and Lucide icons.",
+        "tailwindSnippet": "<!-- 2. Interactive Feature Matrix (HTML + Tailwind CDN) -->\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-6 py-12\">\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"zap\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Zero Build Lag</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Runs instantly in any browser via Tailwind CSS CDN script.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"layers\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Pure HTML & CSS</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Zero JSX or Node.js runtime required. Copy, paste and deploy.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"sparkles\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Micro-Interactions</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Smooth hover elevations and accessible keyboard focus outlines.</p>\n  </div>\n</div>"
+      },
+      {
+        "id": "sec-37-3",
+        "name": "Action & Conversion Trigger",
+        "badge": "HTML5 CTA",
+        "description": "Stand-alone call-to-action block with high-contrast buttons.",
+        "promptText": "Create an instant HTML5 CTA conversion block for \"Animated Memphis Landing Page Hero (Bold Postmodern Product Site)\" with pure Tailwind CSS CDN classes.",
+        "tailwindSnippet": "<!-- 3. Conversion Trigger Action (HTML + Tailwind CDN) -->\n<div class=\"max-w-2xl mx-auto px-6 py-8 text-center\">\n  <div class=\"rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8\">\n    <h3 class=\"text-lg font-bold text-white mb-2\">Experience Animated Memphis Landing Page ...</h3>\n    <p class=\"text-xs text-zinc-400 mb-6\">Open the standalone HTML template in your browser or paste into your project.</p>\n    <div class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-zinc-950 text-xs font-semibold hover:bg-zinc-100 transition-all\">\n        Launch Template\n      </button>\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold hover:bg-zinc-700 transition-all\">\n        Copy HTML Code\n      </button>\n    </div>\n  </div>\n</div>"
+      }
+    ],
+    "features": [
+      "100% Pure Standalone HTML5 + Tailwind CSS via CDN",
+      "Zero JSX, TSX, React, or npm dependencies required",
+      "Double-click to preview instantly in any browser",
+      "1-Click AI Master Prompt optimized for Cursor & Claude"
+    ],
+    "toolsReplaced": [
+      {
+        "name": "UI Component Subscriptions",
+        "monthlyCostUSD": 29
+      },
+      {
+        "name": "Custom Animation Design",
+        "monthlyCostUSD": 99
+      },
+      {
+        "name": "Design Token Kits",
+        "monthlyCostUSD": 49
+      }
+    ],
+    "frameworkStack": [
+      "HTML5",
+      "Tailwind CSS (CDN)",
+      "Vanilla JS / Alpine.js",
+      "Lucide Icons (CDN)",
+      "GSAP (CDN)"
+    ],
+    "quickCopyPrompt": "You are an expert Frontend Engineer. Build a complete, production-ready, standalone HTML5 template for \"Animated Memphis Landing Page Hero (Bold Postmodern Product Site)\".\n\n### CRITICAL OUTPUT FORMAT REQUIREMENTS:\n- **Output ONLY single-file standard HTML (`<!DOCTYPE html> ... </html>`)**.\n- **STRICT PROHIBITION**: Do NOT output JSX, TSX, React components, Next.js code, or npm import statements. Everything must be pure HTML + CSS + JS in one file.\n- **Tailwind CSS via CDN**: Include `<script src=\"https://cdn.tailwindcss.com\"></script>` in `<head>`.\n- **Icons**: Load Lucide Icons via CDN `<script src=\"https://unpkg.com/lucide@latest\"></script>` and initialize with `<script>lucide.createIcons();</script>`.\n- **Fonts**: Load Google Fonts `Inter` and `JetBrains Mono`.\n- **Interactive Animations**: Use vanilla JavaScript or GSAP via CDN (`<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js\"></script>`) embedded inside `<script>` tags at the bottom.\n\n### Component & Design Specifications:\n1. **Design System & Palette**:\n   - Monochromatic Notion/Shopify aesthetic (neutral zinc-900 / zinc-950 dark, zinc-50 / pure white light).\n   - High precision typography with crisp contrast, clean borders (`border-zinc-200` / `border-zinc-800`), and soft shadows.\n2. **Component Architecture for \"Animated Memphis Landing Page Hero (Bold Postmodern Product Site)\"**:\n   - Master layout container with mobile, tablet, and desktop responsiveness.\n   - Micro-interactions on buttons, hover states, and smooth spring-like transitions.\n3. **Stand-Alone Portability**:\n   - Must open directly and render flawlessly by double clicking the `.html` file in any web browser.\n\nComponent: Animated Memphis Landing Page Hero (Bold Postmodern Product Site)\nCategory: Landing Page",
+    "faqs": [
+      {
+        "question": "What is the output format of this prompt?",
+        "answer": "All prompts produce standard, single-file HTML5 templates styled with Tailwind CSS via CDN (<script src=\"https://cdn.tailwindcss.com\"></script>). No JSX, React, or build setups required."
+      },
+      {
+        "question": "How do I run and test the output HTML?",
+        "answer": "Copy the AI output, save it into a file named index.html, and double-click to open it in Chrome, Safari, or Firefox. It renders instantly without compiling."
+      },
+      {
+        "question": "Can I paste this HTML into WordPress, Webflow, or custom sites?",
+        "answer": "Yes! Because the template outputs standard HTML and loads Tailwind CSS via CDN, you can paste it directly into HTML embed blocks or standalone static sites."
+      }
+    ]
+  },
+  {
+    "id": "tmpl-38",
+    "slug": "animated-didone-landing-page-blush-and-dusty-pink-editorial-with-multiply-blended-product-photography",
+    "title": "Animated Didone Landing Page: Blush and Dusty Pink Editorial With Multiply-Blended Product Photography",
+    "shortTitle": "Animated Didone Landing Page",
+    "tagline": "Production-grade Animated Didone Landing Page: Blush and Dusty Pink Editorial With Multiply-Blended Product Photography standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.",
+    "category": "landing_pages",
+    "categoryLabel": "Landing Page",
+    "assetFormat": "native_page",
+    "formatBadge": "HTML + TAILWIND CDN",
+    "badge": "HERO SYSTEM",
+    "rating": 4.91,
+    "reviewsCount": 280,
+    "downloadsCount": 3272,
+    "viewsCount": 3459,
+    "copiesCount": 908,
+    "mediaType": "image",
+    "mediaUrl": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/preview-artifacts/prompt-library/7d97ebb3-363d-49d3-a029-fa9a23815e3f/thumbnails/a172b6b1-dcfc-47ea-8198-9bb41f16b876.png?width=600&quality=75&resize=contain",
+    "heroDescription": "Build and preview Animated Didone Landing Page: Blush and Dusty Pink Editorial With Multiply-Blended Product Photography instantly. Engineered as a complete standalone HTML document using Tailwind CSS via CDN (`<script src=\"https://cdn.tailwindcss.com\"></script>`), pure CSS/vanilla JS interactions, and zero build tool bloat. Perfect for Cursor AI, Claude 3.5 Sonnet, and direct browser execution.",
+    "accentBg": "bg-zinc-950",
+    "accentBorder": "border-zinc-800",
+    "accentText": "text-zinc-100",
+    "accentColor": "#09090b",
+    "coverImage": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/preview-artifacts/prompt-library/7d97ebb3-363d-49d3-a029-fa9a23815e3f/thumbnails/a172b6b1-dcfc-47ea-8198-9bb41f16b876.png?width=600&quality=75&resize=contain",
+    "compatibleBuilders": [
+      "HTML5 Standalone",
+      "Tailwind CSS CDN",
+      "Claude 3.5 Sonnet",
+      "Cursor AI",
+      "v0",
+      "Lovable"
+    ],
+    "sectionsIncluded": [
+      {
+        "id": "sec-38-1",
+        "name": "Focal Layout Architecture",
+        "badge": "HTML5 HERO",
+        "description": "Main hero structure and typography for Animated Didone Landing Page: Blush and Dusty Pink Editorial With Multiply-Blended Product Photography.",
+        "promptText": "Generate a standalone HTML5 hero section for \"Animated Didone Landing Page: Blush and Dusty Pink Editorial With Multiply-Blended Product Photography\" using Tailwind CSS via CDN. Output pure HTML with class=\"...\", zero JSX or TSX.",
+        "tailwindSnippet": "<!-- 1. Focal Layout for Animated Didone Landing Page: Blush and Dusty Pink Editorial With Multiply-Blended Product Photography (HTML + Tailwind CDN) -->\n<section class=\"relative overflow-hidden py-16 sm:py-24 bg-zinc-950 text-zinc-100 antialiased font-sans\">\n  <div class=\"max-w-7xl mx-auto px-6 lg:px-8\">\n    <div class=\"text-center max-w-3xl mx-auto\">\n      <span class=\"inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-900 border border-zinc-800 text-zinc-300\">\n        <i data-lucide=\"sparkles\" class=\"w-3.5 h-3.5 text-zinc-400\"></i>\n        <span>LANDING PAGE</span>\n      </span>\n      <h1 class=\"mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-display\">\n        Animated Didone Landing Page: Blush and Dusty Pink Editorial With Multiply-Blended Product Photography\n      </h1>\n      <p class=\"mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed\">\n        Production-grade Animated Didone Landing Page: Blush and Dusty Pink Editorial With Multiply-Blended Product Photography standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.\n      </p>\n    </div>\n  </div>\n</section>"
+      },
+      {
+        "id": "sec-38-2",
+        "name": "Interactive Feature Matrix",
+        "badge": "HTML5 GRID",
+        "description": "Responsive 3-column card grid with hover transitions and Lucide icons.",
+        "promptText": "Build a pure HTML5 3-column feature grid for \"Animated Didone Landing Page: Blush and Dusty Pink Editorial With Multiply-Blended Product Photography\" with Tailwind CDN utility classes and Lucide icons.",
+        "tailwindSnippet": "<!-- 2. Interactive Feature Matrix (HTML + Tailwind CDN) -->\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-6 py-12\">\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"zap\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Zero Build Lag</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Runs instantly in any browser via Tailwind CSS CDN script.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"layers\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Pure HTML & CSS</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Zero JSX or Node.js runtime required. Copy, paste and deploy.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"sparkles\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Micro-Interactions</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Smooth hover elevations and accessible keyboard focus outlines.</p>\n  </div>\n</div>"
+      },
+      {
+        "id": "sec-38-3",
+        "name": "Action & Conversion Trigger",
+        "badge": "HTML5 CTA",
+        "description": "Stand-alone call-to-action block with high-contrast buttons.",
+        "promptText": "Create an instant HTML5 CTA conversion block for \"Animated Didone Landing Page: Blush and Dusty Pink Editorial With Multiply-Blended Product Photography\" with pure Tailwind CSS CDN classes.",
+        "tailwindSnippet": "<!-- 3. Conversion Trigger Action (HTML + Tailwind CDN) -->\n<div class=\"max-w-2xl mx-auto px-6 py-8 text-center\">\n  <div class=\"rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8\">\n    <h3 class=\"text-lg font-bold text-white mb-2\">Experience Animated Didone Landing Page</h3>\n    <p class=\"text-xs text-zinc-400 mb-6\">Open the standalone HTML template in your browser or paste into your project.</p>\n    <div class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-zinc-950 text-xs font-semibold hover:bg-zinc-100 transition-all\">\n        Launch Template\n      </button>\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold hover:bg-zinc-700 transition-all\">\n        Copy HTML Code\n      </button>\n    </div>\n  </div>\n</div>"
+      }
+    ],
+    "features": [
+      "100% Pure Standalone HTML5 + Tailwind CSS via CDN",
+      "Zero JSX, TSX, React, or npm dependencies required",
+      "Double-click to preview instantly in any browser",
+      "1-Click AI Master Prompt optimized for Cursor & Claude"
+    ],
+    "toolsReplaced": [
+      {
+        "name": "UI Component Subscriptions",
+        "monthlyCostUSD": 29
+      },
+      {
+        "name": "Custom Animation Design",
+        "monthlyCostUSD": 99
+      },
+      {
+        "name": "Design Token Kits",
+        "monthlyCostUSD": 49
+      }
+    ],
+    "frameworkStack": [
+      "HTML5",
+      "Tailwind CSS (CDN)",
+      "Vanilla JS / Alpine.js",
+      "Lucide Icons (CDN)",
+      "GSAP (CDN)"
+    ],
+    "quickCopyPrompt": "You are an expert Frontend Engineer. Build a complete, production-ready, standalone HTML5 template for \"Animated Didone Landing Page: Blush and Dusty Pink Editorial With Multiply-Blended Product Photography\".\n\n### CRITICAL OUTPUT FORMAT REQUIREMENTS:\n- **Output ONLY single-file standard HTML (`<!DOCTYPE html> ... </html>`)**.\n- **STRICT PROHIBITION**: Do NOT output JSX, TSX, React components, Next.js code, or npm import statements. Everything must be pure HTML + CSS + JS in one file.\n- **Tailwind CSS via CDN**: Include `<script src=\"https://cdn.tailwindcss.com\"></script>` in `<head>`.\n- **Icons**: Load Lucide Icons via CDN `<script src=\"https://unpkg.com/lucide@latest\"></script>` and initialize with `<script>lucide.createIcons();</script>`.\n- **Fonts**: Load Google Fonts `Inter` and `JetBrains Mono`.\n- **Interactive Animations**: Use vanilla JavaScript or GSAP via CDN (`<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js\"></script>`) embedded inside `<script>` tags at the bottom.\n\n### Component & Design Specifications:\n1. **Design System & Palette**:\n   - Monochromatic Notion/Shopify aesthetic (neutral zinc-900 / zinc-950 dark, zinc-50 / pure white light).\n   - High precision typography with crisp contrast, clean borders (`border-zinc-200` / `border-zinc-800`), and soft shadows.\n2. **Component Architecture for \"Animated Didone Landing Page: Blush and Dusty Pink Editorial With Multiply-Blended Product Photography\"**:\n   - Master layout container with mobile, tablet, and desktop responsiveness.\n   - Micro-interactions on buttons, hover states, and smooth spring-like transitions.\n3. **Stand-Alone Portability**:\n   - Must open directly and render flawlessly by double clicking the `.html` file in any web browser.\n\nComponent: Animated Didone Landing Page: Blush and Dusty Pink Editorial With Multiply-Blended Product Photography\nCategory: Landing Page",
+    "faqs": [
+      {
+        "question": "What is the output format of this prompt?",
+        "answer": "All prompts produce standard, single-file HTML5 templates styled with Tailwind CSS via CDN (<script src=\"https://cdn.tailwindcss.com\"></script>). No JSX, React, or build setups required."
+      },
+      {
+        "question": "How do I run and test the output HTML?",
+        "answer": "Copy the AI output, save it into a file named index.html, and double-click to open it in Chrome, Safari, or Firefox. It renders instantly without compiling."
+      },
+      {
+        "question": "Can I paste this HTML into WordPress, Webflow, or custom sites?",
+        "answer": "Yes! Because the template outputs standard HTML and loads Tailwind CSS via CDN, you can paste it directly into HTML embed blocks or standalone static sites."
+      }
+    ]
+  },
+  {
+    "id": "tmpl-39",
+    "slug": "card-swap",
+    "title": "Card Swap",
+    "shortTitle": "Card Swap",
+    "tagline": "Production-grade Card Swap standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.",
+    "category": "lovable_projects",
+    "categoryLabel": "Interactive & Animation",
+    "assetFormat": "lovable_project",
+    "formatBadge": "HTML + TAILWIND CDN",
+    "badge": "STANDALONE HTML",
+    "rating": 4.98,
+    "reviewsCount": 73,
+    "downloadsCount": 1179,
+    "viewsCount": 2577,
+    "copiesCount": 760,
+    "mediaType": "video",
+    "mediaUrl": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/preview-artifacts/prompt-library/7d97ebb3-363d-49d3-a029-fa9a23815e3f/thumbnails/95796f7a-9c86-427a-b9b7-42789194ddf6.mp4",
+    "heroDescription": "Build and preview Card Swap instantly. Engineered as a complete standalone HTML document using Tailwind CSS via CDN (`<script src=\"https://cdn.tailwindcss.com\"></script>`), pure CSS/vanilla JS interactions, and zero build tool bloat. Perfect for Cursor AI, Claude 3.5 Sonnet, and direct browser execution.",
+    "accentBg": "bg-zinc-950",
+    "accentBorder": "border-zinc-800",
+    "accentText": "text-zinc-100",
+    "accentColor": "#09090b",
+    "coverImage": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/preview-artifacts/prompt-library/7d97ebb3-363d-49d3-a029-fa9a23815e3f/thumbnails/95796f7a-9c86-427a-b9b7-42789194ddf6.mp4",
+    "compatibleBuilders": [
+      "HTML5 Standalone",
+      "Tailwind CSS CDN",
+      "Claude 3.5 Sonnet",
+      "Cursor AI",
+      "v0",
+      "Lovable"
+    ],
+    "sectionsIncluded": [
+      {
+        "id": "sec-39-1",
+        "name": "Focal Layout Architecture",
+        "badge": "HTML5 HERO",
+        "description": "Main hero structure and typography for Card Swap.",
+        "promptText": "Generate a standalone HTML5 hero section for \"Card Swap\" using Tailwind CSS via CDN. Output pure HTML with class=\"...\", zero JSX or TSX.",
+        "tailwindSnippet": "<!-- 1. Focal Layout for Card Swap (HTML + Tailwind CDN) -->\n<section class=\"relative overflow-hidden py-16 sm:py-24 bg-zinc-950 text-zinc-100 antialiased font-sans\">\n  <div class=\"max-w-7xl mx-auto px-6 lg:px-8\">\n    <div class=\"text-center max-w-3xl mx-auto\">\n      <span class=\"inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-900 border border-zinc-800 text-zinc-300\">\n        <i data-lucide=\"sparkles\" class=\"w-3.5 h-3.5 text-zinc-400\"></i>\n        <span>INTERACTIVE & ANIMATION</span>\n      </span>\n      <h1 class=\"mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-display\">\n        Card Swap\n      </h1>\n      <p class=\"mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed\">\n        Production-grade Card Swap standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.\n      </p>\n    </div>\n  </div>\n</section>"
+      },
+      {
+        "id": "sec-39-2",
+        "name": "Interactive Feature Matrix",
+        "badge": "HTML5 GRID",
+        "description": "Responsive 3-column card grid with hover transitions and Lucide icons.",
+        "promptText": "Build a pure HTML5 3-column feature grid for \"Card Swap\" with Tailwind CDN utility classes and Lucide icons.",
+        "tailwindSnippet": "<!-- 2. Interactive Feature Matrix (HTML + Tailwind CDN) -->\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-6 py-12\">\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"zap\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Zero Build Lag</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Runs instantly in any browser via Tailwind CSS CDN script.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"layers\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Pure HTML & CSS</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Zero JSX or Node.js runtime required. Copy, paste and deploy.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"sparkles\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Micro-Interactions</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Smooth hover elevations and accessible keyboard focus outlines.</p>\n  </div>\n</div>"
+      },
+      {
+        "id": "sec-39-3",
+        "name": "Action & Conversion Trigger",
+        "badge": "HTML5 CTA",
+        "description": "Stand-alone call-to-action block with high-contrast buttons.",
+        "promptText": "Create an instant HTML5 CTA conversion block for \"Card Swap\" with pure Tailwind CSS CDN classes.",
+        "tailwindSnippet": "<!-- 3. Conversion Trigger Action (HTML + Tailwind CDN) -->\n<div class=\"max-w-2xl mx-auto px-6 py-8 text-center\">\n  <div class=\"rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8\">\n    <h3 class=\"text-lg font-bold text-white mb-2\">Experience Card Swap</h3>\n    <p class=\"text-xs text-zinc-400 mb-6\">Open the standalone HTML template in your browser or paste into your project.</p>\n    <div class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-zinc-950 text-xs font-semibold hover:bg-zinc-100 transition-all\">\n        Launch Template\n      </button>\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold hover:bg-zinc-700 transition-all\">\n        Copy HTML Code\n      </button>\n    </div>\n  </div>\n</div>"
+      }
+    ],
+    "features": [
+      "100% Pure Standalone HTML5 + Tailwind CSS via CDN",
+      "Zero JSX, TSX, React, or npm dependencies required",
+      "Double-click to preview instantly in any browser",
+      "1-Click AI Master Prompt optimized for Cursor & Claude"
+    ],
+    "toolsReplaced": [
+      {
+        "name": "UI Component Subscriptions",
+        "monthlyCostUSD": 29
+      },
+      {
+        "name": "Custom Animation Design",
+        "monthlyCostUSD": 99
+      },
+      {
+        "name": "Design Token Kits",
+        "monthlyCostUSD": 49
+      }
+    ],
+    "frameworkStack": [
+      "HTML5",
+      "Tailwind CSS (CDN)",
+      "Vanilla JS / Alpine.js",
+      "Lucide Icons (CDN)",
+      "GSAP (CDN)"
+    ],
+    "quickCopyPrompt": "You are an expert Frontend Engineer. Build a complete, production-ready, standalone HTML5 template for \"Card Swap\".\n\n### CRITICAL OUTPUT FORMAT REQUIREMENTS:\n- **Output ONLY single-file standard HTML (`<!DOCTYPE html> ... </html>`)**.\n- **STRICT PROHIBITION**: Do NOT output JSX, TSX, React components, Next.js code, or npm import statements. Everything must be pure HTML + CSS + JS in one file.\n- **Tailwind CSS via CDN**: Include `<script src=\"https://cdn.tailwindcss.com\"></script>` in `<head>`.\n- **Icons**: Load Lucide Icons via CDN `<script src=\"https://unpkg.com/lucide@latest\"></script>` and initialize with `<script>lucide.createIcons();</script>`.\n- **Fonts**: Load Google Fonts `Inter` and `JetBrains Mono`.\n- **Interactive Animations**: Use vanilla JavaScript or GSAP via CDN (`<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js\"></script>`) embedded inside `<script>` tags at the bottom.\n\n### Component & Design Specifications:\n1. **Design System & Palette**:\n   - Monochromatic Notion/Shopify aesthetic (neutral zinc-900 / zinc-950 dark, zinc-50 / pure white light).\n   - High precision typography with crisp contrast, clean borders (`border-zinc-200` / `border-zinc-800`), and soft shadows.\n2. **Component Architecture for \"Card Swap\"**:\n   - Master layout container with mobile, tablet, and desktop responsiveness.\n   - Micro-interactions on buttons, hover states, and smooth spring-like transitions.\n3. **Stand-Alone Portability**:\n   - Must open directly and render flawlessly by double clicking the `.html` file in any web browser.\n\nComponent: Card Swap\nCategory: Interactive & Animation",
+    "faqs": [
+      {
+        "question": "What is the output format of this prompt?",
+        "answer": "All prompts produce standard, single-file HTML5 templates styled with Tailwind CSS via CDN (<script src=\"https://cdn.tailwindcss.com\"></script>). No JSX, React, or build setups required."
+      },
+      {
+        "question": "How do I run and test the output HTML?",
+        "answer": "Copy the AI output, save it into a file named index.html, and double-click to open it in Chrome, Safari, or Firefox. It renders instantly without compiling."
+      },
+      {
+        "question": "Can I paste this HTML into WordPress, Webflow, or custom sites?",
+        "answer": "Yes! Because the template outputs standard HTML and loads Tailwind CSS via CDN, you can paste it directly into HTML embed blocks or standalone static sites."
+      }
+    ]
+  },
+  {
+    "id": "tmpl-40",
+    "slug": "animated-scroll-pinned-webgl-ribbon-hero-dark-indigo-ai-audio-landing-page",
+    "title": "Animated Scroll-Pinned WebGL Ribbon Hero: Dark Indigo AI Audio Landing Page",
+    "shortTitle": "Animated Scroll-Pinned WebGL R...",
+    "tagline": "Production-grade Animated Scroll-Pinned WebGL Ribbon Hero: Dark Indigo AI Audio Landing Page standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.",
+    "category": "landing_pages",
+    "categoryLabel": "Landing Page",
+    "assetFormat": "native_page",
+    "formatBadge": "HTML + TAILWIND CDN",
+    "badge": "HERO SYSTEM",
+    "rating": 4.91,
+    "reviewsCount": 106,
+    "downloadsCount": 2359,
+    "viewsCount": 4849,
+    "copiesCount": 935,
+    "mediaType": "image",
+    "mediaUrl": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/preview-artifacts/prompt-library/7d97ebb3-363d-49d3-a029-fa9a23815e3f/thumbnails/d74130c6-cd7d-44c5-9c18-36c772a66bae.png?width=600&quality=75&resize=contain",
+    "heroDescription": "Build and preview Animated Scroll-Pinned WebGL Ribbon Hero: Dark Indigo AI Audio Landing Page instantly. Engineered as a complete standalone HTML document using Tailwind CSS via CDN (`<script src=\"https://cdn.tailwindcss.com\"></script>`), pure CSS/vanilla JS interactions, and zero build tool bloat. Perfect for Cursor AI, Claude 3.5 Sonnet, and direct browser execution.",
+    "accentBg": "bg-zinc-950",
+    "accentBorder": "border-zinc-800",
+    "accentText": "text-zinc-100",
+    "accentColor": "#09090b",
+    "coverImage": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/preview-artifacts/prompt-library/7d97ebb3-363d-49d3-a029-fa9a23815e3f/thumbnails/d74130c6-cd7d-44c5-9c18-36c772a66bae.png?width=600&quality=75&resize=contain",
+    "compatibleBuilders": [
+      "HTML5 Standalone",
+      "Tailwind CSS CDN",
+      "Claude 3.5 Sonnet",
+      "Cursor AI",
+      "v0",
+      "Lovable"
+    ],
+    "sectionsIncluded": [
+      {
+        "id": "sec-40-1",
+        "name": "Focal Layout Architecture",
+        "badge": "HTML5 HERO",
+        "description": "Main hero structure and typography for Animated Scroll-Pinned WebGL Ribbon Hero: Dark Indigo AI Audio Landing Page.",
+        "promptText": "Generate a standalone HTML5 hero section for \"Animated Scroll-Pinned WebGL Ribbon Hero: Dark Indigo AI Audio Landing Page\" using Tailwind CSS via CDN. Output pure HTML with class=\"...\", zero JSX or TSX.",
+        "tailwindSnippet": "<!-- 1. Focal Layout for Animated Scroll-Pinned WebGL Ribbon Hero: Dark Indigo AI Audio Landing Page (HTML + Tailwind CDN) -->\n<section class=\"relative overflow-hidden py-16 sm:py-24 bg-zinc-950 text-zinc-100 antialiased font-sans\">\n  <div class=\"max-w-7xl mx-auto px-6 lg:px-8\">\n    <div class=\"text-center max-w-3xl mx-auto\">\n      <span class=\"inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-900 border border-zinc-800 text-zinc-300\">\n        <i data-lucide=\"sparkles\" class=\"w-3.5 h-3.5 text-zinc-400\"></i>\n        <span>LANDING PAGE</span>\n      </span>\n      <h1 class=\"mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-display\">\n        Animated Scroll-Pinned WebGL Ribbon Hero: Dark Indigo AI Audio Landing Page\n      </h1>\n      <p class=\"mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed\">\n        Production-grade Animated Scroll-Pinned WebGL Ribbon Hero: Dark Indigo AI Audio Landing Page standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.\n      </p>\n    </div>\n  </div>\n</section>"
+      },
+      {
+        "id": "sec-40-2",
+        "name": "Interactive Feature Matrix",
+        "badge": "HTML5 GRID",
+        "description": "Responsive 3-column card grid with hover transitions and Lucide icons.",
+        "promptText": "Build a pure HTML5 3-column feature grid for \"Animated Scroll-Pinned WebGL Ribbon Hero: Dark Indigo AI Audio Landing Page\" with Tailwind CDN utility classes and Lucide icons.",
+        "tailwindSnippet": "<!-- 2. Interactive Feature Matrix (HTML + Tailwind CDN) -->\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-6 py-12\">\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"zap\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Zero Build Lag</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Runs instantly in any browser via Tailwind CSS CDN script.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"layers\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Pure HTML & CSS</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Zero JSX or Node.js runtime required. Copy, paste and deploy.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"sparkles\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Micro-Interactions</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Smooth hover elevations and accessible keyboard focus outlines.</p>\n  </div>\n</div>"
+      },
+      {
+        "id": "sec-40-3",
+        "name": "Action & Conversion Trigger",
+        "badge": "HTML5 CTA",
+        "description": "Stand-alone call-to-action block with high-contrast buttons.",
+        "promptText": "Create an instant HTML5 CTA conversion block for \"Animated Scroll-Pinned WebGL Ribbon Hero: Dark Indigo AI Audio Landing Page\" with pure Tailwind CSS CDN classes.",
+        "tailwindSnippet": "<!-- 3. Conversion Trigger Action (HTML + Tailwind CDN) -->\n<div class=\"max-w-2xl mx-auto px-6 py-8 text-center\">\n  <div class=\"rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8\">\n    <h3 class=\"text-lg font-bold text-white mb-2\">Experience Animated Scroll-Pinned WebGL R...</h3>\n    <p class=\"text-xs text-zinc-400 mb-6\">Open the standalone HTML template in your browser or paste into your project.</p>\n    <div class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-zinc-950 text-xs font-semibold hover:bg-zinc-100 transition-all\">\n        Launch Template\n      </button>\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold hover:bg-zinc-700 transition-all\">\n        Copy HTML Code\n      </button>\n    </div>\n  </div>\n</div>"
+      }
+    ],
+    "features": [
+      "100% Pure Standalone HTML5 + Tailwind CSS via CDN",
+      "Zero JSX, TSX, React, or npm dependencies required",
+      "Double-click to preview instantly in any browser",
+      "1-Click AI Master Prompt optimized for Cursor & Claude"
+    ],
+    "toolsReplaced": [
+      {
+        "name": "UI Component Subscriptions",
+        "monthlyCostUSD": 29
+      },
+      {
+        "name": "Custom Animation Design",
+        "monthlyCostUSD": 99
+      },
+      {
+        "name": "Design Token Kits",
+        "monthlyCostUSD": 49
+      }
+    ],
+    "frameworkStack": [
+      "HTML5",
+      "Tailwind CSS (CDN)",
+      "Vanilla JS / Alpine.js",
+      "Lucide Icons (CDN)",
+      "GSAP (CDN)"
+    ],
+    "quickCopyPrompt": "You are an expert Frontend Engineer. Build a complete, production-ready, standalone HTML5 template for \"Animated Scroll-Pinned WebGL Ribbon Hero: Dark Indigo AI Audio Landing Page\".\n\n### CRITICAL OUTPUT FORMAT REQUIREMENTS:\n- **Output ONLY single-file standard HTML (`<!DOCTYPE html> ... </html>`)**.\n- **STRICT PROHIBITION**: Do NOT output JSX, TSX, React components, Next.js code, or npm import statements. Everything must be pure HTML + CSS + JS in one file.\n- **Tailwind CSS via CDN**: Include `<script src=\"https://cdn.tailwindcss.com\"></script>` in `<head>`.\n- **Icons**: Load Lucide Icons via CDN `<script src=\"https://unpkg.com/lucide@latest\"></script>` and initialize with `<script>lucide.createIcons();</script>`.\n- **Fonts**: Load Google Fonts `Inter` and `JetBrains Mono`.\n- **Interactive Animations**: Use vanilla JavaScript or GSAP via CDN (`<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js\"></script>`) embedded inside `<script>` tags at the bottom.\n\n### Component & Design Specifications:\n1. **Design System & Palette**:\n   - Monochromatic Notion/Shopify aesthetic (neutral zinc-900 / zinc-950 dark, zinc-50 / pure white light).\n   - High precision typography with crisp contrast, clean borders (`border-zinc-200` / `border-zinc-800`), and soft shadows.\n2. **Component Architecture for \"Animated Scroll-Pinned WebGL Ribbon Hero: Dark Indigo AI Audio Landing Page\"**:\n   - Master layout container with mobile, tablet, and desktop responsiveness.\n   - Micro-interactions on buttons, hover states, and smooth spring-like transitions.\n3. **Stand-Alone Portability**:\n   - Must open directly and render flawlessly by double clicking the `.html` file in any web browser.\n\nComponent: Animated Scroll-Pinned WebGL Ribbon Hero: Dark Indigo AI Audio Landing Page\nCategory: Landing Page",
+    "faqs": [
+      {
+        "question": "What is the output format of this prompt?",
+        "answer": "All prompts produce standard, single-file HTML5 templates styled with Tailwind CSS via CDN (<script src=\"https://cdn.tailwindcss.com\"></script>). No JSX, React, or build setups required."
+      },
+      {
+        "question": "How do I run and test the output HTML?",
+        "answer": "Copy the AI output, save it into a file named index.html, and double-click to open it in Chrome, Safari, or Firefox. It renders instantly without compiling."
+      },
+      {
+        "question": "Can I paste this HTML into WordPress, Webflow, or custom sites?",
+        "answer": "Yes! Because the template outputs standard HTML and loads Tailwind CSS via CDN, you can paste it directly into HTML embed blocks or standalone static sites."
+      }
+    ]
+  },
+  {
+    "id": "tmpl-41",
+    "slug": "hyper-speed-loading-state",
+    "title": "Hyper-Speed Loading State",
+    "shortTitle": "Hyper-Speed Loading State",
+    "tagline": "Production-grade Hyper-Speed Loading State standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.",
+    "category": "section_prompts",
+    "categoryLabel": "AI Section Prompt",
+    "assetFormat": "section_prompts",
+    "formatBadge": "HTML + TAILWIND CDN",
+    "badge": "AI MASTER PROMPT",
+    "rating": 4.97,
+    "reviewsCount": 66,
+    "downloadsCount": 1422,
+    "viewsCount": 4846,
+    "copiesCount": 800,
+    "mediaType": "image",
+    "mediaUrl": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/hmac-uploads/screenshots/drafts/76761dad-ddad-4f10-bd16-f5c71144d577/1768468296297.png?width=600&quality=75&resize=contain",
+    "heroDescription": "Build and preview Hyper-Speed Loading State instantly. Engineered as a complete standalone HTML document using Tailwind CSS via CDN (`<script src=\"https://cdn.tailwindcss.com\"></script>`), pure CSS/vanilla JS interactions, and zero build tool bloat. Perfect for Cursor AI, Claude 3.5 Sonnet, and direct browser execution.",
+    "accentBg": "bg-zinc-950",
+    "accentBorder": "border-zinc-800",
+    "accentText": "text-zinc-100",
+    "accentColor": "#09090b",
+    "coverImage": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/hmac-uploads/screenshots/drafts/76761dad-ddad-4f10-bd16-f5c71144d577/1768468296297.png?width=600&quality=75&resize=contain",
+    "compatibleBuilders": [
+      "HTML5 Standalone",
+      "Tailwind CSS CDN",
+      "Claude 3.5 Sonnet",
+      "Cursor AI",
+      "v0",
+      "Lovable"
+    ],
+    "sectionsIncluded": [
+      {
+        "id": "sec-41-1",
+        "name": "Focal Layout Architecture",
+        "badge": "HTML5 HERO",
+        "description": "Main hero structure and typography for Hyper-Speed Loading State.",
+        "promptText": "Generate a standalone HTML5 hero section for \"Hyper-Speed Loading State\" using Tailwind CSS via CDN. Output pure HTML with class=\"...\", zero JSX or TSX.",
+        "tailwindSnippet": "<!-- 1. Focal Layout for Hyper-Speed Loading State (HTML + Tailwind CDN) -->\n<section class=\"relative overflow-hidden py-16 sm:py-24 bg-zinc-950 text-zinc-100 antialiased font-sans\">\n  <div class=\"max-w-7xl mx-auto px-6 lg:px-8\">\n    <div class=\"text-center max-w-3xl mx-auto\">\n      <span class=\"inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-900 border border-zinc-800 text-zinc-300\">\n        <i data-lucide=\"sparkles\" class=\"w-3.5 h-3.5 text-zinc-400\"></i>\n        <span>AI SECTION PROMPT</span>\n      </span>\n      <h1 class=\"mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-display\">\n        Hyper-Speed Loading State\n      </h1>\n      <p class=\"mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed\">\n        Production-grade Hyper-Speed Loading State standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.\n      </p>\n    </div>\n  </div>\n</section>"
+      },
+      {
+        "id": "sec-41-2",
+        "name": "Interactive Feature Matrix",
+        "badge": "HTML5 GRID",
+        "description": "Responsive 3-column card grid with hover transitions and Lucide icons.",
+        "promptText": "Build a pure HTML5 3-column feature grid for \"Hyper-Speed Loading State\" with Tailwind CDN utility classes and Lucide icons.",
+        "tailwindSnippet": "<!-- 2. Interactive Feature Matrix (HTML + Tailwind CDN) -->\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-6 py-12\">\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"zap\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Zero Build Lag</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Runs instantly in any browser via Tailwind CSS CDN script.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"layers\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Pure HTML & CSS</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Zero JSX or Node.js runtime required. Copy, paste and deploy.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"sparkles\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Micro-Interactions</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Smooth hover elevations and accessible keyboard focus outlines.</p>\n  </div>\n</div>"
+      },
+      {
+        "id": "sec-41-3",
+        "name": "Action & Conversion Trigger",
+        "badge": "HTML5 CTA",
+        "description": "Stand-alone call-to-action block with high-contrast buttons.",
+        "promptText": "Create an instant HTML5 CTA conversion block for \"Hyper-Speed Loading State\" with pure Tailwind CSS CDN classes.",
+        "tailwindSnippet": "<!-- 3. Conversion Trigger Action (HTML + Tailwind CDN) -->\n<div class=\"max-w-2xl mx-auto px-6 py-8 text-center\">\n  <div class=\"rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8\">\n    <h3 class=\"text-lg font-bold text-white mb-2\">Experience Hyper-Speed Loading State</h3>\n    <p class=\"text-xs text-zinc-400 mb-6\">Open the standalone HTML template in your browser or paste into your project.</p>\n    <div class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-zinc-950 text-xs font-semibold hover:bg-zinc-100 transition-all\">\n        Launch Template\n      </button>\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold hover:bg-zinc-700 transition-all\">\n        Copy HTML Code\n      </button>\n    </div>\n  </div>\n</div>"
+      }
+    ],
+    "features": [
+      "100% Pure Standalone HTML5 + Tailwind CSS via CDN",
+      "Zero JSX, TSX, React, or npm dependencies required",
+      "Double-click to preview instantly in any browser",
+      "1-Click AI Master Prompt optimized for Cursor & Claude"
+    ],
+    "toolsReplaced": [
+      {
+        "name": "UI Component Subscriptions",
+        "monthlyCostUSD": 29
+      },
+      {
+        "name": "Custom Animation Design",
+        "monthlyCostUSD": 99
+      },
+      {
+        "name": "Design Token Kits",
+        "monthlyCostUSD": 49
+      }
+    ],
+    "frameworkStack": [
+      "HTML5",
+      "Tailwind CSS (CDN)",
+      "Vanilla JS / Alpine.js",
+      "Lucide Icons (CDN)",
+      "GSAP (CDN)"
+    ],
+    "quickCopyPrompt": "You are an expert Frontend Engineer. Build a complete, production-ready, standalone HTML5 template for \"Hyper-Speed Loading State\".\n\n### CRITICAL OUTPUT FORMAT REQUIREMENTS:\n- **Output ONLY single-file standard HTML (`<!DOCTYPE html> ... </html>`)**.\n- **STRICT PROHIBITION**: Do NOT output JSX, TSX, React components, Next.js code, or npm import statements. Everything must be pure HTML + CSS + JS in one file.\n- **Tailwind CSS via CDN**: Include `<script src=\"https://cdn.tailwindcss.com\"></script>` in `<head>`.\n- **Icons**: Load Lucide Icons via CDN `<script src=\"https://unpkg.com/lucide@latest\"></script>` and initialize with `<script>lucide.createIcons();</script>`.\n- **Fonts**: Load Google Fonts `Inter` and `JetBrains Mono`.\n- **Interactive Animations**: Use vanilla JavaScript or GSAP via CDN (`<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js\"></script>`) embedded inside `<script>` tags at the bottom.\n\n### Component & Design Specifications:\n1. **Design System & Palette**:\n   - Monochromatic Notion/Shopify aesthetic (neutral zinc-900 / zinc-950 dark, zinc-50 / pure white light).\n   - High precision typography with crisp contrast, clean borders (`border-zinc-200` / `border-zinc-800`), and soft shadows.\n2. **Component Architecture for \"Hyper-Speed Loading State\"**:\n   - Master layout container with mobile, tablet, and desktop responsiveness.\n   - Micro-interactions on buttons, hover states, and smooth spring-like transitions.\n3. **Stand-Alone Portability**:\n   - Must open directly and render flawlessly by double clicking the `.html` file in any web browser.\n\nComponent: Hyper-Speed Loading State\nCategory: AI Section Prompt",
+    "faqs": [
+      {
+        "question": "What is the output format of this prompt?",
+        "answer": "All prompts produce standard, single-file HTML5 templates styled with Tailwind CSS via CDN (<script src=\"https://cdn.tailwindcss.com\"></script>). No JSX, React, or build setups required."
+      },
+      {
+        "question": "How do I run and test the output HTML?",
+        "answer": "Copy the AI output, save it into a file named index.html, and double-click to open it in Chrome, Safari, or Firefox. It renders instantly without compiling."
+      },
+      {
+        "question": "Can I paste this HTML into WordPress, Webflow, or custom sites?",
+        "answer": "Yes! Because the template outputs standard HTML and loads Tailwind CSS via CDN, you can paste it directly into HTML embed blocks or standalone static sites."
+      }
+    ]
+  },
+  {
+    "id": "tmpl-42",
+    "slug": "pill-nav",
+    "title": "Pill Nav",
+    "shortTitle": "Pill Nav",
+    "tagline": "Production-grade Pill Nav standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.",
+    "category": "lovable_projects",
+    "categoryLabel": "Interactive & Animation",
+    "assetFormat": "lovable_project",
+    "formatBadge": "HTML + TAILWIND CDN",
+    "badge": "STANDALONE HTML",
+    "rating": 4.92,
+    "reviewsCount": 241,
+    "downloadsCount": 3281,
+    "viewsCount": 4592,
+    "copiesCount": 545,
+    "mediaType": "video",
+    "mediaUrl": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/preview-artifacts/prompt-library/7d97ebb3-363d-49d3-a029-fa9a23815e3f/thumbnails/0e6cc2c8-3d97-43cc-87a5-d271b3f63f33.mp4",
+    "heroDescription": "Build and preview Pill Nav instantly. Engineered as a complete standalone HTML document using Tailwind CSS via CDN (`<script src=\"https://cdn.tailwindcss.com\"></script>`), pure CSS/vanilla JS interactions, and zero build tool bloat. Perfect for Cursor AI, Claude 3.5 Sonnet, and direct browser execution.",
+    "accentBg": "bg-zinc-950",
+    "accentBorder": "border-zinc-800",
+    "accentText": "text-zinc-100",
+    "accentColor": "#09090b",
+    "coverImage": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/preview-artifacts/prompt-library/7d97ebb3-363d-49d3-a029-fa9a23815e3f/thumbnails/0e6cc2c8-3d97-43cc-87a5-d271b3f63f33.mp4",
+    "compatibleBuilders": [
+      "HTML5 Standalone",
+      "Tailwind CSS CDN",
+      "Claude 3.5 Sonnet",
+      "Cursor AI",
+      "v0",
+      "Lovable"
+    ],
+    "sectionsIncluded": [
+      {
+        "id": "sec-42-1",
+        "name": "Focal Layout Architecture",
+        "badge": "HTML5 HERO",
+        "description": "Main hero structure and typography for Pill Nav.",
+        "promptText": "Generate a standalone HTML5 hero section for \"Pill Nav\" using Tailwind CSS via CDN. Output pure HTML with class=\"...\", zero JSX or TSX.",
+        "tailwindSnippet": "<!-- 1. Focal Layout for Pill Nav (HTML + Tailwind CDN) -->\n<section class=\"relative overflow-hidden py-16 sm:py-24 bg-zinc-950 text-zinc-100 antialiased font-sans\">\n  <div class=\"max-w-7xl mx-auto px-6 lg:px-8\">\n    <div class=\"text-center max-w-3xl mx-auto\">\n      <span class=\"inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-900 border border-zinc-800 text-zinc-300\">\n        <i data-lucide=\"sparkles\" class=\"w-3.5 h-3.5 text-zinc-400\"></i>\n        <span>INTERACTIVE & ANIMATION</span>\n      </span>\n      <h1 class=\"mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-display\">\n        Pill Nav\n      </h1>\n      <p class=\"mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed\">\n        Production-grade Pill Nav standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.\n      </p>\n    </div>\n  </div>\n</section>"
+      },
+      {
+        "id": "sec-42-2",
+        "name": "Interactive Feature Matrix",
+        "badge": "HTML5 GRID",
+        "description": "Responsive 3-column card grid with hover transitions and Lucide icons.",
+        "promptText": "Build a pure HTML5 3-column feature grid for \"Pill Nav\" with Tailwind CDN utility classes and Lucide icons.",
+        "tailwindSnippet": "<!-- 2. Interactive Feature Matrix (HTML + Tailwind CDN) -->\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-6 py-12\">\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"zap\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Zero Build Lag</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Runs instantly in any browser via Tailwind CSS CDN script.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"layers\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Pure HTML & CSS</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Zero JSX or Node.js runtime required. Copy, paste and deploy.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"sparkles\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Micro-Interactions</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Smooth hover elevations and accessible keyboard focus outlines.</p>\n  </div>\n</div>"
+      },
+      {
+        "id": "sec-42-3",
+        "name": "Action & Conversion Trigger",
+        "badge": "HTML5 CTA",
+        "description": "Stand-alone call-to-action block with high-contrast buttons.",
+        "promptText": "Create an instant HTML5 CTA conversion block for \"Pill Nav\" with pure Tailwind CSS CDN classes.",
+        "tailwindSnippet": "<!-- 3. Conversion Trigger Action (HTML + Tailwind CDN) -->\n<div class=\"max-w-2xl mx-auto px-6 py-8 text-center\">\n  <div class=\"rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8\">\n    <h3 class=\"text-lg font-bold text-white mb-2\">Experience Pill Nav</h3>\n    <p class=\"text-xs text-zinc-400 mb-6\">Open the standalone HTML template in your browser or paste into your project.</p>\n    <div class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-zinc-950 text-xs font-semibold hover:bg-zinc-100 transition-all\">\n        Launch Template\n      </button>\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold hover:bg-zinc-700 transition-all\">\n        Copy HTML Code\n      </button>\n    </div>\n  </div>\n</div>"
+      }
+    ],
+    "features": [
+      "100% Pure Standalone HTML5 + Tailwind CSS via CDN",
+      "Zero JSX, TSX, React, or npm dependencies required",
+      "Double-click to preview instantly in any browser",
+      "1-Click AI Master Prompt optimized for Cursor & Claude"
+    ],
+    "toolsReplaced": [
+      {
+        "name": "UI Component Subscriptions",
+        "monthlyCostUSD": 29
+      },
+      {
+        "name": "Custom Animation Design",
+        "monthlyCostUSD": 99
+      },
+      {
+        "name": "Design Token Kits",
+        "monthlyCostUSD": 49
+      }
+    ],
+    "frameworkStack": [
+      "HTML5",
+      "Tailwind CSS (CDN)",
+      "Vanilla JS / Alpine.js",
+      "Lucide Icons (CDN)",
+      "GSAP (CDN)"
+    ],
+    "quickCopyPrompt": "You are an expert Frontend Engineer. Build a complete, production-ready, standalone HTML5 template for \"Pill Nav\".\n\n### CRITICAL OUTPUT FORMAT REQUIREMENTS:\n- **Output ONLY single-file standard HTML (`<!DOCTYPE html> ... </html>`)**.\n- **STRICT PROHIBITION**: Do NOT output JSX, TSX, React components, Next.js code, or npm import statements. Everything must be pure HTML + CSS + JS in one file.\n- **Tailwind CSS via CDN**: Include `<script src=\"https://cdn.tailwindcss.com\"></script>` in `<head>`.\n- **Icons**: Load Lucide Icons via CDN `<script src=\"https://unpkg.com/lucide@latest\"></script>` and initialize with `<script>lucide.createIcons();</script>`.\n- **Fonts**: Load Google Fonts `Inter` and `JetBrains Mono`.\n- **Interactive Animations**: Use vanilla JavaScript or GSAP via CDN (`<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js\"></script>`) embedded inside `<script>` tags at the bottom.\n\n### Component & Design Specifications:\n1. **Design System & Palette**:\n   - Monochromatic Notion/Shopify aesthetic (neutral zinc-900 / zinc-950 dark, zinc-50 / pure white light).\n   - High precision typography with crisp contrast, clean borders (`border-zinc-200` / `border-zinc-800`), and soft shadows.\n2. **Component Architecture for \"Pill Nav\"**:\n   - Master layout container with mobile, tablet, and desktop responsiveness.\n   - Micro-interactions on buttons, hover states, and smooth spring-like transitions.\n3. **Stand-Alone Portability**:\n   - Must open directly and render flawlessly by double clicking the `.html` file in any web browser.\n\nComponent: Pill Nav\nCategory: Interactive & Animation",
+    "faqs": [
+      {
+        "question": "What is the output format of this prompt?",
+        "answer": "All prompts produce standard, single-file HTML5 templates styled with Tailwind CSS via CDN (<script src=\"https://cdn.tailwindcss.com\"></script>). No JSX, React, or build setups required."
+      },
+      {
+        "question": "How do I run and test the output HTML?",
+        "answer": "Copy the AI output, save it into a file named index.html, and double-click to open it in Chrome, Safari, or Firefox. It renders instantly without compiling."
+      },
+      {
+        "question": "Can I paste this HTML into WordPress, Webflow, or custom sites?",
+        "answer": "Yes! Because the template outputs standard HTML and loads Tailwind CSS via CDN, you can paste it directly into HTML embed blocks or standalone static sites."
+      }
+    ]
+  },
+  {
+    "id": "tmpl-43",
+    "slug": "testimonial",
+    "title": "Testimonial",
+    "shortTitle": "Testimonial",
+    "tagline": "Production-grade Testimonial standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.",
+    "category": "lovable_projects",
+    "categoryLabel": "Interactive & Animation",
+    "assetFormat": "lovable_project",
+    "formatBadge": "HTML + TAILWIND CDN",
+    "badge": "STANDALONE HTML",
+    "rating": 4.93,
+    "reviewsCount": 87,
+    "downloadsCount": 3351,
+    "viewsCount": 3952,
+    "copiesCount": 753,
+    "mediaType": "image",
+    "mediaUrl": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/hmac-uploads/screenshots/components/29d400b1-7278-456b-8771-1b25f5ffb582/1daae677-3c3f-424f-bd09-8b0822659842/1767230681166.png?width=600&quality=75&resize=contain",
+    "heroDescription": "Build and preview Testimonial instantly. Engineered as a complete standalone HTML document using Tailwind CSS via CDN (`<script src=\"https://cdn.tailwindcss.com\"></script>`), pure CSS/vanilla JS interactions, and zero build tool bloat. Perfect for Cursor AI, Claude 3.5 Sonnet, and direct browser execution.",
+    "accentBg": "bg-zinc-950",
+    "accentBorder": "border-zinc-800",
+    "accentText": "text-zinc-100",
+    "accentColor": "#09090b",
+    "coverImage": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/hmac-uploads/screenshots/components/29d400b1-7278-456b-8771-1b25f5ffb582/1daae677-3c3f-424f-bd09-8b0822659842/1767230681166.png?width=600&quality=75&resize=contain",
+    "compatibleBuilders": [
+      "HTML5 Standalone",
+      "Tailwind CSS CDN",
+      "Claude 3.5 Sonnet",
+      "Cursor AI",
+      "v0",
+      "Lovable"
+    ],
+    "sectionsIncluded": [
+      {
+        "id": "sec-43-1",
+        "name": "Focal Layout Architecture",
+        "badge": "HTML5 HERO",
+        "description": "Main hero structure and typography for Testimonial.",
+        "promptText": "Generate a standalone HTML5 hero section for \"Testimonial\" using Tailwind CSS via CDN. Output pure HTML with class=\"...\", zero JSX or TSX.",
+        "tailwindSnippet": "<!-- 1. Focal Layout for Testimonial (HTML + Tailwind CDN) -->\n<section class=\"relative overflow-hidden py-16 sm:py-24 bg-zinc-950 text-zinc-100 antialiased font-sans\">\n  <div class=\"max-w-7xl mx-auto px-6 lg:px-8\">\n    <div class=\"text-center max-w-3xl mx-auto\">\n      <span class=\"inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-900 border border-zinc-800 text-zinc-300\">\n        <i data-lucide=\"sparkles\" class=\"w-3.5 h-3.5 text-zinc-400\"></i>\n        <span>INTERACTIVE & ANIMATION</span>\n      </span>\n      <h1 class=\"mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-display\">\n        Testimonial\n      </h1>\n      <p class=\"mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed\">\n        Production-grade Testimonial standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.\n      </p>\n    </div>\n  </div>\n</section>"
+      },
+      {
+        "id": "sec-43-2",
+        "name": "Interactive Feature Matrix",
+        "badge": "HTML5 GRID",
+        "description": "Responsive 3-column card grid with hover transitions and Lucide icons.",
+        "promptText": "Build a pure HTML5 3-column feature grid for \"Testimonial\" with Tailwind CDN utility classes and Lucide icons.",
+        "tailwindSnippet": "<!-- 2. Interactive Feature Matrix (HTML + Tailwind CDN) -->\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-6 py-12\">\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"zap\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Zero Build Lag</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Runs instantly in any browser via Tailwind CSS CDN script.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"layers\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Pure HTML & CSS</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Zero JSX or Node.js runtime required. Copy, paste and deploy.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"sparkles\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Micro-Interactions</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Smooth hover elevations and accessible keyboard focus outlines.</p>\n  </div>\n</div>"
+      },
+      {
+        "id": "sec-43-3",
+        "name": "Action & Conversion Trigger",
+        "badge": "HTML5 CTA",
+        "description": "Stand-alone call-to-action block with high-contrast buttons.",
+        "promptText": "Create an instant HTML5 CTA conversion block for \"Testimonial\" with pure Tailwind CSS CDN classes.",
+        "tailwindSnippet": "<!-- 3. Conversion Trigger Action (HTML + Tailwind CDN) -->\n<div class=\"max-w-2xl mx-auto px-6 py-8 text-center\">\n  <div class=\"rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8\">\n    <h3 class=\"text-lg font-bold text-white mb-2\">Experience Testimonial</h3>\n    <p class=\"text-xs text-zinc-400 mb-6\">Open the standalone HTML template in your browser or paste into your project.</p>\n    <div class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-zinc-950 text-xs font-semibold hover:bg-zinc-100 transition-all\">\n        Launch Template\n      </button>\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold hover:bg-zinc-700 transition-all\">\n        Copy HTML Code\n      </button>\n    </div>\n  </div>\n</div>"
+      }
+    ],
+    "features": [
+      "100% Pure Standalone HTML5 + Tailwind CSS via CDN",
+      "Zero JSX, TSX, React, or npm dependencies required",
+      "Double-click to preview instantly in any browser",
+      "1-Click AI Master Prompt optimized for Cursor & Claude"
+    ],
+    "toolsReplaced": [
+      {
+        "name": "UI Component Subscriptions",
+        "monthlyCostUSD": 29
+      },
+      {
+        "name": "Custom Animation Design",
+        "monthlyCostUSD": 99
+      },
+      {
+        "name": "Design Token Kits",
+        "monthlyCostUSD": 49
+      }
+    ],
+    "frameworkStack": [
+      "HTML5",
+      "Tailwind CSS (CDN)",
+      "Vanilla JS / Alpine.js",
+      "Lucide Icons (CDN)",
+      "GSAP (CDN)"
+    ],
+    "quickCopyPrompt": "You are an expert Frontend Engineer. Build a complete, production-ready, standalone HTML5 template for \"Testimonial\".\n\n### CRITICAL OUTPUT FORMAT REQUIREMENTS:\n- **Output ONLY single-file standard HTML (`<!DOCTYPE html> ... </html>`)**.\n- **STRICT PROHIBITION**: Do NOT output JSX, TSX, React components, Next.js code, or npm import statements. Everything must be pure HTML + CSS + JS in one file.\n- **Tailwind CSS via CDN**: Include `<script src=\"https://cdn.tailwindcss.com\"></script>` in `<head>`.\n- **Icons**: Load Lucide Icons via CDN `<script src=\"https://unpkg.com/lucide@latest\"></script>` and initialize with `<script>lucide.createIcons();</script>`.\n- **Fonts**: Load Google Fonts `Inter` and `JetBrains Mono`.\n- **Interactive Animations**: Use vanilla JavaScript or GSAP via CDN (`<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js\"></script>`) embedded inside `<script>` tags at the bottom.\n\n### Component & Design Specifications:\n1. **Design System & Palette**:\n   - Monochromatic Notion/Shopify aesthetic (neutral zinc-900 / zinc-950 dark, zinc-50 / pure white light).\n   - High precision typography with crisp contrast, clean borders (`border-zinc-200` / `border-zinc-800`), and soft shadows.\n2. **Component Architecture for \"Testimonial\"**:\n   - Master layout container with mobile, tablet, and desktop responsiveness.\n   - Micro-interactions on buttons, hover states, and smooth spring-like transitions.\n3. **Stand-Alone Portability**:\n   - Must open directly and render flawlessly by double clicking the `.html` file in any web browser.\n\nComponent: Testimonial\nCategory: Interactive & Animation",
+    "faqs": [
+      {
+        "question": "What is the output format of this prompt?",
+        "answer": "All prompts produce standard, single-file HTML5 templates styled with Tailwind CSS via CDN (<script src=\"https://cdn.tailwindcss.com\"></script>). No JSX, React, or build setups required."
+      },
+      {
+        "question": "How do I run and test the output HTML?",
+        "answer": "Copy the AI output, save it into a file named index.html, and double-click to open it in Chrome, Safari, or Firefox. It renders instantly without compiling."
+      },
+      {
+        "question": "Can I paste this HTML into WordPress, Webflow, or custom sites?",
+        "answer": "Yes! Because the template outputs standard HTML and loads Tailwind CSS via CDN, you can paste it directly into HTML embed blocks or standalone static sites."
+      }
+    ]
+  },
+  {
+    "id": "tmpl-44",
+    "slug": "magnification-dock",
+    "title": "Magnification Dock",
+    "shortTitle": "Magnification Dock",
+    "tagline": "Production-grade Magnification Dock standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.",
+    "category": "lovable_projects",
+    "categoryLabel": "Interactive & Animation",
+    "assetFormat": "lovable_project",
+    "formatBadge": "HTML + TAILWIND CDN",
+    "badge": "STANDALONE HTML",
+    "rating": 4.98,
+    "reviewsCount": 99,
+    "downloadsCount": 2833,
+    "viewsCount": 4823,
+    "copiesCount": 820,
+    "mediaType": "video",
+    "mediaUrl": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/preview-artifacts/prompt-library/7d97ebb3-363d-49d3-a029-fa9a23815e3f/thumbnails/4f3f35f5-7136-4fa7-aad0-b827f9907130.mp4",
+    "heroDescription": "Build and preview Magnification Dock instantly. Engineered as a complete standalone HTML document using Tailwind CSS via CDN (`<script src=\"https://cdn.tailwindcss.com\"></script>`), pure CSS/vanilla JS interactions, and zero build tool bloat. Perfect for Cursor AI, Claude 3.5 Sonnet, and direct browser execution.",
+    "accentBg": "bg-zinc-950",
+    "accentBorder": "border-zinc-800",
+    "accentText": "text-zinc-100",
+    "accentColor": "#09090b",
+    "coverImage": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/preview-artifacts/prompt-library/7d97ebb3-363d-49d3-a029-fa9a23815e3f/thumbnails/4f3f35f5-7136-4fa7-aad0-b827f9907130.mp4",
+    "compatibleBuilders": [
+      "HTML5 Standalone",
+      "Tailwind CSS CDN",
+      "Claude 3.5 Sonnet",
+      "Cursor AI",
+      "v0",
+      "Lovable"
+    ],
+    "sectionsIncluded": [
+      {
+        "id": "sec-44-1",
+        "name": "Focal Layout Architecture",
+        "badge": "HTML5 HERO",
+        "description": "Main hero structure and typography for Magnification Dock.",
+        "promptText": "Generate a standalone HTML5 hero section for \"Magnification Dock\" using Tailwind CSS via CDN. Output pure HTML with class=\"...\", zero JSX or TSX.",
+        "tailwindSnippet": "<!-- 1. Focal Layout for Magnification Dock (HTML + Tailwind CDN) -->\n<section class=\"relative overflow-hidden py-16 sm:py-24 bg-zinc-950 text-zinc-100 antialiased font-sans\">\n  <div class=\"max-w-7xl mx-auto px-6 lg:px-8\">\n    <div class=\"text-center max-w-3xl mx-auto\">\n      <span class=\"inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-900 border border-zinc-800 text-zinc-300\">\n        <i data-lucide=\"sparkles\" class=\"w-3.5 h-3.5 text-zinc-400\"></i>\n        <span>INTERACTIVE & ANIMATION</span>\n      </span>\n      <h1 class=\"mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-display\">\n        Magnification Dock\n      </h1>\n      <p class=\"mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed\">\n        Production-grade Magnification Dock standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.\n      </p>\n    </div>\n  </div>\n</section>"
+      },
+      {
+        "id": "sec-44-2",
+        "name": "Interactive Feature Matrix",
+        "badge": "HTML5 GRID",
+        "description": "Responsive 3-column card grid with hover transitions and Lucide icons.",
+        "promptText": "Build a pure HTML5 3-column feature grid for \"Magnification Dock\" with Tailwind CDN utility classes and Lucide icons.",
+        "tailwindSnippet": "<!-- 2. Interactive Feature Matrix (HTML + Tailwind CDN) -->\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-6 py-12\">\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"zap\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Zero Build Lag</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Runs instantly in any browser via Tailwind CSS CDN script.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"layers\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Pure HTML & CSS</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Zero JSX or Node.js runtime required. Copy, paste and deploy.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"sparkles\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Micro-Interactions</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Smooth hover elevations and accessible keyboard focus outlines.</p>\n  </div>\n</div>"
+      },
+      {
+        "id": "sec-44-3",
+        "name": "Action & Conversion Trigger",
+        "badge": "HTML5 CTA",
+        "description": "Stand-alone call-to-action block with high-contrast buttons.",
+        "promptText": "Create an instant HTML5 CTA conversion block for \"Magnification Dock\" with pure Tailwind CSS CDN classes.",
+        "tailwindSnippet": "<!-- 3. Conversion Trigger Action (HTML + Tailwind CDN) -->\n<div class=\"max-w-2xl mx-auto px-6 py-8 text-center\">\n  <div class=\"rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8\">\n    <h3 class=\"text-lg font-bold text-white mb-2\">Experience Magnification Dock</h3>\n    <p class=\"text-xs text-zinc-400 mb-6\">Open the standalone HTML template in your browser or paste into your project.</p>\n    <div class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-zinc-950 text-xs font-semibold hover:bg-zinc-100 transition-all\">\n        Launch Template\n      </button>\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold hover:bg-zinc-700 transition-all\">\n        Copy HTML Code\n      </button>\n    </div>\n  </div>\n</div>"
+      }
+    ],
+    "features": [
+      "100% Pure Standalone HTML5 + Tailwind CSS via CDN",
+      "Zero JSX, TSX, React, or npm dependencies required",
+      "Double-click to preview instantly in any browser",
+      "1-Click AI Master Prompt optimized for Cursor & Claude"
+    ],
+    "toolsReplaced": [
+      {
+        "name": "UI Component Subscriptions",
+        "monthlyCostUSD": 29
+      },
+      {
+        "name": "Custom Animation Design",
+        "monthlyCostUSD": 99
+      },
+      {
+        "name": "Design Token Kits",
+        "monthlyCostUSD": 49
+      }
+    ],
+    "frameworkStack": [
+      "HTML5",
+      "Tailwind CSS (CDN)",
+      "Vanilla JS / Alpine.js",
+      "Lucide Icons (CDN)",
+      "GSAP (CDN)"
+    ],
+    "quickCopyPrompt": "You are an expert Frontend Engineer. Build a complete, production-ready, standalone HTML5 template for \"Magnification Dock\".\n\n### CRITICAL OUTPUT FORMAT REQUIREMENTS:\n- **Output ONLY single-file standard HTML (`<!DOCTYPE html> ... </html>`)**.\n- **STRICT PROHIBITION**: Do NOT output JSX, TSX, React components, Next.js code, or npm import statements. Everything must be pure HTML + CSS + JS in one file.\n- **Tailwind CSS via CDN**: Include `<script src=\"https://cdn.tailwindcss.com\"></script>` in `<head>`.\n- **Icons**: Load Lucide Icons via CDN `<script src=\"https://unpkg.com/lucide@latest\"></script>` and initialize with `<script>lucide.createIcons();</script>`.\n- **Fonts**: Load Google Fonts `Inter` and `JetBrains Mono`.\n- **Interactive Animations**: Use vanilla JavaScript or GSAP via CDN (`<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js\"></script>`) embedded inside `<script>` tags at the bottom.\n\n### Component & Design Specifications:\n1. **Design System & Palette**:\n   - Monochromatic Notion/Shopify aesthetic (neutral zinc-900 / zinc-950 dark, zinc-50 / pure white light).\n   - High precision typography with crisp contrast, clean borders (`border-zinc-200` / `border-zinc-800`), and soft shadows.\n2. **Component Architecture for \"Magnification Dock\"**:\n   - Master layout container with mobile, tablet, and desktop responsiveness.\n   - Micro-interactions on buttons, hover states, and smooth spring-like transitions.\n3. **Stand-Alone Portability**:\n   - Must open directly and render flawlessly by double clicking the `.html` file in any web browser.\n\nComponent: Magnification Dock\nCategory: Interactive & Animation",
+    "faqs": [
+      {
+        "question": "What is the output format of this prompt?",
+        "answer": "All prompts produce standard, single-file HTML5 templates styled with Tailwind CSS via CDN (<script src=\"https://cdn.tailwindcss.com\"></script>). No JSX, React, or build setups required."
+      },
+      {
+        "question": "How do I run and test the output HTML?",
+        "answer": "Copy the AI output, save it into a file named index.html, and double-click to open it in Chrome, Safari, or Firefox. It renders instantly without compiling."
+      },
+      {
+        "question": "Can I paste this HTML into WordPress, Webflow, or custom sites?",
+        "answer": "Yes! Because the template outputs standard HTML and loads Tailwind CSS via CDN, you can paste it directly into HTML embed blocks or standalone static sites."
+      }
+    ]
+  },
+  {
+    "id": "tmpl-45",
+    "slug": "circular-gallery",
+    "title": "Circular Gallery",
+    "shortTitle": "Circular Gallery",
+    "tagline": "Production-grade Circular Gallery standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.",
+    "category": "lovable_projects",
+    "categoryLabel": "Interactive & Animation",
+    "assetFormat": "lovable_project",
+    "formatBadge": "HTML + TAILWIND CDN",
+    "badge": "STANDALONE HTML",
+    "rating": 4.97,
+    "reviewsCount": 96,
+    "downloadsCount": 3925,
+    "viewsCount": 4343,
+    "copiesCount": 883,
+    "mediaType": "video",
+    "mediaUrl": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/preview-artifacts/prompt-library/7d97ebb3-363d-49d3-a029-fa9a23815e3f/thumbnails/dc1ce977-8005-4a11-a488-9746d5b0580e.mp4",
+    "heroDescription": "Build and preview Circular Gallery instantly. Engineered as a complete standalone HTML document using Tailwind CSS via CDN (`<script src=\"https://cdn.tailwindcss.com\"></script>`), pure CSS/vanilla JS interactions, and zero build tool bloat. Perfect for Cursor AI, Claude 3.5 Sonnet, and direct browser execution.",
+    "accentBg": "bg-zinc-950",
+    "accentBorder": "border-zinc-800",
+    "accentText": "text-zinc-100",
+    "accentColor": "#09090b",
+    "coverImage": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/preview-artifacts/prompt-library/7d97ebb3-363d-49d3-a029-fa9a23815e3f/thumbnails/dc1ce977-8005-4a11-a488-9746d5b0580e.mp4",
+    "compatibleBuilders": [
+      "HTML5 Standalone",
+      "Tailwind CSS CDN",
+      "Claude 3.5 Sonnet",
+      "Cursor AI",
+      "v0",
+      "Lovable"
+    ],
+    "sectionsIncluded": [
+      {
+        "id": "sec-45-1",
+        "name": "Focal Layout Architecture",
+        "badge": "HTML5 HERO",
+        "description": "Main hero structure and typography for Circular Gallery.",
+        "promptText": "Generate a standalone HTML5 hero section for \"Circular Gallery\" using Tailwind CSS via CDN. Output pure HTML with class=\"...\", zero JSX or TSX.",
+        "tailwindSnippet": "<!-- 1. Focal Layout for Circular Gallery (HTML + Tailwind CDN) -->\n<section class=\"relative overflow-hidden py-16 sm:py-24 bg-zinc-950 text-zinc-100 antialiased font-sans\">\n  <div class=\"max-w-7xl mx-auto px-6 lg:px-8\">\n    <div class=\"text-center max-w-3xl mx-auto\">\n      <span class=\"inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-900 border border-zinc-800 text-zinc-300\">\n        <i data-lucide=\"sparkles\" class=\"w-3.5 h-3.5 text-zinc-400\"></i>\n        <span>INTERACTIVE & ANIMATION</span>\n      </span>\n      <h1 class=\"mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-display\">\n        Circular Gallery\n      </h1>\n      <p class=\"mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed\">\n        Production-grade Circular Gallery standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.\n      </p>\n    </div>\n  </div>\n</section>"
+      },
+      {
+        "id": "sec-45-2",
+        "name": "Interactive Feature Matrix",
+        "badge": "HTML5 GRID",
+        "description": "Responsive 3-column card grid with hover transitions and Lucide icons.",
+        "promptText": "Build a pure HTML5 3-column feature grid for \"Circular Gallery\" with Tailwind CDN utility classes and Lucide icons.",
+        "tailwindSnippet": "<!-- 2. Interactive Feature Matrix (HTML + Tailwind CDN) -->\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-6 py-12\">\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"zap\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Zero Build Lag</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Runs instantly in any browser via Tailwind CSS CDN script.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"layers\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Pure HTML & CSS</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Zero JSX or Node.js runtime required. Copy, paste and deploy.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"sparkles\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Micro-Interactions</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Smooth hover elevations and accessible keyboard focus outlines.</p>\n  </div>\n</div>"
+      },
+      {
+        "id": "sec-45-3",
+        "name": "Action & Conversion Trigger",
+        "badge": "HTML5 CTA",
+        "description": "Stand-alone call-to-action block with high-contrast buttons.",
+        "promptText": "Create an instant HTML5 CTA conversion block for \"Circular Gallery\" with pure Tailwind CSS CDN classes.",
+        "tailwindSnippet": "<!-- 3. Conversion Trigger Action (HTML + Tailwind CDN) -->\n<div class=\"max-w-2xl mx-auto px-6 py-8 text-center\">\n  <div class=\"rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8\">\n    <h3 class=\"text-lg font-bold text-white mb-2\">Experience Circular Gallery</h3>\n    <p class=\"text-xs text-zinc-400 mb-6\">Open the standalone HTML template in your browser or paste into your project.</p>\n    <div class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-zinc-950 text-xs font-semibold hover:bg-zinc-100 transition-all\">\n        Launch Template\n      </button>\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold hover:bg-zinc-700 transition-all\">\n        Copy HTML Code\n      </button>\n    </div>\n  </div>\n</div>"
+      }
+    ],
+    "features": [
+      "100% Pure Standalone HTML5 + Tailwind CSS via CDN",
+      "Zero JSX, TSX, React, or npm dependencies required",
+      "Double-click to preview instantly in any browser",
+      "1-Click AI Master Prompt optimized for Cursor & Claude"
+    ],
+    "toolsReplaced": [
+      {
+        "name": "UI Component Subscriptions",
+        "monthlyCostUSD": 29
+      },
+      {
+        "name": "Custom Animation Design",
+        "monthlyCostUSD": 99
+      },
+      {
+        "name": "Design Token Kits",
+        "monthlyCostUSD": 49
+      }
+    ],
+    "frameworkStack": [
+      "HTML5",
+      "Tailwind CSS (CDN)",
+      "Vanilla JS / Alpine.js",
+      "Lucide Icons (CDN)",
+      "GSAP (CDN)"
+    ],
+    "quickCopyPrompt": "You are an expert Frontend Engineer. Build a complete, production-ready, standalone HTML5 template for \"Circular Gallery\".\n\n### CRITICAL OUTPUT FORMAT REQUIREMENTS:\n- **Output ONLY single-file standard HTML (`<!DOCTYPE html> ... </html>`)**.\n- **STRICT PROHIBITION**: Do NOT output JSX, TSX, React components, Next.js code, or npm import statements. Everything must be pure HTML + CSS + JS in one file.\n- **Tailwind CSS via CDN**: Include `<script src=\"https://cdn.tailwindcss.com\"></script>` in `<head>`.\n- **Icons**: Load Lucide Icons via CDN `<script src=\"https://unpkg.com/lucide@latest\"></script>` and initialize with `<script>lucide.createIcons();</script>`.\n- **Fonts**: Load Google Fonts `Inter` and `JetBrains Mono`.\n- **Interactive Animations**: Use vanilla JavaScript or GSAP via CDN (`<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js\"></script>`) embedded inside `<script>` tags at the bottom.\n\n### Component & Design Specifications:\n1. **Design System & Palette**:\n   - Monochromatic Notion/Shopify aesthetic (neutral zinc-900 / zinc-950 dark, zinc-50 / pure white light).\n   - High precision typography with crisp contrast, clean borders (`border-zinc-200` / `border-zinc-800`), and soft shadows.\n2. **Component Architecture for \"Circular Gallery\"**:\n   - Master layout container with mobile, tablet, and desktop responsiveness.\n   - Micro-interactions on buttons, hover states, and smooth spring-like transitions.\n3. **Stand-Alone Portability**:\n   - Must open directly and render flawlessly by double clicking the `.html` file in any web browser.\n\nComponent: Circular Gallery\nCategory: Interactive & Animation",
+    "faqs": [
+      {
+        "question": "What is the output format of this prompt?",
+        "answer": "All prompts produce standard, single-file HTML5 templates styled with Tailwind CSS via CDN (<script src=\"https://cdn.tailwindcss.com\"></script>). No JSX, React, or build setups required."
+      },
+      {
+        "question": "How do I run and test the output HTML?",
+        "answer": "Copy the AI output, save it into a file named index.html, and double-click to open it in Chrome, Safari, or Firefox. It renders instantly without compiling."
+      },
+      {
+        "question": "Can I paste this HTML into WordPress, Webflow, or custom sites?",
+        "answer": "Yes! Because the template outputs standard HTML and loads Tailwind CSS via CDN, you can paste it directly into HTML embed blocks or standalone static sites."
+      }
+    ]
+  },
+  {
+    "id": "tmpl-46",
+    "slug": "radiant-prompt-input",
+    "title": "Radiant Prompt Input",
+    "shortTitle": "Radiant Prompt Input",
+    "tagline": "Production-grade Radiant Prompt Input standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.",
+    "category": "section_prompts",
+    "categoryLabel": "AI Section Prompt",
+    "assetFormat": "section_prompts",
+    "formatBadge": "HTML + TAILWIND CDN",
+    "badge": "AI MASTER PROMPT",
+    "rating": 4.95,
+    "reviewsCount": 140,
+    "downloadsCount": 3761,
+    "viewsCount": 2884,
+    "copiesCount": 853,
+    "mediaType": "image",
+    "mediaUrl": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/hmac-uploads/screenshots/components/d2a7422b-1c93-41e6-a000-e313c7ad67f9/80ef4c96-3b67-465e-a056-30988465b642/1767671823794.png?width=600&quality=75&resize=contain",
+    "heroDescription": "Build and preview Radiant Prompt Input instantly. Engineered as a complete standalone HTML document using Tailwind CSS via CDN (`<script src=\"https://cdn.tailwindcss.com\"></script>`), pure CSS/vanilla JS interactions, and zero build tool bloat. Perfect for Cursor AI, Claude 3.5 Sonnet, and direct browser execution.",
+    "accentBg": "bg-zinc-950",
+    "accentBorder": "border-zinc-800",
+    "accentText": "text-zinc-100",
+    "accentColor": "#09090b",
+    "coverImage": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/hmac-uploads/screenshots/components/d2a7422b-1c93-41e6-a000-e313c7ad67f9/80ef4c96-3b67-465e-a056-30988465b642/1767671823794.png?width=600&quality=75&resize=contain",
+    "compatibleBuilders": [
+      "HTML5 Standalone",
+      "Tailwind CSS CDN",
+      "Claude 3.5 Sonnet",
+      "Cursor AI",
+      "v0",
+      "Lovable"
+    ],
+    "sectionsIncluded": [
+      {
+        "id": "sec-46-1",
+        "name": "Focal Layout Architecture",
+        "badge": "HTML5 HERO",
+        "description": "Main hero structure and typography for Radiant Prompt Input.",
+        "promptText": "Generate a standalone HTML5 hero section for \"Radiant Prompt Input\" using Tailwind CSS via CDN. Output pure HTML with class=\"...\", zero JSX or TSX.",
+        "tailwindSnippet": "<!-- 1. Focal Layout for Radiant Prompt Input (HTML + Tailwind CDN) -->\n<section class=\"relative overflow-hidden py-16 sm:py-24 bg-zinc-950 text-zinc-100 antialiased font-sans\">\n  <div class=\"max-w-7xl mx-auto px-6 lg:px-8\">\n    <div class=\"text-center max-w-3xl mx-auto\">\n      <span class=\"inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-900 border border-zinc-800 text-zinc-300\">\n        <i data-lucide=\"sparkles\" class=\"w-3.5 h-3.5 text-zinc-400\"></i>\n        <span>AI SECTION PROMPT</span>\n      </span>\n      <h1 class=\"mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-display\">\n        Radiant Prompt Input\n      </h1>\n      <p class=\"mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed\">\n        Production-grade Radiant Prompt Input standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.\n      </p>\n    </div>\n  </div>\n</section>"
+      },
+      {
+        "id": "sec-46-2",
+        "name": "Interactive Feature Matrix",
+        "badge": "HTML5 GRID",
+        "description": "Responsive 3-column card grid with hover transitions and Lucide icons.",
+        "promptText": "Build a pure HTML5 3-column feature grid for \"Radiant Prompt Input\" with Tailwind CDN utility classes and Lucide icons.",
+        "tailwindSnippet": "<!-- 2. Interactive Feature Matrix (HTML + Tailwind CDN) -->\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-6 py-12\">\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"zap\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Zero Build Lag</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Runs instantly in any browser via Tailwind CSS CDN script.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"layers\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Pure HTML & CSS</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Zero JSX or Node.js runtime required. Copy, paste and deploy.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"sparkles\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Micro-Interactions</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Smooth hover elevations and accessible keyboard focus outlines.</p>\n  </div>\n</div>"
+      },
+      {
+        "id": "sec-46-3",
+        "name": "Action & Conversion Trigger",
+        "badge": "HTML5 CTA",
+        "description": "Stand-alone call-to-action block with high-contrast buttons.",
+        "promptText": "Create an instant HTML5 CTA conversion block for \"Radiant Prompt Input\" with pure Tailwind CSS CDN classes.",
+        "tailwindSnippet": "<!-- 3. Conversion Trigger Action (HTML + Tailwind CDN) -->\n<div class=\"max-w-2xl mx-auto px-6 py-8 text-center\">\n  <div class=\"rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8\">\n    <h3 class=\"text-lg font-bold text-white mb-2\">Experience Radiant Prompt Input</h3>\n    <p class=\"text-xs text-zinc-400 mb-6\">Open the standalone HTML template in your browser or paste into your project.</p>\n    <div class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-zinc-950 text-xs font-semibold hover:bg-zinc-100 transition-all\">\n        Launch Template\n      </button>\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold hover:bg-zinc-700 transition-all\">\n        Copy HTML Code\n      </button>\n    </div>\n  </div>\n</div>"
+      }
+    ],
+    "features": [
+      "100% Pure Standalone HTML5 + Tailwind CSS via CDN",
+      "Zero JSX, TSX, React, or npm dependencies required",
+      "Double-click to preview instantly in any browser",
+      "1-Click AI Master Prompt optimized for Cursor & Claude"
+    ],
+    "toolsReplaced": [
+      {
+        "name": "UI Component Subscriptions",
+        "monthlyCostUSD": 29
+      },
+      {
+        "name": "Custom Animation Design",
+        "monthlyCostUSD": 99
+      },
+      {
+        "name": "Design Token Kits",
+        "monthlyCostUSD": 49
+      }
+    ],
+    "frameworkStack": [
+      "HTML5",
+      "Tailwind CSS (CDN)",
+      "Vanilla JS / Alpine.js",
+      "Lucide Icons (CDN)",
+      "GSAP (CDN)"
+    ],
+    "quickCopyPrompt": "You are an expert Frontend Engineer. Build a complete, production-ready, standalone HTML5 template for \"Radiant Prompt Input\".\n\n### CRITICAL OUTPUT FORMAT REQUIREMENTS:\n- **Output ONLY single-file standard HTML (`<!DOCTYPE html> ... </html>`)**.\n- **STRICT PROHIBITION**: Do NOT output JSX, TSX, React components, Next.js code, or npm import statements. Everything must be pure HTML + CSS + JS in one file.\n- **Tailwind CSS via CDN**: Include `<script src=\"https://cdn.tailwindcss.com\"></script>` in `<head>`.\n- **Icons**: Load Lucide Icons via CDN `<script src=\"https://unpkg.com/lucide@latest\"></script>` and initialize with `<script>lucide.createIcons();</script>`.\n- **Fonts**: Load Google Fonts `Inter` and `JetBrains Mono`.\n- **Interactive Animations**: Use vanilla JavaScript or GSAP via CDN (`<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js\"></script>`) embedded inside `<script>` tags at the bottom.\n\n### Component & Design Specifications:\n1. **Design System & Palette**:\n   - Monochromatic Notion/Shopify aesthetic (neutral zinc-900 / zinc-950 dark, zinc-50 / pure white light).\n   - High precision typography with crisp contrast, clean borders (`border-zinc-200` / `border-zinc-800`), and soft shadows.\n2. **Component Architecture for \"Radiant Prompt Input\"**:\n   - Master layout container with mobile, tablet, and desktop responsiveness.\n   - Micro-interactions on buttons, hover states, and smooth spring-like transitions.\n3. **Stand-Alone Portability**:\n   - Must open directly and render flawlessly by double clicking the `.html` file in any web browser.\n\nComponent: Radiant Prompt Input\nCategory: AI Section Prompt",
+    "faqs": [
+      {
+        "question": "What is the output format of this prompt?",
+        "answer": "All prompts produce standard, single-file HTML5 templates styled with Tailwind CSS via CDN (<script src=\"https://cdn.tailwindcss.com\"></script>). No JSX, React, or build setups required."
+      },
+      {
+        "question": "How do I run and test the output HTML?",
+        "answer": "Copy the AI output, save it into a file named index.html, and double-click to open it in Chrome, Safari, or Firefox. It renders instantly without compiling."
+      },
+      {
+        "question": "Can I paste this HTML into WordPress, Webflow, or custom sites?",
+        "answer": "Yes! Because the template outputs standard HTML and loads Tailwind CSS via CDN, you can paste it directly into HTML embed blocks or standalone static sites."
+      }
+    ]
+  },
+  {
+    "id": "tmpl-47",
+    "slug": "light-beam-button",
+    "title": "Light Beam Button",
+    "shortTitle": "Light Beam Button",
+    "tagline": "Production-grade Light Beam Button standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.",
+    "category": "lovable_projects",
+    "categoryLabel": "Interactive & Animation",
+    "assetFormat": "lovable_project",
+    "formatBadge": "HTML + TAILWIND CDN",
+    "badge": "STANDALONE HTML",
+    "rating": 4.93,
+    "reviewsCount": 108,
+    "downloadsCount": 1595,
+    "viewsCount": 3369,
+    "copiesCount": 741,
+    "mediaType": "image",
+    "mediaUrl": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/preview-artifacts/prompt-library/7d97ebb3-363d-49d3-a029-fa9a23815e3f/thumbnails/46eeeb1c-89dd-47e4-bf19-41548ec16401.png?width=600&quality=75&resize=contain",
+    "heroDescription": "Build and preview Light Beam Button instantly. Engineered as a complete standalone HTML document using Tailwind CSS via CDN (`<script src=\"https://cdn.tailwindcss.com\"></script>`), pure CSS/vanilla JS interactions, and zero build tool bloat. Perfect for Cursor AI, Claude 3.5 Sonnet, and direct browser execution.",
+    "accentBg": "bg-zinc-950",
+    "accentBorder": "border-zinc-800",
+    "accentText": "text-zinc-100",
+    "accentColor": "#09090b",
+    "coverImage": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/render/image/public/preview-artifacts/prompt-library/7d97ebb3-363d-49d3-a029-fa9a23815e3f/thumbnails/46eeeb1c-89dd-47e4-bf19-41548ec16401.png?width=600&quality=75&resize=contain",
+    "compatibleBuilders": [
+      "HTML5 Standalone",
+      "Tailwind CSS CDN",
+      "Claude 3.5 Sonnet",
+      "Cursor AI",
+      "v0",
+      "Lovable"
+    ],
+    "sectionsIncluded": [
+      {
+        "id": "sec-47-1",
+        "name": "Focal Layout Architecture",
+        "badge": "HTML5 HERO",
+        "description": "Main hero structure and typography for Light Beam Button.",
+        "promptText": "Generate a standalone HTML5 hero section for \"Light Beam Button\" using Tailwind CSS via CDN. Output pure HTML with class=\"...\", zero JSX or TSX.",
+        "tailwindSnippet": "<!-- 1. Focal Layout for Light Beam Button (HTML + Tailwind CDN) -->\n<section class=\"relative overflow-hidden py-16 sm:py-24 bg-zinc-950 text-zinc-100 antialiased font-sans\">\n  <div class=\"max-w-7xl mx-auto px-6 lg:px-8\">\n    <div class=\"text-center max-w-3xl mx-auto\">\n      <span class=\"inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-900 border border-zinc-800 text-zinc-300\">\n        <i data-lucide=\"sparkles\" class=\"w-3.5 h-3.5 text-zinc-400\"></i>\n        <span>INTERACTIVE & ANIMATION</span>\n      </span>\n      <h1 class=\"mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-display\">\n        Light Beam Button\n      </h1>\n      <p class=\"mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed\">\n        Production-grade Light Beam Button standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.\n      </p>\n    </div>\n  </div>\n</section>"
+      },
+      {
+        "id": "sec-47-2",
+        "name": "Interactive Feature Matrix",
+        "badge": "HTML5 GRID",
+        "description": "Responsive 3-column card grid with hover transitions and Lucide icons.",
+        "promptText": "Build a pure HTML5 3-column feature grid for \"Light Beam Button\" with Tailwind CDN utility classes and Lucide icons.",
+        "tailwindSnippet": "<!-- 2. Interactive Feature Matrix (HTML + Tailwind CDN) -->\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-6 py-12\">\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"zap\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Zero Build Lag</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Runs instantly in any browser via Tailwind CSS CDN script.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"layers\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Pure HTML & CSS</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Zero JSX or Node.js runtime required. Copy, paste and deploy.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"sparkles\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Micro-Interactions</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Smooth hover elevations and accessible keyboard focus outlines.</p>\n  </div>\n</div>"
+      },
+      {
+        "id": "sec-47-3",
+        "name": "Action & Conversion Trigger",
+        "badge": "HTML5 CTA",
+        "description": "Stand-alone call-to-action block with high-contrast buttons.",
+        "promptText": "Create an instant HTML5 CTA conversion block for \"Light Beam Button\" with pure Tailwind CSS CDN classes.",
+        "tailwindSnippet": "<!-- 3. Conversion Trigger Action (HTML + Tailwind CDN) -->\n<div class=\"max-w-2xl mx-auto px-6 py-8 text-center\">\n  <div class=\"rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8\">\n    <h3 class=\"text-lg font-bold text-white mb-2\">Experience Light Beam Button</h3>\n    <p class=\"text-xs text-zinc-400 mb-6\">Open the standalone HTML template in your browser or paste into your project.</p>\n    <div class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-zinc-950 text-xs font-semibold hover:bg-zinc-100 transition-all\">\n        Launch Template\n      </button>\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold hover:bg-zinc-700 transition-all\">\n        Copy HTML Code\n      </button>\n    </div>\n  </div>\n</div>"
+      }
+    ],
+    "features": [
+      "100% Pure Standalone HTML5 + Tailwind CSS via CDN",
+      "Zero JSX, TSX, React, or npm dependencies required",
+      "Double-click to preview instantly in any browser",
+      "1-Click AI Master Prompt optimized for Cursor & Claude"
+    ],
+    "toolsReplaced": [
+      {
+        "name": "UI Component Subscriptions",
+        "monthlyCostUSD": 29
+      },
+      {
+        "name": "Custom Animation Design",
+        "monthlyCostUSD": 99
+      },
+      {
+        "name": "Design Token Kits",
+        "monthlyCostUSD": 49
+      }
+    ],
+    "frameworkStack": [
+      "HTML5",
+      "Tailwind CSS (CDN)",
+      "Vanilla JS / Alpine.js",
+      "Lucide Icons (CDN)",
+      "GSAP (CDN)"
+    ],
+    "quickCopyPrompt": "You are an expert Frontend Engineer. Build a complete, production-ready, standalone HTML5 template for \"Light Beam Button\".\n\n### CRITICAL OUTPUT FORMAT REQUIREMENTS:\n- **Output ONLY single-file standard HTML (`<!DOCTYPE html> ... </html>`)**.\n- **STRICT PROHIBITION**: Do NOT output JSX, TSX, React components, Next.js code, or npm import statements. Everything must be pure HTML + CSS + JS in one file.\n- **Tailwind CSS via CDN**: Include `<script src=\"https://cdn.tailwindcss.com\"></script>` in `<head>`.\n- **Icons**: Load Lucide Icons via CDN `<script src=\"https://unpkg.com/lucide@latest\"></script>` and initialize with `<script>lucide.createIcons();</script>`.\n- **Fonts**: Load Google Fonts `Inter` and `JetBrains Mono`.\n- **Interactive Animations**: Use vanilla JavaScript or GSAP via CDN (`<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js\"></script>`) embedded inside `<script>` tags at the bottom.\n\n### Component & Design Specifications:\n1. **Design System & Palette**:\n   - Monochromatic Notion/Shopify aesthetic (neutral zinc-900 / zinc-950 dark, zinc-50 / pure white light).\n   - High precision typography with crisp contrast, clean borders (`border-zinc-200` / `border-zinc-800`), and soft shadows.\n2. **Component Architecture for \"Light Beam Button\"**:\n   - Master layout container with mobile, tablet, and desktop responsiveness.\n   - Micro-interactions on buttons, hover states, and smooth spring-like transitions.\n3. **Stand-Alone Portability**:\n   - Must open directly and render flawlessly by double clicking the `.html` file in any web browser.\n\nComponent: Light Beam Button\nCategory: Interactive & Animation",
+    "faqs": [
+      {
+        "question": "What is the output format of this prompt?",
+        "answer": "All prompts produce standard, single-file HTML5 templates styled with Tailwind CSS via CDN (<script src=\"https://cdn.tailwindcss.com\"></script>). No JSX, React, or build setups required."
+      },
+      {
+        "question": "How do I run and test the output HTML?",
+        "answer": "Copy the AI output, save it into a file named index.html, and double-click to open it in Chrome, Safari, or Firefox. It renders instantly without compiling."
+      },
+      {
+        "question": "Can I paste this HTML into WordPress, Webflow, or custom sites?",
+        "answer": "Yes! Because the template outputs standard HTML and loads Tailwind CSS via CDN, you can paste it directly into HTML embed blocks or standalone static sites."
+      }
+    ]
+  },
+  {
+    "id": "tmpl-48",
+    "slug": "masonry-gallery",
+    "title": "Masonry Gallery",
+    "shortTitle": "Masonry Gallery",
+    "tagline": "Production-grade Masonry Gallery standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.",
+    "category": "lovable_projects",
+    "categoryLabel": "Interactive & Animation",
+    "assetFormat": "lovable_project",
+    "formatBadge": "HTML + TAILWIND CDN",
+    "badge": "STANDALONE HTML",
+    "rating": 4.93,
+    "reviewsCount": 186,
+    "downloadsCount": 3509,
+    "viewsCount": 2634,
+    "copiesCount": 520,
+    "mediaType": "video",
+    "mediaUrl": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/preview-artifacts/prompt-library/7d97ebb3-363d-49d3-a029-fa9a23815e3f/thumbnails/0b135974-e9b2-4f4a-89ec-9d60326a236f.mp4",
+    "heroDescription": "Build and preview Masonry Gallery instantly. Engineered as a complete standalone HTML document using Tailwind CSS via CDN (`<script src=\"https://cdn.tailwindcss.com\"></script>`), pure CSS/vanilla JS interactions, and zero build tool bloat. Perfect for Cursor AI, Claude 3.5 Sonnet, and direct browser execution.",
+    "accentBg": "bg-zinc-950",
+    "accentBorder": "border-zinc-800",
+    "accentText": "text-zinc-100",
+    "accentColor": "#09090b",
+    "coverImage": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/preview-artifacts/prompt-library/7d97ebb3-363d-49d3-a029-fa9a23815e3f/thumbnails/0b135974-e9b2-4f4a-89ec-9d60326a236f.mp4",
+    "compatibleBuilders": [
+      "HTML5 Standalone",
+      "Tailwind CSS CDN",
+      "Claude 3.5 Sonnet",
+      "Cursor AI",
+      "v0",
+      "Lovable"
+    ],
+    "sectionsIncluded": [
+      {
+        "id": "sec-48-1",
+        "name": "Focal Layout Architecture",
+        "badge": "HTML5 HERO",
+        "description": "Main hero structure and typography for Masonry Gallery.",
+        "promptText": "Generate a standalone HTML5 hero section for \"Masonry Gallery\" using Tailwind CSS via CDN. Output pure HTML with class=\"...\", zero JSX or TSX.",
+        "tailwindSnippet": "<!-- 1. Focal Layout for Masonry Gallery (HTML + Tailwind CDN) -->\n<section class=\"relative overflow-hidden py-16 sm:py-24 bg-zinc-950 text-zinc-100 antialiased font-sans\">\n  <div class=\"max-w-7xl mx-auto px-6 lg:px-8\">\n    <div class=\"text-center max-w-3xl mx-auto\">\n      <span class=\"inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-900 border border-zinc-800 text-zinc-300\">\n        <i data-lucide=\"sparkles\" class=\"w-3.5 h-3.5 text-zinc-400\"></i>\n        <span>INTERACTIVE & ANIMATION</span>\n      </span>\n      <h1 class=\"mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-display\">\n        Masonry Gallery\n      </h1>\n      <p class=\"mt-4 text-sm sm:text-base text-zinc-400 leading-relaxed\">\n        Production-grade Masonry Gallery standalone HTML template with Tailwind CSS via CDN. Instant browser preview, zero build step.\n      </p>\n    </div>\n  </div>\n</section>"
+      },
+      {
+        "id": "sec-48-2",
+        "name": "Interactive Feature Matrix",
+        "badge": "HTML5 GRID",
+        "description": "Responsive 3-column card grid with hover transitions and Lucide icons.",
+        "promptText": "Build a pure HTML5 3-column feature grid for \"Masonry Gallery\" with Tailwind CDN utility classes and Lucide icons.",
+        "tailwindSnippet": "<!-- 2. Interactive Feature Matrix (HTML + Tailwind CDN) -->\n<div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-6 py-12\">\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"zap\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Zero Build Lag</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Runs instantly in any browser via Tailwind CSS CDN script.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"layers\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Pure HTML & CSS</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Zero JSX or Node.js runtime required. Copy, paste and deploy.</p>\n  </div>\n  <div class=\"p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300\">\n    <div class=\"w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-200 mb-4\">\n      <i data-lucide=\"sparkles\" class=\"w-5 h-5\"></i>\n    </div>\n    <h3 class=\"text-base font-semibold text-white mb-2\">Micro-Interactions</h3>\n    <p class=\"text-xs text-zinc-400 leading-relaxed\">Smooth hover elevations and accessible keyboard focus outlines.</p>\n  </div>\n</div>"
+      },
+      {
+        "id": "sec-48-3",
+        "name": "Action & Conversion Trigger",
+        "badge": "HTML5 CTA",
+        "description": "Stand-alone call-to-action block with high-contrast buttons.",
+        "promptText": "Create an instant HTML5 CTA conversion block for \"Masonry Gallery\" with pure Tailwind CSS CDN classes.",
+        "tailwindSnippet": "<!-- 3. Conversion Trigger Action (HTML + Tailwind CDN) -->\n<div class=\"max-w-2xl mx-auto px-6 py-8 text-center\">\n  <div class=\"rounded-2xl bg-zinc-900 border border-zinc-800 p-6 sm:p-8\">\n    <h3 class=\"text-lg font-bold text-white mb-2\">Experience Masonry Gallery</h3>\n    <p class=\"text-xs text-zinc-400 mb-6\">Open the standalone HTML template in your browser or paste into your project.</p>\n    <div class=\"flex flex-col sm:flex-row items-center justify-center gap-3\">\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-zinc-950 text-xs font-semibold hover:bg-zinc-100 transition-all\">\n        Launch Template\n      </button>\n      <button class=\"w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold hover:bg-zinc-700 transition-all\">\n        Copy HTML Code\n      </button>\n    </div>\n  </div>\n</div>"
+      }
+    ],
+    "features": [
+      "100% Pure Standalone HTML5 + Tailwind CSS via CDN",
+      "Zero JSX, TSX, React, or npm dependencies required",
+      "Double-click to preview instantly in any browser",
+      "1-Click AI Master Prompt optimized for Cursor & Claude"
+    ],
+    "toolsReplaced": [
+      {
+        "name": "UI Component Subscriptions",
+        "monthlyCostUSD": 29
+      },
+      {
+        "name": "Custom Animation Design",
+        "monthlyCostUSD": 99
+      },
+      {
+        "name": "Design Token Kits",
+        "monthlyCostUSD": 49
+      }
+    ],
+    "frameworkStack": [
+      "HTML5",
+      "Tailwind CSS (CDN)",
+      "Vanilla JS / Alpine.js",
+      "Lucide Icons (CDN)",
+      "GSAP (CDN)"
+    ],
+    "quickCopyPrompt": "You are an expert Frontend Engineer. Build a complete, production-ready, standalone HTML5 template for \"Masonry Gallery\".\n\n### CRITICAL OUTPUT FORMAT REQUIREMENTS:\n- **Output ONLY single-file standard HTML (`<!DOCTYPE html> ... </html>`)**.\n- **STRICT PROHIBITION**: Do NOT output JSX, TSX, React components, Next.js code, or npm import statements. Everything must be pure HTML + CSS + JS in one file.\n- **Tailwind CSS via CDN**: Include `<script src=\"https://cdn.tailwindcss.com\"></script>` in `<head>`.\n- **Icons**: Load Lucide Icons via CDN `<script src=\"https://unpkg.com/lucide@latest\"></script>` and initialize with `<script>lucide.createIcons();</script>`.\n- **Fonts**: Load Google Fonts `Inter` and `JetBrains Mono`.\n- **Interactive Animations**: Use vanilla JavaScript or GSAP via CDN (`<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js\"></script>`) embedded inside `<script>` tags at the bottom.\n\n### Component & Design Specifications:\n1. **Design System & Palette**:\n   - Monochromatic Notion/Shopify aesthetic (neutral zinc-900 / zinc-950 dark, zinc-50 / pure white light).\n   - High precision typography with crisp contrast, clean borders (`border-zinc-200` / `border-zinc-800`), and soft shadows.\n2. **Component Architecture for \"Masonry Gallery\"**:\n   - Master layout container with mobile, tablet, and desktop responsiveness.\n   - Micro-interactions on buttons, hover states, and smooth spring-like transitions.\n3. **Stand-Alone Portability**:\n   - Must open directly and render flawlessly by double clicking the `.html` file in any web browser.\n\nComponent: Masonry Gallery\nCategory: Interactive & Animation",
+    "faqs": [
+      {
+        "question": "What is the output format of this prompt?",
+        "answer": "All prompts produce standard, single-file HTML5 templates styled with Tailwind CSS via CDN (<script src=\"https://cdn.tailwindcss.com\"></script>). No JSX, React, or build setups required."
+      },
+      {
+        "question": "How do I run and test the output HTML?",
+        "answer": "Copy the AI output, save it into a file named index.html, and double-click to open it in Chrome, Safari, or Firefox. It renders instantly without compiling."
+      },
+      {
+        "question": "Can I paste this HTML into WordPress, Webflow, or custom sites?",
+        "answer": "Yes! Because the template outputs standard HTML and loads Tailwind CSS via CDN, you can paste it directly into HTML embed blocks or standalone static sites."
+      }
+    ]
+  }
 ];
+
+export const FEATURED_TEMPLATES: TemplateItem[] = TEMPLATES_DATA.slice(0, 6);
+
+export function getTemplateBySlug(slug: string): TemplateItem | undefined {
+  return TEMPLATES_DATA.find((t) => t.slug === slug);
+}
+
+export function getTemplatesByCategory(categoryId: string): TemplateItem[] {
+  if (categoryId === 'all') return TEMPLATES_DATA;
+  return TEMPLATES_DATA.filter((t) => t.category === categoryId);
+}

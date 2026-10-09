@@ -31,30 +31,12 @@ export default function ArticlesPage() {
 
       {/* ── Top Header Hero ── */}
       <GlobalResourcesHero
-        tone="studio"
+        tone="neutral"
         badgeIcon={<Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-purple-600" />}
         badgeText="Knowledge Hub & Comparisons"
         titleLine1="Articles & Benchmarks"
         titleLine2="Operational playbooks, GST workflows & software comparisons"
         description="In-depth guides, operational playbooks, 18% GST tax workflows, and side-by-side software benchmarks engineered for high-growth creative studios and media agencies."
-        pillars={[
-          {
-            icon: <Check className="w-3.5 h-3.5 text-emerald-600 font-bold" />,
-            text: '100% Free Open Knowledge',
-          },
-          {
-            icon: <Receipt className="w-3.5 h-3.5 text-purple-600" />,
-            text: 'Indian GST Playbooks',
-          },
-          {
-            icon: <BarChart2 className="w-3.5 h-3.5 text-blue-600" />,
-            text: 'Software Benchmarks',
-          },
-          {
-            icon: <ShieldCheck className="w-3.5 h-3.5 text-indigo-600" />,
-            text: 'Agency SOPs',
-          },
-        ]}
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6">

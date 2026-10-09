@@ -52,8 +52,10 @@ import {
   triggerRazorpayCheckout, 
   useRazorpayPreload, 
   isPartner100Coupon, 
+  calculateDiscountedPrice,
   PlanKey 
 } from '@/components/pricing/FastRazorpayModal';
+import { getActiveReferralCode, initReferralTracking } from '@/lib/referral';
 
 // Official Vector WhatsApp SVG Icon
 const WhatsAppIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
@@ -122,6 +124,7 @@ export default function PricingPage() {
   const [showFloatingToggle, setShowFloatingToggle] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
+  const [activeReferral, setActiveReferral] = useState<string>('');
   const [flashSecondsLeft, setFlashSecondsLeft] = useState(600);
 
   // Preload Razorpay checkout script
@@ -131,11 +134,12 @@ export default function PricingPage() {
   const cardsContainerRef = useRef<HTMLDivElement>(null);
 
   const handleInitiatePlan = (plan: PlanKey) => {
-    trackEvent('plan_checkout_clicked', { plan, billing: billingCycle });
+    trackEvent('plan_checkout_clicked', { plan, billing: billingCycle, referral: activeReferral });
     triggerRazorpayCheckout({
       planKey: plan,
       billingCycle,
-      appliedCoupon
+      appliedCoupon,
+      referralCode: activeReferral
     });
   };
 
@@ -171,9 +175,32 @@ export default function PricingPage() {
     }
   }, []);
 
-  // Dynamic Coupon & URL Parameter Detection + Confetti Blast
+  // Universal Referral Tracking, Dynamic Coupon & URL Parameter Detection + Confetti Blast
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      // 1. Detect and track referral
+      const tracking = initReferralTracking();
+      if (tracking.code) {
+        setActiveReferral(tracking.code);
+        if (tracking.isTracked) {
+          setTimeout(async () => {
+            try {
+              const confetti = (await import('canvas-confetti')).default;
+              confetti({
+                particleCount: 110,
+                spread: 75,
+                origin: { y: 0.58 },
+                colors: ['#18181b', '#27272a', '#10b981', '#ffffff']
+              });
+            } catch (e) {}
+          }, 300);
+        }
+      } else {
+        const ref = getActiveReferralCode();
+        if (ref) setActiveReferral(ref);
+      }
+
+      // 2. Detect coupons
       const params = new URLSearchParams(window.location.search);
       const coupon = params.get('coupon') || params.get('code') || params.get('discount');
       const plan = params.get('plan');
@@ -319,6 +346,11 @@ export default function PricingPage() {
     setShowComparison(nextState);
     trackEvent('pricing_comparison_toggle', { open: nextState });
   };
+
+  const starterPricing = calculateDiscountedPrice('starter', billingCycle, appliedCoupon, activeReferral);
+  const proPricing = calculateDiscountedPrice('pro', billingCycle, appliedCoupon, activeReferral);
+  const scalePricing = calculateDiscountedPrice('scale', billingCycle, appliedCoupon, activeReferral);
+  const indiaPricing = calculateDiscountedPrice('india_only', 'annual', appliedCoupon, activeReferral);
 
   return (
     <main className="w-full relative pb-16 sm:pb-24 bg-white text-zinc-900">
@@ -500,6 +532,35 @@ export default function PricingPage() {
               >
                 Claim Deal ↓
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── ACTIVE REFERRAL DISCOUNT CELEBRATION TOP BANNER ── */}
+      {activeReferral && !isPartner100Coupon(appliedCoupon) && appliedCoupon !== 'INDIA40' && (
+        <div className="w-full max-w-[1240px] mx-auto px-3.5 sm:px-6 mb-8 -mt-6 relative z-20">
+          <div className="rounded-2xl sm:rounded-3xl bg-zinc-950 text-white p-4 sm:p-5 shadow-2xl border border-zinc-800 flex flex-col md:flex-row items-center justify-between gap-4 animate-in fade-in slide-in-from-top-4 duration-300">
+            <div className="flex items-center gap-3 text-left">
+              <span className="text-3xl sm:text-4xl shrink-0">⚡</span>
+              <div>
+                <div className="text-sm sm:text-base font-extrabold tracking-tight flex items-center gap-2 flex-wrap">
+                  <span>10% REFERRAL DISCOUNT ACTIVE!</span>
+                  <span className="px-2.5 py-0.5 rounded-lg bg-zinc-800 font-mono text-xs border border-zinc-700 uppercase text-zinc-200">
+                    PARTNER: @{activeReferral}
+                  </span>
+                </div>
+                <div className="text-xs sm:text-sm text-zinc-300 font-medium mt-0.5">
+                  10% Referral Discount pre-applied across all plans at checkout on top of annual savings!
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2.5 shrink-0 w-full md:w-auto justify-between md:justify-end">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-900 border border-zinc-700 font-mono text-xs font-bold text-emerald-400">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span>10% Off Pre-Applied</span>
+              </span>
             </div>
           </div>
         </div>
@@ -687,6 +748,11 @@ export default function PricingPage() {
                       2 MO. FREE
                     </span>
                   )}
+                  {starterPricing.isReferralDiscount && (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-white text-emerald-950 text-[9.5px] font-mono font-bold tracking-tight">
+                      10% REF OFF
+                    </span>
+                  )}
                 </div>
                 <p className="text-xs text-emerald-50/90 leading-relaxed line-clamp-2 h-[36px] flex items-start">
                   Connect custom domains, send branded emails, and invite 2 teammates.
@@ -701,14 +767,14 @@ export default function PricingPage() {
                 <div className="mb-4 flex flex-col justify-center shrink-0">
                   <div className="h-8 flex items-baseline gap-1.5 flex-wrap">
                     <span className="text-3xl sm:text-[34px] font-display font-bold text-zinc-950 tracking-tight leading-none">
-                      {billingCycle === 'annual'
-                        ? (currency === 'INR' ? '₹833' : '$7.50')
-                        : (currency === 'INR' ? '₹999' : '$9')}
+                      {currency === 'INR'
+                        ? `₹${starterPricing.effectiveMonthlyRate.toLocaleString('en-IN')}`
+                        : (billingCycle === 'annual' ? '$7.50' : '$9')}
                     </span>
                     <span className="text-xs text-zinc-500 font-medium">/ mo</span>
-                    {billingCycle === 'annual' && (
+                    {(starterPricing.discountPercentage > 0 || billingCycle === 'annual') && (
                       <span className="text-xs text-zinc-400 line-through ml-1 font-mono">
-                        {currency === 'INR' ? '₹999' : '$9'}
+                        {currency === 'INR' ? (billingCycle === 'annual' ? '₹833' : '₹999') : '$9'}
                       </span>
                     )}
                   </div>
@@ -716,9 +782,13 @@ export default function PricingPage() {
                     {billingCycle === 'annual' ? (
                       <>
                         <div className="flex items-center gap-1.5 font-medium text-emerald-700">
-                          <span>Billed annually: {currency === 'INR' ? '₹9,990 / yr' : '$90 / yr'}</span>
+                          <span>Billed annually: {currency === 'INR' ? `₹${starterPricing.grandTotal.toLocaleString('en-IN')} / yr` : '$90 / yr'}</span>
                           <span className="text-zinc-300">&bull;</span>
-                          <span className="text-emerald-800 font-bold">{currency === 'INR' ? 'Save ₹1,998' : 'Save $18'}</span>
+                          <span className="text-emerald-800 font-bold">
+                            {currency === 'INR' 
+                              ? `Save ₹${(starterPricing.standardFullRate - starterPricing.grandTotal).toLocaleString('en-IN')}` 
+                              : 'Save $18'}
+                          </span>
                         </div>
                         <div className="text-[10px] text-zinc-400">
                           {currency === 'INR' ? 'Includes 18% GST (12 mos. for the price of 10)' : '12 months access for price of 10'}
@@ -889,6 +959,11 @@ export default function PricingPage() {
                       2 MO. FREE
                     </span>
                   )}
+                  {proPricing.isReferralDiscount && (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-white text-pink-950 text-[9.5px] font-mono font-bold tracking-tight">
+                      10% REF OFF
+                    </span>
+                  )}
                 </div>
                 <p className="text-xs text-pink-50/90 leading-relaxed line-clamp-2 h-[36px] flex items-start">
                   Automate WhatsApp updates, collect payments with UPI QR, and deploy reasoning AI.
@@ -902,38 +977,42 @@ export default function PricingPage() {
                 {/* Price Block */}
                 <div className="mb-4 flex flex-col justify-center shrink-0">
                   <div className="h-8 flex items-baseline gap-1.5 flex-wrap">
-                    <span className="text-3xl sm:text-[34px] font-display font-bold text-zinc-950 tracking-tight leading-none">
+                    <span className="text-3xl sm:text-[34px] font-display font-bold text-white tracking-tight leading-none">
                       {isPartner100Coupon(appliedCoupon)
                         ? '₹0'
-                        : (billingCycle === 'annual'
-                            ? (currency === 'INR' ? '₹2,083' : '$20')
-                            : (currency === 'INR' ? '₹2,499' : '$24'))}
+                        : (currency === 'INR'
+                            ? `₹${proPricing.effectiveMonthlyRate.toLocaleString('en-IN')}`
+                            : (billingCycle === 'annual' ? '$20' : '$24'))}
                     </span>
-                    <span className="text-xs text-zinc-500 font-medium">/ mo</span>
-                    {(isPartner100Coupon(appliedCoupon) || billingCycle === 'annual') && (
-                      <span className="text-xs text-zinc-400 line-through ml-1 font-mono">
+                    <span className="text-xs text-zinc-400 font-medium">/ mo</span>
+                    {(isPartner100Coupon(appliedCoupon) || proPricing.discountPercentage > 0 || billingCycle === 'annual') && (
+                      <span className="text-xs text-zinc-500 line-through ml-1 font-mono">
                         {isPartner100Coupon(appliedCoupon)
                           ? (currency === 'INR' ? '₹2,499' : '$24')
-                          : (currency === 'INR' ? '₹2,499' : '$24')}
+                          : (currency === 'INR' ? (billingCycle === 'annual' ? '₹2,083' : '₹2,499') : '$24')}
                       </span>
                     )}
                   </div>
-                  <div className="text-[11px] text-zinc-500 mt-1.5 flex flex-col gap-0.5">
+                  <div className="text-[11px] text-zinc-400 mt-1.5 flex flex-col gap-0.5">
                     {isPartner100Coupon(appliedCoupon) ? (
-                      <span className="text-emerald-700 font-bold">100% Partner Discount Applied • ₹0 Forever</span>
+                      <span className="text-emerald-400 font-bold">100% Partner Discount Applied • ₹0 Forever</span>
                     ) : (billingCycle === 'annual' ? (
                       <>
-                        <div className="flex items-center gap-1.5 font-medium text-emerald-700">
-                          <span>Billed annually: {currency === 'INR' ? '₹24,990 / yr' : '$240 / yr'}</span>
-                          <span className="text-zinc-300">&bull;</span>
-                          <span className="text-emerald-800 font-bold">{currency === 'INR' ? 'Save ₹4,998' : 'Save $48'}</span>
+                        <div className="flex items-center gap-1.5 font-medium text-emerald-400">
+                          <span>Billed annually: {currency === 'INR' ? `₹${proPricing.grandTotal.toLocaleString('en-IN')} / yr` : '$240 / yr'}</span>
+                          <span className="text-zinc-600">&bull;</span>
+                          <span className="text-emerald-300 font-bold">
+                            {currency === 'INR' 
+                              ? `Save ₹${(proPricing.standardFullRate - proPricing.grandTotal).toLocaleString('en-IN')}` 
+                              : 'Save $48'}
+                          </span>
                         </div>
-                        <div className="text-[10px] text-zinc-400">
+                        <div className="text-[10px] text-zinc-500">
                           {currency === 'INR' ? 'Includes 18% GST (12 mos. for the price of 10)' : '12 months access for price of 10'}
                         </div>
                       </>
                     ) : (
-                      <div className="text-zinc-500 h-4 flex items-center">Billed monthly &bull; Incl. 18% GST</div>
+                      <div className="text-zinc-400 h-4 flex items-center">Billed monthly &bull; Incl. 18% GST</div>
                     ))}
                   </div>
                 </div>
@@ -1101,6 +1180,11 @@ export default function PricingPage() {
                       2 MO. FREE
                     </span>
                   )}
+                  {scalePricing.isReferralDiscount && (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-white text-purple-950 text-[9.5px] font-mono font-bold tracking-tight">
+                      10% REF OFF
+                    </span>
+                  )}
                 </div>
                 <p className="text-xs text-indigo-50/90 leading-relaxed line-clamp-2 h-[36px] flex items-start">
                   Scale your agency with unlimited seats, custom APIs, and free site migration.
@@ -1115,14 +1199,14 @@ export default function PricingPage() {
                 <div className="mb-4 flex flex-col justify-center shrink-0">
                   <div className="h-8 flex items-baseline gap-1.5 flex-wrap">
                     <span className="text-3xl sm:text-[34px] font-display font-bold text-zinc-950 tracking-tight leading-none">
-                      {billingCycle === 'annual'
-                        ? (currency === 'INR' ? '₹3,749' : '$37.50')
-                        : (currency === 'INR' ? '₹4,499' : '$45')}
+                      {currency === 'INR'
+                        ? `₹${scalePricing.effectiveMonthlyRate.toLocaleString('en-IN')}`
+                        : (billingCycle === 'annual' ? '$37.50' : '$45')}
                     </span>
                     <span className="text-xs text-zinc-500 font-medium">/ mo</span>
-                    {billingCycle === 'annual' && (
+                    {(scalePricing.discountPercentage > 0 || billingCycle === 'annual') && (
                       <span className="text-xs text-zinc-400 line-through ml-1 font-mono">
-                        {currency === 'INR' ? '₹4,499' : '$45'}
+                        {currency === 'INR' ? (billingCycle === 'annual' ? '₹3,749' : '₹4,499') : '$45'}
                       </span>
                     )}
                   </div>
@@ -1130,9 +1214,13 @@ export default function PricingPage() {
                     {billingCycle === 'annual' ? (
                       <>
                         <div className="flex items-center gap-1.5 font-medium text-emerald-700">
-                          <span>Billed annually: {currency === 'INR' ? '₹44,990 / yr' : '$450 / yr'}</span>
+                          <span>Billed annually: {currency === 'INR' ? `₹${scalePricing.grandTotal.toLocaleString('en-IN')} / yr` : '$450 / yr'}</span>
                           <span className="text-zinc-300">&bull;</span>
-                          <span className="text-emerald-800 font-bold">{currency === 'INR' ? 'Save ₹8,998' : 'Save $90'}</span>
+                          <span className="text-emerald-800 font-bold">
+                            {currency === 'INR' 
+                              ? `Save ₹${(scalePricing.standardFullRate - scalePricing.grandTotal).toLocaleString('en-IN')}` 
+                              : 'Save $90'}
+                          </span>
                         </div>
                         <div className="text-[10px] text-zinc-400">
                           {currency === 'INR' ? 'Includes 18% GST (12 mos. for the price of 10)' : '12 months access for price of 10'}
@@ -1935,10 +2023,12 @@ export default function PricingPage() {
               <div className="flex items-center gap-2 sm:gap-2.5">
                 <div className="flex items-baseline gap-1 sm:gap-1.5">
                   <span className="text-3xl sm:text-4xl font-display font-extrabold text-zinc-950">
-                    {appliedCoupon === 'INDIA40' ? '₹299' : '₹499'}
+                    {appliedCoupon === 'INDIA40' 
+                      ? '₹299' 
+                      : `₹${indiaPricing.effectiveMonthlyRate.toLocaleString('en-IN')}`}
                   </span>
                   <span className="text-xs text-zinc-500 font-medium">/ month</span>
-                  {appliedCoupon === 'INDIA40' && (
+                  {(appliedCoupon === 'INDIA40' || indiaPricing.isReferralDiscount) && (
                     <span className="text-base text-zinc-400 line-through ml-1 font-mono font-bold">
                       ₹499
                     </span>
@@ -1947,6 +2037,11 @@ export default function PricingPage() {
                 <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 text-[10px] sm:text-[11px] font-bold tracking-wide">
                   Annual Plan Only
                 </span>
+                {indiaPricing.isReferralDiscount && appliedCoupon !== 'INDIA40' && (
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-zinc-950 text-white text-[9.5px] font-mono font-bold tracking-tight">
+                    10% REF OFF
+                  </span>
+                )}
               </div>
 
               <div className="text-[11px] sm:text-xs text-zinc-500 font-mono text-left sm:text-right">
@@ -1954,11 +2049,15 @@ export default function PricingPage() {
                   <>
                     Billed as <span className="text-emerald-700 font-bold">₹3,588/year</span> &bull; <span className="text-emerald-600 font-semibold">Save ₹2,400 with 40% Off</span>
                   </>
+                ) : (indiaPricing.isReferralDiscount ? (
+                  <>
+                    Billed as <span className="text-zinc-950 font-semibold">₹{indiaPricing.grandTotal.toLocaleString('en-IN')}/year</span> &bull; <span className="text-emerald-700 font-bold">Save 10% (Save ₹599)</span>
+                  </>
                 ) : (
                   <>
                     Billed as <span className="text-zinc-950 font-semibold">₹5,988/year</span> &bull; 1-Year Commitment
                   </>
-                )}
+                ))}
               </div>
 
               <button
@@ -1966,7 +2065,11 @@ export default function PricingPage() {
                 onClick={() => handleInitiatePlan('india_only')}
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-zinc-950 hover:bg-zinc-800 text-white px-5 py-2.5 sm:px-7 sm:py-3.5 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-md hover:shadow-lg cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
               >
-                <span>{appliedCoupon === 'INDIA40' ? 'Claim 40% Discount (₹299/mo) →' : 'Claim India Only Plan'}</span>
+                <span>
+                  {appliedCoupon === 'INDIA40' 
+                    ? 'Claim 40% Discount (₹299/mo) →' 
+                    : (indiaPricing.isReferralDiscount ? `Claim with 10% Referral Discount (₹${indiaPricing.effectiveMonthlyRate}/mo) →` : 'Claim India Only Plan')}
+                </span>
                 <ArrowRight className="w-4 h-4 text-zinc-400" />
               </button>
             </div>

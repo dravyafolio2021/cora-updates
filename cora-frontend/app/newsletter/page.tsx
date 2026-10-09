@@ -31,30 +31,12 @@ export default function NewsletterPage() {
   return (
     <main className="bg-white text-zinc-950">
       <GlobalResourcesHero
-        tone="studio"
+        tone="neutral"
         badgeIcon={<Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-purple-600" />}
         badgeText="Cora Operator Brief"
         titleLine1="Cora Operator Brief"
         titleLine2="One useful agency operating system every week"
         description="No generic SaaS noise or fluffy marketing updates. Just practical systems, templates, and operating architectures for running a calmer, more profitable client-service business."
-        pillars={[
-          {
-            icon: <Check className="w-3.5 h-3.5 text-emerald-600 font-bold" />,
-            text: '100% Free Weekly Brief',
-          },
-          {
-            icon: <Clock className="w-3.5 h-3.5 text-purple-600" />,
-            text: '3-Minute Read',
-          },
-          {
-            icon: <ShieldCheck className="w-3.5 h-3.5 text-indigo-600" />,
-            text: 'Zero Spam Policy',
-          },
-          {
-            icon: <Mail className="w-3.5 h-3.5 text-amber-500" />,
-            text: 'Actionable Templates Included',
-          },
-        ]}
       >
         <div className="mx-auto max-w-2xl text-left pt-2">
           <NewsletterCapture

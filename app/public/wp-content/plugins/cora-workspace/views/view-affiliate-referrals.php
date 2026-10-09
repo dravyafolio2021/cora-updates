@@ -876,9 +876,9 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                             <span class="text-[9px] font-semibold px-2 py-0.2 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">30-Day Cookie Active</span>
                         </div>
                         <div class="relative flex items-center">
-                            <input id="cora-ref-link-input" type="text" readonly value="<?php echo esc_attr( $ref_url ); ?>" class="w-full pl-3 pr-20 py-2 text-xs font-mono bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-900 dark:text-zinc-100 select-all focus:outline-none">
-                            <button type="button" onclick="coraCopyReferralLink()" class="absolute right-1 px-3 py-1 text-xs font-semibold bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 rounded-lg transition-all cursor-pointer">
-                                Copy
+                            <input id="cora-ref-link-input" type="text" readonly value="<?php echo esc_attr( $ref_url ); ?>" class="w-full pl-3 pr-24 py-2 text-xs font-mono bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-900 dark:text-zinc-100 select-all focus:outline-none">
+                            <button type="button" id="cora-copy-link-btn" onclick="coraCopyReferralLink(this)" class="absolute right-1 px-3 py-1 text-xs font-semibold bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 rounded-lg transition-all cursor-pointer">
+                                Copy Link
                             </button>
                         </div>
                     </div>
@@ -900,6 +900,11 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                             <span>X</span>
                         </button>
 
+                        <button type="button" onclick="coraShareEmail()" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-200/80 dark:border-zinc-700 rounded-xl transition-all cursor-pointer">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                            <span>Email</span>
+                        </button>
+
                         <button type="button" onclick="coraOpenQRCodeModal()" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-200/80 dark:border-zinc-700 rounded-xl transition-all cursor-pointer">
                             <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M2 2h8v8H2V2zm2 2v4h4V4H4zm1 1h2v2H5V5zm9-3h8v8h-8V2zm2 2v4h4V4h-4zm1 1h2v2h-2V5zM2 14h8v8H2v-8zm2 2v4h4v-4H4zm1 1h2v2H5v-2zm9-1h2v2h-2v-2zm4 0h2v2h-2v-2zm-4 4h2v2h-2v-2zm2-2h2v2h-2v-2zm2 2h2v2h-2v-2zm-6 2h2v2h-2v-2zm6 0h2v2h-2v-2zm-2-6h2v2h-2v-2z"/></svg>
                             <span>QR Code</span>
@@ -907,18 +912,34 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                     </div>
                 </div>
 
-                <!-- Custom Slug Form -->
-                <div class="pt-2.5 border-t border-zinc-100 dark:border-zinc-800/70 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-                    <div class="flex items-center gap-2">
-                        <span class="text-zinc-400">Custom Affiliate Handle:</span>
-                        <span id="cora-display-slug" class="font-mono font-bold text-zinc-800 dark:text-zinc-200 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded"><?php echo esc_html( $custom_slug ); ?></span>
-                        <button type="button" onclick="coraToggleSlugEditor()" class="text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 underline cursor-pointer">Customize</button>
+                <!-- Custom Slug Form with Live URL Preview -->
+                <div class="pt-3 border-t border-zinc-100 dark:border-zinc-800/70 space-y-2 text-xs">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div class="flex items-center gap-2">
+                            <span class="text-zinc-500 dark:text-zinc-400 font-medium">Custom Affiliate Handle:</span>
+                            <span id="cora-display-slug" class="font-mono font-bold text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded"><?php echo esc_html( $custom_slug ); ?></span>
+                            <button type="button" id="cora-btn-customize-slug" onclick="coraToggleSlugEditor()" class="text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 underline font-medium cursor-pointer">Customize</button>
+                        </div>
+                        <div class="text-[11px] text-zinc-400 font-mono" id="cora-live-slug-preview-bar">
+                            <span>Link Preview: </span><code class="text-zinc-700 dark:text-zinc-300 font-bold" id="cora-display-slug-url"><?php echo esc_html( home_url( '/?ref=' . $custom_slug ) ); ?></code>
+                        </div>
                     </div>
 
-                    <div id="cora-slug-editor" class="hidden flex items-center gap-2">
-                        <input id="cora-custom-slug-input" type="text" placeholder="e.g. zenith-studio" value="<?php echo esc_attr( $custom_slug ); ?>" class="px-2.5 py-1 text-xs bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded-lg text-zinc-900 dark:text-zinc-100 font-mono focus:outline-none">
-                        <button type="button" onclick="coraSaveCustomSlug()" class="px-3 py-1 text-xs font-semibold bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:text-zinc-900 rounded-lg transition-all cursor-pointer">Save</button>
-                        <button type="button" onclick="coraToggleSlugEditor()" class="px-2 py-1 text-xs text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 cursor-pointer">Cancel</button>
+                    <div id="cora-slug-editor" class="hidden p-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800 rounded-xl space-y-2.5">
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+                            <div class="flex items-center flex-1">
+                                <span class="px-2.5 py-1.5 text-xs bg-zinc-100 dark:bg-zinc-800 border border-r-0 border-zinc-200 dark:border-zinc-700 rounded-l-lg text-zinc-500 font-mono text-[11px] shrink-0"><?php echo esc_html( home_url( '/?ref=' ) ); ?></span>
+                                <input id="cora-custom-slug-input" type="text" oninput="coraOnSlugInput(this.value)" placeholder="e.g. zenith-studio" value="<?php echo esc_attr( $custom_slug ); ?>" class="w-full px-2.5 py-1.5 text-xs bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-r-lg text-zinc-900 dark:text-zinc-100 font-mono font-bold focus:outline-none">
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <button type="button" id="cora-save-slug-btn" onclick="coraSaveCustomSlug()" class="px-3.5 py-1.5 text-xs font-semibold bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:text-zinc-900 rounded-lg transition-all cursor-pointer">Save Handle</button>
+                                <button type="button" onclick="coraToggleSlugEditor(false)" class="px-2.5 py-1.5 text-xs text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 cursor-pointer">Cancel</button>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between text-[10px] text-zinc-400">
+                            <span>Use 3-32 alphanumeric characters (letters, numbers, hyphens, underscores).</span>
+                            <span id="cora-slug-char-count" class="font-mono"><?php echo strlen( $custom_slug ); ?>/32</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1061,7 +1082,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                     </div>
                     <div>
                         <div class="flex items-center gap-1.5">
-                            <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Your Standing (<?php echo esc_html( $custom_slug ); ?>)</span>
+                            <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Your Standing (<span class="cora-standing-slug"><?php echo esc_html( $custom_slug ); ?></span>)</span>
                             <span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-zinc-200 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-200">Rising +2</span>
                         </div>
                         <p class="text-[10px] text-zinc-500 dark:text-zinc-400">7 more paid referrals to enter the Top 3 Podium!</p>
@@ -1142,7 +1163,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                             <span class="font-mono font-bold text-sm w-7 text-zinc-900 dark:text-zinc-100">#4</span>
                             <div class="truncate">
                                 <div class="font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5 truncate">
-                                    <span><?php echo esc_html( $custom_slug ); ?></span>
+                                    <span class="cora-standing-slug"><?php echo esc_html( $custom_slug ); ?></span>
                                     <span class="px-1.5 py-0.2 rounded text-[9px] bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900">You</span>
                                 </div>
                                 <div class="text-[10px] text-zinc-500 dark:text-zinc-400">🥉 Bronze Partner</div>
@@ -1560,22 +1581,41 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 <!-- ================================================================= -->
 <div id="cora-affiliate-qr-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
     <div onclick="coraCloseQRCodeModal()" class="absolute inset-0 bg-zinc-950/45 backdrop-blur-xs cursor-pointer"></div>
-    <div class="relative w-full max-w-xs bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 shadow-2xl z-10 text-center space-y-3">
-        <div>
-            <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-50">Scan Partner QR Code</h3>
-            <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Let clients scan this code to sign up under your agency.</p>
+    <div class="relative w-full max-w-sm bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-5 sm:p-6 shadow-2xl z-10 text-center space-y-4">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2 text-left">
+                <div class="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-700 dark:text-zinc-300">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M2 2h8v8H2V2zm2 2v4h4V4H4zm1 1h2v2H5V5zm9-3h8v8h-8V2zm2 2v4h4V4h-4zm1 1h2v2h-2V5zM2 14h8v8H2v-8zm2 2v4h4v-4H4zm1 1h2v2H5v-2zm9-1h2v2h-2v-2zm4 0h2v2h-2v-2zm-4 4h2v2h-2v-2zm2-2h2v2h-2v-2zm2 2h2v2h-2v-2zm-6 2h2v2h-2v-2zm6 0h2v2h-2v-2zm-2-6h2v2h-2v-2z"/></svg>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-50">Partner QR Code</h3>
+                    <p class="text-[11px] text-zinc-500 dark:text-zinc-400">Scan to claim 10% off + 100 free AI Runes</p>
+                </div>
+            </div>
+            <button type="button" onclick="coraCloseQRCodeModal()" class="p-1.5 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 rounded-lg cursor-pointer">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
         </div>
 
         <!-- Generated QR Vector -->
-        <div class="bg-zinc-50 dark:bg-zinc-950 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 flex items-center justify-center">
-            <div id="cora-qr-canvas-holder" class="p-2 bg-white rounded-lg shadow-3xs">
-                <img id="cora-qr-img" src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=<?php echo urlencode( $ref_url ); ?>&color=18-18-1b" alt="QR Code" width="160" height="160" class="rounded-md">
+        <div class="bg-zinc-50 dark:bg-zinc-950 p-4 sm:p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 flex flex-col items-center justify-center space-y-3">
+            <div id="cora-qr-canvas-holder" class="p-3 bg-white rounded-xl shadow-3xs border border-zinc-200/60 inline-block">
+                <img id="cora-qr-img" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=<?php echo urlencode( $ref_url ); ?>&color=18-18-1b&bgcolor=ffffff" alt="Partner QR Code" width="170" height="170" class="rounded-md block mx-auto">
+            </div>
+            <div class="text-[11px] font-mono text-zinc-500 dark:text-zinc-400 break-all px-2 max-w-xs" id="cora-qr-modal-url-text">
+                <?php echo esc_html( $ref_url ); ?>
             </div>
         </div>
 
-        <div class="pt-1 flex items-center justify-center gap-2">
-            <button type="button" onclick="coraCloseQRCodeModal()" class="px-3.5 py-1.5 text-xs font-semibold text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 rounded-xl hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all cursor-pointer">Close</button>
-            <button type="button" onclick="coraCopyReferralLink(); coraCloseQRCodeModal();" class="px-4 py-1.5 text-xs font-semibold text-white bg-zinc-950 dark:bg-zinc-100 dark:text-zinc-950 rounded-xl hover:opacity-90 transition-all cursor-pointer">Copy Link</button>
+        <div class="grid grid-cols-2 gap-2 pt-1">
+            <button type="button" id="cora-qr-download-btn" onclick="coraDownloadQRCode()" class="inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold text-zinc-800 dark:text-zinc-200 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 rounded-xl transition-all cursor-pointer">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                <span>Download QR</span>
+            </button>
+            <button type="button" id="cora-qr-copy-btn" onclick="coraCopyReferralLink(this)" class="inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold text-white bg-zinc-950 hover:bg-zinc-900 dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-950 rounded-xl shadow-3xs transition-all cursor-pointer">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                <span>Copy Link</span>
+            </button>
         </div>
     </div>
 </div>
@@ -1864,29 +1904,141 @@ function coraSubmitAffiliateEnrollment() {
 }
 
 /* --- DASHBOARD HANDLERS --- */
-function coraCopyReferralLink() {
+function coraCopyReferralLink(btnEl) {
+    var url = (window.coraAffiliateState && window.coraAffiliateState.referralUrl) 
+        ? window.coraAffiliateState.referralUrl 
+        : (document.getElementById('cora-ref-link-input') ? document.getElementById('cora-ref-link-input').value : window.location.origin + '/?ref=partner');
+
     var input = document.getElementById('cora-ref-link-input');
     if (input) {
-        input.select();
-        navigator.clipboard.writeText(input.value).then(function() {
-            if (window.coraShowToast) {
-                window.coraShowToast('Referral link copied to clipboard!', 'success');
-            }
+        input.value = url;
+        try {
+            input.focus();
+            input.select();
+        } catch (e) {}
+    }
+
+    function triggerSuccessFeedback() {
+        if (window.coraShowToast) {
+            window.coraShowToast('Referral link copied to clipboard!', 'success');
+        }
+
+        // Collect all related copy buttons on the page for synchronized feedback
+        var targetButtons = [];
+        if (btnEl) targetButtons.push(btnEl);
+        
+        var knownSelectors = ['#cora-copy-link-btn', '#cora-qr-copy-btn', '.cora-workspace-header-cta button', '[onclick*="coraCopyReferralLink"]'];
+        knownSelectors.forEach(function(sel) {
+            var found = document.querySelectorAll(sel);
+            found.forEach(function(b) {
+                if (targetButtons.indexOf(b) === -1) targetButtons.push(b);
+            });
         });
+
+        targetButtons.forEach(function(b) {
+            if (!b || !b.innerHTML) return;
+            var originalHtml = b.getAttribute('data-orig-copy-html');
+            if (!originalHtml) {
+                originalHtml = b.innerHTML;
+                b.setAttribute('data-orig-copy-html', originalHtml);
+            }
+            b.innerHTML = '<span class="inline-flex items-center gap-1 font-bold">✓ Copied!</span>';
+            setTimeout(function() {
+                b.innerHTML = originalHtml;
+            }, 2000);
+        });
+    }
+
+    // Modern Clipboard API with graceful hidden textarea fallback
+    if (navigator.clipboard && window.isSecureContext && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(function() {
+            triggerSuccessFeedback();
+        }).catch(function() {
+            fallbackExecCopy(url);
+        });
+    } else {
+        fallbackExecCopy(url);
+    }
+
+    function fallbackExecCopy(text) {
+        var textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-9999px';
+        textArea.style.top = '-9999px';
+        textArea.style.opacity = '0';
+        textArea.setAttribute('readonly', '');
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+            var successful = document.execCommand('copy');
+            if (successful) {
+                triggerSuccessFeedback();
+            } else {
+                if (window.coraShowToast) window.coraShowToast('Please copy link manually: ' + text, 'info');
+            }
+        } catch (err) {
+            if (window.coraShowToast) window.coraShowToast('Failed to copy. Please copy link manually.', 'error');
+        }
+        document.body.removeChild(textArea);
     }
 }
 
-function coraToggleSlugEditor() {
+function coraToggleSlugEditor(forceState) {
     var box = document.getElementById('cora-slug-editor');
-    if (box) {
+    if (!box) return;
+    if (typeof forceState === 'boolean') {
+        if (forceState) {
+            box.classList.remove('hidden');
+        } else {
+            box.classList.add('hidden');
+        }
+    } else {
         box.classList.toggle('hidden');
+    }
+    if (!box.classList.contains('hidden')) {
+        var input = document.getElementById('cora-custom-slug-input');
+        if (input) {
+            input.focus();
+            input.select();
+        }
+    }
+}
+
+function coraOnSlugInput(val) {
+    var clean = String(val).toLowerCase().replace(/[^a-z0-9-_]/g, '');
+    var input = document.getElementById('cora-custom-slug-input');
+    if (input && input.value !== clean) {
+        input.value = clean;
+    }
+    var countEl = document.getElementById('cora-slug-char-count');
+    if (countEl) countEl.innerText = clean.length + '/32';
+    
+    var previewUrlEl = document.getElementById('cora-display-slug-url');
+    if (previewUrlEl) {
+        var origin = (window.coraAffiliateState && window.coraAffiliateState.referralUrl) ? window.coraAffiliateState.referralUrl.split('?')[0] : (window.location.origin + '/');
+        previewUrlEl.innerText = origin + '?ref=' + (clean || 'your-handle');
     }
 }
 
 function coraSaveCustomSlug() {
     var input = document.getElementById('cora-custom-slug-input');
-    var slug = input ? input.value.trim() : '';
-    if (!slug) return;
+    var rawSlug = input ? input.value.trim() : '';
+    var slug = rawSlug.toLowerCase().replace(/[^a-z0-9-_]/g, '');
+    
+    if (slug.length < 3 || slug.length > 32) {
+        if (window.coraShowToast) {
+            window.coraShowToast('Referral handle must be between 3 and 32 alphanumeric characters.', 'error');
+        }
+        return;
+    }
+
+    var saveBtn = document.getElementById('cora-save-slug-btn');
+    if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.innerText = 'Saving...';
+    }
 
     var formData = new FormData();
     formData.append('action', 'cora_affiliate_update_slug');
@@ -1901,23 +2053,109 @@ function coraSaveCustomSlug() {
     })
     .then(function(r){ return r.json(); })
     .then(function(res){
-        if (res.success) {
-            document.getElementById('cora-ref-link-input').value = res.data.referral_url;
-            document.getElementById('cora-display-slug').innerText = res.data.custom_slug;
-            window.coraAffiliateState.referralUrl = res.data.referral_url;
-            coraToggleSlugEditor();
+        if (saveBtn) {
+            saveBtn.disabled = false;
+            saveBtn.innerText = 'Save Handle';
+        }
+        if (res.success && res.data) {
+            var updatedSlug = res.data.custom_slug || slug;
+            var updatedUrl = res.data.referral_url || (window.location.origin + '/?ref=' + updatedSlug);
+
+            // 1. Update State
+            if (window.coraAffiliateState) {
+                window.coraAffiliateState.customSlug = updatedSlug;
+                window.coraAffiliateState.referralUrl = updatedUrl;
+            }
+
+            // 2. Update Input & Badges
+            var refInput = document.getElementById('cora-ref-link-input');
+            if (refInput) refInput.value = updatedUrl;
+
+            var displaySlug = document.getElementById('cora-display-slug');
+            if (displaySlug) displaySlug.innerText = updatedSlug;
+
+            var displaySlugUrl = document.getElementById('cora-display-slug-url');
+            if (displaySlugUrl) displaySlugUrl.innerText = updatedUrl;
+
+            // 3. Update QR Modal Elements
+            var qrModalUrl = document.getElementById('cora-qr-modal-url-text');
+            if (qrModalUrl) qrModalUrl.innerText = updatedUrl;
+
+            var qrImg = document.getElementById('cora-qr-img');
+            if (qrImg) {
+                qrImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(updatedUrl) + '&color=18-18-1b&bgcolor=ffffff';
+            }
+
+            // 4. Update Standing & Leaderboard Slugs
+            var standingSlugs = document.querySelectorAll('.cora-standing-slug');
+            standingSlugs.forEach(function(el) {
+                el.innerText = updatedSlug;
+            });
+
+            coraToggleSlugEditor(false);
+
             if (window.coraShowToast) {
-                window.coraShowToast('Custom referral handle updated!', 'success');
+                window.coraShowToast('Custom referral handle updated to "' + updatedSlug + '"!', 'success');
             }
         } else {
             if (window.coraShowToast) {
-                window.coraShowToast(res.data.message || 'Error updating slug', 'error');
+                window.coraShowToast((res.data && res.data.message) ? res.data.message : 'Error updating custom referral handle.', 'error');
             }
         }
     })
     .catch(function(){
-        if (window.coraShowToast) window.coraShowToast('Network error while updating slug', 'error');
+        if (saveBtn) {
+            saveBtn.disabled = false;
+            saveBtn.innerText = 'Save Handle';
+        }
+        if (window.coraShowToast) window.coraShowToast('Network error while updating referral handle.', 'error');
     });
+}
+
+function coraDownloadQRCode() {
+    var img = document.getElementById('cora-qr-img');
+    if (!img) return;
+    var url = img.src;
+    fetch(url)
+        .then(function(res) { return res.blob(); })
+        .then(function(blob) {
+            var a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            var slug = (window.coraAffiliateState && window.coraAffiliateState.customSlug) ? window.coraAffiliateState.customSlug : 'partner';
+            a.download = 'cora-referral-qr-' + slug + '.png';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            if (window.coraShowToast) window.coraShowToast('Partner QR Code downloaded successfully!', 'success');
+        })
+        .catch(function() {
+            window.open(url, '_blank');
+            if (window.coraShowToast) window.coraShowToast('Opened QR Code in new tab for saving.', 'info');
+        });
+}
+
+function coraShareWhatsApp() {
+    var url = (window.coraAffiliateState && window.coraAffiliateState.referralUrl) ? window.coraAffiliateState.referralUrl : (document.getElementById('cora-ref-link-input') ? document.getElementById('cora-ref-link-input').value : '');
+    var text = encodeURIComponent("Get an exclusive 10% discount on all Cora plans + 100 free AI Runes with my referral link: " + url);
+    window.open("https://api.whatsapp.com/send?text=" + text, '_blank');
+}
+
+function coraShareLinkedIn() {
+    var url = (window.coraAffiliateState && window.coraAffiliateState.referralUrl) ? window.coraAffiliateState.referralUrl : (document.getElementById('cora-ref-link-input') ? document.getElementById('cora-ref-link-input').value : '');
+    window.open("https://www.linkedin.com/sharing/share-offsite/?url=" + encodeURIComponent(url), '_blank');
+}
+
+function coraShareTwitter() {
+    var url = (window.coraAffiliateState && window.coraAffiliateState.referralUrl) ? window.coraAffiliateState.referralUrl : (document.getElementById('cora-ref-link-input') ? document.getElementById('cora-ref-link-input').value : '');
+    var text = encodeURIComponent("Get an exclusive 10% discount on all Cora plans + 100 free AI Runes with my referral link: ");
+    window.open("https://twitter.com/intent/tweet?text=" + text + "&url=" + encodeURIComponent(url), '_blank');
+}
+
+function coraShareEmail() {
+    var url = (window.coraAffiliateState && window.coraAffiliateState.referralUrl) ? window.coraAffiliateState.referralUrl : (document.getElementById('cora-ref-link-input') ? document.getElementById('cora-ref-link-input').value : '');
+    var subject = encodeURIComponent("10% discount + 100 free AI Runes for Cora Workspace");
+    var body = encodeURIComponent("Get an exclusive 10% discount on all Cora plans + 100 free AI Runes with my referral link: " + url);
+    window.location.href = "mailto:?subject=" + subject + "&body=" + body;
 }
 
 function coraFilterReferralTable(filter) {
@@ -2039,23 +2277,6 @@ function coraOpenQRCodeModal() {
 function coraCloseQRCodeModal() {
     var modal = document.getElementById('cora-affiliate-qr-modal');
     if (modal) modal.classList.add('hidden'), modal.classList.remove('flex');
-}
-
-function coraShareWhatsApp() {
-    var url = encodeURIComponent(window.coraAffiliateState.referralUrl);
-    var text = encodeURIComponent("Join Cora - the AI workspace for creative studios and agencies. Sign up with my referral link to get 100 free bonus AI Runes: " + decodeURIComponent(url));
-    window.open("https://api.whatsapp.com/send?text=" + text, '_blank');
-}
-
-function coraShareLinkedIn() {
-    var url = encodeURIComponent(window.coraAffiliateState.referralUrl);
-    window.open("https://www.linkedin.com/sharing/share-offsite/?url=" + url, '_blank');
-}
-
-function coraShareTwitter() {
-    var url = encodeURIComponent(window.coraAffiliateState.referralUrl);
-    var text = encodeURIComponent("Check out Cora - the AI workspace for agencies and studios. Join via my link for 100 bonus AI Runes: ");
-    window.open("https://twitter.com/intent/tweet?text=" + text + "&url=" + url, '_blank');
 }
 
 // Auto-initialize screener simulator values on load

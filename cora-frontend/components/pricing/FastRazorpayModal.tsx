@@ -14,11 +14,18 @@ import {
   Building2 
 } from 'lucide-react';
 import { trackEvent } from '@/components/analytics/Analytics';
+import { 
+  getActiveReferralCode, 
+  initReferralTracking, 
+  persistReferralCode,
+  REFERRAL_DISCOUNT_PERCENTAGE 
+} from '@/lib/referral';
 
 declare global {
   interface Window {
     Razorpay: any;
     endorsely_referral?: string;
+    cora_referral?: string;
   }
 }
 
@@ -112,48 +119,21 @@ export function isPartner100Coupon(code: string | null | undefined): boolean {
 }
 
 /**
- * Safely extract Endorsely affiliate referral ID across window, cookies, localStorage, and URL params.
+ * Safely extract active referral code across window, cookies, localStorage, and URL params.
  */
 export function getEndorselyReferralId(): string {
-  if (typeof window === 'undefined') return '';
-  try {
-    // 1. Direct window global set by endorsely.js
-    if (window.endorsely_referral && typeof window.endorsely_referral === 'string') {
-      return window.endorsely_referral.trim();
-    }
-
-    // 2. Cookie lookup
-    const cookieMatch = document.cookie.match(/(?:^|;\s*)endorsely_referral=([^;]+)/);
-    if (cookieMatch && cookieMatch[1]) {
-      return decodeURIComponent(cookieMatch[1]).trim();
-    }
-
-    // 3. LocalStorage persistence
-    const stored = localStorage.getItem('endorsely_referral');
-    if (stored) {
-      return stored.trim();
-    }
-
-    // 4. URL query parameters (?via=... or ?ref=... or ?endorsely_referral=...)
-    const urlParams = new URLSearchParams(window.location.search);
-    const queryRef = urlParams.get('endorsely_referral') || urlParams.get('via') || urlParams.get('ref');
-    if (queryRef) {
-      localStorage.setItem('endorsely_referral', queryRef.trim());
-      return queryRef.trim();
-    }
-  } catch (e) {
-    // Silent failover
-  }
-  return '';
+  return getActiveReferralCode();
 }
 
 /**
- * Calculate accurate discounted pricing with coupon, annual 2-months-free, and 18% inclusive GST splits.
+ * Calculate accurate discounted pricing with coupon, active referral 10% discount,
+ * annual 2-months-free, and 18% inclusive GST splits.
  */
 export function calculateDiscountedPrice(
   planKey: PlanKey,
   billingCycle: BillingCycle,
-  couponCode?: string | null
+  couponCode?: string | null,
+  referralCode?: string | null
 ): {
   standardFullRate: number;
   annualSavings: number;
@@ -167,6 +147,8 @@ export function calculateDiscountedPrice(
   effectiveMonthlyRate: number;
   cleanCode: string;
   isAnnual: boolean;
+  isReferralDiscount: boolean;
+  activeReferralCode: string;
 } {
   const plan = PLAN_PRICING[planKey] || PLAN_PRICING.pro;
   const isAnnual = billingCycle === 'annual';
@@ -186,7 +168,9 @@ export function calculateDiscountedPrice(
   }
 
   let discountPercentage = 0;
+  let isReferralDiscount = false;
   const cleanCode = (couponCode || '').trim().toUpperCase();
+  const activeReferral = (referralCode !== undefined && referralCode !== null ? referralCode : getActiveReferralCode()).trim();
 
   if (isPartner100Coupon(couponCode)) {
     discountPercentage = 100;
@@ -208,6 +192,12 @@ export function calculateDiscountedPrice(
         discountPercentage = num;
       }
     }
+  }
+
+  // Pre-applied 10% Referral Discount: if no higher coupon code entered, apply 10% referral discount on paid plans
+  if (discountPercentage === 0 && activeReferral && planKey !== 'free') {
+    discountPercentage = REFERRAL_DISCOUNT_PERCENTAGE;
+    isReferralDiscount = true;
   }
 
   let discountAmount = 0;
@@ -242,7 +232,9 @@ export function calculateDiscountedPrice(
     grandTotal,
     effectiveMonthlyRate,
     cleanCode,
-    isAnnual
+    isAnnual,
+    isReferralDiscount,
+    activeReferralCode: activeReferral
   };
 }
 
@@ -253,21 +245,25 @@ export function triggerRazorpayCheckout({
   planKey,
   billingCycle,
   appliedCoupon,
+  referralCode,
   gstin,
   onDismiss
 }: {
   planKey: PlanKey;
   billingCycle: BillingCycle;
   appliedCoupon?: string | null;
+  referralCode?: string | null;
   gstin?: string | null;
   onDismiss?: () => void;
 }) {
-  const endorselyReferral = getEndorselyReferralId();
-  const refParam = endorselyReferral ? `&endorsely_referral=${encodeURIComponent(endorselyReferral)}` : '';
+  const activeReferral = (referralCode || getActiveReferralCode()).trim();
+  const refParam = activeReferral 
+    ? `&ref=${encodeURIComponent(activeReferral)}&cora_referral_code=${encodeURIComponent(activeReferral)}&endorsely_referral=${encodeURIComponent(activeReferral)}` 
+    : '';
 
   // Free Forever -> Instant zero-friction redirect with referral persistence
   if (planKey === 'free') {
-    trackEvent('free_plan_signup_clicked', { source: 'pricing_card', referral: endorselyReferral });
+    trackEvent('free_plan_signup_clicked', { source: 'pricing_card', referral: activeReferral });
     window.location.href = `https://app.heycora.in/workspace/login?plan=free${refParam}`;
     return;
   }
@@ -278,7 +274,7 @@ export function triggerRazorpayCheckout({
       plan: 'pro', 
       coupon: appliedCoupon, 
       billing: billingCycle,
-      referral: endorselyReferral 
+      referral: activeReferral 
     });
     window.location.href = `https://app.heycora.in/workspace/login?plan=pro&billing=${encodeURIComponent(billingCycle)}&coupon=${encodeURIComponent(appliedCoupon || '')}&discount=100&paid=1${refParam}`;
     return;
@@ -293,8 +289,9 @@ export function triggerRazorpayCheckout({
     gstTax,
     grandTotal,
     cleanCode,
-    isAnnual
-  } = calculateDiscountedPrice(planKey, billingCycle, appliedCoupon);
+    isAnnual,
+    isReferralDiscount
+  } = calculateDiscountedPrice(planKey, billingCycle, appliedCoupon, activeReferral);
 
   trackEvent('payment_initiate_direct', { 
     plan: planKey, 
@@ -302,23 +299,28 @@ export function triggerRazorpayCheckout({
     originalBasePrice,
     discountPercentage,
     discountAmount,
+    isReferralDiscount,
     taxableBase, 
     gstTax, 
     grandTotal,
     coupon: cleanCode,
     gstin: gstin || '',
-    referral: endorselyReferral 
+    referral: activeReferral 
   });
 
   const launchRzp = () => {
+    const discountLabel = isReferralDiscount 
+      ? ` + 10% Referral Discount via Partner @${activeReferral}` 
+      : (discountPercentage > 0 ? ` + ${discountPercentage}% OFF Coupon ${cleanCode}` : '');
+
     const options = {
       key: RAZORPAY_KEY,
       amount: Math.round(grandTotal * 100), // in paise (INCLUSIVE of 18% GST)
       currency: 'INR',
       name: 'Cora Studio AI',
       description: isAnnual
-        ? `${plan.name} Annual (12 Mos. Access • 2 Mos. Free${discountPercentage > 0 ? ` + ${discountPercentage}% OFF Coupon ${cleanCode}` : ''}) • ₹${grandTotal.toLocaleString('en-IN')} (Incl. 18% GST)`
-        : `${plan.name} Monthly${discountPercentage > 0 ? ` (${discountPercentage}% OFF Coupon ${cleanCode})` : ''} • ₹${grandTotal.toLocaleString('en-IN')} (Incl. 18% GST)`,
+        ? `${plan.name} Annual (12 Mos. Access • 2 Mos. Free${discountLabel}) • ₹${grandTotal.toLocaleString('en-IN')} (Incl. 18% GST)`
+        : `${plan.name} Monthly${discountLabel ? ` (${discountLabel})` : ''} • ₹${grandTotal.toLocaleString('en-IN')} (Incl. 18% GST)`,
       image: 'https://heycora.in/favicon.png',
       notes: {
         plan: planKey,
@@ -326,12 +328,15 @@ export function triggerRazorpayCheckout({
         billing_mode: isAnnual ? 'Annual (12 Months Access • Pay for 10 Months)' : 'Monthly',
         original_price: String(originalBasePrice),
         discount_applied: discountPercentage > 0 ? `${discountPercentage}% (Save ₹${discountAmount})` : (isAnnual ? '2 Months Free Included' : 'None'),
+        referral_discount_applied: isReferralDiscount ? '10%' : 'None',
+        cora_referral_code: activeReferral || '',
+        endorsely_referral: activeReferral || '',
+        commission_attributed_to: activeReferral || '',
         coupon: cleanCode || '',
         taxable_base_amount: String(taxableBase),
         gst_amount: String(gstTax),
         grand_total_inclusive: String(grandTotal),
-        gstin: gstin || '',
-        endorsely_referral: endorselyReferral || ''
+        gstin: gstin || ''
       },
       theme: {
         color: '#09090b',
@@ -344,7 +349,7 @@ export function triggerRazorpayCheckout({
           payment_id: response?.razorpay_payment_id,
           coupon: cleanCode,
           grand_total: grandTotal,
-          referral: endorselyReferral 
+          referral: activeReferral 
         });
 
         const paymentId = response?.razorpay_payment_id || '';
@@ -392,14 +397,8 @@ export function triggerRazorpayCheckout({
 export function useRazorpayPreload() {
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      // Capture and persist referral if present in URL on arrival
-      try {
-        const urlParams = new URLSearchParams(window.location.search);
-        const ref = urlParams.get('endorsely_referral') || urlParams.get('via') || urlParams.get('ref');
-        if (ref) {
-          localStorage.setItem('endorsely_referral', ref);
-        }
-      } catch (e) {}
+      // Universal detection, 30-day cookie persistence, and background ping
+      initReferralTracking();
 
       // Preload Razorpay SDK
       if (!window.Razorpay) {
@@ -417,24 +416,27 @@ export function useRazorpayPreload() {
 
 /**
  * Slide-in Interactive Checkout Drawer (Desktop Right Drawer / Mobile Bottom Sheet)
- * Provides 100% transparent pricing breakdown, live coupon code input, and instant Razorpay launch.
+ * Provides 100% transparent pricing breakdown, live coupon code input, pre-applied referral discounts, and instant Razorpay launch.
  */
 export function CheckoutDrawer({
   isOpen,
   onClose,
   planKey,
   initialBillingCycle = 'annual',
-  initialCoupon = null
+  initialCoupon = null,
+  initialReferral = null
 }: {
   isOpen: boolean;
   onClose: () => void;
   planKey: PlanKey;
   initialBillingCycle?: BillingCycle;
   initialCoupon?: string | null;
+  initialReferral?: string | null;
 }) {
   const [billingCycle, setBillingCycle] = useState<BillingCycle>(initialBillingCycle);
   const [couponInput, setCouponInput] = useState('');
   const [activeCoupon, setActiveCoupon] = useState<string | null>(initialCoupon);
+  const [activeReferral, setActiveReferral] = useState<string>(initialReferral || '');
   const [gstin, setGstin] = useState('');
   const [couponError, setCouponError] = useState('');
   const [isApplying, setIsApplying] = useState(false);
@@ -450,6 +452,13 @@ export function CheckoutDrawer({
     }
   }, [initialCoupon]);
 
+  useEffect(() => {
+    const ref = initialReferral || getActiveReferralCode();
+    if (ref) {
+      setActiveReferral(ref);
+    }
+  }, [initialReferral]);
+
   if (!isOpen) return null;
 
   const plan = PLAN_PRICING[planKey] || PLAN_PRICING.pro;
@@ -464,8 +473,9 @@ export function CheckoutDrawer({
     grandTotal,
     effectiveMonthlyRate,
     cleanCode,
-    isAnnual
-  } = calculateDiscountedPrice(planKey, billingCycle, activeCoupon);
+    isAnnual,
+    isReferralDiscount
+  } = calculateDiscountedPrice(planKey, billingCycle, activeCoupon, activeReferral);
 
   const handleApplyCoupon = (e: React.FormEvent) => {
     e.preventDefault();
@@ -496,6 +506,7 @@ export function CheckoutDrawer({
       planKey,
       billingCycle,
       appliedCoupon: activeCoupon,
+      referralCode: activeReferral,
       gstin: gstin.trim() || undefined,
       onDismiss: () => {}
     });
@@ -539,6 +550,19 @@ export function CheckoutDrawer({
         {/* Content Body */}
         <div className="p-5 sm:p-6 flex-1 space-y-5">
           
+          {/* Active Referral Announcement Banner inside Drawer */}
+          {activeReferral && (
+            <div className="p-3 rounded-2xl bg-zinc-900 text-white flex items-center justify-between text-xs font-mono shadow-sm">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span>Partner @{activeReferral}</span>
+              </div>
+              <span className="px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-200 text-[10px] font-bold">
+                10% Referral Discount
+              </span>
+            </div>
+          )}
+
           {/* Plan Selected Card */}
           <div className="p-4 rounded-2xl bg-zinc-50 border border-zinc-200/80 space-y-3">
             <div className="flex items-center justify-between">
@@ -588,11 +612,15 @@ export function CheckoutDrawer({
                 <Tag className="w-3.5 h-3.5 text-zinc-600" />
                 <span>Promo / Coupon Code</span>
               </span>
-              {activeCoupon && (
+              {activeCoupon ? (
                 <span className="text-emerald-700 font-bold text-[11px]">
                   ✓ {discountPercentage > 0 ? `${discountPercentage}% Discount Applied` : 'Coupon Active'}
                 </span>
-              )}
+              ) : (isReferralDiscount ? (
+                <span className="text-zinc-900 font-bold text-[11px]">
+                  ✓ 10% Referral Discount Active
+                </span>
+              ) : null)}
             </label>
 
             <form onSubmit={handleApplyCoupon} className="flex gap-2">
@@ -676,8 +704,19 @@ export function CheckoutDrawer({
               </div>
             )}
 
+            {/* Referral Discount */}
+            {isReferralDiscount && discountAmount > 0 && !activeCoupon && (
+              <div className="flex items-center justify-between text-zinc-950 font-bold bg-zinc-100 p-2 rounded-xl border border-zinc-200/80">
+                <span className="flex items-center gap-1">
+                  <Sparkles className="w-3.5 h-3.5 text-zinc-900" />
+                  <span>Partner Referral Discount (10% OFF via @{activeReferral})</span>
+                </span>
+                <span className="font-mono">-₹{discountAmount.toLocaleString('en-IN')}</span>
+              </div>
+            )}
+
             {/* Coupon Discount */}
-            {discountAmount > 0 && (
+            {!isReferralDiscount && discountAmount > 0 && (
               <div className="flex items-center justify-between text-emerald-700 font-bold bg-emerald-100/60 p-2 rounded-xl border border-emerald-200/80">
                 <span className="flex items-center gap-1">
                   <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
