@@ -1012,7 +1012,7 @@ export function Navbar() {
                         </div>
 
                         <Link
-                          href="/features/ai-cofounder"
+                          href="/ai-agent"
                           onClick={() => setActiveDropdown(null)}
                           className="flex items-start gap-3.5 p-2 rounded-2xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
                         >
@@ -2603,7 +2603,7 @@ export function Navbar() {
                         AI HELP
                       </span>
                     </div>
-                    <Link href="/features/ai-cofounder" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
+                    <Link href="/ai-agent" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-2xl hover:bg-zinc-50 transition-colors">
                       <AiCofounderColorIcon className="w-8 h-8 shrink-0" />
                       <div className="min-w-0 flex-1"><div className="text-xs font-bold text-zinc-950">AI Co-Founder</div><div className="text-[11px] text-zinc-500 line-clamp-1">Plan daily tasks, draft replies, and run operations.</div></div>
                     </Link>
