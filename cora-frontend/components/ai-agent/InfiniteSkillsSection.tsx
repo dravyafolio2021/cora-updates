@@ -154,20 +154,6 @@ export function InfiniteSkillsSection() {
       `}} />
 
       <div className="w-full max-w-[1360px] mx-auto px-4 sm:px-6">
-        
-        {/* Section Header */}
-        <div className="max-w-[760px] mx-auto text-center mb-10 sm:mb-14 space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-zinc-100 rounded-full border border-zinc-200/80 text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-800 shadow-2xs">
-            <Sparkles className="w-3.5 h-3.5 text-zinc-600" />
-            <span>PRODUCT CAPABILITIES</span>
-          </div>
-          <h2 className="font-display text-3xl sm:text-4xl lg:text-[46px] font-bold text-zinc-950 tracking-tight leading-[1.12]">
-            One workspace. All your features.
-          </h2>
-          <p className="text-zinc-600 text-sm sm:text-base max-w-[640px] mx-auto leading-relaxed">
-            From client brief intake and 18% GST tax invoices to SHA-256 NDAs and studio hold scheduling &mdash; every core feature is built natively into your Cora workspace.
-          </p>
-        </div>
 
         {/* ── SHOWCASE CONTAINER WITH RESPONSIVE DESKTOP & MOBILE BACKGROUNDS ── */}
         <div className="relative w-full rounded-[28px] sm:rounded-[36px] lg:rounded-[44px] overflow-hidden border border-zinc-200/80 shadow-xl bg-[#FAF6EE]">

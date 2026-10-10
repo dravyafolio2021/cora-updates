@@ -307,19 +307,7 @@ export default function AiAgentPage() {
         { y: 0, opacity: 1, duration: 0.8, stagger: 0.12, ease: 'power3.out' }
       );
 
-      // 2. Hero Powers Slide-In
-      gsap.fromTo(
-        '.gsap-hero-left',
-        { x: -30, opacity: 0 },
-        { x: 0, opacity: 1, duration: 0.75, delay: 0.25, ease: 'power3.out' }
-      );
-      gsap.fromTo(
-        '.gsap-hero-right',
-        { x: 30, opacity: 0 },
-        { x: 0, opacity: 1, duration: 0.75, delay: 0.25, ease: 'power3.out' }
-      );
-
-      // 3. Pinned Parallax Horizontal Scroll on Capabilities (AI Agent Team)
+      // 2. Pinned Parallax Horizontal Scroll on Capabilities (AI Agent Team)
       if (cardsTrackRef.current && capabilitiesSectionRef.current) {
         const track = cardsTrackRef.current;
         const getScrollDistance = () => track.scrollWidth - window.innerWidth + 80;
@@ -339,7 +327,7 @@ export default function AiAgentPage() {
         });
       }
 
-      // 5. Orchestration Pipeline Step Reveal
+      // 3. Orchestration Pipeline Step Reveal
       gsap.fromTo(
         '.gsap-orchestration-box',
         { y: 40, opacity: 0 },
@@ -351,23 +339,6 @@ export default function AiAgentPage() {
           scrollTrigger: {
             trigger: '#orchestration',
             start: 'top 80%',
-          },
-        }
-      );
-
-      // 7. Technology & Telemetry Cards Stagger
-      gsap.fromTo(
-        '.gsap-tech-card',
-        { y: 35, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.65,
-          stagger: 0.12,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: '#technology',
-            start: 'top 82%',
           },
         }
       );
@@ -400,20 +371,18 @@ export default function AiAgentPage() {
         {/* Soft Warm Radial Glow Behind Portrait */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] sm:w-[560px] h-[340px] sm:h-[560px] bg-radial from-orange-200/40 via-amber-100/20 to-transparent rounded-full blur-3xl pointer-events-none z-0" />
 
-        {/* Center Stage: Indian Female AI Co-Founder with Gradient Visor & Dissolving Edges */}
+        {/* Center Stage: Transparent AI Co-Founder Portrait seamlessly blending into hero canvas */}
         <div className="relative z-10 w-full max-w-[1280px] mx-auto px-4 flex-1 flex flex-col items-center justify-center my-auto">
           <div className="relative w-[280px] h-[280px] xs:w-[320px] xs:h-[320px] sm:w-[420px] sm:h-[420px] lg:w-[480px] lg:h-[480px]">
-            {/* Gradient Dissolve Mask so bottom/shoulders smoothly melt into canvas */}
-            <div className="relative w-full h-full [mask-image:linear-gradient(to_bottom,black_60%,black_80%,transparent_100%)]">
+            {/* Smooth bottom dissolve mask */}
+            <div className="relative w-full h-full [mask-image:linear-gradient(to_bottom,black_75%,transparent_100%)]">
               <Image
-                src="/images/cora_hero_indian_agent.png"
+                src="/images/cora_hero_agent_cutout.png"
                 alt="Cora AI Super Agent with Futuristic Visor"
                 fill
                 priority
-                className="object-contain drop-shadow-xl"
+                className="object-contain drop-shadow-2xl"
               />
-              {/* Bottom Scrim Dissolve */}
-              <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-white via-white/30 to-transparent pointer-events-none" />
             </div>
           </div>
         </div>
