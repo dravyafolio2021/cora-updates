@@ -85,12 +85,11 @@ def main():
     if os.path.exists(LOCAL_TAR):
         os.remove(LOCAL_TAR)
     
-    # Exclude .DS_Store, uploads and images (already on server)
+    # Exclude .DS_Store and uploads (already on server)
     subprocess.run([
         "tar", "-czf", LOCAL_TAR,
         "--exclude=.DS_Store",
         "--exclude=uploads",
-        "--exclude=images",
         "-C", LOCAL_OUT, "."
     ], check=True)
     print(f"Created {LOCAL_TAR} ({os.path.getsize(LOCAL_TAR)} bytes)")
@@ -155,6 +154,7 @@ echo "Remote deployment extraction finished successfully."
         ("UPI QR Generator (Next.js)", "https://heycora.in/tools/upi-qr-generator", "UPI"),
         ("Pricing & 40% Flash Tier (Next.js)", "https://heycora.in/pricing?coupon=INDIA40", "India"),
         ("Features Page (Next.js)", "https://heycora.in/features/", "Features"),
+        ("AI Co-Founder Page (Next.js)", "https://heycora.in/ai-agent/", "Super"),
         ("Integrations Hub (Next.js)", "https://heycora.in/integrations/", "Ecosystem"),
         ("Embed Builder Tool (Next.js)", "https://heycora.in/tools/embed-builder/", "Website Embed"),
         ("Templates & Theme Library (Next.js)", "https://heycora.in/templates", "Templates"),
