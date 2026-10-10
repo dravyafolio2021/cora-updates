@@ -102,7 +102,7 @@ export function FeaturesSidebar({
 }: FeaturesSidebarProps) {
 
   return (
-    <aside className="w-full space-y-6">
+    <aside data-lenis-prevent className="w-full space-y-6">
       
       {/* ── 1. SEARCH INPUT ── */}
       <div>
