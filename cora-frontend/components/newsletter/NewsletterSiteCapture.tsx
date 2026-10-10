@@ -33,7 +33,7 @@ export function NewsletterSiteCapture() {
     source = 'tool';
     title = 'Get the next useful agency tool before everyone else.';
     description = 'We send practical templates, generators and operating systems built to save real client-service work—not filler newsletters.';
-  } else if (pathname === '/agency-management-software-india/' || pathname.startsWith('/use-cases/marketing-seo')) {
+  } else if (pathname === '/agency-management-software-india/' || pathname.startsWith('/industries/marketing-seo')) {
     source = 'agency';
     title = 'A weekly operating brief for agency owners.';
     description = 'Client onboarding, scope control, retainers, reporting, delivery systems and AI workflows—one useful idea at a time.';

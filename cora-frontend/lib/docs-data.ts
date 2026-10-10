@@ -146,7 +146,7 @@ Cross-tenant leakage is prevented at both the database abstraction layer and the
 
 Cora bridges client-facing website generation and private agency management into a seamless experience:
 - **Homepage Positioning**: *"Build websites. Run your business, with an AI co-founder."*
-- **Dual Conversion Engine**: Primary "Sign in with Google" OAuth for rapid workspace creation, and secondary "Explore free templates" routing directly into the 16+ turnkey pre-seeded schemas at \`/use-cases\`.
+- **Dual Conversion Engine**: Primary "Sign in with Google" OAuth for rapid workspace creation, and secondary "Explore free templates" routing directly into the 16+ turnkey pre-seeded schemas at \`/industries\`.
 - **Tools & Templates Architecture**: The marketing navigation elevates free business calculators (18% GST calculator, retainer margin tool, proposal generator) alongside production website and workspace templates with instant lead capture bridge into \`wp_cora_leads\`.
 
 ---
@@ -766,7 +766,7 @@ Connect your production Next.js repositories directly via GitHub Personal Access
 ## 10. Tools & Templates Ecosystem (16+ Schemas)
 
 Directly integrated with the public homepage ("Explore free templates") and navigation ("Tools & Templates"):
-- **16+ Turnkey Industry Schemas at \`/use-cases\` & \`/templates\`**:
+- **16+ Turnkey Industry Schemas at \`/industries\` & \`/templates\`**:
   - Photography Studios, Real Estate Brokerages, Digital Marketing Agencies, Stationery Manufacturing & Van Sales, Consulting & Professional Services, Wedding Productions, Salons & Clinics, and Creator Retainers.
 - **4 Interoperable Distribution Formats**:
   - Native Landing Pages (\`native_page\`), AI Section Prompts for Claude/Cursor (\`section_prompts\`), Elementor Template Kits (\`elementor_kit\`), and Lovable / React Projects (\`lovable_project\`).

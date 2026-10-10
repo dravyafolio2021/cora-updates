@@ -53,10 +53,10 @@ export function ModuleCardVisual({ slug, category, title }: ModuleCardVisualProp
   // ── 1. AI CO-FOUNDER (Coral/Peach Reference Style: 3D Floating Action Pills) ──
   if (slug === 'ai-cofounder') {
     return (
-      <div className="w-full h-full bg-gradient-to-b from-[#FFF5F2] via-[#FFEBE5] to-white relative flex items-center justify-center p-4">
+      <div className="w-full h-full bg-zinc-50/60 relative flex items-center justify-center p-4">
         <div className="relative w-full max-w-[260px] flex flex-col items-center gap-2.5">
           {/* Top Pill with Avatar & Checkmark */}
-          <div className="w-full bg-white rounded-2xl p-2.5 shadow-[0_8px_20px_rgba(0,0,0,0.06)] border border-white flex items-center justify-between gap-2 transform -translate-y-1">
+          <div className="w-full bg-white rounded-2xl p-2.5 shadow-2xs border border-white flex items-center justify-between gap-2 transform -translate-y-1">
             <div className="flex items-center gap-2">
               <div className="w-6 h-6 rounded-lg bg-orange-500 text-white flex items-center justify-center font-bold text-[10px] shadow-xs">
                 <User className="w-3.5 h-3.5" />
@@ -69,7 +69,7 @@ export function ModuleCardVisual({ slug, category, title }: ModuleCardVisualProp
           </div>
 
           {/* Main Vibrant Coral Floating Action Pill */}
-          <div className="w-[94%] bg-gradient-to-r from-[#FF5E48] to-[#FF7A59] text-white rounded-2xl py-2.5 px-4 shadow-[0_12px_24px_rgba(255,94,72,0.35)] flex items-center justify-center gap-2 transform scale-105 group-hover:scale-110 transition-transform duration-300">
+          <div className="w-[94%] bg-zinc-950 text-white rounded-2xl py-2.5 px-4 shadow-2xs flex items-center justify-center gap-2 transform scale-105 group-hover:scale-110 transition-transform duration-300">
             <Sparkles className="w-4 h-4 text-amber-200 animate-pulse" />
             <span className="text-xs font-bold tracking-tight">Smart Task Management</span>
           </div>
@@ -93,7 +93,7 @@ export function ModuleCardVisual({ slug, category, title }: ModuleCardVisualProp
   // ── 2. LEAD CRM (Cool Ice Blue Reference Style: Add task cursor + Deal card with avatars) ──
   if (slug === 'lead-crm') {
     return (
-      <div className="w-full h-full bg-gradient-to-b from-[#F2F7FF] via-[#EBF3FE] to-white relative flex items-center justify-center p-4">
+      <div className="w-full h-full bg-zinc-50/60 relative flex items-center justify-center p-4">
         <div className="relative w-full max-w-[260px] flex flex-col gap-2">
           {/* Top Pill with Blue Cursor */}
           <div className="flex items-center justify-between px-1 relative">
@@ -107,12 +107,14 @@ export function ModuleCardVisual({ slug, category, title }: ModuleCardVisualProp
           </div>
 
           {/* Center Card: Error tag, Date, Title, Avatars */}
-          <div className="w-full bg-white rounded-2xl p-3 shadow-[0_10px_25px_rgba(59,130,246,0.12)] border border-blue-100/60">
+          <div className="w-full bg-white rounded-2xl p-3 shadow-2xs border border-blue-100/60">
             <div className="flex items-center justify-between text-[10px] font-mono text-zinc-400 mb-1">
               <span className="font-bold text-blue-600 flex items-center gap-1">
                 ● ERROR
               </span>
-              <span>📅 7 October 2025</span>
+              <span className="flex items-center gap-1">
+                <Calendar className="w-3 h-3 text-zinc-400" /> 7 October 2025
+              </span>
             </div>
             <p className="text-xs font-bold text-zinc-900 mb-2.5">
               Design system requirements
@@ -138,8 +140,8 @@ export function ModuleCardVisual({ slug, category, title }: ModuleCardVisualProp
   // ── 3. MASTER CALENDAR & AUTOMATION (Fresh Mint Reference Style: Repeat Weekly Modal) ──
   if (slug === 'master-calendar' || slug === 'crew-dispatch') {
     return (
-      <div className="w-full h-full bg-gradient-to-b from-[#F2FAF5] via-[#E8F6EE] to-white relative flex items-center justify-center p-4">
-        <div className="relative w-full max-w-[260px] bg-white rounded-2xl p-3 shadow-[0_10px_25px_rgba(16,185,129,0.12)] border border-emerald-100/80">
+      <div className="w-full h-full bg-zinc-50/60 relative flex items-center justify-center p-4">
+        <div className="relative w-full max-w-[260px] bg-white rounded-2xl p-3 shadow-2xs border border-emerald-100/80">
           {/* Header */}
           <div className="flex items-center justify-between text-[11px] font-bold text-zinc-900 mb-2">
             <span>Repeat weekly</span>
@@ -191,9 +193,9 @@ export function ModuleCardVisual({ slug, category, title }: ModuleCardVisualProp
   // ── 4. CONTENT AI (Warm Amber Script Suite) ──
   if (slug === 'content-ai') {
     return (
-      <div className="w-full h-full bg-gradient-to-b from-[#FFFDF2] via-[#FEF7D8] to-white relative flex items-center justify-center p-4">
+      <div className="w-full h-full bg-zinc-50/60 relative flex items-center justify-center p-4">
         <div className="relative w-full max-w-[260px] flex flex-col gap-2">
-          <div className="w-full bg-white rounded-2xl p-3 shadow-[0_10px_25px_rgba(234,179,8,0.12)] border border-amber-100">
+          <div className="w-full bg-white rounded-2xl p-3 shadow-2xs border border-amber-100">
             <div className="flex items-center justify-between text-[10px] text-zinc-400 font-mono mb-1.5">
               <span className="font-bold text-amber-600 flex items-center gap-1">
                 <Sparkles className="w-3 h-3" /> PERFORMANCE AD SCRIPT
@@ -224,19 +226,19 @@ export function ModuleCardVisual({ slug, category, title }: ModuleCardVisualProp
   // ── 5. RAG MCP (Deep Violet & Neural Circuit) ──
   if (slug === 'rag-mcp') {
     return (
-      <div className="w-full h-full bg-gradient-to-b from-[#F5F3FF] via-[#ECE6FE] to-white relative flex items-center justify-center p-4">
+      <div className="w-full h-full bg-zinc-50/60 relative flex items-center justify-center p-4">
         <div className="relative w-full max-w-[250px] flex flex-col items-center gap-2">
           <div className="flex items-center gap-2">
-            <span className="px-3 py-1 bg-white rounded-xl text-[10px] font-bold text-purple-700 shadow-sm border border-purple-100 flex items-center gap-1">
-              <Cpu className="w-3 h-3 text-purple-600" /> MCP Standard
+            <span className="px-3 py-1 bg-white rounded-xl text-[10px] font-bold text-zinc-900 shadow-sm border border-zinc-200 flex items-center gap-1">
+              <Cpu className="w-3 h-3 text-zinc-800" /> MCP Standard
             </span>
-            <span className="text-purple-400 font-bold">⇄</span>
+            <span className="text-zinc-500 font-bold">⇄</span>
             <span className="px-3 py-1 bg-white rounded-xl text-[10px] font-bold text-indigo-700 shadow-sm border border-indigo-100 flex items-center gap-1">
               <Layers className="w-3 h-3 text-indigo-600" /> Vector Store
             </span>
           </div>
 
-          <div className="w-full bg-white rounded-2xl p-3 shadow-[0_10px_25px_rgba(124,58,237,0.12)] border border-purple-100 text-center">
+          <div className="w-full bg-white rounded-2xl p-3 shadow-2xs border border-zinc-200 text-center">
             <div className="flex items-center justify-center gap-1.5 text-[11px] font-bold text-zinc-900 mb-1">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               Living Agency Context Sync
@@ -253,9 +255,9 @@ export function ModuleCardVisual({ slug, category, title }: ModuleCardVisualProp
   // ── 6. VOICE TO SCOPE (Cyan Waveform Studio) ──
   if (slug === 'voice-to-scope') {
     return (
-      <div className="w-full h-full bg-gradient-to-b from-[#F0FDFA] via-[#CCFBF1] to-white relative flex items-center justify-center p-4">
+      <div className="w-full h-full bg-zinc-50/60 relative flex items-center justify-center p-4">
         <div className="relative w-full max-w-[250px] flex flex-col items-center gap-2.5">
-          <div className="w-full bg-white rounded-2xl p-3 shadow-[0_8px_20px_rgba(13,148,136,0.12)] border border-teal-100 flex items-center justify-between gap-2">
+          <div className="w-full bg-white rounded-2xl p-3 shadow-2xs border border-teal-100 flex items-center justify-between gap-2">
             <div className="w-7 h-7 rounded-xl bg-teal-600 text-white flex items-center justify-center shadow-xs">
               <Radio className="w-3.5 h-3.5 animate-pulse" />
             </div>
@@ -282,8 +284,8 @@ export function ModuleCardVisual({ slug, category, title }: ModuleCardVisualProp
   // ── 7. CANVAS BUILDER (Visual Designer) ──
   if (slug === 'canvas-builder') {
     return (
-      <div className="w-full h-full bg-gradient-to-b from-[#F8FAFC] via-[#EEF2F6] to-white relative flex items-center justify-center p-4">
-        <div className="relative w-full max-w-[250px] bg-white rounded-2xl p-3 shadow-[0_10px_25px_rgba(0,0,0,0.06)] border border-zinc-200">
+      <div className="w-full h-full bg-zinc-50/60 relative flex items-center justify-center p-4">
+        <div className="relative w-full max-w-[250px] bg-white rounded-2xl p-3 shadow-2xs border border-zinc-200">
           <div className="flex items-center justify-between pb-2 mb-2 border-b border-zinc-100">
             <div className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-rose-400" />
@@ -315,9 +317,9 @@ export function ModuleCardVisual({ slug, category, title }: ModuleCardVisualProp
   // ── 8. FORM BUILDER (Pink / Lead Capture Form) ──
   if (slug === 'form-builder') {
     return (
-      <div className="w-full h-full bg-gradient-to-b from-[#FDF4FF] via-[#FCE7F3] to-white relative flex items-center justify-center p-4">
-        <div className="relative w-full max-w-[250px] bg-white rounded-2xl p-3 shadow-[0_10px_25px_rgba(217,70,239,0.12)] border border-pink-100">
-          <div className="flex items-center justify-between text-[10px] font-bold text-pink-600 mb-2">
+      <div className="w-full h-full bg-zinc-50/60 relative flex items-center justify-center p-4">
+        <div className="relative w-full max-w-[250px] bg-white rounded-2xl p-3 shadow-2xs border border-zinc-200">
+          <div className="flex items-center justify-between text-[10px] font-bold text-zinc-800 mb-2">
             <span>Client Project Intake Form</span>
             <span className="text-[9px] font-mono text-zinc-400">&lt;iframe /&gt;</span>
           </div>
@@ -327,7 +329,7 @@ export function ModuleCardVisual({ slug, category, title }: ModuleCardVisualProp
             </div>
             <div className="px-2.5 py-1.5 bg-zinc-50 rounded-lg border border-zinc-200 text-zinc-700 flex justify-between">
               <span>Service:</span>
-              <span className="font-bold text-pink-600">Web App &amp; Brand SOW ⌄</span>
+              <span className="font-bold text-zinc-800">Web App &amp; Brand SOW ⌄</span>
             </div>
           </div>
           <div className="mt-2 w-full py-1.5 bg-zinc-950 text-white rounded-lg text-[10px] font-bold text-center">
@@ -341,9 +343,9 @@ export function ModuleCardVisual({ slug, category, title }: ModuleCardVisualProp
   // ── 9. REVIEW PORTAL (Golden Star Reputation) ──
   if (slug === 'review-portal') {
     return (
-      <div className="w-full h-full bg-gradient-to-b from-[#FFFBEB] via-[#FEF3C7] to-white relative flex items-center justify-center p-4">
+      <div className="w-full h-full bg-zinc-50/60 relative flex items-center justify-center p-4">
         <div className="relative w-full max-w-[250px] flex flex-col items-center gap-2">
-          <div className="w-full bg-white rounded-2xl p-3 shadow-[0_10px_25px_rgba(245,158,11,0.12)] border border-amber-100 text-center">
+          <div className="w-full bg-white rounded-2xl p-3 shadow-2xs border border-amber-100 text-center">
             <div className="flex items-center justify-center gap-1 text-amber-500 mb-1">
               {[...Array(5)].map((_, i) => (
                 <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
@@ -366,9 +368,9 @@ export function ModuleCardVisual({ slug, category, title }: ModuleCardVisualProp
   // ── 10. E-SIGN VAULT (Mint / SHA-256 Verified Seal) ──
   if (slug === 'esign-vault') {
     return (
-      <div className="w-full h-full bg-gradient-to-b from-[#F0FDF4] via-[#DCFCE7] to-white relative flex items-center justify-center p-4">
+      <div className="w-full h-full bg-zinc-50/60 relative flex items-center justify-center p-4">
         <div className="relative w-full max-w-[260px] flex flex-col gap-2">
-          <div className="w-full bg-white rounded-2xl p-3 shadow-[0_10px_25px_rgba(34,197,94,0.12)] border border-emerald-100">
+          <div className="w-full bg-white rounded-2xl p-3 shadow-2xs border border-emerald-100">
             <div className="flex items-center justify-between text-[10px] text-zinc-500 mb-1.5">
               <span className="font-bold text-emerald-700 flex items-center gap-1">
                 <Lock className="w-3 h-3" /> SHA-256 VAULT
@@ -396,8 +398,8 @@ export function ModuleCardVisual({ slug, category, title }: ModuleCardVisualProp
   // ── 11. TASK BOARD (Milestone Task Tracker) ──
   if (slug === 'task-board') {
     return (
-      <div className="w-full h-full bg-gradient-to-b from-[#F8FAFC] via-[#F1F5F9] to-white relative flex items-center justify-center p-4">
-        <div className="relative w-full max-w-[250px] bg-white rounded-2xl p-3 shadow-[0_10px_25px_rgba(0,0,0,0.06)] border border-zinc-200">
+      <div className="w-full h-full bg-zinc-50/60 relative flex items-center justify-center p-4">
+        <div className="relative w-full max-w-[250px] bg-white rounded-2xl p-3 shadow-2xs border border-zinc-200">
           <div className="flex items-center justify-between text-[10px] text-zinc-500 mb-2">
             <span className="font-bold text-zinc-900">Sprint Milestones</span>
             <span className="px-1.5 py-0.5 rounded bg-rose-50 text-rose-600 font-bold text-[8px]">SPRINT 4</span>
@@ -426,7 +428,7 @@ export function ModuleCardVisual({ slug, category, title }: ModuleCardVisualProp
   if (slug === 'gst-invoicing') {
     return (
       <div className="w-full h-full bg-gradient-to-b from-[#FEFCE8] via-[#FEF08A]/30 to-white relative flex items-center justify-center p-4">
-        <div className="relative w-full max-w-[260px] bg-white rounded-2xl p-3 shadow-[0_10px_25px_rgba(202,138,4,0.12)] border border-amber-200/80">
+        <div className="relative w-full max-w-[260px] bg-white rounded-2xl p-3 shadow-2xs border border-amber-200/80">
           <div className="flex items-center justify-between text-[10px] text-zinc-500 mb-1.5">
             <span className="font-bold text-amber-800">TAX INVOICE</span>
             <span className="text-[9px] font-mono font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
@@ -457,8 +459,8 @@ export function ModuleCardVisual({ slug, category, title }: ModuleCardVisualProp
   // ── 13. ASSET GEAR (Equipment QR & Check-In/Out) ──
   if (slug === 'asset-gear') {
     return (
-      <div className="w-full h-full bg-gradient-to-b from-[#F0F9FF] via-[#E0F2FE] to-white relative flex items-center justify-center p-4">
-        <div className="relative w-full max-w-[250px] bg-white rounded-2xl p-3 shadow-[0_10px_25px_rgba(14,165,233,0.12)] border border-sky-100">
+      <div className="w-full h-full bg-zinc-50/60 relative flex items-center justify-center p-4">
+        <div className="relative w-full max-w-[250px] bg-white rounded-2xl p-3 shadow-2xs border border-sky-100">
           <div className="flex items-center gap-2 mb-2">
             <div className="w-7 h-7 rounded-lg bg-sky-500 text-white flex items-center justify-center">
               <Camera className="w-4 h-4" />
@@ -481,8 +483,8 @@ export function ModuleCardVisual({ slug, category, title }: ModuleCardVisualProp
   // ── 14. MEDIA HUB (Folder Storage & Aspect Ratio Crop) ──
   if (slug === 'media-hub') {
     return (
-      <div className="w-full h-full bg-gradient-to-b from-[#EFF6FF] via-[#DBEAFE] to-white relative flex items-center justify-center p-4">
-        <div className="relative w-full max-w-[250px] bg-white rounded-2xl p-3 shadow-[0_10px_25px_rgba(37,99,235,0.12)] border border-blue-100">
+      <div className="w-full h-full bg-zinc-50/60 relative flex items-center justify-center p-4">
+        <div className="relative w-full max-w-[250px] bg-white rounded-2xl p-3 shadow-2xs border border-blue-100">
           <div className="flex items-center justify-between text-[10px] font-bold text-blue-700 mb-2">
             <span>Brand Deliverables Vault</span>
             <span className="text-[9px] font-mono text-zinc-400">4.2 TB Stored</span>
@@ -511,13 +513,13 @@ export function ModuleCardVisual({ slug, category, title }: ModuleCardVisualProp
   // ── 15. RBAC SYSTEM (Enterprise Role Access) ──
   if (slug === 'rbac-system') {
     return (
-      <div className="w-full h-full bg-gradient-to-b from-[#FAF5FF] via-[#F3E8FF] to-white relative flex items-center justify-center p-4">
-        <div className="relative w-full max-w-[250px] bg-white rounded-2xl p-3 shadow-[0_10px_25px_rgba(168,85,247,0.12)] border border-purple-100">
-          <div className="text-[10px] font-bold text-purple-800 mb-2">Agency Access Matrix</div>
+      <div className="w-full h-full bg-zinc-50/60 relative flex items-center justify-center p-4">
+        <div className="relative w-full max-w-[250px] bg-white rounded-2xl p-3 shadow-2xs border border-zinc-200">
+          <div className="text-[10px] font-bold text-zinc-900 mb-2">Agency Access Matrix</div>
           <div className="space-y-1.5 text-[10px]">
-            <div className="flex items-center justify-between p-1.5 bg-purple-50 rounded-lg">
+            <div className="flex items-center justify-between p-1.5 bg-zinc-100/80 rounded-lg">
               <span className="font-bold text-zinc-900">Agency Admin</span>
-              <span className="text-[9px] font-bold text-purple-700">Full Access</span>
+              <span className="text-[9px] font-bold text-zinc-900">Full Access</span>
             </div>
             <div className="flex items-center justify-between p-1.5 bg-zinc-50 rounded-lg">
               <span className="text-zinc-700">Lead UI/UX &amp; Full-Stack Dev</span>
@@ -532,10 +534,10 @@ export function ModuleCardVisual({ slug, category, title }: ModuleCardVisualProp
   // ── 16. EMAIL SMTP (Lavender Branded Delivery) ──
   if (slug === 'email-smtp') {
     return (
-      <div className="w-full h-full bg-gradient-to-b from-[#F5F3FF] via-[#EDE9FE] to-white relative flex items-center justify-center p-4">
-        <div className="relative w-full max-w-[250px] bg-white rounded-2xl p-3 shadow-[0_10px_25px_rgba(139,92,246,0.12)] border border-purple-100">
+      <div className="w-full h-full bg-zinc-50/60 relative flex items-center justify-center p-4">
+        <div className="relative w-full max-w-[250px] bg-white rounded-2xl p-3 shadow-2xs border border-zinc-200">
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-7 h-7 rounded-lg bg-purple-600 text-white flex items-center justify-center">
+            <div className="w-7 h-7 rounded-lg bg-zinc-900 text-white flex items-center justify-center">
               <Mail className="w-4 h-4" />
             </div>
             <div>
@@ -543,7 +545,7 @@ export function ModuleCardVisual({ slug, category, title }: ModuleCardVisualProp
               <div className="text-[9px] font-mono text-zinc-400">From: proposals@agency.in</div>
             </div>
           </div>
-          <div className="flex items-center justify-between p-1.5 bg-purple-50 rounded-lg text-[9px] font-bold text-purple-800">
+          <div className="flex items-center justify-between p-1.5 bg-zinc-100/80 rounded-lg text-[9px] font-bold text-zinc-900">
             <span>DKIM / SPF: VERIFIED</span>
             <span>84.6% Open</span>
           </div>
@@ -555,8 +557,8 @@ export function ModuleCardVisual({ slug, category, title }: ModuleCardVisualProp
   // ── 17. PWA PUSH (Mint Push Alert Banner) ──
   if (slug === 'pwa-push') {
     return (
-      <div className="w-full h-full bg-gradient-to-b from-[#F0FDF4] via-[#DCFCE7] to-white relative flex items-center justify-center p-4">
-        <div className="relative w-full max-w-[250px] bg-white rounded-2xl p-3 shadow-[0_10px_25px_rgba(34,197,94,0.12)] border border-emerald-100">
+      <div className="w-full h-full bg-zinc-50/60 relative flex items-center justify-center p-4">
+        <div className="relative w-full max-w-[250px] bg-white rounded-2xl p-3 shadow-2xs border border-emerald-100">
           <div className="flex items-center justify-between text-[10px] text-zinc-500 mb-1.5">
             <span className="font-bold text-emerald-800 flex items-center gap-1">
               <Bell className="w-3 h-3 text-emerald-600" /> PWA NOTIFICATION
@@ -577,8 +579,8 @@ export function ModuleCardVisual({ slug, category, title }: ModuleCardVisualProp
   // ── 18. DOCS PORTAL (Developer REST API) ──
   if (slug === 'docs-portal') {
     return (
-      <div className="w-full h-full bg-gradient-to-b from-[#F8FAFC] via-[#F1F5F9] to-white relative flex items-center justify-center p-4">
-        <div className="relative w-full max-w-[250px] bg-white rounded-2xl p-3 shadow-[0_10px_25px_rgba(0,0,0,0.06)] border border-zinc-200">
+      <div className="w-full h-full bg-zinc-50/60 relative flex items-center justify-center p-4">
+        <div className="relative w-full max-w-[250px] bg-white rounded-2xl p-3 shadow-2xs border border-zinc-200">
           <div className="flex items-center justify-between text-[9px] font-mono text-zinc-500 mb-2">
             <span>REST / MCP API</span>
             <span className="text-emerald-600 font-bold">200 OK</span>
@@ -597,8 +599,8 @@ export function ModuleCardVisual({ slug, category, title }: ModuleCardVisualProp
   // ── 19. SUPER ADMIN (Rose Quartz Governance) ──
   if (slug === 'super-admin') {
     return (
-      <div className="w-full h-full bg-gradient-to-b from-[#FFF1F2] via-[#FFE4E6] to-white relative flex items-center justify-center p-4">
-        <div className="relative w-full max-w-[250px] bg-white rounded-2xl p-3 shadow-[0_10px_25px_rgba(244,63,94,0.12)] border border-rose-100">
+      <div className="w-full h-full bg-zinc-50/60 relative flex items-center justify-center p-4">
+        <div className="relative w-full max-w-[250px] bg-white rounded-2xl p-3 shadow-2xs border border-rose-100">
           <div className="text-[10px] font-bold text-rose-800 mb-2">Agency Multi-Tenant Hub</div>
           <div className="space-y-1.5 text-[10px]">
             <div className="flex items-center justify-between p-1.5 bg-rose-50 rounded-lg font-medium text-zinc-900">
@@ -618,13 +620,13 @@ export function ModuleCardVisual({ slug, category, title }: ModuleCardVisualProp
   // ── 20. ROADMAP: WHATSAPP CLOUD (Light Fresh Mint / WhatsApp Green) ──
   if (slug === 'whatsapp-cloud') {
     return (
-      <div className="w-full h-full bg-gradient-to-b from-[#F0FDF4] via-[#DCFCE7] to-white relative flex items-center justify-center p-4">
-        <div className="relative w-full max-w-[250px] bg-white rounded-2xl p-3 shadow-[0_10px_25px_rgba(34,197,94,0.12)] border border-emerald-100">
+      <div className="w-full h-full bg-zinc-50/60 relative flex items-center justify-center p-4">
+        <div className="relative w-full max-w-[250px] bg-white rounded-2xl p-3 shadow-2xs border border-emerald-100">
           <div className="flex items-center gap-1.5 mb-2 text-emerald-700 text-[10px] font-bold">
             <MessageCircle className="w-3.5 h-3.5 text-emerald-600" /> WhatsApp Cloud 2.0
           </div>
           <div className="p-2 bg-emerald-50/70 rounded-xl text-[10px] text-zinc-800 mb-1.5 border border-emerald-100">
-            &ldquo;Your Q3 Campaign SOW is approved and signed! 🚀&rdquo;
+            &ldquo;Your Q3 Campaign SOW is approved and signed!&rdquo;
           </div>
           <div className="flex items-center justify-between text-[9px]">
             <span className="text-zinc-400">Status: Delivered</span>
@@ -638,18 +640,20 @@ export function ModuleCardVisual({ slug, category, title }: ModuleCardVisualProp
   // ── 21. ROADMAP: PHOTO PROOFING (Light Sky Blue Gallery) ──
   if (slug === 'photo-proofing') {
     return (
-      <div className="w-full h-full bg-gradient-to-b from-[#F0F9FF] via-[#E0F2FE] to-white relative flex items-center justify-center p-4">
-        <div className="relative w-full max-w-[250px] bg-white rounded-2xl p-3 shadow-[0_10px_25px_rgba(14,165,233,0.12)] border border-sky-100">
+      <div className="w-full h-full bg-zinc-50/60 relative flex items-center justify-center p-4">
+        <div className="relative w-full max-w-[250px] bg-white rounded-2xl p-3 shadow-2xs border border-sky-100">
           <div className="flex items-center justify-between text-[10px] font-bold text-sky-800 mb-2">
-            <span>Deliverable Proofing 2.0</span>
-            <span className="text-amber-500 flex items-center gap-0.5">⭐ Approved</span>
+            <span>Deliverable Proofing</span>
+            <span className="text-amber-500 flex items-center gap-1 font-mono text-[9px]">
+              <Star className="w-3 h-3 fill-amber-400 text-amber-400" /> Approved
+            </span>
           </div>
           <div className="grid grid-cols-3 gap-1.5 mb-2">
             <div className="h-10 bg-sky-50 rounded-lg flex items-center justify-center text-[8px] font-mono text-sky-700 border border-sky-200">
-              Figma #1 ✓
+              Figma #1
             </div>
             <div className="h-10 bg-sky-50 rounded-lg flex items-center justify-center text-[8px] font-mono text-sky-700 border border-sky-200">
-              Web Mock ✓
+              Web Mock
             </div>
             <div className="h-10 bg-zinc-50 rounded-lg flex items-center justify-center text-[8px] font-mono text-zinc-400 border border-zinc-200">
               App V2
@@ -667,7 +671,7 @@ export function ModuleCardVisual({ slug, category, title }: ModuleCardVisualProp
   if (slug === 'integrated-payments') {
     return (
       <div className="w-full h-full bg-gradient-to-b from-[#FEFCE8] via-[#FEF08A]/30 to-white relative flex items-center justify-center p-4">
-        <div className="relative w-full max-w-[250px] bg-white rounded-2xl p-3 shadow-[0_10px_25px_rgba(202,138,4,0.12)] border border-amber-100">
+        <div className="relative w-full max-w-[250px] bg-white rounded-2xl p-3 shadow-2xs border border-amber-100">
           <div className="flex items-center justify-between text-[10px] text-amber-800 font-bold mb-2">
             <span className="flex items-center gap-1"><CreditCard className="w-3.5 h-3.5" /> Auto-Reconcile</span>
             <span className="text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded text-[8px]">ACTIVE</span>
@@ -687,18 +691,20 @@ export function ModuleCardVisual({ slug, category, title }: ModuleCardVisualProp
   // ── 23. ROADMAP: VIDEO STORYBOARD (Light Coral / Deck Generator) ──
   if (slug === 'video-storyboard') {
     return (
-      <div className="w-full h-full bg-gradient-to-b from-[#FFF5F2] via-[#FFEBE5] to-white relative flex items-center justify-center p-4">
-        <div className="relative w-full max-w-[250px] bg-white rounded-2xl p-3 shadow-[0_10px_25px_rgba(255,94,72,0.12)] border border-rose-100">
+      <div className="w-full h-full bg-zinc-50/60 relative flex items-center justify-center p-4">
+        <div className="relative w-full max-w-[250px] bg-white rounded-2xl p-3 shadow-2xs border border-rose-100">
           <div className="flex items-center justify-between text-[10px] font-bold text-rose-700 mb-2">
             <span className="flex items-center gap-1"><Video className="w-3.5 h-3.5" /> AI Ad Storyboard</span>
             <span className="text-zinc-400 text-[9px]">4 Scenes</span>
           </div>
           <div className="grid grid-cols-2 gap-1.5 mb-1.5">
-            <div className="p-1.5 bg-rose-50 rounded-lg text-[9px] text-zinc-800 font-medium border border-rose-100">
-              Scene 1: Hook 🎬
+            <div className="p-1.5 bg-rose-50 rounded-lg text-[9px] text-zinc-800 font-medium border border-rose-100 flex items-center justify-between">
+              <span>Scene 1: Hook</span>
+              <Film className="w-3 h-3 text-rose-500 shrink-0" />
             </div>
-            <div className="p-1.5 bg-rose-50 rounded-lg text-[9px] text-zinc-800 font-medium border border-rose-100">
-              Scene 2: CTA ✨
+            <div className="p-1.5 bg-rose-50 rounded-lg text-[9px] text-zinc-800 font-medium border border-rose-100 flex items-center justify-between">
+              <span>Scene 2: CTA</span>
+              <Sparkles className="w-3 h-3 text-rose-500 shrink-0" />
             </div>
           </div>
           <div className="text-[9px] text-center text-rose-700 font-bold">
@@ -712,15 +718,15 @@ export function ModuleCardVisual({ slug, category, title }: ModuleCardVisualProp
   // ── 24. ROADMAP: MULTI-BRANCH (Light Purple Franchise Hub) ──
   if (slug === 'multi-branch') {
     return (
-      <div className="w-full h-full bg-gradient-to-b from-[#F5F3FF] via-[#EDE9FE] to-white relative flex items-center justify-center p-4">
-        <div className="relative w-full max-w-[250px] bg-white rounded-2xl p-3 shadow-[0_10px_25px_rgba(139,92,246,0.12)] border border-purple-100">
-          <div className="flex items-center justify-between text-[10px] font-bold text-purple-700 mb-2">
+      <div className="w-full h-full bg-zinc-50/60 relative flex items-center justify-center p-4">
+        <div className="relative w-full max-w-[250px] bg-white rounded-2xl p-3 shadow-2xs border border-zinc-200">
+          <div className="flex items-center justify-between text-[10px] font-bold text-zinc-900 mb-2">
             <span className="flex items-center gap-1"><GitBranch className="w-3.5 h-3.5" /> Global Agency Network</span>
             <span className="text-[9px] font-mono text-zinc-400">3 Hubs</span>
           </div>
-          <div className="p-2 bg-purple-50 rounded-xl text-[10px] text-zinc-900 font-semibold mb-1 flex justify-between">
+          <div className="p-2 bg-zinc-100/80 rounded-xl text-[10px] text-zinc-900 font-semibold mb-1 flex justify-between">
             <span>Shared Talent &amp; Tech Assets</span>
-            <span className="text-purple-700 font-bold">12 Teams</span>
+            <span className="text-zinc-900 font-bold">12 Teams</span>
           </div>
           <div className="text-[9px] text-zinc-500 text-center">
             Consolidated Agency P&amp;L &amp; Retainers
@@ -733,8 +739,8 @@ export function ModuleCardVisual({ slug, category, title }: ModuleCardVisualProp
   // ── 25. ROADMAP: VOICE AI AGENT (Light Cyan Voice Concierge) ──
   if (slug === 'voice-ai-agent') {
     return (
-      <div className="w-full h-full bg-gradient-to-b from-[#F0FDFA] via-[#CCFBF1] to-white relative flex items-center justify-center p-4">
-        <div className="relative w-full max-w-[250px] bg-white rounded-2xl p-3 shadow-[0_10px_25px_rgba(13,148,136,0.12)] border border-teal-100">
+      <div className="w-full h-full bg-zinc-50/60 relative flex items-center justify-center p-4">
+        <div className="relative w-full max-w-[250px] bg-white rounded-2xl p-3 shadow-2xs border border-teal-100">
           <div className="flex items-center justify-between text-[10px] font-bold text-teal-700 mb-2">
             <span className="flex items-center gap-1"><PhoneCall className="w-3.5 h-3.5" /> Inbound Voice AI</span>
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -753,8 +759,8 @@ export function ModuleCardVisual({ slug, category, title }: ModuleCardVisualProp
   // ── 26. ROADMAP: TALLY ZOHO EXPORT (Light Mint CA Ledger) ──
   if (slug === 'tally-zoho-export') {
     return (
-      <div className="w-full h-full bg-gradient-to-b from-[#F0FDF4] via-[#DCFCE7] to-white relative flex items-center justify-center p-4">
-        <div className="relative w-full max-w-[250px] bg-white rounded-2xl p-3 shadow-[0_10px_25px_rgba(34,197,94,0.12)] border border-emerald-100">
+      <div className="w-full h-full bg-zinc-50/60 relative flex items-center justify-center p-4">
+        <div className="relative w-full max-w-[250px] bg-white rounded-2xl p-3 shadow-2xs border border-emerald-100">
           <div className="flex items-center justify-between text-[10px] font-bold text-emerald-800 mb-2">
             <span className="flex items-center gap-1"><FileSpreadsheet className="w-3.5 h-3.5" /> GSTR-1 Ledger Sync</span>
             <span className="text-[9px] font-mono text-emerald-600 font-bold">XML / JSON</span>
@@ -774,8 +780,8 @@ export function ModuleCardVisual({ slug, category, title }: ModuleCardVisualProp
   // ── 27. ROADMAP: CLIENT MOBILE APP (Light Blue Mobile Companion) ──
   if (slug === 'client-mobile-app') {
     return (
-      <div className="w-full h-full bg-gradient-to-b from-[#EFF6FF] via-[#DBEAFE] to-white relative flex items-center justify-center p-4">
-        <div className="relative w-full max-w-[250px] bg-white rounded-2xl p-3 shadow-[0_10px_25px_rgba(37,99,235,0.12)] border border-blue-100">
+      <div className="w-full h-full bg-zinc-50/60 relative flex items-center justify-center p-4">
+        <div className="relative w-full max-w-[250px] bg-white rounded-2xl p-3 shadow-2xs border border-blue-100">
           <div className="flex items-center justify-between text-[10px] font-bold text-blue-700 mb-2">
             <span className="flex items-center gap-1"><TabletSmartphone className="w-3.5 h-3.5" /> Client Portal App</span>
             <span className="text-[9px] text-zinc-400">iOS &amp; Android</span>
@@ -795,7 +801,7 @@ export function ModuleCardVisual({ slug, category, title }: ModuleCardVisualProp
   // ── DEFAULT FALLBACK (Clean Light Skeuomorphic Capsule) ──
   return (
     <div className="w-full h-full bg-gradient-to-b from-zinc-50 via-zinc-100/60 to-white relative flex items-center justify-center p-4">
-      <div className="relative w-full max-w-[240px] bg-white rounded-2xl p-3.5 shadow-[0_8px_20px_rgba(0,0,0,0.05)] border border-zinc-200/90 text-center">
+      <div className="relative w-full max-w-[240px] bg-white rounded-2xl p-3.5 shadow-2xs border border-zinc-200/90 text-center">
         <div className="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-zinc-950 text-white mb-2 shadow-xs">
           <Sparkles className="w-4 h-4 text-zinc-200" />
         </div>

@@ -239,7 +239,7 @@ export const BUILT_MODULES: FeatureModule[] = [
     faqs: [
       {
         question: 'How does the AI Co-Founder access my agency CRM and billing data?',
-        answer: 'Cora queries your workspace database using secure, tenant-isolated Model Context Protocol (MCP) tools. Your confidential client files and financial ledgers never leave your private workspace.'
+        answer: 'Cora queries your workspace database using secure, tenant-isolated secure private data connections tools. Your confidential client files and financial ledgers never leave your private workspace.'
       },
       {
         question: 'Can Cora execute actions without my explicit approval?',
@@ -322,7 +322,7 @@ export const BUILT_MODULES: FeatureModule[] = [
     ],
     theCoraWay: [
       'Generate publication-ready technical case studies from project specs and metrics in under 60 seconds.',
-      'Notify Google, Bing, and Yandex instantly via one-click IndexNow API pings upon publishing.',
+      'Notify Google, Bing, and Yandex instantly via one-click instant search engine alerts upon publishing.',
       'Inject hyper-local GEO schemas (e.g. Bandra, Indiranagar, Cyber Hub) to dominate commercial search intent.'
     ],
     capabilities: [
@@ -433,16 +433,16 @@ export const BUILT_MODULES: FeatureModule[] = [
   },
   {
     slug: 'rag-mcp',
-    title: 'Model Context Protocol (MCP) & Self-Learning RAG Memory',
+    title: 'secure private data connections & Self-Learning RAG Memory',
     shortTitle: 'RAG Memory MCP',
     category: 'intelligence',
     categoryLabel: 'Intelligence & AI',
     tagline: 'Ground every AI response in your agency rate cards, past proposals, and tech SOPs.',
-    heroDescription: 'Eliminate hallucinated quotes and generic boilerplate. Cora transforms your rate cards, Master Services Agreements, design guidelines, and engineering playbooks into a private vector knowledge brain. Query your entire agency IP via open Model Context Protocol (MCP) standards with zero data leakage.',
+    heroDescription: 'Eliminate hallucinated quotes and generic boilerplate. Cora transforms your rate cards, Master Services Agreements, design guidelines, and engineering playbooks into a private vector knowledge brain. Query your entire agency IP via open secure private data connections standards with zero data leakage.',
     badgeColor: 'purple',
     iconName: 'BrainCircuit',
     status: 'Live in Product',
-    tags: ['Model Context Protocol (MCP)', 'Vector Embeddings', 'Living Knowledge Base', 'Self-Learning Context'],
+    tags: ['secure private data connections', 'Vector Embeddings', 'Living Knowledge Base', 'Self-Learning Context'],
     stats: [
       { metric: '100% Private', label: 'Tenant Isolation' },
       { metric: 'Sub-80ms', label: 'Vector Retrieval' },
@@ -455,7 +455,7 @@ export const BUILT_MODULES: FeatureModule[] = [
     ],
     theCoraWay: [
       'Maintain a private vector memory store indexing your exact rate cards, SOW templates, and tech guidelines.',
-      'Empower AI agents to query live agency documents safely through open Model Context Protocol (MCP) tools.',
+      'Empower AI agents to query live agency documents safely through open secure private data connections tools.',
       'Enforce enterprise tenant isolation so your proprietary commercial data never trains public AI models.'
     ],
     capabilities: [
@@ -529,7 +529,7 @@ export const BUILT_MODULES: FeatureModule[] = [
         { id: 'mcp-tools', label: 'Active MCP Tools', badge: '9 Tools' },
         { id: 'query-test', label: 'Semantic Playground' }
       ],
-      headerTitle: 'Agency Memory & Model Context Protocol (MCP)',
+      headerTitle: 'Agency Memory & secure private data connections',
       headerSubtitle: 'Active Vector Store: 2,480 Chunks • Embedding Engine: text-embedding-3-small',
       primaryActionLabel: '+ Ingest Document',
       metric1: { label: 'Indexed Chunks', value: '2,480 Chunks' },
@@ -1236,7 +1236,7 @@ export const BUILT_MODULES: FeatureModule[] = [
     category: 'operations',
     categoryLabel: 'Operations & Legal',
     tagline: 'Execute airtight client agreements, collect legal e-signatures in seconds, and protect project margins with cryptographic audit trails.',
-    heroDescription: 'Stop losing agency revenue to scope creep and disputed terms. Close deals faster with pre-built agency MSAs, Statements of Work, and retainer agreements. Collect legally binding electronic signatures on any device and lock milestones with immutable SHA-256 cryptographic timestamps under global e-sign frameworks.',
+    heroDescription: 'Stop losing agency revenue to scope creep and disputed terms. Close deals faster with pre-built agency MSAs, Statements of Work, and retainer agreements. Collect legally binding electronic signatures on any device and lock milestones with immutable tamper-proof digital timestamps under global e-sign frameworks.',
     badgeColor: 'rose',
     iconName: 'FileText',
     status: 'Live in Product',
@@ -1310,7 +1310,7 @@ export const BUILT_MODULES: FeatureModule[] = [
         answer: 'No. Clients click a secure, tokenized link to review terms, approve scope, and sign instantly from any smartphone or desktop browser.'
       },
       {
-        question: 'How does the SHA-256 cryptographic seal prevent contract tampering?',
+        question: 'How does the tamper-proof legal seal prevent contract tampering?',
         answer: 'Every signed PDF generates a unique mathematical hash. If even a single character, punctuation mark, or payment term is altered post-signing, the cryptographic hash breaks immediately.'
       },
       {
@@ -1663,7 +1663,7 @@ export const BUILT_MODULES: FeatureModule[] = [
       },
       {
         title: 'Enforce Urgent Priority & Countdown Timers',
-        description: 'Highlight critical deliverables with visual badges (Critical 🔴, In Progress 🟡, Done 🟢) and real-time deadline countdowns.',
+        description: 'Highlight critical deliverables with visual status indicators (Critical, In Progress, Done) and real-time deadline countdowns.',
         tag: 'Visual Priority'
       },
       {
@@ -1786,7 +1786,7 @@ export const BUILT_MODULES: FeatureModule[] = [
     theCoraWay: [
       'Auto-detect intra-state vs inter-state client GSTINs and compute exact CGST, SGST, or IGST tax splits instantly.',
       'Embed dynamic, invoice-specific UPI QR codes directly on branded PDFs so clients scan and settle instantly with zero fees.',
-      'Export one-click GSTR-1 compliant sales registers formatted with B2B GSTIN validation, SAC 9983 codes, and taxable turnovers.'
+      'Export one-click GSTR-1 compliant sales registers formatted with B2B GSTIN validation, standard service tax codes (SAC), and taxable turnovers.'
     ],
     capabilities: [
       {
@@ -2450,7 +2450,7 @@ export const BUILT_MODULES: FeatureModule[] = [
     ],
     theCoraWay: [
       'Install a standalone PWA with full-screen gestures, in-app link retention, and zero browser chrome distractions.',
-      'Receive instant VAPID lock-screen push alerts when clients sign SOWs, approve sprint deliverables, or settle invoices.',
+      'Receive instant instant lock-screen push notifications alerts when clients sign SOWs, approve sprint deliverables, or settle invoices.',
       'Enjoy sub-400ms service worker caching for instantaneous page hydration, offline access, and 60fps mobile snappiness.'
     ],
     capabilities: [
@@ -2566,7 +2566,7 @@ export const BUILT_MODULES: FeatureModule[] = [
     category: 'platform',
     categoryLabel: 'Platform & Governance',
     tagline: 'Explore Notion-styled 3-column documentation, trigger ⌘K search, and test live REST APIs in the interactive browser playground.',
-    heroDescription: 'Supercharge custom agency integrations with open developer documentation and interactive API explorers. Connect REST endpoints, subscribe to HMAC-signed webhooks, and orchestrate Model Context Protocol (MCP) agents using copy-paste code snippets.',
+    heroDescription: 'Supercharge custom agency integrations with open developer documentation and interactive API explorers. Connect REST endpoints, subscribe to secure webhook alerts, and orchestrate secure private data connections agents using copy-paste code snippets.',
     badgeColor: 'blue',
     iconName: 'BookOpen',
     status: 'Live in Product',
@@ -2963,8 +2963,8 @@ export const BUILT_MODULES: FeatureModule[] = [
 export const UPCOMING_MODULES: RoadmapModule[] = [
   {
     id: 'whatsapp-cloud',
-    title: 'Native WhatsApp Business Cloud API',
-    desc: 'Engage clients with 2-way CRM chat, automated SOW reminders, instant proposal dispatches, and quick-reply scopes.',
+    title: 'WhatsApp Business Client CRM',
+    desc: 'Chat with clients directly via 2-way WhatsApp, send automatic contract reminders, dispatch proposals in 1 click, and get instant approvals on their phones.',
     iconName: 'MessageCircle',
     eta: 'Q3 2026',
     status: 'Building Soon',
@@ -2972,8 +2972,8 @@ export const UPCOMING_MODULES: RoadmapModule[] = [
   },
   {
     id: 'photo-proofing',
-    title: 'Client Deliverable & Figma Proofing Portal 2.0',
-    desc: 'Collect client feedback with pin-drop annotations, deliverable approvals, version comparisons, and sign-off workflows.',
+    title: 'Client Review & Visual Proofing Portal',
+    desc: 'Gather clear client feedback with pin-point visual comments, deliverable approvals, side-by-side version comparisons, and one-click sign-offs.',
     iconName: 'ImageIcon',
     eta: 'Q3 2026',
     status: 'Building Soon',
@@ -2982,8 +2982,8 @@ export const UPCOMING_MODULES: RoadmapModule[] = [
   },
   {
     id: 'integrated-payments',
-    title: 'Integrated Payment Gateways (Auto-Reconcile)',
-    desc: 'Collect client retainer payments via Razorpay, Stripe, and UPI links with instant automated ledger reconciliation.',
+    title: 'Automated Retainer & Online Payment Collection',
+    desc: 'Collect client retainers and project milestones via UPI, net banking, and cards, with instant automated invoice reconciliation.',
     iconName: 'CreditCard',
     eta: 'Q3 2026',
     status: 'Building Soon',
@@ -2991,8 +2991,8 @@ export const UPCOMING_MODULES: RoadmapModule[] = [
   },
   {
     id: 'video-storyboard',
-    title: 'AI Video Script & Ad Storyboard Engine',
-    desc: 'Generate high-converting performance ad scripts, motion design storyboards, and viral short-form video concepts in 1 click.',
+    title: 'AI Video Script & Ad Storyboard Creator',
+    desc: 'Generate high-converting video ad scripts, visual storyboards, and short-form video concepts tailored to your brand in one click.',
     iconName: 'Video',
     eta: 'Q4 2026',
     status: 'Building Soon',
@@ -3001,8 +3001,8 @@ export const UPCOMING_MODULES: RoadmapModule[] = [
   },
   {
     id: 'multi-branch',
-    title: 'Multi-Branch & Global Agency Workspace System',
-    desc: 'Manage multiple agency branches, international client accounts, consolidated P&L reporting, and shared creative talent.',
+    title: 'Multi-Branch & Multi-Location Workspace System',
+    desc: 'Manage multiple studio locations, international client accounts, consolidated profit-and-loss reports, and shared team talent effortlessly.',
     iconName: 'GitBranch',
     eta: 'Q4 2026',
     status: 'Building Soon',
@@ -3010,8 +3010,8 @@ export const UPCOMING_MODULES: RoadmapModule[] = [
   },
   {
     id: 'voice-ai-agent',
-    title: 'Autonomous Voice AI Lead Qualification Agent',
-    desc: 'Deploy conversational Voice AI agents via ElevenLabs & Twilio to qualify inbound agency leads and book discovery calls.',
+    title: '24/7 Voice AI Lead Qualification Assistant',
+    desc: 'Deploy natural-sounding Voice AI phone assistants to qualify inbound inquiries, answer common FAQs, and book discovery calls automatically.',
     iconName: 'PhoneCall',
     eta: 'Q4 2026',
     status: 'Building Soon',
@@ -3019,8 +3019,8 @@ export const UPCOMING_MODULES: RoadmapModule[] = [
   },
   {
     id: 'tally-zoho-export',
-    title: 'Automated Accounting & Tally/Zoho Export',
-    desc: 'Export GSTR-1 ready sales ledgers and client retainer data in structured XML/JSON format for Tally Prime and Zoho Books.',
+    title: 'One-Click Tally & Zoho Accounting Export',
+    desc: 'Export clean, accountant-ready sales ledgers and client retainer data directly into Tally Prime and Zoho Books with zero manual data entry.',
     iconName: 'FileSpreadsheet',
     eta: 'Q4 2026',
     status: 'Building Soon',
@@ -3028,8 +3028,8 @@ export const UPCOMING_MODULES: RoadmapModule[] = [
   },
   {
     id: 'client-mobile-app',
-    title: 'White-Labeled Client Mobile Companion App',
-    desc: 'Provide agency clients a native iOS & Android portal to approve deliverables, sign SOWs, track sprints, and pay invoices.',
+    title: 'Branded Client Mobile App (iOS & Android)',
+    desc: 'Give your clients a branded mobile app on iPhone and Android to review deliverables, sign agreements, track sprint progress, and pay invoices.',
     iconName: 'TabletSmartphone',
     eta: 'Q1 2027',
     status: 'Building Soon',

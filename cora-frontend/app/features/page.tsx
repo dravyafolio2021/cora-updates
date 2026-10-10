@@ -35,50 +35,51 @@ import { RoadmapNotifyModal } from '@/components/features/RoadmapNotifyModal';
 import { ArtisticHeroBackground } from '@/components/features/ArtisticHeroBackground';
 import { trackEvent } from '@/components/analytics/Analytics';
 
-// Concise punchy descriptions for all modules with active action verbs tailored for agencies
+// Concise punchy descriptions for all modules with active action verbs tailored for agencies and creative studios
 const MODULE_MICRO_DESCRIPTIONS: Record<string, string> = {
-  'ai-cofounder': 'Draft client scopes and automate agency workflows.',
-  'content-ai': 'Generate SEO campaigns, case studies, and ad copy.',
-  'rag-mcp': 'Sync agency rate cards and client context.',
-  'voice-to-scope': 'Turn voice memos into client SOWs instantly.',
-  'lead-crm': 'Close high-ticket deals in visual pipelines.',
-  'canvas-builder': 'Deploy high-converting landing pages and funnels.',
-  'form-builder': 'Capture qualified leads with embeddable forms.',
-  'review-portal': 'Acquire 5-star client reviews and Google reputation.',
-  'esign-vault': 'Execute binding SHA-256 client agreements.',
-  'crew-dispatch': 'Dispatch project teams without scheduling conflicts.',
-  'master-calendar': 'Coordinate client sprints and project milestones.',
-  'task-board': 'Ship client deliverables with milestone tracking.',
-  'gst-invoicing': 'Automate 18% GST retainers and UPI billing.',
-  'asset-gear': 'Track equipment, dev hardware, and inventory.',
-  'media-hub': 'Deliver high-res creative assets and client media.',
-  'rbac-system': 'Enforce granular role permissions and tenant security.',
-  'email-smtp': 'Send branded proposals from your custom domain.',
-  'pwa-push': 'Receive instant project alerts on mobile PWA.',
-  'docs-portal': 'Build custom API integrations and webhooks.',
-  'super-admin': 'Govern multi-tenant workspaces and AI token quotas.',
-  'onboarding-wizard': 'Launch your agency operating system in 3 minutes.',
+  // Live Modules
+  'ai-cofounder': 'Draft client proposals and automate daily studio operations.',
+  'content-ai': 'Create high-ranking case studies, SEO articles, and ad copy.',
+  'rag-mcp': 'Connect your rate cards, past proposals, and studio rules.',
+  'voice-to-scope': 'Turn quick voice notes into complete client proposals in seconds.',
+  'lead-crm': 'Track high-ticket inquiries and close deals with visual pipelines.',
+  'canvas-builder': 'Build high-converting landing pages and client pitch decks.',
+  'form-builder': 'Capture qualified project briefs with custom intake forms.',
+  'review-portal': 'Collect 5-star Google reviews and client testimonials automatically.',
+  'esign-vault': 'Sign legally binding, tamper-proof client agreements in seconds.',
+  'crew-dispatch': 'Schedule project teams and freelancers with zero double-booking.',
+  'master-calendar': 'Coordinate client milestones, shoot dates, and sprint deadlines.',
+  'task-board': 'Track project milestones and collect 1-click client approvals.',
+  'gst-invoicing': 'Generate 18% GST invoices and collect instant UPI payments with 0% fees.',
+  'asset-gear': 'Track studio cameras, testing devices, and team software licenses.',
+  'media-hub': 'Share branded client galleries with instant social media crops.',
+  'rbac-system': 'Set custom team permissions and protect financial privacy.',
+  'email-smtp': 'Send branded proposals and invoices from your own business email.',
+  'pwa-push': 'Get instant mobile alerts for signed proposals and payments.',
+  'docs-portal': 'Connect your favorite tools and build custom studio automations.',
+  'super-admin': 'Manage client workspaces, team permissions, and AI usage limits.',
+  'onboarding-wizard': 'Launch your complete studio workspace in under 3 minutes.',
 
   // Roadmap Modules
-  'whatsapp-cloud': 'Engage clients directly via 2-way WhatsApp CRM.',
-  'photo-proofing': 'Approve creative assets in client review galleries.',
-  'integrated-payments': 'Reconcile UPI and card retainer collections.',
-  'video-storyboard': 'Generate viral video scripts and motion pitch decks.',
-  'multi-branch': 'Manage multi-branch studios and shared resources.',
-  'voice-ai-agent': 'Deploy voice AI agents for inbound client qualification.',
-  'tally-zoho-export': 'Export CA-ready sales ledgers to Tally and Zoho.',
-  'client-mobile-app': 'Launch white-labeled iOS and Android client portals.'
+  'whatsapp-cloud': 'Chat with clients, share proposals, and get approvals on WhatsApp.',
+  'photo-proofing': 'Collect visual client feedback and side-by-side photo approvals.',
+  'integrated-payments': 'Collect retainer payments via UPI and cards with auto-reconciled invoices.',
+  'video-storyboard': 'Generate video ad scripts, creative storyboards, and pitch concepts.',
+  'multi-branch': 'Manage multiple studio branches, team rosters, and shared resources.',
+  'voice-ai-agent': 'Answer incoming client calls and book discovery meetings 24/7.',
+  'tally-zoho-export': 'Export accountant-ready sales ledgers to Tally and Zoho Books in 1 click.',
+  'client-mobile-app': 'Give clients a branded mobile app to track projects and approve work.'
 };
 
 const ROADMAP_SHORT_TITLES: Record<string, string> = {
-  'whatsapp-cloud': 'WhatsApp Cloud API',
-  'photo-proofing': 'Client Photo Proofing',
-  'integrated-payments': 'Instant Auto-Payments',
-  'video-storyboard': 'AI Video Storyboard',
+  'whatsapp-cloud': 'WhatsApp Client CRM',
+  'photo-proofing': 'Visual Proofing Portal',
+  'integrated-payments': 'Online Auto-Payments',
+  'video-storyboard': 'AI Video Storyboards',
   'multi-branch': 'Multi-Branch Workspaces',
-  'voice-ai-agent': 'Autonomous Voice AI',
-  'tally-zoho-export': 'Tally & Zoho Sync',
-  'client-mobile-app': 'Client Mobile App'
+  'voice-ai-agent': '24/7 Voice AI Assistant',
+  'tally-zoho-export': 'Tally & Zoho Export',
+  'client-mobile-app': 'Branded Client App'
 };
 
 export default function FeaturesPage() {
@@ -257,7 +258,10 @@ export default function FeaturesPage() {
               <span>&bull;</span>
               <span>Ready in 2 Minutes</span>
               <span>&bull;</span>
-              <span>Made for India 🇮🇳</span>
+              <span className="flex items-center gap-1">
+                <span>Made for India</span>
+                <span className="px-1.5 py-0.2 rounded bg-zinc-100 text-[9px] font-mono font-bold text-zinc-700 border border-zinc-200">IN</span>
+              </span>
             </div>
           </div>
 

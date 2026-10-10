@@ -14,7 +14,8 @@ import {
   ArrowRight,
   Zap,
   TrendingUp,
-  Cpu
+  Cpu,
+  Mic
 } from 'lucide-react';
 import { FeatureModule } from '@/lib/features-data';
 
@@ -126,41 +127,41 @@ export function CapabilityVisualCard({ cap, feature, index }: CapabilityVisualCa
 
         {/* Storytelling Visual Nodes */}
         <div className="space-y-2 text-xs">
-          <div className="p-2.5 rounded-2xl bg-gradient-to-r from-amber-50/60 to-transparent border border-amber-200/60 flex items-center justify-between">
+          <div className="p-2.5 rounded-2xl bg-zinc-50/70 border border-zinc-200/70 flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />
+              <span className="w-2 h-2 rounded-full bg-zinc-900 shrink-0" />
               <div>
                 <span className="font-bold text-zinc-900 block text-xs">Raymond Commercial Shoot</span>
                 <span className="text-[10px] text-zinc-500 font-mono">Matched Rate Card: ₹4.5L/Day • Mumbai</span>
               </div>
             </div>
-            <span className="font-mono text-[10px] font-bold text-amber-800 bg-amber-100/80 px-2 py-0.5 rounded">
+            <span className="font-mono text-[10px] font-bold text-zinc-800 bg-zinc-100 px-2 py-0.5 rounded">
               RECALLED
             </span>
           </div>
 
-          <div className="p-2.5 rounded-2xl bg-gradient-to-r from-blue-50/60 to-transparent border border-blue-200/60 flex items-center justify-between">
+          <div className="p-2.5 rounded-2xl bg-zinc-50/70 border border-zinc-200/70 flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0" />
+              <span className="w-2 h-2 rounded-full bg-zinc-700 shrink-0" />
               <div>
                 <span className="font-bold text-zinc-900 block text-xs">Cinema Kit #A (Sony FX6 4K)</span>
                 <span className="text-[10px] text-zinc-500 font-mono">Calendar Verified: 0 Booking Conflicts</span>
               </div>
             </div>
-            <span className="font-mono text-[10px] font-bold text-blue-800 bg-blue-100/80 px-2 py-0.5 rounded">
+            <span className="font-mono text-[10px] font-bold text-zinc-800 bg-zinc-100 px-2 py-0.5 rounded">
               LOCKED
             </span>
           </div>
 
-          <div className="p-2.5 rounded-2xl bg-gradient-to-r from-purple-50/60 to-transparent border border-purple-200/60 flex items-center justify-between">
+          <div className="p-2.5 rounded-2xl bg-zinc-50/70 border border-zinc-200/70 flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <span className="w-2 h-2 rounded-full bg-purple-500 shrink-0" />
+              <span className="w-2 h-2 rounded-full bg-zinc-800 shrink-0" />
               <div>
                 <span className="font-bold text-zinc-900 block text-xs">18% GST (CGST 9% + SGST 9%)</span>
                 <span className="text-[10px] text-zinc-500 font-mono">SAC 998314 • Tax: ₹81,000</span>
               </div>
             </div>
-            <span className="font-mono text-[10px] font-bold text-purple-800 bg-purple-100/80 px-2 py-0.5 rounded">
+            <span className="font-mono text-[10px] font-bold text-zinc-800 bg-zinc-100 px-2 py-0.5 rounded">
               CALCULATED
             </span>
           </div>
@@ -187,8 +188,8 @@ export function CapabilityVisualCard({ cap, feature, index }: CapabilityVisualCa
         {/* Inbound Voice / Brief Trigger Header */}
         <div className="flex items-center justify-between pb-3 border-b border-zinc-100">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-xl bg-zinc-950 text-white flex items-center justify-center text-xs font-bold shadow-xs">
-              🎙️
+            <div className="w-7 h-7 rounded-xl bg-zinc-950 text-white flex items-center justify-center shadow-xs">
+              <Mic className="w-3.5 h-3.5 text-white" />
             </div>
             <div>
               <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider block">Single Voice Command</span>
@@ -237,7 +238,7 @@ export function CapabilityVisualCard({ cap, feature, index }: CapabilityVisualCa
 
           <div className="p-2.5 rounded-2xl bg-zinc-50 border border-zinc-200 flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <div className="w-6 h-6 rounded-lg bg-purple-950 text-purple-300 flex items-center justify-center">
+              <div className="w-6 h-6 rounded-lg bg-zinc-900 text-zinc-400 flex items-center justify-center">
                 <Calendar className="w-3.5 h-3.5" />
               </div>
               <div>
@@ -245,7 +246,7 @@ export function CapabilityVisualCard({ cap, feature, index }: CapabilityVisualCa
                 <span className="text-[10px] text-zinc-500">Call Time 06:30 AM • DOP &amp; Kit Locked</span>
               </div>
             </div>
-            <span className="font-mono text-[10px] font-bold text-purple-700 bg-purple-100 px-2 py-0.5 rounded">
+            <span className="font-mono text-[10px] font-bold text-zinc-900 bg-zinc-100 px-2 py-0.5 rounded">
               SCHEDULED
             </span>
           </div>
@@ -314,7 +315,7 @@ export function CapabilityVisualCard({ cap, feature, index }: CapabilityVisualCa
               </div>
             </div>
             <span className="flex items-center gap-1 font-mono text-[10px] font-bold text-blue-700">
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-500" /> ACTIVE
+              <span className="w-1.5 h-1.5 rounded-full bg-zinc-700" /> ACTIVE
             </span>
           </div>
 
@@ -393,7 +394,7 @@ export function CapabilityVisualCard({ cap, feature, index }: CapabilityVisualCa
       </div>
 
       {/* SHA-256 Tamper Evident Banner */}
-      <div className="p-2.5 rounded-2xl bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 border border-emerald-200 text-center">
+      <div className="p-2.5 rounded-2xl bg-zinc-50 border border-zinc-200/80 text-center">
         <div className="flex items-center justify-center gap-1.5 text-emerald-950 text-xs font-bold">
           <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
           <span>Court-Admissible SHA-256 Electronic Seal</span>

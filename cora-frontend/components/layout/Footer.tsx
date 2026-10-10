@@ -20,7 +20,7 @@ const FOOTER_SECTIONS: FooterSection[] = [
     links: [
       { label: 'Features', href: '/features' },
       { label: 'AI Co-Founder', href: '/ai-agent' },
-      { label: 'Industry Workspaces', href: '/use-cases' },
+      { label: 'Industry Workspaces', href: '/industries' },
       { label: 'Interactive Demo', href: '/demo' },
       { label: 'Pricing Plans', href: '/pricing' },
       { label: 'Product Changelog', href: '/changelog' },

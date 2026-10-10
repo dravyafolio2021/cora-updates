@@ -3,6 +3,7 @@
 import React, { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
+import Link from 'next/link';
 import { 
   Scissors, 
   Dumbbell, 
@@ -22,6 +23,7 @@ if (typeof window !== 'undefined') {
 const USE_CASES = [
   {
     id: 'salons_spas',
+    slug: 'salons-wellness',
     title: 'Salons & Spas',
     desc: 'Manage appointments, repeat client preferences, service menus, and instant UPI billing.',
     badge: 'Appointments & Billing',
@@ -29,6 +31,7 @@ const USE_CASES = [
   },
   {
     id: 'gyms_fitness',
+    slug: 'salons-wellness',
     title: 'Gyms & Fitness Studios',
     desc: 'Track active memberships, renewal dates, trainer schedules, and fee collections without spreadsheets.',
     badge: 'Memberships & Fees',
@@ -36,6 +39,7 @@ const USE_CASES = [
   },
   {
     id: 'dental_clinics',
+    slug: 'doctors-clinics',
     title: 'Dental & Health Clinics',
     desc: 'Organize patient appointments, consultation invoices, and automatic follow-up reminders.',
     badge: 'Patient Visits',
@@ -43,6 +47,7 @@ const USE_CASES = [
   },
   {
     id: 'restaurants_cafes',
+    slug: 'consultants-advisors',
     title: 'Restaurants & Cafes',
     desc: 'Track vendor invoices, daily supplier expenses, party bookings, and catering inquiries.',
     badge: 'Expenses & Catering',
@@ -50,6 +55,7 @@ const USE_CASES = [
   },
   {
     id: 'real_estate',
+    slug: 'real-estate-property',
     title: 'Real Estate Agencies',
     desc: 'Organize buyer inquiries, property site visits, agreement drafting, and commission tracking.',
     badge: 'Leads & Deals',
@@ -57,7 +63,8 @@ const USE_CASES = [
   },
   {
     id: 'agencies_solo',
-    title: 'Creative Agencies & Solo Founders',
+    slug: 'software-agencies',
+    title: 'Creative Agencies & Dev Boutiques',
     desc: 'Handle project milestones, client scope approvals, deliverable handoffs, and tax-ready GST accounts.',
     badge: 'Retainers & Invoices',
     icon: Briefcase,
@@ -76,7 +83,7 @@ export function UseCasesSection() {
           y: 0,
           opacity: 1,
           duration: 0.8,
-          stagger: 0.1,
+          stagger: 0.12,
           ease: 'power3.out',
           scrollTrigger: {
             trigger: sectionRef.current,
@@ -95,7 +102,7 @@ export function UseCasesSection() {
 
   return (
     <section
-      id="use-cases"
+      id="industries"
       ref={sectionRef}
       className="py-16 sm:py-[100px] bg-[#FAFAFA] relative z-10 overflow-hidden"
     >
@@ -119,8 +126,9 @@ export function UseCasesSection() {
           {USE_CASES.map((uc) => {
             const IconComp = uc.icon;
             return (
-              <div
+              <Link
                 key={uc.id}
+                href={`/industries/${uc.slug}`}
                 onClick={() => handleCardClick(uc.id, uc.title)}
                 className="usecase-anim-item bg-white rounded-3xl p-6 sm:p-7 border border-zinc-200/80 shadow-2xs hover:shadow-md transition-all duration-300 flex flex-col justify-between group hover:-translate-y-1"
               >
@@ -145,24 +153,24 @@ export function UseCasesSection() {
 
                 <div className="pt-6 mt-4 border-t border-zinc-100 flex items-center justify-between">
                   <span className="text-xs font-semibold text-zinc-900 group-hover:text-zinc-950 inline-flex items-center gap-1.5">
-                    <span>Explore workflow</span>
+                    <span>Explore workspace</span>
                     <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                   </span>
                 </div>
-              </div>
+              </Link>
             );
           })}
         </div>
 
         {/* Bottom CTA Box */}
         <div className="mt-12 text-center usecase-anim-item">
-          <a
-            href="https://app.heycora.in/workspace/login?source=usecases_footer"
+          <Link
+            href="/industries"
             className="inline-flex items-center gap-2 bg-zinc-950 text-white hover:bg-zinc-800 px-6 py-3 rounded-xl text-xs sm:text-sm font-semibold shadow-2xs transition-all hover:-translate-y-0.5"
           >
-            <span>Start your business workspace for free</span>
+            <span>Explore all 16 industry workspaces</span>
             <ArrowRight className="w-4 h-4" />
-          </a>
+          </Link>
         </div>
 
       </div>

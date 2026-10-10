@@ -3,13 +3,13 @@
 import React from 'react';
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 🎨 CLAY-STYLE VIBRANT PROFESSIONAL COLOR ICONS FOR CORA MODULES
+// VECTOR GLYPH ICONS FOR CORA MODULES
 // ─────────────────────────────────────────────────────────────────────────────
 
 // 1. AI Co-Founder
 export function AiCofounderColorIcon({ className = "w-10 h-10" }: { className?: string }) {
   return (
-    <div className={`${className} rounded-2xl bg-gradient-to-br from-emerald-500/15 via-teal-500/10 to-emerald-500/20 border border-emerald-500/30 flex items-center justify-center shrink-0 shadow-[0_2px_10px_rgba(16,185,129,0.12)] group-hover:scale-105 group-hover:border-emerald-500/50 transition-all duration-200`}>
+    <div className={`${className} rounded-2xl bg-zinc-100 border border-zinc-200/90 flex items-center justify-center shrink-0 shadow-2xs group-hover:bg-zinc-200/70 group-hover:border-zinc-300 transition-all duration-200`}>
       <svg className="w-6 h-6" viewBox="0 0 32 32" fill="none">
         <defs>
           <linearGradient id="ai_bot_grad" x1="4" y1="8" x2="28" y2="28" gradientUnits="userSpaceOnUse">
@@ -38,7 +38,7 @@ export function AiCofounderColorIcon({ className = "w-10 h-10" }: { className?: 
 // 2. Voice-to-Scope
 export function VoiceScopeColorIcon({ className = "w-10 h-10" }: { className?: string }) {
   return (
-    <div className={`${className} rounded-2xl bg-gradient-to-br from-purple-500/15 via-violet-500/10 to-indigo-500/20 border border-purple-500/30 flex items-center justify-center shrink-0 shadow-[0_2px_10px_rgba(168,85,247,0.12)] group-hover:scale-105 group-hover:border-purple-500/50 transition-all duration-200`}>
+    <div className={`${className} rounded-2xl bg-zinc-100 border border-zinc-200/90 flex items-center justify-center shrink-0 shadow-2xs group-hover:bg-zinc-200/70 group-hover:border-zinc-300 transition-all duration-200`}>
       <svg className="w-6 h-6" viewBox="0 0 32 32" fill="none">
         <defs>
           <linearGradient id="v_bar1" x1="0" y1="0" x2="0" y2="100%">
@@ -63,7 +63,7 @@ export function VoiceScopeColorIcon({ className = "w-10 h-10" }: { className?: s
 // 3. Content AI & GEO
 export function ContentAiColorIcon({ className = "w-10 h-10" }: { className?: string }) {
   return (
-    <div className={`${className} rounded-2xl bg-gradient-to-br from-amber-500/15 via-orange-500/10 to-yellow-500/20 border border-amber-500/30 flex items-center justify-center shrink-0 shadow-[0_2px_10px_rgba(245,158,11,0.12)] group-hover:scale-105 group-hover:border-amber-500/50 transition-all duration-200`}>
+    <div className={`${className} rounded-2xl bg-zinc-100 border border-zinc-200/90 flex items-center justify-center shrink-0 shadow-2xs group-hover:bg-zinc-200/70 group-hover:border-zinc-300 transition-all duration-200`}>
       <svg className="w-6 h-6" viewBox="0 0 32 32" fill="none">
         <defs>
           <linearGradient id="ai_star_main" x1="16" y1="3" x2="16" y2="27" gradientUnits="userSpaceOnUse">
@@ -87,7 +87,7 @@ export function ContentAiColorIcon({ className = "w-10 h-10" }: { className?: st
 // 4. RAG Memory MCP
 export function RagMemoryColorIcon({ className = "w-10 h-10" }: { className?: string }) {
   return (
-    <div className={`${className} rounded-2xl bg-gradient-to-br from-sky-500/15 via-blue-500/10 to-cyan-500/20 border border-sky-500/30 flex items-center justify-center shrink-0 shadow-[0_2px_10px_rgba(2,132,199,0.12)] group-hover:scale-105 group-hover:border-sky-500/50 transition-all duration-200`}>
+    <div className={`${className} rounded-2xl bg-zinc-100 border border-zinc-200/90 flex items-center justify-center shrink-0 shadow-2xs group-hover:bg-zinc-200/70 group-hover:border-zinc-300 transition-all duration-200`}>
       <svg className="w-6 h-6" viewBox="0 0 32 32" fill="none">
         <defs>
           <linearGradient id="rag_cube" x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse">
@@ -110,7 +110,7 @@ export function RagMemoryColorIcon({ className = "w-10 h-10" }: { className?: st
 // 5. Kanban Lead CRM
 export function LeadCrmColorIcon({ className = "w-10 h-10" }: { className?: string }) {
   return (
-    <div className={`${className} rounded-2xl bg-gradient-to-br from-blue-500/15 via-indigo-500/10 to-blue-600/20 border border-blue-500/30 flex items-center justify-center shrink-0 shadow-[0_2px_10px_rgba(59,130,246,0.12)] group-hover:scale-105 group-hover:border-blue-500/50 transition-all duration-200`}>
+    <div className={`${className} rounded-2xl bg-zinc-100 border border-zinc-200/90 flex items-center justify-center shrink-0 shadow-2xs group-hover:bg-zinc-200/70 group-hover:border-zinc-300 transition-all duration-200`}>
       <svg className="w-6 h-6" viewBox="0 0 32 32" fill="none">
         <defs>
           <linearGradient id="crm_bar_1" x1="0" y1="0" x2="0" y2="100%">
@@ -137,7 +137,7 @@ export function LeadCrmColorIcon({ className = "w-10 h-10" }: { className?: stri
 // 6. Funnel Builder
 export function CanvasBuilderColorIcon({ className = "w-10 h-10" }: { className?: string }) {
   return (
-    <div className={`${className} rounded-2xl bg-gradient-to-br from-rose-500/15 via-pink-500/10 to-rose-600/20 border border-rose-500/30 flex items-center justify-center shrink-0 shadow-[0_2px_10px_rgba(244,63,94,0.12)] group-hover:scale-105 group-hover:border-rose-500/50 transition-all duration-200`}>
+    <div className={`${className} rounded-2xl bg-zinc-100 border border-zinc-200/90 flex items-center justify-center shrink-0 shadow-2xs group-hover:bg-zinc-200/70 group-hover:border-zinc-300 transition-all duration-200`}>
       <svg className="w-6 h-6" viewBox="0 0 32 32" fill="none">
         <defs>
           <linearGradient id="canvas_top" x1="4" y1="4" x2="28" y2="12" gradientUnits="userSpaceOnUse">
@@ -161,7 +161,7 @@ export function CanvasBuilderColorIcon({ className = "w-10 h-10" }: { className?
 // 7. Visual Forms
 export function FormBuilderColorIcon({ className = "w-10 h-10" }: { className?: string }) {
   return (
-    <div className={`${className} rounded-2xl bg-gradient-to-br from-teal-500/15 via-emerald-500/10 to-teal-600/20 border border-teal-500/30 flex items-center justify-center shrink-0 shadow-[0_2px_10px_rgba(13,148,136,0.12)] group-hover:scale-105 group-hover:border-teal-500/50 transition-all duration-200`}>
+    <div className={`${className} rounded-2xl bg-zinc-100 border border-zinc-200/90 flex items-center justify-center shrink-0 shadow-2xs group-hover:bg-zinc-200/70 group-hover:border-zinc-300 transition-all duration-200`}>
       <svg className="w-6 h-6" viewBox="0 0 32 32" fill="none">
         <defs>
           <linearGradient id="form_sheet" x1="5" y1="4" x2="27" y2="28" gradientUnits="userSpaceOnUse">
@@ -179,10 +179,10 @@ export function FormBuilderColorIcon({ className = "w-10 h-10" }: { className?: 
   );
 }
 
-// 8. 5★ Review Portal
+// 8. 5-Star Review Portal
 export function ReviewPortalColorIcon({ className = "w-10 h-10" }: { className?: string }) {
   return (
-    <div className={`${className} rounded-2xl bg-gradient-to-br from-amber-500/15 via-yellow-500/10 to-amber-600/20 border border-amber-500/30 flex items-center justify-center shrink-0 shadow-[0_2px_10px_rgba(245,158,11,0.12)] group-hover:scale-105 group-hover:border-amber-500/50 transition-all duration-200`}>
+    <div className={`${className} rounded-2xl bg-zinc-100 border border-zinc-200/90 flex items-center justify-center shrink-0 shadow-2xs group-hover:bg-zinc-200/70 group-hover:border-zinc-300 transition-all duration-200`}>
       <svg className="w-6 h-6" viewBox="0 0 32 32" fill="none">
         <defs>
           <linearGradient id="rev_star" x1="16" y1="3" x2="16" y2="28" gradientUnits="userSpaceOnUse">
@@ -201,7 +201,7 @@ export function ReviewPortalColorIcon({ className = "w-10 h-10" }: { className?:
 // 9. SHA-256 E-Signs
 export function EsignVaultColorIcon({ className = "w-10 h-10" }: { className?: string }) {
   return (
-    <div className={`${className} rounded-2xl bg-gradient-to-br from-emerald-500/15 via-teal-500/10 to-emerald-600/20 border border-emerald-500/30 flex items-center justify-center shrink-0 shadow-[0_2px_10px_rgba(16,185,129,0.12)] group-hover:scale-105 group-hover:border-emerald-500/50 transition-all duration-200`}>
+    <div className={`${className} rounded-2xl bg-zinc-100 border border-zinc-200/90 flex items-center justify-center shrink-0 shadow-2xs group-hover:bg-zinc-200/70 group-hover:border-zinc-300 transition-all duration-200`}>
       <svg className="w-6 h-6" viewBox="0 0 32 32" fill="none">
         <defs>
           <linearGradient id="doc_grad" x1="5" y1="3" x2="27" y2="29" gradientUnits="userSpaceOnUse">
@@ -221,7 +221,7 @@ export function EsignVaultColorIcon({ className = "w-10 h-10" }: { className?: s
 // 10. Crew Dispatch
 export function CrewDispatchColorIcon({ className = "w-10 h-10" }: { className?: string }) {
   return (
-    <div className={`${className} rounded-2xl bg-gradient-to-br from-indigo-500/15 via-blue-500/10 to-indigo-600/20 border border-indigo-500/30 flex items-center justify-center shrink-0 shadow-[0_2px_10px_rgba(99,102,241,0.12)] group-hover:scale-105 group-hover:border-indigo-500/50 transition-all duration-200`}>
+    <div className={`${className} rounded-2xl bg-zinc-100 border border-zinc-200/90 flex items-center justify-center shrink-0 shadow-2xs group-hover:bg-zinc-200/70 group-hover:border-zinc-300 transition-all duration-200`}>
       <svg className="w-6 h-6" viewBox="0 0 32 32" fill="none">
         <defs>
           <linearGradient id="plane_grad1" x1="3" y1="3" x2="29" y2="29" gradientUnits="userSpaceOnUse">
@@ -244,7 +244,7 @@ export function CrewDispatchColorIcon({ className = "w-10 h-10" }: { className?:
 // 11. Master Calendar
 export function MasterCalendarColorIcon({ className = "w-10 h-10" }: { className?: string }) {
   return (
-    <div className={`${className} rounded-2xl bg-gradient-to-br from-rose-500/15 via-red-500/10 to-rose-600/20 border border-rose-500/30 flex items-center justify-center shrink-0 shadow-[0_2px_10px_rgba(225,29,72,0.12)] group-hover:scale-105 group-hover:border-rose-500/50 transition-all duration-200`}>
+    <div className={`${className} rounded-2xl bg-zinc-100 border border-zinc-200/90 flex items-center justify-center shrink-0 shadow-2xs group-hover:bg-zinc-200/70 group-hover:border-zinc-300 transition-all duration-200`}>
       <svg className="w-6 h-6" viewBox="0 0 32 32" fill="none">
         <defs>
           <linearGradient id="cal_body" x1="4" y1="6" x2="28" y2="28" gradientUnits="userSpaceOnUse">
@@ -265,7 +265,7 @@ export function MasterCalendarColorIcon({ className = "w-10 h-10" }: { className
 // 12. Task Board
 export function TaskBoardColorIcon({ className = "w-10 h-10" }: { className?: string }) {
   return (
-    <div className={`${className} rounded-2xl bg-gradient-to-br from-violet-500/15 via-purple-500/10 to-violet-600/20 border border-violet-500/30 flex items-center justify-center shrink-0 shadow-[0_2px_10px_rgba(139,92,246,0.12)] group-hover:scale-105 group-hover:border-violet-500/50 transition-all duration-200`}>
+    <div className={`${className} rounded-2xl bg-zinc-100 border border-zinc-200/90 flex items-center justify-center shrink-0 shadow-2xs group-hover:bg-zinc-200/70 group-hover:border-zinc-300 transition-all duration-200`}>
       <svg className="w-6 h-6" viewBox="0 0 32 32" fill="none">
         <defs>
           <linearGradient id="task_row1" x1="0" y1="0" x2="100%" y2="0">
@@ -292,7 +292,7 @@ export function TaskBoardColorIcon({ className = "w-10 h-10" }: { className?: st
 // 13. 18% GST Invoicing
 export function GstInvoicingColorIcon({ className = "w-10 h-10" }: { className?: string }) {
   return (
-    <div className={`${className} rounded-2xl bg-gradient-to-br from-emerald-500/15 via-green-500/10 to-teal-600/20 border border-emerald-500/30 flex items-center justify-center shrink-0 shadow-[0_2px_10px_rgba(16,185,129,0.12)] group-hover:scale-105 group-hover:border-emerald-500/50 transition-all duration-200`}>
+    <div className={`${className} rounded-2xl bg-zinc-100 border border-zinc-200/90 flex items-center justify-center shrink-0 shadow-2xs group-hover:bg-zinc-200/70 group-hover:border-zinc-300 transition-all duration-200`}>
       <svg className="w-6 h-6" viewBox="0 0 32 32" fill="none">
         <defs>
           <linearGradient id="gst_bill" x1="5" y1="3" x2="27" y2="29" gradientUnits="userSpaceOnUse">
@@ -311,7 +311,7 @@ export function GstInvoicingColorIcon({ className = "w-10 h-10" }: { className?:
 // 14. Gear & Inventory
 export function AssetGearColorIcon({ className = "w-10 h-10" }: { className?: string }) {
   return (
-    <div className={`${className} rounded-2xl bg-gradient-to-br from-zinc-700/15 via-zinc-800/10 to-zinc-900/20 border border-zinc-700/30 flex items-center justify-center shrink-0 shadow-[0_2px_10px_rgba(39,39,42,0.12)] group-hover:scale-105 group-hover:border-zinc-700/50 transition-all duration-200`}>
+    <div className={`${className} rounded-2xl bg-zinc-100 border border-zinc-200/90 flex items-center justify-center shrink-0 shadow-2xs group-hover:bg-zinc-200/70 group-hover:border-zinc-300 transition-all duration-200`}>
       <svg className="w-6 h-6" viewBox="0 0 32 32" fill="none">
         <defs>
           <linearGradient id="cam_body" x1="4" y1="8" x2="28" y2="28" gradientUnits="userSpaceOnUse">
@@ -339,7 +339,7 @@ export function AssetGearColorIcon({ className = "w-10 h-10" }: { className?: st
 // 15. Media Hub & RAW
 export function MediaHubColorIcon({ className = "w-10 h-10" }: { className?: string }) {
   return (
-    <div className={`${className} rounded-2xl bg-gradient-to-br from-fuchsia-500/15 via-pink-500/10 to-purple-600/20 border border-fuchsia-500/30 flex items-center justify-center shrink-0 shadow-[0_2px_10px_rgba(217,70,239,0.12)] group-hover:scale-105 group-hover:border-fuchsia-500/50 transition-all duration-200`}>
+    <div className={`${className} rounded-2xl bg-zinc-100 border border-zinc-200/90 flex items-center justify-center shrink-0 shadow-2xs group-hover:bg-zinc-200/70 group-hover:border-zinc-300 transition-all duration-200`}>
       <svg className="w-6 h-6" viewBox="0 0 32 32" fill="none">
         <defs>
           <linearGradient id="media_vault" x1="4" y1="5" x2="28" y2="27" gradientUnits="userSpaceOnUse">
@@ -359,7 +359,7 @@ export function MediaHubColorIcon({ className = "w-10 h-10" }: { className?: str
 // 16. Multi-Tenant RBAC
 export function RbacSecurityColorIcon({ className = "w-10 h-10" }: { className?: string }) {
   return (
-    <div className={`${className} rounded-2xl bg-gradient-to-br from-cyan-500/15 via-teal-500/10 to-cyan-600/20 border border-cyan-500/30 flex items-center justify-center shrink-0 shadow-[0_2px_10px_rgba(8,145,178,0.12)] group-hover:scale-105 group-hover:border-cyan-500/50 transition-all duration-200`}>
+    <div className={`${className} rounded-2xl bg-zinc-100 border border-zinc-200/90 flex items-center justify-center shrink-0 shadow-2xs group-hover:bg-zinc-200/70 group-hover:border-zinc-300 transition-all duration-200`}>
       <svg className="w-6 h-6" viewBox="0 0 32 32" fill="none">
         <defs>
           <linearGradient id="shield_grad" x1="16" y1="3" x2="16" y2="29" gradientUnits="userSpaceOnUse">
@@ -378,7 +378,7 @@ export function RbacSecurityColorIcon({ className = "w-10 h-10" }: { className?:
 // 17. Email & SMTP
 export function EmailSmtpColorIcon({ className = "w-10 h-10" }: { className?: string }) {
   return (
-    <div className={`${className} rounded-2xl bg-gradient-to-br from-sky-500/15 via-blue-500/10 to-cyan-600/20 border border-sky-500/30 flex items-center justify-center shrink-0 shadow-[0_2px_10px_rgba(14,165,233,0.12)] group-hover:scale-105 group-hover:border-sky-500/50 transition-all duration-200`}>
+    <div className={`${className} rounded-2xl bg-zinc-100 border border-zinc-200/90 flex items-center justify-center shrink-0 shadow-2xs group-hover:bg-zinc-200/70 group-hover:border-zinc-300 transition-all duration-200`}>
       <svg className="w-6 h-6" viewBox="0 0 32 32" fill="none">
         <defs>
           <linearGradient id="mail_body" x1="4" y1="6" x2="28" y2="26" gradientUnits="userSpaceOnUse">
@@ -397,7 +397,7 @@ export function EmailSmtpColorIcon({ className = "w-10 h-10" }: { className?: st
 // 18. Mobile App / PWA Push
 export function PwaPushColorIcon({ className = "w-10 h-10" }: { className?: string }) {
   return (
-    <div className={`${className} rounded-2xl bg-gradient-to-br from-pink-500/15 via-rose-500/10 to-pink-600/20 border border-pink-500/30 flex items-center justify-center shrink-0 shadow-[0_2px_10px_rgba(236,72,153,0.12)] group-hover:scale-105 group-hover:border-pink-500/50 transition-all duration-200`}>
+    <div className={`${className} rounded-2xl bg-zinc-100 border border-zinc-200/90 flex items-center justify-center shrink-0 shadow-2xs group-hover:bg-zinc-200/70 group-hover:border-zinc-300 transition-all duration-200`}>
       <svg className="w-6 h-6" viewBox="0 0 32 32" fill="none">
         <defs>
           <linearGradient id="phone_body" x1="7" y1="3" x2="25" y2="29" gradientUnits="userSpaceOnUse">
@@ -417,7 +417,7 @@ export function PwaPushColorIcon({ className = "w-10 h-10" }: { className?: stri
 // 19. All 20 Modules
 export function AllModulesColorIcon({ className = "w-10 h-10" }: { className?: string }) {
   return (
-    <div className={`${className} rounded-2xl bg-gradient-to-br from-zinc-700/15 via-zinc-800/10 to-zinc-900/20 border border-zinc-700/30 flex items-center justify-center shrink-0 shadow-[0_2px_10px_rgba(24,24,27,0.12)] group-hover:scale-105 group-hover:border-zinc-700/50 transition-all duration-200`}>
+    <div className={`${className} rounded-2xl bg-zinc-100 border border-zinc-200/90 flex items-center justify-center shrink-0 shadow-2xs group-hover:bg-zinc-200/70 group-hover:border-zinc-300 transition-all duration-200`}>
       <svg className="w-6 h-6" viewBox="0 0 32 32" fill="none">
         <rect x="4" y="4" width="10" height="10" rx="3" fill="#18181B" />
         <rect x="18" y="4" width="10" height="10" rx="3" fill="#52525B" />
@@ -454,82 +454,82 @@ export const MODULE_GLYPH_MAP: Record<string, {
 }> = {
   'ai-cofounder': {
     Glyph: AiCofounderColorIcon,
-    bgGradient: 'bg-emerald-500',
+    bgGradient: 'bg-zinc-950 text-white',
     shortName: 'AI Co-Founder'
   },
   'content-ai': {
     Glyph: ContentAiColorIcon,
-    bgGradient: 'bg-amber-500',
+    bgGradient: 'bg-zinc-950 text-white',
     shortName: 'Content AI & SEO'
   },
   'rag-mcp': {
     Glyph: RagMemoryColorIcon,
-    bgGradient: 'bg-sky-500',
+    bgGradient: 'bg-zinc-950 text-white',
     shortName: 'RAG Memory MCP'
   },
   'voice-to-scope': {
     Glyph: VoiceScopeColorIcon,
-    bgGradient: 'bg-purple-500',
+    bgGradient: 'bg-zinc-950 text-white',
     shortName: 'Voice-to-Scope'
   },
   'lead-crm': {
     Glyph: LeadCrmColorIcon,
-    bgGradient: 'bg-blue-500',
+    bgGradient: 'bg-zinc-950 text-white',
     shortName: 'Kanban Lead CRM'
   },
   'canvas-builder': {
     Glyph: CanvasBuilderColorIcon,
-    bgGradient: 'bg-rose-500',
+    bgGradient: 'bg-zinc-950 text-white',
     shortName: 'Funnel Builder'
   },
   'form-builder': {
     Glyph: FormBuilderColorIcon,
-    bgGradient: 'bg-teal-500',
+    bgGradient: 'bg-zinc-950 text-white',
     shortName: 'Visual Forms'
   },
   'review-portal': {
     Glyph: ReviewPortalColorIcon,
-    bgGradient: 'bg-amber-500',
-    shortName: '5★ Review Portal'
+    bgGradient: 'bg-zinc-950 text-white',
+    shortName: '5-Star Reviews'
   },
   'esign-vault': {
     Glyph: EsignVaultColorIcon,
-    bgGradient: 'bg-emerald-600',
-    shortName: 'SHA-256 E-Signs'
+    bgGradient: 'bg-zinc-950 text-white',
+    shortName: 'Legal E-Signs'
   },
   'crew-dispatch': {
     Glyph: CrewDispatchColorIcon,
-    bgGradient: 'bg-indigo-600',
+    bgGradient: 'bg-zinc-950 text-white',
     shortName: 'Crew Dispatch'
   },
   'master-calendar': {
     Glyph: MasterCalendarColorIcon,
-    bgGradient: 'bg-rose-600',
+    bgGradient: 'bg-zinc-950 text-white',
     shortName: 'Master Calendar'
   },
   'task-board': {
     Glyph: TaskBoardColorIcon,
-    bgGradient: 'bg-violet-600',
+    bgGradient: 'bg-zinc-950 text-white',
     shortName: 'Task Board'
   },
   'gst-invoicing': {
     Glyph: GstInvoicingColorIcon,
-    bgGradient: 'bg-emerald-600',
+    bgGradient: 'bg-zinc-950 text-white',
     shortName: '18% GST Invoicing'
   },
   'asset-gear': {
     Glyph: AssetGearColorIcon,
-    bgGradient: 'bg-zinc-800',
+    bgGradient: 'bg-zinc-950 text-white',
     shortName: 'Gear & Inventory'
   },
   'media-hub': {
     Glyph: MediaHubColorIcon,
-    bgGradient: 'bg-fuchsia-600',
+    bgGradient: 'bg-zinc-950 text-white',
     shortName: 'Media Hub & RAW'
   },
   'rbac-system': {
     Glyph: RbacSecurityColorIcon,
-    bgGradient: 'bg-cyan-700',
+    bgGradient: 'bg-zinc-950 text-white',
     shortName: 'Multi-Tenant RBAC'
   }
 };

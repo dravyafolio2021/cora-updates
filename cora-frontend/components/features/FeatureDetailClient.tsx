@@ -261,7 +261,7 @@ export function FeatureDetailClient({ feature }: FeatureDetailClientProps) {
                               ? 'text-emerald-800 bg-emerald-50 border-emerald-200' 
                               : idx === 2 
                                 ? 'text-blue-800 bg-blue-50 border-blue-200' 
-                                : 'text-purple-800 bg-purple-50 border-purple-200'
+                                : 'text-zinc-900 bg-zinc-100/80 border-zinc-200'
                         }`}>
                           <span className="w-1.5 h-1.5 rounded-full bg-current" />
                           {cap.tag}
@@ -295,7 +295,7 @@ export function FeatureDetailClient({ feature }: FeatureDetailClientProps) {
                               ? 'text-emerald-800 bg-emerald-50 border-emerald-200' 
                               : idx === 2 
                                 ? 'text-blue-800 bg-blue-50 border-blue-200' 
-                                : 'text-purple-800 bg-purple-50 border-purple-200'
+                                : 'text-zinc-900 bg-zinc-100/80 border-zinc-200'
                         }`}>
                           <span className="w-1.5 h-1.5 rounded-full bg-current" />
                           {cap.tag}

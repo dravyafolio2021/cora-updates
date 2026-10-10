@@ -242,9 +242,9 @@ export default function AgencyManagementSoftwareIndiaPage() {
             </h2>
           </div>
           <div className="mt-9 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <Link href="/use-cases/marketing-seo/" className="rounded-2xl border border-zinc-200 bg-white p-5 transition hover:border-zinc-400">
+            <Link href="/industries/marketing-seo/" className="rounded-2xl border border-zinc-200 bg-white p-5 transition hover:border-zinc-400">
               <div className="font-semibold">Marketing & SEO agencies</div>
-              <div className="mt-2 text-sm leading-6 text-zinc-600">See the agency workflow and client operations use case.</div>
+              <div className="mt-2 text-sm leading-6 text-zinc-600">See the agency workflow and client operations workspace.</div>
             </Link>
             <Link href="/features/" className="rounded-2xl border border-zinc-200 bg-white p-5 transition hover:border-zinc-400">
               <div className="font-semibold">Explore features</div>

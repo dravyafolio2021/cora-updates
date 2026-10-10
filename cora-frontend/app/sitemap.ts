@@ -71,14 +71,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url: `${baseUrl}/industries/${ind.slug}`,
     lastModified: now,
     changeFrequency: 'weekly' as const,
-    priority: 0.9,
-  }));
-
-  const useCaseUrls = INDUSTRY_WORKSPACES.map((uc) => ({
-    url: `${baseUrl}/use-cases/${uc.slug}`,
-    lastModified: now,
-    changeFrequency: 'weekly' as const,
-    priority: 0.9,
+    priority: 0.92,
   }));
 
   const comparisonUrls = Object.keys(COMPARISONS_DATA).map((slug) => ({
@@ -123,7 +116,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/docs`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.95 },
     { url: `${baseUrl}/features`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.95 },
     { url: `${baseUrl}/industries`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.95 },
-    { url: `${baseUrl}/use-cases`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.95 },
     { url: `${baseUrl}/ai-agent`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.95 },
     { url: `${baseUrl}/pricing`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.95 },
     { url: `${baseUrl}/demo`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.9 },
@@ -154,7 +146,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...docUrls,
     ...featureUrls,
     ...industryUrls,
-    ...useCaseUrls,
     ...templateUrls,
     ...comparisonUrls,
     ...integrationUrls,

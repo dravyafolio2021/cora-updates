@@ -154,6 +154,8 @@ echo "Remote deployment extraction finished successfully."
         ("UPI QR Generator (Next.js)", "https://heycora.in/tools/upi-qr-generator", "UPI"),
         ("Pricing & 40% Flash Tier (Next.js)", "https://heycora.in/pricing?coupon=INDIA40", "India"),
         ("Features Page (Next.js)", "https://heycora.in/features/", "Features"),
+        ("Industries Hub (Next.js)", "https://heycora.in/industries/", "Industries"),
+        ("Software Agencies Industry (Next.js)", "https://heycora.in/industries/software-agencies/", "Software Agencies"),
         ("AI Co-Founder Page (Next.js)", "https://heycora.in/ai-agent/", "Super"),
         ("Integrations Hub (Next.js)", "https://heycora.in/integrations/", "Ecosystem"),
         ("Embed Builder Tool (Next.js)", "https://heycora.in/tools/embed-builder/", "Website Embed"),

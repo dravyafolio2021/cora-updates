@@ -136,47 +136,47 @@ export const INDUSTRY_WORKSPACES: IndustryWorkspace[] = [
     sectorBadge: 'TECH & DEV',
     badgeColor: 'blue',
     iconName: 'Code',
-    tagline: 'Sprint retainers, milestone escrow staging & client review vaults.',
-    heroDescription: 'Purpose-built operating system for custom software engineering firms, dev boutiques, and IT consultancies. Manage sprint retainers, milestone staging gates, SLA uptime guarantees, and automated 18% GST SAC 998314 billing.',
+    tagline: 'Project retainers, milestone sign-offs & client delivery portals.',
+    heroDescription: 'The all-in-one operating system for software development agencies and IT consultancies. Manage monthly retainers, milestone approvals, client staging sign-offs, and automated GST billing in one place.',
     sacCode: 'SAC 998314',
     gstRate: '18% GST',
     stats: [
       { metric: '3X Faster', label: 'Proposal to signed contract' },
-      { metric: '18% GST', label: 'SAC 998314 auto-splitting' },
-      { metric: '100%', label: 'Milestone sign-off before deploy' }
+      { metric: '18% GST', label: 'Automated tax calculations' },
+      { metric: '100%', label: 'Milestone sign-off before launch' }
     ],
     theOldWay: [
-      'Unsigned client change-orders causing painful scope creep and unbilled dev hours',
-      'Manually calculating 18% GST on sprint retainers and sending disconnected PDF invoices',
-      'Deploying code to production without recorded, legally binding client milestone sign-offs'
+      'Unsigned client change requests causing unbilled developer hours and scope creep',
+      'Manually calculating 18% GST on monthly retainers and sending separate PDF invoices',
+      'Delivering code to production without recorded, legally binding client milestone sign-offs'
     ],
     theCoraWay: [
-      'Digital change-order generator that calculates additional hours and requires e-sign before work begins',
-      'Automated SAC 998314 tax engine that splits CGST/SGST and triggers recurring UPI & NEFT payment links',
-      'Milestone-gated client staging portals requiring cryptographic SHA-256 sign-offs before deploy'
+      'Instant change-order generator that quotes extra hours and collects client signatures before work starts',
+      'Automated GST invoicing with instant UPI QR codes and bank transfer payment links',
+      'Milestone approval portals where clients review and sign off before final launch'
     ],
     capabilities: [
       {
-        title: 'Agile Sprint Retainer Engine',
-        description: 'Automate weekly or bi-weekly client retainers with integrated hour tracking, roll-over controls, and instant overage invoicing.',
-        tag: 'Sprint Retainers'
+        title: 'Monthly Retainer & Hours Engine',
+        description: 'Automate monthly or sprint retainers with tracked hours, rollover balances, and automated overage billing.',
+        tag: 'Retainers'
       },
       {
-        title: 'Milestone Escrow & Staging Approvals',
-        description: 'Client staging portals where stakeholders inspect test builds and sign off on completion before production deployment.',
-        tag: 'Staging Gates'
+        title: 'Milestone Staging Approvals',
+        description: 'Client staging portals where stakeholders inspect deliverables and approve completion before production launch.',
+        tag: 'Milestone Gates'
       },
       {
-        title: 'SAC 998314 Tax & Invoicing',
-        description: 'Pre-seeded Indian tax schemas for domestic and export IT services with reverse charge (RCM) and SEZ zero-tax support.',
+        title: 'Automated GST Invoicing',
+        description: 'Pre-configured Indian tax engine for domestic and export services with automatic tax splitting.',
         tag: '18% GST Engine'
       }
     ],
     howItWorks: [
-      { step: '01', title: 'Scope & Sprint Definition', description: 'Convert discovery notes into structured sprint milestones using AI Voice-to-Scope.' },
-      { step: '02', title: 'SHA-256 Master Agreement', description: 'Client executes master services agreement (MSA) with IT Act 2000 digital signatures.' },
-      { step: '03', title: 'Staging Milestone Approval', description: 'Client reviews test build and approves release checklist with one click.' },
-      { step: '04', title: 'Automated GST Invoicing', description: 'SAC 998314 invoice generated automatically with embedded UPI QR and bank links.' }
+      { step: '01', title: 'Scope Definition', description: 'Turn client conversations and notes into structured project milestones in minutes.' },
+      { step: '02', title: 'Digital Contract', description: 'Client signs the master service agreement online with legally binding digital signatures.' },
+      { step: '03', title: 'Milestone Review', description: 'Client reviews the test build and approves the release checklist with one click.' },
+      { step: '04', title: 'Automated Payment', description: 'GST invoice is generated automatically with instant UPI and bank transfer links.' }
     ],
     toolsReplaced: [
       { name: 'DocuSign', category: 'E-Signatures', monthlySavingsINR: 3500 },
@@ -186,12 +186,12 @@ export const INDUSTRY_WORKSPACES: IndustryWorkspace[] = [
     ],
     faqs: [
       {
-        question: 'How does Cora handle software sprint retainers vs fixed-price milestones?',
-        answer: 'Cora supports both agile sprint retainers (recurring monthly/bi-weekly fee with allocated dev hours) and fixed-price milestone schedules (e.g. 50% advance, 25% staging sign-off, 25% production launch). Both trigger automated GST invoices upon approval.'
+        question: 'How does Cora handle recurring retainers vs fixed-price milestones?',
+        answer: 'Cora supports both recurring monthly retainers (fixed monthly fee with allocated hours) and fixed-price milestone schedules (e.g. 50% advance, 25% staging sign-off, 25% launch). Both trigger automated GST invoices upon approval.'
       },
       {
-        question: 'Does Cora support Indian IT Act 2000 compliant digital signatures for NDAs and MSAs?',
-        answer: 'Yes. Every agreement executed on Cora generates a tamper-evident SHA-256 cryptographic hash with recorded IP addresses, device user agents, and ISO timestamps fully compliant with Section 10A of the Indian Information Technology Act 2000.'
+        question: 'Are digital contracts signed in Cora legally binding in India?',
+        answer: 'Yes. Every agreement signed on Cora generates a secure verification audit trail with IP address, device details, and timestamp fully compliant with Section 10A of the Indian Information Technology Act 2000.'
       },
       {
         question: 'Can we bill international clients with 0% GST (Export of Services)?',
@@ -199,34 +199,35 @@ export const INDUSTRY_WORKSPACES: IndustryWorkspace[] = [
       }
     ],
     preSeededTemplates: [
-      'Agile Sprint Retainer Agreement (Master Services Agreement)',
-      'Fixed-Scope Milestone Sign-Off & Escrow Release Form',
-      'Software SLA & Priority Incident Support Agreement',
-      'Mutual Non-Disclosure & IP Ownership Transfer (IT Act 2000)'
+      'Master Services Agreement (Software Development)',
+      'Agile Sprint Retainer & SLA Schedule',
+      'Milestone Staging Sign-Off & Release Approval',
+      'Change-Order Request & Scope Amendment'
     ],
     workflowHighlights: [
-      'Automated recurring sprint retainer billing with direct UPI & NEFT payment links',
-      'Client staging approval portals requiring cryptographic digital sign-off before production deploy',
-      'SLA uptime and maintenance tracking with priority bug escalation tiers',
-      'Cryptographic SHA-256 digital contracts compliant with the Indian Information Technology Act 2000'
+      'Digital change-order generator that requires client signature before adding hours',
+      'Milestone-gated staging approval portals for clean client sign-offs',
+      'Automated GST invoicing with embedded UPI QR codes and NEFT details',
+      'Legally binding digital contracts compliant with the Indian IT Act 2000'
     ],
     recommendedModules: [
-      { id: 'ai-cofounder', title: 'AI Co-Founder', icon: 'Bot' },
       { id: 'esign-vault', title: 'E-Sign Vault', icon: 'ShieldCheck' },
+      { id: 'lead-crm', title: 'Client CRM', icon: 'Users2' },
       { id: 'gst-invoicing', title: '18% GST Invoicing', icon: 'Receipt' },
-      { id: 'task-board', title: 'Sprint Boards', icon: 'Kanban' }
+      { id: 'task-board', title: 'Project Boards', icon: 'Kanban' }
     ],
     challengeVsSolution: {
-      challenge: 'Unsigned change-orders, delayed milestone client sign-offs, and manual GST invoicing across multi-week sprints.',
-      solution: 'Milestone-gated client staging approval portals with automated SAC 998314 tax invoice generation upon sign-off.'
+      challenge: 'Scope creep and delayed payments from informal client approvals on chat apps.',
+      solution: 'Milestone approval portals with automated GST invoice generation upon client sign-off.'
     },
-    sampleRetainerText: 'Monthly Tech Retainer: ₹2,50,000 + 18% GST (CGST ₹22,500 + SGST ₹22,500). Includes 80 dev hours, bi-weekly sprint reviews, and 4-hour SLA response.',
-    accentBg: 'bg-blue-50/60',
-    accentBorder: 'border-blue-200/80',
-    accentText: 'text-blue-700',
-    heroImage: '/images/cora_community_crowd.jpg',
-    relatedIndustrySlugs: ['web-app-studios', 'it-tech-services', 'ai-automation', 'consultants-advisors']
+    sampleRetainerText: 'Software Retainer: 40 Dev Hours / Month at ₹1,20,000 + 18% GST. Includes bi-weekly staging reviews and deployment support.',
+    accentBg: 'bg-zinc-100',
+    accentBorder: 'border-zinc-200',
+    accentText: 'text-zinc-900',
+    heroImage: '/images/usecase_production_house.jpg',
+    relatedIndustrySlugs: ['web-app-studios', 'it-tech-services', 'ai-automation', 'design-uiux']
   },
+
   {
     id: 'web-app-studios',
     slug: 'web-app-studios',
@@ -237,47 +238,47 @@ export const INDUSTRY_WORKSPACES: IndustryWorkspace[] = [
     sectorBadge: 'TECH & DEV',
     badgeColor: 'blue',
     iconName: 'LayoutTemplate',
-    tagline: 'Fixed-scope contracts, client Figma sign-offs & SLA trackers.',
-    heroDescription: 'The operating system for modern Webflow, Next.js, and mobile app studios. Lock in design-build scopes, collect 50% advance booking deposits, and eliminate scope creep with client Figma sign-off portals.',
+    tagline: 'Figma sign-offs, revision controls & milestone deposit billing.',
+    heroDescription: 'Purpose-built client management for UI/UX studios and web design agencies. Coordinate design sprint milestones, collect upfront deposits, manage revisions, and bill monthly maintenance retainers.',
     sacCode: 'SAC 998315',
     gstRate: '18% GST',
     stats: [
-      { metric: '4-Phase', label: 'Wireframe to launch gates' },
-      { metric: 'Zero', label: 'Unpaid scope creep revisions' },
-      { metric: 'Instant', label: '50% advance deposit generation' }
+      { metric: '50% Upfront', label: 'Advance deposit locked on contract sign' },
+      { metric: '0 Scope Creep', label: 'Clear revision limits in every agreement' },
+      { metric: '1-Click', label: 'Figma milestone sign-offs' }
     ],
     theOldWay: [
       'Clients requesting endless design revisions without paying for additional scope',
-      'Delivering Figma files or website transfers before collecting the final payment balance',
-      'No formal SLA for post-launch hosting, security updates, and bug fixes'
+      'Chasing overdue milestone payments through manual email threads',
+      'Sharing Figma files before final payment is cleared'
     ],
     theCoraWay: [
-      'Pre-seeded 4-phase milestone contracts with built-in revision limit rules and change-orders',
-      'Automated client hand-off vaults that release credentials and asset files only upon invoice payment',
-      'Turnkey monthly website hosting and maintenance retainer templates with automated debit reminders'
+      'Clear revision boundaries with one-click change-orders when clients request extra features',
+      'Automated 50/25/25 milestone payment schedules tied directly to client approvals',
+      'Secure client portals that deliver design assets only after final invoice clearance'
     ],
     capabilities: [
       {
-        title: 'Design-Build Milestone Schedule',
-        description: 'Pre-configured 4-phase milestone structure: 50% Deposit, 25% UI Sign-Off, 25% Launch Handover.',
-        tag: 'Phase Gates'
+        title: 'Milestone Deposit Engine',
+        description: 'Auto-split project payments into 50% advance, 25% design sign-off, and 25% launch balance with instant GST invoicing.',
+        tag: 'Milestone Deposits'
       },
       {
-        title: 'Client Asset Handover Vault',
-        description: 'Secure client portal that automatically delivers production source code, assets, and DNS keys upon invoice clearance.',
-        tag: 'Delivery Vault'
+        title: 'Design Review & Revision Gates',
+        description: 'Structured review portals where clients leave feedback within agreed revision rounds and formally approve deliverables.',
+        tag: 'Revision Limits'
       },
       {
-        title: 'Change-Order Scope Amendment',
-        description: 'One-click change order builder for extra pages or features that clients can approve and pay directly.',
-        tag: 'Scope Protection'
+        title: 'Hosting & Maintenance Retainers',
+        description: 'Automate monthly website hosting, security maintenance, and support retainers with recurring tax invoices.',
+        tag: 'Maintenance Retainers'
       }
     ],
     howItWorks: [
-      { step: '01', title: 'Proposal & Scope Builder', description: 'Assemble deliverables, revision limits, and payment terms in 3 minutes.' },
-      { step: '02', title: 'E-Sign & Advance Payment', description: 'Client signs digital contract and clears 50% advance deposit via UPI or bank transfer.' },
-      { step: '03', title: 'Figma Review & Sign-Off', description: 'Client signs off on design milestone checklist before engineering begins.' },
-      { step: '04', title: 'Launch & Retainer Handover', description: 'Final balance invoice clears automatically and client transitions to monthly maintenance retainer.' }
+      { step: '01', title: 'Proposal & Scope', description: 'Assemble deliverables, revision limits, and payment terms in 3 minutes.' },
+      { step: '02', title: 'E-Sign & Advance', description: 'Client signs digital contract and clears 50% advance deposit via UPI or bank transfer.' },
+      { step: '03', title: 'Design Sign-Off', description: 'Client signs off on design milestone checklist before engineering begins.' },
+      { step: '04', title: 'Launch & Retainer', description: 'Final balance invoice clears automatically and client transitions to monthly maintenance.' }
     ],
     toolsReplaced: [
       { name: 'HoneyBook', category: 'CRM & Proposals', monthlySavingsINR: 3200 },
@@ -287,24 +288,28 @@ export const INDUSTRY_WORKSPACES: IndustryWorkspace[] = [
     faqs: [
       {
         question: 'How does Cora prevent scope creep for web design projects?',
-        answer: 'Cora specifies revision round limits directly in the contract. When a client requests changes outside the original brief, you can generate an instant Change-Order Addendum with one click that the client must digitally sign before work begins.'
+        answer: 'Cora specifies revision limits directly in the contract. When a client requests changes outside the original brief, you can generate an instant Change-Order Addendum with one click that the client must digitally sign before work begins.'
       },
       {
         question: 'Can we manage monthly website hosting and maintenance retainers in Cora?',
-        answer: 'Yes. You can set up recurring monthly maintenance retainers with automated SAC 998315 tax invoices sent to clients on the 1st of every month.'
+        answer: 'Yes. You can set up recurring monthly maintenance retainers with automated GST invoices sent to clients on the 1st of every month.'
+      },
+      {
+        question: 'Can clients preview and approve design milestones on mobile?',
+        answer: 'Yes. The client review portal is fully mobile-responsive, allowing clients to review checklists and sign milestone approvals on their phone.'
       }
     ],
     preSeededTemplates: [
       'Web & App Design-Build Master Agreement',
-      'Figma UI/UX Milestone Client Sign-Off Form',
+      'Design Milestone Client Sign-Off Form',
       'Post-Launch Hosting & Maintenance Retainer SLA',
       'Change-Order Request & Scope Amendment Contract'
     ],
     workflowHighlights: [
       '50% advance booking deposit invoice auto-generated upon contract e-sign',
-      'Interactive design review portal with client approval checklist for Figma handoffs',
+      'Interactive design review portal with client approval checklist',
       'Automated change-order generator that quotes additional features instantly',
-      'Integrated SAC 998315 tax splitting for domestic and export IT services'
+      'Integrated GST tax calculations for domestic and export services'
     ],
     recommendedModules: [
       { id: 'canvas-builder', title: 'Funnel Builder', icon: 'LayoutTemplate' },
@@ -317,108 +322,114 @@ export const INDUSTRY_WORKSPACES: IndustryWorkspace[] = [
       solution: 'Strict milestone sign-off gates with automated change-order addendums that must be digitally signed before work begins.'
     },
     sampleRetainerText: 'Design-Build Milestone Schedule: 50% Advance (₹1,75,000), 25% UI Sign-Off (₹87,500), 25% Production Launch (₹87,500) + 18% GST.',
-    accentBg: 'bg-indigo-50/60',
-    accentBorder: 'border-indigo-200/80',
-    accentText: 'text-indigo-700',
+    accentBg: 'bg-zinc-100',
+    accentBorder: 'border-zinc-200',
+    accentText: 'text-zinc-900',
     heroImage: '/images/bento_crew_camera.jpg',
-    relatedIndustrySlugs: ['software-agencies', 'design-uiux', 'marketing-seo', 'consultants-advisors']
+    relatedIndustrySlugs: ['software-agencies', 'design-uiux', 'marketing-seo', 'ai-automation']
   },
+
   {
     id: 'it-tech-services',
     slug: 'it-tech-services',
-    title: 'IT & Tech Services (MSPs)',
-    shortTitle: 'IT & Tech Services',
+    title: 'IT & Tech Services',
+    shortTitle: 'IT Services',
     sectorId: 'tech_dev',
     sectorLabel: 'Tech & Dev',
     sectorBadge: 'TECH & DEV',
     badgeColor: 'blue',
-    iconName: 'ShieldCheck',
-    tagline: 'Managed IT retainers, uptime SLAs & hardware asset registries.',
-    heroDescription: 'Complete operational command center for Managed Service Providers (MSPs), cloud infrastructure consultants, and network engineering firms. Coordinate monthly support SLAs, server hardware check-ins, and automated recurring billing.',
+    iconName: 'Cpu',
+    tagline: 'Support retainers, SLA guarantees & automated monthly billing.',
+    heroDescription: 'Streamlined operations for MSPs, cloud consultancies, and IT support providers. Automate monthly service retainers, track response times, and generate compliant GST invoices effortlessly.',
     sacCode: 'SAC 998313',
     gstRate: '18% GST',
     stats: [
-      { metric: '99.9%', label: 'SLA uptime logging' },
-      { metric: 'Monthly', label: 'Auto recurring retainer runs' },
-      { metric: 'Zero', label: 'Billing leakage on support' }
+      { metric: '100% SLA', label: 'Guaranteed response time tracking' },
+      { metric: 'Monthly Auto', label: 'Recurring retainer billing' },
+      { metric: 'Zero Manual', label: 'Automated invoice generation' }
     ],
     theOldWay: [
-      'Out-of-scope IT emergency support going unrecorded and unbilled',
-      'Hardware equipment and client loaner laptops tracked on scattered spreadsheets',
-      'Manual SLA reporting and painful monthly reconciliation for corporate accounts'
+      'Tracking monthly support hours across fragmented spreadsheets with disputed time logs',
+      'Late invoice payments leading to cashflow gaps on ongoing managed infrastructure',
+      'Unsigned annual maintenance contracts (AMCs) exposing the firm to uncontracted liability'
     ],
     theCoraWay: [
-      'Automated retainer hour metering with instant overage invoicing once contracted hours are exceeded',
-      'Hardware asset registry with barcode, serial number, and assigned employee check-out logs',
-      'Client portal displaying real-time SLA uptime guarantees and signed IT maintenance contracts'
+      'Automated monthly support hour tracking with clear client-facing balance reports',
+      'Automated recurring GST billing on the 1st of every month with UPI and bank transfer links',
+      'Pre-seeded Annual Maintenance Contracts (AMC) with digital signatures and SLA definitions'
     ],
     capabilities: [
       {
-        title: 'Tiered Managed IT Retainers',
-        description: 'Pre-configured support tiers (Standard, Gold, 24/7 Mission-Critical) with automated monthly SAC 998313 invoicing.',
-        tag: 'SLA Retainers'
+        title: 'Monthly AMC Retainer Billing',
+        description: 'Set up recurring monthly or annual IT maintenance contracts with automatic GST invoice dispatch and payment tracking.',
+        tag: 'AMC Retainers'
       },
       {
-        title: 'Hardware & Infrastructure Registry',
-        description: 'Track client servers, network switches, and loaner laptops with depreciation logs and maintenance schedules.',
-        tag: 'Asset Hub'
+        title: 'SLA Response Tier Management',
+        description: 'Define clear service levels (Standard, Priority, 24/7 Mission-Critical) with automated monthly retainer invoicing.',
+        tag: 'SLA Tiers'
       },
       {
-        title: 'Priority Escalation Matrix',
-        description: 'Contractually bound response time tiers (P1 Critical 1-hour, P2 Urgent 4-hour, P3 Normal 24-hour).',
-        tag: 'SLA Matrix'
+        title: 'Hardware & Cloud Procurement Invoicing',
+        description: 'Separate service hours from hardware and cloud infrastructure pass-through costs with transparent line-item GST billing.',
+        tag: 'Procurement Billing'
       }
     ],
     howItWorks: [
-      { step: '01', title: 'Onboarding & Asset Audit', description: 'Log client hardware inventory and infrastructure credentials into secure vault.' },
-      { step: '02', title: 'SLA Contract Execution', description: 'Client signs tiered managed services agreement with uptime guarantees.' },
-      { step: '03', title: 'Incident & Retainer Metering', description: 'Support hours are tracked against contracted retainer allowance with auto-alerts.' },
-      { step: '04', title: 'Monthly GST Ledger', description: 'Automated 18% GST billing runs on the 1st of every month with direct payment links.' }
+      { step: '01', title: 'Select Service Tier', description: 'Choose from pre-configured IT support packages with defined response times.' },
+      { step: '02', title: 'Sign Annual AMC', description: 'Client executes digital support agreement with SLA terms and renewal dates.' },
+      { step: '03', title: 'Automated Monthly Billing', description: 'System issues 18% GST invoices on the 1st of every month automatically.' },
+      { step: '04', title: 'Support Tracking', description: 'Client accesses portal to request assistance, view SLA metrics, and log tickets.' }
     ],
     toolsReplaced: [
-      { name: 'ConnectWise', category: 'MSP Software', monthlySavingsINR: 8500 },
+      { name: 'ConnectWise', category: 'PSA & Invoicing', monthlySavingsINR: 5500 },
       { name: 'DocuSign', category: 'E-Signatures', monthlySavingsINR: 3500 },
-      { name: 'Zoho Books', category: 'Invoicing', monthlySavingsINR: 2400 }
+      { name: 'QuickBooks', category: 'Accounting', monthlySavingsINR: 2500 }
     ],
     faqs: [
       {
-        question: 'Can we manage multiple client corporate locations and branch offices in Cora?',
-        answer: 'Yes. Cora includes Multi-Branch governance allowing you to segment client hardware assets, user permissions, and SLA contracts by specific branch locations while maintaining consolidated billing.'
+        question: 'Can Cora handle annual maintenance contracts (AMCs) with quarterly billing?',
+        answer: 'Yes. You can configure annual AMC agreements that bill monthly, quarterly, or annually with automated GST invoices and payment reminders.'
       },
       {
-        question: 'Does Cora support annual upfront IT maintenance contracts (AMCs)?',
-        answer: 'Yes. You can issue Annual Maintenance Contracts (AMCs) with automated quarterly tax invoice schedules or single lump-sum 18% GST billing.'
+        question: 'How are SLA breach liabilities handled in the contract templates?',
+        answer: 'Cora pre-seeded AMC templates include industry-standard liability caps and response time exclusions, safeguarding your IT firm from open-ended financial liabilities.'
+      },
+      {
+        question: 'Does Cora support export IT consultancy with LUT?',
+        answer: 'Yes. For overseas tech clients, Cora automatically generates 0% GST export invoices with your registered GST LUT number.'
       }
     ],
     preSeededTemplates: [
-      'Managed IT Services Agreement & SLA Matrix',
-      'Cybersecurity Audit & Compliance Review Contract',
-      'Hardware Infrastructure Deployment & Rental Form',
-      '24/7 Priority Emergency Support Addendum'
+      'Annual Maintenance Contract (AMC) for IT Infrastructure',
+      'Cloud Managed Services Agreement & SLA Schedule',
+      'Emergency Incident Response & Escalation Matrix',
+      'Hardware & Software Procurement Supply Agreement'
     ],
     workflowHighlights: [
-      'Tiered monthly IT support retainer automation with automated tax invoices',
-      'Hardware and network asset tracking with serial numbers and assigned client tags',
-      'Incident ticket escalation logging with verified audit timestamps',
-      'One-click client portal for viewing infrastructure health and signed SLAs'
+      'Automated recurring monthly IT retainer billing with instant UPI links',
+      'Pre-seeded AMC legal contracts with clear SLA performance definitions',
+      'Separate service labor and hardware procurement line-item invoicing',
+      'Client portal for reviewing active contracts and invoice payment history'
     ],
     recommendedModules: [
-      { id: 'asset-gear', title: 'Asset & Gear Hub', icon: 'HardDrive' },
-      { id: 'gst-invoicing', title: '18% GST Invoicing', icon: 'Receipt' },
-      { id: 'email-smtp', title: 'Verified SMTP', icon: 'Send' },
-      { id: 'rbac-system', title: 'RBAC Security', icon: 'Lock' }
+      { id: 'esign-vault', title: 'E-Sign Vault', icon: 'ShieldCheck' },
+      { id: 'gst-invoicing', title: 'GST Invoicing', icon: 'Receipt' },
+      { id: 'lead-crm', title: 'Account CRM', icon: 'Users2' },
+      { id: 'analytics-pwa', title: 'Performance Stats', icon: 'BarChart2' }
     ],
     challengeVsSolution: {
-      challenge: 'Tracking out-of-scope IT requests that go unbilled at month-end.',
-      solution: 'Automatic retainer hour logging with instant overage invoicing once monthly contracted hours are exceeded.'
+      challenge: 'Managing recurring AMC contracts and collecting monthly fees on time.',
+      solution: 'Automated recurring billing cycles with instant digital contracts and payment notifications.'
     },
-    sampleRetainerText: 'Managed Cloud SLA Retainer: ₹1,20,000/mo + 18% GST. Covers 24/7 server monitoring, up to 40 support hours, and monthly security patch audits.',
-    accentBg: 'bg-emerald-50/60',
-    accentBorder: 'border-emerald-200/80',
-    accentText: 'text-emerald-700',
-    heroImage: '/images/usecase_commercial_studio.jpg',
-    relatedIndustrySlugs: ['software-agencies', 'ai-automation', 'audit-compliance', 'consultants-advisors']
+    sampleRetainerText: 'Managed Cloud Infrastructure: ₹65,000/mo + 18% GST. Includes 24/7 uptime monitoring, security patching, and 15 support hours.',
+    accentBg: 'bg-zinc-100',
+    accentBorder: 'border-zinc-200',
+    accentText: 'text-zinc-900',
+    heroImage: '/images/usecase_realestate_agency.jpg',
+    relatedIndustrySlugs: ['software-agencies', 'ai-automation', 'consultants-advisors', 'audit-compliance']
   },
+
   {
     id: 'ai-automation',
     slug: 'ai-automation',
@@ -428,48 +439,48 @@ export const INDUSTRY_WORKSPACES: IndustryWorkspace[] = [
     sectorLabel: 'Tech & Dev',
     sectorBadge: 'TECH & DEV',
     badgeColor: 'blue',
-    iconName: 'Zap',
-    tagline: 'Custom agent workflows, token billing & client AI vaults.',
-    heroDescription: 'Specialized business platform for agencies building autonomous AI agents, voice bots, and LLM automation pipelines. Manage token usage billing, RAG document memory bridges, and enterprise IP handover deeds.',
+    iconName: 'Bot',
+    tagline: 'AI workflow retainers, client knowledge bases & privacy protection.',
+    heroDescription: 'The complete platform for agencies building AI assistants, automations, and intelligent workflows. Manage client knowledge documents, monthly support retainers, and strict enterprise privacy guarantees.',
     sacCode: 'SAC 998316',
     gstRate: '18% GST',
     stats: [
-      { metric: 'Token-Based', label: 'Flexible usage retainer models' },
-      { metric: 'RAG Vaults', label: 'Secure memory bridges' },
-      { metric: '3-Min', label: 'Client onboarding to live AI' }
+      { metric: 'Smart Hub', label: 'Secure client knowledge bases' },
+      { metric: 'Monthly Retainers', label: 'Predictable recurring billing' },
+      { metric: '100% Private', label: 'Client data privacy guarantee' }
     ],
     theOldWay: [
-      'Unclear contract terms regarding AI hallucinations, token overage costs, and prompt IP ownership',
-      'Client enterprise security fears regarding corporate data leakage and model training',
-      'Manually compiling API token costs from OpenAI, Anthropic, and voice models at month-end'
+      'Client worries about proprietary business data being used for public AI training',
+      'Manually invoicing variable monthly maintenance and API usage fees',
+      'Scattered workflow documentation and lost API configuration details'
     ],
     theCoraWay: [
-      'Pre-seeded AI Agent Master Services Agreement with explicit IP handover and non-liability terms',
-      'Pre-configured Enterprise Data Privacy Addendums ensuring zero data training on private IP',
-      'Automated hybrid retainer billing combining fixed monthly maintenance with variable token usage'
+      'Built-in data privacy guarantee agreements assuring complete confidentiality',
+      'Combined monthly support retainers with automated GST invoices',
+      'Encrypted client workspaces storing all workflow logic and documentation safely'
     ],
     capabilities: [
       {
-        title: 'Enterprise AI Privacy Addendum',
-        description: 'Legally vetted contract clauses ensuring client corporate data is strictly isolated and never used for model training.',
+        title: 'Client Data Privacy Guarantees',
+        description: 'Pre-seeded non-training enterprise data agreements assuring enterprise clients that their private data is never used to train public models.',
         tag: 'Data Privacy'
       },
       {
-        title: 'RAG Document Knowledge Depository',
-        description: 'Encrypted document vault for client SOPs, PDFs, and API keys that feed private context to your deployed agents.',
-        tag: 'RAG Memory'
+        title: 'Secure Client Knowledge Base',
+        description: 'Organize client documents, prompts, and automation rules in dedicated, encrypted workspaces.',
+        tag: 'Knowledge Base'
       },
       {
-        title: 'Hybrid Retainer & Token Billing',
-        description: 'Combine a monthly agent maintenance retainer with automated usage-based tier invoicing under SAC 998316.',
-        tag: 'Token Billing'
+        title: 'Monthly Automation Retainers',
+        description: 'Combine fixed monthly maintenance with automated usage-tier invoicing and GST billing.',
+        tag: 'AI Retainers'
       }
     ],
     howItWorks: [
-      { step: '01', title: 'Agent Architecture Proposal', description: 'Generate AI workflow scope with model architecture and API requirements.' },
-      { step: '02', title: 'Privacy & MSA Execution', description: 'Client executes enterprise privacy deed and development contract with SHA-256 verification.' },
-      { step: '03', title: 'RAG Knowledge Ingestion', description: 'Upload client documents and connect API webhooks inside isolated client vault.' },
-      { step: '04', title: 'Live Deployment & Retainer', description: 'Agent goes live with automated monthly maintenance and token usage billing.' }
+      { step: '01', title: 'Workflow Scoping', description: 'Define the automation brief, required integrations, and deliverables.' },
+      { step: '02', title: 'Privacy & Contract Sign', description: 'Client signs the master service agreement and enterprise privacy addendum.' },
+      { step: '03', title: 'Knowledge Base Setup', description: 'Upload client documents and connect automation endpoints inside their secure workspace.' },
+      { step: '04', title: 'Live Deployment & Retainer', description: 'Automation goes live with automated monthly maintenance and support billing.' }
     ],
     toolsReplaced: [
       { name: 'PandaDoc', category: 'Proposals', monthlySavingsINR: 3800 },
@@ -478,40 +489,44 @@ export const INDUSTRY_WORKSPACES: IndustryWorkspace[] = [
     ],
     faqs: [
       {
-        question: 'Who owns the Intellectual Property (IP) of the AI agents and custom prompts built on Cora?',
-        answer: 'Our pre-seeded agreements provide full IP transfer to the client upon final invoice clearance, while licensing generic underlying workflow scaffolding to the agency.'
+        question: 'Who owns the intellectual property of the automations built on Cora?',
+        answer: 'Our pre-seeded agreements ensure complete intellectual property transfer to the client upon final invoice clearance, protecting both parties.'
       },
       {
-        question: 'Does Cora integrate with Claude 3.5 Sonnet, Gemini, and GPT-4o?',
-        answer: 'Yes. Cora features native multi-model orchestration, allowing your team to draft proposals, extract meeting scopes, and triage client inquiries with the world\'s best AI models.'
+        question: 'Does Cora integrate with modern AI models like Claude, Gemini, and GPT-4o?',
+        answer: 'Yes. Cora features multi-model orchestration, allowing your team to draft proposals, extract meeting scopes, and organize client inquiries with top AI models.'
+      },
+      {
+        question: 'How do we handle monthly maintenance and fine-tuning retainers?',
+        answer: 'You can establish recurring monthly retainers that automatically generate GST invoices on the 1st of every month with integrated payment links.'
       }
     ],
     preSeededTemplates: [
-      'AI Agent Development & Deployment Agreement',
-      'Enterprise LLM Data Privacy & Non-Training Addendum',
-      'Monthly Automation Maintenance & Token Retainer',
-      'Workflow IP & Prompt Architecture Handover Deed'
+      'AI Automation & Agent Development Agreement',
+      'Enterprise Data Privacy & Non-Training Addendum',
+      'Monthly Automation Maintenance & Support Retainer',
+      'Workflow IP & Prompt Architecture Handover Agreement'
     ],
     workflowHighlights: [
-      'Custom AI agent build scopes with phased deployment milestones',
-      'Monthly token and maintenance retainer automation with GST invoices',
-      'Isolated RAG knowledge base vault for confidential client document storage',
-      'Automated client onboarding wizard for configuring API keys and webhooks'
+      'Custom AI automation scopes with phased deployment milestones',
+      'Monthly support and maintenance retainer automation with GST invoices',
+      'Dedicated knowledge base workspace for confidential client document storage',
+      'Automated client onboarding wizard for configuring integrations safely'
     ],
     recommendedModules: [
-      { id: 'ai-cofounder', title: 'AI Co-Founder', icon: 'Bot' },
-      { id: 'rag-mcp', title: 'RAG Memory MCP', icon: 'BrainCircuit' },
+      { id: 'ai-cofounder', title: 'AI Assistant', icon: 'Bot' },
       { id: 'content-ai', title: 'Content AI', icon: 'Sparkles' },
-      { id: 'docs-portal', title: 'API Specs Hub', icon: 'Terminal' }
+      { id: 'docs-portal', title: 'Workflow Hub', icon: 'Terminal' },
+      { id: 'esign-vault', title: 'E-Sign Vault', icon: 'ShieldCheck' }
     ],
     challengeVsSolution: {
-      challenge: 'Client concerns regarding enterprise data privacy and non-training on private corporate IP.',
-      solution: 'Pre-seeded enterprise LLM data privacy addendums with complete cryptographic workspace isolation.'
+      challenge: 'Client concerns regarding enterprise data privacy and model training.',
+      solution: 'Pre-seeded enterprise data privacy addendums with complete workspace data isolation.'
     },
-    sampleRetainerText: 'Enterprise AI Agent Retainer: ₹1,80,000/mo + 18% GST. Includes 5 custom agent workflows, monthly model fine-tuning, and RAG context optimization.',
-    accentBg: 'bg-amber-50/60',
-    accentBorder: 'border-amber-200/80',
-    accentText: 'text-amber-700',
+    sampleRetainerText: 'Enterprise Automation Retainer: ₹1,80,000/mo + 18% GST. Includes 5 custom automated workflows, monthly maintenance, and optimization.',
+    accentBg: 'bg-zinc-100',
+    accentBorder: 'border-zinc-200',
+    accentText: 'text-zinc-900',
     heroImage: '/images/usecase_production_house.jpg',
     relatedIndustrySlugs: ['software-agencies', 'web-app-studios', 'consultants-advisors', 'marketing-seo']
   },
@@ -527,188 +542,198 @@ export const INDUSTRY_WORKSPACES: IndustryWorkspace[] = [
     sectorBadge: 'LEGAL & FINANCE',
     badgeColor: 'slate',
     iconName: 'Scale',
-    tagline: 'SHA-256 e-sign vaults, retainer agreements & client intake.',
-    heroDescription: 'Airtight digital practice management for advocates, corporate legal counsels, and law firms. Execute IT Act 2000 compliant digital e-signatures, manage monthly corporate retainers, and maintain confidential client document vaults.',
+    tagline: 'Legally binding e-signatures, retainer mandates & confidential vaults.',
+    heroDescription: 'Cloud practice management for advocates, legal consultants, and corporate law chambers. Manage client intake questionnaires, execute digital agreements under the IT Act 2000, and track billable hours.',
     sacCode: 'SAC 998211',
-    gstRate: '18% GST (RCM / Forward)',
+    gstRate: '18% GST / Reverse Charge (RCM)',
     stats: [
-      { metric: 'SHA-256', label: 'Cryptographic hash signatures' },
-      { metric: '100%', label: 'IT Act 2000 Section 10A valid' },
-      { metric: 'Zero', label: 'Lost paper contracts or filings' }
+      { metric: 'IT Act Valid', label: '100% legally enforceable digital signatures' },
+      { metric: 'Encrypted', label: 'Confidential client document vaults' },
+      { metric: 'Instant', label: 'Retainer mandate agreements' }
     ],
     theOldWay: [
-      'Printing, physical courier delivery, and manual scanning of multi-page agreements',
-      'Chasing corporate clients for quarterly retainer payments without automated billing',
-      'Client intake details scattered across unencrypted emails and WhatsApp threads'
+      'Printing, signing, and courier-scanning paper retainer mandates taking weeks',
+      'Confidential case briefs and agreements shared insecurely over email attachments',
+      'Manual calculation of Reverse Charge Mechanism (RCM) tax on legal invoices'
     ],
     theCoraWay: [
-      '5-step guided e-signature flow that captures IP address, user agent, and SHA-256 document hash',
-      'Automated corporate legal retainer billing with Reverse Charge (RCM) tax categorization',
-      'Confidential client intake questionnaires with conflict-of-interest check verification'
+      'Instant digital contract execution with tamper-proof audit trails valid in Indian courts',
+      'Dedicated encrypted client vaults with strict access permissions for case files',
+      'Automated legal fee invoicing with built-in RCM reverse-charge tax indicators'
     ],
     capabilities: [
       {
-        title: 'IT Act 2000 Digital E-Sign Vault',
-        description: 'Execute legally binding contracts with Section 10A validity under Indian jurisdiction with tamper-evident audit logs.',
+        title: 'IT Act 2000 E-Signatures',
+        description: 'Execute legal retainer mandates, NDAs, and settlement terms with tamper-evident digital signatures valid under Section 10A.',
         tag: 'Legal E-Sign'
       },
       {
-        title: 'Corporate Retainer Automation',
-        description: 'Automate monthly and quarterly advisory retainers with custom advisory hour tracking and overage invoicing.',
-        tag: 'Legal Retainers'
+        title: 'Confidential Case Vaults',
+        description: 'Bank-grade encrypted storage for case briefs, evidence files, and court filings with role-based access control.',
+        tag: 'Case Vault'
       },
       {
-        title: 'Confidential Client Intake & Conflict Check',
-        description: 'Secure digital intake questionnaires that screen opposing parties and capture confidential case briefs.',
-        tag: 'Intake Vault'
+        title: 'Legal Retainer & RCM Invoicing',
+        description: 'Automated legal fee billing supporting standard 18% GST and business-to-business Reverse Charge Mechanism (RCM).',
+        tag: 'Legal Invoicing'
       }
     ],
     howItWorks: [
-      { step: '01', title: 'Conflict Check & Intake', description: 'Client completes secure intake form verifying parties and matter details.' },
-      { step: '02', title: 'Engagement Letter E-Sign', description: 'Advocate issues pre-seeded engagement letter signed digitally by client.' },
-      { step: '03', title: 'Encrypted Matter Depository', description: 'Upload case pleadings, NDAs, and corporate filings into isolated document vault.' },
-      { step: '04', title: 'Retainer Billing & RCM', description: 'Automated legal invoice issued with professional SAC 998211 tax classification.' }
+      { step: '01', title: 'Digital Client Intake', description: 'Client completes secure intake questionnaire with conflict-of-interest check.' },
+      { step: '02', title: 'Sign Retainer Mandate', description: 'Both parties sign the legal representation agreement with digital verification.' },
+      { step: '03', title: 'Secure File Exchange', description: 'Client uploads confidential evidence into their private encrypted workspace.' },
+      { step: '04', title: 'Compliant Fee Invoicing', description: 'System issues compliant legal fee invoice with RCM tax classification.' }
     ],
     toolsReplaced: [
-      { name: 'DocuSign Pro', category: 'E-Signatures', monthlySavingsINR: 4200 },
-      { name: 'Clio Legal', category: 'Practice Management', monthlySavingsINR: 6500 },
-      { name: 'Dropbox Business', category: 'Document Storage', monthlySavingsINR: 2800 }
+      { name: 'DocuSign Enterprise', category: 'E-Signatures', monthlySavingsINR: 4800 },
+      { name: 'Clio Manage', category: 'Legal CRM', monthlySavingsINR: 6500 },
+      { name: 'Box Enterprise', category: 'Encrypted Storage', monthlySavingsINR: 3200 }
     ],
     faqs: [
       {
-        question: 'Are e-signatures generated on Cora legally enforceable in Indian courts?',
-        answer: 'Yes. Cora\'s e-signature system complies with Section 10A of the Information Technology Act 2000. Each document generates a cryptographic SHA-256 hash, verified timestamp, IP address, and signer email log.'
+        question: 'Are digital signatures in Cora admissible in Indian courts?',
+        answer: 'Yes. Digital signatures on Cora meet the requirements of Section 10A and Section 65B of the Indian Evidence Act, with complete IP, timestamp, and audit trail logs.'
       },
       {
-        question: 'How does Cora handle GST Reverse Charge Mechanism (RCM) for legal services?',
-        answer: 'Under GST notification No. 13/2017, legal services provided by individual advocates or firms to business entities are subject to RCM. Cora includes one-click RCM toggle switches that format tax invoices accordingly.'
+        question: 'How does Cora handle GST Reverse Charge Mechanism (RCM) on legal services?',
+        answer: 'Under GST rules, legal services provided to business entities fall under RCM. Cora invoices automatically display the mandatory RCM flag so your corporate clients can self-remit GST.'
+      },
+      {
+        question: 'Can junior associates be restricted from seeing sensitive partner billing data?',
+        answer: 'Yes. Cora provides role-based access control, allowing associates to work on case files without seeing overall firm billing or partner fee agreements.'
       }
     ],
     preSeededTemplates: [
-      'Comprehensive Legal Advisory Retainer Agreement',
+      'Legal Representation & Retainer Mandate Agreement',
       'Mutual Non-Disclosure Agreement (Indian Jurisdiction)',
-      'Employment & Independent Contractor Legal Agreement',
-      'Client Confidential Intake & Conflict Check Questionnaire'
+      'Employment Contract & IP Assignment Deed',
+      'Commercial Settlement & Release Protocol'
     ],
     workflowHighlights: [
-      '5-Step guided e-signature flow with IP timestamping and immutable SHA-256 hashes',
-      'Encrypted client document vault for NDAs, deeds, and court filings',
-      'Automated recurring legal retainer billing with Reverse Charge Mechanism (RCM) tax splits',
-      'Client intake questionnaires with conditional legal branches'
+      '100% IT Act 2000 compliant digital contract execution in under 2 minutes',
+      'Automated RCM tax classification on legal professional fee invoices',
+      'Encrypted document repository for litigation evidence and corporate contracts',
+      'Digital client intake forms with built-in conflict-of-interest checks'
     ],
     recommendedModules: [
-      { id: 'esign-vault', title: 'E-Sign Vault', icon: 'ShieldCheck' },
-      { id: 'rbac-system', title: 'RBAC Security', icon: 'Lock' },
-      { id: 'gst-invoicing', title: 'GST Math', icon: 'Receipt' },
-      { id: 'form-builder', title: 'Intake Forms', icon: 'FormInput' }
+      { id: 'esign-vault', title: 'Legal E-Sign', icon: 'ShieldCheck' },
+      { id: 'lead-crm', title: 'Client Registry', icon: 'Users2' },
+      { id: 'gst-invoicing', title: 'Legal Invoicing', icon: 'Receipt' },
+      { id: 'rbac-system', title: 'Data Isolation', icon: 'Lock' }
     ],
     challengeVsSolution: {
-      challenge: 'Tracking physical signatures and maintaining verifiable audit trails for client contracts.',
-      solution: 'IT Act 2000 compliant digital e-sign vaults that record IP addresses, user agents, and SHA-256 hashes on every document.'
+      challenge: 'Slow physical signing of legal retainer agreements delaying the start of legal representation.',
+      solution: 'Legally enforceable digital contracts that clients can review and sign on their phone in 60 seconds.'
     },
-    sampleRetainerText: 'Corporate Legal Retainer: ₹1,50,000/mo + 18% GST. Includes 20 advisory hours, contract reviews, and regulatory compliance filings.',
-    accentBg: 'bg-slate-50/70',
-    accentBorder: 'border-slate-300',
-    accentText: 'text-slate-800',
+    sampleRetainerText: 'Corporate Legal Advisory: ₹1,50,000/mo under Reverse Charge Mechanism (RCM). Includes 15 hours of contract review and legal counsel.',
+    accentBg: 'bg-zinc-100',
+    accentBorder: 'border-zinc-200',
+    accentText: 'text-zinc-900',
     heroImage: '/images/bento_crew_camera.jpg',
     relatedIndustrySlugs: ['tax-ca-firms', 'financial-advisors', 'audit-compliance', 'consultants-advisors']
   },
+
   {
     id: 'tax-ca-firms',
     slug: 'tax-ca-firms',
-    title: 'Tax & CA Practices',
-    shortTitle: 'Tax & CA Practices',
+    title: 'Tax & CA Firms',
+    shortTitle: 'Tax & CA Firms',
     sectorId: 'legal_finance',
     sectorLabel: 'Legal & Finance',
     sectorBadge: 'LEGAL & FINANCE',
     badgeColor: 'slate',
     iconName: 'Receipt',
-    tagline: '18% GST auto-splitting, SAC audits & client retainer automation.',
-    heroDescription: 'The dedicated practice OS for Chartered Accountants, tax advisory firms, and GST practitioners. Automate SAC code allocation, client compliance retainers, dynamic UPI QR collections, and audit proof vaults.',
+    tagline: 'Tax audit retainers, statutory checklists & instant UPI payments.',
+    heroDescription: 'The modern operating system for chartered accountants and tax advisory practices. Streamline client document collection, audit milestone checklists, and automated 18% GST billing with UPI QR codes.',
     sacCode: 'SAC 998222',
     gstRate: '18% GST',
     stats: [
-      { metric: '18% GST', label: 'CGST + SGST tax auto-calculation' },
-      { metric: 'SAC Codes', label: 'Pre-seeded accounting schemas' },
-      { metric: '+45%', label: 'Faster collection via dynamic UPI' }
+      { metric: '18% GST', label: 'Automated statutory tax splitting' },
+      { metric: '1-Click UPI', label: 'Instant QR payment collection' },
+      { metric: 'Zero Paper', label: 'Digital audit document intake' }
     ],
     theOldWay: [
-      'Manually typing hundreds of recurring GST and TDS compliance invoices every month',
-      'Chasing business clients for fee payments with delayed NEFT transfers and lost cheque proofs',
-      'Client audit balance sheets and tax returns scattered across messy WhatsApp chats'
+      'Chasing business clients for bank statements and GST receipts over endless WhatsApp messages',
+      'Manually drafting audit engagement letters for hundreds of annual tax clients',
+      'Delayed CA professional fee payments with manual bank reconciliation'
     ],
     theCoraWay: [
-      'One-click batch generation of recurring monthly GST compliance invoices with instant WhatsApp delivery',
-      'Dynamic UPI QR code embedded directly on every invoice for instant phone-to-phone settlement',
-      'Encrypted client depository with year-wise categorization for ITR, ROC, and GST filing proofs'
+      'Digital client intake portals where businesses securely upload financial statements and tax documents',
+      'Pre-seeded audit engagement letters ready to sign digitally in one click',
+      'Automated professional fee invoicing with instant UPI QR codes and automated reminders'
     ],
     capabilities: [
       {
-        title: 'Native 18% GST Auto-Tax Engine',
-        description: 'Auto-calculates 9% CGST + 9% SGST for intra-state and 18% IGST for inter-state clients with SAC 998222 classification.',
-        tag: 'GST Engine'
+        title: 'Audit Engagement Mandates',
+        description: 'Standardized statutory audit and tax audit engagement letters with digital signatures.',
+        tag: 'Audit Engagement'
       },
       {
-        title: 'Dynamic UPI QR Billing',
-        description: 'Embeds UPI intent QR codes directly on invoices so clients can pay instantly from Google Pay, PhonePe, or Paytm.',
-        tag: 'UPI Collections'
+        title: 'Client Tax Document Vault',
+        description: 'Structured checklists for GST returns, TDS certificates, and balance sheet schedules.',
+        tag: 'Tax Document Vault'
       },
       {
-        title: 'Audit & Compliance Depository',
-        description: 'Organize client tax filings, challans, and ICAI engagement letters in tamper-evident year-wise vaults.',
-        tag: 'Audit Vault'
+        title: 'CA Retainer & UPI Billing',
+        description: 'Automate monthly and quarterly accounting retainers with dynamic UPI QR payment links.',
+        tag: 'UPI Retainers'
       }
     ],
     howItWorks: [
-      { step: '01', title: 'ICAI Engagement Letter', description: 'Issue pre-seeded statutory audit engagement letter with digital client sign-off.' },
-      { step: '02', title: 'Monthly Retainer Schedule', description: 'Configure recurring GST & TDS monthly compliance fee schedule.' },
-      { step: '03', title: 'Dynamic Invoice Dispatch', description: 'Invoices generated automatically on the 1st with embedded UPI QR codes.' },
-      { step: '04', title: 'Audit Proof Archival', description: 'Store filed GSTR-3B, GSTR-1, and 26AS proofs in client document vault.' }
+      { step: '01', title: 'Intake Checklist', description: 'Send automated document request checklist for GST, TDS, and financial records.' },
+      { step: '02', title: 'Sign Engagement Letter', description: 'Client signs statutory audit or tax filing mandate digitally.' },
+      { step: '03', title: 'Secure Document Intake', description: 'Client uploads trial balance and bank statements into their encrypted portal.' },
+      { step: '04', title: 'UPI Fee Settlement', description: 'Automated GST invoice is generated with embedded UPI QR code for instant payment.' }
     ],
     toolsReplaced: [
-      { name: 'Zoho Books', category: 'Accounting Billing', monthlySavingsINR: 2900 },
+      { name: 'QuickBooks CA', category: 'Accounting', monthlySavingsINR: 3500 },
       { name: 'DocuSign', category: 'E-Signatures', monthlySavingsINR: 3500 },
-      { name: 'Google Workspace Storage', category: 'Storage', monthlySavingsINR: 2100 }
+      { name: 'Google Workspace Storage', category: 'File Storage', monthlySavingsINR: 1500 }
     ],
     faqs: [
       {
-        question: 'Does Cora comply with the Institute of Chartered Accountants of India (ICAI) engagement norms?',
-        answer: 'Yes. Our pre-seeded engagement letter templates adhere to the ICAI Standard on Auditing (SA 210) regarding agreeing the terms of audit engagements.'
+        question: 'Are the CA engagement letters aligned with ICAI professional standards?',
+        answer: 'Yes. Our pre-seeded audit engagement templates incorporate standard terms and statutory declarations recommended for Indian accounting practices.'
       },
       {
-        question: 'Can CA firms export sales and billing ledgers to Tally or Zoho Books?',
-        answer: 'Yes. Cora provides one-click CSV and JSON ledger exports formatted specifically for seamless import into Tally Prime and Zoho Books.'
+        question: 'Can clients pay CA professional fees directly via UPI QR on the invoice?',
+        answer: 'Yes. Cora automatically embeds dynamic UPI QR codes and NEFT bank details directly into every invoice for instant phone settlement.'
+      },
+      {
+        question: 'How is client financial data kept secure and confidential?',
+        answer: 'Every client has a dedicated, encrypted workspace with strict access controls, ensuring complete data segregation across all your firm clients.'
       }
     ],
     preSeededTemplates: [
-      'Statutory & Tax Audit Engagement Letter (ICAI Aligned)',
-      'Monthly GST & TDS Compliance Retainer Contract',
-      'Accounting & Bookkeeping Service Agreement',
-      'Annual Corporate Filing & ROC Advisory Mandate'
+      'Statutory Audit Engagement Letter',
+      'Tax Audit & GST Compliance Retainer Agreement',
+      'Monthly Bookkeeping & Accounting Services SLA',
+      'Transfer Pricing & International Tax Advisory Mandate'
     ],
     workflowHighlights: [
-      'Automated SAC tax classification for auditing, accounting, and tax representation',
-      'One-click dynamic UPI QR code and NEFT/RTGS payment collection',
-      'Monthly recurring client retainer automation with professional PDF tax invoices',
-      'Encrypted document depository for client balance sheets, GST returns, and audit proofs'
+      'Automated monthly and quarterly accounting retainer invoicing with instant UPI QR codes',
+      'Pre-seeded audit engagement letters ready for immediate digital signature',
+      'Encrypted document checklist portal for collecting bank statements and vouchers',
+      'Automatic CGST and SGST tax splitting on all professional fee invoices'
     ],
     recommendedModules: [
-      { id: 'gst-invoicing', title: 'GST Tax Engine', icon: 'Receipt' },
-      { id: 'esign-vault', title: 'Audit Vault', icon: 'ShieldCheck' },
-      { id: 'super-admin', title: 'Multi-Branch Hub', icon: 'Layers' },
-      { id: 'pwa-push', title: 'Client Alerts', icon: 'Bell' }
+      { id: 'gst-invoicing', title: 'CA Invoicing', icon: 'Receipt' },
+      { id: 'esign-vault', title: 'E-Sign Vault', icon: 'ShieldCheck' },
+      { id: 'form-builder', title: 'Document Intake', icon: 'FormInput' },
+      { id: 'lead-crm', title: 'Client CRM', icon: 'Users2' }
     ],
     challengeVsSolution: {
-      challenge: 'Manual GST calculations and delayed payment collections from hundreds of corporate clients.',
-      solution: 'Automated 18% GST invoice generator with embedded dynamic UPI QR codes and automated payment reminders.'
+      challenge: 'Chasing clients for tax documents and waiting weeks for professional fee payments.',
+      solution: 'Automated document request checklists combined with instant UPI QR invoice settlement.'
     },
-    sampleRetainerText: 'Annual Statutory Audit & GST Retainer: ₹3,00,000 + 18% GST (CGST ₹27,000 + SGST ₹27,000). Covers quarterly reconciliations and ITR filing.',
-    accentBg: 'bg-emerald-50/60',
-    accentBorder: 'border-emerald-200/80',
-    accentText: 'text-emerald-700',
-    heroImage: '/images/usecase_commercial_studio.jpg',
+    sampleRetainerText: 'Tax & GST Retainer: ₹25,000/mo + 18% GST (CGST ₹2,250 + SGST ₹2,250). Includes monthly GSTR-1, GSTR-3B filings, and TDS reconciliation.',
+    accentBg: 'bg-zinc-100',
+    accentBorder: 'border-zinc-200',
+    accentText: 'text-zinc-900',
+    heroImage: '/images/usecase_solo_creator.jpg',
     relatedIndustrySlugs: ['lawyers-law-firms', 'financial-advisors', 'audit-compliance', 'consultants-advisors']
   },
+
   {
     id: 'financial-advisors',
     slug: 'financial-advisors',
@@ -718,66 +743,70 @@ export const INDUSTRY_WORKSPACES: IndustryWorkspace[] = [
     sectorLabel: 'Legal & Finance',
     sectorBadge: 'LEGAL & FINANCE',
     badgeColor: 'slate',
-    iconName: 'Briefcase',
-    tagline: 'Advisory retainers, wealth portfolios & confidential agreements.',
-    heroDescription: 'Client management and compliance platform for SEBI-registered investment advisors (RIAs), wealth managers, and corporate financial planners. Coordinate digital risk profiling, quarterly fee billing, and portfolio reviews.',
+    iconName: 'BarChart2',
+    tagline: 'Client risk profiles, advisory retainers & encrypted vaults.',
+    heroDescription: 'Enterprise client portal for registered investment advisors, wealth managers, and financial planners. Automate digital risk profiling, quarterly advisory billing, and secure financial statement vaults.',
     sacCode: 'SAC 997159',
     gstRate: '18% GST',
     stats: [
-      { metric: '₹5L+ Avg', label: 'Advisory retainer size supported' },
-      { metric: '100%', label: 'Digital risk-profiling compliance' },
-      { metric: 'SEBI-Ready', label: 'Complete immutable audit trails' }
+      { metric: 'Digital Intake', label: 'Automated risk profile scoring' },
+      { metric: 'Quarterly Auto', label: 'Advisory fee retainer billing' },
+      { metric: 'Bank-Grade', label: 'Encrypted document storage' }
     ],
     theOldWay: [
-      'Paper risk assessment forms that get misplaced before compliance audits',
-      'Manual quarterly advisory fee calculation based on varying AUM tiers',
-      'Unencrypted email delivery of confidential net-worth statements'
+      'Collecting confidential net-worth statements over insecure email threads',
+      'Manually calculating quarterly advisory fees on spreadsheets and sending separate bills',
+      'Tracking client risk profiles on paper forms with missing compliance timestamps'
     ],
     theCoraWay: [
-      'Digital risk-profiling questionnaire that calculates investor risk score and stores signed mandate',
-      'Automated quarterly advisory retainer invoicing with pre-set percentage and flat fee models',
-      'Encrypted client wealth portal with role-based access for HNW clients and family offices'
+      'Bank-grade encrypted client portals for uploading net-worth and portfolio statements',
+      'Automated quarterly advisory fee invoicing with clear GST breakdowns',
+      'Digital risk-profiling intake questionnaires with automated scoring and audit timestamps'
     ],
     capabilities: [
       {
-        title: 'SEBI-Aligned Risk Profiler',
-        description: 'Interactive client intake questionnaire that scores risk tolerance and executes investment advisory mandates.',
-        tag: 'Risk Profiler'
+        title: 'Digital Risk Profile Intake',
+        description: 'Interactive questionnaires that calculate client risk tolerance scores and generate investment mandates.',
+        tag: 'Risk Profiling'
       },
       {
-        title: 'Quarterly Advisory Retainers',
-        description: 'Automate quarterly fee invoices under SAC 997159 with clear GST tax math and payment links.',
-        tag: 'Wealth Retainers'
+        title: 'Advisory Retainer Invoicing',
+        description: 'Automate fixed quarterly retainers or asset-based advisory billing with compliant GST invoices.',
+        tag: 'Advisory Billing'
       },
       {
-        title: 'HNW Client Depository',
-        description: 'Isolated client vaults for portfolio rebalancing notes, wealth statements, and tax-loss harvesting reports.',
+        title: 'Encrypted Wealth Vault',
+        description: 'Bank-grade encrypted storage for client tax returns, net-worth statements, and portfolio reviews.',
         tag: 'Wealth Vault'
       }
     ],
     howItWorks: [
-      { step: '01', title: 'Risk Assessment Intake', description: 'Client completes digital risk questionnaire determining investment horizon.' },
-      { step: '02', title: 'Advisory Mandate E-Sign', description: 'Client signs SEBI-aligned investment advisory contract with SHA-256 hash.' },
-      { step: '03', title: 'Quarterly Invoicing', description: 'Advisory fee invoice is generated with automated 18% GST tax breakdown.' },
-      { step: '04', title: 'Portfolio Review Archival', description: 'Upload quarterly review notes and allocation decks to client portal.' }
+      { step: '01', title: 'Risk Assessment', description: 'Client completes interactive digital risk profiling questionnaire on mobile.' },
+      { step: '02', title: 'Sign Advisory Mandate', description: 'Client executes investment advisory agreement with digital verification.' },
+      { step: '03', title: 'Vault Upload', description: 'Client uploads portfolio statements into their private encrypted workspace.' },
+      { step: '04', title: 'Quarterly Invoicing', description: 'System generates quarterly advisory retainer invoice with instant payment links.' }
     ],
     toolsReplaced: [
       { name: 'DocuSign', category: 'E-Signatures', monthlySavingsINR: 3500 },
-      { name: 'Typeform', category: 'Risk Forms', monthlySavingsINR: 2800 },
-      { name: 'FreshBooks', category: 'Invoicing', monthlySavingsINR: 2400 }
+      { name: 'Wealthbox', category: 'Advisory CRM', monthlySavingsINR: 4900 },
+      { name: 'Egnyte', category: 'Secure Storage', monthlySavingsINR: 3800 }
     ],
     faqs: [
       {
-        question: 'Does Cora support both flat-fee and percentage AUM advisory billing?',
-        answer: 'Yes. You can configure fixed retainer schedules (e.g. ₹50,000/quarter) or custom asset-under-management (AUM) fee calculations with SAC 997159 tax breakdowns.'
+        question: 'Can Cora handle quarterly advisory retainers?',
+        answer: 'Yes. You can configure fixed retainer schedules (e.g. ₹50,000/quarter) or custom advisory fee calculations with automated GST breakdowns.'
       },
       {
         question: 'How is confidential client financial data secured in Cora?',
-        answer: 'Every workspace features complete multi-tenant database isolation, AES-256 storage encryption, and role-based permissions preventing unauthorized team or cross-client data access.'
+        answer: 'Every workspace features complete multi-tenant database isolation, AES-256 storage encryption, and role-based permissions preventing unauthorized access.'
+      },
+      {
+        question: 'Can we customize the risk assessment questions for our practice?',
+        answer: 'Yes. You can customize the intake questions, scoring logic, and risk categories using the built-in form builder.'
       }
     ],
     preSeededTemplates: [
-      'Investment Advisory Agreement (SEBI RIA Aligned)',
+      'Investment Advisory Agreement',
       'Client Risk Profile & Asset Allocation Mandate',
       'Wealth Management Quarterly Retainer Contract',
       'Confidential Financial Disclosure & NDA'
@@ -790,21 +819,22 @@ export const INDUSTRY_WORKSPACES: IndustryWorkspace[] = [
     ],
     recommendedModules: [
       { id: 'esign-vault', title: 'E-Sign Vault', icon: 'ShieldCheck' },
-      { id: 'lead-crm', title: 'High-Net-Worth CRM', icon: 'Users2' },
+      { id: 'lead-crm', title: 'Wealth CRM', icon: 'Users2' },
       { id: 'gst-invoicing', title: 'Advisory Invoicing', icon: 'Receipt' },
       { id: 'rbac-system', title: 'Data Isolation', icon: 'Lock' }
     ],
     challengeVsSolution: {
-      challenge: 'Maintaining compliant risk-profiling records and collecting recurring advisory fees.',
-      solution: 'Integrated digital risk assessment intake forms paired with automated quarterly advisory retainer billing.'
+      challenge: 'Maintaining compliant risk-profiling records and collecting recurring advisory fees on time.',
+      solution: 'Digital risk assessment intake forms paired with automated quarterly advisory retainer billing.'
     },
-    sampleRetainerText: 'Wealth Advisory Fee: 1.00% AUM billed quarterly in advance: ₹1,25,000/qtr + 18% GST. Includes semi-annual rebalancing and tax-loss harvesting.',
-    accentBg: 'bg-indigo-50/60',
-    accentBorder: 'border-indigo-200/80',
-    accentText: 'text-indigo-700',
+    sampleRetainerText: 'Wealth Advisory Fee: Quarterly Retainer of ₹75,000/qtr + 18% GST. Includes quarterly portfolio reviews and rebalancing advisory.',
+    accentBg: 'bg-zinc-100',
+    accentBorder: 'border-zinc-200',
+    accentText: 'text-zinc-900',
     heroImage: '/images/usecase_production_house.jpg',
     relatedIndustrySlugs: ['lawyers-law-firms', 'tax-ca-firms', 'audit-compliance', 'consultants-advisors']
   },
+
   {
     id: 'audit-compliance',
     slug: 'audit-compliance',
@@ -815,287 +845,300 @@ export const INDUSTRY_WORKSPACES: IndustryWorkspace[] = [
     sectorBadge: 'LEGAL & FINANCE',
     badgeColor: 'slate',
     iconName: 'Layers',
-    tagline: 'Regulatory audit trails, capability matrix & verified logs.',
-    heroDescription: 'Enterprise compliance management system for secretarial audit firms, ISO certification consultants, and internal risk auditors. Coordinate multi-branch inspection checklists, evidence vaults, and board resolution sign-offs.',
+    tagline: 'Compliance checklists, verified audit logs & evidence vaults.',
+    heroDescription: 'Comprehensive compliance tracking for internal auditors, ISO consultants, and secretarial audit practices. Manage multi-branch inspection checklists, timestamped evidence logs, and sign-off approvals.',
     sacCode: 'SAC 998223',
     gstRate: '18% GST',
     stats: [
-      { metric: '30-Point', label: 'Governance audit matrix' },
-      { metric: 'Immutable', label: 'SHA-256 verified evidence logs' },
-      { metric: 'Multi-Branch', label: 'Enterprise data isolation' }
+      { metric: '30-Point', label: 'Standardized governance checklist' },
+      { metric: 'Timestamped', label: 'Tamper-proof evidence logs' },
+      { metric: 'Multi-Entity', label: 'Separate branch workspaces' }
     ],
     theOldWay: [
       'Scattered audit evidence across disconnected email chains and personal drives',
-      'Unverifiable timestamps on corporate governance inspection checklists',
-      'Manual compilation of executive audit reports taking weeks of associate time'
+      'Unsigned audit findings with disputes over inspection completion dates',
+      'Manual compilation of governance reports taking dozens of hours per client'
     ],
     theCoraWay: [
-      'Centralized evidence vault where uploaded compliance proofs are timestamped with SHA-256 hashes',
-      'Structured 30-point capability and security matrix with assigned department owners',
-      'One-click consolidated audit dashboard for presenting findings to the board of directors'
+      'Centralized evidence vault with timestamped logs for all uploaded documents',
+      'Digital sign-offs on audit findings and executive management representations',
+      'Standardized compliance checklists with one-click report generation'
     ],
     capabilities: [
       {
-        title: '30-Point Security & Audit Matrix',
-        description: 'Pre-seeded compliance checklist covering statutory filings, access controls, and financial reconciliations.',
+        title: '30-Point Compliance Checklist',
+        description: 'Standardized inspection matrix for statutory governance, ESG disclosures, and ISO certifications.',
         tag: 'Audit Matrix'
       },
       {
-        title: 'Immutable Evidence Depository',
-        description: 'Upload audit proofs with cryptographic verification ensuring evidence cannot be altered after the fact.',
+        title: 'Timestamped Evidence Vault',
+        description: 'Secure digital repository for inspection photos, ledger samples, and management representations.',
         tag: 'Evidence Vault'
       },
       {
-        title: 'Multi-Branch Governance Hub',
-        description: 'Audit and monitor compliance status across multiple corporate regional branches from a single unified screen.',
-        tag: 'Multi-Branch'
+        title: 'Board Sign-Offs & Mandates',
+        description: 'Execute audit engagement letters and final findings reports with legally binding digital signatures.',
+        tag: 'Board Sign-Off'
       }
     ],
     howItWorks: [
-      { step: '01', title: 'Engagement Mandate', description: 'Issue pre-seeded corporate governance audit agreement to client board.' },
-      { step: '02', title: 'Checklist Assignment', description: 'Assign compliance control points to specific company department leads.' },
-      { step: '03', title: 'Evidence Ingestion', description: 'Collect and verify timestamped compliance proofs in the secure vault.' },
-      { step: '04', title: 'Executive Sign-Off', description: 'Issue final audit report with multi-party digital signatures from statutory auditors.' }
+      { step: '01', title: 'Audit Scope Setup', description: 'Select the compliance standard (ISO, ESG, Secretarial) and assign branch tasks.' },
+      { step: '02', title: 'Evidence Collection', description: 'Branch teams upload required documentation into structured category folders.' },
+      { step: '03', title: 'Inspector Review', description: 'Lead auditor evaluates evidence and marks compliance status on each checkpoint.' },
+      { step: '04', title: 'Final Report Sign-Off', description: 'Executive summary generated automatically and signed digitally by stakeholders.' }
     ],
     toolsReplaced: [
-      { name: 'AuditBoard', category: 'Compliance Software', monthlySavingsINR: 12000 },
+      { name: 'AuditBoard', category: 'Compliance OS', monthlySavingsINR: 8500 },
       { name: 'DocuSign', category: 'E-Signatures', monthlySavingsINR: 3500 },
-      { name: 'Box Enterprise', category: 'Vault', monthlySavingsINR: 3800 }
+      { name: 'Smartsheet', category: 'Tracking', monthlySavingsINR: 2800 }
     ],
     faqs: [
       {
-        question: 'Can multiple auditors and company directors review and sign off on audit findings simultaneously?',
-        answer: 'Yes. Cora supports multi-party sequential or parallel digital signature workflows where each director and auditor signs with their own verified credentials.'
+        question: 'Can we run multi-branch audits with separate permissions?',
+        answer: 'Yes. Cora allows you to create isolated branch workspaces while giving lead auditors a central master dashboard to monitor overall progress.'
       },
       {
-        question: 'How does Cora maintain branch-level data segregation for corporate groups?',
-        answer: 'Cora uses isolated workspace architecture allowing corporate groups to create dedicated sub-workspaces for each branch while giving the lead auditor super-admin oversight.'
+        question: 'How are evidence files timestamped and verified?',
+        answer: 'Every uploaded file receives an immutable timestamp, user identity tag, and verification record, providing complete audit integrity.'
+      },
+      {
+        question: 'Can we export the final compliance audit report to PDF?',
+        answer: 'Yes. You can generate a branded executive summary report complete with findings, completion percentages, and digital signatures.'
       }
     ],
     preSeededTemplates: [
-      'Corporate Governance & Secretarial Audit Mandate',
-      'ISO 27001 / SOC-2 Compliance Review Contract',
-      'Internal Financial Controls (IFC) Audit Agreement',
-      'Director Sign-Off & Board Resolution Protocol'
+      'Secretarial & Statutory Audit Engagement Mandate',
+      'ISO 27001 / ISO 9001 Compliance Inspection Checklist',
+      'Internal Financial Controls (IFC) Testing Protocol',
+      'Board Management Representation Letter'
     ],
     workflowHighlights: [
-      'Multi-stage compliance checklist milestones with assigned department owners',
-      'Evidence depository with tamper-evident SHA-256 digital verification',
-      'Multi-party digital signature flows for board directors and statutory auditors',
-      'Consolidated audit status dashboard for tracking enterprise branch readiness'
+      'Pre-seeded 30-point governance and statutory compliance inspection checklists',
+      'Timestamped evidence vault for storing audit workpapers and documentation',
+      'Digital sign-off on board representation letters and final audit reports',
+      'Multi-branch workspace isolation for enterprise corporate audits'
     ],
     recommendedModules: [
-      { id: 'rbac-system', title: '30-Point RBAC', icon: 'Lock' },
-      { id: 'esign-vault', title: 'Audit Vault', icon: 'ShieldCheck' },
-      { id: 'super-admin', title: 'Multi-Branch Hub', icon: 'Layers' },
-      { id: 'docs-portal', title: 'Specs & Protocols', icon: 'Terminal' }
+      { id: 'esign-vault', title: 'E-Sign Vault', icon: 'ShieldCheck' },
+      { id: 'task-board', title: 'Audit Kanban', icon: 'Kanban' },
+      { id: 'form-builder', title: 'Checklists', icon: 'FormInput' },
+      { id: 'rbac-system', title: 'Data Isolation', icon: 'Lock' }
     ],
     challengeVsSolution: {
-      challenge: 'Scattered audit evidence across email threads making regulatory verification difficult.',
-      solution: 'Centralized evidence vault with cryptographic timestamping and role-based auditor access.'
+      challenge: 'Disorganized audit evidence across spreadsheets leading to compliance delays.',
+      solution: 'Structured digital checklist matrix with timestamped file uploads and formal sign-offs.'
     },
-    sampleRetainerText: 'Enterprise ISO Governance Audit: ₹4,50,000 + 18% GST. Covers 3 regional branches, 40 control checks, and final certification submission.',
-    accentBg: 'bg-purple-50/60',
-    accentBorder: 'border-purple-200/80',
-    accentText: 'text-purple-700',
+    sampleRetainerText: 'Annual Compliance Audit: ₹3,50,000 + 18% GST. Phased across 4 quarterly reviews with executive board reporting.',
+    accentBg: 'bg-zinc-100',
+    accentBorder: 'border-zinc-200',
+    accentText: 'text-zinc-900',
     heroImage: '/images/usecase_realestate_agency.jpg',
-    relatedIndustrySlugs: ['lawyers-law-firms', 'tax-ca-firms', 'financial-advisors', 'consultants-advisors']
+    relatedIndustrySlugs: ['tax-ca-firms', 'lawyers-law-firms', 'financial-advisors', 'consultants-advisors']
   },
 
   // ── 3. MARKETING & CREATIVE SECTOR ──
   {
     id: 'marketing-seo',
     slug: 'marketing-seo',
-    title: 'Marketing & SEO',
+    title: 'Marketing & SEO Agencies',
     shortTitle: 'Marketing & SEO',
     sectorId: 'marketing_creative',
     sectorLabel: 'Marketing & Design',
     sectorBadge: 'MARKETING & DESIGN',
     badgeColor: 'purple',
-    iconName: 'BarChart2',
-    tagline: 'Retainer billing, SEO audits, ad spend tracking & dashboards.',
-    heroDescription: 'Consolidated operating system for performance marketing agencies, SEO consultancies, and growth studios. Replace 5+ fragmented apps with automated monthly retainer billing, SEO brief vaults, and white-label client reporting.',
+    iconName: 'Sparkles',
+    tagline: 'Monthly retainer billing, campaign roadmaps & client portals.',
+    heroDescription: 'The growth engine for performance marketing, SEO, and social media agencies. Manage monthly client retainers, deliverable sign-offs, performance report portals, and instant UPI payment links.',
     sacCode: 'SAC 998361',
     gstRate: '18% GST',
     stats: [
-      { metric: '₹1.8L/Mo', label: 'Saved by consolidating SaaS' },
-      { metric: 'Monthly', label: 'Auto recurring retainer runs' },
-      { metric: '1-Click', label: 'SEO audit & script generator' }
+      { metric: 'Monthly Auto', label: 'Recurring retainer invoices' },
+      { metric: '5-Min Setup', label: 'Client onboarding portals' },
+      { metric: '18% GST', label: 'Automated agency billing' }
     ],
     theOldWay: [
-      'Paying thousands of dollars every month for Notion, HoneyBook, DocuSign, ChatGPT, and Zapier',
-      'Clients disputing monthly ad spend fees and SEO deliverable completion',
-      'Manually compiling monthly PDF performance reports taking entire team weekends'
+      'Clients disputing monthly marketing fees due to lack of transparent deliverable sign-offs',
+      'Manually chasing monthly retainer payments over WhatsApp and email every month',
+      'Scattered campaign briefs and lost creative assets across disconnected folders'
     ],
     theCoraWay: [
-      'One single unified workspace handling client CRM, proposal e-signing, AI copywriting, and 18% GST billing',
-      'Clear deliverable milestones and monthly retainer agreements executed with digital e-signatures',
-      'White-label client portal displaying real-time deliverable status, approved scripts, and paid invoices'
+      'Dedicated client portal showing real-time monthly deliverables, reports, and approvals',
+      'Automated recurring retainer billing on the 1st of every month with instant UPI links',
+      'Centralized creative asset library for campaign copies, banners, and monthly reports'
     ],
     capabilities: [
       {
-        title: 'Monthly Growth Retainer Engine',
-        description: 'Automate recurring agency retainers with custom deliverable scopes and SAC 998361 tax breakdown.',
-        tag: 'Agency Retainers'
+        title: 'Monthly Retainer Automation',
+        description: 'Set up recurring monthly agency retainers with automated GST invoice generation and payment tracking.',
+        tag: 'Monthly Retainers'
       },
       {
-        title: 'Content AI & Viral Scriptwriter',
-        description: 'Generate 3-act viral video scripts, SEO articles, and ad headlines using built-in Claude 3.5 Sonnet and GPT-4o.',
-        tag: 'Content AI'
+        title: 'Client Reporting & Deliverables Portal',
+        description: 'Share monthly SEO rankings, ad spend reports, and creative assets in a clean, white-labeled client portal.',
+        tag: 'Client Portals'
       },
       {
-        title: 'White-Label Client Portal',
-        description: 'Branded client dashboard where clients review deliverables, approve campaign briefs, and download tax invoices.',
-        tag: 'Client Portal'
+        title: 'Performance & Ad-Spend Invoicing',
+        description: 'Easily separate agency management retainers from direct ad-spend budgets with clean itemized billing.',
+        tag: 'Agency Invoicing'
       }
     ],
     howItWorks: [
-      { step: '01', title: 'Retainer Scope Assembly', description: 'Assemble monthly deliverable package (SEO, Meta Ads, Copywriting) in 2 minutes.' },
-      { step: '02', title: 'Contract E-Execution', description: 'Client signs digital retainer agreement with monthly automated billing terms.' },
-      { step: '03', title: 'Content AI Production', description: 'Team drafts high-converting scripts and articles with living workspace context.' },
-      { step: '04', title: 'Monthly GST Invoicing', description: 'Recurring 18% GST invoice is generated and delivered automatically via WhatsApp.' }
+      { step: '01', title: 'Scope & Retainer Agreement', description: 'Assemble monthly deliverables, ad-spend limits, and retainer fees.' },
+      { step: '02', title: 'Sign Digital Contract', description: 'Client executes master retainer agreement with digital signature.' },
+      { step: '03', title: 'Deliverable Sign-Off', description: 'Client reviews and approves monthly campaign roadmaps and creative assets.' },
+      { step: '04', title: 'Automated Retainer Billing', description: 'System issues recurring 18% GST invoice with instant UPI QR payment link.' }
     ],
     toolsReplaced: [
-      { name: 'HoneyBook', category: 'Proposals & Billing', monthlySavingsINR: 3200 },
+      { name: 'HoneyBook', category: 'Proposals & CRM', monthlySavingsINR: 3200 },
       { name: 'DocuSign', category: 'E-Signatures', monthlySavingsINR: 3500 },
-      { name: 'ChatGPT Plus (5 seats)', category: 'AI Copywriting', monthlySavingsINR: 9000 },
-      { name: 'Zapier', category: 'Automations', monthlySavingsINR: 3900 }
+      { name: 'Zoho Invoice', category: 'GST Billing', monthlySavingsINR: 1900 }
     ],
     faqs: [
       {
-        question: 'How does Cora replace multiple ChatGPT or Claude seats for our marketing agency?',
-        answer: 'Cora includes built-in multi-model AI (Claude 3.5 Sonnet, Gemini, GPT-4o) directly inside your team workspace with living context of your client briefs, contracts, and tone of voice.'
+        question: 'How do monthly marketing retainers work in Cora?',
+        answer: 'You configure the monthly retainer amount and billing date. Cora automatically issues an 18% GST invoice with UPI and bank links on the 1st of every month.'
       },
       {
-        question: 'Can we white-label the client portal with our agency domain and logo?',
-        answer: 'Yes. You can connect your custom domain (e.g. portal.youragency.com) with custom logos, branding colors, and verified SMTP emails.'
+        question: 'Can we separate agency management fees from client ad spend?',
+        answer: 'Yes. Cora lets you invoice agency professional fees and client ad budgets as distinct line items with correct tax classifications.'
+      },
+      {
+        question: 'Can clients approve monthly content calendars and ad copy in Cora?',
+        answer: 'Yes. Clients can log in to their dedicated review portal to inspect monthly content schedules, leave feedback, and approve copy.'
       }
     ],
     preSeededTemplates: [
-      'Digital Marketing & SEO Retainer Master Agreement',
-      'Performance Ad Spend Management & ROAS Contract',
-      'Influencer Campaign SOW & Deliverable Contract',
-      'Monthly Content Strategy & Approval Protocol'
+      'Performance Marketing & Media Buying Master Contract',
+      'Monthly SEO & Content Marketing Retainer Agreement',
+      'Social Media Management & Creator Retainer SOW',
+      'Agency Ad-Spend Management & Billing Authorization'
     ],
     workflowHighlights: [
-      'Automated monthly marketing retainer invoices with custom SAC 998361 tax splits',
-      'White-label client performance dashboard for tracking KPIs and signed deliverables',
-      'Content AI assistant for generating viral 3-act scripts and SEO-optimized copy',
-      'Role-based permissions for account managers, media buyers, and client stakeholders'
+      'Automated recurring monthly retainer billing with embedded UPI QR codes',
+      'White-label client portal for deliverable tracking and monthly reports',
+      'Pre-seeded agency master agreements with clear performance boundaries',
+      'Instant change-orders for out-of-scope campaign requests'
     ],
     recommendedModules: [
-      { id: 'content-ai', title: 'Content AI & GEO', icon: 'Sparkles' },
-      { id: 'lead-crm', title: 'Agency Lead CRM', icon: 'Users2' },
+      { id: 'lead-crm', title: 'Agency CRM', icon: 'Users2' },
       { id: 'gst-invoicing', title: '18% GST Invoicing', icon: 'Receipt' },
-      { id: 'canvas-builder', title: 'Campaign Builder', icon: 'LayoutTemplate' }
+      { id: 'esign-vault', title: 'E-Sign Vault', icon: 'ShieldCheck' },
+      { id: 'task-board', title: 'Campaign Boards', icon: 'Kanban' }
     ],
     challengeVsSolution: {
-      challenge: 'Paying for separate tools for CRM, proposal e-signing, AI copywriting, and invoicing.',
-      solution: 'One unified workspace that handles client lead intake, proposal e-signing, AI writing, and GST billing.'
+      challenge: 'Late payments on monthly retainers and scope creep on extra campaign requests.',
+      solution: 'Automated recurring billing cycles paired with digital change-orders for extra deliverables.'
     },
-    sampleRetainerText: 'Comprehensive Growth Retainer: ₹1,50,000/mo + 18% GST. Includes technical SEO audits, 8 monthly articles, and ₹10L ad spend management.',
-    accentBg: 'bg-sky-50/60',
-    accentBorder: 'border-sky-200/80',
-    accentText: 'text-sky-700',
-    heroImage: '/images/usecase_realestate_agency.jpg',
-    relatedIndustrySlugs: ['design-uiux', 'photo-video-studios', 'web-app-studios', 'consultants-advisors']
+    sampleRetainerText: 'Growth Marketing Retainer: ₹1,20,000/mo + 18% GST. Includes Google & Meta ad management, weekly optimizations, and monthly reporting.',
+    accentBg: 'bg-zinc-100',
+    accentBorder: 'border-zinc-200',
+    accentText: 'text-zinc-900',
+    heroImage: '/images/usecase_solo_creator.jpg',
+    relatedIndustrySlugs: ['design-uiux', 'photo-video-studios', 'software-agencies', 'consultants-advisors']
   },
+
   {
     id: 'design-uiux',
     slug: 'design-uiux',
-    title: 'Design & UI/UX',
+    title: 'Design & UI/UX Studios',
     shortTitle: 'Design & UI/UX',
     sectorId: 'marketing_creative',
     sectorLabel: 'Marketing & Design',
     sectorBadge: 'MARKETING & DESIGN',
     badgeColor: 'purple',
-    iconName: 'Sparkles',
-    tagline: 'Design sprints, asset portals & client Figma approvals.',
-    heroDescription: 'Purpose-built workspace for brand identity studios, visual designers, and UI/UX product teams. Manage 2-week design sprints, client Figma sign-offs, high-resolution asset vaults, and copyright assignment deeds.',
+    iconName: 'LayoutTemplate',
+    tagline: 'Design sprint milestones, copyright transfer & asset delivery.',
+    heroDescription: 'Complete operating system for brand identity and product design studios. Run structured design sprints, collect upfront booking deposits, and transfer copyright ownership automatically on final payment.',
     sacCode: 'SAC 998391',
     gstRate: '18% GST',
     stats: [
-      { metric: '2-Week', label: 'Structured design sprint gates' },
-      { metric: 'Zero', label: 'Unapproved Figma revision loops' },
-      { metric: 'Instant', label: 'Brand asset delivery vaults' }
+      { metric: '50% Upfront', label: 'Advance deposit locked on contract sign' },
+      { metric: 'IP Transfer', label: 'Automated copyright handover' },
+      { metric: 'Figma Ready', label: 'Milestone review portals' }
     ],
     theOldWay: [
-      'Clients requesting endless design variations without formal milestone sign-offs',
-      'Sending final vector logos and source files before collecting the final invoice payment',
-      'No formal copyright transfer deed protecting both designer and client'
+      'Sending final design source files before the client has cleared the final invoice',
+      'Unclear revision boundaries leading to endless subjective design tweaks',
+      'Complicated copyright assignment agreements requiring expensive lawyer drafts'
     ],
     theCoraWay: [
-      'Design sprint gates requiring written client checklist sign-off before progressing to next phase',
-      'Gated asset delivery vault that unlocks high-res exports only after final GST invoice clearance',
-      'Pre-seeded Intellectual Property Assignment Deed executed automatically upon project wrap'
+      'Asset delivery vaults that unlock source files only after final GST invoice clearance',
+      'Clear revision round limits built directly into the signed digital contract',
+      'Automated copyright and intellectual property assignment executed upon final payment'
     ],
     capabilities: [
       {
-        title: 'Design Sprint Milestone Gates',
-        description: 'Structured 3-phase delivery (Moodboard & Concept, High-Fi Prototype, Final Token Export).',
-        tag: 'Sprint Gates'
+        title: 'Design Sprint Milestone Staging',
+        description: 'Split design projects into clear milestones (Wireframes, High-Fidelity UI, Design System) with client sign-offs.',
+        tag: 'Design Sprints'
       },
       {
-        title: 'Gated Brand Asset Vault',
-        description: 'Deliver vector SVG logos, design tokens, and source files with automated download locking until payment clears.',
-        tag: 'Asset Vault'
-      },
-      {
-        title: 'Copyright Assignment Deed',
-        description: 'Formal legal transfer of design copyright compliant with the Indian Copyright Act 1957.',
+        title: 'Automated IP & Copyright Transfer',
+        description: 'Legally assign copyright to the client automatically when the final balance invoice is settled.',
         tag: 'IP Transfer'
+      },
+      {
+        title: 'Asset Delivery Vault',
+        description: 'Securely share Figma links, vector logos, and design tokens with automatic access gating.',
+        tag: 'Asset Vault'
       }
     ],
     howItWorks: [
-      { step: '01', title: 'Interactive Brief Intake', description: 'Client fills visual design brief questionnaire with brand references.' },
-      { step: '02', title: '50% Advance E-Sign', description: 'Client signs design contract and clears 50% booking deposit.' },
-      { step: '03', title: 'Figma Milestone Sign-Off', description: 'Client reviews interactive prototype and signs milestone approval.' },
-      { step: '04', title: 'Final Invoice & IP Deed', description: 'Final invoice clears and high-res asset vault unlocks with signed IP deed.' }
+      { step: '01', title: 'Proposal & Scope', description: 'Assemble design deliverables, revision limits, and sprint timelines in 3 minutes.' },
+      { step: '02', title: 'E-Sign & Advance', description: 'Client signs digital contract and clears 50% advance deposit via UPI or bank link.' },
+      { step: '03', title: 'Milestone Approval', description: 'Client reviews design deliverables and formally signs off on completion.' },
+      { step: '04', title: 'Payment & IP Handover', description: 'Final invoice clears and copyright assignment document is generated automatically.' }
     ],
     toolsReplaced: [
-      { name: 'HoneyBook', category: 'Proposals', monthlySavingsINR: 3200 },
+      { name: 'HoneyBook', category: 'Proposals & CRM', monthlySavingsINR: 3200 },
       { name: 'DocuSign', category: 'E-Signatures', monthlySavingsINR: 3500 },
-      { name: 'Dropbox Pro', category: 'Asset Delivery', monthlySavingsINR: 2200 }
+      { name: 'Zoho Books', category: 'Invoicing', monthlySavingsINR: 2200 }
     ],
     faqs: [
       {
-        question: 'How does Cora handle copyright assignment for graphic design and branding projects?',
-        answer: 'Cora includes pre-seeded Intellectual Property and Copyright Assignment Deeds under Section 19 of the Indian Copyright Act 1957. The deed is executed digitally upon receipt of the final project balance.'
+        question: 'When is copyright ownership transferred to the client?',
+        answer: 'Our contracts specify that copyright and IP transfer occurs only upon 100% settlement of the final project invoice, protecting your creative work.'
       },
       {
-        question: 'Can we share clickable prototype links and asset downloads directly in the client portal?',
-        answer: 'Yes. You can embed Figma links, design tokens, and high-resolution downloadable packages directly inside the client\'s branded vault.'
+        question: 'How do revision limits protect our design studio?',
+        answer: 'Every contract includes defined revision rounds. If a client requests modifications beyond that limit, you can generate an instant Change-Order with one click.'
+      },
+      {
+        question: 'Can we bill monthly design-on-demand retainers?',
+        answer: 'Yes. You can configure ongoing monthly design retainers that bill automatically on the 1st of every month.'
       }
     ],
     preSeededTemplates: [
       'Brand Identity & UI/UX Design Master Contract',
       'Design Sprint Milestone Approval & Sign-Off Form',
-      'Copyright & Intellectual Property Assignment Deed',
+      'Copyright & Intellectual Property Assignment Agreement',
       'Monthly Design-on-Demand Retainer Agreement'
     ],
     workflowHighlights: [
       'Design sprint milestone gates with mandatory client sign-off before final export',
       'Asset delivery portal for securely sharing Figma files, vector logos, and design tokens',
       'Automated copyright transfer documentation executed upon final invoice clearance',
-      'Integrated SAC 998391 specialized design tax calculations'
+      'Integrated GST tax calculations for specialized design services'
     ],
     recommendedModules: [
-      { id: 'media-hub', title: 'Asset & Brand Hub', icon: 'HardDrive' },
       { id: 'esign-vault', title: 'E-Sign Vault', icon: 'ShieldCheck' },
       { id: 'task-board', title: 'Sprint Board', icon: 'Kanban' },
-      { id: 'gst-invoicing', title: '18% GST Invoicing', icon: 'Receipt' }
+      { id: 'gst-invoicing', title: '18% GST Invoicing', icon: 'Receipt' },
+      { id: 'lead-crm', title: 'Client CRM', icon: 'Users2' }
     ],
     challengeVsSolution: {
       challenge: 'Delivering design source files before the client has cleared the final balance payment.',
       solution: 'Automated asset delivery vaults that unlock download permissions only when final GST invoices are paid.'
     },
     sampleRetainerText: 'Product Design Sprint: 2-Week Sprint at ₹2,00,000 + 18% GST. Includes wireframes, high-fidelity Figma components, and clickable prototype.',
-    accentBg: 'bg-violet-50/60',
-    accentBorder: 'border-violet-200/80',
-    accentText: 'text-violet-700',
+    accentBg: 'bg-zinc-100',
+    accentBorder: 'border-zinc-200',
+    accentText: 'text-zinc-900',
     heroImage: '/images/usecase_solo_creator.jpg',
     relatedIndustrySlugs: ['web-app-studios', 'marketing-seo', 'photo-video-studios', 'architecture-interiors']
   },
+
   {
     id: 'photo-video-studios',
     slug: 'photo-video-studios',
@@ -1106,93 +1149,97 @@ export const INDUSTRY_WORKSPACES: IndustryWorkspace[] = [
     sectorBadge: 'MARKETING & DESIGN',
     badgeColor: 'purple',
     iconName: 'Camera',
-    tagline: 'Production scopes, 4K proofing, call sheets & gear tracking.',
-    heroDescription: 'Complete studio management system for commercial photography studios, film production houses, and fashion creators. Coordinate multi-day shoot bookings, camera gear registries, crew call sheets, and 4K proofing galleries.',
+    tagline: 'Shoot scheduling, 4K media proofing & crew call sheets.',
+    heroDescription: 'All-in-one studio management for commercial photography, film production houses, and content creators. Coordinate multi-day shoot bookings, crew schedules, and secure client proofing galleries.',
     sacCode: 'SAC 998381',
     gstRate: '18% GST',
     stats: [
-      { metric: '50% Advance', label: 'Deposit locked on contract e-sign' },
-      { metric: '8K Ready', label: 'RAW proofing & delivery vaults' },
-      { metric: 'Conflict-Free', label: 'Crew & equipment scheduling' }
+      { metric: '50% Advance', label: 'Deposit collected before shoot dates' },
+      { metric: '4K Proofing', label: 'Private client review galleries' },
+      { metric: 'Zero Clashes', label: 'Team and equipment scheduling' }
     ],
     theOldWay: [
-      'Crew scheduling double-bookings and unreturned camera gear from remote shoots',
-      'Clients canceling shoots at the last minute without signed non-refundable deposit agreements',
-      'Delivering unwatermarked RAW photos and waiting months for final client payment'
+      'Clients canceling shoots last-minute without signed non-refundable deposit contracts',
+      'Sharing unwatermarked high-res photos and waiting months for final client payment',
+      'Crew scheduling clashes and unreturned camera gear from location shoots'
     ],
     theCoraWay: [
-      'Centralized master calendar that automatically verifies crew availability and gear checkout status',
-      'Mandatory 50% advance booking deposit invoice generated automatically upon contract signature',
-      'Watermarked client photo and video proofing portal where clients select favorites and unlock downloads upon payment'
+      'Mandatory 50% advance booking deposit invoice generated automatically on contract sign',
+      'Private 4K proofing galleries with watermarking that unlock high-res exports on final payment',
+      'Centralized studio calendar for managing crew call sheets, shoot dates, and equipment'
     ],
     capabilities: [
       {
-        title: 'Master Shoot Calendar & Call Sheets',
-        description: 'Generate professional crew call sheets with location maps, weather notes, and talent contact lists.',
+        title: 'Shoot Booking & Advance Deposit',
+        description: 'Lock in shoot dates with digital contract e-signatures and instant 50% advance deposit invoicing.',
+        tag: 'Shoot Booking'
+      },
+      {
+        title: 'Private 4K Proofing Galleries',
+        description: 'Client review galleries where stakeholders select favorites, leave comments, and approve edits.',
+        tag: 'Media Proofing'
+      },
+      {
+        title: 'Crew & Gear Call Sheets',
+        description: 'Generate digital call sheets with location details, crew schedules, and equipment checkout lists.',
         tag: 'Call Sheets'
-      },
-      {
-        title: 'Camera Gear & Asset Registry',
-        description: 'Track cameras, cinema lenses, lighting kits, and audio gear with serial numbers and check-out logs.',
-        tag: 'Gear Hub'
-      },
-      {
-        title: 'Watermarked 4K/8K Proofing Portal',
-        description: 'Client review gallery with digital watermarking, selection star ratings, and instant approval locks.',
-        tag: 'Proofing Hub'
       }
     ],
     howItWorks: [
-      { step: '01', title: 'Shoot Scope & Quote', description: 'Assemble crew day-rates, gear rentals, and post-production hours in 2 minutes.' },
-      { step: '02', title: 'Contract & 50% Advance', description: 'Client signs commercial production contract and clears 50% booking deposit.' },
-      { step: '03', title: 'Crew Dispatch & Call Sheet', description: 'Automated call sheets sent to camera ops, gaffers, and stylists via WhatsApp.' },
-      { step: '04', title: 'Proofing & Final Delivery', description: 'Client approves watermarked gallery and clears final balance to unlock 4K downloads.' }
+      { step: '01', title: 'Production Scope', description: 'Assemble shoot dates, deliverables, crew requirements, and licensing terms.' },
+      { step: '02', title: 'Sign & Deposit', description: 'Client signs digital production contract and clears 50% advance deposit.' },
+      { step: '03', title: 'Shoot & Proofing', description: 'Upload watermarked previews to client proofing portal for selection and review.' },
+      { step: '04', title: 'Balance & High-Res', description: 'Final invoice clears and full-resolution unwatermarked media is unlocked.' }
     ],
     toolsReplaced: [
-      { name: 'Studio Ninja', category: 'Studio CRM', monthlySavingsINR: 3200 },
-      { name: 'DocuSign', category: 'E-Signatures', monthlySavingsINR: 3500 },
-      { name: 'Pixieset', category: 'Photo Proofing', monthlySavingsINR: 2800 },
-      { name: 'Cheqroom', category: 'Gear Tracking', monthlySavingsINR: 4500 }
+      { name: 'Pixieset', category: 'Client Galleries', monthlySavingsINR: 2800 },
+      { name: 'HoneyBook', category: 'Contracts & Invoicing', monthlySavingsINR: 3200 },
+      { name: 'DocuSign', category: 'E-Signatures', monthlySavingsINR: 3500 }
     ],
     faqs: [
       {
-        question: 'Does Cora include model and talent release agreements?',
-        answer: 'Yes. Cora includes pre-seeded Indian jurisdiction Model and Location Release forms that models and venue managers can sign directly on a mobile phone on shoot day.'
+        question: 'How do advance booking deposits protect our studio from cancellations?',
+        answer: 'Our pre-seeded production contracts clearly define non-refundable deposit terms and cancellation windows, ensuring your studio is paid for reserved shoot dates.'
       },
       {
-        question: 'Can we track multi-day commercial shoots with separate pre-pro, shoot, and editing phases?',
-        answer: 'Yes. Cora\'s master calendar and milestone engine allow you to schedule pre-production prep days, active shoot dates, and post-production review milestones seamlessly.'
+        question: 'Can we include commercial image usage licensing terms in the agreement?',
+        answer: 'Yes. Every template includes commercial usage rights clauses defining whether licenses are editorial, digital, or exclusive broadcast.'
+      },
+      {
+        question: 'Can clients select and favorite raw photos from the gallery?',
+        answer: 'Yes. Clients can review proofing galleries, select their favorite shots, and submit their final edit list with one click.'
       }
     ],
     preSeededTemplates: [
-      'Commercial Photography & Production Contract',
-      'Crew Call Sheet & Location Release Agreement',
-      'Model & Talent Release Form (Indian Jurisdiction)',
-      'Equipment Rental & Gear Liability Agreement'
+      'Commercial Photography & Video Production Master Contract',
+      'Shoot Cancellation & Non-Refundable Deposit Protocol',
+      'Model & Location Release Agreement (Indian Jurisdiction)',
+      'Media Licensing & Commercial Usage Rights Agreement'
     ],
     workflowHighlights: [
-      'Multi-day shoot master calendar with crew dispatch and location mapping',
-      'Camera gear inventory check-in/out registry with barcode and serial tracking',
-      'Watermarked client photo and video proofing portal with selection approvals',
-      '50% advance deposit invoice generation triggered instantly upon contract signature'
+      '50% advance booking deposit invoice auto-generated upon contract signature',
+      'Private 4K client proofing gallery with favorite selection and review tools',
+      'Automated high-res asset unlock only after final invoice settlement',
+      'Pre-seeded commercial usage licensing and model release legal agreements'
     ],
     recommendedModules: [
-      { id: 'crew-dispatch', title: 'Crew Dispatch', icon: 'Calendar' },
-      { id: 'asset-gear', title: 'Gear Inventory', icon: 'HardDrive' },
-      { id: 'media-hub', title: '4K Media Hub', icon: 'Film' },
-      { id: 'master-calendar', title: 'Master Calendar', icon: 'Calendar' }
+      { id: 'esign-vault', title: 'E-Sign Vault', icon: 'ShieldCheck' },
+      { id: 'lead-crm', title: 'Studio CRM', icon: 'Users2' },
+      { id: 'gst-invoicing', title: '18% GST Invoicing', icon: 'Receipt' },
+      { id: 'task-board', title: 'Shoot Schedule', icon: 'Kanban' }
     ],
     challengeVsSolution: {
-      challenge: 'Crew scheduling double-bookings and unreturned camera gear from remote shoots.',
-      solution: 'Centralized master calendar with conflict-free crew dispatch and serialized gear check-in/out logs.'
+      challenge: 'Last-minute shoot cancellations and unpaid high-resolution photo deliveries.',
+      solution: 'Automated 50% non-refundable advance deposits and gated high-res downloads upon final payment.'
     },
-    sampleRetainerText: 'Commercial Campaign Package: 2-Day Shoot (₹3,50,000) + Post-Production (₹1,50,000) + 18% GST (CGST ₹45,000 + SGST ₹45,000).',
-    accentBg: 'bg-rose-50/60',
-    accentBorder: 'border-rose-200/80',
-    accentText: 'text-rose-700',
-    heroImage: '/images/usecase_commercial_studio.jpg',
-    relatedIndustrySlugs: ['design-uiux', 'marketing-seo', 'architecture-interiors', 'real-estate-property']
+    sampleRetainerText: 'Commercial Brand Shoot: 2-Day Production at ₹2,50,000 + 18% GST. Includes 4K video reel, 50 retouched photos, and commercial digital license.',
+    accentBg: 'bg-zinc-100',
+    accentBorder: 'border-zinc-200',
+    accentText: 'text-zinc-900',
+    heroImage: '/images/bento_crew_camera.jpg',
+    relatedIndustrySlugs: ['design-uiux', 'marketing-seo', 'real-estate-property', 'web-app-studios']
   },
+
   {
     id: 'architecture-interiors',
     slug: 'architecture-interiors',
@@ -1203,94 +1250,98 @@ export const INDUSTRY_WORKSPACES: IndustryWorkspace[] = [
     sectorBadge: 'MARKETING & DESIGN',
     badgeColor: 'purple',
     iconName: 'Building2',
-    tagline: '3D CAD milestones, blueprint approvals & progressive draws.',
-    heroDescription: 'Project governance and progressive billing operating system for architectural practices, interior design consultancies, and turnkey contracting firms. Coordinate 3D CAD sign-offs, change-orders, and progressive construction draw schedules.',
+    tagline: 'Phased stage billing, 3D blueprint vaults & site approvals.',
+    heroDescription: 'Project management for architectural firms and interior design studios. Manage phased milestone billing (Concept, 3D Renders, Working Drawings), change-orders, and on-site sign-offs.',
     sacCode: 'SAC 998321',
     gstRate: '18% GST',
     stats: [
-      { metric: '4-Stage', label: 'Concept to handover draw schedules' },
-      { metric: '100%', label: 'Signed client change-order protection' },
-      { metric: 'Zero', label: 'Uncollected contractor milestone fees' }
+      { metric: '4-Stage', label: 'Milestone payment schedule' },
+      { metric: 'Zero Creep', label: 'Digital change-order approvals' },
+      { metric: '18% GST', label: 'Architectural fee tax calculation' }
     ],
     theOldWay: [
-      'Clients requesting material or structural changes on site without written cost approval',
-      'Contractors executing work before the client has cleared the progressive milestone draw',
-      'Scattered blueprint versions and CAD files across emails and WhatsApp groups'
+      'Clients changing floor plans and finishes midway without paying for revised drawings',
+      'Delays in releasing site contractor payments due to disorganized milestone approvals',
+      'Disputes over design fees versus material procurement budgets'
     ],
     theCoraWay: [
-      'Mandatory digital change-order sign-offs that update the project total before site execution',
-      'Progressive draw schedule (25% Concept, 30% 3D CAD, 25% GFC, 20% Handover) with automated GST invoicing',
-      'Integrated document depository for Good-for-Construction (GFC) drawings, 3D renders, and material specifications'
+      'Digital change-orders quoting revised drawing fees that clients must sign before execution',
+      'Clear 4-stage milestone schedules linked directly to architectural phase sign-offs',
+      'Clean separation between architectural design fees and material procurement invoices'
     ],
     capabilities: [
       {
-        title: 'Progressive Milestone Draw Engine',
-        description: 'Link progressive payment draws to verified construction and design completion stages under SAC 998321.',
-        tag: 'Progressive Draws'
+        title: 'Phased Architectural Milestone Billing',
+        description: 'Link progressive payments to verified stages: Concept Design, 3D Renders, Working Drawings, and Site Completion.',
+        tag: 'Phased Billing'
       },
       {
-        title: 'Digital Site Change-Order Builder',
-        description: 'Quote client material variances and structural additions instantly with mandatory digital signature.',
-        tag: 'Change-Orders'
+        title: '3D Render & Drawing Vault',
+        description: 'Centralized repository for sharing CAD drawings, 3D walkthroughs, and material spec sheets with clients.',
+        tag: 'Drawing Vault'
       },
       {
-        title: 'GFC Blueprint & CAD Depository',
-        description: 'Secure client portal for sharing Good-for-Construction drawings, 3D walkthroughs, and finish schedules.',
-        tag: 'Blueprint Vault'
+        title: 'Material Procurement Invoicing',
+        description: 'Separate professional consultancy fees from interior material and contractor pass-through expenses.',
+        tag: 'Material Billing'
       }
     ],
     howItWorks: [
-      { step: '01', title: 'Consultancy Mandate', description: 'Client executes architectural master agreement with progressive draw milestones.' },
-      { step: '02', title: 'Concept & 3D Approval', description: 'Client approves 3D renders and signs milestone sign-off form in portal.' },
-      { step: '03', title: 'GFC Drawing Release', description: 'Good-for-Construction drawings released to site contractors upon milestone payment.' },
-      { step: '04', title: 'Site Handover Wrap', description: 'Final 20% handover invoice cleared with executed completion protocol.' }
+      { step: '01', title: 'Design Proposal', description: 'Set square-foot consultancy rates, 4-stage milestones, and scope boundaries.' },
+      { step: '02', title: 'Sign Master Mandate', description: 'Client executes architectural agreement with digital verification.' },
+      { step: '03', title: 'Stage Sign-Off', description: 'Client approves 3D renders and drawing sets at each project phase.' },
+      { step: '04', title: 'Phased Invoicing', description: 'System issues 18% GST invoice upon each milestone approval.' }
     ],
     toolsReplaced: [
+      { name: 'HoneyBook', category: 'Proposals & CRM', monthlySavingsINR: 3200 },
       { name: 'DocuSign', category: 'E-Signatures', monthlySavingsINR: 3500 },
-      { name: 'Houzz Pro', category: 'Design Management', monthlySavingsINR: 5800 },
-      { name: 'Zoho Invoice', category: 'Invoicing', monthlySavingsINR: 1900 }
+      { name: 'Zoho Books', category: 'Invoicing', monthlySavingsINR: 2200 }
     ],
     faqs: [
       {
-        question: 'Does Cora support Indian Council of Architecture (CoA) fee guidelines?',
-        answer: 'Yes. Our pre-seeded architectural agreements can be aligned with Council of Architecture percentage-of-cost fee schedules or fixed per-sqft consultancy models.'
+        question: 'Are the architectural contract templates aligned with Council of Architecture guidelines?',
+        answer: 'Yes. Our pre-seeded templates follow standard practice guidelines for Indian architectural consultancies, including standard stage percentages and liability definitions.'
       },
       {
-        question: 'How does Cora handle site variance change-orders?',
-        answer: 'You can create a change-order addendum with one click detailing the material difference, added contractor labor, and updated GST tax total. Work proceeds only when the client signs.'
+        question: 'How do change-orders handle client modifications during site execution?',
+        answer: 'When a client modifies layouts or specifications, you can generate an instant Digital Change-Order with revised fees that must be signed before updated drawings are released.'
+      },
+      {
+        question: 'Can we manage separate invoices for design fees and contractor procurement?',
+        answer: 'Yes. Cora lets you maintain clear separate billing streams for professional design consultancy and material procurement.'
       }
     ],
     preSeededTemplates: [
-      'Architectural & Interior Design Consultancy Agreement',
-      'Progressive Milestone Draw & Site Handover Protocol',
-      'Client Change-Order & Material Variance Contract',
-      'Contractor & Site Execution Supervision Mandate'
+      'Architectural Consultancy & Interior Design Master Agreement',
+      'Phased Design Stage Sign-Off & Drawing Approval Form',
+      'Material Specification & Contractor Procurement Mandate',
+      'Change-Order Request & Scope Revision Addendum'
     ],
     workflowHighlights: [
-      'Progressive milestone billing tied to design phase completion (Concept, 3D Render, GFC Drawings, Handover)',
-      'Digital client change-order approvals with cryptographic e-signatures before execution',
-      'Integrated document depository for site blueprints, CAD files, and material specs',
-      'Automated SAC 998321 tax breakdown on architectural consultancy fees'
+      '4-stage milestone schedule (Concept, 3D Renders, Working Drawings, Site Handover)',
+      'Digital client change-order approvals with digital signatures before execution',
+      'Secure document repository for 3D walkthroughs, floor plans, and material sheets',
+      'Automated GST tax breakdown on architectural consultancy fees'
     ],
     recommendedModules: [
-      { id: 'task-board', title: 'Site Milestone Board', icon: 'Kanban' },
       { id: 'esign-vault', title: 'E-Sign Vault', icon: 'ShieldCheck' },
-      { id: 'gst-invoicing', title: 'Progressive Invoicing', icon: 'Receipt' },
-      { id: 'media-hub', title: 'Blueprint Vault', icon: 'HardDrive' }
+      { id: 'lead-crm', title: 'Project CRM', icon: 'Users2' },
+      { id: 'gst-invoicing', title: '18% GST Invoicing', icon: 'Receipt' },
+      { id: 'task-board', title: 'Site Stages', icon: 'Kanban' }
     ],
     challengeVsSolution: {
-      challenge: 'Clients requesting structural or finish modifications mid-construction without agreeing on extra costs.',
-      solution: 'Mandatory digital change-order sign-offs that automatically update the project milestone billing total.'
+      challenge: 'Clients changing specifications during construction without paying for updated drawings.',
+      solution: 'Formal stage sign-off gates paired with instant digital change-orders for plan revisions.'
     },
-    sampleRetainerText: 'Architectural Consultancy Fee: ₹8,00,000 + 18% GST across 4 Milestones: 25% Concept (₹2L), 30% 3D CAD (₹2.4L), 25% GFC (₹2L), 20% Handover (₹1.6L).',
-    accentBg: 'bg-orange-50/60',
-    accentBorder: 'border-orange-200/80',
-    accentText: 'text-orange-700',
-    heroImage: '/images/usecase_solo_creator.jpg',
-    relatedIndustrySlugs: ['design-uiux', 'real-estate-property', 'photo-video-studios', 'consultants-advisors']
+    sampleRetainerText: 'Architectural Consultancy: ₹4,50,000 + 18% GST. Phased across Concept (20%), 3D Renders (30%), Working Drawings (30%), and Site Handover (20%).',
+    accentBg: 'bg-zinc-100',
+    accentBorder: 'border-zinc-200',
+    accentText: 'text-zinc-900',
+    heroImage: '/images/usecase_realestate_agency.jpg',
+    relatedIndustrySlugs: ['photo-video-studios', 'real-estate-property', 'design-uiux', 'consultants-advisors']
   },
 
-  // ── 4. SERVICES & LIFESTYLE SECTOR ──
+  // ── 4. SERVICES & ADVISORY SECTOR ──
   {
     id: 'consultants-advisors',
     slug: 'consultants-advisors',
@@ -1301,92 +1352,97 @@ export const INDUSTRY_WORKSPACES: IndustryWorkspace[] = [
     sectorBadge: 'SERVICES & ADVISORY',
     badgeColor: 'teal',
     iconName: 'Briefcase',
-    tagline: 'Diagnostic audits, scopes & executive board decks.',
-    heroDescription: 'Executive operating system for management consultants, strategy advisors, and corporate transformation experts. Turn discovery meeting notes into formal advisory agreements in 2 minutes, manage retainer milestones, and share executive decks.',
+    tagline: 'Voice-to-Proposal AI, advisory retainers & strategy vaults.',
+    heroDescription: 'Executive operating system for management consultants and strategy advisors. Convert voice memos into polished client proposals in seconds, execute digital contracts, and bill recurring advisory retainers.',
     sacCode: 'SAC 998311',
     gstRate: '18% GST',
     stats: [
-      { metric: '2 Minutes', label: 'Voice brief to formal proposal' },
-      { metric: '₹5L+ Avg', label: 'Advisory retainer size supported' },
-      { metric: 'Multi-Seat', label: 'Role-based access for teams' }
+      { metric: '2-Min', label: 'Voice notes converted to proposals' },
+      { metric: 'Monthly Auto', label: 'Recurring retainer billing' },
+      { metric: 'Executive', label: 'Branded client portals' }
     ],
     theOldWay: [
-      'Spending 4-6 hours typing formal proposal documents after discovery meetings',
-      'Unclear milestone deliverables leading to executive scope disputes and delayed retainer payments',
-      'Delivering strategy decks over unencrypted emails with zero download tracking'
+      'Spending hours manually drafting long proposal documents after client discovery meetings',
+      'Unsigned scope changes leading to unbilled advisory time and unpaid strategic guidance',
+      'Sharing confidential boardroom strategies over unencrypted email chains'
     ],
     theCoraWay: [
-      'Voice-to-Scope AI that converts meeting audio or notes into ready-to-sign advisory contracts in 2 minutes',
-      'Clear multi-stage milestone structure (Advance, Diagnostic Wrap, Board Review) with automated GST invoicing',
-      'White-label executive presentation depository for sharing strategy decks and tracking client engagement'
+      'Voice-to-Scope AI that turns 2-minute voice recordings into polished advisory proposals instantly',
+      'Pre-seeded advisory retainers with digital signatures valid under the Indian IT Act 2000',
+      'Branded executive client portals for sharing confidential strategy decks and roadmap reviews'
     ],
     capabilities: [
       {
-        title: 'Voice-to-Scope AI Proposal Engine',
-        description: 'Upload discovery call audio or paste notes to generate formal advisory agreements with deliverables and pricing.',
-        tag: 'Voice-to-Scope'
+        title: 'Voice-to-Proposal AI',
+        description: 'Speak your client discovery notes aloud and let AI generate structured deliverables and pricing tables in seconds.',
+        tag: 'Voice AI'
       },
       {
-        title: 'Strategic Advisory Retainers',
-        description: 'Automate monthly and quarterly advisory retainers with custom advisory hour tracking and board review milestones.',
+        title: 'Monthly Advisory Retainers',
+        description: 'Automate executive advisory retainers with recurring GST invoices, meeting logs, and hours tracking.',
         tag: 'Advisory Retainers'
       },
       {
-        title: 'Executive Presentation Vault',
-        description: 'Share diagnostic audits, transformation decks, and financial models in an encrypted white-label executive portal.',
-        tag: 'Executive Vault'
+        title: 'Confidential Strategy Vaults',
+        description: 'Bank-grade encrypted workspace for sharing market intelligence, board decks, and strategic roadmaps.',
+        tag: 'Strategy Vault'
       }
     ],
     howItWorks: [
-      { step: '01', title: 'Voice Discovery Capture', description: 'Record meeting notes and convert into structured advisory scope with AI.' },
-      { step: '02', title: 'Mandate E-Signature', description: 'Client board signs engagement contract with SHA-256 digital verification.' },
-      { step: '03', title: 'Executive Portal Handover', description: 'Share diagnostic decks and roadmap milestones in branded client vault.' },
-      { step: '04', title: 'Retainer Tax Settlement', description: 'Automated 18% GST invoice issued with professional SAC 998311 tax classification.' }
+      { step: '01', title: 'Record Discovery Brief', description: 'Speak discovery notes into Cora to generate a formal advisory proposal.' },
+      { step: '02', title: 'Sign Advisory Mandate', description: 'Client board signs engagement contract with digital verification.' },
+      { step: '03', title: 'Strategy Delivery', description: 'Share executive decks and roadmaps inside the client private portal.' },
+      { step: '04', title: 'Retainer Settlement', description: 'Automated 18% GST invoice issued with professional tax classification.' }
     ],
     toolsReplaced: [
+      { name: 'PandaDoc', category: 'Proposals', monthlySavingsINR: 3800 },
       { name: 'DocuSign', category: 'E-Signatures', monthlySavingsINR: 3500 },
-      { name: 'Otter.ai', category: 'Transcription', monthlySavingsINR: 2200 },
-      { name: 'PandaDoc', category: 'Proposals', monthlySavingsINR: 3800 }
+      { name: 'Notion Teams', category: 'Knowledge Base', monthlySavingsINR: 2400 }
     ],
     faqs: [
       {
-        question: 'How accurate is the Voice-to-Scope AI in capturing consulting industry terminology?',
-        answer: 'Our Voice-to-Scope engine is fine-tuned specifically on management consulting, M&A, diagnostic audits, and IT advisory terminology to generate professional, legally sound scopes.'
+        question: 'How does Voice-to-Scope AI work for consulting proposals?',
+        answer: 'You simply record an audio summary of your client meeting. Cora extracts key objectives, milestones, timeline, and deliverables, generating a ready-to-sign formal contract.'
       },
       {
-        question: 'Can we configure multi-phase advisory milestones with advance deposits?',
-        answer: 'Yes. You can structure advisory engagements with upfront diagnostic advances, milestone deliverables, and ongoing monthly governance retainers.'
+        question: 'Can we protect proprietary consulting frameworks with built-in NDAs?',
+        answer: 'Yes. Our pre-seeded engagement agreements feature comprehensive intellectual property and confidentiality terms protecting your proprietary frameworks.'
+      },
+      {
+        question: 'Can we bill monthly retainers or project milestone fees?',
+        answer: 'Yes. Cora supports ongoing monthly advisory retainers as well as phased milestone engagements (e.g. Diagnostic, Strategy, Execution).'
       }
     ],
     preSeededTemplates: [
-      'Strategic Advisory & Management Consulting Master Agreement',
-      'Diagnostic Audit Scope & Executive Deliverable Mandate',
-      'Quarterly Advisory Retainer & Milestone Contract',
-      'Mutual Non-Disclosure & Enterprise IP Protection Deed'
+      'Management Consulting & Strategic Advisory Agreement',
+      'Voice-Generated Executive Proposal & SOW',
+      'Board Advisory Retainer & Governance Protocol',
+      'Mutual Non-Disclosure & Confidentiality Agreement'
     ],
     workflowHighlights: [
-      'Voice-to-Scope audio transcription converting meeting notes into structured advisory proposals in 2 minutes',
+      'Voice-to-Scope AI converting audio discovery notes into formal proposals in 2 minutes',
       'Multi-stage payment milestones (Advance, Diagnostic Wrap, Board Review)',
-      'White-label executive client presentation portals for sharing strategy decks',
+      'Branded executive client presentation portals for sharing strategy decks',
       'Complete multi-tenant data isolation protecting confidential corporate transformations'
     ],
     recommendedModules: [
       { id: 'voice-to-scope', title: 'Voice-to-Scope', icon: 'Sparkles' },
-      { id: 'ai-cofounder', title: 'AI Co-Founder', icon: 'Bot' },
+      { id: 'ai-cofounder', title: 'AI Assistant', icon: 'Bot' },
       { id: 'esign-vault', title: 'E-Sign Vault', icon: 'ShieldCheck' },
-      { id: 'lead-crm', title: 'Enterprise CRM', icon: 'Users2' }
+      { id: 'lead-crm', title: 'Client CRM', icon: 'Users2' }
     ],
     challengeVsSolution: {
       challenge: 'Spending hours drafting long proposal documents after client discovery meetings.',
       solution: 'Voice-to-Scope AI that transforms voice recordings and notes into ready-to-sign formal advisory contracts.'
     },
     sampleRetainerText: 'Corporate Strategy Mandate: ₹4,00,000/mo + 18% GST. Includes bi-weekly executive reviews, market intelligence audits, and board decks.',
-    accentBg: 'bg-indigo-50/60',
-    accentBorder: 'border-indigo-200/80',
-    accentText: 'text-indigo-700',
+    accentBg: 'bg-zinc-100',
+    accentBorder: 'border-zinc-200',
+    accentText: 'text-zinc-900',
     heroImage: '/images/usecase_production_house.jpg',
     relatedIndustrySlugs: ['lawyers-law-firms', 'financial-advisors', 'software-agencies', 'marketing-seo']
   },
+
   {
     id: 'doctors-clinics',
     slug: 'doctors-clinics',
@@ -1397,253 +1453,267 @@ export const INDUSTRY_WORKSPACES: IndustryWorkspace[] = [
     sectorBadge: 'SERVICES & ADVISORY',
     badgeColor: 'teal',
     iconName: 'Heart',
-    tagline: 'Patient intake booking, consent e-signs & confidential records.',
-    heroDescription: 'Paperless clinic workflow and patient appointment OS for specialized wellness practices, dental clinics, physiotherapy centers, and medical consultancies. Coordinate online intake forms, digital patient consent e-signs, and instant fee receipts.',
+    tagline: 'Paperless patient intake, digital consent & appointment booking.',
+    heroDescription: 'Modern clinic management for dental clinics, wellness centers, physiotherapy practices, and specialized medical consultancies. Coordinate digital intake forms, patient consent signatures, and automated receipts.',
     sacCode: 'SAC 999312',
     gstRate: 'Exempt / 18% GST (Cosmetic)',
     stats: [
       { metric: '100% Digital', label: 'Paperless intake forms and consent' },
-      { metric: 'Instant', label: 'Automated booking confirmation' },
-      { metric: 'Encrypted', label: 'Confidential patient vault' }
+      { metric: 'Instant', label: 'Automated booking confirmations' },
+      { metric: 'Confidential', label: 'Encrypted patient records' }
     ],
     theOldWay: [
-      'Manual paper intake forms creating long waiting room queues and illegible hand-written records',
-      'Patients missing appointments due to lack of automated WhatsApp reminders',
-      'Unsigned or misplaced procedure consent forms exposing practitioners to legal liabilities'
+      'Manual paper intake forms creating waiting room delays and unorganized physical files',
+      'Patients missing appointments due to lack of automated confirmation messages',
+      'Unsigned or misplaced procedure consent forms exposing practitioners to liability'
     ],
     theCoraWay: [
-      'Mobile-friendly digital intake forms sent to patients via WhatsApp prior to clinic arrival',
-      'Automated appointment calendar with WhatsApp reminders that reduce no-shows by 60%',
-      'Digital patient consent e-signatures with legal timestamping before medical or aesthetic procedures'
+      'Mobile-friendly digital intake forms sent to patients prior to clinic arrival',
+      'Automated appointment confirmations and reminders reducing no-shows',
+      'Digital patient consent signatures with timestamped audit records before procedures'
     ],
     capabilities: [
       {
         title: 'Paperless Digital Intake Forms',
         description: 'Send mobile intake questionnaires capturing medical history, allergies, and symptoms prior to appointment.',
-        tag: 'Patient Intake'
+        tag: 'Digital Intake'
       },
       {
-        title: 'Digital Medical Consent Vault',
-        description: 'Pre-seeded procedure consent agreements executed with verified digital signature before treatment begins.',
-        tag: 'Consent Vault'
+        title: 'Digital Patient Consent',
+        description: 'Collect legally binding digital consent signatures on tablets or mobile phones before procedures.',
+        tag: 'Patient Consent'
       },
       {
-        title: 'Instant UPI Fee Settlement',
-        description: 'Generate instant digital tax receipts with dynamic UPI QR codes for seamless front-desk checkout.',
-        tag: 'UPI Quick-Bill'
+        title: 'Instant Receipts & Billing',
+        description: 'Issue instant digital fee receipts and GST invoices (with medical exemption handling).',
+        tag: 'Clinic Billing'
       }
     ],
     howItWorks: [
-      { step: '01', title: 'Online Slot Booking', description: 'Patient selects doctor and consultation slot on interactive clinic calendar.' },
-      { step: '02', title: 'WhatsApp Intake Link', description: 'Patient receives digital intake questionnaire and medical history form via WhatsApp.' },
-      { step: '03', title: 'Digital Consent Sign-Off', description: 'Patient digitally signs procedure consent form on their phone.' },
-      { step: '04', title: 'Instant Receipt & Review', description: 'Fee receipt delivered instantly via SMS/WhatsApp with 1-click Google review request.' }
+      { step: '01', title: 'Online Intake Link', description: 'Patient receives digital intake questionnaire to complete on their phone.' },
+      { step: '02', title: 'Sign Digital Consent', description: 'Patient reviews treatment details and signs informed consent form digitally.' },
+      { step: '03', title: 'Consultation & Notes', description: 'Practitioner records clinical notes in the secure patient profile.' },
+      { step: '04', title: 'Instant Receipt', description: 'Digital fee receipt issued with integrated UPI QR code for contactless checkout.' }
     ],
     toolsReplaced: [
-      { name: 'Practo Ray', category: 'Clinic Management', monthlySavingsINR: 4500 },
-      { name: 'DocuSign', category: 'Consent Forms', monthlySavingsINR: 3500 },
-      { name: 'Typeform', category: 'Intake Forms', monthlySavingsINR: 2800 }
+      { name: 'Practo Ray', category: 'Clinic Management', monthlySavingsINR: 3500 },
+      { name: 'DocuSign', category: 'E-Signatures', monthlySavingsINR: 3500 },
+      { name: 'Paper Intake Filing', category: 'Admin Overhead', monthlySavingsINR: 2000 }
     ],
     faqs: [
       {
-        question: 'Is healthcare consultation exempt from GST in India?',
-        answer: 'Yes. Under GST Notification No. 12/2017, health care services by a clinical establishment or authorized medical practitioner are exempt from GST (SAC 999312). However, specialized cosmetic or hair transplant services are taxable at 18%, both of which Cora handles seamlessly.'
+        question: 'Are health care consultation fees exempt from GST?',
+        answer: 'Yes. Under standard GST rules, primary health care services are exempt from GST. For aesthetic or cosmetic procedures where 18% GST applies, Cora handles both automatically.'
       },
       {
-        question: 'How are patient medical records and intake details kept private?',
-        answer: 'Cora encrypts all patient data at rest with AES-256 and provides role-based access so only authorized clinical staff can view confidential medical histories.'
+        question: 'Can patients sign consent forms on their own mobile phone or clinic tablet?',
+        answer: 'Yes. Patients can sign consent forms on their phone via a simple link or directly on a clinic iPad or tablet at reception.'
+      },
+      {
+        question: 'Is patient medical data stored securely and privately?',
+        answer: 'Yes. Every workspace uses encrypted storage with strict role-based access, ensuring patient records remain confidential.'
       }
     ],
     preSeededTemplates: [
-      'Patient Registration & Medical History Intake Form',
-      'Informed Medical & Clinical Procedure Consent Agreement',
-      'Tele-Consultation Terms & Confidentiality Form',
-      'Clinical Treatment Package & Fee Schedule Agreement'
+      'General Medical & Dental Informed Consent Form',
+      'Specialized Aesthetic Procedure Consent Protocol',
+      'Patient Registration & Medical History Intake',
+      'Tele-Consultation & Digital Prescription Consent'
     ],
     workflowHighlights: [
-      'Online appointment booking calendar with automated WhatsApp and SMS confirmation alerts',
-      'Paperless patient intake questionnaires with conditional medical branches',
-      'Digital patient consent e-signatures with legal timestamping before procedures',
-      'Instant digital tax receipts with UPI QR codes for seamless fee settlement'
+      'Paperless mobile patient intake forms capturing medical history prior to arrival',
+      'Digital informed consent signatures timestamped before procedures',
+      'Instant fee receipt generation with UPI QR code checkout',
+      'Automated appointment calendar reminders'
     ],
     recommendedModules: [
       { id: 'form-builder', title: 'Patient Intake', icon: 'FormInput' },
-      { id: 'master-calendar', title: 'Clinic Calendar', icon: 'Calendar' },
-      { id: 'esign-vault', title: 'Consent Vault', icon: 'ShieldCheck' },
-      { id: 'pwa-push', title: 'SMS & App Alerts', icon: 'Bell' }
+      { id: 'esign-vault', title: 'Consent E-Sign', icon: 'ShieldCheck' },
+      { id: 'gst-invoicing', title: 'Fee Receipts', icon: 'Receipt' },
+      { id: 'rbac-system', title: 'Data Isolation', icon: 'Lock' }
     ],
     challengeVsSolution: {
-      challenge: 'Manual paper intake forms creating patient waiting room bottlenecks and lost records.',
-      solution: 'Mobile-friendly digital intake forms sent to patients via WhatsApp prior to clinic arrival.'
+      challenge: 'Long waiting room queues and misplaced paper consent forms exposing clinics to liability.',
+      solution: 'Mobile digital intake questionnaires paired with instant digital consent signatures.'
     },
-    sampleRetainerText: 'Specialized Consultation Package: 6-Session Clinical Wellness Protocol at ₹45,00,000 with digital intake and secure progress tracking.',
-    accentBg: 'bg-teal-50/60',
-    accentBorder: 'border-teal-200/80',
-    accentText: 'text-teal-700',
+    sampleRetainerText: 'Specialized Clinic Package: ₹35,000 (GST Exempt for Health Care / 18% GST for Aesthetic Procedures). Includes full consultation and follow-up review.',
+    accentBg: 'bg-zinc-100',
+    accentBorder: 'border-zinc-200',
+    accentText: 'text-zinc-900',
     heroImage: '/images/usecase_solo_creator.jpg',
-    relatedIndustrySlugs: ['salons-wellness', 'consultants-advisors', 'lawyers-law-firms', 'financial-advisors']
+    relatedIndustrySlugs: ['salons-wellness', 'consultants-advisors', 'lawyers-law-firms', 'tax-ca-firms']
   },
+
   {
     id: 'salons-wellness',
     slug: 'salons-wellness',
-    title: 'Salons, Spas & Wellness',
+    title: 'Salons & Wellness',
     shortTitle: 'Salons & Wellness',
     sectorId: 'services_lifestyle',
     sectorLabel: 'Services & Advisory',
     sectorBadge: 'SERVICES & ADVISORY',
     badgeColor: 'teal',
     iconName: 'Scissors',
-    tagline: 'Service menu packages, slot booking & instant UPI billing.',
-    heroDescription: 'Turnkey operating system for high-end luxury salons, boutique spas, and aesthetic wellness centers. Manage specialist stylist calendars, bridal beauty package deposits, rapid UPI checkout, and automated Google review collection.',
+    tagline: 'Online booking deposits, staff scheduling & automated review requests.',
+    heroDescription: 'Effortless salon and wellness management for premium hair studios, aesthetic clinics, and spa centers. Collect advance booking deposits, manage staff calendars, and send automated Google review requests.',
     sacCode: 'SAC 999721',
     gstRate: '18% GST',
     stats: [
-      { metric: 'Zero', label: 'Front-desk checkout queues' },
-      { metric: 'Instant', label: 'Dynamic UPI QR billing' },
-      { metric: '-60%', label: 'No-shows with WhatsApp alerts' }
+      { metric: '60% Fewer', label: 'No-shows with upfront deposits' },
+      { metric: '5-Star', label: 'Automated Google review collection' },
+      { metric: '1-Click', label: 'Instant UPI payment checkout' }
     ],
     theOldWay: [
-      'Clients booking expensive bridal or package slots and canceling at the last minute without deposits',
-      'Slow manual billing at the front desk creating checkout queues during peak weekend hours',
-      'Stylist chair overbooking leading to frustrated clients and negative online reviews'
+      'Clients missing booked appointments without penalty, leaving staff idle',
+      'Paper appointment books causing double-bookings and scheduling errors',
+      'Losing out on 5-star Google reviews due to no automated follow-up system'
     ],
     theCoraWay: [
-      'Online visual service menu with mandatory advance deposit collection on premium bridal packages',
-      'Rapid dynamic UPI QR billing allowing clients to scan and pay from their chairs in seconds',
-      'Specialist chair allocation calendar with automated WhatsApp reminders that eliminate no-shows'
+      'Upfront booking deposits collected online via UPI to prevent last-minute no-shows',
+      'Real-time staff booking calendar accessible from any phone or front-desk computer',
+      'Automated review requests sent after checkout to grow positive Google reviews'
     ],
     capabilities: [
       {
-        title: 'Visual Service Menu & Bridal Booking',
-        description: 'Interactive catalog for hair, skin, and spa packages with built-in deposit collection.',
-        tag: 'Service Menu'
+        title: 'Booking Deposit Collection',
+        description: 'Collect small advance booking deposits online via UPI to secure appointment slots and eliminate no-shows.',
+        tag: 'Booking Deposits'
       },
       {
-        title: 'Stylist & Chair Allocation Calendar',
-        description: 'Manage specialist stylists and treatment rooms preventing double-bookings and scheduling conflicts.',
-        tag: 'Stylist Hub'
+        title: 'Staff & Chair Scheduling',
+        description: 'Coordinate multiple stylists and treatment rooms with a visual, real-time master calendar.',
+        tag: 'Staff Scheduling'
       },
       {
-        title: 'Rapid UPI Quick-Billing & Reviews',
-        description: 'Generate dynamic UPI QR codes and trigger automated 5-star Google review requests upon checkout.',
-        tag: 'UPI Quick-Bill'
+        title: 'Automated Review Requests',
+        description: 'Send automated thank-you messages and 5-star Google review links immediately after client checkout.',
+        tag: 'Google Reviews'
       }
     ],
     howItWorks: [
-      { step: '01', title: 'Package Selection', description: 'Client selects beauty service package or bridal service from visual menu.' },
-      { step: '02', title: 'Deposit E-Agreement', description: 'Client clears 50% deposit locking specialist stylist and date.' },
-      { step: '03', title: 'WhatsApp Appointment Alert', description: 'Automated WhatsApp reminder sent 24 hours and 2 hours before appointment.' },
-      { step: '04', title: 'UPI Quick-Bill & Review', description: 'Client scans QR code to pay balance and receives automated review prompt.' }
+      { step: '01', title: 'Select Service & Slot', description: 'Client chooses treatment, stylist, and time slot on your mobile booking page.' },
+      { step: '02', title: 'Pay Advance Deposit', description: 'Client pays booking deposit instantly via UPI QR to lock their reservation.' },
+      { step: '03', title: 'Service Execution', description: 'Stylist checks client notes and delivers treatment at scheduled time.' },
+      { step: '04', title: 'Checkout & Review', description: 'Final balance settled at reception and automated review link is sent to client.' }
     ],
     toolsReplaced: [
-      { name: 'Fresha / Shedul', category: 'Salon Software', monthlySavingsINR: 4200 },
-      { name: 'DocuSign', category: 'Deposit Agreements', monthlySavingsINR: 3500 },
-      { name: 'WhatsApp Business API', category: 'Alerts', monthlySavingsINR: 2000 }
+      { name: 'Fresha', category: 'Salon Software', monthlySavingsINR: 2500 },
+      { name: 'Zenoti', category: 'Spa Management', monthlySavingsINR: 6500 },
+      { name: 'Paper Books', category: 'Admin Overhead', monthlySavingsINR: 1500 }
     ],
     faqs: [
       {
-        question: 'Can we collect advance booking deposits for high-ticket bridal and event packages?',
-        answer: 'Yes. Cora allows you to require a mandatory 50% booking deposit on premium packages executed with a digital agreement that protects your salon against last-minute cancellations.'
+        question: 'How do advance booking deposits reduce salon no-shows?',
+        answer: 'Requiring a modest advance deposit (e.g. ₹500) creates commitment, reducing appointment no-shows by up to 60%.'
       },
       {
-        question: 'How does the automated Google review collection work?',
-        answer: 'When a bill is marked paid at checkout, Cora automatically sends a polite WhatsApp message thanking the client and providing a direct link to leave a 5-star Google review.'
+        question: 'Can individual stylists view their own daily appointment schedules?',
+        answer: 'Yes. Stylists can view their daily schedule on their phone with client notes and service durations.'
+      },
+      {
+        question: 'How does automated Google review collection work?',
+        answer: 'When a bill is marked as settled, Cora sends a friendly thank-you message with a direct link to your Google Business profile.'
       }
     ],
     preSeededTemplates: [
-      'Bridal & Event Beauty Package Agreement & Deposit Contract',
-      'Salon Membership & Subscription Wellness Agreement',
-      'Chemical Treatment & Client Sensitivity Consent Form',
-      'Specialist Chair & Booth Rental Contract'
+      'Salon Service Booking & Cancellation Policy',
+      'Hair Treatment & Skin Patch Test Consent Form',
+      'Membership & Pre-Paid Package Agreement',
+      'Staff Commission & Stylist Employment Contract'
     ],
     workflowHighlights: [
-      'Interactive visual service menu and bridal package booking with deposit collection',
-      'Specialist chair and stylist allocation calendar preventing overbooking',
-      'Automated appointment reminder notifications sent via WhatsApp',
-      'Rapid GST billing with dynamic UPI QR codes and instant SMS receipt delivery'
+      'Advance booking deposit collection via UPI QR reducing appointment no-shows',
+      'Visual staff and treatment room master calendar',
+      'Automated 5-star Google review request messages upon service checkout',
+      'Membership and package balance tracking with automated GST invoicing'
     ],
     recommendedModules: [
-      { id: 'master-calendar', title: 'Stylist Calendar', icon: 'Calendar' },
-      { id: 'form-builder', title: 'Service Menus', icon: 'FormInput' },
-      { id: 'gst-invoicing', title: 'UPI Quick-Bill', icon: 'Receipt' },
-      { id: 'review-portal', title: 'Google Reviews', icon: 'Star' }
+      { id: 'form-builder', title: 'Booking Page', icon: 'FormInput' },
+      { id: 'gst-invoicing', title: 'POS Invoicing', icon: 'Receipt' },
+      { id: 'lead-crm', title: 'Client CRM', icon: 'Users2' },
+      { id: 'task-board', title: 'Staff Calendar', icon: 'Kanban' }
     ],
     challengeVsSolution: {
-      challenge: 'Last-minute appointment cancellations and slow manual payment collection at the reception desk.',
-      solution: 'Advance deposit collection on premium bookings paired with automated WhatsApp reminders.'
+      challenge: 'High appointment no-show rates and missed customer reviews.',
+      solution: 'Online booking deposits combined with automated post-service Google review requests.'
     },
-    sampleRetainerText: 'Luxury Bridal Hair & Makeup Package: ₹65,000 + 18% GST (50% booking deposit locked via digital agreement, 50% on event date).',
-    accentBg: 'bg-pink-50/60',
-    accentBorder: 'border-pink-200/80',
-    accentText: 'text-pink-700',
-    heroImage: '/images/bento_crew_camera.jpg',
-    relatedIndustrySlugs: ['doctors-clinics', 'photo-video-studios', 'consultants-advisors', 'real-estate-property']
+    sampleRetainerText: 'Annual Wellness Membership: ₹45,000 + 18% GST. Includes 12 monthly premium treatments, priority booking, and family sharing.',
+    accentBg: 'bg-zinc-100',
+    accentBorder: 'border-zinc-200',
+    accentText: 'text-zinc-900',
+    heroImage: '/images/usecase_solo_creator.jpg',
+    relatedIndustrySlugs: ['doctors-clinics', 'consultants-advisors', 'photo-video-studios', 'marketing-seo']
   },
+
   {
     id: 'real-estate-property',
     slug: 'real-estate-property',
     title: 'Real Estate & Property',
-    shortTitle: 'Real Estate & Property',
+    shortTitle: 'Real Estate',
     sectorId: 'services_lifestyle',
     sectorLabel: 'Services & Advisory',
     sectorBadge: 'SERVICES & ADVISORY',
     badgeColor: 'teal',
     iconName: 'Building2',
-    tagline: 'Property listings, brokerage contracts & 4K media shoots.',
-    heroDescription: 'All-in-one brokerage operating system for commercial real estate consultants, property advisory firms, and luxury realtors. Manage exclusive mandate contracts, listing microsites, property media shoots, and commission invoicing.',
+    tagline: 'Property microsites, brokerage mandates & commission billing.',
+    heroDescription: 'The high-converting platform for real estate brokerages and commercial leasing firms. Build property listing microsites, execute exclusive broker mandates digitally, and invoice commissions effortlessly.',
     sacCode: 'SAC 997212',
     gstRate: '18% GST',
     stats: [
-      { metric: '1-Click', label: 'Listing AI description builder' },
-      { metric: '100%', label: 'Signed mandate protection' },
-      { metric: '4K Ready', label: 'Virtual tour media vaults' }
+      { metric: '100% Signed', label: 'Exclusive digital broker mandates' },
+      { metric: 'Fast Launch', label: 'Property listing microsites' },
+      { metric: '18% GST', label: 'Compliant commission invoices' }
     ],
     theOldWay: [
-      'Disputes over brokerage commission percentages after commercial lease closures',
-      'Spending hours writing property listing descriptions across multiple portals',
-      'No formal digital agreement with property owners before spending money on professional photography'
+      'Disputes over brokerage commission percentages after commercial lease or sale closures',
+      'Sharing property photos and videos over messy WhatsApp messages that get buried',
+      'Losing high-intent buyer leads due to slow follow-up and lack of organized tracking'
     ],
     theCoraWay: [
-      'Pre-signed exclusive brokerage mandate agreements executed digitally before showing properties',
-      'Listing AI tool that generates high-converting, compliant property copy in 10 seconds',
-      'Dedicated property listing microsites with built-in lead capture forms and virtual tour embeds'
+      'Pre-signed exclusive brokerage mandate agreements executed digitally before property showings',
+      'Branded property listing microsites with built-in virtual tours and lead capture forms',
+      'Automated commission invoicing with compliant 18% GST tax calculation upon deal closure'
     ],
     capabilities: [
       {
+        title: 'Property Listing Microsites',
+        description: 'Create beautiful property landing pages with virtual tours, floor plans, and lead capture forms in minutes.',
+        tag: 'Property Microsites'
+      },
+      {
         title: 'Exclusive Brokerage Mandates',
-        description: 'Legally binding commission agreements under Indian contract law securing your 1-2 month brokerage fee.',
-        tag: 'Brokerage Mandate'
+        description: 'Execute exclusive representation agreements and commission fee deeds digitally before showing properties.',
+        tag: 'Broker Mandates'
       },
       {
-        title: 'Listing AI Description Generator',
-        description: 'Generate luxury property descriptions, social copy, and email blasts from basic carpet area and amenity inputs.',
-        tag: 'Listing AI'
-      },
-      {
-        title: 'Property Microsite & Media Hub',
-        description: 'Host 4K virtual tours, floor plans, and RERA registration documents on branded property landing pages.',
-        tag: 'Property Hub'
+        title: 'Commission Invoicing & GST',
+        description: 'Issue professional brokerage commission invoices with automated 18% GST tax calculations upon deal closure.',
+        tag: 'Commission Invoicing'
       }
     ],
     howItWorks: [
-      { step: '01', title: 'Owner Mandate Execution', description: 'Property owner executes exclusive brokerage contract with agreed commission terms.' },
-      { step: '02', title: 'Listing AI Generation', description: 'Generate high-converting property copy and floor plan specs in seconds.' },
-      { step: '03', title: 'Virtual Tour & Media Hub', description: 'Publish property microsite with lead capture form and 4K photo gallery.' },
-      { step: '04', title: 'Commission Invoicing', description: 'Issue automated SAC 997212 commission invoice upon lease or sale execution.' }
+      { step: '01', title: 'Sign Mandate Agreement', description: 'Property owner executes exclusive brokerage representation agreement digitally.' },
+      { step: '02', title: 'Launch Listing Site', description: 'Publish property microsite with 4K photos, floor plans, and lead capture.' },
+      { step: '03', title: 'Lead Triage & Site Visits', description: 'Track buyer inquiries and coordinate property site visit schedules.' },
+      { step: '04', title: 'Commission Invoicing', description: 'Issue automated commission invoice upon successful lease or sale execution.' }
     ],
     toolsReplaced: [
       { name: 'DocuSign', category: 'E-Signatures', monthlySavingsINR: 3500 },
-      { name: 'LeadSquared', category: 'Real Estate CRM', monthlySavingsINR: 6500 },
-      { name: 'Copy.ai', category: 'Listing Copy', monthlySavingsINR: 2800 }
+      { name: 'LeadSquared', category: 'Real Estate CRM', monthlySavingsINR: 5500 },
+      { name: 'Unbounce', category: 'Landing Pages', monthlySavingsINR: 4200 }
     ],
     faqs: [
       {
-        question: 'Does Cora protect brokers against direct deals between landlords and clients?',
-        answer: 'Yes. Our pre-seeded Exclusive Brokerage Mandate agreements include non-circumvention and client introduction registration clauses valid under Indian contract law.'
+        question: 'How do digital brokerage mandates protect our commission?',
+        answer: 'Our pre-seeded agreements lock in commission percentages, exclusivity terms, and validity periods, providing full legal enforceability under Indian contract law.'
       },
       {
-        question: 'Can we create standalone single-property landing pages for luxury listings?',
-        answer: 'Yes. Cora\'s Funnel Builder lets you launch branded property microsites with high-resolution photo galleries, floor plans, and lead capture forms in minutes.'
+        question: 'Can we generate property listing landing pages without coding?',
+        answer: 'Yes. You can build branded property microsites with floor plans, photo galleries, and lead capture forms in minutes.'
+      },
+      {
+        question: 'Does Cora support channel partner commission sharing agreements?',
+        answer: 'Yes. Pre-seeded templates include channel partner fee-sharing contracts for seamless co-broking collaboration.'
       }
     ],
     preSeededTemplates: [
@@ -1654,9 +1724,9 @@ export const INDUSTRY_WORKSPACES: IndustryWorkspace[] = [
     ],
     workflowHighlights: [
       'Property listing microsites with built-in lead capture forms and virtual tour embeds',
-      'Brokerage commission agreements with legally binding SHA-256 digital signatures',
+      'Brokerage commission agreements with legally binding digital signatures',
       'Listing AI tool generating high-converting property descriptions in seconds',
-      'Automated commission invoicing with SAC 997212 tax calculation'
+      'Automated commission invoicing with compliant GST tax calculations'
     ],
     recommendedModules: [
       { id: 'lead-crm', title: 'Property CRM', icon: 'Users2' },
@@ -1669,9 +1739,9 @@ export const INDUSTRY_WORKSPACES: IndustryWorkspace[] = [
       solution: 'Pre-signed exclusive brokerage mandate agreements executed digitally before showing properties.'
     },
     sampleRetainerText: 'Commercial Brokerage Mandate: 1 Month Rental Commission (₹2,50,000) + 18% GST (CGST ₹22,500 + SGST ₹22,500) payable on lease execution.',
-    accentBg: 'bg-emerald-50/60',
-    accentBorder: 'border-emerald-200/80',
-    accentText: 'text-emerald-700',
+    accentBg: 'bg-zinc-100',
+    accentBorder: 'border-zinc-200',
+    accentText: 'text-zinc-900',
     heroImage: '/images/usecase_realestate_agency.jpg',
     relatedIndustrySlugs: ['photo-video-studios', 'architecture-interiors', 'lawyers-law-firms', 'consultants-advisors']
   }

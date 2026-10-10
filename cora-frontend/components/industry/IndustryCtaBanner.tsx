@@ -29,7 +29,7 @@ export function IndustryCtaBanner() {
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 mb-8">
           <a
-            href="https://app.heycora.in/workspace/login?source=use_cases_cta"
+            href="https://app.heycora.in/workspace/login?source=industries_cta"
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl bg-white text-zinc-950 text-xs sm:text-sm font-semibold hover:bg-zinc-100 transition-all shadow-sm group cursor-pointer"
           >
             <span>Launch Free Agency Workspace</span>

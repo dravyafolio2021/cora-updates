@@ -173,7 +173,7 @@ export function FeaturePlusEverythingGrid({ feature }: FeaturePlusEverythingGrid
           badge: 'Real-time Webhook',
           description: 'Broadcasts instant channel alerts when high-value client contracts are signed and advances paid.',
           OfficialLogo: SlackLogo,
-          logoBg: 'bg-pink-50 border-pink-200'
+          logoBg: 'bg-zinc-100/80 border-zinc-200'
         }
       ];
     }

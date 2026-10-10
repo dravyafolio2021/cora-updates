@@ -1,7 +1,13 @@
-'use client';
-
 import React from 'react';
-import { ArrowRight, Search, CheckCircle2 } from 'lucide-react';
+import { 
+  ArrowRight, 
+  Search, 
+  CheckCircle2, 
+  LayoutDashboard, 
+  TrendingUp, 
+  Flag, 
+  Users 
+} from 'lucide-react';
 import { FeatureModule } from '@/lib/features-data';
 
 interface FeatureStudioSpotlightBannerProps {
@@ -64,17 +70,21 @@ export function FeatureStudioSpotlightBanner({ feature }: FeatureStudioSpotlight
 
           {/* Sub-tabs Navigation */}
           <div className="px-4 sm:px-6 py-2.5 bg-white border-b border-zinc-100 flex items-center gap-2 sm:gap-4 overflow-x-auto text-xs font-medium text-zinc-600">
-            <span className="px-3 py-1 rounded-lg bg-zinc-100 text-zinc-950 font-bold">
-              📊 Overview
+            <span className="px-3 py-1 rounded-lg bg-zinc-100 text-zinc-950 font-bold flex items-center gap-1.5">
+              <LayoutDashboard className="w-3.5 h-3.5 text-zinc-900" />
+              <span>Overview</span>
             </span>
-            <span className="hover:text-zinc-950 cursor-pointer">
-              📈 Analytics
+            <span className="hover:text-zinc-950 cursor-pointer flex items-center gap-1.5">
+              <TrendingUp className="w-3.5 h-3.5 text-zinc-500" />
+              <span>Analytics</span>
             </span>
-            <span className="text-zinc-950 font-bold border-b-2 border-zinc-950 pb-0.5">
-              🚩 Sprint Milestones
+            <span className="text-zinc-950 font-bold border-b-2 border-zinc-950 pb-0.5 flex items-center gap-1.5">
+              <Flag className="w-3.5 h-3.5 text-zinc-950" />
+              <span>Sprint Milestones</span>
             </span>
-            <span className="hover:text-zinc-950 cursor-pointer">
-              👥 Project Teams
+            <span className="hover:text-zinc-950 cursor-pointer flex items-center gap-1.5">
+              <Users className="w-3.5 h-3.5 text-zinc-500" />
+              <span>Project Teams</span>
             </span>
           </div>
 

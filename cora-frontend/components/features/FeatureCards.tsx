@@ -6,8 +6,8 @@ import { Bot, Layers, FileCheck, Search, MessageSquare, Zap, CheckCircle2 } from
 const features = [
   {
     icon: Bot,
-    iconColor: 'text-purple-600',
-    iconBg: 'bg-purple-50 border-purple-100',
+    iconColor: 'text-zinc-800',
+    iconBg: 'bg-zinc-100/80 border-zinc-200',
     tag: 'Frontier AI Routing',
     title: 'Multi-Model AI Orchestration',
     description: 'Switch intelligently between Claude 3.5 Sonnet, GPT-4o, and Gemini 2.0 Flash with unified quota management and zero API key headaches.',

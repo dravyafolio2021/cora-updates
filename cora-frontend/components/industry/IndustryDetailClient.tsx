@@ -60,7 +60,7 @@ export function IndustryDetailClient({ workspace }: IndustryDetailClientProps) {
               Home
             </Link>
             <ChevronRight className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
-            <Link href="/use-cases" className="hover:text-zinc-950 transition-colors">
+            <Link href="/industries" className="hover:text-zinc-950 transition-colors">
               Industries
             </Link>
             <ChevronRight className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
@@ -77,12 +77,12 @@ export function IndustryDetailClient({ workspace }: IndustryDetailClientProps) {
             {/* Status & Sector Badge */}
             <div className="flex items-center flex-wrap gap-2">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/90 backdrop-blur-md text-zinc-900 border border-zinc-200/90 rounded-full text-xs font-semibold shadow-2xs">
-                <div className={`w-4 h-4 rounded-[5px] ${workspace.accentBg} ${workspace.accentText} inline-flex items-center justify-center p-0.5`}>
+                <div className="w-4 h-4 rounded-[5px] bg-zinc-900 text-white inline-flex items-center justify-center p-0.5">
                   <IndustryIcon name={workspace.iconName} className="w-3 h-3" />
                 </div>
                 <span>{workspace.sectorLabel}</span>
               </span>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-500/10 text-emerald-700 border border-emerald-500/30 rounded-full text-[10px] font-mono font-bold backdrop-blur-md">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-zinc-100 text-zinc-800 border border-zinc-200/90 rounded-full text-[10px] font-mono font-bold backdrop-blur-md">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 <span>Pre-Seeded Turnkey Workspace</span>
               </span>
@@ -186,7 +186,7 @@ export function IndustryDetailClient({ workspace }: IndustryDetailClientProps) {
             {/* Left: Pre-Seeded Indian IT Act 2000 Contracts */}
             <div className="rounded-3xl bg-white border border-zinc-200/90 p-7 sm:p-8 shadow-sm space-y-5">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-2xl bg-zinc-100 text-zinc-900 border border-zinc-200 flex items-center justify-center">
                   <ShieldCheck className="w-5 h-5" />
                 </div>
                 <div>
@@ -194,7 +194,7 @@ export function IndustryDetailClient({ workspace }: IndustryDetailClientProps) {
                     Pre-Seeded Indian IT Act 2000 Contracts
                   </h3>
                   <span className="text-xs text-zinc-500">
-                    Tamper-evident SHA-256 e-signature agreements ready out-of-the-box
+                    Tamper-evident digital signature agreements ready out-of-the-box
                   </span>
                 </div>
               </div>
@@ -211,7 +211,7 @@ export function IndustryDetailClient({ workspace }: IndustryDetailClientProps) {
                         {template}
                       </span>
                     </div>
-                    <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded">
+                    <span className="text-[10px] font-mono font-bold text-zinc-700 bg-zinc-100 px-2 py-0.5 rounded border border-zinc-200/70">
                       IT ACT 2000
                     </span>
                   </div>
@@ -222,12 +222,12 @@ export function IndustryDetailClient({ workspace }: IndustryDetailClientProps) {
             {/* Right: Automated SAC Tax & Invoicing */}
             <div className="rounded-3xl bg-white border border-zinc-200/90 p-7 sm:p-8 shadow-sm space-y-5">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-blue-50 text-blue-700 border border-blue-200 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-2xl bg-zinc-100 text-zinc-900 border border-zinc-200 flex items-center justify-center">
                   <Receipt className="w-5 h-5" />
                 </div>
                 <div>
                   <h3 className="text-base sm:text-lg font-bold text-zinc-950">
-                    Automated SAC {workspace.sacCode} GST Tax Split
+                    Automated {workspace.sacCode} Tax Calculations
                   </h3>
                   <span className="text-xs text-zinc-500">
                     Intelligent CGST + SGST (9%+9%) & IGST (18%) tax compliance
@@ -237,16 +237,16 @@ export function IndustryDetailClient({ workspace }: IndustryDetailClientProps) {
 
               <div className="space-y-3">
                 <div className="p-4 rounded-2xl bg-zinc-50 border border-zinc-200/70 flex items-center justify-between">
-                  <span className="text-xs font-semibold text-zinc-700">Pre-Configured SAC Code</span>
+                  <span className="text-xs font-semibold text-zinc-700">Pre-Configured Tax Code</span>
                   <span className="text-xs font-mono font-bold text-zinc-950">{workspace.sacCode}</span>
                 </div>
                 <div className="p-4 rounded-2xl bg-zinc-50 border border-zinc-200/70 flex items-center justify-between">
                   <span className="text-xs font-semibold text-zinc-700">Statutory GST Rate</span>
                   <span className="text-xs font-mono font-bold text-zinc-950">{workspace.gstRate}</span>
                 </div>
-                <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 flex items-center justify-between">
-                  <span className="text-xs font-semibold text-emerald-900">Dynamic Payment Dispatch</span>
-                  <span className="text-xs font-mono font-bold text-emerald-800">1-Click UPI & WhatsApp</span>
+                <div className="p-4 rounded-2xl bg-zinc-50 border border-zinc-200/70 flex items-center justify-between">
+                  <span className="text-xs font-semibold text-zinc-900">Payment Collection</span>
+                  <span className="text-xs font-mono font-bold text-zinc-900">Instant UPI QR & Bank Links</span>
                 </div>
               </div>
             </div>
@@ -306,15 +306,15 @@ export function IndustryDetailClient({ workspace }: IndustryDetailClientProps) {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* The Old Way */}
-            <div className="rounded-3xl bg-white border border-red-200/80 p-6 sm:p-8 space-y-4">
-              <div className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-red-600">
-                <XCircle className="w-4 h-4" />
+            <div className="rounded-3xl bg-white border border-zinc-200/90 p-6 sm:p-8 space-y-4">
+              <div className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-zinc-500">
+                <XCircle className="w-4 h-4 text-zinc-400" />
                 <span>The Fragmented Old Way</span>
               </div>
               <ul className="space-y-3">
                 {workspace.theOldWay.map((item, idx) => (
                   <li key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-zinc-600">
-                    <XCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+                    <XCircle className="w-4 h-4 text-zinc-400 shrink-0 mt-0.5" />
                     <span>{item}</span>
                   </li>
                 ))}
@@ -322,8 +322,8 @@ export function IndustryDetailClient({ workspace }: IndustryDetailClientProps) {
             </div>
 
             {/* The Cora Way */}
-            <div className="rounded-3xl bg-white border border-emerald-200/80 p-6 sm:p-8 space-y-4 shadow-sm">
-              <div className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-emerald-700">
+            <div className="rounded-3xl bg-white border border-zinc-300 p-6 sm:p-8 space-y-4 shadow-sm">
+              <div className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-zinc-900">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                 <span>The Cora Turnkey Way</span>
               </div>
@@ -357,7 +357,7 @@ export function IndustryDetailClient({ workspace }: IndustryDetailClientProps) {
             </div>
 
             <div className="text-center sm:text-right shrink-0">
-              <span className="text-[11px] font-mono text-emerald-400 uppercase tracking-wider block">
+              <span className="text-[11px] font-mono text-zinc-400 uppercase tracking-wider block">
                 Estimated Monthly Savings
               </span>
               <span className="font-display text-2xl sm:text-3xl font-extrabold text-white">
@@ -425,7 +425,7 @@ export function IndustryDetailClient({ workspace }: IndustryDetailClientProps) {
                 </span>
               </div>
               <Link
-                href="/use-cases"
+                href="/industries"
                 className="text-xs font-semibold text-zinc-950 hover:text-zinc-600 inline-flex items-center gap-1 transition-colors"
               >
                 <span>View all 16 industries</span>
@@ -437,12 +437,12 @@ export function IndustryDetailClient({ workspace }: IndustryDetailClientProps) {
               {relatedWorkspaces.map((rel) => (
                 <Link
                   key={rel.id}
-                  href={`/use-cases/${rel.slug}`}
+                  href={`/industries/${rel.slug}`}
                   className="group rounded-2xl bg-white border border-zinc-200/80 hover:border-zinc-950 p-5 flex flex-col justify-between shadow-2xs hover:shadow-md transition-all duration-200"
                 >
                   <div>
                     <div className="flex items-center justify-between mb-3">
-                      <div className={`w-8 h-8 rounded-xl ${rel.accentBg} ${rel.accentText} border ${rel.accentBorder} flex items-center justify-center`}>
+                      <div className="w-8 h-8 rounded-xl bg-zinc-100 text-zinc-900 border border-zinc-200/80 flex items-center justify-center">
                         <IndustryIcon name={rel.iconName} className="w-4 h-4" />
                       </div>
                       <span className="text-[9px] font-mono text-zinc-500 bg-zinc-100 px-2 py-0.5 rounded-full">

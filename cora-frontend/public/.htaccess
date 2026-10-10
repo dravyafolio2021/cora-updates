@@ -67,6 +67,9 @@ RewriteRule ^\.well-known/(oauth-authorization-server|openid-configuration)/?$ /
 # Direct Service Worker & PWA manifest routing without redirection
 RewriteRule ^(cora-service-worker\.js|cora-manifest\.json|cora-offline\.html)$ /index.php [L]
 
+# Redirect /use-cases to /industries
+RewriteRule ^use-cases(/.*)?$ /industries$1 [R=301,L]
+
 # Redirect any workspace requests on main domain directly to app.heycora.in/workspace
 RewriteCond %{HTTP_HOST} ^(www\.)?heycora\.in$ [NC]
 RewriteRule ^workspace(/.*)?$ https://app.heycora.in/workspace$1 [R=301,L]

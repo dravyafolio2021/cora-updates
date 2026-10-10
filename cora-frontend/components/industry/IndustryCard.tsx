@@ -13,7 +13,7 @@ interface IndustryCardProps {
 export function IndustryCard({ workspace }: IndustryCardProps) {
   return (
     <Link
-      href={`/use-cases/${workspace.slug}`}
+      href={`/industries/${workspace.slug}`}
       className="group relative rounded-3xl bg-white border border-zinc-200/90 hover:border-zinc-400/90 overflow-hidden flex flex-col justify-between shadow-2xs hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)] transition-all duration-300"
     >
       {/* ── Top Micro-UI Visual Illustration Viewport ── */}
@@ -39,15 +39,15 @@ export function IndustryCard({ workspace }: IndustryCardProps) {
             {workspace.tagline}
           </p>
 
-          {/* Clean Feature Tag Chips (2-3 tags only) */}
+          {/* Clean Feature Tag Chips (2-3 tags only, monochromatic) */}
           <div className="flex flex-wrap items-center gap-1.5 mb-2">
             <span className="text-[11px] font-mono font-medium text-zinc-700 bg-zinc-50 border border-zinc-200/80 px-2.5 py-1 rounded-lg">
-              {workspace.sacCode} • {workspace.gstRate}
+              {workspace.gstRate} Invoicing
             </span>
             <span className="text-[11px] font-mono font-medium text-zinc-700 bg-zinc-50 border border-zinc-200/80 px-2.5 py-1 rounded-lg">
               {workspace.stats[0]?.metric} {workspace.stats[0]?.label.split(' ')[0]}
             </span>
-            <span className="text-[11px] font-mono font-medium text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2.5 py-1 rounded-lg">
+            <span className="text-[11px] font-mono font-medium text-zinc-800 bg-zinc-100 border border-zinc-200/80 px-2.5 py-1 rounded-lg">
               Turnkey Workflows
             </span>
           </div>

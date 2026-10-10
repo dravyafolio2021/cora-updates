@@ -64,7 +64,7 @@ const solutionsData: WorkflowSolution[] = [
     headlineAccent: 'without unpaid revisions',
     replaces: ['Notion', 'Asana', 'DocuSign', 'QuickBooks'],
     ctaText: 'Explore Creative Agency Workflows',
-    ctaLink: '/use-cases/software-agencies',
+    ctaLink: '/industries/design-uiux',
     agents: [
       {
         id: 'agency-brief',
@@ -158,7 +158,7 @@ const solutionsData: WorkflowSolution[] = [
     headlineAccent: 'with zero reporting overhead',
     replaces: ['Looker Studio', 'Supermetrics', 'Slack', 'Razorpay'],
     ctaText: 'Explore Performance Agency Workflows',
-    ctaLink: '/use-cases/software-agencies',
+    ctaLink: '/industries/marketing-seo',
     agents: [
       {
         id: 'perf-roas',
@@ -249,7 +249,7 @@ const solutionsData: WorkflowSolution[] = [
     headlineAccent: 'with milestone-locked deposits',
     replaces: ['Jira', 'Linear', 'Harvest', 'Stripe'],
     ctaText: 'Explore Dev Studio Workflows',
-    ctaLink: '/use-cases/software-agencies',
+    ctaLink: '/industries/software-agencies',
     agents: [
       {
         id: 'dev-spec',
@@ -340,7 +340,7 @@ const solutionsData: WorkflowSolution[] = [
     headlineAccent: 'without feedback chaos',
     replaces: ['Frame.io', 'Google Drive', 'Monday.com', 'WhatsApp'],
     ctaText: 'Explore Video Studio Workflows',
-    ctaLink: '/use-cases/software-agencies',
+    ctaLink: '/industries/photo-video-studios',
     agents: [
       {
         id: 'video-call',

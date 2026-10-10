@@ -141,7 +141,7 @@ export function WallOfFeaturesSection() {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white border border-zinc-200 text-zinc-900 text-xs font-bold shadow-2xs">
-                  <span className="w-2 h-2 rounded-full bg-purple-500" />
+                  <span className="w-2 h-2 rounded-full bg-zinc-100/800" />
                   <span>Docs &amp; E-Sign</span>
                 </div>
                 <span className="text-[10px] font-bold text-zinc-400">IT Act Valid</span>

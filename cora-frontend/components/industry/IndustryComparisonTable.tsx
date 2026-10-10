@@ -5,31 +5,31 @@ const COMPARISON_ROWS = [
   {
     feature: 'Pre-Seeded Agency Master Contracts',
     generic: 'Blank templates or expensive lawyer drafts (₹15,000+)',
-    cora: '64+ Turnkey digital agency contracts with SHA-256 e-sign',
+    cora: '64+ Turnkey digital agency contracts with instant e-signatures',
     coraHighlight: true
   },
   {
-    feature: '18% GST SAC Code Auto-Splitting',
+    feature: '18% GST Tax Auto-Splitting',
     generic: 'Manual spreadsheet math and delayed CA reconciliation',
-    cora: 'Automatic CGST/SGST splitting by SAC 998314/998361',
+    cora: 'Automatic CGST/SGST tax calculation and UPI QR payments',
     coraHighlight: true
   },
   {
-    feature: 'Milestone Escrow & Staging Approvals',
-    generic: 'Unrecorded WhatsApp approvals causing scope creep',
-    cora: 'Cryptographic client sign-off gates before code deploy',
+    feature: 'Milestone Staging & Deliverable Sign-Offs',
+    generic: 'Unrecorded WhatsApp messages causing scope creep',
+    cora: 'Digital client sign-off gates before code or design launch',
     coraHighlight: true
   },
   {
-    feature: 'Voice-to-Scope Proposal Generator',
+    feature: 'Voice-to-Proposal AI Generator',
     generic: '3-4 hours typing formal scope & SOW documents',
-    cora: 'Convert 2-min audio brief to client contract in seconds',
+    cora: 'Convert 2-min voice brief into client proposal in seconds',
     coraHighlight: true
   },
   {
     feature: 'Client Review & Asset Proofing Vault',
     generic: 'Fragmented subscriptions (DocuSign, Drive, Frame.io)',
-    cora: 'Integrated 4K asset vault, Figma sign-off & reviews',
+    cora: 'Integrated 4K asset vault, design reviews & sign-offs',
     coraHighlight: true
   },
   {
@@ -51,10 +51,10 @@ export function IndustryComparisonTable() {
             Architectural Advantage
           </span>
           <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-zinc-950 tracking-tight mb-3">
-            Why Generic CRMs Fail High-Performing Agencies
+            Why Generic CRMs Fail Modern Agencies
           </h2>
           <p className="text-xs sm:text-sm md:text-base text-zinc-600 font-normal leading-relaxed">
-            Generic CRMs force your team to stitch together 5+ separate tools. Cora delivers pre-seeded agency master agreements, automated 18% GST SAC billing, milestone review portals, and living AI copilots in one unified platform.
+            Generic CRMs force your team to stitch together 5+ separate tools. Cora delivers pre-seeded agency agreements, automated 18% GST billing, milestone review portals, and AI assistants in one unified platform.
           </p>
         </div>
 

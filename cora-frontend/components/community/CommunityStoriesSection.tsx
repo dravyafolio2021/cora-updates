@@ -105,7 +105,7 @@ export function CommunityStoriesSection() {
                 How Top Studios Scale to ₹25L/mo Retainers with ₹0 Tax Errors
               </h4>
               <a
-                href="/use-cases"
+                href="/industries"
                 className="inline-flex items-center gap-1 text-xs font-semibold text-zinc-300 hover:text-white"
               >
                 <span>Watch now</span>
@@ -139,8 +139,8 @@ export function CommunityStoriesSection() {
               </div>
 
               <a
-                href="/use-cases"
-                className="inline-flex items-center gap-1 text-xs font-bold text-zinc-950 hover:text-indigo-600"
+                href="/industries/photo-video-studios"
+                className="inline-flex items-center gap-1 text-xs font-bold text-zinc-950 hover:text-zinc-600"
               >
                 <span>Read story</span>
                 <ArrowRight className="w-3 h-3" />
