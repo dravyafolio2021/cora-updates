@@ -1394,9 +1394,9 @@ export function Navbar() {
                       <div className="space-y-1">
                         <div className="flex items-center justify-between pb-2 mb-2 border-b border-zinc-100">
                           <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider">
-                            Tech &amp; Dev
+                            TECH &amp; DEV
                           </span>
-                          <span className="text-[9px] font-mono font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200/60">
+                          <span className="text-[9px] font-mono font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200/60">
                             TECH &amp; DEV
                           </span>
                         </div>
@@ -1404,57 +1404,53 @@ export function Navbar() {
                           <Link
                             href="/industries/software-agencies"
                             onClick={() => setActiveDropdown(null)}
-                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
+                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors group"
                           >
-                            <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 border border-blue-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                            <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 border border-blue-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
                               <Code className="w-4 h-4 stroke-[2]" />
                             </div>
-                            <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
+                            <span className="text-[13.5px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
                               Software Agencies
                             </span>
-                            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                           </Link>
 
                           <Link
                             href="/industries/web-app-studios"
                             onClick={() => setActiveDropdown(null)}
-                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
+                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors group"
                           >
-                            <div className="w-8 h-8 rounded-lg bg-cyan-50 text-cyan-600 border border-cyan-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                            <div className="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
                               <LayoutTemplate className="w-4 h-4 stroke-[2]" />
                             </div>
-                            <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
+                            <span className="text-[13.5px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
                               Web &amp; App Studios
                             </span>
-                            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                           </Link>
 
                           <Link
                             href="/industries/it-tech-services"
                             onClick={() => setActiveDropdown(null)}
-                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
+                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors group"
                           >
-                            <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                            <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
                               <ShieldCheck className="w-4 h-4 stroke-[2]" />
                             </div>
-                            <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
+                            <span className="text-[13.5px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
                               IT &amp; Tech Services
                             </span>
-                            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                           </Link>
 
                           <Link
                             href="/industries/ai-automation"
                             onClick={() => setActiveDropdown(null)}
-                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
+                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors group"
                           >
-                            <div className="w-8 h-8 rounded-lg bg-violet-50 text-violet-600 border border-violet-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                            <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 border border-amber-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
                               <Zap className="w-4 h-4 stroke-[2]" />
                             </div>
-                            <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
+                            <span className="text-[13.5px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
                               AI &amp; Automation
                             </span>
-                            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                           </Link>
                         </div>
                       </div>
@@ -1463,9 +1459,9 @@ export function Navbar() {
                       <div className="space-y-1">
                         <div className="flex items-center justify-between pb-2 mb-2 border-b border-zinc-100">
                           <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider">
-                            Legal &amp; Finance
+                            LEGAL &amp; FINANCE
                           </span>
-                          <span className="text-[9px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60">
+                          <span className="text-[9px] font-mono font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200/70">
                             LEGAL &amp; FINANCE
                           </span>
                         </div>
@@ -1473,57 +1469,53 @@ export function Navbar() {
                           <Link
                             href="/industries/lawyers-law-firms"
                             onClick={() => setActiveDropdown(null)}
-                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
+                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors group"
                           >
-                            <div className="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 border border-slate-200/80 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                            <div className="w-9 h-9 rounded-xl bg-slate-100 text-slate-700 border border-slate-200/80 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
                               <Scale className="w-4 h-4 stroke-[2]" />
                             </div>
-                            <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
+                            <span className="text-[13.5px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
                               Lawyers &amp; Law Firms
                             </span>
-                            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                           </Link>
 
                           <Link
                             href="/industries/tax-ca-firms"
                             onClick={() => setActiveDropdown(null)}
-                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
+                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors group"
                           >
-                            <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                            <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
                               <Receipt className="w-4 h-4 stroke-[2]" />
                             </div>
-                            <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
+                            <span className="text-[13.5px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
                               Tax &amp; CA Firms
                             </span>
-                            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                           </Link>
 
                           <Link
                             href="/industries/financial-advisors"
                             onClick={() => setActiveDropdown(null)}
-                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
+                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors group"
                           >
-                            <div className="w-8 h-8 rounded-lg bg-teal-50 text-teal-600 border border-teal-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                            <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 border border-blue-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
                               <Briefcase className="w-4 h-4 stroke-[2]" />
                             </div>
-                            <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
+                            <span className="text-[13.5px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
                               Financial Advisors
                             </span>
-                            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                           </Link>
 
                           <Link
                             href="/industries/audit-compliance"
                             onClick={() => setActiveDropdown(null)}
-                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
+                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors group"
                           >
-                            <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 border border-indigo-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                            <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 border border-purple-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
                               <Layers className="w-4 h-4 stroke-[2]" />
                             </div>
-                            <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
+                            <span className="text-[13.5px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
                               Audit &amp; Compliance
                             </span>
-                            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                           </Link>
                         </div>
                       </div>
@@ -1532,9 +1524,9 @@ export function Navbar() {
                       <div className="space-y-1">
                         <div className="flex items-center justify-between pb-2 mb-2 border-b border-zinc-100">
                           <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider">
-                            Marketing &amp; Creative
+                            MARKETING &amp; CREATIVE
                           </span>
-                          <span className="text-[9px] font-mono font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200/60">
+                          <span className="text-[9px] font-mono font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200/60">
                             MARKETING &amp; DESIGN
                           </span>
                         </div>
@@ -1542,57 +1534,53 @@ export function Navbar() {
                           <Link
                             href="/industries/marketing-seo"
                             onClick={() => setActiveDropdown(null)}
-                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
+                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors group"
                           >
-                            <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 border border-blue-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                            <div className="w-9 h-9 rounded-xl bg-sky-50 text-sky-600 border border-sky-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
                               <BarChart2 className="w-4 h-4 stroke-[2]" />
                             </div>
-                            <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
+                            <span className="text-[13.5px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
                               Marketing &amp; SEO
                             </span>
-                            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                           </Link>
 
                           <Link
                             href="/industries/design-uiux"
                             onClick={() => setActiveDropdown(null)}
-                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
+                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors group"
                           >
-                            <div className="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 border border-purple-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                            <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 border border-purple-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
                               <Sparkles className="w-4 h-4 stroke-[2]" />
                             </div>
-                            <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
+                            <span className="text-[13.5px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
                               Design &amp; UI/UX
                             </span>
-                            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                           </Link>
 
                           <Link
                             href="/industries/photo-video-studios"
                             onClick={() => setActiveDropdown(null)}
-                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
+                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors group"
                           >
-                            <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 border border-amber-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                            <div className="w-9 h-9 rounded-xl bg-rose-50 text-rose-500 border border-rose-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
                               <Camera className="w-4 h-4 stroke-[2]" />
                             </div>
-                            <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
+                            <span className="text-[13.5px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
                               Photo &amp; Video Studios
                             </span>
-                            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                           </Link>
 
                           <Link
                             href="/industries/architecture-interiors"
                             onClick={() => setActiveDropdown(null)}
-                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
+                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors group"
                           >
-                            <div className="w-8 h-8 rounded-lg bg-orange-50 text-orange-600 border border-orange-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                            <div className="w-9 h-9 rounded-xl bg-orange-50 text-orange-600 border border-orange-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
                               <Building2 className="w-4 h-4 stroke-[2]" />
                             </div>
-                            <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
+                            <span className="text-[13.5px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
                               Architecture &amp; Interiors
                             </span>
-                            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                           </Link>
                         </div>
                       </div>
@@ -1601,7 +1589,7 @@ export function Navbar() {
                       <div className="space-y-1">
                         <div className="flex items-center justify-between pb-2 mb-2 border-b border-zinc-100">
                           <span className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider">
-                            Services &amp; Lifestyle
+                            SERVICES &amp; LIFESTYLE
                           </span>
                           <span className="text-[9px] font-mono font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200/60">
                             SERVICES &amp; ADVISORY
@@ -1611,57 +1599,53 @@ export function Navbar() {
                           <Link
                             href="/industries/consultants-advisors"
                             onClick={() => setActiveDropdown(null)}
-                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
+                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors group"
                           >
-                            <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 border border-indigo-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                            <div className="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
                               <Briefcase className="w-4 h-4 stroke-[2]" />
                             </div>
-                            <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
+                            <span className="text-[13.5px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
                               Consultants &amp; Advisors
                             </span>
-                            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                           </Link>
 
                           <Link
                             href="/industries/doctors-clinics"
                             onClick={() => setActiveDropdown(null)}
-                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
+                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors group"
                           >
-                            <div className="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 border border-rose-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                            <div className="w-9 h-9 rounded-xl bg-teal-50 text-teal-600 border border-teal-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
                               <Heart className="w-4 h-4 stroke-[2]" />
                             </div>
-                            <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
+                            <span className="text-[13.5px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
                               Doctors &amp; Clinics
                             </span>
-                            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                           </Link>
 
                           <Link
                             href="/industries/salons-wellness"
                             onClick={() => setActiveDropdown(null)}
-                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
+                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors group"
                           >
-                            <div className="w-8 h-8 rounded-lg bg-pink-50 text-pink-600 border border-pink-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                            <div className="w-9 h-9 rounded-xl bg-pink-50 text-pink-500 border border-pink-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
                               <Scissors className="w-4 h-4 stroke-[2]" />
                             </div>
-                            <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
+                            <span className="text-[13.5px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
                               Salons, Spas &amp; Wellness
                             </span>
-                            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                           </Link>
 
                           <Link
                             href="/industries/real-estate-property"
                             onClick={() => setActiveDropdown(null)}
-                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-200/60 transition-all group"
+                            className="flex items-center gap-3 p-2 rounded-xl hover:bg-zinc-50 transition-colors group"
                           >
-                            <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                            <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-200/60 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
                               <Building2 className="w-4 h-4 stroke-[2]" />
                             </div>
-                            <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
+                            <span className="text-[13.5px] font-bold text-zinc-900 group-hover:text-black tracking-tight flex-1">
                               Real Estate &amp; Property
                             </span>
-                            <ArrowRight className="w-3.5 h-3.5 text-zinc-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                           </Link>
                         </div>
                       </div>
