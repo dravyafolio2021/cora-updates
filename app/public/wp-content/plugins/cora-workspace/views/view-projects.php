@@ -1370,26 +1370,35 @@ function coraSyncMainAreaBounds() {
             return;
         }
 
-        // Calculate available main canvas bounds
-        var mainEl = document.querySelector('main.cora-main') || document.querySelector('.cora-main');
-        if (mainEl) {
-            var rect = mainEl.getBoundingClientRect();
-            var targetLeft = isMobile ? 0 : (isSidebarCollapsed ? 64 : (rect.left > 0 ? rect.left : 256));
-            var targetWidth = window.innerWidth - targetLeft;
+        // Calculate available main canvas bounds directly against sidebar boundary
+        var topbarEl = document.getElementById('cora-global-topbar');
+        var actualTop = topbarEl ? Math.round(topbarEl.getBoundingClientRect().bottom) : 52;
+        if (actualTop < 0 || isNaN(actualTop)) actualTop = 52;
 
-            document.documentElement.style.setProperty('--cora-main-left', targetLeft + 'px');
-            document.documentElement.style.setProperty('--cora-main-top', '52px');
-            document.documentElement.style.setProperty('--cora-main-width', targetWidth + 'px');
-            document.documentElement.style.setProperty('--cora-main-height', (window.innerHeight - 52) + 'px');
-
-            // Set responsive inline bounds dynamically
-            drawer.style.left = targetLeft + 'px';
-            drawer.style.top = '52px';
-            drawer.style.width = targetWidth + 'px';
-            drawer.style.maxWidth = targetWidth + 'px';
-            drawer.style.height = (window.innerHeight - 52) + 'px';
-            drawer.style.maxHeight = (window.innerHeight - 52) + 'px';
+        var targetLeft = 0;
+        if (!isMobile && sidebarEl) {
+            var sRect = sidebarEl.getBoundingClientRect();
+            // Use actual right edge of the sidebar so drawer aligns flush with sidebar border
+            targetLeft = Math.round(sRect.right);
+            if (targetLeft <= 0 || isNaN(targetLeft)) {
+                targetLeft = isSidebarCollapsed ? 64 : 256;
+            }
         }
+        var targetWidth = window.innerWidth - targetLeft;
+        var targetHeight = window.innerHeight - actualTop;
+
+        document.documentElement.style.setProperty('--cora-main-left', targetLeft + 'px');
+        document.documentElement.style.setProperty('--cora-main-top', actualTop + 'px');
+        document.documentElement.style.setProperty('--cora-main-width', targetWidth + 'px');
+        document.documentElement.style.setProperty('--cora-main-height', targetHeight + 'px');
+
+        // Set responsive inline bounds dynamically
+        drawer.style.left = targetLeft + 'px';
+        drawer.style.top = actualTop + 'px';
+        drawer.style.width = targetWidth + 'px';
+        drawer.style.maxWidth = targetWidth + 'px';
+        drawer.style.height = targetHeight + 'px';
+        drawer.style.maxHeight = targetHeight + 'px';
     }
 }
 window.addEventListener('resize', coraSyncMainAreaBounds);
@@ -1419,8 +1428,6 @@ function coraShowProjectDrawer() {
     var drawer = document.getElementById('cora-project-drawer');
     var mainEl = document.querySelector('main.cora-main') || document.querySelector('.cora-main');
 
-    coraSyncMainAreaBounds();
-
     // Body Portaling: Guarantee drawer sits at document.body level with no clipping or layout offset
     if (drawer && drawer.parentNode !== document.body) {
         document.body.appendChild(drawer);
@@ -1429,6 +1436,9 @@ function coraShowProjectDrawer() {
     if (drawer) {
         drawer.classList.remove('collapsed');
         drawer.classList.add('open');
+
+        // Immediately sync bounds to sidebar edge
+        coraSyncMainAreaBounds();
 
         // Lock ONLY main content area scroll; SIDEBAR REMAINS UNLOCKED & FULLY ACCESSIBLE
         if (mainEl) {
