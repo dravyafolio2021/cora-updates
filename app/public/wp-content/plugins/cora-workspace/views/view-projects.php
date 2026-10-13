@@ -197,6 +197,30 @@ $frontend_base = home_url();
     width: 100%;
 }
 .cora-proj-tab-panel.active { display: block; }
+
+/* Level 01 Segmented Switcher Scoped Overrides in Header Sub-Tabs */
+.cora-sub-tabs-container #view-mode-table-btn,
+.cora-sub-tabs-container #view-mode-grid-btn {
+    height: 22px !important;
+    min-height: 22px !important;
+    max-height: 22px !important;
+    width: 26px !important;
+    min-width: 26px !important;
+    max-width: 26px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 1 !important;
+    box-sizing: border-box !important;
+}
+.cora-sub-tabs-container #view-mode-table-btn svg,
+.cora-sub-tabs-container #view-mode-grid-btn svg {
+    display: block !important;
+    margin: 0 auto !important;
+}
 </style>
 
 <div id="cora-projects-module" class="w-full flex-1 min-h-0 flex flex-col gap-4">
@@ -216,8 +240,8 @@ $frontend_base = home_url();
             'icon'        => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>',
             'visible'     => true,
         ),
-        'tabs_extra_html'    => '<div class="flex items-center gap-2 py-0.5">
-            <div class="relative w-48 sm:w-60">
+        'tabs_extra_html'    => '<div class="h-full flex items-center gap-1.5 sm:gap-2">
+            <div class="relative w-32 xs:w-40 sm:w-52 md:w-60 flex items-center">
                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                 <input 
                     type="text" 
@@ -227,11 +251,11 @@ $frontend_base = home_url();
                     onkeyup="coraFilterProjectsList()"
                 />
             </div>
-            <div class="inline-flex items-center p-0.5 bg-zinc-200/60 dark:bg-zinc-800/80 rounded-lg border border-zinc-200/70 dark:border-zinc-700/70 shrink-0">
-                <button type="button" onclick="coraSetViewMode(\'table\')" id="view-mode-table-btn" class="p-1 rounded-md bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white shadow-2xs border-0 cursor-pointer" title="Table View">
+            <div class="h-7 inline-flex items-center p-0.5 bg-zinc-200/60 dark:bg-zinc-800/80 rounded-lg border border-zinc-200/70 dark:border-zinc-700/70 shrink-0 box-border">
+                <button type="button" onclick="coraSetViewMode(\'table\')" id="view-mode-table-btn" class="h-[22px] w-[26px] p-0 m-0 rounded-md bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white shadow-2xs border-0 cursor-pointer inline-flex items-center justify-center transition-all" title="Table View">
                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
                 </button>
-                <button type="button" onclick="coraSetViewMode(\'grid\')" id="view-mode-grid-btn" class="p-1 rounded-md text-zinc-500 hover:text-zinc-900 dark:hover:text-white bg-transparent border-0 cursor-pointer" title="Grid View">
+                <button type="button" onclick="coraSetViewMode(\'grid\')" id="view-mode-grid-btn" class="h-[22px] w-[26px] p-0 m-0 rounded-md text-zinc-500 hover:text-zinc-900 dark:hover:text-white bg-transparent border-0 cursor-pointer inline-flex items-center justify-center transition-all" title="Grid View">
                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
                 </button>
             </div>
