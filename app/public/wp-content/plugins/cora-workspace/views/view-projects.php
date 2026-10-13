@@ -217,33 +217,56 @@ $frontend_base = home_url();
             'icon'        => '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" class="shrink-0"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>',
             'visible'     => true,
         ),
+        'tabs_extra_html'    => '<div class="flex items-center gap-2 py-0.5">
+            <div class="relative w-48 sm:w-60">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input 
+                    type="text" 
+                    id="cora-proj-search-input"
+                    placeholder="Search projects..." 
+                    class="h-7 w-full pl-8 pr-2.5 rounded-lg border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-xs text-zinc-900 dark:text-white placeholder:text-zinc-400 outline-none focus:border-zinc-400 transition-all shadow-2xs"
+                    onkeyup="coraFilterProjectsList()"
+                />
+            </div>
+            <div class="inline-flex items-center p-0.5 bg-zinc-200/60 dark:bg-zinc-800/80 rounded-lg border border-zinc-200/70 dark:border-zinc-700/70 shrink-0">
+                <button type="button" onclick="coraSetViewMode(\'table\')" id="view-mode-table-btn" class="p-1 rounded-md bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white shadow-2xs border-0 cursor-pointer" title="Table View">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                </button>
+                <button type="button" onclick="coraSetViewMode(\'grid\')" id="view-mode-grid-btn" class="p-1 rounded-md text-zinc-500 hover:text-zinc-900 dark:hover:text-white bg-transparent border-0 cursor-pointer" title="Grid View">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                </button>
+            </div>
+        </div>',
         'tabs'               => array(
             array(
                 'id'           => 'all',
                 'dom_id'       => 'tab-projects-all',
                 'label'        => 'All Projects',
                 'mobile_label' => 'All',
+                'badge'        => '<span class="ml-1 px-1.5 py-0.2 rounded-full bg-zinc-200/60 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[10px] font-mono leading-tight">' . esc_html( $total_projects ) . '</span>',
                 'icon'         => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect></svg>',
                 'active'       => true,
-                'onclick'      => "coraSwitchTabFilter('all')",
+                'onclick'      => "coraSwitchTabFilter('all', this)",
             ),
             array(
                 'id'           => 'published',
                 'dom_id'       => 'tab-projects-published',
                 'label'        => 'Published',
                 'mobile_label' => 'Live',
+                'badge'        => '<span class="ml-1 px-1.5 py-0.2 rounded-full bg-zinc-200/60 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[10px] font-mono leading-tight">' . esc_html( $published_count ) . '</span>',
                 'icon'         => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>',
                 'active'       => false,
-                'onclick'      => "coraSwitchTabFilter('published')",
+                'onclick'      => "coraSwitchTabFilter('published', this)",
             ),
             array(
                 'id'           => 'draft',
                 'dom_id'       => 'tab-projects-draft',
                 'label'        => 'Drafts In Review',
                 'mobile_label' => 'Drafts',
+                'badge'        => '<span class="ml-1 px-1.5 py-0.2 rounded-full bg-zinc-200/60 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[10px] font-mono leading-tight">' . esc_html( $drafts_count ) . '</span>',
                 'icon'         => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>',
                 'active'       => false,
-                'onclick'      => "coraSwitchTabFilter('draft')",
+                'onclick'      => "coraSwitchTabFilter('draft', this)",
             ),
         ),
     );
@@ -317,50 +340,7 @@ $frontend_base = home_url();
         </div>
     </div>
 
-    <!-- 3. TOOLBAR CONTROLS (Segmented Filters, Search, View Mode) -->
-    <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-1">
-        
-        <!-- Segmented Control Filters (Rule 13: Tonal Surface Selection) -->
-        <div class="grid grid-cols-3 sm:inline-flex items-center gap-1 p-1 bg-zinc-100/90 dark:bg-zinc-800/80 rounded-xl border border-zinc-200/70 dark:border-zinc-800/80 w-full sm:w-auto shrink-0 select-none" id="cora-proj-status-filters">
-            <button type="button" class="cora-proj-filter-btn inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white shadow-2xs border-0 cursor-pointer whitespace-nowrap" data-status="all">
-                <span>All</span>
-                <span class="px-1.5 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[10px] font-mono leading-none"><?php echo esc_html( $total_projects ); ?></span>
-            </button>
-            <button type="button" class="cora-proj-filter-btn inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50 bg-transparent border-0 cursor-pointer whitespace-nowrap" data-status="published">
-                <span class="w-1.5 h-1.5 rounded-full bg-zinc-900 dark:bg-zinc-100 shrink-0"></span>
-                <span>Published</span>
-                <span class="px-1.5 py-0.5 rounded-full bg-zinc-200/70 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[10px] font-mono leading-none"><?php echo esc_html( $published_count ); ?></span>
-            </button>
-            <button type="button" class="cora-proj-filter-btn inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50 bg-transparent border-0 cursor-pointer whitespace-nowrap" data-status="draft">
-                <span>Drafts</span>
-                <span class="px-1.5 py-0.5 rounded-full bg-zinc-200/70 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[10px] font-mono leading-none"><?php echo esc_html( $drafts_count ); ?></span>
-            </button>
-        </div>
 
-        <!-- Search Bar & View Mode Toggle -->
-        <div class="flex items-center gap-2">
-            <div class="relative flex-1 sm:w-64">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                <input 
-                    type="text" 
-                    id="cora-proj-search-input"
-                    placeholder="Search projects or clients..." 
-                    class="h-9 w-full pl-9 pr-3 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-xs text-zinc-900 dark:text-white placeholder:text-zinc-400 outline-none focus:border-zinc-400 transition-all shadow-2xs"
-                    onkeyup="coraFilterProjectsList()"
-                />
-            </div>
-
-            <!-- View Switcher (Table vs Grid) -->
-            <div class="inline-flex items-center p-1 bg-zinc-100 dark:bg-zinc-800 rounded-xl border border-zinc-200/70 dark:border-zinc-800 shrink-0">
-                <button type="button" onclick="coraSetViewMode('table')" id="view-mode-table-btn" class="p-1.5 rounded-lg bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white shadow-2xs border-0 cursor-pointer" title="Table View">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
-                </button>
-                <button type="button" onclick="coraSetViewMode('grid')" id="view-mode-grid-btn" class="p-1.5 rounded-lg text-zinc-500 hover:text-zinc-900 dark:hover:text-white bg-transparent border-0 cursor-pointer" title="Grid View">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-                </button>
-            </div>
-        </div>
-    </div>
 
     <!-- 4. NOTION / SHOPIFY MONOCHROMATIC DATA TABLE (View Mode: Table) -->
     <div id="cora-projects-table-view" class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl overflow-hidden shadow-2xs">
@@ -1184,12 +1164,6 @@ function coraSetViewMode(mode) {
     }
 }
 
-// HEADER SUB-TAB FILTER ROUTER
-function coraSwitchTabFilter(status) {
-    var btn = document.querySelector('.cora-proj-filter-btn[data-status="' + status + '"]');
-    if (btn) btn.click();
-}
-
 // TAB SWITCHING IN DRAWER (Pill Segmented Control)
 document.querySelectorAll('.cora-proj-tab-btn').forEach(function(btn) {
     btn.addEventListener('click', function(e) {
@@ -1245,42 +1219,51 @@ function coraSetDrawerStatus(status) {
     }
 }
 
-// STATUS FILTER BUTTONS (Segmented Controls)
-document.querySelectorAll('.cora-proj-filter-btn').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-        var status = this.getAttribute('data-status');
-        
-        document.querySelectorAll('.cora-proj-filter-btn').forEach(function(b) {
-            b.classList.remove('bg-white', 'dark:bg-zinc-900', 'text-zinc-950', 'dark:text-white', 'shadow-2xs', 'font-bold');
-            b.classList.add('text-zinc-600', 'dark:text-zinc-400', 'font-medium');
-        });
-        this.classList.remove('text-zinc-600', 'dark:text-zinc-400', 'font-medium');
-        this.classList.add('bg-white', 'dark:bg-zinc-900', 'text-zinc-950', 'dark:text-white', 'shadow-2xs', 'font-bold');
+// ACTIVE FILTER STATE
+var coraActiveStatusFilter = 'all';
 
-        var rows = document.querySelectorAll('.cora-project-row');
-        rows.forEach(function(row) {
-            var rowStatus = row.getAttribute('data-status');
-            if (status === 'all' || rowStatus === status) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
-        });
+// HEADER SUB-TAB FILTER ROUTER
+function coraSwitchTabFilter(status, tabBtn) {
+    coraActiveStatusFilter = status || 'all';
+
+    // Update active tab button styles
+    document.querySelectorAll('.cora-sub-tabs-container .cora-sub-tab').forEach(function(btn) {
+        btn.classList.remove('active', 'border-zinc-950', 'text-zinc-900', 'dark:border-white', 'dark:text-white', 'font-semibold');
+        btn.classList.add('border-transparent', 'text-zinc-500', 'dark:text-zinc-400');
     });
-});
 
-// SEARCH FILTER
-function coraFilterProjectsList() {
-    var query = (document.getElementById('cora-proj-search-input').value || '').toLowerCase();
+    if (tabBtn) {
+        tabBtn.classList.remove('border-transparent', 'text-zinc-500', 'dark:text-zinc-400');
+        tabBtn.classList.add('active', 'border-zinc-950', 'text-zinc-900', 'dark:border-white', 'dark:text-white', 'font-semibold');
+    }
+
+    coraApplyProjectsFilter();
+}
+
+// SEARCH & STATUS COMBINED FILTER
+function coraApplyProjectsFilter() {
+    var queryInput = document.getElementById('cora-proj-search-input');
+    var query = queryInput ? (queryInput.value || '').toLowerCase().trim() : '';
+    var status = coraActiveStatusFilter || 'all';
+
     var rows = document.querySelectorAll('.cora-project-row');
     rows.forEach(function(row) {
+        var rowStatus = row.getAttribute('data-status');
         var text = row.innerText.toLowerCase();
-        if (!query || text.indexOf(query) !== -1) {
+
+        var matchesStatus = (status === 'all' || rowStatus === status);
+        var matchesSearch = (!query || text.indexOf(query) !== -1);
+
+        if (matchesStatus && matchesSearch) {
             row.style.display = '';
         } else {
             row.style.display = 'none';
         }
     });
+}
+
+function coraFilterProjectsList() {
+    coraApplyProjectsFilter();
 }
 
 // OPEN DRAWER FOR CREATE

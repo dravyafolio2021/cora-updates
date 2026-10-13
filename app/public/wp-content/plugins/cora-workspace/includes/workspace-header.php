@@ -434,7 +434,8 @@ function cora_render_workspace_header( $args = array() ) {
 
     <!-- Sub Navigation Tabs (Sticky Bar) -->
     <?php if ( ! empty( $visible_tabs ) ) : ?>
-        <div class="cora-sub-tabs-container cora-sticky-sub-tabs flex items-center gap-1 border-b border-zinc-200/80 dark:border-zinc-800 overflow-x-auto scrollbar-hide bg-[#FBFaf7] dark:bg-[#0c0c0e] -mx-3 sm:-mx-4 md:-mx-5 px-3 sm:px-4 md:px-5 w-[calc(100%+1.5rem)] sm:w-[calc(100%+2rem)] md:w-[calc(100%+2.5rem)] max-w-[calc(100%+1.5rem)] sm:max-w-[calc(100%+2rem)] md:max-w-[calc(100%+2.5rem)]" id="<?php echo esc_attr( $args['tabs_dom_id'] ?? 'cora-sub-navigation-tabs' ); ?>" style="position: -webkit-sticky; position: sticky; left: 0; right: 0; z-index: 40; display: flex; flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; touch-action: pan-x pan-y; overscroll-behavior-x: contain; scrollbar-width: none; min-height: 40px; height: 40px; padding-top: 0; padding-bottom: 0;">
+        <div class="cora-sub-tabs-container cora-sticky-sub-tabs flex items-center justify-between border-b border-zinc-200/80 dark:border-zinc-800 bg-[#FBFaf7] dark:bg-[#0c0c0e] -mx-3 sm:-mx-4 md:-mx-5 px-3 sm:px-4 md:px-5 w-[calc(100%+1.5rem)] sm:w-[calc(100%+2rem)] md:w-[calc(100%+2.5rem)] max-w-[calc(100%+1.5rem)] sm:max-w-[calc(100%+2rem)] md:max-w-[calc(100%+2.5rem)]" id="<?php echo esc_attr( $args['tabs_dom_id'] ?? 'cora-sub-navigation-tabs' ); ?>" style="position: -webkit-sticky; position: sticky; left: 0; right: 0; z-index: 40; display: flex; flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; touch-action: pan-x pan-y; overscroll-behavior-x: contain; scrollbar-width: none; min-height: 40px; height: 40px; padding-top: 0; padding-bottom: 0;">
+            <div class="flex items-center gap-1 shrink-0 overflow-x-auto scrollbar-hide">
             <?php foreach ( $visible_tabs as $tab ) : 
                 $active_class = ! empty( $tab['active'] ) ? 'active border-zinc-950 text-zinc-900 dark:border-white dark:text-white font-semibold' : 'border-transparent text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 font-semibold';
                 $onclick_attr = ! empty( $tab['onclick'] ) ? 'onclick="' . esc_attr( $tab['onclick'] ) . '"' : '';
@@ -452,6 +453,12 @@ function cora_render_workspace_header( $args = array() ) {
                     <?php endif; ?>
                 </button>
             <?php endforeach; ?>
+            </div>
+            <?php if ( ! empty( $args['tabs_extra_html'] ) ) : ?>
+                <div class="cora-sub-tabs-extra flex items-center gap-2 pl-3 ml-auto shrink-0 select-none">
+                    <?php echo $args['tabs_extra_html']; ?>
+                </div>
+            <?php endif; ?>
         </div>
     <?php endif; ?>
     <?php
