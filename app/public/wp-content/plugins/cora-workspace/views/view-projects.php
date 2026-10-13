@@ -243,8 +243,6 @@ $frontend_base = home_url();
 }
 </style>
 
-<div id="cora-projects-module" class="w-full flex-1 min-h-0 flex flex-col gap-4">
-
     <!-- 1. WORKSPACE PAGE HEADER (Level 03 Standard Organism) -->
     <?php
     $portfolio_header_args = array(
@@ -349,6 +347,8 @@ $frontend_base = home_url();
         cora_render_workspace_header( $portfolio_header_args );
     }
     ?>
+
+    <div id="cora-projects-module" class="w-full flex-1 min-h-0 flex flex-col gap-4 mt-4">
 
     <!-- 2. WORKSPACE KPI METRIC CARDS (Sleek Monochromatic Cards - Atomic Level 02) -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3.5">

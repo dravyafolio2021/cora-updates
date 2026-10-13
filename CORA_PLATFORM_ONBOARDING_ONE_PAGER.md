@@ -1,7 +1,7 @@
 # Cora Platform — Comprehensive Platform & Onboarding Strategic Brief
 > **Target Audience for this Document**: AI Product & Growth Strategist Agent  
 > **Objective**: Comprehensive platform architectural overview, feature breakdown, and onboarding evaluation brief to formulate optimal user onboarding, product activation, and launch strategies for Cora.  
-> **Platform Version**: `v4.9.381` | **Date**: October 2026
+> **Platform Version**: `v4.9.384` | **Date**: October 2026
 
 ---
 
@@ -71,6 +71,9 @@ Cora consolidates the entire agency lifecycle into a single, unified, white-labe
 48. **Dynamic Forms-to-Lead CRM Auto-Conversion Pipeline (v4.9.381)**: Inbound submissions from public lead capture forms and embedded widgets automatically synthesize into high-velocity CRM lead records (`wp_cora_leads`), extracting client contact details, projected deal value, and source attribution while triggering instantaneous top-floating monochromatic toast feedback (`window.coraShowToast`) and Web Push alerts without third-party webhooks.
 49. **Canvas Themes 4-KPI Analytical Bar & Sticky 3-Tab Sub-Navigation (v4.9.381)**: High-density 2x2 mobile / 1x4 desktop diagnostic scorecard bar (`CWV Score`, `LCP Velocity`, `Themes Library Quota`, `Published Pages & SEO`) paired with sleek ~40px sticky sub-navigation bar (`Theme Library`, `Speed & Core Web Vitals`, `Migration & Tools`) with extreme-edge GitHub docking and touch-action swipe support.
 50. **Editorial Knowledge Engine & High-Authority Article Library (`/articles`) (v4.9.381)**: Structured long-form editorial library (`lib/articles-data.ts`) with schema-validated JSON-LD Knowledge Graphs, semantic entity linking, answer-first executive summaries, and citation anchors optimized for Generative Engine Optimization (GEO) across ChatGPT Search, Perplexity, and Google AI Overviews.
+51. **Shopify-Inspired Main-Area Docked View Panel Architecture (v4.9.382 / SOP Rule 15)**: Workspace editing drawers, creators, and case study builders slide up smoothly from the bottom into a clean, docked main-area view panel below the global top header (`top: 52px; height: calc(100vh - 52px)`). Panels dynamically scale to available canvas width based on sidebar status, enforce zero dimming backdrops to preserve full underlying context, and lock scrolling strictly to `main.cora-main` without freezing the body or sidebar.
+52. **Shopify-Inspired Canvas Maximize / Restore Toggle (⤢ Fullscreen Mode) (v4.9.382)**: Dedicated maximize trigger (`#cora-proj-maximize-btn`) expanding docked panels across the entire viewport width (`100vw`) for distraction-free case study composing, narrative drafting, and metric calculation, with 1-click restoration back to docked canvas mode.
+53. **Global Sticky Workspace Header & Mobile Expandable Sub-Tabs Search (v4.9.383 - v4.9.384)**: Global sticky header pinning (`top: 0; z-index: 100020;`) paired with pixel-perfect sub-tabs vertical alignment, Level 01 Segmented view switchers (Table vs Grid), and 1-tap expandable search inputs (< 640px) that prevent horizontal mobile overflow.
 
 ---
 
@@ -198,4 +201,4 @@ Cora consolidates the entire agency lifecycle into a single, unified, white-labe
 
 ---
 
-*Cora Strategic Onboarding Brief v4.9.381 — Architecture & Growth Team. Last updated: October 2026.*
+*Cora Strategic Onboarding Brief v4.9.384 — Architecture & Growth Team. Last updated: October 2026.*

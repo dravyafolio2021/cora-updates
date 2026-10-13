@@ -1,6 +1,6 @@
 # Cora Platform — Comprehensive Platform Documentation
 
-This document serves as the master technical specification and architectural manual for the Cora Workspace Platform (v4.9.381).
+This document serves as the master technical specification and architectural manual for the Cora Workspace Platform (v4.9.384).
 
 ---
 
@@ -793,6 +793,47 @@ The **Editorial Knowledge Engine** (`cora-frontend/lib/articles-data.ts`) houses
 * **Indian IT Act 2000 Electronic Contract Validity**: Legal analysis of Section 10A digital contract enforceability in commercial production.
 * **Tamper-Evident SHA-256 Digital Contracts**: Cryptographic document hashing, audit trails, and non-repudiation in the Document Vault.
 * **Legacy Platform Teardowns**: In-depth competitive teardowns against HoneyBook, Studio Ninja, HubSpot, Dubsado, and Pixieset highlighting Cora's all-in-one architecture.
+
+---
+
+### 1.47 Shopify-Inspired Main-Area Docked View Panel Architecture & Responsive Bounds Sync (v4.9.382 / SOP Rule 15)
+Introduced and hardened across **v4.9.382 - v4.9.384**, workspace drawers, editors, and multi-step sheet forms implement the **Shopify-Inspired Main-Area Docked View Panel Standard Operating Procedure** (`views/view-projects.php`, `admin-dashboard.php`):
+* **Universal Bottom-Slide Motion (`translateY(0)`)**: All workspace drawers slide up smoothly from the bottom (`translateY(100%)` to `translateY(0)`) into a clean, docked main-area view panel.
+* **Direct Below-Header Docking**: Panels dock directly beneath the global top header (`top: var(--cora-main-top, 52px); height: var(--cora-main-height, calc(100vh - 52px)); bottom: 0;`).
+* **Dynamic Available Space Sizing**: The panel strictly occupies the exact available space in the main content canvas synchronized in real time with sidebar status:
+  - **Sidebar Expanded** (`w-64` / 16rem): `left: 16rem; width: calc(100vw - 16rem); right: 0;`
+  - **Sidebar Collapsed** (`w-16` / 4rem): `left: 4rem; width: calc(100vw - 4rem); right: 0;`
+  - **Mobile / Off-Canvas** (`< 1024px`): `left: 0; width: 100vw; right: 0;`
+  - Bounds dynamically synchronize via `MutationObserver` on `.cora-sidebar` class changes, `resize` window events, and the custom `cora:sidebar-toggle` event listener.
+* **Zero Overlay / Zero Backdrop**: No dark dimming, blur overlay, or backdrop element behind the panel (`backdrop: false`). The underlying workspace view remains 100% visible, professional, and integrated.
+* **Zero Shadow & Clear Structural Boundaries**: Floating card shadows and rounded corners are strictly prohibited (`box-shadow: none !important; border-radius: 0 !important;`). The panel is demarcated by clear formal architectural borders (`border-left: 1px solid var(--border); border-top: 1px solid var(--border);`).
+* **Sidebar Remains 100% Accessible & Visible**: The sidebar is never covered, overlapped, or locked. Users can navigate to any sidebar link at all times.
+* **Scoped Main Scroll Lock**: Scroll locking applies strictly to `main.cora-main` (`mainEl.classList.add('overflow-hidden')`), leaving `document.body` and the sidebar completely unlocked.
+* **Escape Key Dismissal**: Registers a global `Escape` keyboard event listener to close immediately on press.
+* **Level 01 Segmented Pill Tabs**: Multi-tab panels use the Level 01 Segmented Control container: `p-1 bg-zinc-100/90 dark:bg-zinc-800/80 rounded-xl border border-zinc-200/70 dark:border-zinc-800/80` with active tab styled as `bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white shadow-2xs font-bold rounded-lg px-3 py-1.5`.
+
+---
+
+### 1.48 Shopify-Inspired Canvas Maximize / Restore Toggle (⤢ Fullscreen Mode) (v4.9.382)
+In **v4.9.382**, the docked view panel architecture added a 1-click **Canvas Maximize / Restore Toggle** (`coraToggleProjectDrawerMaximize()`) for zero-distraction focus:
+* **Header Maximize Trigger**: Dedicated control button (`#cora-proj-maximize-btn`) positioned alongside the close trigger in the drawer header.
+* **Fullscreen Canvas Mode (`.maximized`)**:
+  - Expands the drawer across the entire viewport width (`left: 0 !important; width: 100vw !important; max-width: 100vw !important; border-left: none !important; z-index: 100060 !important;`).
+  - Toggles the SVG action icon between Expand (`⤢`) and Restore (`⤡`).
+  - Eliminates distraction during long-form case study authoring, complex transformation metrics entry, and narrative script writing.
+* **1-Click Restore**: Clicking restore instantly collapses the panel back to the docked canvas state, recalculating sidebar boundaries via `coraSyncMainAreaBounds()`.
+
+---
+
+### 1.49 Global Sticky Workspace Header & Sub-Tabs Navigation with Mobile Expandable Search (v4.9.383 - v4.9.384)
+Hardened in **v4.9.383** and **v4.9.384**, workspace headers and sub-navigation bars implement seamless sticky pinning and responsive mobile search:
+* **Global Sticky Header**: The main workspace header pins sticky at `top: 0` (`position: sticky; top: 0; z-index: 100020;`) across both desktop and mobile viewports, ensuring brand identity, quick actions, and profile controls remain instantly accessible during deep vertical page scrolling.
+* **Sub-Tabs Extra Actions Alignment**: Standardized `tabs_extra_html` in `workspace-header.php` with `h-full flex items-center gap-1.5 sm:gap-2` container, guaranteeing pixel-perfect vertical alignment between title tabs, search inputs, and view switchers.
+* **Level 01 Segmented View Switcher**: Table vs Grid switcher styled with Level 01 Segmented Control container tokens (`h-7 inline-flex items-center p-0.5 bg-zinc-200/60 dark:bg-zinc-800/80 rounded-lg`), providing instantaneous client-side view toggling with active button state caching.
+* **Mobile Expandable Search Bar (< 640px)**:
+  - On mobile screens, replacing fixed search inputs that cause horizontal overflow with a compact search button trigger (`#cora-proj-search-trigger-btn`).
+  - Tapping the trigger expands a full-width overlay input (`#cora-proj-search-wrapper.mobile-expanded`) inside the sub-tabs bar (`top: 0; bottom: 0; left: 0; right: 70px; z-index: 30;`).
+  - Includes 1-tap close icon and `Escape` key handler to dismiss the search bar and clear query filters without losing page context.
 
 ---
 
@@ -1994,6 +2035,10 @@ When authenticated as Super Admin (`cora_admin` / `admin@cora.local`), the platf
 
 | Version | Release Date | Key Features & Enhancements |
 | :--- | :--- | :--- |
+| **v4.9.384 (CORA-1236)** | Oct 2026 | Global Sticky Workspace Header & Mobile Expandable Sub-Tabs Search: Enforced global sticky header pinning (`position: sticky; top: 0; z-index: 100020;`) across all desktop and mobile viewports; resolved sub-tabs search horizontal overflow on mobile screens (< 640px) via 1-tap expandable search trigger (`#cora-proj-search-trigger-btn`) expanding full-width input (`#cora-proj-search-wrapper.mobile-expanded`) with Esc / close button dismiss; and synchronized version manifest to 4.9.384 |
+| **v4.9.383 (CORA-1235)** | Oct 2026 | Sub-Tabs Extra Actions Vertical Alignment & Level 01 Segmented Switcher: Standardized `tabs_extra_html` vertical alignment in `includes/workspace-header.php` (`h-full flex items-center gap-1.5 sm:gap-2`); implemented Level 01 Segmented Control container for Table vs Grid view mode toggle with active button styling (`bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white shadow-2xs`) |
+| **v4.9.382 (CORA-1234)** | Oct 2026 | Shopify-Inspired Canvas Maximize / Restore Toggle (⤢ Fullscreen Mode): Added dedicated maximize button (`#cora-proj-maximize-btn`) in docked drawer header toggling `.maximized` state, expanding drawer across full viewport (`left: 0; width: 100vw; z-index: 100060; border-left: none`) for zero-distraction case study authoring with instant sidebar synchronization on `cora:sidebar-toggle` |
+| **v4.9.382 (CORA-1233)** | Oct 2026 | Shopify-Inspired Main-Area Docked View Panel Architecture & Responsive Bounds Sync: Implemented SOP Rule 15 docked view panel in `views/view-projects.php` sliding up smoothly from bottom (`translateY(100%)` to `translateY(0)`), docking directly beneath top header (`top: 52px; height: calc(100vh - 52px)`), dynamically sizing to available main content canvas based on sidebar state (`MutationObserver` & `resize`), zero overlay / zero backdrop, scoped main scroll lock (`overflow-hidden` on `main.cora-main`), and Escape key dismissal |
 | **v4.9.381 (CORA-1227)** | Oct 2026 | Agency Projects & Portfolio Case Studies Module Architecture: Dedicated multi-tenant schema `wp_cora_projects` with 46 fields (title, slug, client_name, industry, services_rendered, status, is_featured, is_confidential, hero_image_url, gallery_images, featured_kpis, executive_summary, challenge_narrative, solution_narrative, deliverables_list, testimonial_quote, testimonial_author, testimonial_role, conversion_cta_url, conversion_cta_text, views_count); 3-stage status lifecycle (published, draft, archived); automated confidentiality / stealth NDA masking; numerical KPI highlights rendered in JetBrains Mono font (`font-mono font-bold tracking-tight text-zinc-950`); 4-act transformation narrative framework (Act 1: Executive Summary, Act 2: Challenge / Friction, Act 3: Solution, Act 4: Deliverables); verified client testimonials (`Aarav Mehta`, `Kavya Patel`, `Rohan Verma`); Strategy Audit conversion CTA bridge (`Schedule Strategy Audit` -> `/contact`); 6-tab drawer editor in `views/view-projects.php` (Overview, Narrative Story, Impact KPIs, Media & Visuals, Endorsement, SEO & CTA); and high-performance Next.js frontend at `cora-frontend/app/projects/` powered by `projects-data.ts` |
 | **v4.9.381 (CORA-1228)** | Oct 2026 | Public Micro-Tools Growth Engine & Canonical Tool Registry: Single source of truth in `tools-canonical-registry.ts` defining 63 verified tools across 10 problem domains (Agency Economics, WordPress Stack, AI Discovery, Finance & Tax, Contracts & Legal, Developer & Embed, PDF Tools, Sheets Tools, Image Tools, Real Estate) with full 24-field schema; core framework UI components (`ToolInputGroup`, `ToolResultSummary`, `ToolActionBanner`, `ToolFaqAccordion` with Schema.org JSON-LD, `ToolBreakdownTable`); strict Zero-PII analytics governance in `lib/tools-analytics.ts` forbidding transmission of client names, documents, prompts, or revenue figures; 6 flagship growth tools (`wp-plugin-cost-calculator`, `lead-leakage-calculator`, `scope-creep-calculator`, `service-pricing-calculator`, `wp-publishing-friction-calculator`, `ai-crawler-checker`); and frictionless Problem-to-Workspace conversion bridge |
 | **v4.9.381 (CORA-1229)** | Oct 2026 | Canvas Frontend Themes Engine & GitHub CI/CD Full-Lifecycle Architecture: Consolidated 4-KPI analytical overview bar in `views/view-canvas.php` (Core Web Vitals score, LCP load speed, Themes Library count with live/draft quota, Published Pages count with 100% SEO readiness); ~40px edge-to-edge sticky 3-subtab bar (`Theme Library`, `Speed & Core Web Vitals`, `Migration & Tools`, plus extreme-right `GitHub Integration`); complete Git lifecycle in `Cora_GitHub_Integration` (`includes/class-cora-github-integration.php`) supporting RFC 8628 OAuth 2.0 Device Authorization Grant (`cora_github_initiate_device_flow`, `cora_github_poll_device_token`), secure PAT storage with Bearer fallbacks, dynamic branch creation (`cora_github_create_branch`), automated PR creation (`cora_github_create_pr`), PR review list & 1-click atomic merging (`cora_github_merge_pr`), automated commit rollback/revert (`cora_github_revert_commit`), atomic workspace synchronization (`cora_github_sync_entire_workspace`), and organization repository provisioning (`cora_github_provision_org_repo`) |
@@ -2250,4 +2295,4 @@ When authenticated as Super Admin (`cora_admin` / `admin@cora.local`), the platf
 
 ---
 
-*Cora Platform v4.9.381 — Master Architectural Manual. Last updated: October 2026.*
+*Cora Platform v4.9.384 — Master Architectural Manual. Last updated: October 2026.*

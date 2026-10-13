@@ -1,4 +1,4 @@
-# Cora Platform — Developer Feature & Optimization Guide (v4.9.381)
+# Cora Platform — Developer Feature & Optimization Guide (v4.9.384)
 
 This guide defines the standardized architectural patterns, blueprints, and performance guidelines for engineering new modules and extending features across the Cora SaaS Workspace (`app/public/wp-content/plugins/cora-workspace`) and Marketing Frontend (`cora-frontend`).
 
@@ -114,6 +114,9 @@ This guide defines the standardized architectural patterns, blueprints, and perf
 103. **Dynamic Forms-to-Lead CRM Auto-Conversion Pipeline (v4.9.381)**: Public and embedded form submissions intercepted in `cora_rest_submit_form()` must automatically bridge into the CRM Sales Pipeline (`wp_cora_leads`). Field detection must case-insensitively map or auto-detect contact details (`name`, `email`, `phone`, `notes`, `budget`, `city`, `service`). Records must enforce tenant isolation by `agency_id` and `branch_id`. The engine must resolve assignees via direct assignment or round-robin workload balancing, compute predictive deal qualification (`hot`, `warm`, `cold`), invalidate lead caches immediately via `cora_db_get_leads(true)`, prepend to `cora_workspace_leads` for 0ms reactivity, and ingest lead creation events into `cora_rag_ingest_event` for real-time AI Co-Founder awareness.
 104. **Editorial Generative Engine Optimization (GEO) & Knowledge Graph Engine (v4.9.381)**: Long-form editorial assets in `articles-data.ts` must be structured for Generative Engine Optimization (GEO) to maximize direct extraction and attribution by AI search engines (Perplexity, ChatGPT Search, Claude, Gemini AI Overviews). Articles must enforce rich technical depth, explicit reading times, difficulty indicators, structured key takeaways, interactive widget bindings (GST calculators, margin simulators), verified author credentials with Rule 3 compliance (`Aarav Mehta`, `Kavya Patel`, `Rohan Verma`, editorial teams), and Schema.org `FAQPage` and `Article` JSON-LD schemas.
 105. **Multi-Submission Aggregated REST Data Routing (v4.9.381)**: Form data pipelines must expose centralized multi-submission aggregation endpoints (`GET /wp-json/cora/v1/forms/all-submissions` and `/forms/submissions`) that consolidate entries across all tenant forms. Handlers must support tenant-scoped isolation, pagination (`page`, `per_page`), date filtering, keyword search, and CSV streaming, powering the universal 5th tab "All Entries" registry in `views/view-forms.php` without degrading per-form performance.
+106. **Shopify-Inspired Main-Area Docked View Panel Architecture (v4.9.382 / SOP Rule 15)**: Workspace editing drawers, creators, and sheet forms must slide up smoothly from the bottom (`translateY(100%)` to `translateY(0)`) into a clean, docked main-area view panel directly below the global top header (`top: var(--cora-main-top, 52px); height: calc(100vh - 52px)`). Panels must strictly occupy the exact available space in the main content canvas synchronized with sidebar state (`MutationObserver` and `resize` / `cora:sidebar-toggle` events: `left: 16rem` expanded, `left: 4rem` collapsed, `left: 0` mobile). Panels enforce zero backdrop/dimming overlay (`backdrop: false`), zero floating box-shadow, clear structural borders, and keep the sidebar 100% accessible and interactive at all times. Scroll lock applies strictly to `main.cora-main` (`overflow-hidden`), never locking `body` or the sidebar.
+107. **Shopify-Inspired Canvas Maximize / Restore Toggle (⤢ Fullscreen Mode) (v4.9.382)**: Docked view panels provide a dedicated header maximize button (`#cora-proj-maximize-btn`) toggling `.maximized` state. In maximized mode, the drawer spans the full viewport width (`left: 0 !important; width: 100vw !important; max-width: 100vw !important; border-left: none !important; z-index: 100060 !important;`), toggling the icon between Expand (`⤢`) and Restore (`⤡`). This eliminates distraction during long-form case study composition or complex metric editing while allowing 1-click restoration back to docked canvas mode with automatic real-time sidebar space recalculation.
+108. **Global Sticky Workspace Header & Sub-Tabs Ergonomics with Mobile Expandable Search (v4.9.383 - v4.9.384)**: The workspace header is enforced sticky at `top: 0` (`position: sticky; top: 0; z-index: 100020;`) across desktop and mobile screens. Sub-tabs extra action containers (`tabs_extra_html` in `workspace-header.php`) enforce pixel-perfect vertical centering (`h-full flex items-center gap-1.5 sm:gap-2`) with Level 01 Segmented Control container styling for view mode switchers (Table vs Grid). To prevent horizontal overflow on mobile viewports (< 640px), search bars implement a 1-tap expandable trigger (`#cora-proj-search-trigger-btn`) expanding an absolute full-width search input (`#cora-proj-search-wrapper.mobile-expanded`) inside the sub-tabs bar with 1-tap close and `Escape` key dismissal.
 
 ---
 ---
@@ -1532,4 +1535,132 @@ Articles bind specialized interactive tools based on `interactiveWidget`:
 
 ---
 
-*Cora Developer Feature Guide v4.9.381 — Last updated: October 2026.*
+## 68. Shopify-Inspired Main-Area Docked View Panel Blueprint (SOP Rule 15 & `views/view-projects.php`)
+
+When engineering workspace drawers, editors, and sheet forms:
+
+### 1. Architectural Contract & Motion
+All workspace drawers and editors must slide up smoothly from the bottom (`translateY(100%)` to `translateY(0)`) into a clean, docked main-area view panel:
+```css
+/* Docked Main-Area View Panel (Shopify-Inspired) */
+#cora-project-drawer {
+    position: fixed !important;
+    top: var(--cora-main-top, 52px) !important;
+    height: var(--cora-main-height, calc(100vh - 52px)) !important;
+    max-height: var(--cora-main-height, calc(100vh - 52px)) !important;
+    bottom: 0 !important;
+    z-index: 100050 !important;
+    background: #ffffff;
+    border-left: 1px solid var(--border, #e4e4e7);
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    transform: translateY(100%);
+    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), left 0.15s ease, width 0.15s ease;
+}
+#cora-project-drawer.open {
+    transform: translateY(0) !important;
+}
+```
+
+### 2. Dynamic Available Space Calculation (`coraSyncMainAreaBounds()`)
+The panel strictly synchronizes with the main canvas area in real time:
+- Desktop Sidebar Expanded (`w-64` / 16rem): `left: 16rem; width: calc(100vw - 16rem);`
+- Desktop Sidebar Collapsed (`w-16` / 4rem): `left: 4rem; width: calc(100vw - 4rem);`
+- Mobile / Tablet (< 1024px): `left: 0; width: 100vw;`
+- Continuous synchronization wired to:
+  ```javascript
+  window.addEventListener('resize', coraSyncMainAreaBounds);
+  window.addEventListener('cora:sidebar-toggle', coraSyncMainAreaBounds);
+  if (window.MutationObserver) {
+      var sidebar = document.querySelector('.cora-sidebar');
+      if (sidebar) {
+          new MutationObserver(coraSyncMainAreaBounds).observe(sidebar, {
+              attributes: true,
+              attributeFilter: ['class', 'style']
+          });
+      }
+  }
+  ```
+
+### 3. Zero Backdrop & Scoped Scroll Locking
+- **Zero Dimming Backdrop (`backdrop: false`)**: No dark backdrop overlay element. The underlying workspace content remains visible, professional, and directly integrated.
+- **Scoped Main Scroll Lock**: Only `main.cora-main` is locked (`mainEl.classList.add('overflow-hidden')`). The sidebar and `document.body` remain completely unlocked, so the user can see and click navigation links at any moment.
+
+---
+
+## 69. Shopify-Inspired Canvas Maximize / Restore Toggle Blueprint (`coraToggleProjectDrawerMaximize`)
+
+When implementing distraction-free fullscreen focus inside docked panels:
+
+### 1. Maximize State Toggle & DOM Bounds
+- Clicking `#cora-proj-maximize-btn` toggles the `.maximized` class on `#cora-project-drawer`:
+```css
+/* MAXIMIZED FULLSCREEN VIEW (Shopify Expand ⤢ Mode) */
+#cora-project-drawer.maximized {
+    left: 0 !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    border-left: none !important;
+    z-index: 100060 !important;
+}
+```
+- In JavaScript, `coraToggleProjectDrawerMaximize()` updates the button icon and title dynamically:
+  - When maximized: Title becomes `"Restore Docked Canvas"`, icon switches to collapse vector (`M4 14h6v6...`).
+  - When restored: Title becomes `"Expand / Fullscreen Canvas"`, icon switches to expand vector (`M15 3h6v6...`), and `coraSyncMainAreaBounds()` immediately restores flush alignment with the sidebar.
+
+### 2. State Cleanup on Drawer Dismissal
+`coraCloseProjectDrawer()` must always remove both `.open` and `.maximized` classes:
+```javascript
+drawer.classList.remove('open');
+drawer.classList.add('collapsed');
+drawer.classList.remove('maximized');
+```
+
+---
+
+## 70. Global Sticky Workspace Header & Sub-Tabs Mobile Expandable Search Blueprint
+
+When standardizing workspace navigation headers and responsive search bars:
+
+### 1. Global Sticky Header Enforcement
+Enforce sticky pinning at `top: 0` across all views:
+```css
+.cora-topbar,
+#cora-workspace-header {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 100020 !important;
+}
+```
+
+### 2. Sub-Tabs Extra Actions Vertical Alignment
+In `includes/workspace-header.php`, pass `tabs_extra_html` wrapped in `h-full flex items-center gap-1.5 sm:gap-2`:
+```php
+'tabs_extra_html' => '<div class="h-full flex items-center gap-1.5 sm:gap-2">...</div>'
+```
+
+### 3. Responsive Mobile Expandable Search (< 640px)
+- Render a compact search button trigger on small viewports (`h-7 w-7 flex sm:hidden`).
+- Tapping the trigger adds `.mobile-expanded` to `#cora-proj-search-wrapper`:
+```css
+@media (max-width: 639px) {
+    #cora-proj-search-wrapper.mobile-expanded {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 70px;
+        z-index: 30;
+        display: flex !important;
+        align-items: center;
+        background: #FBFaf7;
+        padding-left: 12px;
+        padding-right: 6px;
+    }
+}
+```
+- Auto-focus the input on trigger, support `Escape` key and close icon dismiss, and delegate real-time typing events to client filter algorithms (`oninput="coraFilterProjectsList()"`).
+
+---
+
+*Cora Developer Feature Guide v4.9.384 — Last updated: October 2026.*

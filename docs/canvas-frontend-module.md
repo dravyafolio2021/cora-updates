@@ -1,8 +1,8 @@
-# Cora Platform — Canvas & Frontend Module Documentation (v4.9.381)
+# Cora Platform — Canvas & Frontend Module Documentation (v4.9.384)
 
 ## Section 1: Overview & Multi-Engine Architecture
 
-Cora Canvas is a unified frontend website and theme creation engine providing a 100% white-labeled builder experience for agencies and workspace owners. Hardened through **v4.9.381**, Canvas operates across five core architectural engines:
+Cora Canvas is a unified frontend website and theme creation engine providing a 100% white-labeled builder experience for agencies and workspace owners. Hardened through **v4.9.384**, Canvas operates across five core architectural engines:
 
 1. **Engine A: White-Labeled Visual Drag-and-Drop Engine**: Operates within a sandboxed, two-row monochromatic toolbar (`cora-elementor-reskin.js` and `.css`), stripping out all CMS headers, admin chrome, upsell notices, and third-party references.
 2. **Engine B: Visual HTML Canvas Engine (Lovable-Compatible)**: In-browser visual HTML editor rendering semantic HTML5/Tailwind inside an isolated sandboxed iframe (`#cora-html-canvas-iframe`) with inline `contenteditable` editing, media inventory scanning, 1-click image swapping, code-split editing, URL edit state persistence, and AI rewriting.
@@ -928,4 +928,37 @@ Shipped in **v4.9.381**, Canvas provides native, full-lifecycle Git integration 
 
 ---
 
-*Cora Canvas Documentation v4.9.381 — Last updated: October 2026.*
+## Section 32: Shopify-Inspired Canvas Maximize / Restore Toggle & Dynamic Sidebar Space Synchronization (v4.9.382)
+
+### 32.1 Shopify-Inspired Maximize Canvas Architecture
+In **v4.9.382**, the Canvas and docked drawer engines introduced a 1-click **Maximize / Restore Toggle** (`coraToggleProjectDrawerMaximize()`) inspired by the Shopify Admin theme customizer:
+* **Maximize Action Button**: Positioned in the docked panel header (`#cora-proj-maximize-btn`) next to the close button with clean SVG geometry.
+* **Fullscreen Canvas State (`.maximized`)**:
+  - Sets `left: 0 !important; width: 100vw !important; max-width: 100vw !important; border-left: none !important; z-index: 100060 !important;`.
+  - Toggles the action vector icon between Expand (`⤢`) and Restore (`⤡`).
+  - Provides maximum horizontal and vertical runway for deep layout editing, long-form copy drafting, and visual element inspection without visual interference from the sidebar.
+* **Instant Bounds Re-Synchronization**:
+  - Clicking restore immediately transitions the panel back to docked mode (`translateY(0)`).
+  - Listens to the `cora:sidebar-toggle` event and recalibrates left boundary and width flush to the sidebar.
+
+---
+
+## Section 33: Global Sticky Workspace Header & Sub-Tabs Navigation Polish (v4.9.383 - v4.9.384)
+
+### 33.1 Global Sticky Header Integration
+Starting in **v4.9.384**, the workspace top header (`#cora-workspace-header` / `.cora-topbar`) is enforced sticky platform-wide across all viewport widths:
+* **Sticky Positioning**: Configured with `position: sticky; top: 0; z-index: 100020;`, ensuring seamless brand presence, global search triggers (`⌘K`), active notification badges, and the administrator profile widget remain accessible throughout extended scrolling journeys.
+* **Zero Layout Bleed**: Prevents body content from clipping or scrolling under floating header artifacts on mobile browsers.
+
+### 33.2 Sub-Tabs Extra Actions Vertical Alignment & Level 01 Segmented Switcher
+* **Vertical Centering**: Extra action containers in `workspace-header.php` (`tabs_extra_html`) enforce `h-full flex items-center gap-1.5 sm:gap-2`, aligning search inputs, filters, and view toggles with the tab pills.
+* **Level 01 Segmented View Switcher**: Provides instantaneous switching between Table view and Grid card stack using Level 01 atomic design tokens (`bg-zinc-200/60 dark:bg-zinc-800/80 rounded-lg border border-zinc-200/70`).
+
+### 33.3 Mobile Expandable Search Engine (< 640px)
+* **Responsive Search Trigger**: On viewports under 640px, the search bar transforms into a compact 28x28px trigger button (`#cora-proj-search-trigger-btn`).
+* **Overlay Input Expansion**: Tapping the trigger expands `#cora-proj-search-wrapper.mobile-expanded` across the sub-tabs bar (`right: 70px`), allowing full-width query input without causing horizontal layout overflow.
+* **Dismiss Lifecycle**: Dismisses on `Escape` key press or close button tap, instantly resetting the query filter.
+
+---
+
+*Cora Canvas Documentation v4.9.384 — Last updated: October 2026.*

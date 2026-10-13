@@ -144,4 +144,4 @@ Integrated in **v4.9.351** directly within the Canvas Template Editor:
 
 ---
 
-*Cora Universal MCP Compatibility Matrix v4.9.364 — Last updated: October 2026.*
+*Cora Universal MCP Compatibility Matrix v4.9.384 — Last updated: October 2026.*

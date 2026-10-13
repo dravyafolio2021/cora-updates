@@ -9,9 +9,13 @@
 
 | Module Name | Branch Name | Status | Main Touchpoint Files | Assigned Agent / Chat |
 |---|---|---|---|---|
-| **Core Platform** | `main` | 🟢 Stable (v4.9.381) | `cora-workspace.php`, `admin-dashboard.php` | Main Orchestrator |
+| **Core Platform** | `main` | 🟢 Stable (v4.9.384) | `cora-workspace.php`, `admin-dashboard.php` | Main Orchestrator |
 <!-- MODULE_ROWS_START -->
-| **Agency Projects & Portfolio Case Studies Module** | `main` | 🟢 100% Production Ready (v4.9.381) | `modules/projects/*`, `views/view-projects.php`, `cora-frontend/app/projects/*` | Portfolio & Case Studies Agent |
+| **Global Sticky Workspace Header & Mobile Expandable Search** | `main` | 🟢 Complete & Active (v4.9.384) | `admin-dashboard.php`, `includes/workspace-header.php`, `assets/css/admin-style.css`, `assets/js/admin-script.js` | Mobile & Navigation Agent |
+| **Sub-Tabs Extra Actions & Level 01 Segmented Switcher** | `main` | 🟢 Complete & Active (v4.9.383) | `includes/workspace-header.php`, `views/view-projects.php` | Navigation & UI Agent |
+| **Shopify-Inspired Canvas Maximize & Instant Sidebar Sync** | `main` | 🟢 Complete & Active (v4.9.382) | `views/view-projects.php`, `admin-dashboard.php` | Canvas Visual Engine Agent |
+| **Shopify-Inspired Docked Drawer Architecture** | `main` | 🟢 Complete & Active (v4.9.382) | `views/view-projects.php`, `admin-dashboard.php` | Workspace Core & UI Agent |
+| **Agency Projects & Portfolio Case Studies Module** | `main` | 🟢 100% Production Ready (v4.9.384) | `modules/projects/*`, `views/view-projects.php`, `cora-frontend/app/projects/*` | Portfolio & Case Studies Agent |
 | **Public Micro-Tools Growth Engine** | `main` | 🟢 100% Production Ready (v4.9.381) | `cora-frontend/app/tools/*`, `cora-frontend/lib/tools-canonical-registry.ts` | Growth & Micro-Tools Agent |
 | **Canvas Themes GitHub CI/CD & Rollback Engine** | `main` | 🟢 100% Production Ready (v4.9.381) | `includes/class-cora-github-integration.php`, `views/view-canvas.php` | Canvas Integration & DevOps Agent |
 | **Canonical Industry Directory & Slug Migration** | `main` | 🟢 Complete & Active (v4.9.380) | `cora-frontend/app/industries/*`, `cora-frontend/lib/industry-data.ts`, `cora-frontend/components/layout/Navbar.tsx` | Industry Hub & Navigation Agent |
@@ -321,6 +325,10 @@
 
 | Version | Date | Key Changes |
 | :--- | :--- | :--- |
+| **v4.9.384**<br>`CORA-1236` | Oct 2026 | **Global Sticky Workspace Header & Mobile Expandable Sub-Tabs Search**: Enforced global sticky header pinning (`position: sticky; top: 0; z-index: 100020;`) across all desktop and mobile viewports; resolved sub-tabs search horizontal overflow on mobile screens (< 640px) via 1-tap expandable search trigger (`#cora-proj-search-trigger-btn`) expanding full-width input (`#cora-proj-search-wrapper.mobile-expanded`) with Esc / close button dismiss; and synchronized version manifest to 4.9.384. |
+| **v4.9.383**<br>`CORA-1235` | Oct 2026 | **Sub-Tabs Extra Actions Vertical Alignment & Level 01 Segmented Switcher**: Standardized `tabs_extra_html` vertical alignment in `includes/workspace-header.php` (`h-full flex items-center gap-1.5 sm:gap-2`); implemented Level 01 Segmented Control container for Table vs Grid view mode toggle with active button styling (`bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white shadow-2xs`). |
+| **v4.9.382**<br>`CORA-1234` | Oct 2026 | **Shopify-Inspired Canvas Maximize / Restore Toggle (⤢ Fullscreen Mode)**: Added dedicated maximize button (`#cora-proj-maximize-btn`) in docked drawer header toggling `.maximized` state, expanding drawer across full viewport (`left: 0; width: 100vw; z-index: 100060; border-left: none`) for zero-distraction case study authoring with instant sidebar synchronization on `cora:sidebar-toggle`. |
+| **v4.9.382**<br>`CORA-1233` | Oct 2026 | **Shopify-Inspired Main-Area Docked View Panel Architecture & Responsive Bounds Sync**: Implemented SOP Rule 15 docked view panel in `views/view-projects.php` sliding up smoothly from bottom (`translateY(100%)` to `translateY(0)`), docking directly beneath top header (`top: 52px; height: calc(100vh - 52px)`), dynamically sizing to available main content canvas based on sidebar state (`MutationObserver` & `resize`), zero overlay / zero backdrop, scoped main scroll lock (`overflow-hidden` on `main.cora-main`), and Escape key dismissal. |
 | **v4.9.381**<br>`CORA-1227` | Oct 2026 | **Agency Projects & Portfolio Case Studies Module**: Complete multi-tenant workspace project management (`wp_cora_projects`, `/workspace/projects`) and public Next.js portfolio (`/projects`, `/portfolio`), 6-tab studio editor, 4-Act narrative architecture (Summary, Challenge, Solution, Deliverables), verified testimonials, big numerical KPI cards in JetBrains Mono, and connected JSON-LD schemas. |
 | **v4.9.381**<br>`CORA-1228` | Oct 2026 | **Public Micro-Tools Growth Engine & Canonical Tool Registry**: Physical audit, reconciliation, and verification of 63 search-optimized client-side micro-tools across 11 categories (`cora-frontend/app/tools/*`, `lib/tools-canonical-registry.ts`) with zero-PII privacy architecture and contextual conversion hooks into Cora workspaces. |
 | **v4.9.381**<br>`CORA-1229` | Oct 2026 | **Canvas Themes GitHub CI/CD Full-Lifecycle PR & Rollback Engine**: Full Git version control docked at extreme right edge of Canvas sub-navigation (`includes/class-cora-github-integration.php`), supporting Personal PAT vs Organisation modes, branch management, automated PR creation with visual diffs, 1-click merging, and 1-click snapshot rollback (`cora_github_revert_commit`). |
@@ -437,4 +445,4 @@
 
 ---
 
-*Cora Platform Release Manifest v4.9.381 — Architecture & Engineering Team.*
+*Cora Platform Release Manifest v4.9.384 — Architecture & Engineering Team.*

@@ -54,8 +54,8 @@ function cora_render_workspace_header( $args = array() ) {
     ?>
     <style>
     /* Reset extra action buttons inside sticky sub-tabs from global tab button overrides */
-    .cora-sub-tabs-container .cora-sub-tabs-extra button,
-    .cora-sticky-sub-tabs .cora-sub-tabs-extra button {
+    .cora-sub-tabs-container .cora-sub-tabs-extra button:not(#cora-proj-search-trigger-btn):not(#cora-proj-search-close-btn),
+    .cora-sticky-sub-tabs .cora-sub-tabs-extra button:not(#cora-proj-search-trigger-btn):not(#cora-proj-search-close-btn) {
         height: 22px !important;
         min-height: 22px !important;
         max-height: 22px !important;
@@ -277,21 +277,9 @@ function cora_render_workspace_header( $args = array() ) {
 
                 // Stuck state handler for subtle elevation shadow
                 var checkStuck = function() {
-                    var headerEl = document.querySelector('.cora-workspace-header');
                     var topbarH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cora-topbar-height')) || 48;
-                    var headerH = (headerEl && window.innerWidth < 1024) ? (parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cora-mobile-header-height')) || Math.round(headerEl.getBoundingClientRect().height) || 44) : 0;
-                    
-                    if (headerEl && window.innerWidth < 1024) {
-                        var hRect = headerEl.getBoundingClientRect();
-                        if (hRect.top <= (topbarH + 2)) {
-                            headerEl.classList.add('cora-header-stuck');
-                        } else {
-                            headerEl.classList.remove('cora-header-stuck');
-                        }
-                    }
-
                     var rect = container.getBoundingClientRect();
-                    var threshold = (window.innerWidth >= 1024) ? 2 : (topbarH + headerH + 2);
+                    var threshold = (window.innerWidth >= 1024) ? 2 : (topbarH + 2);
                     if (rect.top <= threshold) {
                         container.classList.add('cora-tabs-stuck');
                     } else {
@@ -484,7 +472,7 @@ function cora_render_workspace_header( $args = array() ) {
         $container_extra_class = $has_extra ? ' has-extra-actions' : '';
         $container_overflow = $has_extra ? 'overflow: hidden;' : 'overflow-x: auto; overflow-y: hidden;';
     ?>
-        <div class="cora-sub-tabs-container cora-sticky-sub-tabs<?php echo $container_extra_class; ?> relative flex items-center justify-between border-b border-zinc-200/80 dark:border-zinc-800 bg-[#FBFaf7] dark:bg-[#0c0c0e] -mx-3 sm:-mx-4 md:-mx-5 px-3 sm:px-4 md:px-5 w-[calc(100%+1.5rem)] sm:w-[calc(100%+2rem)] md:w-[calc(100%+2.5rem)] max-w-[calc(100%+1.5rem)] sm:max-w-[calc(100%+2rem)] md:max-w-[calc(100%+2.5rem)]" id="<?php echo esc_attr( $args['tabs_dom_id'] ?? 'cora-sub-navigation-tabs' ); ?>" style="position: -webkit-sticky; position: sticky; left: 0; right: 0; z-index: 40; display: flex; flex-wrap: nowrap; <?php echo $container_overflow; ?> -webkit-overflow-scrolling: touch; touch-action: pan-x pan-y; overscroll-behavior-x: contain; scrollbar-width: none; min-height: 40px; height: 40px; padding-top: 0; padding-bottom: 0;">
+        <div class="cora-sub-tabs-container cora-sticky-sub-tabs<?php echo $container_extra_class; ?> relative flex items-center justify-between border-b border-zinc-200/80 dark:border-zinc-800 bg-[#FBFaf7] dark:bg-[#0c0c0e] -mx-3 sm:-mx-4 md:-mx-5 px-3 sm:px-4 md:px-5 w-[calc(100%+1.5rem)] sm:w-[calc(100%+2rem)] md:w-[calc(100%+2.5rem)] max-w-[calc(100%+1.5rem)] sm:max-w-[calc(100%+2rem)] md:max-w-[calc(100%+2.5rem)]" id="<?php echo esc_attr( $args['tabs_dom_id'] ?? 'cora-sub-navigation-tabs' ); ?>" style="position: -webkit-sticky; position: sticky; top: var(--cora-sticky-tabs-top, var(--cora-topbar-height, 48px)); left: 0; right: 0; z-index: 40; display: flex; flex-wrap: nowrap; <?php echo $container_overflow; ?> -webkit-overflow-scrolling: touch; touch-action: pan-x pan-y; overscroll-behavior-x: contain; scrollbar-width: none; min-height: 40px; height: 40px; padding-top: 0; padding-bottom: 0;">
             <div class="cora-sub-tabs-nav flex items-center gap-1 <?php echo $has_extra ? 'min-w-0 flex-1' : 'shrink-0'; ?> overflow-x-auto scrollbar-hide" style="touch-action: pan-x pan-y; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; scrollbar-width: none;">
             <?php foreach ( $visible_tabs as $tab ) : 
                 $active_class = ! empty( $tab['active'] ) ? 'active border-zinc-950 text-zinc-900 dark:border-white dark:text-white font-semibold' : 'border-transparent text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 font-semibold';
