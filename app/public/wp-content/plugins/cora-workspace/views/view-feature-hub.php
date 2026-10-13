@@ -132,6 +132,11 @@ $features_list = array(
             'desc'  => 'Automate Google Places review collection campaigns and feedback responses.',
             'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M9 12l2 2 4-4"></path></svg>'
         ),
+        'projects' => array(
+            'title' => 'Portfolio',
+            'desc'  => 'Curate agency portfolio transformation stories, proof KPIs, and publish directly to the frontend.',
+            'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path><line x1="12" y1="11" x2="12" y2="17"></line><line x1="9" y1="14" x2="15" y2="14"></line></svg>'
+        ),
         'social-meta' => array(
             'title' => 'Social Media & Ads',
             'desc'  => 'Preview scheduled social campaigns, feeds, grids, and ad metrics.',
@@ -166,7 +171,7 @@ $active_modules_count = 0;
 foreach ( $features_list as $cat => $items ) {
     foreach ( $items as $slug => $data ) {
         $is_found = ! empty( $data['foundation'] ) || in_array( $slug, $foundation_slugs, true );
-        if ( $is_found || in_array( $slug, $enabled, true ) || ( empty( $enabled ) && in_array( $slug, array( 'team-roles', 'tasks', 'vault', 'financials', 'activity-timeline', 'leads', 'analytics', 'knowledge-base', 'automations', 'blogs', 'canvas', 'forms', 'emails', 'crew_scheduler', 'review_acquisition', 'gbp', 'mcp', 'media', 'plant_inventory', 'calendar', 'equipment', 'properties', 'inbox', 'social-meta' ), true ) ) ) {
+        if ( $is_found || in_array( $slug, $enabled, true ) || ( empty( $enabled ) && in_array( $slug, array( 'team-roles', 'tasks', 'vault', 'financials', 'activity-timeline', 'leads', 'analytics', 'knowledge-base', 'automations', 'blogs', 'canvas', 'forms', 'emails', 'crew_scheduler', 'review_acquisition', 'gbp', 'mcp', 'media', 'plant_inventory', 'calendar', 'equipment', 'properties', 'inbox', 'social-meta', 'projects' ), true ) ) ) {
             $active_modules_count++;
         }
     }
@@ -196,7 +201,7 @@ foreach ( $features_list as $cat => $items ) {
         <div style="display: flex; align-items: center; gap: 8px; width: 100%;">
             <div style="position: relative; flex: 1; min-width: 0;">
                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #71717a; pointer-events: none;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                <input type="text" id="cora-fh-search-input" placeholder="Search 24 modules..." style="width: 100%; height: 34px; padding: 0 28px 0 28px; font-size: 12px; background: #fafafa; border: 1px solid #e4e4e7; border-radius: 8px; color: #18181b; outline: none; transition: all 0.15s; box-sizing: border-box;" onfocus="this.style.borderColor='#18181b'; this.style.background='#ffffff';" onblur="this.style.borderColor='#e4e4e7'; this.style.background='#fafafa';" />
+                <input type="text" id="cora-fh-search-input" placeholder="Search <?php echo intval( $total_modules_count ); ?> modules..." style="width: 100%; height: 34px; padding: 0 28px 0 28px; font-size: 12px; background: #fafafa; border: 1px solid #e4e4e7; border-radius: 8px; color: #18181b; outline: none; transition: all 0.15s; box-sizing: border-box;" onfocus="this.style.borderColor='#18181b'; this.style.background='#ffffff';" onblur="this.style.borderColor='#e4e4e7'; this.style.background='#fafafa';" />
                 <button type="button" id="cora-fh-clear-search-icon" style="display: none; position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; padding: 2px 4px; color: #a1a1aa; cursor: pointer; font-size: 11px; line-height: 1;">✕</button>
             </div>
             <button type="button" id="cora-fh-save-top-btn" class="cora-fh-save-btn cora-btn-primary" style="height: 34px; padding: 0 13px; font-size: 11.5px; font-weight: 700; border-radius: 8px; white-space: nowrap; flex-shrink: 0; display: inline-flex; align-items: center; gap: 5px;">
@@ -575,7 +580,7 @@ foreach ( $features_list as $cat => $items ) {
     const defaultSlugs = [
         'blogs', 'financials', 'team-roles', 'media', 'vault', 'calendar', 'activity-timeline', 'automations', 'inbox', 'analytics',
         'leads', 'crew_scheduler', 'equipment', 'properties', 'tasks', 'plant_inventory',
-        'canvas', 'forms', 'emails', 'review_acquisition', 'social-meta',
+        'canvas', 'forms', 'emails', 'review_acquisition', 'social-meta', 'projects',
         'gbp', 'mcp', 'knowledge-base'
     ];
 

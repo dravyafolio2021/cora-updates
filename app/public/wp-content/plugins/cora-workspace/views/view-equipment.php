@@ -1712,7 +1712,7 @@ window.coraSelectMediaLibrary = function(previewId, pathId) {
         file_frame.open();
     } else {
         if (typeof window.coraShowToast === 'function') {
-            window.coraShowToast('WordPress Media Library is not enqueued.', 'error');
+            window.coraShowToast('Media Library is not enqueued.', 'error');
         }
     }
 };

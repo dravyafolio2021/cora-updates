@@ -1,12 +1,12 @@
 /**
  * Cora Platform & Marketing Design Tokens (v4.0.0)
  * Monochromatic Notion / Shopify Visual System Standard
- * Core User: Shruti (Studio Administrator)
+ * Core User: Studio Admin (Studio Administrator)
  */
 
 const CoraDesignTokens = {
   version: "4.0.0",
-  systemOwner: "Shruti",
+  systemOwner: "Studio Admin",
   palette: {
     neutral: {
       50: "#fafafa",
@@ -90,21 +90,70 @@ const CoraDesignTokens = {
     sm: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
     md: "0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)",
     lg: "0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04)",
-    xl: "0 20px 25px -5px rgba(0, 0, 0, 0.12), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
+    xl: "0 20px 25px -5px rgba(0, 0, 0, 0.12), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+    drawer: "-16px 0 48px rgba(0, 0, 0, 0.16)",
+    mobileSheet: "0 -16px 48px rgba(0, 0, 0, 0.18)"
   },
 
   layout: {
     appMaxWidth: "80rem",
     marketingMaxWidth: "72rem",
-    drawerWidth: "28rem"
+    drawerWidth: "40rem", // 640px full master standard
+    drawerBackdropZIndex: 100040,
+    drawerZIndex: 100050
+  },
+
+  drawerStandard: {
+    architecture: "shopifyMainAreaDockedPanel",
+    motion: "bottomSlideUp", // Slides up smoothly from bottom into docked position
+    coverage: "availableMainArea", // Fills exact available space of main area based on sidebar status
+    sidebarAccessible: true, // Sidebar remains 100% visible, clickable, and accessible
+    overlay: false, // Zero overlay / zero backdrop behind panel
+    shadow: "none", // Zero shadow, clean architectural boundary
+    borders: "clearStructural", // Clear border-left and border-top
+    desktop: {
+      position: "fixed",
+      top: "var(--cora-main-top, 52px)", // Docks directly below header
+      bottom: "0px",
+      left: "var(--cora-main-left, 16rem)", // Aligned to sidebar edge
+      right: "0px",
+      width: "var(--cora-main-width, calc(100vw - 16rem))", // Fills available space
+      maxWidth: "var(--cora-main-width, calc(100vw - 16rem))",
+      height: "var(--cora-main-height, calc(100vh - 52px))",
+      borderRadius: "0px", // Square, flush formal architecture
+      borderTop: "1px solid #e4e4e7",
+      borderLeft: "1px solid #e4e4e7",
+      boxShadow: "none",
+      zIndex: 100050,
+      transition: "transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.15s ease"
+    },
+    mobile: {
+      position: "fixed",
+      top: "var(--cora-main-top, 52px)",
+      bottom: "0px",
+      left: "0px",
+      right: "0px",
+      width: "100vw",
+      borderRadius: "0px",
+      boxShadow: "none",
+      zIndex: 100050
+    },
+    backdrop: false, // No backdrop overlay
+    portaling: "document.body",
+    mainContentScrollLockOnly: true, // Lock only main.cora-main; NEVER lock document.body
+    dismissOnEscape: true
   },
 
   rules: {
-    user: "Shruti",
+    user: "Studio Admin",
     avatarInitials: "S",
     noNativeAlerts: true,
     useMonochromaticToasts: true,
-    useSlidingSideDrawers: true,
+    useMainAreaDockedPanels: true, // Shopify-inspired: all drawers slide from bottom and dock into main area
+    noOverlayOrBackdrop: true,     // Zero dark blur overlay behind drawers
+    zeroShadowDockedUI: true,      // Clean structural borders, zero shadows
+    sidebarNeverOverlaid: true,    // Sidebar remains 100% visible and accessible
+    portalDrawersToBody: true,
     stickyAdminPopover: true,
     claudeCreamBRoll: "#FBFaf7",
     noOutlineStyling: true,

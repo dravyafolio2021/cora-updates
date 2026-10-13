@@ -66,6 +66,7 @@ class Cora_Module_Registry {
         require_once CORA_WORKSPACE_PATH . 'modules/professional-services/class-professional-services-module.php';
         require_once CORA_WORKSPACE_PATH . 'modules/custom-workspace/class-custom-module.php';
         require_once CORA_WORKSPACE_PATH . 'modules/manufacturing-inventory/class-manufacturing-inventory-module.php';
+        require_once CORA_WORKSPACE_PATH . 'modules/projects/class-cora-projects-module.php';
 
         // Register core industry modules
         self::register_module(new Cora_Real_Estate_Module());

@@ -15,7 +15,8 @@ import {
   Calculator,
   Code,
   Tag,
-  ShieldCheck
+  ShieldCheck,
+  X
 } from 'lucide-react';
 import { TOOL_AGENT_REGISTRY, ToolAgentData } from '@/lib/tools-agent-config';
 import { ToolAiSdrHeroCard } from './ToolAiSdrHeroCard';
@@ -48,6 +49,7 @@ export function ToolPageShell({
   onCloseOutcomeModal,
 }: ToolPageShellProps) {
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
+  const [isMobileBannerDismissed, setIsMobileBannerDismissed] = useState<boolean>(false);
 
   // Retrieve assigned AI co-founder agent persona
   const agentData: ToolAgentData = TOOL_AGENT_REGISTRY[toolId] || {
@@ -94,7 +96,7 @@ export function ToolPageShell({
   const firstName = agentData.agent.name.split(' ')[0];
 
   return (
-    <div className="relative w-full bg-[#FAFAF9] text-zinc-900 min-h-screen pt-[108px] sm:pt-[116px] pb-24 sm:pb-20 selection:bg-zinc-900 selection:text-white overflow-hidden">
+    <div className="relative w-full bg-[#FAFAF9] text-zinc-900 min-h-screen pt-[84px] sm:pt-[116px] pb-24 sm:pb-20 selection:bg-zinc-900 selection:text-white overflow-hidden">
       
       {/* ── Seamless Full-Width Background Pattern ── */}
       <div 
@@ -114,51 +116,51 @@ export function ToolPageShell({
       <div className="relative z-10 w-full max-w-[1240px] mx-auto px-4 sm:px-6">
         
         {/* ── Intro Section: Unboxed & Seamlessly Structured ── */}
-        <div className="mb-8 sm:mb-10">
+        <div className="mb-6 sm:mb-10">
           
           {/* Back Navigation Breadcrumb */}
-          <div className="mb-4 sm:mb-5">
+          <div className="mb-3 sm:mb-5">
             <Link
               href="/tools"
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-500 hover:text-zinc-950 transition-colors group"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-500 hover:text-zinc-950 transition-colors group touch-manipulation"
             >
               <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
               <span>Back to all micro-tools</span>
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-8 items-start">
             
             {/* Left Column: Category Badge, H1 Title, Subtitle, Trust Points */}
-            <div className="lg:col-span-7 xl:col-span-8 space-y-3 pt-0.5">
+            <div className="lg:col-span-7 xl:col-span-8 space-y-2.5 sm:space-y-3 pt-0.5">
               
               {/* Category Pill */}
-              <div className="inline-flex items-center gap-1.5 text-[11px] font-mono font-bold text-zinc-800 px-3 py-1 bg-white/90 backdrop-blur-sm border border-zinc-200/90 rounded-full shadow-2xs">
+              <div className="inline-flex items-center gap-1.5 text-[10px] sm:text-[11px] font-mono font-bold text-zinc-800 px-2.5 sm:px-3 py-1 bg-white/90 backdrop-blur-sm border border-zinc-200/90 rounded-full shadow-2xs">
                 {getToolBadgeIcon()}
                 <span>{cleanBadgeTag}</span>
               </div>
 
               {/* Main H1 Title */}
-              <h1 className="font-display text-2xl sm:text-3xl lg:text-[38px] font-bold text-zinc-950 tracking-[-0.035em] leading-[1.14]">
+              <h1 className="font-display text-xl sm:text-3xl lg:text-[38px] font-bold text-zinc-950 tracking-[-0.035em] leading-[1.15]">
                 {title}
               </h1>
 
               {/* Subtitle */}
-              <p className="text-zinc-600 text-xs sm:text-sm lg:text-[15px] font-normal leading-relaxed max-w-2xl">
+              <p className="text-zinc-600 text-xs sm:text-sm lg:text-[15px] font-normal leading-relaxed max-w-2xl line-clamp-2 sm:line-clamp-none">
                 {subtitle}
               </p>
 
               {/* Trust & Privacy Micro-Badges */}
-              <div className="flex flex-wrap items-center gap-2 pt-1">
-                <span className="inline-flex items-center gap-1 text-[11px] font-mono font-medium text-zinc-600 bg-white/80 px-2.5 py-1 rounded-md border border-zinc-200/70 shadow-2xs">
+              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 pt-0.5">
+                <span className="inline-flex items-center gap-1 text-[10px] sm:text-[11px] font-mono font-medium text-zinc-600 bg-white/80 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-md border border-zinc-200/70 shadow-2xs">
                   <Lock className="w-3 h-3 text-emerald-600" />
                   100% Client-Side Private
                 </span>
-                <span className="inline-flex items-center gap-1 text-[11px] font-mono font-medium text-zinc-600 bg-white/80 px-2.5 py-1 rounded-md border border-zinc-200/70 shadow-2xs">
+                <span className="inline-flex items-center gap-1 text-[10px] sm:text-[11px] font-mono font-medium text-zinc-600 bg-white/80 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-md border border-zinc-200/70 shadow-2xs">
                   <Zap className="w-3 h-3 text-amber-500" />
                   Zero Server Upload
                 </span>
-                <span className="inline-flex items-center gap-1 text-[11px] font-mono font-medium text-zinc-600 bg-white/80 px-2.5 py-1 rounded-md border border-zinc-200/70 shadow-2xs">
+                <span className="inline-flex items-center gap-1 text-[10px] sm:text-[11px] font-mono font-medium text-zinc-600 bg-white/80 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-md border border-zinc-200/70 shadow-2xs">
                   <Check className="w-3 h-3 text-zinc-800" />
                   Free & Unlimited
                 </span>
@@ -255,43 +257,54 @@ export function ToolPageShell({
       )}
 
       {/* ══════════════════════════════════════════════════════════════
-          MOBILE PEACEFUL VALUE BAR (Non-Intrusive)
+          MOBILE PEACEFUL VALUE BAR (Non-Intrusive & Dismissible)
           ══════════════════════════════════════════════════════════════ */}
-      <aside
-        aria-label="Cora AI Co-Founder Free Guarantee"
-        className="fixed bottom-3 inset-x-3 z-40 lg:hidden animate-in fade-in slide-in-from-bottom-5 duration-300"
-      >
-        <div className="relative overflow-hidden rounded-2xl bg-zinc-950/95 backdrop-blur-xl border border-zinc-800 p-3 shadow-[0_12px_40px_rgba(0,0,0,0.35)] text-white">
-          <div className="flex items-center justify-between gap-3">
-            
-            <div className="flex items-center gap-2.5 min-w-0 flex-1">
-              <div className="relative w-8 h-8 rounded-xl overflow-hidden shrink-0 border border-white/15 bg-zinc-900 flex items-center justify-center text-emerald-400 font-mono text-xs">
-                <ShieldCheck className="w-4 h-4 text-emerald-400" />
+      {!isMobileBannerDismissed && (
+        <aside
+          aria-label="Cora Free Guarantee"
+          className="fixed bottom-3 inset-x-3 z-40 lg:hidden animate-in fade-in slide-in-from-bottom-5 duration-300"
+        >
+          <div className="relative overflow-hidden rounded-2xl bg-zinc-950/95 backdrop-blur-xl border border-zinc-800 p-2.5 sm:p-3 shadow-[0_12px_40px_rgba(0,0,0,0.35)] text-white">
+            <div className="flex items-center justify-between gap-2.5">
+              
+              <div className="flex items-center gap-2 min-w-0 flex-1">
+                <div className="relative w-7 h-7 rounded-lg overflow-hidden shrink-0 border border-white/15 bg-zinc-900 flex items-center justify-center text-emerald-400 font-mono text-xs">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                </div>
+
+                <div className="min-w-0 flex-1">
+                  <div className="text-[11px] font-bold text-white tracking-tight truncate">
+                    Free Client-Side Tool
+                  </div>
+                  <div className="text-[9px] text-zinc-400 truncate font-mono">
+                    100% In-Browser RAM • Zero Sign-Up
+                  </div>
+                </div>
               </div>
 
-              <div className="min-w-0 flex-1">
-                <div className="text-xs font-bold text-white tracking-tight truncate">
-                  Free Client-Side Tool
-                </div>
-                <div className="text-[10px] text-zinc-400 truncate font-mono">
-                  100% In-Browser RAM • Zero Sign-Up
-                </div>
+              <div className="flex items-center gap-1.5 shrink-0">
+                <Link
+                  href={`/workspace/login?mode=signup&ref=tofu_mobile_${toolId}`}
+                  className="px-3 py-1.5 rounded-xl bg-white hover:bg-zinc-100 text-zinc-950 font-bold text-[11px] flex items-center gap-1 shadow-xs active:scale-95 transition-all cursor-pointer touch-manipulation"
+                >
+                  <span>Free Workspace</span>
+                  <ArrowRight className="w-3 h-3 text-zinc-950" />
+                </Link>
+
+                <button
+                  type="button"
+                  onClick={() => setIsMobileBannerDismissed(true)}
+                  aria-label="Dismiss banner"
+                  className="p-1 rounded-lg text-zinc-400 hover:text-white transition-colors cursor-pointer touch-manipulation"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
               </div>
-            </div>
 
-            <div className="flex items-center shrink-0">
-              <Link
-                href={`/workspace/login?mode=signup&ref=tofu_mobile_${toolId}`}
-                className="px-3.5 py-1.5 rounded-xl bg-white hover:bg-zinc-100 text-zinc-950 font-bold text-xs flex items-center gap-1 shadow-md active:scale-95 transition-all cursor-pointer"
-              >
-                <span>Free Workspace</span>
-                <ArrowRight className="w-3 h-3 text-zinc-950" />
-              </Link>
             </div>
-
           </div>
-        </div>
-      </aside>
+        </aside>
+      )}
 
     </div>
   );

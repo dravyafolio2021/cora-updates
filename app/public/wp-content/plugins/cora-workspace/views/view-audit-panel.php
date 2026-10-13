@@ -290,7 +290,7 @@ $total_events = count( $filtered_logs );
                         <td class="py-3 px-4 text-emerald-600 font-mono font-bold">$1.12</td>
                     </tr>
                     <tr class="hover:bg-zinc-50/50 transition-colors">
-                        <td class="py-3 px-4 font-semibold text-zinc-900 ">WordPress Media Alt & SEO Optimizer</td>
+                        <td class="py-3 px-4 font-semibold text-zinc-900 ">Media Alt & SEO Optimizer</td>
                         <td class="py-3 px-4 font-mono">Claude 3.5 Sonnet</td>
                         <td class="py-3 px-4 font-mono">214,300</td>
                         <td class="py-3 px-4 font-mono">38,400</td>

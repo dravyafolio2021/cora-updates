@@ -103,7 +103,7 @@ export default function ToolsIndexPage() {
           <div className="mb-4 sm:mb-6">
             <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full bg-white/95 backdrop-blur-md text-zinc-900 border border-zinc-200/80 text-xs sm:text-sm font-medium shadow-2xs">
               <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-500" />
-              <span>43 Free Turnkey Micro-Tools</span>
+              <span>{TOOLS_DATA.length} Free Turnkey Micro-Tools</span>
             </span>
           </div>
 
@@ -230,21 +230,21 @@ export default function ToolsIndexPage() {
             </span>
           </div>
 
-          <div className="flex items-center gap-1.5 overflow-x-auto whitespace-nowrap scrollbar-none w-full sm:w-auto py-1">
+          <div className="flex items-center gap-2 overflow-x-auto whitespace-nowrap scrollbar-none w-full sm:w-auto py-1.5 -mx-4 px-4 sm:mx-0 sm:px-0 touch-pan-x">
             {TOOL_CATEGORIES.map((cat) => {
               const isActive = activeCategory === cat.id;
               return (
                 <button
                   key={cat.id}
                   onClick={() => setActiveCategory(cat.id)}
-                  className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+                  className={`inline-flex items-center gap-1.5 px-3.5 py-2 min-h-[38px] rounded-full text-xs font-semibold transition-all cursor-pointer touch-manipulation active:scale-[0.98] ${
                     isActive
                       ? 'bg-zinc-950 text-white shadow-xs'
                       : 'bg-zinc-50 text-zinc-700 border border-zinc-200 hover:bg-zinc-100 hover:text-zinc-950'
                   }`}
                 >
                   <span>{cat.label}</span>
-                  <span className={`text-[10px] font-mono rounded-full px-1.5 py-0.2 ${isActive ? 'bg-zinc-800 text-zinc-300' : 'bg-zinc-200/70 text-zinc-600'}`}>
+                  <span className={`text-[10px] font-mono rounded-full px-1.5 py-0.5 ${isActive ? 'bg-zinc-800 text-zinc-300' : 'bg-zinc-200/70 text-zinc-600'}`}>
                     {cat.count}
                   </span>
                 </button>

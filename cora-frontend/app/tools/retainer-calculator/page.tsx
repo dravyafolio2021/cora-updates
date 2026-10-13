@@ -11,6 +11,7 @@ export default function RetainerCalculatorPage() {
   const [clientCount, setClientCount] = useState<number>(4);
   const [scopeBufferPercent, setScopeBufferPercent] = useState<number>(20);
   const [copied, setCopied] = useState<boolean>(false);
+  const [mobileTab, setMobileTab] = useState<'inputs' | 'results'>('inputs');
   const { showToast } = useToast();
 
   // Math Calculations
@@ -65,11 +66,37 @@ Generated via Cora Tools (https://heycora.in/tools/retainer-calculator)`;
       subtitle="Convert your target monthly agency revenue into sustainable client retainer packages with built-in scope creep insurance and 18% GST invoice splitting."
       faqItems={retainerFaqs}
     >
+      {/* Mobile Segmented Toggle */}
+      <div className="flex items-center gap-1.5 p-1 bg-zinc-100 rounded-xl mb-4 md:hidden">
+        <button
+          type="button"
+          onClick={() => setMobileTab('inputs')}
+          className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all touch-manipulation cursor-pointer ${
+            mobileTab === 'inputs'
+              ? 'bg-white text-zinc-950 shadow-2xs font-bold'
+              : 'text-zinc-600 hover:text-zinc-950'
+          }`}
+        >
+          Revenue & Capacity
+        </button>
+        <button
+          type="button"
+          onClick={() => setMobileTab('results')}
+          className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all touch-manipulation cursor-pointer ${
+            mobileTab === 'results'
+              ? 'bg-white text-zinc-950 shadow-2xs font-bold'
+              : 'text-zinc-600 hover:text-zinc-950'
+          }`}
+        >
+          Retainer Model (₹{retainerPerClient.toLocaleString('en-IN')}/mo)
+        </button>
+      </div>
+
       {/* ── 70% Tool Workspace (Interactive Form + Live Output) ── */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
         
         {/* Left Console (7 Cols) */}
-        <div className="md:col-span-7 bg-white border border-zinc-200/90 rounded-3xl p-5 sm:p-6 shadow-xs space-y-5">
+        <div className={`md:col-span-7 bg-white border border-zinc-200/90 rounded-3xl p-5 sm:p-6 shadow-xs space-y-5 ${mobileTab === 'results' ? 'hidden md:block' : 'block'}`}>
           
           {/* Target Monthly Revenue */}
           <div>
@@ -167,7 +194,7 @@ Generated via Cora Tools (https://heycora.in/tools/retainer-calculator)`;
         </div>
 
         {/* Right Output Card (5 Cols — Clean Light Minimal Design) */}
-        <div className="md:col-span-5 bg-white border border-zinc-200/90 rounded-3xl p-5 sm:p-6 shadow-xs flex flex-col justify-between space-y-5">
+        <div className={`md:col-span-5 bg-white border border-zinc-200/90 rounded-3xl p-5 sm:p-6 shadow-xs flex flex-col justify-between space-y-5 ${mobileTab === 'inputs' ? 'hidden md:flex' : 'flex'}`}>
           <div>
             <div className="flex items-center justify-between pb-3 mb-4 border-b border-zinc-200 text-xs">
               <span className="font-mono text-zinc-500 uppercase tracking-wider font-semibold">
@@ -211,13 +238,42 @@ Generated via Cora Tools (https://heycora.in/tools/retainer-calculator)`;
           <button
             type="button"
             onClick={copyBreakdown}
-            className="w-full py-3 rounded-2xl bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs"
+            className="w-full py-3 rounded-2xl bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs touch-manipulation active:scale-[0.98]"
           >
             {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4 text-zinc-400" />}
             <span>{copied ? 'Retainer Math Copied!' : 'Copy Proposal Summary'}</span>
           </button>
         </div>
 
+      </div>
+
+      {/* Mobile Sticky Live Summary Bar */}
+      <div className="fixed bottom-3 inset-x-3 z-30 md:hidden animate-in fade-in slide-in-from-bottom-3 duration-200">
+        <div className="rounded-2xl bg-zinc-950/95 backdrop-blur-xl border border-zinc-800 p-2.5 px-3.5 shadow-xl text-white flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <span className="block text-[10px] font-mono text-zinc-400 uppercase tracking-wider">Per Client</span>
+            <span className="block font-mono text-sm font-bold text-white truncate">
+              ₹{retainerPerClient.toLocaleString('en-IN')}/mo
+            </span>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={copyBreakdown}
+              className="p-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-semibold touch-manipulation cursor-pointer transition-colors"
+              title="Copy Summary"
+            >
+              {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+            </button>
+            <button
+              type="button"
+              onClick={() => setMobileTab(mobileTab === 'inputs' ? 'results' : 'inputs')}
+              className="px-3 py-2 rounded-xl bg-white text-zinc-950 text-xs font-bold touch-manipulation cursor-pointer transition-all active:scale-95 shadow-xs"
+            >
+              {mobileTab === 'inputs' ? 'View Model' : 'Edit Inputs'}
+            </button>
+          </div>
+        </div>
       </div>
     </ToolPageShell>
   );

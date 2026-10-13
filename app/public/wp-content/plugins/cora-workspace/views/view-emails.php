@@ -4,7 +4,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 ?>
-<div id="cora-page-emails" class="flex-1 flex flex-col min-h-0 bg-zinc-50 p-4 sm:p-6 md:p-8" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+<div id="cora-page-emails" class="flex-1 flex flex-col min-h-0" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
     
 <?php
 $emails_header_args = array(
@@ -27,89 +27,89 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 }
 ?>
 
-    <!-- Top KPI Summary Cards Row (2x2 Mobile / 1x4 Desktop) -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 mt-4 sm:mt-5 shrink-0">
-        <!-- Stat Card 1: Total Emails Sent -->
-        <div class="bg-white border border-zinc-200/80 rounded-xl p-3 shadow-3xs flex items-center justify-between min-w-0">
-            <div class="min-w-0 pr-2">
-                <span class="text-[10px] font-bold tracking-wider text-zinc-400 uppercase block truncate">Total Emails Sent</span>
-                <div class="text-base sm:text-lg font-bold text-zinc-900 mt-0.5 truncate" id="stat-total-sent">--</div>
-                <span class="text-[10px] text-zinc-500 font-medium block truncate" id="stat-month-sent">-- sent this month</span>
-            </div>
-            <div class="w-7 h-7 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-700 shrink-0">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M22 2L11 13"></path><path d="M22 2l-7 20-4-9-9-4 20-7z"></path></svg>
-            </div>
-        </div>
-
-        <!-- Stat Card 2: Delivery Success Rate -->
-        <div class="bg-white border border-zinc-200/80 rounded-xl p-3 shadow-3xs flex items-center justify-between min-w-0">
-            <div class="min-w-0 pr-2">
-                <span class="text-[10px] font-bold tracking-wider text-zinc-400 uppercase block truncate">Delivery Success</span>
-                <div class="text-base sm:text-lg font-bold text-zinc-900 mt-0.5 truncate" id="stat-success-rate">99.4%</div>
-                <div class="flex items-center gap-1.5 mt-0.5">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span class="text-[10px] text-emerald-600 font-semibold truncate">SMTP Relay Active</span>
-                </div>
-            </div>
-            <div class="w-7 h-7 rounded-lg bg-emerald-50 border border-emerald-200/50 flex items-center justify-center text-emerald-600 shrink-0">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M9 12l2 2 4-4"></path></svg>
-            </div>
-        </div>
-
-        <!-- Stat Card 3: Email Templates -->
-        <div class="bg-white border border-zinc-200/80 rounded-xl p-3 shadow-3xs flex items-center justify-between cursor-pointer hover:bg-zinc-50/80 transition-all min-w-0" onclick="coraSwitchEmailSubTab('email-tab-templates')">
-            <div class="min-w-0 pr-2">
-                <span class="text-[10px] font-bold tracking-wider text-zinc-400 uppercase block truncate">Active Templates</span>
-                <div class="text-base sm:text-lg font-bold text-zinc-900 mt-0.5 truncate" id="stat-active-templates">6 Active</div>
-                <span class="text-[10px] text-zinc-500 font-medium block truncate">System & Presets</span>
-            </div>
-            <div class="w-7 h-7 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-700 shrink-0">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-            </div>
-        </div>
-
-        <!-- Stat Card 4: SMTP Health -->
-        <div class="bg-white border border-zinc-200/80 rounded-xl p-3 shadow-3xs flex items-center justify-between cursor-pointer hover:bg-zinc-50/80 transition-all min-w-0" onclick="coraSwitchEmailSubTab('email-tab-settings')">
-            <div class="min-w-0 pr-2">
-                <span class="text-[10px] font-bold tracking-wider text-zinc-400 uppercase block truncate">SMTP Provider</span>
-                <div class="text-xs font-bold text-zinc-900 mt-0.5 truncate" id="stat-smtp-provider">SMTP Relay Active</div>
-                <span class="text-[10px] text-zinc-500 font-mono block truncate">Port 587 / TLS SSL</span>
-            </div>
-            <div class="w-7 h-7 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-700 shrink-0">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
-            </div>
-        </div>
-    </div>
-
-    <!-- Sticky Sub-Navigation Tabs SOP (~36px Sleek Height - Edge-to-Edge) -->
-    <div id="cora-emails-subtabs" class="cora-sub-tabs-container cora-sticky-sub-tabs sticky z-30 flex items-center gap-1 border-b border-zinc-200/80 bg-white/95 backdrop-blur-md -mx-3 sm:-mx-4 md:-mx-5 px-3 sm:px-4 md:px-5 mt-4 sm:mt-5 shrink-0 overflow-x-auto no-scrollbar" style="touch-action: pan-x; -webkit-overflow-scrolling: touch; scrollbar-width: none;">
+    <!-- Sticky Sub-Navigation Tabs SOP (~40px Sleek Height - Edge-to-Edge - Just After Header) -->
+    <div id="cora-emails-subtabs" class="cora-sub-tabs-container cora-sticky-sub-tabs flex items-center gap-1 border-b border-zinc-200/80 dark:border-zinc-800 bg-[#FBFaf7] dark:bg-[#0c0c0e] -mx-3 sm:-mx-4 md:-mx-5 px-3 sm:px-4 md:px-5 shrink-0 overflow-x-auto scrollbar-hide w-[calc(100%+1.5rem)] sm:w-[calc(100%+2rem)] md:w-[calc(100%+2.5rem)] max-w-[calc(100%+1.5rem)] sm:max-w-[calc(100%+2rem)] md:max-w-[calc(100%+2.5rem)] mb-4" style="position: -webkit-sticky; position: sticky; top: var(--cora-sticky-tabs-top, 0px); left: 0; right: 0; z-index: 40; touch-action: pan-x pan-y; -webkit-overflow-scrolling: touch; scrollbar-width: none; min-height: 40px; height: 40px; padding-top: 0; padding-bottom: 0; margin-top: 0;">
         <button id="tab-btn-email-tab-compose" onclick="coraSwitchEmailSubTab('email-tab-compose')"
-                class="cora-email-sub-tab px-3.5 py-2 text-xs font-bold text-zinc-900 border-b-2 border-zinc-950 transition-all whitespace-nowrap cursor-pointer shrink-0">
+                class="cora-email-sub-tab px-3.5 h-[40px] py-0 -mb-px text-xs font-bold text-zinc-900 border-b-2 border-zinc-950 transition-all whitespace-nowrap cursor-pointer shrink-0 inline-flex items-center">
             Compose & Send
         </button>
         <button id="tab-btn-email-tab-templates" onclick="coraSwitchEmailSubTab('email-tab-templates')"
-                class="cora-email-sub-tab px-3.5 py-2 text-xs font-semibold text-zinc-500 hover:text-zinc-900 border-b-2 border-transparent transition-all whitespace-nowrap cursor-pointer shrink-0">
+                class="cora-email-sub-tab px-3.5 h-[40px] py-0 -mb-px text-xs font-semibold text-zinc-500 hover:text-zinc-900 border-b-2 border-transparent transition-all whitespace-nowrap cursor-pointer shrink-0 inline-flex items-center">
             Email Templates
         </button>
         <button id="tab-btn-email-tab-sequences" onclick="coraSwitchEmailSubTab('email-tab-sequences')"
-                class="cora-email-sub-tab px-3.5 py-2 text-xs font-semibold text-zinc-500 hover:text-zinc-900 border-b-2 border-transparent transition-all whitespace-nowrap cursor-pointer shrink-0">
+                class="cora-email-sub-tab px-3.5 h-[40px] py-0 -mb-px text-xs font-semibold text-zinc-500 hover:text-zinc-900 border-b-2 border-transparent transition-all whitespace-nowrap cursor-pointer shrink-0 inline-flex items-center">
             Automated Drip Sequences
         </button>
         <button id="tab-btn-email-tab-outbox" onclick="coraSwitchEmailSubTab('email-tab-outbox')"
-                class="cora-email-sub-tab px-3.5 py-2 text-xs font-semibold text-zinc-500 hover:text-zinc-900 border-b-2 border-transparent transition-all whitespace-nowrap cursor-pointer shrink-0">
+                class="cora-email-sub-tab px-3.5 h-[40px] py-0 -mb-px text-xs font-semibold text-zinc-500 hover:text-zinc-900 border-b-2 border-transparent transition-all whitespace-nowrap cursor-pointer shrink-0 inline-flex items-center">
             Outbox & Sent Logs
         </button>
         <button id="tab-btn-email-tab-settings" onclick="coraSwitchEmailSubTab('email-tab-settings')"
-                class="cora-email-sub-tab px-3.5 py-2 text-xs font-semibold text-zinc-500 hover:text-zinc-900 border-b-2 border-transparent transition-all whitespace-nowrap cursor-pointer shrink-0">
+                class="cora-email-sub-tab px-3.5 h-[40px] py-0 -mb-px text-xs font-semibold text-zinc-500 hover:text-zinc-900 border-b-2 border-transparent transition-all whitespace-nowrap cursor-pointer shrink-0 inline-flex items-center">
             SMTP & Provider Settings
         </button>
     </div>
 
     <!-- MAIN SUB-TAB CONTENT PANELS CONTAINER -->
-    <div class="flex-1 mt-4 min-h-0 relative">
+    <div class="flex-1 min-h-0 relative">
         
         <!-- SUB-TAB 1: COMPOSE & SEND -->
-        <div id="email-tab-compose" class="cora-email-tab-content flex-1 flex flex-col h-full min-h-0">
+        <div id="email-tab-compose" class="cora-email-tab-content flex-1 flex flex-col h-full min-h-0 space-y-4">
+            
+            <!-- Top KPI Summary Cards Row (2x2 Mobile / 1x4 Desktop) -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 shrink-0">
+                <!-- Stat Card 1: Total Emails Sent -->
+                <div class="bg-white border border-zinc-200/80 rounded-xl p-3 shadow-3xs flex items-center justify-between min-w-0">
+                    <div class="min-w-0 pr-2">
+                        <span class="text-[10px] font-bold tracking-wider text-zinc-400 uppercase block truncate">Total Emails Sent</span>
+                        <div class="text-base sm:text-lg font-bold text-zinc-900 mt-0.5 truncate" id="stat-total-sent">--</div>
+                        <span class="text-[10px] text-zinc-500 font-medium block truncate" id="stat-month-sent">-- sent this month</span>
+                    </div>
+                    <div class="w-7 h-7 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-700 shrink-0">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M22 2L11 13"></path><path d="M22 2l-7 20-4-9-9-4 20-7z"></path></svg>
+                    </div>
+                </div>
+
+                <!-- Stat Card 2: Delivery Success Rate -->
+                <div class="bg-white border border-zinc-200/80 rounded-xl p-3 shadow-3xs flex items-center justify-between min-w-0">
+                    <div class="min-w-0 pr-2">
+                        <span class="text-[10px] font-bold tracking-wider text-zinc-400 uppercase block truncate">Delivery Success</span>
+                        <div class="text-base sm:text-lg font-bold text-zinc-900 mt-0.5 truncate" id="stat-success-rate">99.4%</div>
+                        <div class="flex items-center gap-1.5 mt-0.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <span class="text-[10px] text-emerald-600 font-semibold truncate">SMTP Relay Active</span>
+                        </div>
+                    </div>
+                    <div class="w-7 h-7 rounded-lg bg-emerald-50 border border-emerald-200/50 flex items-center justify-center text-emerald-600 shrink-0">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M9 12l2 2 4-4"></path></svg>
+                    </div>
+                </div>
+
+                <!-- Stat Card 3: Email Templates -->
+                <div class="bg-white border border-zinc-200/80 rounded-xl p-3 shadow-3xs flex items-center justify-between cursor-pointer hover:bg-zinc-50/80 transition-all min-w-0" onclick="coraSwitchEmailSubTab('email-tab-templates')">
+                    <div class="min-w-0 pr-2">
+                        <span class="text-[10px] font-bold tracking-wider text-zinc-400 uppercase block truncate">Active Templates</span>
+                        <div class="text-base sm:text-lg font-bold text-zinc-900 mt-0.5 truncate" id="stat-active-templates">6 Active</div>
+                        <span class="text-[10px] text-zinc-500 font-medium block truncate">System & Presets</span>
+                    </div>
+                    <div class="w-7 h-7 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-700 shrink-0">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                    </div>
+                </div>
+
+                <!-- Stat Card 4: SMTP Health -->
+                <div class="bg-white border border-zinc-200/80 rounded-xl p-3 shadow-3xs flex items-center justify-between cursor-pointer hover:bg-zinc-50/80 transition-all min-w-0" onclick="coraSwitchEmailSubTab('email-tab-settings')">
+                    <div class="min-w-0 pr-2">
+                        <span class="text-[10px] font-bold tracking-wider text-zinc-400 uppercase block truncate">SMTP Provider</span>
+                        <div class="text-xs font-bold text-zinc-900 mt-0.5 truncate" id="stat-smtp-provider">SMTP Relay Active</div>
+                        <span class="text-[10px] text-zinc-500 font-mono block truncate">Port 587 / TLS SSL</span>
+                    </div>
+                    <div class="w-7 h-7 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-700 shrink-0">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
+                    </div>
+                </div>
+            </div>
             
             <!-- Mobile Segment Switcher (Compose vs Live Preview) -->
             <div class="flex lg:hidden items-center justify-between mb-3 bg-white p-1 rounded-xl border border-zinc-200">
@@ -1210,7 +1210,7 @@ jQuery(document).ready(function($) {
                 }
             },
             error: function() {
-                $console.html(`[FATAL] Network error connecting to WordPress AJAX relay.`);
+                $console.html(`[FATAL] Network error connecting to backend AJAX relay.`);
                 window.coraShowToast && window.coraShowToast("SMTP diagnostic failed to execute.", "error");
             },
             complete: function() {

@@ -65,19 +65,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 2. Configuration
-    const apiToken = process.env.HOSTINGER_EMAIL_API_TOKEN;
-    const mailboxId = process.env.HOSTINGER_MAILBOX_RESOURCE_ID;
-    const targetEmail = process.env.NOTIFICATION_FORWARD_EMAIL || 'notifications@cora.local';
-
-    if (!apiToken || !mailboxId) {
-      console.error('[Contact API] Missing required Hostinger email API configuration in environment variables.');
-      return NextResponse.json(
-        { success: false, error: 'Email service configuration unavailable. Please reach out directly or try again later.' },
-        { status: 503 }
-      );
-    }
-
+    // 2. Data Sanitization
     const cleanName = escapeHtml(name.trim().slice(0, 100));
     const cleanEmail = escapeHtml(email.trim().slice(0, 120));
     const cleanPhone = phone ? escapeHtml(phone.trim().slice(0, 30)) : 'Not provided';
@@ -93,6 +81,55 @@ export async function POST(req: NextRequest) {
       dateStyle: 'full',
       timeStyle: 'medium'
     });
+
+    // 3. Bridge enquiry directly into Cora CRM & Form Submissions Engine (Non-blocking)
+    try {
+      const wpBaseUrl = process.env.NEXT_PUBLIC_WORDPRESS_URL || 
+                        process.env.WORDPRESS_URL || 
+                        (process.env.CORA_GROWTH_API_URL ? new URL(process.env.CORA_GROWTH_API_URL).origin : 'http://cora.local');
+      
+      const crmPayload = {
+        submitted_data: {
+          'Full Name': cleanName,
+          'Email Address': cleanEmail,
+          'Phone / WhatsApp': cleanPhone,
+          'Company / Studio': cleanCompany,
+          'Industry': cleanIndustry,
+          'Topics of Interest': topicsList,
+          'Message / Notes': cleanMessage,
+          'Source': cleanSource,
+          'Submission Timestamp': submissionTime
+        }
+      };
+
+      fetch(`${wpBaseUrl}/wp-json/cora/v1/forms/contact_us/submit`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(crmPayload),
+        signal: AbortSignal.timeout(4000)
+      }).catch((crmErr) => {
+        console.warn('[Contact API] Cora CRM background sync warning:', crmErr?.message || crmErr);
+      });
+    } catch (crmEx) {
+      console.warn('[Contact API] Cora CRM endpoint resolution error:', crmEx);
+    }
+
+    // 4. Configuration for Email Forwarding
+    const apiToken = process.env.HOSTINGER_EMAIL_API_TOKEN;
+    const mailboxId = process.env.HOSTINGER_MAILBOX_RESOURCE_ID;
+    const targetEmail = process.env.NOTIFICATION_FORWARD_EMAIL || 'notifications@cora.local';
+
+    if (!apiToken || !mailboxId) {
+      console.warn('[Contact API] Hostinger email API not configured. Enquiry saved in Cora CRM.');
+      return NextResponse.json({
+        success: true,
+        delivered: false,
+        message: 'Enquiry received and recorded in workspace CRM.'
+      });
+    }
 
     const subject = `⚡ New Inbound Lead: ${cleanName} — ${cleanCompany !== 'Not specified' ? cleanCompany : cleanIndustry}`;
 
@@ -210,7 +247,7 @@ Received: ${submissionTime} IST
 Forwarded to: ${targetEmail}
     `.trim();
 
-    // 4. Dispatch via Hostinger Email API
+    // 5. Dispatch via Hostinger Email API
     const response = await fetch(`https://api.mail.hostinger.com/api/v1/mailboxes/${mailboxId}/send`, {
       method: 'POST',
       headers: {

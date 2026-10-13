@@ -90,6 +90,22 @@ The Cora platform enforces a full 5-level Atomic Component Architecture defined 
 - **Strictly Protected Archive Branches & Tags**: The remote branch `archive/virtual-subdomain-architecture` and release tag `archive-virtual-subdomain-architecture-locked` contain the complete virtual subdomain multi-tenancy architecture, dynamic vhost routing, and Hostinger automated provisioning engines.
 - **Zero Deletion / Zero Overwrite Policy**: Under NO circumstances should this branch or tag be deleted (`git branch -D`, `git push --delete`), force-pushed (`git push -f`), or modified. All future workspace work must strictly branch from `main` or new dedicated feature branches.
 
+## 15. Shopify-Inspired Main-Area Docked View Panel Standard Operating Procedure (SOP)
+- **Universal Bottom-Slide Motion (`translateY(0)`)**: ALL workspace drawers, editors, and sheet forms MUST slide up smoothly from the bottom (`translateY(100%)` to `translateY(0)`) into a clean, docked main-area view panel.
+- **Direct Below-Header Docking**: The panel docks directly beneath the global top header (`top: var(--cora-main-top, 52px); height: var(--cora-main-height, calc(100vh - 52px)); bottom: 0;`).
+- **Dynamic Available Space Sizing**: The panel MUST strictly occupy the exact available space in the main content canvas based on sidebar status:
+  - Sidebar Expanded (`w-64` / 16rem): `left: 16rem; width: calc(100vw - 16rem); right: 0;`
+  - Sidebar Collapsed (`w-16` / 4rem): `left: 4rem; width: calc(100vw - 4rem); right: 0;`
+  - Mobile / Off-Canvas (`< 1024px`): `left: 0; width: 100vw; right: 0;`
+  - Bounds MUST dynamically synchronize in real-time (`MutationObserver` on sidebar class mutations and window `resize`).
+- **Zero Overlay / Zero Backdrop**: No dark dimming, blur overlay, or backdrop element behind the panel (`backdrop: false`). The UI remains clean, formal, professional, and directly integrated into the workspace.
+- **Zero Shadow & Clear Structural Boundaries**: Floating card shadows and rounded corners are strictly prohibited (`box-shadow: none !important; border-radius: 0 !important;`). The panel is demarcated by clear formal architectural borders (`border-left: 1px solid var(--border); border-top: 1px solid var(--border);`).
+- **Sidebar Remains 100% Accessible & Visible**: The sidebar is never covered, overlapped, or locked. Users can see and click any navigation link at all times.
+- **Scoped Main Scroll Lock**: Scroll locking applies strictly to `main.cora-main` (`mainEl.classList.add('overflow-hidden')`), leaving `document.body` and the sidebar completely unlocked.
+- **Escape Key Dismissal**: All docked panels must register a global `Escape` key event listener to close immediately on press.
+- **Level 01 Segmented Pill Tabs**: Multi-tab panels must use the Level 01 Segmented Control container: `p-1 bg-zinc-100/90 dark:bg-zinc-800/80 rounded-xl border border-zinc-200/70 dark:border-zinc-800/80` with active tab styled as `bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white shadow-2xs font-bold rounded-lg px-3 py-1.5`.
+- **Zero Browser Default Controls**: Native browser selects `<select>` and raw unstyled checkboxes are strictly forbidden. Use monochromatic pill segmented controls, custom styled dropdowns, or toggle switches.
+
 
 
 

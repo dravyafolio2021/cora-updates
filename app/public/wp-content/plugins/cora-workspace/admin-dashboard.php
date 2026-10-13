@@ -157,7 +157,7 @@ if ( in_array( $sub_page, array( 'dashboard', 'bookings', 'tasks', 'client-tasks
 $cora_workspace_listings = ( in_array( $sub_page, array( 'dashboard', 'equipment', 'leads', 'bookings', 'tasks', 'client-tasks', 'client_tasks', 'client-task-manager' ) ) ) ? cora_db_get_properties() : array();
 $cora_permissions = get_option( 'cora_role_permissions', array() );
 // Auto-grant access to new enterprise modules for all active roles
-$cora_new_module_keys = array('event_timeline', 'event-timeline', 'review_acquisition', 'smart-reviews', 'crew_scheduler', 'crew-scheduler', 'team_scheduler', 'team-scheduler', 'vault', 'emails', 'plant_inventory', 'plant-inventory', 'stationery_inventory', 'stationery-inventory', 'inventory', 'inventory_management', 'affiliates', 'referrals');
+$cora_new_module_keys = array('event_timeline', 'event-timeline', 'review_acquisition', 'smart-reviews', 'crew_scheduler', 'crew-scheduler', 'team_scheduler', 'team-scheduler', 'vault', 'emails', 'plant_inventory', 'plant-inventory', 'stationery_inventory', 'stationery-inventory', 'inventory', 'inventory_management', 'affiliates', 'referrals', 'projects', 'case-studies', 'case_studies');
 if ( is_array( $cora_permissions ) ) {
     foreach ( $cora_permissions as $r_key => $r_perms ) {
         if ( is_array( $r_perms ) ) {
@@ -9604,8 +9604,8 @@ textarea,
             </section>
             <?php endif; ?>
 
-            <!-- SECTION 4: CLIENT GALLERIES -->
-            <?php if ( $sub_page === 'portfolio' ) : ?>
+            <!-- SECTION 4: CLIENT GALLERIES (LEGACY) -->
+            <?php if ( $sub_page === 'client-galleries' ) : ?>
             <?php $cora_portfolios = get_option( 'cora_workspace_portfolios', array() ); ?>
             <section id="cora-page-portfolio" class="cora-page-section cora-active flex flex-col h-full overflow-hidden bg-white -m-4 p-0 md:-m-8 md:p-0">
                 <!-- TOP NAVIGATION BAR -->
@@ -10567,6 +10567,13 @@ textarea,
             <?php if ( $sub_page === 'feature-hub' ) : ?>
             <section id="cora-page-feature-hub" class="cora-page-section cora-active">
                 <?php include CORA_WORKSPACE_PATH . 'views/view-feature-hub.php'; ?>
+            </section>
+            <?php endif; ?>
+
+            <!-- SECTION: PROJECTS & PORTFOLIO CASE STUDIES -->
+            <?php if ( in_array( $sub_page, array( 'projects', 'portfolio', 'case-studies', 'case_studies' ), true ) ) : ?>
+            <section id="cora-page-projects" class="cora-page-section cora-active">
+                <?php include CORA_WORKSPACE_PATH . 'views/view-projects.php'; ?>
             </section>
             <?php endif; ?>
 

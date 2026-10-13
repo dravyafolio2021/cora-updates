@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import Lenis from 'lenis';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
@@ -10,7 +11,10 @@ if (typeof window !== 'undefined') {
 }
 
 export function SmoothScrollProvider({ children }: { children: React.ReactNode }) {
+  const isDesignSystem = usePathname()?.startsWith('/design-system');
   useEffect(() => {
+    // The reference uses native scrolling, including reduced-motion and anchor navigation.
+    if (isDesignSystem) return;
     // Only enable Lenis smooth scrolling on non-touch desktop viewports to prevent mobile scroll hijacking
     const isTouch = 
       typeof window !== 'undefined' && 
@@ -47,7 +51,7 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
       gsap.ticker.remove(updateTicker);
       lenis.destroy();
     };
-  }, []);
+  }, [isDesignSystem]);
 
   return <>{children}</>;
 }

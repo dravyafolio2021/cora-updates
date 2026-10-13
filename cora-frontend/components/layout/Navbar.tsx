@@ -150,7 +150,7 @@ export function Navbar() {
   }, []);
 
   // Dedicated independent header on Docs pages & Partner Landing Pages (Menu not required)
-  const isHiddenRoute = pathname?.startsWith('/docs') || pathname?.startsWith('/vanshrajput') || pathname?.startsWith('/vnxdigital');
+  const isHiddenRoute = pathname?.startsWith('/docs') || pathname?.startsWith('/design-system') || pathname?.startsWith('/vanshrajput') || pathname?.startsWith('/vnxdigital');
   if (isHiddenRoute) {
     return null;
   }
@@ -848,6 +848,17 @@ export function Navbar() {
                             <Sparkles className="w-4 h-4 stroke-[2]" />
                           </div>
                           <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black">About Cora</span>
+                        </Link>
+
+                        <Link
+                          href="/projects"
+                          onClick={() => setActiveDropdown(null)}
+                          className="flex items-center gap-3 p-2 rounded-xl text-xs font-semibold text-zinc-800 hover:text-black hover:bg-zinc-50 transition-all group"
+                        >
+                          <div className="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-600 border border-indigo-500/20 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                            <Layers className="w-4 h-4 stroke-[2]" />
+                          </div>
+                          <span className="text-[13px] font-bold text-zinc-900 group-hover:text-black">Case Studies &amp; Projects</span>
                         </Link>
 
                         <Link

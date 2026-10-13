@@ -345,6 +345,32 @@ function cora_get_sparkline_points( $history, $type ) {
         }
         ?>
 
+        <!-- Sticky Sub-Navigation Tabs SOP (~40px Sleek Height - Edge-to-Edge - Just After Header) -->
+        <div id="cora-canvas-subtabs" class="cora-sub-tabs-container cora-sticky-sub-tabs flex items-center gap-1 border-b border-zinc-200/80 dark:border-zinc-800 bg-[#FBFaf7] dark:bg-[#0c0c0e] -mx-3 sm:-mx-4 md:-mx-5 px-3 sm:px-4 md:px-5 shrink-0 overflow-x-auto scrollbar-hide w-[calc(100%+1.5rem)] sm:w-[calc(100%+2rem)] md:w-[calc(100%+2.5rem)] max-w-[calc(100%+1.5rem)] sm:max-w-[calc(100%+2rem)] md:max-w-[calc(100%+2.5rem)] mb-4" style="position: -webkit-sticky; position: sticky; top: var(--cora-sticky-tabs-top, 0px); left: 0; right: 0; z-index: 40; touch-action: pan-x pan-y; -webkit-overflow-scrolling: touch; scrollbar-width: none; min-height: 40px; height: 40px; padding-top: 0; padding-bottom: 0; margin-top: 0;">
+            <button type="button" onclick="coraSwitchCanvasSubTab('tab-canvas-overview')" id="subtab-btn-tab-canvas-overview"
+                    class="cora-canvas-sub-tab px-3.5 h-[40px] py-0 -mb-px text-xs font-bold whitespace-nowrap transition-all border-b-2 border-zinc-950 text-zinc-950 inline-flex items-center gap-1.5 cursor-pointer bg-transparent">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                <span>Theme Library</span>
+            </button>
+            <button type="button" onclick="coraSwitchCanvasSubTab('tab-canvas-vitals')" id="subtab-btn-tab-canvas-vitals"
+                    class="cora-canvas-sub-tab px-3.5 h-[40px] py-0 -mb-px text-xs font-medium whitespace-nowrap transition-all border-b-2 border-transparent text-zinc-500 hover:text-zinc-900 inline-flex items-center gap-1.5 cursor-pointer bg-transparent">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                <span>Speed & Core Web Vitals</span>
+            </button>
+            <button type="button" onclick="coraSwitchCanvasSubTab('tab-canvas-migration')" id="subtab-btn-tab-canvas-migration"
+                    class="hidden md:inline-flex cora-canvas-sub-tab px-3.5 h-[40px] py-0 -mb-px text-xs font-medium whitespace-nowrap transition-all border-b-2 border-transparent text-zinc-500 hover:text-zinc-900 items-center gap-1.5 cursor-pointer bg-transparent">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                <span>Migration & Tools</span>
+            </button>
+            <!-- Extreme Edge: GitHub Integration -->
+            <button type="button" onclick="coraSwitchCanvasSubTab('tab-canvas-github')" id="subtab-btn-tab-canvas-github"
+                    class="cora-canvas-sub-tab sm:ml-auto px-3.5 h-[40px] py-0 -mb-px text-xs font-medium whitespace-nowrap transition-all border-b-2 border-transparent text-zinc-500 hover:text-zinc-900 inline-flex items-center gap-1.5 cursor-pointer bg-transparent" title="GitHub Multi-Tenant Workspace Integration">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+                <span>GitHub Integration</span>
+                <span id="cora-github-subtab-badge" class="ml-1 text-[9px] font-mono px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-600 border border-zinc-200/80">Sync</span>
+            </button>
+        </div>
+
         <!-- Hidden Backdoor Buttons for Automated Tests -->
         <div class="sr-only" aria-hidden="true" style="position: absolute; width: 1px; height: 1px; overflow: hidden; opacity: 0.001; pointer-events: auto;">
             <button onclick="openAddThemeWizard()">+ New Theme</button>
@@ -415,87 +441,67 @@ function cora_get_sparkline_points( $history, $type ) {
         $canvas_display_url = wp_parse_url( home_url(), PHP_URL_HOST ) . '/site';
         ?>
 
-        <!-- Consolidated High-Density KPI Summary Cards Row (2x2 Mobile / 1x4 Desktop) -->
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 shrink-0">
-            <!-- Stat Card 1: Core Web Vitals Score -->
-            <div class="bg-white border border-zinc-200/80 rounded-xl p-3 shadow-3xs flex items-center justify-between min-w-0 cursor-pointer hover:bg-zinc-50/80 transition-all" onclick="coraSwitchCanvasSubTab('tab-canvas-vitals')">
-                <div class="min-w-0 pr-2">
-                    <span class="text-[10px] font-bold tracking-wider text-zinc-400 uppercase block truncate">Core Web Vitals</span>
-                    <div class="flex items-center gap-1.5 mt-0.5">
-                        <span id="pagespeed-val-score" class="text-base sm:text-lg font-bold text-zinc-900 leading-none"><?php echo esc_html($ps_score); ?></span>
-                        <span id="pagespeed-badge-score"><?php echo $score_badge; ?></span>
-                    </div>
-                    <span class="text-[10px] text-zinc-500 font-medium block truncate mt-0.5">Target &gt; 89 Score</span>
-                </div>
-                <div class="w-7 h-7 rounded-lg bg-emerald-50 border border-emerald-200/50 flex items-center justify-center text-emerald-600 shrink-0">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M9 12l2 2 4-4"></path></svg>
-                </div>
-            </div>
-
-            <!-- Stat Card 2: LCP Load Speed -->
-            <div class="bg-white border border-zinc-200/80 rounded-xl p-3 shadow-3xs flex items-center justify-between min-w-0 cursor-pointer hover:bg-zinc-50/80 transition-all" onclick="coraSwitchCanvasSubTab('tab-canvas-vitals')">
-                <div class="min-w-0 pr-2">
-                    <span class="text-[10px] font-bold tracking-wider text-zinc-400 uppercase block truncate">Largest Paint (LCP)</span>
-                    <div class="flex items-center gap-1.5 mt-0.5">
-                        <span id="pagespeed-val-lcp" class="text-base sm:text-lg font-bold text-zinc-900 leading-none"><?php echo esc_html($ps_lcp); ?></span>
-                        <span id="pagespeed-badge-lcp"><?php echo $lcp_badge; ?></span>
-                    </div>
-                    <div class="flex items-center gap-1.5 mt-0.5">
-                        <span id="pagespeed-conn-indicator" class="w-1.5 h-1.5 rounded-full shrink-0 <?php echo $ps_is_mocked ? 'bg-amber-400' : 'bg-emerald-500'; ?>"></span>
-                        <span id="pagespeed-conn-text" class="text-[10px] text-zinc-500 font-medium truncate"><?php echo $ps_is_mocked ? 'Simulated' : 'Connected'; ?></span>
-                    </div>
-                </div>
-                <div class="w-7 h-7 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-700 shrink-0">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                </div>
-            </div>
-
-            <!-- Stat Card 3: Active & Draft Themes -->
-            <div class="bg-white border border-zinc-200/80 rounded-xl p-3 shadow-3xs flex items-center justify-between min-w-0 cursor-pointer hover:bg-zinc-50/80 transition-all" onclick="coraSwitchCanvasSubTab('tab-canvas-overview'); document.getElementById('draft-themes-library-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' });">
-                <div class="min-w-0 pr-2">
-                    <span class="text-[10px] font-bold tracking-wider text-zinc-400 uppercase block truncate">Themes Library</span>
-                    <div id="canvas-kpi-themes-count" class="text-base sm:text-lg font-bold text-zinc-900 mt-0.5 truncate">1 Live · <?php echo esc_html($total_drafts); ?> Drafts</div>
-                    <span id="canvas-kpi-draft-quota" class="text-[10px] text-zinc-500 font-medium block truncate mt-0.5"><?php echo esc_html($total_drafts); ?> / <?php echo esc_html($draft_limit); ?> Draft Quota</span>
-                </div>
-                <div class="w-7 h-7 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-700 shrink-0">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
-                </div>
-            </div>
-
-            <!-- Stat Card 4: Published Pages & SEO -->
-            <div class="bg-white border border-zinc-200/80 rounded-xl p-3 shadow-3xs flex items-center justify-between min-w-0 cursor-pointer hover:bg-zinc-50/80 transition-all" onclick="editTheme(<?php echo $live_theme ? $live_theme['id'] : 0; ?>, '<?php echo esc_js($live_theme ? $live_theme['name'] : ''); ?>', true); switchTab('pages');">
-                <div class="min-w-0 pr-2">
-                    <span class="text-[10px] font-bold tracking-wider text-zinc-400 uppercase block truncate">Published Pages</span>
-                    <div class="text-base sm:text-lg font-bold text-zinc-900 mt-0.5 truncate"><?php echo esc_html($pub_count); ?> Pages Live</div>
-                    <span class="text-[10px] text-emerald-600 font-semibold block truncate mt-0.5"><?php echo $seo_issues === 0 ? '✓ 100% SEO Ready' : ($seo_issues . ' SEO warnings'); ?></span>
-                </div>
-                <div class="w-7 h-7 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-700 shrink-0">
-                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-                </div>
-            </div>
-        </div>
-
-        <!-- Sticky Sub-Navigation Tabs SOP (~36px Sleek Height - Edge-to-Edge) -->
-        <div id="cora-canvas-subtabs" class="cora-sub-tabs-container cora-sticky-sub-tabs sticky z-30 flex items-center gap-1 border-b border-zinc-200/80 bg-white/95 backdrop-blur-md -mx-3 sm:-mx-4 md:-mx-5 px-3 sm:px-4 md:px-5 shrink-0 overflow-x-auto no-scrollbar" style="touch-action: pan-x; -webkit-overflow-scrolling: touch; scrollbar-width: none;">
-            <button type="button" onclick="coraSwitchCanvasSubTab('tab-canvas-overview')" id="subtab-btn-tab-canvas-overview"
-                    class="cora-canvas-sub-tab px-3.5 py-2.5 text-xs font-bold whitespace-nowrap transition-all border-b-2 border-zinc-950 text-zinc-950 flex items-center gap-1.5 cursor-pointer bg-transparent">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
-                <span>Theme Library</span>
-            </button>
-            <button type="button" onclick="coraSwitchCanvasSubTab('tab-canvas-vitals')" id="subtab-btn-tab-canvas-vitals"
-                    class="cora-canvas-sub-tab px-3.5 py-2.5 text-xs font-medium whitespace-nowrap transition-all border-b-2 border-transparent text-zinc-500 hover:text-zinc-900 flex items-center gap-1.5 cursor-pointer bg-transparent">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
-                <span>Speed & Core Web Vitals</span>
-            </button>
-            <button type="button" onclick="coraSwitchCanvasSubTab('tab-canvas-migration')" id="subtab-btn-tab-canvas-migration"
-                    class="hidden md:flex cora-canvas-sub-tab px-3.5 py-2.5 text-xs font-medium whitespace-nowrap transition-all border-b-2 border-transparent text-zinc-500 hover:text-zinc-900 items-center gap-1.5 cursor-pointer bg-transparent">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                <span>Migration & Tools</span>
-            </button>
-        </div>
-
         <!-- SUB-TAB 1: OVERVIEW & ACTIVE THEME -->
         <div id="tab-canvas-overview" class="cora-canvas-tab-content space-y-4">
+            <!-- Consolidated High-Density KPI Summary Cards Row (2x2 Mobile / 1x4 Desktop) -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 shrink-0">
+                <!-- Stat Card 1: Core Web Vitals Score -->
+                <div class="bg-white border border-zinc-200/80 rounded-xl p-3 shadow-3xs flex items-center justify-between min-w-0 cursor-pointer hover:bg-zinc-50/80 transition-all" onclick="coraSwitchCanvasSubTab('tab-canvas-vitals')">
+                    <div class="min-w-0 pr-2">
+                        <span class="text-[10px] font-bold tracking-wider text-zinc-400 uppercase block truncate">Core Web Vitals</span>
+                        <div class="flex items-center gap-1.5 mt-0.5">
+                            <span id="pagespeed-val-score" class="text-base sm:text-lg font-bold text-zinc-900 leading-none"><?php echo esc_html($ps_score); ?></span>
+                            <span id="pagespeed-badge-score"><?php echo $score_badge; ?></span>
+                        </div>
+                        <span class="text-[10px] text-zinc-500 font-medium block truncate mt-0.5">Target &gt; 89 Score</span>
+                    </div>
+                    <div class="w-7 h-7 rounded-lg bg-emerald-50 border border-emerald-200/50 flex items-center justify-center text-emerald-600 shrink-0">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M9 12l2 2 4-4"></path></svg>
+                    </div>
+                </div>
+
+                <!-- Stat Card 2: LCP Load Speed -->
+                <div class="bg-white border border-zinc-200/80 rounded-xl p-3 shadow-3xs flex items-center justify-between min-w-0 cursor-pointer hover:bg-zinc-50/80 transition-all" onclick="coraSwitchCanvasSubTab('tab-canvas-vitals')">
+                    <div class="min-w-0 pr-2">
+                        <span class="text-[10px] font-bold tracking-wider text-zinc-400 uppercase block truncate">Largest Paint (LCP)</span>
+                        <div class="flex items-center gap-1.5 mt-0.5">
+                            <span id="pagespeed-val-lcp" class="text-base sm:text-lg font-bold text-zinc-900 leading-none"><?php echo esc_html($ps_lcp); ?></span>
+                            <span id="pagespeed-badge-lcp"><?php echo $lcp_badge; ?></span>
+                        </div>
+                        <div class="flex items-center gap-1.5 mt-0.5">
+                            <span id="pagespeed-conn-indicator" class="w-1.5 h-1.5 rounded-full shrink-0 <?php echo $ps_is_mocked ? 'bg-amber-400' : 'bg-emerald-500'; ?>"></span>
+                            <span id="pagespeed-conn-text" class="text-[10px] text-zinc-500 font-medium truncate"><?php echo $ps_is_mocked ? 'Simulated' : 'Connected'; ?></span>
+                        </div>
+                    </div>
+                    <div class="w-7 h-7 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-700 shrink-0">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    </div>
+                </div>
+
+                <!-- Stat Card 3: Active & Draft Themes -->
+                <div class="bg-white border border-zinc-200/80 rounded-xl p-3 shadow-3xs flex items-center justify-between min-w-0 cursor-pointer hover:bg-zinc-50/80 transition-all" onclick="coraSwitchCanvasSubTab('tab-canvas-overview'); document.getElementById('draft-themes-library-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' });">
+                    <div class="min-w-0 pr-2">
+                        <span class="text-[10px] font-bold tracking-wider text-zinc-400 uppercase block truncate">Themes Library</span>
+                        <div id="canvas-kpi-themes-count" class="text-base sm:text-lg font-bold text-zinc-900 mt-0.5 truncate">1 Live · <?php echo esc_html($total_drafts); ?> Drafts</div>
+                        <span id="canvas-kpi-draft-quota" class="text-[10px] text-zinc-500 font-medium block truncate mt-0.5"><?php echo esc_html($total_drafts); ?> / <?php echo esc_html($draft_limit); ?> Draft Quota</span>
+                    </div>
+                    <div class="w-7 h-7 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-700 shrink-0">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                    </div>
+                </div>
+
+                <!-- Stat Card 4: Published Pages & SEO -->
+                <div class="bg-white border border-zinc-200/80 rounded-xl p-3 shadow-3xs flex items-center justify-between min-w-0 cursor-pointer hover:bg-zinc-50/80 transition-all" onclick="editTheme(<?php echo $live_theme ? $live_theme['id'] : 0; ?>, '<?php echo esc_js($live_theme ? $live_theme['name'] : ''); ?>', true); switchTab('pages');">
+                    <div class="min-w-0 pr-2">
+                        <span class="text-[10px] font-bold tracking-wider text-zinc-400 uppercase block truncate">Published Pages</span>
+                        <div class="text-base sm:text-lg font-bold text-zinc-900 mt-0.5 truncate"><?php echo esc_html($pub_count); ?> Pages Live</div>
+                        <span class="text-[10px] text-emerald-600 font-semibold block truncate mt-0.5"><?php echo $seo_issues === 0 ? '✓ 100% SEO Ready' : ($seo_issues . ' SEO warnings'); ?></span>
+                    </div>
+                    <div class="w-7 h-7 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-700 shrink-0">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                    </div>
+                </div>
+            </div>
             <?php if ( $live_theme ) : 
                 $live_theme_settings = json_decode($live_theme['settings'], true) ?: array();
                 $live_source = strtolower($live_theme_settings['source'] ?? '');
@@ -1178,7 +1184,574 @@ function cora_get_sparkline_points( $history, $type ) {
                 </div>
             </div>
         </div>
-    </div>
+
+        <!-- SUB-TAB 4: GITHUB INTEGRATION & WORKSPACE SYNC -->
+        <div id="tab-canvas-github" class="cora-canvas-tab-content hidden space-y-6">
+
+            <!-- ========================================================================= -->
+            <!-- 1. UNCONNECTED STATE: SPACIOUS, BEAUTIFUL SAAS ONBOARDING (WHEN NO REPO)  -->
+            <!-- ========================================================================= -->
+            <div id="cora-gh-unconnected-view" class="py-8 sm:py-14 max-w-4xl mx-auto space-y-10">
+                <!-- Hero Header with Generous White Space -->
+                <div class="text-center space-y-3">
+                    <div class="w-14 h-14 rounded-2xl bg-zinc-100 flex items-center justify-center text-zinc-950 mx-auto mb-4 border border-zinc-200/60 shadow-3xs">
+                        <svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+                    </div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-zinc-950 tracking-tight">Connect GitHub to Workspace</h2>
+                    <p class="text-xs sm:text-sm text-zinc-500 max-w-lg mx-auto leading-relaxed">
+                        Automatic Git versioning and 1-click snapshot rollbacks. Every text modification, layout change, and asset is safely tracked and completely reversible.
+                    </p>
+                    <div class="pt-2 flex items-center justify-center gap-3">
+                        <button type="button" onclick="coraOpenGithubGuideModal()" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-xs font-semibold transition-colors cursor-pointer border border-zinc-200/80">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                            <span>How it Works &amp; Step-by-Step Guide</span>
+                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Dual Connection Choice Cards (Spacious 2-Column Grid) -->
+                <div id="cora-gh-unconnected-choices" class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+
+                    <!-- Method A: Personal GitHub Account -->
+                    <div class="bg-white border border-zinc-200/90 rounded-2xl p-6 sm:p-7 shadow-3xs flex flex-col justify-between hover:border-zinc-300 transition-all space-y-6">
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <span class="px-2.5 py-1 text-[10px] font-mono font-bold uppercase rounded-md bg-zinc-100 text-zinc-700 border border-zinc-200">Personal GitHub</span>
+                                <span class="text-[10px] text-zinc-400 font-mono">For Developers &amp; Teams</span>
+                            </div>
+                            <div>
+                                <h3 class="text-base font-bold text-zinc-950">Connect Personal GitHub Account</h3>
+                                <p class="text-xs text-zinc-500 mt-1.5 leading-relaxed">
+                                    Link your personal or organisation GitHub account using a Personal Access Token. Repositories and branches are managed directly under your account.
+                                </p>
+                            </div>
+
+                            <!-- 3rd Party Direct Link -->
+                            <div class="p-3.5 bg-zinc-50 border border-zinc-200/80 rounded-xl space-y-2">
+                                <div class="flex items-center justify-between gap-2">
+                                    <span class="text-[11px] font-bold text-zinc-800">1. Generate Token on GitHub</span>
+                                    <span class="text-[10px] font-mono text-zinc-500 font-semibold">Pre-Configured</span>
+                                </div>
+                                <p class="text-[11px] text-zinc-500 leading-snug">
+                                    Opens GitHub with the required <code class="text-[10px] font-mono bg-zinc-200/70 px-1 py-0.5 rounded text-zinc-800">repo</code> and <code class="text-[10px] font-mono bg-zinc-200/70 px-1 py-0.5 rounded text-zinc-800">read:org</code> scopes automatically pre-selected.
+                                </p>
+                                <a href="https://github.com/settings/tokens/new?scopes=repo,read:org&description=Cora%20Studio%20Integration&default_expires_at=90" target="_blank" rel="noopener noreferrer" class="w-full py-2 px-3 bg-white hover:bg-zinc-100 border border-zinc-200 text-zinc-900 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 no-underline shadow-3xs">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                                    <span>Open GitHub Token Settings &rarr;</span>
+                                </a>
+                            </div>
+
+                            <!-- Paste & Connect Form -->
+                            <div class="space-y-1.5 pt-1">
+                                <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-mono">2. Paste Personal Access Token</label>
+                                <input type="password" id="cora-gh-pat-inline-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxx" class="w-full bg-white border border-zinc-200 rounded-xl px-3.5 py-2.5 text-xs font-mono text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-zinc-900 transition-colors shadow-3xs">
+                            </div>
+                        </div>
+
+                        <div class="space-y-2 pt-2">
+                            <button type="button" onclick="coraConnectPersonalPAT()" id="cora-gh-btn-save-pat" class="w-full py-2.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-xl text-xs font-bold shadow-3xs cursor-pointer transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
+                                <span>Connect Account</span>
+                            </button>
+                            <button type="button" onclick="coraOpenGithubGuideModal()" class="w-full text-center text-[11px] text-zinc-400 hover:text-zinc-800 cursor-pointer transition-colors bg-transparent border-none py-1">
+                                Need help generating your token? View step-by-step guide &rarr;
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Method B: 1-Click Managed Workspace -->
+                    <div class="bg-white border border-zinc-200/90 rounded-2xl p-6 sm:p-7 shadow-3xs flex flex-col justify-between hover:border-zinc-300 transition-all space-y-6">
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <span class="px-2.5 py-1 text-[10px] font-mono font-bold uppercase rounded-md bg-zinc-100 text-zinc-700 border border-zinc-200">Instant Cloud Setup</span>
+                                <span class="text-[10px] text-emerald-600 font-semibold font-mono">No Token Required</span>
+                            </div>
+                            <div>
+                                <h3 class="text-base font-bold text-zinc-950">Managed Cloud Repository</h3>
+                                <p class="text-xs text-zinc-500 mt-1.5 leading-relaxed">
+                                    Zero developer setup needed. We automatically provision an isolated, secure repository for your workspace under Cora Cloud.
+                                </p>
+                            </div>
+
+                            <!-- Benefit checklist -->
+                            <div class="p-3.5 bg-zinc-50 border border-zinc-200/80 rounded-xl space-y-2.5 text-xs text-zinc-600">
+                                <div class="flex items-center gap-2">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" class="text-emerald-600 shrink-0"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                    <span class="font-medium text-zinc-800">Automated daily Git snapshots</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" class="text-emerald-600 shrink-0"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                    <span class="font-medium text-zinc-800">1-click rollback for any accidental edit</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" class="text-emerald-600 shrink-0"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                    <span class="font-medium text-zinc-800">Cryptographically sandboxed workspace tree</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" class="text-emerald-600 shrink-0"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                    <span class="font-medium text-zinc-800">Zero technical configuration required</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2 pt-2">
+                            <button type="button" onclick="coraProvisionOrgRepo()" id="cora-gh-btn-provision-org" class="w-full py-2.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-xl text-xs font-bold shadow-3xs cursor-pointer transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                                <span>Provision Managed Workspace</span>
+                            </button>
+                            <span class="w-full text-center text-[11px] text-zinc-400 block py-1">Takes under 5 seconds &middot; Ready instantly</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Unconnected Post-PAT Repo Setup Card (If PAT connected but no repo linked yet) -->
+                <div id="cora-gh-unconnected-repo-step" class="bg-white border border-zinc-200/90 rounded-2xl p-6 sm:p-7 shadow-3xs space-y-5 hidden">
+                    <div class="flex items-center justify-between border-b border-zinc-100 pb-3">
+                        <div class="flex items-center gap-2.5">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                            <h3 class="text-sm font-bold text-zinc-950">GitHub Account Connected (<span id="cora-gh-connected-user-name">@user</span>)</h3>
+                        </div>
+                        <button type="button" onclick="coraDisconnectGitHub()" class="text-xs text-zinc-400 hover:text-red-600 cursor-pointer transition-colors bg-transparent border-none">Disconnect</button>
+                    </div>
+                    <p class="text-xs text-zinc-500 leading-relaxed">
+                        Your account token is verified. Select an option below to link a repository where your website code and draft revisions will be versioned.
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Create New Repo -->
+                        <div class="p-4 bg-zinc-50 border border-zinc-200/80 rounded-xl space-y-3">
+                            <h4 class="text-xs font-bold text-zinc-900">Create New Repository</h4>
+                            <p class="text-[11px] text-zinc-500">Initialize a private repository directly under your GitHub account.</p>
+                            <input type="text" id="cora-gh-input-new-repo" value="cora-website-<?php echo sanitize_title( get_bloginfo( 'name' ) ?: 'site' ); ?>" class="w-full bg-white border border-zinc-200 rounded-lg px-3 py-2 text-xs font-mono text-zinc-900 focus:outline-none focus:border-zinc-900">
+                            <button type="button" onclick="coraCreateNewRepo()" id="cora-gh-btn-create-repo" class="w-full py-2 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold cursor-pointer transition-all border-none">Create Private Repo</button>
+                        </div>
+                        <!-- Link Existing Repo -->
+                        <div class="p-4 bg-zinc-50 border border-zinc-200/80 rounded-xl space-y-3">
+                            <h4 class="text-xs font-bold text-zinc-900">Link Existing Repository</h4>
+                            <p class="text-[11px] text-zinc-500">Connect a repository you already manage (e.g. owner/repo).</p>
+                            <input type="text" id="cora-gh-input-link-repo" placeholder="owner/repo-name" class="w-full bg-white border border-zinc-200 rounded-lg px-3 py-2 text-xs font-mono text-zinc-900 focus:outline-none focus:border-zinc-900">
+                            <button type="button" onclick="coraLinkExistingRepo()" id="cora-gh-btn-link-repo" class="w-full py-2 border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-900 rounded-lg text-xs font-bold cursor-pointer transition-all">Link Repository</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3-Column Trust & Benefit Bar with Generous White Space -->
+                <div class="pt-8 border-t border-zinc-100 grid grid-cols-1 md:grid-cols-3 gap-6 text-center sm:text-left">
+                    <div class="space-y-1">
+                        <div class="w-8 h-8 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-800 mx-auto sm:mx-0 mb-2">
+                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                        </div>
+                        <h4 class="text-xs font-bold text-zinc-900">1-Click Snapshot Rollbacks</h4>
+                        <p class="text-[11px] text-zinc-500 leading-relaxed">Made an accidental edit or breaking change? Roll back the entire workspace or specific pages to any historical snapshot in 1 click.</p>
+                    </div>
+                    <div class="space-y-1">
+                        <div class="w-8 h-8 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-800 mx-auto sm:mx-0 mb-2">
+                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                        </div>
+                        <h4 class="text-xs font-bold text-zinc-900">Zero Data Loss Backups</h4>
+                        <p class="text-[11px] text-zinc-500 leading-relaxed">Every page layout, theme configuration, and content modification is continuously backed up to an immutable Git commit ledger.</p>
+                    </div>
+                    <div class="space-y-1">
+                        <div class="w-8 h-8 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-800 mx-auto sm:mx-0 mb-2">
+                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="18" cy="18" r="3"></circle><circle cx="6" cy="6" r="3"></circle><path d="M13 6h3a2 2 0 0 1 2 2v7"></path><line x1="6" y1="9" x2="6" y2="21"></line></svg>
+                        </div>
+                        <h4 class="text-xs font-bold text-zinc-900">Collaborative Pull Requests</h4>
+                        <p class="text-[11px] text-zinc-500 leading-relaxed">Test and preview revisions on isolated draft branches before publishing. Team members can review line diffs before merging.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================================================= -->
+            <!-- 2. CONNECTED DASHBOARD: REVEALED ONLY AFTER REPOSITORY IS FULLY LINKED    -->
+            <!-- ========================================================================= -->
+            <div id="cora-gh-connected-dashboard" class="space-y-4 hidden">
+                <!-- 1. Hero Status & KPI Header -->
+                <div class="bg-white border border-zinc-200/80 rounded-xl p-4 sm:p-5 shadow-3xs space-y-4">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-zinc-100">
+                        <div class="flex items-start sm:items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center text-zinc-900 shrink-0">
+                                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <h2 class="text-sm sm:text-base font-bold text-zinc-900">GitHub Workspace Integration</h2>
+                                    <span id="cora-gh-header-status-pill" class="text-[9px] font-mono font-semibold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-600 border border-zinc-200">Checking...</span>
+                                    <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-500 border border-zinc-200">100k Multi-Tenant</span>
+                                </div>
+                                <p class="text-xs text-zinc-500 mt-0.5 leading-relaxed">Connected to GitHub. Autonomous change tracking, automated Pull Requests, and reversible git snapshots for your workspace.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 shrink-0 flex-wrap">
+                            <button type="button" onclick="coraSyncEntireWorkspace()" id="cora-gh-btn-full-sync" class="px-3.5 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold shadow-3xs cursor-pointer transition-all active:scale-95 flex items-center gap-1.5 border-none">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                                <span>Sync Workspace</span>
+                            </button>
+                            <button type="button" onclick="pullDesignTemplates()" class="px-3 py-1.5 border border-zinc-200 hover:bg-zinc-50 text-zinc-700 rounded-lg text-xs font-semibold shadow-3xs cursor-pointer transition-all active:scale-95 flex items-center gap-1.5 bg-white">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="8 17 12 21 16 17"></polyline><line x1="12" y1="12" x2="12" y2="21"></line><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"></path></svg>
+                                <span>Pull</span>
+                            </button>
+                            <button type="button" onclick="openGitDrawer()" class="px-3 py-1.5 border border-zinc-200 hover:bg-zinc-50 text-zinc-700 rounded-lg text-xs font-semibold shadow-3xs cursor-pointer transition-all active:scale-95 flex items-center gap-1.5 bg-white" title="Open Slide Drawer">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="15" y1="3" x2="15" y2="21"></line></svg>
+                                <span>Drawer</span>
+                            </button>
+                            <button type="button" onclick="coraDisconnectGitHub()" id="cora-gh-btn-disconnect-hdr" class="px-2.5 py-1.5 text-zinc-400 hover:text-red-600 rounded-lg text-xs font-medium cursor-pointer transition-colors bg-transparent border-none">
+                                Disconnect
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 4 KPI Status Cards -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                        <!-- KPI 1: Account -->
+                        <div class="bg-zinc-50/70 border border-zinc-200/70 rounded-xl p-3 flex items-center justify-between">
+                            <div class="min-w-0 pr-2">
+                                <span class="text-[10px] font-bold tracking-wider text-zinc-400 uppercase block truncate">GitHub Account</span>
+                                <div class="text-xs sm:text-sm font-bold text-zinc-900 mt-0.5 truncate" id="cora-gh-stat-account">Checking...</div>
+                                <span class="text-[10px] text-zinc-500 font-medium block truncate mt-0.5" id="cora-gh-stat-scope">Personal Access Token</span>
+                            </div>
+                            <div class="w-7 h-7 rounded-lg bg-white border border-zinc-200/80 flex items-center justify-center text-zinc-700 shrink-0">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                            </div>
+                        </div>
+
+                        <!-- KPI 2: Repository & Branch -->
+                        <div class="bg-zinc-50/70 border border-zinc-200/70 rounded-xl p-3 flex items-center justify-between">
+                            <div class="min-w-0 pr-2">
+                                <span class="text-[10px] font-bold tracking-wider text-zinc-400 uppercase block truncate">Active Repository</span>
+                                <div class="text-xs sm:text-sm font-bold text-zinc-900 mt-0.5 truncate">
+                                    <a href="#" id="cora-gh-stat-repo-link" target="_blank" class="hover:underline text-zinc-900 truncate block">No repository linked</a>
+                                </div>
+                                <div class="flex items-center gap-1.5 mt-0.5">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
+                                    <span class="text-[10px] text-zinc-600 font-mono truncate" id="cora-gh-stat-branch">branch: main</span>
+                                </div>
+                            </div>
+                            <div class="w-7 h-7 rounded-lg bg-white border border-zinc-200/80 flex items-center justify-center text-zinc-700 shrink-0">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><line x1="6" y1="3" x2="6" y2="15"></line><circle cx="18" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><path d="M18 9a9 9 0 0 1-9 9"></path></svg>
+                            </div>
+                        </div>
+
+                        <!-- KPI 3: Reversibility Engine -->
+                        <div class="bg-zinc-50/70 border border-zinc-200/70 rounded-xl p-3 flex items-center justify-between">
+                            <div class="min-w-0 pr-2">
+                                <span class="text-[10px] font-bold tracking-wider text-zinc-400 uppercase block truncate">Workflow Mode</span>
+                                <div class="text-xs sm:text-sm font-bold text-zinc-900 mt-0.5 truncate" id="cora-gh-stat-mode">PR Mode (Reversible)</div>
+                                <span class="text-[10px] text-emerald-600 font-semibold block truncate mt-0.5" id="cora-gh-stat-auto-status">✓ Auto-Track Enabled</span>
+                            </div>
+                            <div class="w-7 h-7 rounded-lg bg-white border border-zinc-200/80 flex items-center justify-center text-zinc-700 shrink-0">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline><path d="M4.93 4.93l4.24 4.24"></path></svg>
+                            </div>
+                        </div>
+
+                        <!-- KPI 4: Tenant Scale Isolation -->
+                        <div class="bg-zinc-50/70 border border-zinc-200/70 rounded-xl p-3 flex items-center justify-between">
+                            <div class="min-w-0 pr-2">
+                                <span class="text-[10px] font-bold tracking-wider text-zinc-400 uppercase block truncate">Tenant Security</span>
+                                <div class="text-xs sm:text-sm font-bold text-zinc-900 mt-0.5 truncate">Tenant #ws-<?php echo get_current_user_id(); ?></div>
+                                <span class="text-[10px] text-zinc-500 font-medium block truncate mt-0.5">🔒 Isolated Tree · 100k Safe</span>
+                            </div>
+                            <div class="w-7 h-7 rounded-lg bg-white border border-zinc-200/80 flex items-center justify-center text-zinc-700 shrink-0">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            <!-- 2. Autonomous Tracking & Safe Reversibility Center -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <!-- Reversibility Workflow Configuration -->
+                <div class="bg-white border border-zinc-200/80 rounded-xl p-4 sm:p-5 shadow-3xs space-y-3.5 flex flex-col justify-between">
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between border-b border-zinc-100 pb-2.5">
+                            <div>
+                                <h3 class="text-xs sm:text-sm font-bold text-zinc-900">Change Tracking & Reversibility Engine</h3>
+                                <p class="text-[11px] text-zinc-500 mt-0.5">Control how changes are versioned and audited on GitHub.</p>
+                            </div>
+                            <span class="text-[9px] font-mono font-semibold px-2 py-0.5 rounded bg-zinc-100 text-zinc-700 border border-zinc-200">Reversibility 100%</span>
+                        </div>
+
+                        <!-- Engine Mode Selection (Tonal Monochromatic Cards - SOP Rule 13) -->
+                        <div class="space-y-2">
+                            <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider font-mono">Engine Mode</label>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                <!-- Mode 1: PR Mode -->
+                                <div onclick="coraSetSyncEngineMode('pr')" id="cora-gh-mode-card-pr" class="p-3 rounded-xl border border-zinc-200/80 bg-zinc-100/90 cursor-pointer transition-all space-y-1">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-xs font-bold text-zinc-900">Pull Request (PR) Mode</span>
+                                        <span id="cora-gh-radio-pr" class="w-3.5 h-3.5 rounded-full bg-zinc-950 flex items-center justify-center text-white text-[8px]">✓</span>
+                                    </div>
+                                    <p class="text-[10px] text-zinc-500 leading-snug">Every text change or publish opens an automated PR on a draft branch. Inspect diffs, review, and merge. Completely reversible.</p>
+                                </div>
+
+                                <!-- Mode 2: Direct Commit Mode -->
+                                <div onclick="coraSetSyncEngineMode('direct')" id="cora-gh-mode-card-direct" class="p-3 rounded-xl border border-zinc-200/80 bg-white hover:bg-zinc-50 cursor-pointer transition-all space-y-1">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-xs font-bold text-zinc-900">Direct Commit Mode</span>
+                                        <span id="cora-gh-radio-direct" class="w-3.5 h-3.5 rounded-full border border-zinc-300 flex items-center justify-center text-transparent text-[8px]">✓</span>
+                                    </div>
+                                    <p class="text-[10px] text-zinc-500 leading-snug">Commits and pushes changes directly to the active branch on save or publish for rapid deployment.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Auto-Sync Toggle -->
+                        <div class="pt-1 flex items-center justify-between p-2.5 bg-zinc-50 rounded-lg border border-zinc-200/60">
+                            <div>
+                                <span class="text-xs font-semibold text-zinc-900 block">Auto-Track on Page Save &amp; Publish</span>
+                                <span class="text-[10px] text-zinc-500 block">Trigger automated commit / PR whenever text or design is edited</span>
+                            </div>
+                            <input type="checkbox" id="cora-gh-toggle-auto-sync" onchange="coraToggleAutoSync(this.checked)" checked class="w-4 h-4 accent-zinc-950 cursor-pointer rounded">
+                        </div>
+                    </div>
+
+                    <!-- Branch Selector Strip -->
+                    <div class="pt-3 border-t border-zinc-100 flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-2 flex-1 min-w-0">
+                            <span class="text-[10px] font-bold text-zinc-400 uppercase font-mono shrink-0">Branch:</span>
+                            <select id="cora-gh-branch-dropdown" onchange="coraChangeActiveBranch(this.value)" class="bg-white border border-zinc-200/80 rounded-lg px-2.5 py-1.5 text-xs font-mono text-zinc-900 focus:outline-none focus:border-zinc-900 transition-colors flex-1 min-w-0 cursor-pointer">
+                                <option value="main">main</option>
+                            </select>
+                        </div>
+                        <button type="button" onclick="coraCreateBranchPrompt()" class="px-2.5 py-1.5 border border-zinc-200 hover:bg-zinc-50 rounded-lg text-xs font-semibold text-zinc-700 bg-white shadow-3xs cursor-pointer transition-all shrink-0 flex items-center gap-1">
+                            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                            <span>New</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Live Working Tree & Change Inspector -->
+                <div class="bg-white border border-zinc-200/80 rounded-xl p-4 sm:p-5 shadow-3xs space-y-3.5 flex flex-col justify-between">
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between border-b border-zinc-100 pb-2.5">
+                            <div>
+                                <h3 class="text-xs sm:text-sm font-bold text-zinc-900">Working Tree &amp; Change Inspector</h3>
+                                <p class="text-[11px] text-zinc-500 mt-0.5">Live status of layout files, text edits, and pending commits.</p>
+                            </div>
+                            <span id="cora-gh-tree-status-badge" class="text-[9px] font-mono font-semibold px-2 py-0.5 rounded bg-zinc-100 text-zinc-600 border border-zinc-200">Checking...</span>
+                        </div>
+
+                        <!-- Working Tree State Card -->
+                        <div id="cora-gh-working-tree-box" class="space-y-2">
+                            <!-- Clean state (default) -->
+                            <div id="cora-gh-tree-clean" class="p-3.5 bg-zinc-50 border border-zinc-200/70 rounded-xl flex items-center gap-2.5">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
+                                <div class="min-w-0">
+                                    <span class="text-xs font-bold text-zinc-900 block">Working tree clean</span>
+                                    <span class="text-[10px] text-zinc-500 block">All page templates, design layouts, and tenant manifests are synchronized.</span>
+                                </div>
+                            </div>
+
+                            <!-- Dirty state (hidden by default) -->
+                            <div id="cora-gh-tree-dirty" class="p-3.5 bg-amber-50/60 border border-amber-200/80 rounded-xl space-y-2 hidden">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-2 h-2 rounded-full bg-amber-500 shrink-0 animate-pulse"></span>
+                                        <span id="cora-gh-tree-file-path" class="text-xs font-mono font-semibold text-zinc-900">pages/home/design.json</span>
+                                    </div>
+                                    <span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-amber-100 text-amber-800 font-bold uppercase">Modified</span>
+                                </div>
+                                <p class="text-[10px] text-zinc-600 leading-snug">Uncommitted text or layout edits detected. Ready to commit or create a reversible Pull Request.</p>
+                            </div>
+                        </div>
+
+                        <!-- Commit Message / AI Suggestion -->
+                        <div class="space-y-1.5">
+                            <div class="flex items-center justify-between">
+                                <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider font-mono">Commit / PR Summary</label>
+                                <button type="button" onclick="coraApplyGhCommitSuggestion()" class="text-[10px] text-zinc-500 hover:text-zinc-900 font-medium cursor-pointer bg-transparent border-none">Use AI suggestion</button>
+                            </div>
+                            <input type="text" id="cora-gh-input-commit-msg" placeholder="e.g. update hero headline and call-to-action button" class="w-full bg-white border border-zinc-200/80 rounded-lg px-3 py-2 text-xs font-mono text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-zinc-900 transition-colors">
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="pt-2 grid grid-cols-2 gap-2">
+                        <button type="button" onclick="coraManualCommitPush(true)" id="cora-gh-btn-create-pr-action" class="py-2 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold shadow-3xs cursor-pointer transition-all active:scale-95 flex items-center justify-center gap-1.5">
+                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><circle cx="18" cy="18" r="3"></circle><circle cx="6" cy="6" r="3"></circle><path d="M13 6h3a2 2 0 0 1 2 2v7"></path><line x1="6" y1="9" x2="6" y2="21"></line></svg>
+                            <span>Create PR</span>
+                        </button>
+                        <button type="button" onclick="coraManualCommitPush(false)" id="cora-gh-btn-commit-action" class="py-2 border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-900 rounded-lg text-xs font-bold shadow-3xs cursor-pointer transition-all active:scale-95 flex items-center justify-center gap-1.5">
+                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><polyline points="16 16 12 12 8 16"></polyline><line x1="12" y1="12" x2="12" y2="21"></line><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"></path></svg>
+                            <span>Commit &amp; Push</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Pull Requests (PR) & Reversibility Registry -->
+            <div class="bg-white border border-zinc-200/80 rounded-xl p-4 sm:p-5 shadow-3xs space-y-3.5">
+                <div class="flex items-center justify-between border-b border-zinc-100 pb-2.5">
+                    <div class="flex items-center gap-2">
+                        <div class="w-6 h-6 rounded bg-zinc-100 flex items-center justify-center text-zinc-700">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="18" cy="18" r="3"></circle><circle cx="6" cy="6" r="3"></circle><path d="M13 6h3a2 2 0 0 1 2 2v7"></path><line x1="6" y1="9" x2="6" y2="21"></line></svg>
+                        </div>
+                        <div>
+                            <h3 class="text-xs sm:text-sm font-bold text-zinc-900">Pull Requests &amp; Audited Revisions</h3>
+                            <p class="text-[11px] text-zinc-500 mt-0.5">Every text change in PR mode generates an audited Pull Request for safe review and reversibility.</p>
+                        </div>
+                    </div>
+                    <span id="cora-gh-pr-count-badge" class="text-[9px] font-mono font-bold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-700 border border-zinc-200">0 Open</span>
+                </div>
+
+                <!-- PR List Container -->
+                <div id="cora-gh-pr-list-container" class="space-y-2">
+                    <div class="p-4 text-center text-xs text-zinc-400 italic bg-zinc-50 rounded-xl border border-dashed border-zinc-200">
+                        No open pull requests. All draft revisions are currently merged and deployed.
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. Commit History & 1-Click Rollback / Revert Center -->
+            <div class="bg-white border border-zinc-200/80 rounded-xl p-4 sm:p-5 shadow-3xs space-y-3.5">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-100 pb-2.5">
+                    <div class="flex items-center gap-2">
+                        <div class="w-6 h-6 rounded bg-zinc-100 flex items-center justify-center text-zinc-700">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+                        </div>
+                        <div>
+                            <h3 class="text-xs sm:text-sm font-bold text-zinc-900">Version History &amp; 1-Click Rollback Center</h3>
+                            <p class="text-[11px] text-zinc-500 mt-0.5">Every single commit is recorded on GitHub. You can roll back the entire workspace or specific pages to any historical snapshot in 1 click.</p>
+                        </div>
+                    </div>
+                    <span class="text-[10px] text-zinc-400 font-mono">Reversible at 100k scale</span>
+                </div>
+
+                <!-- Commits List Container -->
+                <div id="cora-gh-commits-list-container" class="space-y-2">
+                    <div class="p-4 text-center text-xs text-zinc-400 italic bg-zinc-50 rounded-xl border border-zinc-200">
+                        Loading version history from GitHub...
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. Multi-Tenant Enterprise Security & Scale Architecture -->
+            <div class="bg-zinc-50/70 border border-zinc-200/80 rounded-xl p-4 sm:p-5 space-y-3">
+                <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded bg-zinc-200 flex items-center justify-center text-zinc-800">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    </div>
+                    <h3 class="text-xs font-bold text-zinc-900 uppercase tracking-wider font-mono">100,000+ Multi-Tenant Security &amp; Isolation Architecture</h3>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1 text-xs text-zinc-600">
+                    <div class="p-3 bg-white border border-zinc-200/70 rounded-xl space-y-1">
+                        <strong class="text-zinc-900 font-bold block text-xs">1. Cryptographic Tenant Scoping</strong>
+                        <p class="text-[11px] text-zinc-500 leading-relaxed">Each workspace is identified by a unique tenant key (<code class="text-[10px] font-mono">ws-<?php echo get_current_user_id(); ?></code>). File manifests and git commits are namespaced to guarantee zero cross-tenant contamination.</p>
+                    </div>
+                    <div class="p-3 bg-white border border-zinc-200/70 rounded-xl space-y-1">
+                        <strong class="text-zinc-900 font-bold block text-xs">2. Sandboxed Branch Workflows</strong>
+                        <p class="text-[11px] text-zinc-500 leading-relaxed">Draft revisions live on temporary sandboxed feature branches (<code class="text-[10px] font-mono">draft/ws-*</code>). Pull Requests isolate unapproved changes until merged, ensuring safe rollback anytime.</p>
+                    </div>
+                    <div class="p-3 bg-white border border-zinc-200/70 rounded-xl space-y-1">
+                        <strong class="text-zinc-900 font-bold block text-xs">3. Reversible Audit Ledger</strong>
+                        <p class="text-[11px] text-zinc-500 leading-relaxed">Even if a single word of copy is modified, git tracks the exact line diff. Workspaces can be instantly restored to any historical snapshot without database corruption.</p>
+                    </div>
+                </div>
+            </div>
+            </div> <!-- /#cora-gh-connected-dashboard -->
+        </div> <!-- /#tab-canvas-github -->
+
+        <!-- ========================================================================= -->
+        <!-- GITHUB INTEGRATION GUIDE MODAL (NON-SCROLLABLE, NO BG OVERLAY, VISUAL)     -->
+        <!-- ========================================================================= -->
+        <div id="modal-github-connection-guide" class="fixed inset-0 z-[999999] bg-transparent flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-200 hidden" style="position:fixed!important;top:0!important;left:0!important;right:0!important;bottom:0!important;width:100vw!important;height:100vh!important;margin:0!important;z-index:999999!important;" onclick="if(event.target === this) coraCloseGithubGuideModal()">
+            <div class="cora-guide-modal-card bg-white border border-zinc-200/90 rounded-2xl max-w-xl w-full shadow-2xl flex flex-col overflow-hidden pointer-events-auto transform scale-95 transition-all duration-200">
+                <!-- Header -->
+                <div class="px-5 py-3.5 border-b border-zinc-100 flex items-center justify-between bg-zinc-50/60">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-950 border border-zinc-200/80 shadow-3xs shrink-0">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold text-zinc-950">GitHub Connection Guide</h3>
+                            <p class="text-[11px] text-zinc-500">3-step personal account setup &amp; automated rollback protection</p>
+                        </div>
+                    </div>
+                    <button type="button" onclick="coraCloseGithubGuideModal()" class="w-7 h-7 rounded-lg text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 flex items-center justify-center cursor-pointer transition-colors border-none bg-transparent" title="Close Guide">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
+
+                <!-- Visual 3-Step Cards Flow (Zero Scrolling) -->
+                <div class="p-4 sm:p-5 space-y-3.5">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                        <!-- Step 1 -->
+                        <div class="p-3 bg-zinc-50/70 border border-zinc-200/80 rounded-xl space-y-2 flex flex-col justify-between">
+                            <div class="space-y-1">
+                                <div class="flex items-center justify-between">
+                                    <span class="w-5 h-5 rounded-md bg-zinc-950 text-white text-[10px] font-mono font-bold flex items-center justify-center">1</span>
+                                    <span class="text-[9px] font-mono text-zinc-400 font-semibold uppercase">Token</span>
+                                </div>
+                                <h4 class="text-xs font-bold text-zinc-950">Open GitHub</h4>
+                                <p class="text-[11px] text-zinc-500 leading-snug">Opens GitHub with required scopes pre-configured.</p>
+                            </div>
+                            <a href="https://github.com/settings/tokens/new?scopes=repo,read:org&description=Cora%20Studio%20Integration&default_expires_at=90" target="_blank" rel="noopener noreferrer" class="w-full py-1.5 px-2 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-[11px] font-bold transition-all shadow-3xs flex items-center justify-center gap-1 no-underline">
+                                <span>Open GitHub ↗</span>
+                            </a>
+                        </div>
+
+                        <!-- Step 2 -->
+                        <div class="p-3 bg-zinc-50/70 border border-zinc-200/80 rounded-xl space-y-2 flex flex-col justify-between">
+                            <div class="space-y-1">
+                                <div class="flex items-center justify-between">
+                                    <span class="w-5 h-5 rounded-md bg-zinc-200 text-zinc-900 text-[10px] font-mono font-bold flex items-center justify-center">2</span>
+                                    <span class="text-[9px] font-mono text-emerald-600 font-semibold uppercase">Pre-Checked</span>
+                                </div>
+                                <h4 class="text-xs font-bold text-zinc-950">Verify Scopes</h4>
+                                <div class="flex items-center gap-1 pt-0.5">
+                                    <code class="px-1.5 py-0.5 rounded bg-white text-zinc-800 font-mono text-[9px] font-bold border border-zinc-200">repo</code>
+                                    <code class="px-1.5 py-0.5 rounded bg-white text-zinc-800 font-mono text-[9px] font-bold border border-zinc-200">read:org</code>
+                                </div>
+                                <p class="text-[11px] text-zinc-500 leading-snug pt-0.5">Scroll down and click <strong>Generate token</strong>.</p>
+                            </div>
+                            <div class="text-[10px] text-zinc-400 font-mono text-center py-1">Auto-selected</div>
+                        </div>
+
+                        <!-- Step 3 -->
+                        <div class="p-3 bg-zinc-50/70 border border-zinc-200/80 rounded-xl space-y-2 flex flex-col justify-between">
+                            <div class="space-y-1">
+                                <div class="flex items-center justify-between">
+                                    <span class="w-5 h-5 rounded-md bg-zinc-200 text-zinc-900 text-[10px] font-mono font-bold flex items-center justify-center">3</span>
+                                    <span class="text-[9px] font-mono text-zinc-400 font-semibold uppercase">Connect</span>
+                                </div>
+                                <h4 class="text-xs font-bold text-zinc-950">Paste in Cora</h4>
+                                <div class="px-2 py-0.5 rounded bg-white border border-zinc-200 text-[10px] font-mono text-zinc-400 truncate">
+                                    ghp_••••••••••••
+                                </div>
+                                <p class="text-[11px] text-zinc-500 leading-snug pt-0.5">Paste into the input and click <strong>Connect</strong>.</p>
+                            </div>
+                            <div class="text-[10px] text-emerald-600 font-mono font-semibold text-center py-1">✓ Instant Rollback</div>
+                        </div>
+                    </div>
+
+                    <!-- Method B Quick Alternative Strip -->
+                    <div class="p-2.5 bg-zinc-50/70 border border-zinc-200/80 rounded-xl flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-2 min-w-0">
+                            <div class="w-6 h-6 rounded-md bg-white border border-zinc-200/80 flex items-center justify-center text-zinc-800 shrink-0">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                            </div>
+                            <div class="min-w-0">
+                                <span class="text-xs font-bold text-zinc-900 block truncate">No developer account? Choose Managed Cloud</span>
+                                <span class="text-[10px] text-zinc-500 block truncate">Automated workspace provisioning on Cora Cloud with zero tokens.</span>
+                            </div>
+                        </div>
+                        <button type="button" onclick="coraCloseGithubGuideModal(); coraProvisionOrgRepo();" class="px-2.5 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-[11px] font-bold shrink-0 cursor-pointer transition-all border-none">
+                            Provision Cloud
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="px-5 py-3 border-t border-zinc-100 bg-zinc-50/40 flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-2.5 text-[10px] text-zinc-500 font-mono">
+                        <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> 1-Click Rollbacks</span>
+                        <span class="hidden sm:inline text-zinc-300">·</span>
+                        <span class="hidden sm:inline">Zero Data Loss</span>
+                    </div>
+                    <button type="button" onclick="coraCloseGithubGuideModal()" class="px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold cursor-pointer transition-all border-none shadow-3xs">
+                        Got it, Close
+                    </button>
+                </div>
+            </div>
+        </div>
 
     <!-- LEVEL 2 — THEME DASHBOARD -->
     <div id="canvas-level-2" class="space-y-4 hidden">
@@ -3531,12 +4104,6 @@ function cora_get_sparkline_points( $history, $type ) {
         </div>
     </div>
 </div>
-        <div class="flex items-center justify-end gap-2.5 pt-2">
-            <button type="button" class="px-3.5 py-2 border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 font-semibold rounded-lg text-xs transition-colors cursor-pointer" onclick="closeNewThemeDrawer()">Cancel</button>
-            <button type="button" class="px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-semibold rounded-lg text-xs transition-colors cursor-pointer" onclick="saveNewTheme()">Create Theme</button>
-        </div>
-    </div>
-</div>
 
 <!-- 2. New Page Setup Drawer (Right-Sliding Sheet) -->
 <div id="drawer-new-page" class="fixed inset-0 z-[999999] bg-zinc-900/40 backdrop-blur-[1px] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300 hidden">
@@ -3653,45 +4220,6 @@ function cora_get_sparkline_points( $history, $type ) {
             <button type="button" class="px-3.5 py-2 border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 font-bold rounded-lg text-xs transition-colors cursor-pointer font-sans" onclick="closeNewPageDrawer()">Cancel</button>
             <button type="button" id="cora-create-page-only-btn" class="px-3.5 py-2 border border-zinc-200 hover:bg-zinc-50 text-zinc-700 font-bold rounded-lg text-xs transition-colors cursor-pointer font-sans" onclick="saveNewPage(false)">Create Only</button>
             <button type="button" id="cora-create-and-edit-btn" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer flex items-center gap-1.5 font-sans shadow-sm" onclick="saveNewPage(true)">
-                <span id="cora-create-edit-text">Create &amp; Edit</span>
-            </button>
-        </div>
-    </div>
-</div>
-
-        <!-- Form Inputs -->
-        <div class="space-y-3.5">
-            <div class="space-y-1.5">
-                <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Page Title *</label>
-                <input type="text" id="new-page-title-input" onkeyup="autoGenerateSlug(this)" placeholder="e.g. Featured Penthouse Listings" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 font-medium">
-            </div>
-            <div class="space-y-1.5">
-                <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">URL Slug Path *</label>
-                <input type="text" id="new-page-slug-input" placeholder="e.g. penthouse-listings" class="w-full px-3 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 font-medium">
-            </div>
-            <div class="grid grid-cols-2 gap-3.5">
-                <div class="space-y-1.5">
-                    <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Page Layout</label>
-                    <select id="new-page-template-input" class="w-full px-2.5 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 cursor-pointer bg-white font-medium">
-                        <option value="canvas">Canvas (Standalone Clean HTML - Recommended)</option>
-                        <option value="default">Default (Wrap with Theme Header &amp; Footer)</option>
-                    </select>
-                </div>
-                <div class="space-y-1.5">
-                    <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Status</label>
-                    <select id="new-page-status-input" class="w-full px-2.5 py-2 border border-zinc-200 rounded-lg text-xs focus:outline-none focus:border-zinc-400 cursor-pointer bg-white font-medium">
-                        <option value="draft">Draft</option>
-                        <option value="published">Published</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-
-        <!-- Action Buttons -->
-        <div class="flex items-center justify-end gap-2.5 pt-2 border-t border-zinc-100">
-            <button type="button" class="px-3.5 py-2 border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 font-bold rounded-lg text-xs transition-colors cursor-pointer" onclick="closeNewPageDrawer()">Cancel</button>
-            <button type="button" id="cora-create-page-only-btn" class="px-3.5 py-2 border border-zinc-200 hover:bg-zinc-50 text-zinc-700 font-bold rounded-lg text-xs transition-colors cursor-pointer" onclick="saveNewPage(false)">Create Only</button>
-            <button type="button" id="cora-create-and-edit-btn" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer flex items-center gap-1.5" onclick="saveNewPage(true)">
                 <span id="cora-create-edit-text">Create &amp; Edit</span>
             </button>
         </div>
@@ -4460,9 +4988,10 @@ function cora_get_sparkline_points( $history, $type ) {
     </div>
 </div>
 
-<!-- 7. Git Connection Drawer (Right-Sliding Sheet) -->
-<div id="drawer-git-connect" class="fixed inset-0 z-[999999] bg-zinc-900/40 backdrop-blur-[1px] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300 hidden">
-    <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[460px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 pointer-events-auto" id="drawer-git-connect-card">
+<!-- 7. Git Connection Drawer (Desktop Side Sheet / Mobile Bottom Sheet SOP Rule 12) -->
+<div id="drawer-git-connect" class="fixed inset-0 z-[999999] bg-zinc-900/40 backdrop-blur-[1px] flex justify-end max-md:justify-center max-md:items-end opacity-0 pointer-events-none transition-opacity duration-300 hidden">
+    <div class="bg-white border-l max-md:border-l-0 max-md:border-t border-zinc-200 h-full max-md:h-[88vh] w-full max-w-[460px] max-md:max-w-full max-md:rounded-t-3xl shadow-2xl flex flex-col transform translate-x-full max-md:translate-x-0 max-md:translate-y-full transition-transform duration-300 pointer-events-auto" id="drawer-git-connect-card">
+        <div class="md:hidden w-10 h-1 rounded-full bg-zinc-300 mx-auto mt-3 -mb-1"></div>
         <div class="p-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/50 flex-shrink-0">
             <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-lg bg-zinc-100 flex items-center justify-center">
@@ -7149,6 +7678,10 @@ echo esc_textarea( json_encode( array(
         try {
             localStorage.setItem('cora_canvas_active_subtab', tabId);
         } catch (e) {}
+
+        if (tabId === 'tab-canvas-github' && typeof window.loadCanvasGitHubView === 'function') {
+            window.loadCanvasGitHubView();
+        }
     }
     window.coraSwitchCanvasSubTab = coraSwitchCanvasSubTab;
 
@@ -7163,6 +7696,13 @@ echo esc_textarea( json_encode( array(
                 coraSwitchCanvasSubTab(savedSubTab);
             }
         } catch (e) {}
+
+        // Initial background status sync for GitHub subtab badge
+        setTimeout(function() {
+            if (typeof window.loadCanvasGitHubView === 'function') {
+                window.loadCanvasGitHubView(true);
+            }
+        }, 500);
 
         // Explicit delegated click listeners for main tab action buttons
         $(document).on('click', '#tab-btn-add-page', function(e) {
@@ -11053,7 +11593,7 @@ echo esc_textarea( json_encode( array(
             });
             frame.open();
         } else {
-            window.coraShowToast('WordPress Media Library not available. Paste URL directly.');
+            window.coraShowToast('Media Library not available. Paste URL directly.');
         }
     }
 
@@ -11414,10 +11954,10 @@ echo esc_textarea( json_encode( array(
                 } else {
                     jQuery('#iframe-loader').addClass('hidden');
                     jQuery('#elementor-blocking-title').text('Page Post Provisioning Error');
-                    jQuery('#elementor-blocking-desc').html((res && res.data && res.data.message) ? res.data.message : 'Could not initialize WordPress page post. Launch direct editor to verify page state.');
+                    jQuery('#elementor-blocking-desc').html((res && res.data && res.data.message) ? res.data.message : 'Could not initialize page post. Launch direct editor to verify page state.');
                     jQuery('#elementor-blocking-msg').removeClass('hidden');
                     if (typeof window.coraShowToast === 'function') {
-                        window.coraShowToast('Could not provision WordPress page post.', 'error');
+                        window.coraShowToast('Could not provision page post.', 'error');
                     }
                 }
             }).fail(function() {
@@ -11483,8 +12023,8 @@ echo esc_textarea( json_encode( array(
                             jQuery('#elementor-editor-iframe').addClass('hidden');
                             jQuery('#iframe-loader').addClass('hidden');
                             if (isWpAdminShell) {
-                                jQuery('#elementor-blocking-title').text('WordPress Admin Redirect Intercepted');
-                                jQuery('#elementor-blocking-desc').html('WordPress redirected this page request to the admin dashboard instead of opening the Elementor builder canvas.<br><span class="font-semibold text-zinc-800">Launch direct editor in a new tab to edit this page seamlessly.</span>');
+                                jQuery('#elementor-blocking-title').text('Admin Redirect Intercepted');
+                                jQuery('#elementor-blocking-desc').html('The backend redirected this page request to the admin dashboard instead of opening the Elementor builder canvas.<br><span class="font-semibold text-zinc-800">Launch direct editor in a new tab to edit this page seamlessly.</span>');
                             } else {
                                 jQuery('#elementor-blocking-title').text('Preview Security Blocked (HTTP 403)');
                                 jQuery('#elementor-blocking-desc').html('Browser security or session timeout prevented embedding the editor in this window.<br><span class="font-semibold text-zinc-800">Launch direct editor in a new tab to continue seamlessly.</span>');
@@ -16135,10 +16675,15 @@ Return ONLY clean, standalone HTML in an <!DOCTYPE html> document.`
         if (!drawer || !card) return;
         drawer.classList.remove('hidden');
         requestAnimationFrame(() => {
-            drawer.classList.remove('opacity-0');
-            drawer.classList.remove('pointer-events-none');
-            card.classList.remove('translate-x-full');
-            card.classList.add('translate-x-0');
+            drawer.classList.remove('opacity-0', 'pointer-events-none');
+            const isMobile = window.innerWidth < 768;
+            if (isMobile) {
+                card.classList.remove('translate-y-full');
+                card.classList.add('translate-y-0');
+            } else {
+                card.classList.remove('translate-x-full');
+                card.classList.add('translate-x-0');
+            }
         });
         loadGitStatus();
     }
@@ -16147,10 +16692,15 @@ Return ONLY clean, standalone HTML in an <!DOCTYPE html> document.`
         const drawer = document.getElementById('drawer-git-connect');
         const card   = document.getElementById('drawer-git-connect-card');
         if (!drawer || !card) return;
-        card.classList.remove('translate-x-0');
-        card.classList.add('translate-x-full');
-        drawer.classList.add('opacity-0');
-        drawer.classList.add('pointer-events-none');
+        const isMobile = window.innerWidth < 768;
+        if (isMobile) {
+            card.classList.remove('translate-y-0');
+            card.classList.add('translate-y-full');
+        } else {
+            card.classList.remove('translate-x-0');
+            card.classList.add('translate-x-full');
+        }
+        drawer.classList.add('opacity-0', 'pointer-events-none');
         setTimeout(() => drawer.classList.add('hidden'), 300);
     }
 
@@ -16612,6 +17162,721 @@ Return ONLY clean, standalone HTML in an <!DOCTYPE html> document.`
             }
         });
     }
+
+    // ══════════════════════════════════════════════════════════════════════════
+    // CORA CANVAS GITHUB MULTI-TENANT WORKSPACE CONTROLLER
+    // ══════════════════════════════════════════════════════════════════════════
+    window.coraCanvasGhState = {
+        connected: false,
+        username: '',
+        repo: '',
+        has_repo: false,
+        branches: ['main'],
+        currentBranch: 'main',
+        syncMode: 'pr',
+        autoSync: true,
+        repoMode: 'personal',
+        tenantId: 'ws-1',
+        orgName: 'cora-platform',
+        pullRequests: [],
+        recentCommits: []
+    };
+
+    window.coraSwitchGhSetupTab = function(tab) {
+        const btnPersonal = document.getElementById('cora-gh-tab-btn-personal');
+        const btnOrg = document.getElementById('cora-gh-tab-btn-org');
+        const panelPersonal = document.getElementById('cora-gh-panel-personal');
+        const panelOrg = document.getElementById('cora-gh-panel-org');
+        if (!btnPersonal || !btnOrg || !panelPersonal || !panelOrg) return;
+
+        if (tab === 'personal') {
+            btnPersonal.className = 'px-3 py-1.5 text-[11px] font-bold rounded-md bg-white text-zinc-900 shadow-3xs cursor-pointer transition-all border-none';
+            btnOrg.className = 'px-3 py-1.5 text-[11px] font-medium rounded-md bg-transparent text-zinc-500 hover:text-zinc-900 cursor-pointer transition-all border-none';
+            panelPersonal.classList.remove('hidden');
+            panelOrg.classList.add('hidden');
+        } else {
+            btnOrg.className = 'px-3 py-1.5 text-[11px] font-bold rounded-md bg-white text-zinc-900 shadow-3xs cursor-pointer transition-all border-none';
+            btnPersonal.className = 'px-3 py-1.5 text-[11px] font-medium rounded-md bg-transparent text-zinc-500 hover:text-zinc-900 cursor-pointer transition-all border-none';
+            panelOrg.classList.remove('hidden');
+            panelPersonal.classList.add('hidden');
+        }
+    };
+
+    window.coraRenderSyncModeUI = function(mode) {
+        const cardPr = document.getElementById('cora-gh-mode-card-pr');
+        const cardDirect = document.getElementById('cora-gh-mode-card-direct');
+        const radioPr = document.getElementById('cora-gh-radio-pr');
+        const radioDirect = document.getElementById('cora-gh-radio-direct');
+        if (!cardPr || !cardDirect) return;
+
+        if (mode === 'pr') {
+            cardPr.className = 'p-3 rounded-xl border border-zinc-200/80 bg-zinc-100/90 cursor-pointer transition-all space-y-1';
+            cardDirect.className = 'p-3 rounded-xl border border-zinc-200/80 bg-white hover:bg-zinc-50 cursor-pointer transition-all space-y-1';
+            if (radioPr) { radioPr.className = 'w-3.5 h-3.5 rounded-full bg-zinc-950 flex items-center justify-center text-white text-[8px]'; radioPr.textContent = '✓'; }
+            if (radioDirect) { radioDirect.className = 'w-3.5 h-3.5 rounded-full border border-zinc-300 flex items-center justify-center text-transparent text-[8px]'; radioDirect.textContent = ''; }
+        } else {
+            cardDirect.className = 'p-3 rounded-xl border border-zinc-200/80 bg-zinc-100/90 cursor-pointer transition-all space-y-1';
+            cardPr.className = 'p-3 rounded-xl border border-zinc-200/80 bg-white hover:bg-zinc-50 cursor-pointer transition-all space-y-1';
+            if (radioDirect) { radioDirect.className = 'w-3.5 h-3.5 rounded-full bg-zinc-950 flex items-center justify-center text-white text-[8px]'; radioDirect.textContent = '✓'; }
+            if (radioPr) { radioPr.className = 'w-3.5 h-3.5 rounded-full border border-zinc-300 flex items-center justify-center text-transparent text-[8px]'; radioPr.textContent = ''; }
+        }
+    };
+
+    window.coraSetSyncEngineMode = function(mode) {
+        window.coraRenderSyncModeUI(mode);
+        const ajaxUrl = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : (window.ajaxurl || '/wp-admin/admin-ajax.php');
+        const nonce = (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : '';
+
+        jQuery.post(ajaxUrl, {
+            action: 'cora_github_save_preferences',
+            nonce: nonce,
+            sync_mode: mode
+        }, function(res) {
+            if (res.success) {
+                window.coraShowToast(mode === 'pr' ? 'Workflow set to Pull Request (PR) Mode (100% reversible).' : 'Workflow set to Direct Commit Mode.');
+                const statMode = document.getElementById('cora-gh-stat-mode');
+                if (statMode) statMode.textContent = mode === 'pr' ? 'PR Mode (Reversible)' : 'Direct Commit Mode';
+            }
+        });
+    };
+
+    window.coraToggleAutoSync = function(enable) {
+        const ajaxUrl = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : (window.ajaxurl || '/wp-admin/admin-ajax.php');
+        const nonce = (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : '';
+
+        jQuery.post(ajaxUrl, {
+            action: 'cora_github_save_preferences',
+            nonce: nonce,
+            auto_sync: enable ? '1' : '0'
+        }, function(res) {
+            if (res.success) {
+                window.coraShowToast(enable ? 'Auto-track on save & publish enabled.' : 'Auto-track disabled.');
+                const statAuto = document.getElementById('cora-gh-stat-auto-status');
+                if (statAuto) {
+                    statAuto.textContent = enable ? '✓ Auto-Track Active' : 'Manual Track Only';
+                    statAuto.className = enable ? 'text-[10px] text-emerald-600 font-semibold block truncate mt-0.5' : 'text-[10px] text-zinc-400 font-medium block truncate mt-0.5';
+                }
+            }
+        });
+    };
+
+    window.loadCanvasGitHubView = function(isQuiet) {
+        const ajaxUrl = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : (window.ajaxurl || '/wp-admin/admin-ajax.php');
+        const nonce = (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : '';
+        const activeBranch = localStorage.getItem('cora_active_branch') || 'main';
+
+        jQuery.post(ajaxUrl, {
+            action: 'cora_github_get_status',
+            nonce: nonce,
+            page_id: (window.canvasState && canvasState.activeWpPostId) ? canvasState.activeWpPostId : 0,
+            branch: activeBranch
+        }, function(res) {
+            if (res.success && res.data) {
+                const d = res.data;
+                const state = window.coraCanvasGhState;
+                state.connected = !!d.connected;
+                state.username = d.username || '';
+                state.repo = d.repo || '';
+                state.has_repo = !!d.has_repo;
+                state.branches = d.branches || ['main'];
+                state.syncMode = d.sync_mode || 'pr';
+                state.autoSync = d.auto_sync !== false;
+                state.repoMode = d.repo_mode || 'personal';
+                state.tenantId = d.tenant_id || 'ws-1';
+                state.orgName = d.org_name || 'cora-platform';
+                state.pullRequests = d.pull_requests || [];
+                state.recentCommits = d.recent_commits || [];
+
+                // 1. Update Sub-Navigation Tab Badge
+                const subtabBadge = document.getElementById('cora-github-subtab-badge');
+                if (subtabBadge) {
+                    if (d.connected && d.has_repo) {
+                        subtabBadge.textContent = 'Active · ' + (activeBranch || 'main');
+                        subtabBadge.className = 'ml-1 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200/80';
+                    } else if (d.connected) {
+                        subtabBadge.textContent = 'Linked';
+                        subtabBadge.className = 'ml-1 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-700 border border-zinc-200';
+                    } else {
+                        subtabBadge.textContent = 'Sync';
+                        subtabBadge.className = 'ml-1 text-[9px] font-mono px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-500 border border-zinc-200/80';
+                    }
+                }
+
+                // 2. Update Header Status Pill
+                const headerPill = document.getElementById('cora-gh-header-status-pill');
+                if (headerPill) {
+                    if (d.connected && d.has_repo) {
+                        headerPill.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block mr-1"></span> Connected (@' + d.username + ')';
+                        headerPill.className = 'text-[9px] font-mono font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200';
+                    } else if (d.connected) {
+                        headerPill.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-amber-500 inline-block mr-1"></span> Setup Repo (@' + d.username + ')';
+                        headerPill.className = 'text-[9px] font-mono font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200';
+                    } else {
+                        headerPill.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-zinc-400 inline-block mr-1"></span> Disconnected';
+                        headerPill.className = 'text-[9px] font-mono font-semibold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-600 border border-zinc-200';
+                    }
+                }
+
+                // Disconnect button in header
+                const disBtn = document.getElementById('cora-gh-btn-disconnect-hdr');
+                if (disBtn) {
+                    if (d.connected) disBtn.classList.remove('hidden');
+                    else disBtn.classList.add('hidden');
+                }
+
+                // 3. Update KPI 1 (Account)
+                const statAcc = document.getElementById('cora-gh-stat-account');
+                const statScope = document.getElementById('cora-gh-stat-scope');
+                if (statAcc) {
+                    statAcc.textContent = d.connected ? ('@' + d.username) : 'Not Connected';
+                }
+                if (statScope) {
+                    statScope.textContent = d.connected ? '✓ Token Verified' : 'Awaiting Connection';
+                }
+
+                // 4. Update KPI 2 (Repository & Branch)
+                const repoLink = document.getElementById('cora-gh-stat-repo-link');
+                const statBranch = document.getElementById('cora-gh-stat-branch');
+                if (repoLink) {
+                    if (d.has_repo) {
+                        repoLink.textContent = d.repo;
+                        repoLink.href = 'https://github.com/' + d.repo;
+                    } else {
+                        repoLink.textContent = d.connected ? 'Create or link repo below' : 'No repository linked';
+                        repoLink.href = '#';
+                    }
+                }
+                if (statBranch) {
+                    statBranch.textContent = 'branch: ' + activeBranch;
+                }
+
+                // 5. Update KPI 3 (Engine Mode)
+                const statMode = document.getElementById('cora-gh-stat-mode');
+                const statAuto = document.getElementById('cora-gh-stat-auto-status');
+                if (statMode) {
+                    statMode.textContent = d.sync_mode === 'direct' ? 'Direct Commit Mode' : 'PR Mode (Reversible)';
+                }
+                if (statAuto) {
+                    statAuto.textContent = d.auto_sync !== false ? '✓ Auto-Track Active' : 'Manual Track Only';
+                    statAuto.className = d.auto_sync !== false ? 'text-[10px] text-emerald-600 font-semibold block truncate mt-0.5' : 'text-[10px] text-zinc-400 font-medium block truncate mt-0.5';
+                }
+
+                // Sync Mode UI
+                window.coraRenderSyncModeUI(d.sync_mode || 'pr');
+                const autoToggle = document.getElementById('cora-gh-toggle-auto-sync');
+                if (autoToggle) autoToggle.checked = (d.auto_sync !== false);
+
+                // Toggle between Unconnected Onboarding and Connected Dashboard
+                const isFullyConnected = (d.connected && d.has_repo);
+                const isPatOnlyConnected = (d.connected && !d.has_repo);
+
+                const unconnectedView = document.getElementById('cora-gh-unconnected-view');
+                const connectedDashboard = document.getElementById('cora-gh-connected-dashboard');
+                const unconnectedChoices = document.getElementById('cora-gh-unconnected-choices');
+                const unconnectedRepoStep = document.getElementById('cora-gh-unconnected-repo-step');
+                const connectedUserName = document.getElementById('cora-gh-connected-user-name');
+
+                if (isFullyConnected) {
+                    if (unconnectedView) unconnectedView.classList.add('hidden');
+                    if (connectedDashboard) connectedDashboard.classList.remove('hidden');
+                } else {
+                    if (unconnectedView) unconnectedView.classList.remove('hidden');
+                    if (connectedDashboard) connectedDashboard.classList.add('hidden');
+
+                    if (isPatOnlyConnected) {
+                        if (unconnectedChoices) unconnectedChoices.classList.add('hidden');
+                        if (unconnectedRepoStep) unconnectedRepoStep.classList.remove('hidden');
+                        if (connectedUserName) connectedUserName.textContent = '@' + (d.username || 'user');
+                    } else {
+                        if (unconnectedChoices) unconnectedChoices.classList.remove('hidden');
+                        if (unconnectedRepoStep) unconnectedRepoStep.classList.add('hidden');
+                    }
+                }
+
+                // Branch dropdown
+                const branchSelect = document.getElementById('cora-gh-branch-dropdown');
+                if (branchSelect) {
+                    branchSelect.innerHTML = '';
+                    const branches = (d.branches && d.branches.length) ? d.branches : ['main'];
+                    branches.forEach(b => {
+                        const opt = document.createElement('option');
+                        opt.value = b;
+                        opt.textContent = b;
+                        branchSelect.appendChild(opt);
+                    });
+                    branchSelect.value = activeBranch;
+                }
+
+                // 6. Working Tree Changes
+                const treeClean = document.getElementById('cora-gh-tree-clean');
+                const treeDirty = document.getElementById('cora-gh-tree-dirty');
+                const treeBadge = document.getElementById('cora-gh-tree-status-badge');
+                const treePath = document.getElementById('cora-gh-tree-file-path');
+                const commitInput = document.getElementById('cora-gh-input-commit-msg');
+
+                if (d.page_status && d.page_status.modified) {
+                    if (treeClean) treeClean.classList.add('hidden');
+                    if (treeDirty) treeDirty.classList.remove('hidden');
+                    if (treeBadge) {
+                        treeBadge.textContent = '1 Modified File';
+                        treeBadge.className = 'text-[9px] font-mono font-bold px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200';
+                    }
+                    if (treePath) treePath.textContent = d.page_status.file_path;
+                    if (commitInput && !commitInput.value.trim() && d.page_status.suggested_message) {
+                        commitInput.value = d.page_status.suggested_message;
+                    }
+                } else {
+                    if (treeDirty) treeDirty.classList.add('hidden');
+                    if (treeClean) treeClean.classList.remove('hidden');
+                    if (treeBadge) {
+                        treeBadge.textContent = 'Clean Tree';
+                        treeBadge.className = 'text-[9px] font-mono font-semibold px-2 py-0.5 rounded bg-zinc-100 text-zinc-600 border border-zinc-200';
+                    }
+                }
+
+                // 7. Pull Requests Registry
+                const prContainer = document.getElementById('cora-gh-pr-list-container');
+                const prBadge = document.getElementById('cora-gh-pr-count-badge');
+                if (prBadge) {
+                    prBadge.textContent = (d.pull_requests ? d.pull_requests.length : 0) + ' Open';
+                }
+                if (prContainer) {
+                    if (d.pull_requests && d.pull_requests.length) {
+                        prContainer.innerHTML = d.pull_requests.map(p => `
+                            <div class="p-3 bg-zinc-50/80 border border-zinc-200/80 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                                <div class="min-w-0 space-y-0.5">
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <span class="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-800">#${p.number}</span>
+                                        <h4 class="text-xs font-bold text-zinc-900 truncate">${p.title}</h4>
+                                        <span class="text-[9px] font-mono px-1 py-0.2 rounded bg-zinc-200 text-zinc-700">${p.head} &rarr; ${p.base}</span>
+                                    </div>
+                                    <div class="text-[10px] text-zinc-500 font-sans">
+                                        Opened by @${p.user || 'author'} &bull; ${new Date(p.created_at).toLocaleString()}
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2 shrink-0">
+                                    <a href="${p.html_url}" target="_blank" class="px-2.5 py-1 text-xs border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700 font-semibold rounded-lg no-underline transition-colors">
+                                        View on GitHub
+                                    </a>
+                                    <button type="button" onclick="coraMergePR(${p.number})" class="px-2.5 py-1 text-xs bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg shadow-3xs cursor-pointer transition-all active:scale-95 border-none">
+                                        Merge &amp; Deploy
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('');
+                    } else {
+                        prContainer.innerHTML = `
+                            <div class="p-4 text-center text-xs text-zinc-400 italic bg-zinc-50 rounded-xl border border-dashed border-zinc-200">
+                                No open pull requests. All draft revisions are currently merged and deployed.
+                            </div>
+                        `;
+                    }
+                }
+
+                // 8. Commit History & Snapshot Rollback
+                const commitContainer = document.getElementById('cora-gh-commits-list-container');
+                if (commitContainer) {
+                    if (d.recent_commits && d.recent_commits.length) {
+                        commitContainer.innerHTML = d.recent_commits.map(c => `
+                            <div class="p-3 bg-zinc-50/80 border border-zinc-200/80 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 hover:bg-zinc-100/50 transition-colors">
+                                <div class="min-w-0 space-y-0.5">
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <a href="${c.url}" target="_blank" class="text-[10px] font-mono font-bold text-zinc-900 bg-white px-1.5 py-0.5 rounded border border-zinc-200 hover:underline">
+                                            ${c.sha}
+                                        </a>
+                                        <p class="text-xs font-semibold text-zinc-900 truncate">${c.message}</p>
+                                    </div>
+                                    <div class="text-[10px] text-zinc-400 font-sans">
+                                        Committed by ${c.author || 'Studio Admin'} &bull; ${new Date(c.date).toLocaleString()}
+                                    </div>
+                                </div>
+                                <div class="shrink-0 flex items-center gap-2">
+                                    <button type="button" onclick="coraRevertToCommit('${c.full_sha}')" class="px-2.5 py-1 text-xs border border-zinc-200 bg-white hover:bg-zinc-100 text-zinc-800 font-semibold rounded-lg shadow-3xs cursor-pointer transition-all active:scale-95 flex items-center gap-1" title="Restore workspace layout to this commit snapshot">
+                                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                                        <span>Revert to this Commit</span>
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('');
+                    } else {
+                        commitContainer.innerHTML = `
+                            <div class="p-4 text-center text-xs text-zinc-400 italic bg-zinc-50 rounded-xl border border-dashed border-zinc-200">
+                                No recent commits recorded on this branch yet.
+                            </div>
+                        `;
+                    }
+                }
+            }
+        });
+    };
+
+    window.coraConnectPersonalPAT = function() {
+        const input = document.getElementById('cora-gh-pat-inline-input');
+        const pat = input ? input.value.trim() : '';
+        if (!pat) { window.coraShowToast('Personal Access Token is required.', 'warning'); return; }
+
+        const btn = document.getElementById('cora-gh-btn-save-pat');
+        if (btn) { btn.disabled = true; btn.textContent = 'Connecting...'; }
+
+        const ajaxUrl = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : (window.ajaxurl || '/wp-admin/admin-ajax.php');
+        const nonce = (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : '';
+
+        jQuery.post(ajaxUrl, {
+            action: 'cora_github_save_pat',
+            nonce: nonce,
+            pat: pat
+        }, function(res) {
+            if (btn) { btn.disabled = false; btn.textContent = 'Connect Account'; }
+            if (res.success) {
+                window.coraShowToast('GitHub account connected successfully! Welcome @' + (res.data?.username || 'user') + '.', 'success');
+                if (input) input.value = '';
+                window.loadCanvasGitHubView();
+            } else {
+                window.coraShowToast(res.data?.message || 'Invalid Personal Access Token.', 'error');
+            }
+        }).fail(function() {
+            if (btn) { btn.disabled = false; btn.textContent = 'Connect Account'; }
+            window.coraShowToast('Connection error. Please try again.', 'error');
+        });
+    };
+
+    window.coraCreateNewRepo = function() {
+        const input = document.getElementById('cora-gh-input-new-repo');
+        const name = input ? input.value.trim() : '';
+        if (!name) { window.coraShowToast('Repository name is required.', 'warning'); return; }
+
+        const btn = document.getElementById('cora-gh-btn-create-repo');
+        if (btn) { btn.disabled = true; btn.textContent = 'Creating...'; }
+
+        const ajaxUrl = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : (window.ajaxurl || '/wp-admin/admin-ajax.php');
+        const nonce = (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : '';
+
+        jQuery.post(ajaxUrl, {
+            action: 'cora_github_create_repo',
+            nonce: nonce,
+            repo_name: name
+        }, function(res) {
+            if (btn) { btn.disabled = false; btn.textContent = 'Create Private Repository'; }
+            if (res.success) {
+                window.coraShowToast('Private repository ' + res.data.repo + ' created & initialized!', 'success');
+                window.loadCanvasGitHubView();
+            } else {
+                window.coraShowToast(res.data?.message || 'Failed to create repository.', 'error');
+            }
+        });
+    };
+
+    window.coraLinkExistingRepo = function() {
+        const input = document.getElementById('cora-gh-input-link-repo');
+        const repo = input ? input.value.trim() : '';
+        if (!repo) { window.coraShowToast('Repository path (owner/repo) is required.', 'warning'); return; }
+
+        const btn = document.getElementById('cora-gh-btn-link-repo');
+        if (btn) { btn.disabled = true; btn.textContent = 'Linking...'; }
+
+        const ajaxUrl = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : (window.ajaxurl || '/wp-admin/admin-ajax.php');
+        const nonce = (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : '';
+
+        jQuery.post(ajaxUrl, {
+            action: 'cora_github_link_repo',
+            nonce: nonce,
+            repo: repo
+        }, function(res) {
+            if (btn) { btn.disabled = false; btn.textContent = 'Link Repository'; }
+            if (res.success) {
+                window.coraShowToast('Repository ' + res.data.repo + ' linked successfully!', 'success');
+                window.loadCanvasGitHubView();
+            } else {
+                window.coraShowToast(res.data?.message || 'Failed to link repository.', 'error');
+            }
+        });
+    };
+
+    window.coraProvisionOrgRepo = function() {
+        const btn = document.getElementById('cora-gh-btn-provision-org');
+        if (btn) { btn.disabled = true; btn.innerHTML = '<div class="w-3.5 h-3.5 rounded-full border-2 border-white border-t-transparent animate-spin mr-1 inline-block"></div> Provisioning...'; }
+
+        const ajaxUrl = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : (window.ajaxurl || '/wp-admin/admin-ajax.php');
+        const nonce = (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : '';
+
+        jQuery.post(ajaxUrl, {
+            action: 'cora_github_provision_org_repo',
+            nonce: nonce
+        }, function(res) {
+            if (btn) { btn.disabled = false; btn.innerHTML = '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> <span>Provision Tenant Workspace</span>'; }
+            if (res.success) {
+                window.coraShowToast('Tenant repository ' + res.data.repo + ' provisioned under organisation!', 'success');
+                window.loadCanvasGitHubView();
+            } else {
+                window.coraShowToast(res.data?.message || 'Could not provision repository under organization.', 'error');
+            }
+        });
+    };
+
+    window.coraChangeActiveBranch = function(branch) {
+        if (!branch) return;
+        localStorage.setItem('cora_active_branch', branch);
+        window.coraShowToast('Active branch changed to: ' + branch);
+        window.loadCanvasGitHubView();
+    };
+
+    window.coraCreateBranchPrompt = function() {
+        const name = prompt ? null : '';
+        // Open drawer with branch form focused
+        if (typeof openGitDrawer === 'function') {
+            openGitDrawer();
+            setTimeout(function() {
+                if (typeof toggleInlineNewBranch === 'function') toggleInlineNewBranch(true);
+            }, 350);
+        }
+    };
+
+    window.coraApplyGhCommitSuggestion = function() {
+        const commitInput = document.getElementById('cora-gh-input-commit-msg');
+        const textEl = document.getElementById('git-suggestion-text');
+        if (commitInput) {
+            if (textEl && textEl.textContent) {
+                let msg = textEl.textContent.trim().replace(/^"/, '').replace(/"$/, '');
+                commitInput.value = msg;
+            } else {
+                commitInput.value = 'update workspace design and layout copy';
+            }
+            window.coraShowToast('AI suggestion applied!', 'success');
+        }
+    };
+
+    window.coraManualCommitPush = function(isPR) {
+        const commitInput = document.getElementById('cora-gh-input-commit-msg');
+        const msg = (commitInput && commitInput.value.trim()) ? commitInput.value.trim() : 'update page layout and copy';
+        const activeBranch = localStorage.getItem('cora_active_branch') || 'main';
+
+        const btn = isPR ? document.getElementById('cora-gh-btn-create-pr-action') : document.getElementById('cora-gh-btn-commit-action');
+        if (btn) { btn.disabled = true; btn.textContent = isPR ? 'Creating PR...' : 'Pushing...'; }
+
+        const ajaxUrl = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : (window.ajaxurl || '/wp-admin/admin-ajax.php');
+        const nonce = (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : '';
+
+        if (isPR) {
+            // PR Mode: Sync and generate Pull Request
+            jQuery.post(ajaxUrl, {
+                action: 'cora_github_sync_entire_workspace',
+                nonce: nonce,
+                branch: activeBranch,
+                sync_mode: 'pr',
+                message: msg
+            }, function(res) {
+                if (btn) { btn.disabled = false; btn.innerHTML = '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><circle cx="18" cy="18" r="3"></circle><circle cx="6" cy="6" r="3"></circle><path d="M13 6h3a2 2 0 0 1 2 2v7"></path><line x1="6" y1="9" x2="6" y2="21"></line></svg> <span>Create PR</span>'; }
+                if (res.success) {
+                    const pr = res.data?.pull_request;
+                    if (pr) {
+                        window.coraShowToast('Pull Request #' + pr.number + ' opened on GitHub! Changes tracked safely.', 'success');
+                    } else {
+                        window.coraShowToast('Changes committed to feature branch ' + res.data?.branch + '!', 'success');
+                    }
+                    if (commitInput) commitInput.value = '';
+                    window.loadCanvasGitHubView();
+                } else {
+                    window.coraShowToast(res.data?.message || 'Failed to create pull request.', 'error');
+                }
+            });
+        } else {
+            // Direct commit
+            jQuery.post(ajaxUrl, {
+                action: 'cora_github_commit_page',
+                nonce: nonce,
+                page_id: (window.canvasState && canvasState.activeWpPostId) ? canvasState.activeWpPostId : 0,
+                message: msg,
+                branch: activeBranch
+            }, function(res) {
+                if (btn) { btn.disabled = false; btn.innerHTML = '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><polyline points="16 16 12 12 8 16"></polyline><line x1="12" y1="12" x2="12" y2="21"></line><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"></path></svg> <span>Commit &amp; Push</span>'; }
+                if (res.success) {
+                    window.coraShowToast('Changes committed and pushed to ' + activeBranch + ' successfully!', 'success');
+                    if (commitInput) commitInput.value = '';
+                    window.loadCanvasGitHubView();
+                } else {
+                    window.coraShowToast(res.data?.message || 'Commit failed.', 'error');
+                }
+            });
+        }
+    };
+
+    window.coraMergePR = function(prNum) {
+        if (!prNum) return;
+        window.coraShowToast('Merging Pull Request #' + prNum + ' and deploying to workspace...', 'info');
+
+        const ajaxUrl = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : (window.ajaxurl || '/wp-admin/admin-ajax.php');
+        const nonce = (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : '';
+
+        jQuery.post(ajaxUrl, {
+            action: 'cora_github_merge_pr',
+            nonce: nonce,
+            pull_number: prNum
+        }, function(res) {
+            if (res.success) {
+                window.coraShowToast('Pull Request #' + prNum + ' merged and deployed! Workspace updated.', 'success');
+                window.loadCanvasGitHubView();
+            } else {
+                window.coraShowToast(res.data?.message || 'Failed to merge PR.', 'error');
+            }
+        });
+    };
+
+    window.coraRevertToCommit = function(sha) {
+        if (!sha) return;
+        const shortSha = sha.substring(0, 7);
+        window.coraShowToast('Rolling back workspace to commit ' + shortSha + '...', 'info');
+
+        const ajaxUrl = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : (window.ajaxurl || '/wp-admin/admin-ajax.php');
+        const nonce = (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : '';
+        const activeBranch = localStorage.getItem('cora_active_branch') || 'main';
+
+        jQuery.post(ajaxUrl, {
+            action: 'cora_github_revert_commit',
+            nonce: nonce,
+            commit_sha: sha,
+            branch: activeBranch
+        }, function(res) {
+            if (res.success) {
+                window.coraShowToast('Workspace successfully restored to historical commit ' + shortSha + '!', 'success');
+                window.loadCanvasGitHubView();
+                // Reload editor iframe if open
+                const iframe = document.getElementById('elementor-editor-iframe');
+                if (iframe) {
+                    document.getElementById('iframe-loader')?.classList.remove('hidden');
+                    iframe.contentWindow.location.reload();
+                }
+            } else {
+                window.coraShowToast(res.data?.message || 'Rollback failed.', 'error');
+            }
+        });
+    };
+
+    window.coraSyncEntireWorkspace = function() {
+        const btn = document.getElementById('cora-gh-btn-full-sync');
+        if (btn) { btn.disabled = true; btn.innerHTML = '<div class="w-3.5 h-3.5 rounded-full border-2 border-white border-t-transparent animate-spin mr-1 inline-block"></div> Syncing...'; }
+
+        window.coraShowToast('Exporting all workspace pages, theme settings & manifest to GitHub...', 'info');
+
+        const ajaxUrl = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : (window.ajaxurl || '/wp-admin/admin-ajax.php');
+        const nonce = (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : '';
+        const activeBranch = localStorage.getItem('cora_active_branch') || 'main';
+        const mode = window.coraCanvasGhState.syncMode || 'pr';
+
+        jQuery.post(ajaxUrl, {
+            action: 'cora_github_sync_entire_workspace',
+            nonce: nonce,
+            branch: activeBranch,
+            sync_mode: mode
+        }, function(res) {
+            if (btn) { btn.disabled = false; btn.innerHTML = '<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg> <span>Sync Workspace</span>'; }
+            if (res.success) {
+                const count = res.data?.committed_count || 0;
+                const pr = res.data?.pull_request;
+                if (pr) {
+                    window.coraShowToast('Workspace synced (' + count + ' pages)! PR #' + pr.number + ' opened.', 'success');
+                } else {
+                    window.coraShowToast('Full workspace (' + count + ' pages) synced to ' + (res.data?.branch || activeBranch) + '!', 'success');
+                }
+                window.loadCanvasGitHubView();
+            } else {
+                window.coraShowToast(res.data?.message || 'Workspace sync failed.', 'error');
+            }
+        });
+    };
+
+    window.coraDisconnectGitHub = function() {
+        const ajaxUrl = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : (window.ajaxurl || '/wp-admin/admin-ajax.php');
+        const nonce = (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : '';
+
+        jQuery.post(ajaxUrl, {
+            action: 'cora_github_disconnect',
+            nonce: nonce
+        }, function(res) {
+            if (res.success) {
+                window.coraShowToast('Disconnected from GitHub.');
+                localStorage.removeItem('cora_active_branch');
+                window.loadCanvasGitHubView();
+            } else {
+                window.coraShowToast('Failed to disconnect repository.', 'error');
+            }
+        });
+    };
+
+    window.coraOpenGithubGuideModal = function() {
+        const modal = document.getElementById('modal-github-connection-guide');
+        if (!modal) return;
+
+        // Move directly to document.body so no parent container or transform offsets it
+        if (modal.parentElement !== document.body) {
+            document.body.appendChild(modal);
+        }
+
+        // Lock page scrolling so the user cannot scroll the background page while the modal is open
+        document.body.style.overflow = 'hidden';
+        document.documentElement.style.overflow = 'hidden';
+        const scrollContainers = document.querySelectorAll('main.cora-main, .cora-main, #wpbody-content, #cora-workspace-container');
+        scrollContainers.forEach(el => {
+            el.dataset.prevOverflow = el.style.overflow || '';
+            el.style.overflow = 'hidden';
+        });
+
+        // Intercept wheel/touch gestures on modal to prevent scrolling the underlying page
+        if (!modal._hasScrollPrevent) {
+            modal._hasScrollPrevent = true;
+            modal.addEventListener('wheel', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }, { passive: false });
+            modal.addEventListener('touchmove', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }, { passive: false });
+        }
+
+        modal.classList.remove('hidden');
+        requestAnimationFrame(() => {
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            const card = modal.querySelector('.cora-guide-modal-card');
+            if (card) {
+                card.classList.remove('scale-95');
+                card.classList.add('scale-100');
+            }
+        });
+    };
+
+    window.coraCloseGithubGuideModal = function() {
+        const modal = document.getElementById('modal-github-connection-guide');
+        if (!modal) return;
+
+        modal.classList.add('opacity-0', 'pointer-events-none');
+        const card = modal.querySelector('.cora-guide-modal-card');
+        if (card) {
+            card.classList.add('scale-95');
+            card.classList.remove('scale-100');
+        }
+
+        // Restore page scrolling immediately
+        document.body.style.overflow = '';
+        document.documentElement.style.overflow = '';
+        const scrollContainers = document.querySelectorAll('main.cora-main, .cora-main, #wpbody-content, #cora-workspace-container');
+        scrollContainers.forEach(el => {
+            el.style.overflow = el.dataset.prevOverflow || '';
+            delete el.dataset.prevOverflow;
+        });
+
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 200);
+    };
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const modal = document.getElementById('modal-github-connection-guide');
+            if (modal && !modal.classList.contains('hidden') && !modal.classList.contains('pointer-events-none')) {
+                window.coraCloseGithubGuideModal();
+            }
+        }
+    });
 
     // Auto-save changes dirty status observer loop
     setInterval(() => {

@@ -1,0 +1,37 @@
+.catalog { min-width:0; }
+.guide { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--cora-space-6); background:var(--cora-surface); padding:var(--cora-space-6); border-radius:var(--cora-radius-xl); margin-bottom:var(--cora-space-6); }
+.guide h3 { margin:0 0 var(--cora-space-2); }
+.catalog a { color:var(--cora-text); text-underline-offset:3px; }
+.controls { display:flex; align-items:end; flex-wrap:wrap; gap:var(--cora-space-3); }
+.controls label { display:grid; gap:var(--cora-space-2); font-size:var(--cora-text-caption); font-weight:500; color:var(--cora-muted); }
+.controls .search { flex:1; min-width:200px; }
+.controls input,.controls select { min-height:var(--cora-control-height); min-width:0; width:100%; border:1px solid var(--cora-border-strong); border-radius:var(--cora-radius-lg); padding:var(--cora-space-2) var(--cora-space-3); background:var(--cora-bg); color:var(--cora-text); font-family:inherit; font-size:var(--cora-text-small); }
+.controls input::placeholder { color:var(--cora-subtle); }
+.filters { display:flex; flex-wrap:wrap; gap:var(--cora-space-2); margin:var(--cora-space-5) 0 var(--cora-space-3); }
+.filters button { min-height:var(--cora-control-height); font:inherit; font-size:var(--cora-text-caption); border:1px solid var(--cora-border); border-radius:var(--cora-radius-pill); padding:var(--cora-space-2) var(--cora-space-3); color:var(--cora-muted); background:var(--cora-bg); cursor:pointer; }
+.filters button[aria-pressed=true] { color:var(--cora-text); background:var(--cora-selected); }
+.filters span { margin-left:var(--cora-space-1); font-family:var(--cora-font-code); }
+.catalog .count,.catalog .note,.catalog .feedback { font-size:var(--cora-text-caption); }
+.feedback { min-height:1.5em; }
+.grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); align-items:start; gap:var(--cora-space-5); }
+.tile { min-width:0; border:1px solid var(--cora-border); border-radius:var(--cora-radius-xl); overflow:clip; scroll-margin-top:var(--cora-space-24); }
+.tile:focus-visible { outline:2px solid var(--cora-focus); outline-offset:3px; }
+.expanded { grid-column:1 / -1; }
+.heading { display:flex; align-items:center; justify-content:space-between; gap:var(--cora-space-3); flex-wrap:wrap; padding:var(--cora-space-5) var(--cora-space-5) 0; }
+.heading h3 { margin:var(--cora-space-1) 0; }
+.category { color:var(--cora-subtle); font-size:var(--cora-text-caption); }
+.catalog .description { padding:0 var(--cora-space-5); margin:var(--cora-space-2) 0 var(--cora-space-5); }
+.frame { background:var(--cora-canvas); color:var(--cora-text); padding:var(--cora-space-5); border-block:1px solid var(--cora-border); min-width:0; min-height:260px; }
+.actions { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; padding:var(--cora-space-2) var(--cora-space-3); gap:var(--cora-space-2); }
+.actions a { display:inline-flex; align-items:center; gap:var(--cora-space-2); font-size:var(--cora-text-caption); min-height:var(--cora-control-height); padding:var(--cora-space-2); }
+.details { border-top:1px solid var(--cora-border); }
+.details summary { min-height:var(--cora-control-height); padding:var(--cora-space-3) var(--cora-space-5); font-weight:500; font-size:var(--cora-text-small); cursor:pointer; }
+.reference { padding:0 var(--cora-space-5) var(--cora-space-5); min-width:0; }
+.reference h4 { margin-top:var(--cora-space-5); }
+.reference code { overflow-wrap:anywhere; }
+.tags,.contracts { display:flex; gap:var(--cora-space-2); flex-wrap:wrap; }
+.contracts { margin-top:var(--cora-space-3); font-size:var(--cora-text-small); }
+.catalog .note { margin-top:var(--cora-space-6); }
+.empty { border:1px dashed var(--cora-border-strong); border-radius:var(--cora-radius-xl); padding:var(--cora-space-8); text-align:center; }
+@media(max-width:1100px) { .grid { grid-template-columns:1fr; } }
+@media(max-width:639px) { .guide { grid-template-columns:1fr; padding:var(--cora-space-4); }.frame,.reference { padding:var(--cora-space-4); }.heading { padding:var(--cora-space-4) var(--cora-space-4) 0; }.catalog .description { padding-inline:var(--cora-space-4); }.tile { scroll-margin-top:180px; }.controls label { flex:1; }.controls .search { flex-basis:100%; } }

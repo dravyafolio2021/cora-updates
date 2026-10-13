@@ -118,148 +118,45 @@ foreach($cora_posts as $post) {
 }
 $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
 ?>
-<!-- Metrics Grid -->
-<div id="cora-overview-metrics-grid" class="cora-metrics-grid mb-6 px-0 grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-3.5">
-    <!-- Card 1: Total Articles -->
-    <div class="cora-stat-card p-3.5 sm:p-4 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xs flex flex-col justify-between">
-        <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <div class="w-6 h-6 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 flex items-center justify-center shrink-0">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                </div>
-                <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Total Articles</span>
-            </div>
-            <span class="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 font-mono">Library</span>
-        </div>
-        <div class="flex items-baseline justify-between mt-2.5">
-            <div class="text-xl sm:text-2xl font-extrabold text-zinc-950 dark:text-white font-mono tracking-tight"><?php echo esc_html($total_articles); ?></div>
-            <span class="text-[10px] font-medium text-zinc-400">All Topics</span>
-        </div>
-    </div>
 
-    <!-- Card 2: Published -->
-    <div class="cora-stat-card p-3.5 sm:p-4 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xs flex flex-col justify-between">
-        <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <div class="w-6 h-6 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                </div>
-                <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Published</span>
-            </div>
-            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800 font-mono">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                <?php echo $total_articles > 0 ? round(($published_count / $total_articles) * 100) : 0; ?>%
-            </span>
-        </div>
-        <div class="flex items-baseline justify-between mt-2.5">
-            <div class="text-xl sm:text-2xl font-extrabold text-zinc-950 dark:text-white font-mono tracking-tight"><?php echo esc_html($published_count); ?></div>
-            <span class="text-[10px] font-medium text-emerald-600 dark:text-emerald-400">Live on site</span>
-        </div>
-    </div>
-
-    <!-- Card 3: Drafts -->
-    <div class="cora-stat-card cora-metric-card-secondary p-3.5 sm:p-4 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xs flex flex-col justify-between">
-        <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <div class="w-6 h-6 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 flex items-center justify-center shrink-0">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-                </div>
-                <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Drafts</span>
-            </div>
-            <span class="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 font-mono">
-                <?php echo $total_articles > 0 ? round(($draft_count / $total_articles) * 100) : 0; ?>%
-            </span>
-        </div>
-        <div class="flex items-baseline justify-between mt-2.5">
-            <div class="text-xl sm:text-2xl font-extrabold text-zinc-950 dark:text-white font-mono tracking-tight"><?php echo esc_html($draft_count); ?></div>
-            <span class="text-[10px] font-medium text-zinc-400">In progress</span>
-        </div>
-    </div>
-
-    <!-- Card 4: Avg SEO Score -->
-    <div class="cora-stat-card cora-metric-card-secondary p-3.5 sm:p-4 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xs flex flex-col justify-between">
-        <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <div class="w-6 h-6 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 flex items-center justify-center shrink-0">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M23 6l-9.5 9.5-5-5L1 18"></path><polyline points="17 6 23 6 23 12"></polyline></svg>
-                </div>
-                <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Avg SEO Score</span>
-            </div>
-            <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-200/60 dark:border-zinc-700 font-mono">
-                <svg viewBox="0 0 24 24" width="8" height="8" stroke="currentColor" stroke-width="3" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>
-                3%
-            </span>
-        </div>
-        <div class="flex items-baseline justify-between mt-2.5">
-            <div class="text-xl sm:text-2xl font-extrabold text-zinc-950 dark:text-white font-mono tracking-tight"><?php echo esc_html($avg_seo); ?><span class="text-xs font-normal text-zinc-400 ml-0.5">/100</span></div>
-            <span class="text-[10px] font-medium <?php echo $avg_seo >= 80 ? 'text-emerald-600' : ($avg_seo >= 60 ? 'text-zinc-600' : 'text-amber-600'); ?>">Overall Health</span>
-        </div>
-    </div>
-
-    <!-- Card 5: Total Leads -->
-    <div class="cora-stat-card cora-metric-card-secondary p-3.5 sm:p-4 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xs flex flex-col justify-between">
-        <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <div class="w-6 h-6 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 flex items-center justify-center shrink-0">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                </div>
-                <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Total Leads</span>
-            </div>
-            <span class="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 font-mono">Inbound</span>
-        </div>
-        <div class="flex items-baseline justify-between mt-2.5">
-            <div class="text-xl sm:text-2xl font-extrabold text-zinc-950 dark:text-white font-mono tracking-tight"><?php echo esc_html($total_leads); ?></div>
-            <span class="text-[10px] font-medium text-zinc-400">From content</span>
-        </div>
-    </div>
-</div>
-
-<!-- Mobile Metrics Expand/Collapse Toggle -->
-<div class="sm:hidden -mt-3 mb-5 flex justify-center select-none">
-    <button type="button" id="cora-mobile-metrics-toggle" onclick="window.coraToggleMobileMetrics()" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-300 text-[11px] font-semibold transition-all border-0 cursor-pointer shadow-3xs active:scale-97">
-        <span id="cora-mobile-metrics-toggle-text">Show 3 more metrics</span>
-        <svg id="cora-mobile-metrics-toggle-icon" viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none" class="transition-transform duration-200"><polyline points="6 9 12 15 18 9"></polyline></svg>
-    </button>
-</div>
-
-<!-- Tabs Navigation (Sticky Sub-Navigation Bar) -->
-<div class="cora-sticky-content-tabs flex items-center gap-1 border-b border-zinc-200/80 dark:border-zinc-800 select-none overflow-x-auto scrollbar-hide bg-[#FBFaf7] dark:bg-[#0c0c0e] mb-4" id="cora-content-tabs" style="position: -webkit-sticky; position: sticky; left: 0; right: 0; z-index: 35; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; scrollbar-width: none; min-height: 40px;">
-    <button class="cora-tab-btn px-3.5 py-2.5 border-b-2 text-xs font-bold cursor-pointer transition-all border-zinc-950 text-zinc-950 dark:border-white dark:text-white flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="ct-overview" onclick="switchContentTab('ct-overview')">
+<!-- Tabs Navigation (Sticky Sub-Navigation Bar - SOP Flush After Header) -->
+<div class="cora-sticky-content-tabs cora-sub-tabs-container cora-sticky-sub-tabs flex items-center gap-1 border-b border-zinc-200/80 dark:border-zinc-800 select-none overflow-x-auto scrollbar-hide bg-[#FBFaf7] dark:bg-[#0c0c0e] -mx-3 sm:-mx-4 md:-mx-5 px-3 sm:px-4 md:px-5 w-[calc(100%+1.5rem)] sm:w-[calc(100%+2rem)] md:w-[calc(100%+2.5rem)] max-w-[calc(100%+1.5rem)] sm:max-w-[calc(100%+2rem)] md:max-w-[calc(100%+2.5rem)] mb-4" id="cora-content-tabs" style="position: -webkit-sticky; position: sticky; top: var(--cora-sticky-tabs-top, 0px); left: 0; right: 0; z-index: 40; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; scrollbar-width: none; min-height: 40px; height: 40px; padding-top: 0; padding-bottom: 0; margin-top: 0;">
+    <button class="cora-tab-btn px-3.5 h-[40px] py-0 -mb-px border-b-2 text-xs font-bold cursor-pointer transition-all border-zinc-950 text-zinc-950 dark:border-white dark:text-white flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="ct-overview" onclick="switchContentTab('ct-overview')">
         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><rect x="3" y="3" width="7" height="9" rx="1"></rect><rect x="14" y="3" width="7" height="5" rx="1"></rect><rect x="14" y="12" width="7" height="9" rx="1"></rect><rect x="3" y="16" width="7" height="5" rx="1"></rect></svg>
         <span>Overview</span>
     </button>
-    <button class="cora-tab-btn px-3.5 py-2.5 border-b-2 text-xs font-semibold cursor-pointer transition-all border-transparent text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="ct-opportunities" onclick="switchContentTab('ct-opportunities')" id="btn-tab-keywords-explorer">
+    <button class="cora-tab-btn px-3.5 h-[40px] py-0 -mb-px border-b-2 text-xs font-semibold cursor-pointer transition-all border-transparent text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="ct-opportunities" onclick="switchContentTab('ct-opportunities')" id="btn-tab-keywords-explorer">
         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
         <span>Opportunities</span>
         <span class="ml-1 px-1.5 py-0.5 bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 text-[9px] font-bold rounded-full">NEW</span>
     </button>
-    <button class="cora-tab-btn px-3.5 py-2.5 border-b-2 text-xs font-semibold cursor-pointer transition-all border-transparent text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="ct-library" onclick="switchContentTab('ct-library')" id="btn-tab-articles-list">
+    <button class="cora-tab-btn px-3.5 h-[40px] py-0 -mb-px border-b-2 text-xs font-semibold cursor-pointer transition-all border-transparent text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="ct-library" onclick="switchContentTab('ct-library')" id="btn-tab-articles-list">
         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
         <span>Content Library</span>
         <?php if ($total_articles > 0): ?>
             <span class="ml-1 px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[9px] font-bold font-mono rounded-full border border-zinc-200/60 dark:border-zinc-700"><?php echo esc_html($total_articles); ?></span>
         <?php endif; ?>
     </button>
-    <button class="cora-tab-btn px-3.5 py-2.5 border-b-2 text-xs font-semibold cursor-pointer transition-all border-transparent text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="ct-seo" onclick="switchContentTab('ct-seo')" id="btn-tab-geo-analytics">
+    <button class="cora-tab-btn px-3.5 h-[40px] py-0 -mb-px border-b-2 text-xs font-semibold cursor-pointer transition-all border-transparent text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="ct-seo" onclick="switchContentTab('ct-seo')" id="btn-tab-geo-analytics">
         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
         <span>SEO & AI Visibility</span>
     </button>
-    <button class="cora-tab-btn px-3.5 py-2.5 border-b-2 text-xs font-semibold cursor-not-allowed transition-all border-transparent text-zinc-400 dark:text-zinc-500 flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="ct-calendar" onclick="switchContentTab('ct-calendar')">
+    <button class="cora-tab-btn px-3.5 h-[40px] py-0 -mb-px border-b-2 text-xs font-semibold cursor-not-allowed transition-all border-transparent text-zinc-400 dark:text-zinc-500 flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="ct-calendar" onclick="switchContentTab('ct-calendar')">
         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
         <span>Calendar</span>
         <span class="ml-1 px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 text-[8.5px] font-bold rounded border border-zinc-200/50 dark:border-zinc-700/50 tracking-wider">SOON</span>
     </button>
-    <button class="cora-tab-btn px-3.5 py-2.5 border-b-2 text-xs font-semibold cursor-not-allowed transition-all border-transparent text-zinc-400 dark:text-zinc-500 flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="ct-performance" onclick="switchContentTab('ct-performance')">
+    <button class="cora-tab-btn px-3.5 h-[40px] py-0 -mb-px border-b-2 text-xs font-semibold cursor-not-allowed transition-all border-transparent text-zinc-400 dark:text-zinc-500 flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="ct-performance" onclick="switchContentTab('ct-performance')">
         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M23 6l-9.5 9.5-5-5L1 18"></path><polyline points="17 6 23 6 23 12"></polyline></svg>
         <span>Performance</span>
         <span class="ml-1 px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 text-[8.5px] font-bold rounded border border-zinc-200/50 dark:border-zinc-700/50 tracking-wider">SOON</span>
     </button>
-    <button class="cora-tab-btn px-3.5 py-2.5 border-b-2 text-xs font-semibold cursor-not-allowed transition-all border-transparent text-zinc-400 dark:text-zinc-500 flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="ct-automations" onclick="switchContentTab('ct-automations')">
+    <button class="cora-tab-btn px-3.5 h-[40px] py-0 -mb-px border-b-2 text-xs font-semibold cursor-not-allowed transition-all border-transparent text-zinc-400 dark:text-zinc-500 flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="ct-automations" onclick="switchContentTab('ct-automations')">
         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg>
         <span>Automations</span>
         <span class="ml-1 px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 text-[8.5px] font-bold rounded border border-zinc-200/50 dark:border-zinc-700/50 tracking-wider">SOON</span>
     </button>
-    <button class="cora-tab-btn px-3.5 py-2.5 border-b-2 text-xs font-semibold cursor-not-allowed transition-all border-transparent text-zinc-400 dark:text-zinc-500 flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="ct-brain" onclick="switchContentTab('ct-brain')">
+    <button class="cora-tab-btn px-3.5 h-[40px] py-0 -mb-px border-b-2 text-xs font-semibold cursor-not-allowed transition-all border-transparent text-zinc-400 dark:text-zinc-500 flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="ct-brain" onclick="switchContentTab('ct-brain')">
         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44 2.5 2.5 0 0 1 0-4.12 2.5 2.5 0 0 1 0-4.12A2.5 2.5 0 0 1 9.5 2z"></path><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44 2.5 2.5 0 0 0 0-4.12 2.5 2.5 0 0 0 0-4.12A2.5 2.5 0 0 0 14.5 2z"></path></svg>
         <span>Business Brain</span>
         <span class="ml-1 px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 text-[8.5px] font-bold rounded border border-zinc-200/50 dark:border-zinc-700/50 tracking-wider">SOON</span>
@@ -268,6 +165,110 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
 
 <!-- PANEL: Overview (panel-ct-overview) -->
 <div id="panel-ct-overview" class="cora-ct-panel block space-y-5">
+
+    <!-- Metrics Grid (Overview Tab) -->
+    <div id="cora-overview-metrics-grid" class="cora-metrics-grid mb-6 px-0 grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-3.5">
+        <!-- Card 1: Total Articles -->
+        <div class="cora-stat-card p-3.5 sm:p-4 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xs flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 flex items-center justify-center shrink-0">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                    </div>
+                    <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Total Articles</span>
+                </div>
+                <span class="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 font-mono">Library</span>
+            </div>
+            <div class="flex items-baseline justify-between mt-2.5">
+                <div class="text-xl sm:text-2xl font-extrabold text-zinc-950 dark:text-white font-mono tracking-tight"><?php echo esc_html($total_articles); ?></div>
+                <span class="text-[10px] font-medium text-zinc-400">All Topics</span>
+            </div>
+        </div>
+
+        <!-- Card 2: Published -->
+        <div class="cora-stat-card p-3.5 sm:p-4 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xs flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    </div>
+                    <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Published</span>
+                </div>
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800 font-mono">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <?php echo $total_articles > 0 ? round(($published_count / $total_articles) * 100) : 0; ?>%
+                </span>
+            </div>
+            <div class="flex items-baseline justify-between mt-2.5">
+                <div class="text-xl sm:text-2xl font-extrabold text-zinc-950 dark:text-white font-mono tracking-tight"><?php echo esc_html($published_count); ?></div>
+                <span class="text-[10px] font-medium text-emerald-600 dark:text-emerald-400">Live on site</span>
+            </div>
+        </div>
+
+        <!-- Card 3: Drafts -->
+        <div class="cora-stat-card cora-metric-card-secondary p-3.5 sm:p-4 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xs flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 flex items-center justify-center shrink-0">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                    </div>
+                    <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Drafts</span>
+                </div>
+                <span class="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 font-mono">
+                    <?php echo $total_articles > 0 ? round(($draft_count / $total_articles) * 100) : 0; ?>%
+                </span>
+            </div>
+            <div class="flex items-baseline justify-between mt-2.5">
+                <div class="text-xl sm:text-2xl font-extrabold text-zinc-950 dark:text-white font-mono tracking-tight"><?php echo esc_html($draft_count); ?></div>
+                <span class="text-[10px] font-medium text-zinc-400">In progress</span>
+            </div>
+        </div>
+
+        <!-- Card 4: Avg SEO Score -->
+        <div class="cora-stat-card cora-metric-card-secondary p-3.5 sm:p-4 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xs flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 flex items-center justify-center shrink-0">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M23 6l-9.5 9.5-5-5L1 18"></path><polyline points="17 6 23 6 23 12"></polyline></svg>
+                    </div>
+                    <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Avg SEO Score</span>
+                </div>
+                <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-200/60 dark:border-zinc-700 font-mono">
+                    <svg viewBox="0 0 24 24" width="8" height="8" stroke="currentColor" stroke-width="3" fill="none"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                    3%
+                </span>
+            </div>
+            <div class="flex items-baseline justify-between mt-2.5">
+                <div class="text-xl sm:text-2xl font-extrabold text-zinc-950 dark:text-white font-mono tracking-tight"><?php echo esc_html($avg_seo); ?><span class="text-xs font-normal text-zinc-400 ml-0.5">/100</span></div>
+                <span class="text-[10px] font-medium <?php echo $avg_seo >= 80 ? 'text-emerald-600' : ($avg_seo >= 60 ? 'text-zinc-600' : 'text-amber-600'); ?>">Overall Health</span>
+            </div>
+        </div>
+
+        <!-- Card 5: Total Leads -->
+        <div class="cora-stat-card cora-metric-card-secondary p-3.5 sm:p-4 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xs flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 flex items-center justify-center shrink-0">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    </div>
+                    <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Total Leads</span>
+                </div>
+                <span class="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 font-mono">Inbound</span>
+            </div>
+            <div class="flex items-baseline justify-between mt-2.5">
+                <div class="text-xl sm:text-2xl font-extrabold text-zinc-950 dark:text-white font-mono tracking-tight"><?php echo esc_html($total_leads); ?></div>
+                <span class="text-[10px] font-medium text-zinc-400">From content</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Metrics Expand/Collapse Toggle -->
+    <div class="sm:hidden -mt-3 mb-5 flex justify-center select-none">
+        <button type="button" id="cora-mobile-metrics-toggle" onclick="window.coraToggleMobileMetrics()" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-300 text-[11px] font-semibold transition-all border-0 cursor-pointer shadow-3xs active:scale-97">
+            <span id="cora-mobile-metrics-toggle-text">Show 3 more metrics</span>
+            <svg id="cora-mobile-metrics-toggle-icon" viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none" class="transition-transform duration-200"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+    </div>
 
     <!-- Strategic Focus & Directive Banner -->
     <div class="border border-zinc-200/80 dark:border-zinc-800 rounded-2xl bg-white dark:bg-zinc-900 shadow-2xs p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">

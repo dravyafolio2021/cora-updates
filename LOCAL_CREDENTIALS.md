@@ -20,7 +20,7 @@ This document contains pre-configured test credentials for accessing local works
 
 ## 🛠️ Management & Provisioning Commands
 
-- **Login Portal**: `http://cora.local/workspace/login` or `http://cora.local/wp-login.php`
+- **Login Portal**: `http://cora.local/workspace/login`
 - **Re-provision Accounts Script**:
   ```bash
   /Applications/Local.app/Contents/Resources/extraResources/lightning-services/php-8.2.29+0/bin/darwin-arm64/bin/php scripts/setup_local_accounts.php

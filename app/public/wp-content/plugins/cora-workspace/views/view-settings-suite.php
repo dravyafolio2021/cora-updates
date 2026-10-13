@@ -585,7 +585,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         #cora-settings-tabs { display: flex !important; }
     }
 </style>
-<div id="cora-settings-tabs" class="cora-sub-tabs-container cora-sticky-sub-tabs lg:hidden items-center gap-1 border-b border-zinc-200/80 dark:border-zinc-800 select-none overflow-x-auto scrollbar-hide bg-[#FBFaf7] dark:bg-[#0c0c0e]" style="position: -webkit-sticky; position: sticky; left: 0; right: 0; z-index: 35; flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; touch-action: pan-x pan-y; overscroll-behavior-x: contain; scrollbar-width: none; min-height: 42px;">
+<div id="cora-settings-tabs" class="cora-sub-tabs-container cora-sticky-sub-tabs lg:hidden items-center gap-1 border-b border-zinc-200/80 dark:border-zinc-800 select-none overflow-x-auto scrollbar-hide bg-[#FBFaf7] dark:bg-[#0c0c0e] -mx-3 sm:-mx-4 md:-mx-5 px-3 sm:px-4 md:px-5 w-[calc(100%+1.5rem)] sm:w-[calc(100%+2rem)] md:w-[calc(100%+2.5rem)] max-w-[calc(100%+1.5rem)] sm:max-w-[calc(100%+2rem)] md:max-w-[calc(100%+2.5rem)] mb-4" style="position: -webkit-sticky; position: sticky; top: var(--cora-sticky-tabs-top, 0px); left: 0; right: 0; z-index: 40; flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; touch-action: pan-x pan-y; overscroll-behavior-x: contain; scrollbar-width: none; min-height: 40px; height: 40px; padding-top: 0; padding-bottom: 0; margin-top: 0;">
     <?php
     $tabs = $cora_settings_tabs;
     foreach ( $tabs as $tab_key => $tab ) :

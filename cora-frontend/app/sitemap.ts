@@ -114,6 +114,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/templates`, lastModified: now, changeFrequency: 'daily' as const, priority: 0.98 },
     { url: `${baseUrl}/articles`, lastModified: now, changeFrequency: 'daily' as const, priority: 0.95 },
     { url: `${baseUrl}/docs`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.95 },
+    { url: `${baseUrl}/design-system/`, lastModified: new Date('2026-10-13'), changeFrequency: 'monthly' as const, priority: 0.8 },
     { url: `${baseUrl}/features`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.95 },
     { url: `${baseUrl}/industries`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.95 },
     { url: `${baseUrl}/ai-agent`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.95 },

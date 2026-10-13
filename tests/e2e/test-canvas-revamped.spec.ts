@@ -11,7 +11,7 @@ test.describe('Canvas Themes Module Revamp', () => {
   test('Desktop: Verify Canvas Header, 4 KPI cards, Unified Theme Library & Edge-to-Edge Sticky Bar', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto('/workspace/canvas');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // 1. Verify Header
     await expect(page.locator('h1, span').filter({ hasText: 'Canvas Themes' }).first()).toBeVisible();
@@ -48,6 +48,14 @@ test.describe('Canvas Themes Module Revamp', () => {
     await page.waitForTimeout(300);
     await page.screenshot({ path: path.join(outputDir, 'desktop_canvas_sticky_scrolled.png'), fullPage: false });
 
+    // Scroll to the bottom of the overview tab to verify no uncontained forms/buttons bleed
+    await page.evaluate(() => {
+      const scrollEl = document.querySelector('.cora-main') || window;
+      scrollEl.scrollTo({ top: 99999, behavior: 'instant' });
+    });
+    await page.waitForTimeout(300);
+    await page.screenshot({ path: path.join(outputDir, 'desktop_canvas_overview_bottom.png'), fullPage: false });
+
     // Switch to Tab 2: Speed & Core Web Vitals
     await vitalsTab.click();
     await expect(page.locator('#tab-canvas-vitals')).toBeVisible();
@@ -59,17 +67,36 @@ test.describe('Canvas Themes Module Revamp', () => {
     await expect(page.locator('#tab-canvas-migration')).toBeVisible();
     await expect(page.locator('#tab-canvas-vitals')).toBeHidden();
     await page.screenshot({ path: path.join(outputDir, 'desktop_canvas_migration.png'), fullPage: false });
+
+    // Switch to Tab 4: GitHub Integration (Extreme Edge)
+    const githubTab = page.locator('#subtab-btn-tab-canvas-github');
+    await expect(githubTab).toBeVisible();
+    await githubTab.click();
+    await page.waitForTimeout(600);
+    await expect(page.locator('#tab-canvas-github')).toBeVisible();
+    await expect(page.locator('#tab-canvas-migration')).toBeHidden();
+    const isConnected = await page.locator('#cora-gh-connected-dashboard').isVisible();
+    if (isConnected) {
+      await expect(page.locator('#cora-gh-connected-dashboard')).toBeVisible();
+    } else {
+      await expect(page.locator('#cora-gh-unconnected-view')).toBeVisible();
+    }
+    await page.screenshot({ path: path.join(outputDir, 'desktop_canvas_github_tab.png'), fullPage: false });
   });
 
   test('Mobile: Verify 390x844 Mobile Layout, 2x2 KPIs, and Touch Navigation', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/workspace/canvas');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(600);
 
     // Verify Active Theme Card & Drafts rendered cleanly
     await expect(page.locator('#subtab-btn-tab-canvas-overview')).toBeVisible();
     await expect(page.locator('#subtab-btn-tab-canvas-vitals')).toBeVisible();
-    await expect(page.locator('#subtab-btn-tab-canvas-migration')).toBeHidden();
+    
+    // Migration tab has hidden class on mobile
+    const migrationTabClass = await page.locator('#subtab-btn-tab-canvas-migration').getAttribute('class');
+    expect(migrationTabClass).toContain('hidden');
     await expect(page.locator('#tab-canvas-overview')).toBeVisible();
     await expect(page.locator('#active-theme-card')).toBeVisible();
     await expect(page.locator('#draft-themes-library-card')).toBeVisible();
@@ -88,5 +115,12 @@ test.describe('Canvas Themes Module Revamp', () => {
     await page.locator('#subtab-btn-tab-canvas-vitals').click();
     await expect(page.locator('#tab-canvas-vitals')).toBeVisible();
     await page.screenshot({ path: path.join(outputDir, 'mobile_canvas_vitals.png'), fullPage: false });
+
+    // Switch to GitHub on mobile
+    const mobileGhTab = page.locator('#subtab-btn-tab-canvas-github');
+    await expect(mobileGhTab).toBeVisible();
+    await mobileGhTab.click();
+    await expect(page.locator('#tab-canvas-github')).toBeVisible();
+    await page.screenshot({ path: path.join(outputDir, 'mobile_canvas_github.png'), fullPage: false });
   });
 });

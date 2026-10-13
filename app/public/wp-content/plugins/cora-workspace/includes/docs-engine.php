@@ -236,6 +236,88 @@ function cora_seed_docs_data() {
             }
         }
 
+        // ── Upsert v4.9.380+ documentation pages ─────────────────────────
+        if ( function_exists( 'cora_docs_get_new_pages_v49380' ) ) {
+            $v49380_pages = cora_docs_get_new_pages_v49380();
+            foreach ( $v49380_pages as $p ) {
+                $exists = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$t_pages} WHERE slug = %s", $p['slug'] ) );
+                if ( ! $exists ) {
+                    $wpdb->insert( $t_pages, array_merge( $p, array(
+                        'status'     => 'public_live',
+                        'created_by' => $author_id,
+                        'updated_by' => $author_id,
+                        'created_at' => current_time('mysql'),
+                        'updated_at' => current_time('mysql'),
+                    ) ) );
+                } else {
+                    $wpdb->update( $t_pages, array(
+                        'title'      => $p['title'],
+                        'content'    => $p['content'],
+                        'category'   => $p['category'],
+                        'updated_at' => current_time('mysql'),
+                    ), array( 'slug' => $p['slug'] ) );
+                }
+            }
+        }
+
+        // ── Upsert v4.9.380+ changelog entries ───────────────────────────
+        if ( function_exists( 'cora_docs_get_v49380_changelog_entries' ) ) {
+            $v49380_entries = cora_docs_get_v49380_changelog_entries();
+            foreach ( $v49380_entries as $entry ) {
+                $exists = $wpdb->get_var( $wpdb->prepare(
+                    "SELECT id FROM {$t_changelog} WHERE version = %s AND title = %s",
+                    $entry['version'], $entry['title']
+                ) );
+                if ( ! $exists ) {
+                    $wpdb->insert( $t_changelog, array_merge( $entry, array(
+                        'author_id'  => $author_id,
+                        'created_at' => current_time('mysql'),
+                    ) ) );
+                }
+            }
+        }
+
+        // ── Upsert v4.9.381+ pages ─────────────────────────────────────────
+        if ( function_exists( 'cora_docs_get_new_pages_v49381' ) ) {
+            $v49381_pages = cora_docs_get_new_pages_v49381();
+            foreach ( $v49381_pages as $p ) {
+                $exists = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$t_pages} WHERE slug = %s", $p['slug'] ) );
+                if ( ! $exists ) {
+                    $wpdb->insert( $t_pages, array_merge( $p, array(
+                        'status'     => 'public_live',
+                        'created_by' => $author_id,
+                        'updated_by' => $author_id,
+                        'created_at' => current_time('mysql'),
+                        'updated_at' => current_time('mysql'),
+                    ) ) );
+                } else {
+                    $wpdb->update( $t_pages, array(
+                        'title'      => $p['title'],
+                        'content'    => $p['content'],
+                        'category'   => $p['category'],
+                        'updated_at' => current_time('mysql'),
+                    ), array( 'slug' => $p['slug'] ) );
+                }
+            }
+        }
+
+        // ── Upsert v4.9.381+ changelog entries ───────────────────────────
+        if ( function_exists( 'cora_docs_get_v49381_changelog_entries' ) ) {
+            $v49381_entries = cora_docs_get_v49381_changelog_entries();
+            foreach ( $v49381_entries as $entry ) {
+                $exists = $wpdb->get_var( $wpdb->prepare(
+                    "SELECT id FROM {$t_changelog} WHERE version = %s AND title = %s",
+                    $entry['version'], $entry['title']
+                ) );
+                if ( ! $exists ) {
+                    $wpdb->insert( $t_changelog, array_merge( $entry, array(
+                        'author_id'  => $author_id,
+                        'created_at' => current_time('mysql'),
+                    ) ) );
+                }
+            }
+        }
+
         return; // Already seeded, upserts done
     }
 
@@ -245,7 +327,7 @@ function cora_seed_docs_data() {
         'slug' => 'platform-overview',
         'title' => 'Platform Overview',
         'category' => 'overview',
-        'content' => "# Platform Overview\n\nCora is a modular SaaS platform built for Indian service businesses (salons, dental clinics, gyms, restaurants). It leverages WordPress as a foundational backend and wraps it in a modern, lightweight, isolated multi-tenant architecture designed to scale to the first 100 enterprise customers.\n\n## Core Features\n- **Decoupled Architecture**: Isolation of workspaces and databases.\n- **Universal Auto-Save**: Background debounce auto-save utilizing WordPress transient filters.\n- **MCP Ready**: Seamless connection of external LLM tools with inherited role permissions.\n- **Native AI RAG Layer**: Localized knowledge base synchronization per tenant workspace.\n\n## Tech Stack\n- **Backend**: WordPress 6.x foundation\n- **Client UI**: Vanilla CSS & HTML, Tailwind CSS overlays, and React custom integrations\n- **AI Infrastructure**: Gemini 3.5 Flash and Claude 3.5 Sonnet RAG context agents\n- **MCP Gateway**: Secure JSON-RPC over WebSockets connection portal",
+        'content' => "# Platform Overview\n\nCora is a modular SaaS platform built for Indian service businesses (salons, dental clinics, gyms, restaurants). It leverages an enterprise-grade PHP framework backend and wraps it in a modern, lightweight, isolated multi-tenant architecture designed to scale to the first 100 enterprise customers.\n\n## Core Features\n- **Decoupled Architecture**: Isolation of workspaces and databases.\n- **Universal Auto-Save**: Background debounce auto-save utilizing high-performance transient buffers.\n- **MCP Ready**: Seamless connection of external LLM tools with inherited role permissions.\n- **Native AI RAG Layer**: Localized knowledge base synchronization per tenant workspace.\n\n## Tech Stack\n- **Backend**: High-Performance PHP 8.2+ Framework Foundation\n- **Client UI**: Vanilla CSS & HTML, Tailwind CSS overlays, and React custom integrations\n- **AI Infrastructure**: Gemini 3.5 Flash and Claude 3.5 Sonnet RAG context agents\n- **MCP Gateway**: Secure JSON-RPC over WebSockets connection portal",
         'status' => 'draft',
         'created_by' => $author_id,
         'updated_by' => $author_id,
@@ -1223,7 +1305,7 @@ function cora_docs_get_new_pages_v3246() {
             'slug'     => 'architecture-overview',
             'title'    => 'Architecture & Stack',
             'category' => 'overview',
-            'content'  => "# Architecture & Stack\n\nCora is a single-plugin WordPress SaaS platform. All tenant workspaces, modules, and REST routes live inside a single plugin (`cora-workspace`) deployed on a shared Hostinger VPS.\n\n## Routing Layer\nAll inbound HTTP requests pass through `cora-workspace.php`'s `template_redirect` hook. Routes are matched by inspecting the request URI path segments:\n- `/workspace/**` → Workspace SPA shell\n- `/docs/**` → Public developer documentation\n- `/cora-manifest.json` → Dynamic PWA manifest\n- `/cora-service-worker.js` → Service Worker served at root scope\n- `/api/v1/**` → JSON REST endpoints\n\n## Database Layer\nCora uses custom `\$wpdb` tables with the `cora_` prefix. All queries are tenant-scoped by `agency_id` to enforce multi-tenant data isolation.\n\n## AI Layer\n- **RAG**: Retrieval-Augmented Generation via `cora_rag_knowledge` table. Syncs agency documents for in-context retrieval.\n- **LLM**: Google Gemini Flash and Anthropic Claude Sonnet via REST API calls from PHP.\n- **MCP**: JSON-RPC 2.0 over WebSockets, allowing external LLM agents to call Cora AJAX actions with inherited role permissions.\n\n## PWA Layer (v3.2.46)\n- **Manifest**: Dynamically generated via `/cora-manifest.json` with agency-branded icons.\n- **Service Worker**: Registered at root scope. Handles offline caching (Cache-First for assets, Network-First for API), background push notification delivery, and click-to-focus routing.\n- **VAPID**: ES256 self-signed JWT push authorization for all Web Push subscriptions."
+            'content'  => "# Architecture & Stack\n\nCora is an enterprise-grade PHP SaaS platform. All tenant workspaces, modules, and REST routes live inside a modular PHP framework architecture deployed on a high-performance VPS.\n\n## Routing Layer\nAll inbound HTTP requests pass through the framework routing lifecycle. Routes are matched by inspecting the request URI path segments:\n- `/workspace/**` → Workspace SPA shell\n- `/docs/**` → Public developer documentation\n- `/cora-manifest.json` → Dynamic PWA manifest\n- `/cora-service-worker.js` → Service Worker served at root scope\n- `/api/v1/**` → JSON REST endpoints\n\n## Database Layer\nCora uses custom relational database tables with the `cora_` prefix. All queries are tenant-scoped by `agency_id` to enforce multi-tenant data isolation.\n\n## AI Layer\n- **RAG**: Retrieval-Augmented Generation via `cora_rag_knowledge` table. Syncs agency documents for in-context retrieval.\n- **LLM**: Google Gemini Flash and Anthropic Claude Sonnet via REST API calls from PHP.\n- **MCP**: JSON-RPC 2.0 over WebSockets, allowing external LLM agents to call Cora AJAX actions with inherited role permissions.\n\n## PWA Layer (v3.2.46)\n- **Manifest**: Dynamically generated via `/cora-manifest.json` with agency-branded icons.\n- **Service Worker**: Registered at root scope. Handles offline caching (Cache-First for assets, Network-First for API), background push notification delivery, and click-to-focus routing.\n- **VAPID**: ES256 self-signed JWT push authorization for all Web Push subscriptions."
         ),
         array(
             'slug'     => 'workspace-roles',
@@ -1237,7 +1319,7 @@ function cora_docs_get_new_pages_v3246() {
             'slug'     => 'crm-client-tasks',
             'title'    => 'Client Task Manager',
             'category' => 'crm',
-            'content'  => "# Client Task Manager\n\nThe Client Task Manager enables agencies to assign, track, and communicate deliverables directly to clients through a dedicated task board integrated into the CRM.\n\n## Overview\nTasks are structured as deliverables linked to a CRM lead or contact. Each task has a priority level, deadline, assignee, and real-time status.\n\n## Task Lifecycle\n1. **Created**: Task assigned by admin, visible to client in portal.\n2. **In Progress**: Assignee marks task as started.\n3. **Review**: Submitted for client approval or internal review.\n4. **Completed**: Signed off by admin or client.\n5. **Overdue**: Auto-flagged when deadline passes without completion.\n\n## Push Notifications (v3.2.46)\nHigh-priority task updates (status change, new assignments, deadline approaching) now trigger Web Push notifications to subscribed agency staff via the VAPID push system.\n\n## AJAX API Reference\n| Action | Parameters | Description |\n|---|---|---|\n| `cora_ajax_get_client_tasks` | `nonce`, `lead_id` | Returns all tasks for a lead |\n| `cora_ajax_create_client_task` | `nonce`, `lead_id`, `title`, `priority`, `due_date` | Creates a new task |\n| `cora_ajax_update_task_status` | `nonce`, `task_id`, `status` | Updates task status and triggers push notification |\n\n## Database Schema\n### `cora_client_tasks`\n| Column | Type | Description |\n|---|---|---|\n| `id` | bigint | Primary Key |\n| `agency_id` | bigint | Tenant isolation |\n| `lead_id` | bigint | Associated CRM lead |\n| `title` | varchar(255) | Task title |\n| `status` | varchar(50) | pending/in_progress/completed/overdue |\n| `priority` | varchar(20) | low/medium/high/urgent |\n| `due_date` | date | Deadline |\n| `assigned_to` | bigint | WordPress user ID |"
+            'content'  => "# Client Task Manager\n\nThe Client Task Manager enables agencies to assign, track, and communicate deliverables directly to clients through a dedicated task board integrated into the CRM.\n\n## Overview\nTasks are structured as deliverables linked to a CRM lead or contact. Each task has a priority level, deadline, assignee, and real-time status.\n\n## Task Lifecycle\n1. **Created**: Task assigned by admin, visible to client in portal.\n2. **In Progress**: Assignee marks task as started.\n3. **Review**: Submitted for client approval or internal review.\n4. **Completed**: Signed off by admin or client.\n5. **Overdue**: Auto-flagged when deadline passes without completion.\n\n## Push Notifications (v3.2.46)\nHigh-priority task updates (status change, new assignments, deadline approaching) now trigger Web Push notifications to subscribed agency staff via the VAPID push system.\n\n## AJAX API Reference\n| Action | Parameters | Description |\n|---|---|---|\n| `cora_ajax_get_client_tasks` | `nonce`, `lead_id` | Returns all tasks for a lead |\n| `cora_ajax_create_client_task` | `nonce`, `lead_id`, `title`, `priority`, `due_date` | Creates a new task |\n| `cora_ajax_update_task_status` | `nonce`, `task_id`, `status` | Updates task status and triggers push notification |\n\n## Database Schema\n### `cora_client_tasks`\n| Column | Type | Description |\n|---|---|---|\n| `id` | bigint | Primary Key |\n| `agency_id` | bigint | Tenant isolation |\n| `lead_id` | bigint | Associated CRM lead |\n| `title` | varchar(255) | Task title |\n| `status` | varchar(50) | pending/in_progress/completed/overdue |\n| `priority` | varchar(20) | low/medium/high/urgent |\n| `due_date` | date | Deadline |\n| `assigned_to` | bigint | System user ID |"
         ),
 
         // ── Finance AI Co-founder (v3.4.44) ───────────────────────────────
@@ -1291,7 +1373,7 @@ function cora_docs_get_new_pages_v3246() {
             'slug'     => 'media-library',
             'title'    => 'Media Library',
             'category' => 'media',
-            'content'  => "# Media Library\n\nThe Cora Media Library is a workspace-scoped asset management system that replaces the native WordPress media library with a tenant-isolated, AI-enhanced file management interface.\n\n## Features\n- **Folder Organization**: Hierarchical folder tree for organizing shoots, projects, and brands.\n- **AI Tagging**: Auto-generated semantic tags on uploaded images using the Gemini Vision API.\n- **Client Sharing**: Generate time-limited secure share links for client gallery delivery.\n- **Bulk Operations**: Select multiple files for batch download, delete, or move.\n- **Search**: Full-text and tag-based search across the entire media library.\n\n## Architecture\nMedia metadata is stored in `cora_media_assets`. Actual files are stored in WordPress uploads. The library renders as a responsive grid SPA inside the workspace sidebar navigation.\n\n## AJAX API Reference\n| Action | Parameters | Description |\n|---|---|---|\n| `cora_ajax_get_media_library` | `nonce`, `folder_id`, `page` | Paginated media list |\n| `cora_ajax_upload_media` | `nonce`, `file`, `folder_id` | Handles file upload |\n| `cora_ajax_delete_media` | `nonce`, `media_id` | Permanently deletes a file |\n| `cora_ajax_share_media` | `nonce`, `media_id`, `expiry_days` | Generates secure share link |\n\n## Database Schema\n### `cora_media_assets`\n| Column | Type | Description |\n|---|---|---|\n| `id` | bigint | Primary Key |\n| `agency_id` | bigint | Tenant isolation |\n| `wp_attachment_id` | bigint | WordPress attachment ID |\n| `folder_id` | bigint | Parent folder |\n| `title` | varchar(255) | Display name |\n| `tags` | text | JSON array of AI-generated tags |\n| `file_type` | varchar(50) | image/video/pdf/raw |\n| `file_size` | bigint | File size in bytes |"
+            'content'  => "# Media Library\n\nThe Cora Media Library is a workspace-scoped asset management system that provides a tenant-isolated, AI-enhanced file management interface.\n\n## Features\n- **Folder Organization**: Hierarchical folder tree for organizing shoots, projects, and brands.\n- **AI Tagging**: Auto-generated semantic tags on uploaded images using the Gemini Vision API.\n- **Client Sharing**: Generate time-limited secure share links for client gallery delivery.\n- **Bulk Operations**: Select multiple files for batch download, delete, or move.\n- **Search**: Full-text and tag-based search across the entire media library.\n\n## Architecture\nMedia metadata is stored in `cora_media_assets`. Files are stored in protected storage partitions. The library renders as a responsive grid SPA inside the workspace sidebar navigation.\n\n## AJAX API Reference\n| Action | Parameters | Description |\n|---|---|---|\n| `cora_ajax_get_media_library` | `nonce`, `folder_id`, `page` | Paginated media list |\n| `cora_ajax_upload_media` | `nonce`, `file`, `folder_id` | Handles file upload |\n| `cora_ajax_delete_media` | `nonce`, `media_id` | Permanently deletes a file |\n| `cora_ajax_share_media` | `nonce`, `media_id`, `expiry_days` | Generates secure share link |\n\n## Database Schema\n### `cora_media_assets`\n| Column | Type | Description |\n|---|---|---|\n| `id` | bigint | Primary Key |\n| `agency_id` | bigint | Tenant isolation |\n| `wp_attachment_id` | bigint | File asset ID |\n| `folder_id` | bigint | Parent folder |\n| `title` | varchar(255) | Display name |\n| `tags` | text | JSON array of AI-generated tags |\n| `file_type` | varchar(50) | image/video/pdf/raw |\n| `file_size` | bigint | File size in bytes |"
         ),
         array(
             'slug'     => 'media-editor',
@@ -1329,7 +1411,7 @@ function cora_docs_get_new_pages_v3246() {
             'slug'     => 'portal-comments',
             'title'    => 'Comments System',
             'category' => 'client-portal',
-            'content'  => "# Comments System\n\nThe Comments module provides threaded inline commenting across deliverables, tasks, and document vault items, enabling async collaboration between agency teams and clients.\n\n## Features\n- **Inline Comments**: Attach comments to specific media files, tasks, or document sections.\n- **@Mentions**: Tag specific workspace users for notifications.\n- **Resolved State**: Mark comment threads as resolved to maintain clean audit trails.\n- **Client Access**: Clients can comment via the portal without a WordPress login.\n\n## AJAX API Reference\n| Action | Parameters | Description |\n|---|---|---|\n| `cora_ajax_post_comment` | `nonce`, `entity_type`, `entity_id`, `message` | Posts a comment |\n| `cora_ajax_resolve_comment` | `nonce`, `comment_id` | Marks comment as resolved |\n| `cora_ajax_get_comments` | `nonce`, `entity_type`, `entity_id` | Returns all comments for an entity |"
+            'content'  => "# Comments System\n\nThe Comments module provides threaded inline commenting across deliverables, tasks, and document vault items, enabling async collaboration between agency teams and clients.\n\n## Features\n- **Inline Comments**: Attach comments to specific media files, tasks, or document sections.\n- **@Mentions**: Tag specific workspace users for notifications.\n- **Resolved State**: Mark comment threads as resolved to maintain clean audit trails.\n- **Client Access**: Clients can comment via the portal without a platform login barrier.\n\n## AJAX API Reference\n| Action | Parameters | Description |\n|---|---|---|\n| `cora_ajax_post_comment` | `nonce`, `entity_type`, `entity_id`, `message` | Posts a comment |\n| `cora_ajax_resolve_comment` | `nonce`, `comment_id` | Marks comment as resolved |\n| `cora_ajax_get_comments` | `nonce`, `entity_type`, `entity_id` | Returns all comments for an entity |"
         ),
 
         // ── Document Vault ────────────────────────────────────────────────
@@ -1337,7 +1419,7 @@ function cora_docs_get_new_pages_v3246() {
             'slug'     => 'vault-overview',
             'title'    => 'Vault Overview',
             'category' => 'vault',
-            'content'  => "# Document Vault — Overview\n\nThe Document Vault is a secure, agency-scoped document management and e-signature registry. It is the centerpiece of Cora's legal and compliance workflow.\n\n## Architecture\nVault documents are stored as WordPress attachments with metadata in `cora_workspace_vault_docs`. Each document has a full lifecycle from draft through e-signature to archived.\n\n## Document Lifecycle\n1. **Draft**: Created, edited, or uploaded by agency.\n2. **Staged**: Shared with client for review via a secure share link.\n3. **Signed**: Client applies digital signature through the e-sign pad.\n4. **Archived**: Final signed copy stored with a PDF watermark and timestamp.\n\n## Document Types\n- **Contracts**: Service agreements, NDAs, model releases.\n- **Invoices**: Linked to the Financials module.\n- **GST Certificates**: Generated from the GST Math Engine.\n- **Custom PDFs**: Upload any PDF for client e-signature.\n\n## Multi-tenant Isolation\nAll vault queries filter by `agency_id`. Documents from one tenant are never accessible to another."
+            'content'  => "# Document Vault — Overview\n\nThe Document Vault is a secure, agency-scoped document management and e-signature registry. It is the centerpiece of Cora's legal and compliance workflow.\n\n## Architecture\nVault documents are stored as secure platform file attachments with metadata in `cora_workspace_vault_docs`. Each document has a full lifecycle from draft through e-signature to archived.\n\n## Document Lifecycle\n1. **Draft**: Created, edited, or uploaded by agency.\n2. **Staged**: Shared with client for review via a secure share link.\n3. **Signed**: Client applies digital signature through the e-sign pad.\n4. **Archived**: Final signed copy stored with a PDF watermark and timestamp.\n\n## Document Types\n- **Contracts**: Service agreements, NDAs, model releases.\n- **Invoices**: Linked to the Financials module.\n- **GST Certificates**: Generated from the GST Math Engine.\n- **Custom PDFs**: Upload any PDF for client e-signature.\n\n## Multi-tenant Isolation\nAll vault queries filter by `agency_id`. Documents from one tenant are never accessible to another."
         ),
         array(
             'slug'     => 'vault-esign',
@@ -1349,7 +1431,7 @@ function cora_docs_get_new_pages_v3246() {
             'slug'     => 'vault-storage',
             'title'    => 'Document Storage',
             'category' => 'vault',
-            'content'  => "# Document Storage\n\nThe Document Storage layer handles all file persistence, retrieval, and secure access control within the Vault.\n\n## Storage Backend\nFiles are stored in WordPress uploads (`/wp-content/uploads/cora-vault/{agency_id}/`). Each file is inaccessible directly — all downloads are routed through a PHP proxy that verifies agency_id scope before serving the binary.\n\n## Features\n- **Versioning**: Every re-upload creates a versioned snapshot.\n- **Encryption at Rest**: Sensitive PDFs can be optionally AES-256 encrypted.\n- **Expiring Links**: Secure share URLs include a hash and expiry timestamp.\n- **Audit Log**: All access events (view, download, sign) are logged to `cora_vault_audit_log`."
+            'content'  => "# Document Storage\n\nThe Document Storage layer handles all file persistence, retrieval, and secure access control within the Vault.\n\n## Storage Backend\nFiles are stored in protected vault storage (`/uploads/cora-vault/{agency_id}/`). Each file is inaccessible directly — all downloads are routed through a PHP proxy that verifies agency_id scope before serving the binary.\n\n## Features\n- **Versioning**: Every re-upload creates a versioned snapshot.\n- **Encryption at Rest**: Sensitive PDFs can be optionally AES-256 encrypted.\n- **Expiring Links**: Secure share URLs include a hash and expiry timestamp.\n- **Audit Log**: All access events (view, download, sign) are logged to `cora_vault_audit_log`."
         ),
 
         // ── Communications ────────────────────────────────────────────────
@@ -1377,7 +1459,7 @@ function cora_docs_get_new_pages_v3246() {
             'slug'     => 'content-suite',
             'title'    => 'Content Suite',
             'category' => 'content',
-            'content'  => "# Content Suite\n\nThe Content Suite is an AI-powered content creation and publishing hub for agencies managing social media, blog posts, and marketing copy.\n\n## Features\n- **AI Content Generation**: Generate captions, blog posts, and email copy using the configured LLM (Gemini/Claude).\n- **WhatsApp-Style AI Chat**: Conversational short-bubble chat interface (max 2-3 sentences per bubble) designed for quick founder decisions.\n- **RCS Card Formatter**: Automatically parses structured lists and action recommendations into neat checklist cards with vector checkmarks and gray borders.\n- **Real-Time Credits Widget**: Displays session token credit usage in a sticky progress bar synchronized with `localStorage` (`cora_ai_credits_used`).\n- **Width-Locked Suggestions Toggle**: Supports collapsing the suggestions sidebar (saving state to `localStorage` under `cora_suggestions_collapsed`) and applies a locked width grid system (`max-w-[720px]` open, `max-w-[500px]` collapsed).\n- **Clean Drawer Redirects**: Strips URL query parameters (`action` and `post_id`) before reload redirection to ensure the slide-out editor drawer closes on save, submission, or approval.\n- **Content Calendar**: Visual monthly publishing calendar.\n- **Platform Publishing**: Direct publish to Instagram (via Meta API), LinkedIn, and blog posts via WordPress.\n- **Brand Voice**: Per-agency brand voice configuration saved to the RAG layer for consistent AI tone.\n\n## AJAX API Reference\n| Action | Parameters | Description |\n|---|---|---|\n| `cora_ajax_generate_content` | `nonce`, `type`, `prompt`, `brand_voice` | Generates AI content |\n| `cora_ajax_schedule_post` | `nonce`, `content_id`, `platform`, `publish_at` | Schedules a post |\n| `cora_ajax_get_content_calendar` | `nonce`, `month`, `year` | Returns publishing calendar |"
+            'content'  => "# Content Suite\n\nThe Content Suite is an AI-powered content creation and publishing hub for agencies managing social media, blog posts, and marketing copy.\n\n## Features\n- **AI Content Generation**: Generate captions, blog posts, and email copy using the configured LLM (Gemini/Claude).\n- **WhatsApp-Style AI Chat**: Conversational short-bubble chat interface (max 2-3 sentences per bubble) designed for quick founder decisions.\n- **RCS Card Formatter**: Automatically parses structured lists and action recommendations into neat checklist cards with vector checkmarks and gray borders.\n- **Real-Time Credits Widget**: Displays session token credit usage in a sticky progress bar synchronized with `localStorage` (`cora_ai_credits_used`).\n- **Width-Locked Suggestions Toggle**: Supports collapsing the suggestions sidebar (saving state to `localStorage` under `cora_suggestions_collapsed`) and applies a locked width grid system (`max-w-[720px]` open, `max-w-[500px]` collapsed).\n- **Clean Drawer Redirects**: Strips URL query parameters (`action` and `post_id`) before reload redirection to ensure the slide-out editor drawer closes on save, submission, or approval.\n- **Content Calendar**: Visual monthly publishing calendar.\n- **Platform Publishing**: Direct publish to Instagram (via Meta API), LinkedIn, and native blog posts.\n- **Brand Voice**: Per-agency brand voice configuration saved to the RAG layer for consistent AI tone.\n\n## AJAX API Reference\n| Action | Parameters | Description |\n|---|---|---|\n| `cora_ajax_generate_content` | `nonce`, `type`, `prompt`, `brand_voice` | Generates AI content |\n| `cora_ajax_schedule_post` | `nonce`, `content_id`, `platform`, `publish_at` | Schedules a post |\n| `cora_ajax_get_content_calendar` | `nonce`, `month`, `year` | Returns publishing calendar |"
         ),
         array(
             'slug'     => 'content-seo-geo',
@@ -1612,7 +1694,7 @@ function cora_docs_get_new_pages_v49364() {
             'slug'     => 'canvas-resilience-shield',
             'title'    => 'Canvas Live HTML Preview Resilience Shield & Auto-Tailwind',
             'category' => 'content',
-            'content'  => "# Canvas Live HTML Preview Resilience Shield & Auto-Tailwind\n\nShipped in **v4.9.358 - v4.9.363**, the Canvas Live Preview Resilience Shield provides a bulletproof editing and preview runtime for static HTML and Tailwind themes.\n\n## Automatic Tailwind CDN Injection\nWhen rendering preview iframes or exporting static bundles, the compiler scans markup for Tailwind utility classes. If a compiled stylesheet link is missing, the engine automatically injects:\n```html\n<script src=\"https://cdn.tailwindcss.com\"></script>\n```\ninto the `<head>`, guaranteeing 100% visual styling fidelity with zero Node.js compilation delay.\n\n## Iframe Error Boundaries & Zero Blank Sections\nPreview iframes are encapsulated in error boundaries. Broken JavaScript snippets, missing fonts, or malformed SVG graphics are isolated gracefully, preventing blank screen lockouts and layout freezes.\n\n## Unified 'Edit with AI' Toolbar (v4.9.362)\nThe Live Code Editor consolidates fragmented AI tools into a single, high-contrast 'Edit with AI' action bar supporting instant diff previews and 1-click code application into CodeMirror buffers.\n\n## Live Static Site Styling Parity (v4.9.363)\nPreview iframes strictly encapsulate host WordPress admin styles, ensuring that typography, grid layouts, and media queries in the editor look identical to exported production builds (`theme_{id}/out/index.html`)."
+            'content'  => "# Canvas Live HTML Preview Resilience Shield & Auto-Tailwind\n\nShipped in **v4.9.358 - v4.9.363**, the Canvas Live Preview Resilience Shield provides a bulletproof editing and preview runtime for static HTML and Tailwind themes.\n\n## Automatic Tailwind CDN Injection\nWhen rendering preview iframes or exporting static bundles, the compiler scans markup for Tailwind utility classes. If a compiled stylesheet link is missing, the engine automatically injects:\n```html\n<script src=\"https://cdn.tailwindcss.com\"></script>\n```\ninto the `<head>`, guaranteeing 100% visual styling fidelity with zero Node.js compilation delay.\n\n## Iframe Error Boundaries & Zero Blank Sections\nPreview iframes are encapsulated in error boundaries. Broken JavaScript snippets, missing fonts, or malformed SVG graphics are isolated gracefully, preventing blank screen lockouts and layout freezes.\n\n## Unified 'Edit with AI' Toolbar (v4.9.362)\nThe Live Code Editor consolidates fragmented AI tools into a single, high-contrast 'Edit with AI' action bar supporting instant diff previews and 1-click code application into CodeMirror buffers.\n\n## Live Static Site Styling Parity (v4.9.363)\nPreview iframes strictly encapsulate host admin styles, ensuring that typography, grid layouts, and media queries in the editor look identical to exported production builds (`theme_{id}/out/index.html`)."
         ),
         array(
             'slug'     => 'ai-quotas-pacing',
@@ -1636,13 +1718,13 @@ function cora_docs_get_new_pages_v49364() {
             'slug'     => 'forms-embedding-suite',
             'title'    => 'Forms Embedding Suite & Static Site Lead Bridge',
             'category' => 'client-portal',
-            'content'  => "# Forms Embedding Suite & Static Site Lead Bridge\n\nThe Forms Embedding Suite enables agency founders to embed dynamic Form AI Architect lead intake forms into any static Canvas landing page or external website.\n\n## Shortcode & Iframe Generators\n- **WordPress Shortcode**: `[cora-form id=\"{form_id}\" theme=\"light\"]`\n- **Responsive Iframe Embed**:\n```html\n<iframe src=\"https://app.heycora.in/workspace/forms/embed?id={form_id}\" class=\"w-full border-0 rounded-2xl min-h-[480px]\" loading=\"lazy\"></iframe>\n```\n\n## Automatic CRM Routing\nAll submissions automatically ingest into `wp_cora_leads`, trigger instant in-app toasts, and dispatch Web Push notifications to subscribed agency devices."
+            'content'  => "# Forms Embedding Suite & Static Site Lead Bridge\n\nThe Forms Embedding Suite enables agency founders to embed dynamic Form AI Architect lead intake forms into any static Canvas landing page or external website.\n\n## Shortcode & Iframe Generators\n- **Embed Shortcode**: `[cora-form id=\"{form_id}\" theme=\"light\"]`\n- **Responsive Iframe Embed**:\n```html\n<iframe src=\"https://app.heycora.in/workspace/forms/embed?id={form_id}\" class=\"w-full border-0 rounded-2xl min-h-[480px]\" loading=\"lazy\"></iframe>\n```\n\n## Automatic CRM Routing\nAll submissions automatically ingest into `wp_cora_leads`, trigger instant in-app toasts, and dispatch Web Push notifications to subscribed agency devices."
         ),
         array(
             'slug'     => 'cora-ai-sdr',
             'title'    => 'Sticky Conversational AI SDR & Objection Engine',
             'category' => 'ai',
-            'content'  => "# Sticky Conversational AI SDR & Objection Engine\n\nMounted via React Portal into `document.body` on the public marketing site (`heycora.in`), the Cora AI SDR acts as an autonomous sales co-founder.\n\n## Portaled Viewport Docking\n- **True Viewport Docking**: Positioned sticky bottom-center (`bottom-0 sm:bottom-4`) portaled to `document.body`, eliminating parent container clipping and layout jumps.\n- **Zero Backdrop Overlay**: Floats freely above the web canvas without dimming background content.\n\n## Objection Handling & Conversion Incentives\n- **Pre-Configured Objection Vectors**: Handles common founder switching doubts (Notion/HoneyBook comparisons, white-glove site migrations, annual discount negotiation, WordPress multi-plugin stability).\n- **Dynamic Discount Coupons**: Generates actionable promotional offer cards with direct checkout links (`MIGRATEFREE`, `CORA10`) that auto-apply discount parameters into `/pricing`.\n\n## Industry Quick-Pills\nProvides 1-tap inquiries tailored for Web Design, Creative & Branding, Performance & SEO, App Dev, and Media Production."
+            'content'  => "# Sticky Conversational AI SDR & Objection Engine\n\nMounted via React Portal into `document.body` on the public marketing site (`heycora.in`), the Cora AI SDR acts as an autonomous sales co-founder.\n\n## Portaled Viewport Docking\n- **True Viewport Docking**: Positioned sticky bottom-center (`bottom-0 sm:bottom-4`) portaled to `document.body`, eliminating parent container clipping and layout jumps.\n- **Zero Backdrop Overlay**: Floats freely above the web canvas without dimming background content.\n\n## Objection Handling & Conversion Incentives\n- **Pre-Configured Objection Vectors**: Handles common founder switching doubts (Notion/HoneyBook comparisons, white-glove site migrations, annual discount negotiation, legacy multi-plugin instability).\n- **Dynamic Discount Coupons**: Generates actionable promotional offer cards with direct checkout links (`MIGRATEFREE`, `CORA10`) that auto-apply discount parameters into `/pricing`.\n\n## Industry Quick-Pills\nProvides 1-tap inquiries tailored for Web Design, Creative & Branding, Performance & SEO, App Dev, and Media Production."
         ),
         array(
             'slug'     => 'templates-asset-library',
@@ -1874,5 +1956,207 @@ function cora_docs_get_v49374_changelog_entries() {
     );
 }
 }
+
+// ── 13. New Documentation Pages (v4.9.380) ───────────────────────────────
+
+if ( ! function_exists( 'cora_docs_get_new_pages_v49380' ) ) {
+function cora_docs_get_new_pages_v49380() {
+    return array(
+        array(
+            'slug'     => 'industry-verticals-directory',
+            'title'    => 'Industry Solutions Directory & 301 Redirect Architecture',
+            'category' => 'overview',
+            'content'  => "# Industry Solutions Directory & 301 Redirect Architecture\n\nShipped in **v4.9.380**, this release establishes `/industries` as the canonical industry directory for Cora, migrating all legacy `/use-cases` endpoints while preserving 100% SEO link equity.\n\n## 10+ Production Industry Solutions\nEach vertical provides bespoke operational tools, tax configurations, and client interfaces:\n1. **Real Estate & Property Developers** (`/industries/real-estate`): Geocoded property listings, virtual site tour schedules, WhatsApp showing alerts, and client inquiry pipelines.\n2. **Photography & Film Studios** (`/industries/photography-studio`): Full-resolution media proofing, digital client contracts, multi-ratio crop presets, and shoot gear custody registries.\n3. **Architecture & Interior Design** (`/industries/architecture-interior-design`): Material moodboards, revision milestone sign-offs, contractor tenders, and project phase tracking.\n4. **Digital Marketing & Creative Agencies** (`/industries/creative-agency`): Retainer margin calculators, commercial proposals, multi-client campaign tracking, and GST SAC 9983 tax invoicing.\n5. **Consulting & Professional Services** (`/industries/consulting`): Advisory engagement logs, client milestone deliverables, confidential vault contracts, and auto-scheduled call links.\n6. **Salons, Spas & Wellness Clinics** (`/industries/salon-wellness`): Chair/therapist booking slots, customer loyalty memberships, automated reminder WhatsApps, and spot UPI billing.\n7. **Fitness Studios & Personal Trainers** (`/industries/fitness-studio`): Session packs, automated membership renewals, client progress metrics, and trainer shift coordination.\n8. **Event Production & Wedding Management** (`/industries/events-weddings`): Multi-vendor dispatch schedules, client milestone approvals, budget reconciliation, and run-sheet coordination.\n9. **Hospitality & Boutique Restaurants** (`/industries/hospitality`): Table reservation workflows, private event catering agreements, distributor inventory tracking, and daily reconciliation sheets.\n10. **E-Commerce & DTC Brands** (`/industries/ecommerce-dtc`): SKU catalog management, volume discount tiers, factory van sales dispatch, and automated GST billing.\n\n## Canonical 301 Redirect Architecture\n- Configured in `.htaccess` and Next.js route mapping, ensuring `/use-cases` and `/use-cases/*` permanently redirect to `/industries` without 404 dead ends or link dilution.\n\n## Refined Desktop Mega-Menu\n- High-density multi-column dropdown in `Navbar.tsx` featuring dedicated vertical icon tiles, subtle pill indicators, and synchronized mobile drawer navigation."
+        ),
+        array(
+            'slug'     => 'autonomous-ai-workforce',
+            'title'    => 'Autonomous AI Multi-Agent Workforce & Skills Marquee',
+            'category' => 'intelligence',
+            'content'  => "# Autonomous AI Multi-Agent Workforce & Skills Marquee\n\nDeployed in **v4.9.379**, the AI Workforce canvas (`/ai-agent`) visualizes Cora's multi-agent autonomous operational model.\n\n## High-Resolution Neural Portrait & Blended Canvas\n- Features neural portrait cutout assets (`cora_hero_agent_cutout.png`) seamlessly integrated with subtle container gradient lighting.\n\n## 4-Row Infinite Skills Marquee\n- Hardware-accelerated CSS marquee (`InfiniteSkillsSection.tsx`) highlighting verified production capabilities across 4 operational streams:\n  * **Stream 1: Operations & Logistics**: Shift scheduling, resource custody, attendance validation, and plant restock triggers.\n  * **Stream 2: CRM & Sales Pipeline**: Lead scoring, WhatsApp automation, proposals, and call synthesis.\n  * **Stream 3: Finance & Legal Vault**: GST SAC 9983 calculations, spot billing, e-sign SHA-256 logs, and daily PDF briefs.\n  * **Stream 4: Creative Delivery**: Watermark proofing, storage accounting, client selections, and multi-ratio cropping."
+        ),
+        array(
+            'slug'     => 'features-catalog-lenis',
+            'title'    => 'Features Capability Directory & Lenis Scroll Boundary Isolation',
+            'category' => 'overview',
+            'content'  => "# Features Capability Directory & Lenis Scroll Boundary Isolation\n\nShipped in **v4.9.378**, this major architectural update standardizes the `/features` catalog.\n\n## Lenis Smooth-Scroll Boundary Isolation (`data-lenis-prevent`)\n- Wraps the interactive sidebar with `data-lenis-prevent` and explicit height boundaries (`max-h-[calc(100vh-120px)] overflow-y-auto`).\n- Prevents wheel-scroll trapping by keeping inner sidebar scrolling independent from global Lenis page scrolling.\n\n## Compact Single-Line Navigation\n- High-density list items with icon glyphs and segmented status filters (*All*, *Released*, *Beta*, *Upcoming*).\n- Search input with positioned vector SVG preventing text overlap.\n\n## Active-Voice Visual Capability Cards\n- Over 40+ module cards rewritten with punchy active voice descriptions and a unified 'Get Started for Free' call-to-action."
+        ),
+        array(
+            'slug'     => 'brand-asset-registry',
+            'title'    => 'Enterprise Brand Asset Registry & Turnkey SVG Kit',
+            'category' => 'marketing',
+            'content'  => "# Enterprise Brand Asset Registry & Turnkey SVG Kit\n\nDeployed in **v4.9.377**, the Brand Asset Registry (`/brand`) centralizes Cora design guidelines.\n\n## Turnkey Vector SVG Download Kit\n- 1-click clipboard SVG markup copy and instant `.svg` file download for Primary Wordmark, Inverted Wordmark, and Symbol Mark.\n\n## Official Design Tokens Reference\n- Complete specifications for the 11-step neutral zinc color scale, typography scale, co-branding guidelines, and logo clearspace rules adhering strictly to Rule 13 zero-outline styling."
+        ),
+        array(
+            'slug'     => 'about-story-timeline',
+            'title'    => 'Agency Story Canvas & Chronological Journey Ribbon',
+            'category' => 'overview',
+            'content'  => "# Agency Story Canvas & Chronological Journey Ribbon\n\nShipped in **v4.9.376**, the redesigned `/about` page communicates Cora's agency operating philosophy.\n\n## Connected Chronological Timeline Ribbon\n- Continuous vertical milestone rail with unified rail segments, completely eliminating floating tick gaps.\n- Mobile timeline spine layout ensuring responsive narrative flow on screens `< 768px`.\n\n## Structured Bento Grid Architecture\n- Core Values bento grid (`CoreValuesSection.tsx`) and dynamic operational week calendar (`DynamicWeekCalendar.tsx`)."
+        ),
+        array(
+            'slug'     => 'contact-validation-suite',
+            'title'    => 'Contact Form Multi-Field Input Validation Suite',
+            'category' => 'forms',
+            'content'  => "# Contact Form Multi-Field Input Validation Suite\n\nDeployed in **v4.9.375**, this release reinforces the public inquiry pipeline (`/contact`).\n\n## Multi-Field Validation Matrix\n- Enforces strict validation across Full Name (length >= 2), RFC 5322 Work Email, numeric Phone regex (`/^[0-9+ -]{7,15}$/`), Company/Studio, and Topic dropdown.\n\n## Accessible Monochromatic Feedback\n- Inline error notifications, accessible ARIA live attributes, and top-floating monochromatic toast dispatch (`window.coraShowToast`)."
+        )
+    );
+}
+}
+
+// ── 14. Latest Changelog Entries (v4.9.380) ───────────────────────────────
+
+if ( ! function_exists( 'cora_docs_get_v49380_changelog_entries' ) ) {
+function cora_docs_get_v49380_changelog_entries() {
+    return array(
+        array(
+            'module_key'  => 'industries',
+            'version'     => '4.9.380',
+            'status'      => 'released',
+            'title'       => 'Canonical Industry Directory Overhaul & Slug Migration',
+            'description' => 'Migrated primary industry vertical directory from /use-cases to canonical /industries with 301 redirect parity, refined desktop mega-menu with dedicated icon tiles and colored pill indicators, 10+ plain-English vertical directories, and dynamic industry comparison table.',
+            'ticket_id'   => 'CORA-1220',
+        ),
+        array(
+            'module_key'  => 'ai-agent',
+            'version'     => '4.9.379',
+            'status'      => 'released',
+            'title'       => 'Autonomous AI Workforce & 4-Row Infinite Skills Marquee',
+            'description' => 'Deployed dedicated /ai-agent landing canvas, high-resolution neural portrait cutout asset with smooth canvas blend, 4-row infinite skills marquee across operations, sales, finance, and creative delivery, and automated deployment health check.',
+            'ticket_id'   => 'CORA-1221',
+        ),
+        array(
+            'module_key'  => 'features',
+            'version'     => '4.9.378',
+            'status'      => 'released',
+            'title'       => 'Features Catalog & Lenis Smooth-Scroll Boundary Isolation',
+            'description' => 'Overhauled /features capability catalog, compact single-line sidebar navigation with segmented status filters, Lenis scroll isolation via data-lenis-prevent eliminating wheel-scroll trapping, search icon overlap fix, and 40+ active-voice visual capability cards.',
+            'ticket_id'   => 'CORA-1222',
+        ),
+        array(
+            'module_key'  => 'brand',
+            'version'     => '4.9.377',
+            'status'      => 'released',
+            'title'       => 'Enterprise Brand Asset Registry & Turnkey SVG Kit',
+            'description' => 'Modernized /brand center with latest agency positioning, 1-click turnkey SVG vector download kit for Primary, Inverted, and Symbol wordmarks, complete design tokens reference, and authentic production UI captures adhering strictly to Rule 13 zero-outline styling.',
+            'ticket_id'   => 'CORA-1223',
+        ),
+        array(
+            'module_key'  => 'about',
+            'version'     => '4.9.376',
+            'status'      => 'released',
+            'title'       => 'Agency Story Canvas & Connected Chronological Journey Ribbon',
+            'description' => 'Redesigned /about page with full-width narrative layout, connected chronological timeline ribbon with seamless rail segments eliminating floating tick gaps, responsive mobile spine on 375px+ screens, Core Values bento cards, and dynamic operational week calendar.',
+            'ticket_id'   => 'CORA-1224',
+        ),
+        array(
+            'module_key'  => 'contact',
+            'version'     => '4.9.375',
+            'status'      => 'released',
+            'title'       => 'Contact Form Validation & Documentation Mobile Layout Polish',
+            'description' => 'Shipped robust multi-field client/server validation suite on /contact with monochromatic alerts and ARIA accessibility, streamlined docs sidebar navigation and badge wrapping in DocsClient.tsx, and mobile floating island clearance (pb-28).',
+            'ticket_id'   => 'CORA-1225',
+        ),
+        array(
+            'module_key'  => 'nav',
+            'version'     => '4.9.375-nav',
+            'status'      => 'released',
+            'title'       => 'Global Navigation Synchronization & React Hook Integrity',
+            'description' => 'Synchronized all desktop, mobile, resources, company, and footer navlinks across Navbar.tsx and Footer.tsx, and resolved React Hook order violation in Navbar.tsx.',
+            'ticket_id'   => 'CORA-1226',
+        ),
+    );
+}
+}
+
+// ── 15. New Documentation Pages (v4.9.381) ────────────────────────────────
+
+if ( ! function_exists( 'cora_docs_get_new_pages_v49381' ) ) {
+function cora_docs_get_new_pages_v49381() {
+    return array(
+        array(
+            'slug'     => 'projects-portfolio-module',
+            'title'    => 'Agency Projects & Portfolio Case Studies Module',
+            'category' => 'sales',
+            'content'  => "# Agency Projects & Portfolio Case Studies Module\n\nShipped in **v4.9.381**, the Projects & Portfolio Case Studies Module empowers marketing agencies and studio workspaces to curate and publish enterprise-grade case studies from the workspace to a high-converting frontend portfolio.\n\n## 6-Tab Drawer Editor Workflow\n- **Tab 1: Overview & Metadata**: Title, slug, client name, industry, and stealth NDA confidentiality masking.\n- **Tab 2: 4-Act Story Narrative**: Executive Summary, The Challenge, The Solution, and Deliverables scope.\n- **Tab 3: Numerical KPI Metrics**: Big numerical KPI stat pills displayed in JetBrains Mono with delta benchmarks.\n- **Tab 4: Media Assets & Visual Gallery**: Hero cover photo URL and multi-asset gallery grid.\n- **Tab 5: Verified Client Testimonial**: Quote text, client name, executive role, and company avatar.\n- **Tab 6: Conversion Bridge & Strategy Audit CTA**: Direct link to free strategy audit or inquiry form.\n\n## Database & API Architecture\n- Managed via `wp_cora_projects` table and AJAX endpoints (`cora_get_projects`, `cora_save_project`, `cora_delete_project`, `cora_toggle_project_publish`, `cora_duplicate_project`).\n- Public headless API at `/cora-api/v1/projects` with Next.js SSG fallback at `/projects`."
+        ),
+        array(
+            'slug'     => 'micro-tools-growth-engine',
+            'title'    => 'Public Micro-Tools Growth Engine & Canonical Tool Registry',
+            'category' => 'growth',
+            'content'  => "# Public Micro-Tools Growth Engine & Canonical Tool Registry\n\nIntroduced in **v4.9.381**, the Cora Public Micro-Tools Growth Engine serves as a top-of-funnel acquisition channel delivering un-gated operational utility directly in the browser.\n\n## Canonical Tool Registry & Inventory\n- 63 verified public micro-tools across 10 problem domains cataloged in `tools-canonical-registry.ts`.\n- Browser-only local computational execution with zero server data transmission for financial inputs.\n\n## 6 Priority Flagship Tools\n1. **WordPress Plugin Stack Cost Calculator** (`/tools/wp-plugin-cost-calculator`): Total Cost of Ownership analysis for plugin maintenance and renewals.\n2. **Website Lead-Leakage Calculator** (`/tools/lead-leakage-calculator`): Measures revenue loss from response latency.\n3. **Agency Scope-Creep Calculator** (`/tools/scope-creep-calculator`): Models unbilled revision hours and EHR erosion.\n4. **Service Project Pricing Calculator** (`/tools/service-pricing-calculator`): Margin modeling and milestone proposal generator.\n5. **WordPress Publishing Friction Calculator** (`/tools/wp-publishing-friction-calculator`): Quantifies copy-paste handoff bottlenecks.\n6. **AI Crawler Access Checker** (`/tools/ai-crawler-checker`): Tests `robots.txt` compliance for OpenAI, Claude, and Perplexity bots.\n\n## Zero-PII Analytics Governance\n- Non-sensitive telemetry strictly restricted to tool execution start, finish, and anonymous diagnostic tier."
+        ),
+        array(
+            'slug'     => 'canvas-github-cicd',
+            'title'    => 'Canvas Themes GitHub CI/CD Full-Lifecycle Engine',
+            'category' => 'websites',
+            'content'  => "# Canvas Themes GitHub CI/CD Full-Lifecycle Engine\n\nHardened in **v4.9.381**, the Canvas Themes workspace module provides bidirectional synchronization between the visual canvas and GitHub repositories.\n\n## Analytical KPI Dashboard & Navigation\n- 4 High-Density KPI cards: PageSpeed Performance Score, LCP Speed, Total Themes/Versions, and Storage Footprint.\n- Sticky 3-subtab navigation: Theme Library, Speed & Core Web Vitals, and Migration & Tools.\n\n## GitHub CI/CD Full-Lifecycle Engine\n- **Device Flow & PAT Auth**: Secure OAuth 2.0 device flow and Personal Access Token storage with dual authentication headers (`Bearer` / `token`).\n- **Branch Management & Automated PRs**: One-click branch creation (`cora_github_create_branch`), automated PR creation (`cora_github_create_pr`), and PR list inspection (`cora_github_get_prs`).\n- **1-Click Merge & Rollback**: Safe PR merge (`cora_github_merge_pr`), instant commit rollback (`cora_github_revert_commit`), and full workspace synchronization (`cora_github_sync_entire_workspace`)."
+        ),
+        array(
+            'slug'     => 'forms-crm-lead-pipeline',
+            'title'    => 'Forms to CRM Lead Pipeline Automation & All-Submissions API',
+            'category' => 'forms',
+            'content'  => "# Forms to CRM Lead Pipeline Automation & All-Submissions API\n\nDeployed in **v4.9.381**, this engine bridges external web intake directly into the Cora Lead CRM with zero manual data entry.\n\n## Automated Lead Ingestion Pipeline\n- On form submission via `cora_rest_submit_form()`, user inputs are sanitized and automatically converted into normalized leads in `wp_cora_leads`.\n- Preserves tenant isolation via workspace `agency_id`, normalizes pipeline stage, and assigns leads to configured team members.\n- Triggers immediate lead cache invalidation (`cora_db_get_leads(true)`), reflecting new leads on the Kanban board with zero page reload.\n\n## Universal Aggregated Submissions REST Endpoint\n- `GET /wp-json/cora/v1/forms/all-submissions` (`cora_rest_get_all_form_submissions`): Cross-form aggregated view across all workspace forms with search, pagination, and tenant isolation."
+        )
+    );
+}
+}
+
+// ── 16. Latest Changelog Entries (v4.9.381) ───────────────────────────────
+
+if ( ! function_exists( 'cora_docs_get_v49381_changelog_entries' ) ) {
+function cora_docs_get_v49381_changelog_entries() {
+    return array(
+        array(
+            'module_key'  => 'projects',
+            'version'     => '4.9.381',
+            'status'      => 'released',
+            'title'       => 'Agency Projects & Portfolio Case Studies Module',
+            'description' => 'Shipped dedicated Projects & Portfolio module with wp_cora_projects schema, 6-tab drawer editor, 5 KPI analytical scorecards, confidentiality/stealth NDA toggle, JetBrains Mono stats, 4-act storytelling layout, and public Next.js frontend portfolio at /projects.',
+            'ticket_id'   => 'CORA-1227',
+        ),
+        array(
+            'module_key'  => 'tools',
+            'version'     => '4.9.381',
+            'status'      => 'released',
+            'title'       => 'Public Micro-Tools Growth Engine & Canonical Tool Registry',
+            'description' => 'Reconciled 63 public micro-tools across 10 problem domains in tools-canonical-registry.ts, deployed 6 priority flagship calculators (WordPress Plugin Cost, Lead Leakage, Scope Creep, Service Pricing, Publishing Friction, AI Crawler Checker), and zero-PII telemetry governance.',
+            'ticket_id'   => 'CORA-1228',
+        ),
+        array(
+            'module_key'  => 'canvas',
+            'version'     => '4.9.381',
+            'status'      => 'released',
+            'title'       => 'Canvas Themes GitHub CI/CD Full-Lifecycle PR & Rollback Engine',
+            'description' => 'Overhauled view-canvas.php with 4 KPI analytical cards, sticky 3-subtab bar, and full GitHub integration in Cora_GitHub_Integration: Device Flow, branch creation, automated PR generation, 1-click merge, commit rollback, and full workspace sync.',
+            'ticket_id'   => 'CORA-1229',
+        ),
+        array(
+            'module_key'  => 'forms',
+            'version'     => '4.9.381',
+            'status'      => 'released',
+            'title'       => 'Forms to CRM Lead Pipeline Automation & All-Submissions REST Endpoint',
+            'description' => 'Automated inbound form submission conversion to CRM leads in cora_rest_submit_form() with stage normalization, tenant isolation, and cache invalidation; added aggregate submissions REST route GET /wp-json/cora/v1/forms/all-submissions.',
+            'ticket_id'   => 'CORA-1230',
+        ),
+        array(
+            'module_key'  => 'content',
+            'version'     => '4.9.381',
+            'status'      => 'released',
+            'title'       => 'Editorial Knowledge Engine & High-Authority Article Library',
+            'description' => 'Expanded cora-frontend/lib/articles-data.ts with 15+ high-authority guides and teardowns covering WordPress plugin TCO, agency scope creep, speed-to-lead benchmarks, autonomous studio AI, MCP guides, and IT Act 2000 digital contracts.',
+            'ticket_id'   => 'CORA-1231',
+        ),
+        array(
+            'module_key'  => 'emails',
+            'version'     => '4.9.381',
+            'status'      => 'released',
+            'title'       => 'Content Suite & Email Infrastructure Hardening',
+            'description' => 'Refined publishing workflow in view-content-suite.php and stabilized transactional SMTP relay logging, bounce rate monitoring, and CRM contact auto-suggest in view-emails.php.',
+            'ticket_id'   => 'CORA-1232',
+        ),
+    );
+}
+}
+
+
 
 

@@ -9,6 +9,7 @@ import { Analytics } from '@/components/analytics/Analytics';
 import { SmoothScrollProvider } from '@/components/providers/SmoothScrollProvider';
 import { MadeInCoraBadge } from '@/components/ui/MadeInCoraBadge';
 import { generatePlatformSchemas } from '@/lib/seo-schema';
+import { designSystemCss } from '@/lib/design-system';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -127,6 +128,7 @@ export default function RootLayout({
       className={`${inter.variable} ${interTight.variable} ${caveat.variable} ${jetbrainsMono.variable} ${instrumentSerif.variable}`}
     >
       <head>
+        <style id="cora-design-tokens" dangerouslySetInnerHTML={{ __html: designSystemCss() }} />
         {/* Performance Resource Hints for Faster LCP */}
         <link rel="preconnect" href="https://checkout.razorpay.com" />
         <link rel="dns-prefetch" href="https://checkout.razorpay.com" />

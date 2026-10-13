@@ -6045,8 +6045,8 @@ jQuery(document).ready(function($) {
             });
         });
 
-        const enterpriseNewModules = ['event_timeline', 'event-timeline', 'multi-day-timeline', 'review_acquisition', 'smart-reviews', 'crew_scheduler', 'crew-scheduler', 'team_scheduler', 'team-scheduler', 'shifts', 'vault', 'emails', 'calendar', 'activity-timeline', 'automations', 'inbox', 'analytics', 'social-meta', 'plant_inventory', 'plant-inventory', 'stationery_inventory', 'stationery-inventory', 'inventory', 'inventory_management', 'affiliates', 'referrals'];
-        permissions['administrator'] = ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'settings', 'vault', 'portfolio', 'leads', 'clients', 'attendance', 'tasks', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'canvas', 'audit-panel', 'media', 'forms', 'emails', 'ecosystem', 'mcp', 'affiliates', 'referrals', 'super-admin', 'super-users', 'super-finances', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-docs', ...enterpriseNewModules];
+        const enterpriseNewModules = ['event_timeline', 'event-timeline', 'multi-day-timeline', 'review_acquisition', 'smart-reviews', 'crew_scheduler', 'crew-scheduler', 'team_scheduler', 'team-scheduler', 'shifts', 'vault', 'emails', 'calendar', 'activity-timeline', 'automations', 'inbox', 'analytics', 'social-meta', 'plant_inventory', 'plant-inventory', 'stationery_inventory', 'stationery-inventory', 'inventory', 'inventory_management', 'affiliates', 'referrals', 'projects', 'portfolio', 'case-studies', 'case_studies'];
+        permissions['administrator'] = ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'settings', 'vault', 'portfolio', 'projects', 'leads', 'clients', 'attendance', 'tasks', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'canvas', 'audit-panel', 'media', 'forms', 'emails', 'ecosystem', 'mcp', 'affiliates', 'referrals', 'super-admin', 'super-users', 'super-finances', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-docs', ...enterpriseNewModules];
         permissions['cora_super_admin'] = permissions['administrator'];
         permissions['cora_shruti'] = permissions['administrator'];
 
@@ -7132,15 +7132,15 @@ jQuery(document).ready(function($) {
 
     // Role Enforcement capability controller
     window.coraEnforcePermissions = function(role) {
-        const enterpriseNewModules = ['event_timeline', 'event-timeline', 'multi-day-timeline', 'review_acquisition', 'smart-reviews', 'crew_scheduler', 'crew-scheduler', 'team_scheduler', 'team-scheduler', 'shifts', 'vault', 'emails', 'calendar', 'activity-timeline', 'automations', 'inbox', 'analytics', 'social-meta', 'plant_inventory', 'plant-inventory', 'stationery_inventory', 'stationery-inventory', 'inventory', 'inventory_management', 'affiliates', 'referrals'];
+        const enterpriseNewModules = ['event_timeline', 'event-timeline', 'multi-day-timeline', 'review_acquisition', 'smart-reviews', 'crew_scheduler', 'crew-scheduler', 'team_scheduler', 'team-scheduler', 'shifts', 'vault', 'emails', 'calendar', 'activity-timeline', 'automations', 'inbox', 'analytics', 'social-meta', 'plant_inventory', 'plant-inventory', 'stationery_inventory', 'stationery-inventory', 'inventory', 'inventory_management', 'affiliates', 'referrals', 'projects', 'portfolio', 'case-studies', 'case_studies'];
         let allowed = (coraREData.userPermissions && coraREData.userPermissions[role]) ? coraREData.userPermissions[role] : [];
         
         if (!allowed || allowed.length === 0) {
-            allowed = ['dashboard', 'bookings', 'portfolio', 'leads', 'clients', 'attendance', 'tasks', 'affiliates', 'referrals', ...enterpriseNewModules];
+            allowed = ['dashboard', 'bookings', 'portfolio', 'projects', 'leads', 'clients', 'attendance', 'tasks', 'affiliates', 'referrals', ...enterpriseNewModules];
         }
 
         if (role === 'administrator' || role === 'cora_super_admin' || role === 'cora_shruti' || role === 'cora_owner' || role === 'owner' || role === 'agency_owner' || role === 'cora_re_broker_owner' || role === 'cora_studio_owner' || role === 'cora_manager' || role === 'cora_plant_manager') {
-            allowed = ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'attendance', 'tasks', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'canvas', 'audit-panel', 'media', 'forms', 'emails', 'ecosystem', 'mcp', 'affiliates', 'referrals', 'super-admin', 'super-users', 'super-finances', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-docs', ...enterpriseNewModules];
+            allowed = ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'projects', 'leads', 'clients', 'attendance', 'tasks', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'canvas', 'audit-panel', 'media', 'forms', 'emails', 'ecosystem', 'mcp', 'affiliates', 'referrals', 'super-admin', 'super-users', 'super-finances', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-docs', ...enterpriseNewModules];
         }
 
         // Hide/show financial details based on role permissions
@@ -18132,7 +18132,7 @@ jQuery(document).ready(function($) {
             if (!cleanPhone) {
                 e.preventDefault();
                 if (window.coraShowToast) window.coraShowToast('Please enter a valid phone number for WhatsApp outreach.', 'error');
-                $('#cora-drawer-input-phone').focus().addClass('ring-2 ring-rose-500');
+                $('#cora-drawer-input-phone').focus().addClass('border-rose-400 bg-rose-50/50 dark:bg-rose-950/20');
             }
         });
 
@@ -18140,7 +18140,7 @@ jQuery(document).ready(function($) {
             if (!cleanPhone) {
                 e.preventDefault();
                 if (window.coraShowToast) window.coraShowToast('Please enter a valid phone number to initiate call.', 'error');
-                $('#cora-drawer-input-phone').focus().addClass('ring-2 ring-rose-500');
+                $('#cora-drawer-input-phone').focus().addClass('border-rose-400 bg-rose-50/50 dark:bg-rose-950/20');
             }
         });
 
@@ -18148,7 +18148,7 @@ jQuery(document).ready(function($) {
             if (!email) {
                 e.preventDefault();
                 if (window.coraShowToast) window.coraShowToast('Please enter a valid email address for direct outreach.', 'error');
-                $('#cora-drawer-input-email').focus().addClass('ring-2 ring-rose-500');
+                $('#cora-drawer-input-email').focus().addClass('border-rose-400 bg-rose-50/50 dark:bg-rose-950/20');
             }
         });
     };
@@ -18252,16 +18252,16 @@ jQuery(document).ready(function($) {
         const emailInput = $('#cora-drawer-input-email');
         const phoneInput = $('#cora-drawer-input-phone');
         
-        nameInput.removeClass('border-rose-500 ring-2 ring-rose-500');
-        emailInput.removeClass('border-rose-500 ring-2 ring-rose-500');
-        phoneInput.removeClass('border-rose-500 ring-2 ring-rose-500');
+        nameInput.removeClass('border-rose-400 bg-rose-50/50 dark:bg-rose-950/20 border-rose-500 ring-2 ring-rose-500');
+        emailInput.removeClass('border-rose-400 bg-rose-50/50 dark:bg-rose-950/20 border-rose-500 ring-2 ring-rose-500');
+        phoneInput.removeClass('border-rose-400 bg-rose-50/50 dark:bg-rose-950/20 border-rose-500 ring-2 ring-rose-500');
         
         let hasError = false;
         let errorMessage = '';
         
         const nameVal = (nameInput.val() || '').trim();
         if (!nameVal || nameVal.length < 2) {
-            nameInput.addClass('border-rose-500 ring-2 ring-rose-500');
+            nameInput.addClass('border-rose-400 bg-rose-50/50 dark:bg-rose-950/20');
             hasError = true;
             errorMessage = 'Full Name / Title is required (minimum 2 characters).';
         }
@@ -18270,7 +18270,7 @@ jQuery(document).ready(function($) {
         if (emailVal) {
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(emailVal)) {
-                emailInput.addClass('border-rose-500 ring-2 ring-rose-500');
+                emailInput.addClass('border-rose-400 bg-rose-50/50 dark:bg-rose-950/20');
                 hasError = true;
                 errorMessage = errorMessage || 'Please enter a valid email address (e.g. client@domain.com).';
             }
@@ -18280,7 +18280,7 @@ jQuery(document).ready(function($) {
         if (phoneVal) {
             const cleanDigits = phoneVal.replace(/[^0-9]/g, '');
             if (cleanDigits.length < 7 || cleanDigits.length > 15) {
-                phoneInput.addClass('border-rose-500 ring-2 ring-rose-500');
+                phoneInput.addClass('border-rose-400 bg-rose-50/50 dark:bg-rose-950/20');
                 hasError = true;
                 errorMessage = errorMessage || 'Phone number must contain between 7 and 15 digits.';
             }

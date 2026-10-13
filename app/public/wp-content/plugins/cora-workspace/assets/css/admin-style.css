@@ -710,12 +710,14 @@ body.cora-skeleton-active .cora-page-section {
     .cora-sticky-content-tabs,
     #cora-forms-tabs,
     #cora-settings-tabs,
+    #cora-emails-subtabs,
+    #cora-canvas-subtabs,
     .cora-sticky-sub-tabs,
     .cora-sub-tabs-container {
         position: -webkit-sticky !important;
         position: sticky !important;
         top: var(--cora-sticky-tabs-top, var(--cora-topbar-height, 52px)) !important;
-        z-index: 45 !important;
+        z-index: 40 !important;
     }
 }
 
@@ -1723,11 +1725,14 @@ body.cora-scroll-locked {
 
 /* =============================================================================
    Sticky Navigation Tab Bar (Content Suite, Forms, Users, and Sub-Tabs)
+   Edge-to-Edge Design System Specification
    ============================================================================= */
 #cora-content-tabs,
 .cora-sticky-content-tabs,
 #cora-forms-tabs,
 #cora-settings-tabs,
+#cora-emails-subtabs,
+#cora-canvas-subtabs,
 .cora-sticky-sub-tabs,
 .cora-sub-tabs-container {
     position: -webkit-sticky !important;
@@ -1735,7 +1740,8 @@ body.cora-scroll-locked {
     top: var(--cora-sticky-tabs-top, var(--cora-topbar-height, 48px)) !important;
     left: 0 !important;
     right: 0 !important;
-    z-index: 35 !important;
+    z-index: 40 !important;
+    margin-top: 0 !important;
     display: flex !important;
     flex-wrap: nowrap !important;
     overflow-x: auto !important;
@@ -1745,19 +1751,19 @@ body.cora-scroll-locked {
     overscroll-behavior-x: contain !important;
     scrollbar-width: none !important;
     -ms-overflow-style: none !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    padding-left: 0.25rem !important;
-    padding-right: 0.25rem !important;
-    padding-top: 4px !important;
+    margin-left: -0.75rem !important;
+    margin-right: -0.75rem !important;
+    width: calc(100% + 1.5rem) !important;
+    max-width: calc(100% + 1.5rem) !important;
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+    padding-top: 0 !important;
     padding-bottom: 0 !important;
-    min-height: 42px !important;
+    min-height: 40px !important;
+    height: 40px !important;
     box-sizing: border-box !important;
     background-color: #FBFaf7 !important;
     border-bottom: 1px solid rgba(228, 228, 231, 0.85) !important;
-    box-shadow: 0 1px 2px 0 rgba(9, 9, 11, 0.03) !important;
     transition: background-color 0.15s ease, box-shadow 0.2s ease, border-color 0.15s ease;
 }
 
@@ -1765,6 +1771,8 @@ body.cora-scroll-locked {
 .cora-sticky-content-tabs::-webkit-scrollbar,
 #cora-forms-tabs::-webkit-scrollbar,
 #cora-settings-tabs::-webkit-scrollbar,
+#cora-emails-subtabs::-webkit-scrollbar,
+#cora-canvas-subtabs::-webkit-scrollbar,
 .cora-sticky-sub-tabs::-webkit-scrollbar,
 .cora-sub-tabs-container::-webkit-scrollbar {
     display: none !important;
@@ -1775,6 +1783,8 @@ body.cora-scroll-locked {
 .cora-sub-tab,
 .cora-tab-btn,
 .cora-settings-nav-mobile,
+.cora-email-sub-tab,
+.cora-canvas-sub-tab,
 .cora-sub-tabs-container button,
 .cora-sub-tabs-container a,
 .cora-sticky-sub-tabs button,
@@ -1784,7 +1794,16 @@ body.cora-scroll-locked {
 #cora-settings-tabs a,
 #cora-settings-tabs button,
 #cora-content-tabs button,
-#cora-content-tabs a {
+#cora-content-tabs a,
+#cora-emails-subtabs button,
+#cora-canvas-subtabs button {
+    height: 40px !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    margin-bottom: -1px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    box-sizing: border-box !important;
     flex-shrink: 0 !important;
     white-space: nowrap !important;
     touch-action: pan-x pan-y !important;
@@ -1796,6 +1815,8 @@ body.cora-scroll-locked {
 
 .cora-sub-tab > *,
 .cora-tab-btn > *,
+.cora-email-sub-tab > *,
+.cora-canvas-sub-tab > *,
 .cora-sticky-sub-tabs button > *,
 .cora-sub-tabs-container button > * {
     pointer-events: none !important;
@@ -1816,7 +1837,9 @@ body.cora-scroll-locked {
 .cora-sticky-sub-tabs a:focus,
 .cora-sticky-sub-tabs a:focus-visible,
 #cora-settings-tabs a:focus,
-#cora-settings-tabs a:focus-visible {
+#cora-settings-tabs a:focus-visible,
+#cora-emails-subtabs button:focus,
+#cora-canvas-subtabs button:focus {
     outline: none !important;
     box-shadow: none !important;
 }
@@ -1826,14 +1849,16 @@ body.cora-scroll-locked {
     .cora-sticky-content-tabs,
     #cora-forms-tabs,
     #cora-settings-tabs,
+    #cora-emails-subtabs,
+    #cora-canvas-subtabs,
     .cora-sticky-sub-tabs,
     .cora-sub-tabs-container {
-        margin-left: 0 !important;
-        margin-right: 0 !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        padding-left: 0.5rem !important;
-        padding-right: 0.5rem !important;
+        margin-left: -1rem !important;
+        margin-right: -1rem !important;
+        width: calc(100% + 2rem) !important;
+        max-width: calc(100% + 2rem) !important;
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
     }
 }
 
@@ -1842,14 +1867,16 @@ body.cora-scroll-locked {
     .cora-sticky-content-tabs,
     #cora-forms-tabs,
     #cora-settings-tabs,
+    #cora-emails-subtabs,
+    #cora-canvas-subtabs,
     .cora-sticky-sub-tabs,
     .cora-sub-tabs-container {
-        margin-left: 0 !important;
-        margin-right: 0 !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        padding-left: 0.5rem !important;
-        padding-right: 0.5rem !important;
+        margin-left: -1.25rem !important;
+        margin-right: -1.25rem !important;
+        width: calc(100% + 2.5rem) !important;
+        max-width: calc(100% + 2.5rem) !important;
+        padding-left: 1.25rem !important;
+        padding-right: 1.25rem !important;
     }
 }
 
@@ -1858,9 +1885,12 @@ body.cora-scroll-locked {
     .cora-sticky-content-tabs,
     #cora-forms-tabs,
     #cora-settings-tabs,
+    #cora-emails-subtabs,
+    #cora-canvas-subtabs,
     .cora-sticky-sub-tabs,
     .cora-sub-tabs-container {
         top: 0px !important;
+        margin-top: 0 !important;
     }
 }
 
@@ -1868,6 +1898,8 @@ body.cora-scroll-locked {
 .dark .cora-sticky-content-tabs,
 .dark #cora-forms-tabs,
 .dark #cora-settings-tabs,
+.dark #cora-emails-subtabs,
+.dark #cora-canvas-subtabs,
 .dark .cora-sticky-sub-tabs,
 .dark .cora-sub-tabs-container {
     background-color: #0c0c0e !important;
@@ -1879,18 +1911,30 @@ body.cora-scroll-locked {
 .cora-sticky-content-tabs.cora-tabs-stuck,
 #cora-forms-tabs.cora-tabs-stuck,
 #cora-settings-tabs.cora-tabs-stuck,
+#cora-emails-subtabs.cora-tabs-stuck,
+#cora-canvas-subtabs.cora-tabs-stuck,
 .cora-sticky-sub-tabs.cora-tabs-stuck,
 .cora-sub-tabs-container.cora-tabs-stuck {
-    box-shadow: 0 4px 12px -2px rgba(9, 9, 11, 0.08) !important;
+    background-color: rgba(251, 250, 247, 0.98) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    border-bottom-color: rgba(228, 228, 231, 0.95) !important;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05) !important;
 }
 
 .dark #cora-content-tabs.cora-tabs-stuck,
 .dark .cora-sticky-content-tabs.cora-tabs-stuck,
 .dark #cora-forms-tabs.cora-tabs-stuck,
 .dark #cora-settings-tabs.cora-tabs-stuck,
+.dark #cora-emails-subtabs.cora-tabs-stuck,
+.dark #cora-canvas-subtabs.cora-tabs-stuck,
 .dark .cora-sticky-sub-tabs.cora-tabs-stuck,
 .dark .cora-sub-tabs-container.cora-tabs-stuck {
-    box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.5) !important;
+    background-color: rgba(12, 12, 14, 0.98) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    border-bottom-color: #27272a !important;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.4) !important;
 }
 
 /* =============================================================================

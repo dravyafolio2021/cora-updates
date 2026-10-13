@@ -190,7 +190,7 @@ export function ToolsHeroAIInput({ onSearchChange, searchQuery }: ToolsHeroAIInp
             value={inputVal}
             onChange={handleInputChange}
             placeholder="Ask AI or search tools (e.g. '18% GST on ₹75,000')..."
-            className="w-full bg-transparent text-sm sm:text-base font-medium text-zinc-900 placeholder:text-zinc-400 focus:outline-none"
+            className="w-full bg-transparent text-base font-medium text-zinc-900 placeholder:text-zinc-400 focus:outline-none"
           />
           {inputVal && (
             <button
@@ -200,7 +200,7 @@ export function ToolsHeroAIInput({ onSearchChange, searchQuery }: ToolsHeroAIInp
                 onSearchChange('');
                 setAiResponse(null);
               }}
-              className="p-1 rounded-full text-zinc-400 hover:text-zinc-700 transition-colors"
+              className="p-1 rounded-full text-zinc-400 hover:text-zinc-700 transition-colors cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -231,9 +231,9 @@ export function ToolsHeroAIInput({ onSearchChange, searchQuery }: ToolsHeroAIInp
         </div>
       </form>
 
-      {/* ── Quick Prompt Chips (Desktop/Tablet Only, Flex-Wrap Centered with Zero Scrollbar) ── */}
-      <div className="hidden sm:flex flex-wrap items-center justify-center gap-1.5 py-2.5 px-1">
-        <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-wider mr-0.5">
+      {/* ── Quick Prompt Chips (Swipeable on Mobile, Centered on Tablet/Desktop) ── */}
+      <div className="flex items-center sm:justify-center gap-1.5 py-2 px-1 overflow-x-auto whitespace-nowrap scrollbar-none -mx-2 px-2 sm:mx-0 touch-pan-x sm:flex-wrap">
+        <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-wider mr-0.5 shrink-0">
           Try:
         </span>
         {quickPrompts.map((prompt, idx) => (
@@ -241,7 +241,7 @@ export function ToolsHeroAIInput({ onSearchChange, searchQuery }: ToolsHeroAIInp
             key={idx}
             type="button"
             onClick={() => handleQuickPromptClick(prompt)}
-            className="text-[11px] font-medium text-zinc-600 bg-white/80 hover:bg-white border border-zinc-200/80 hover:border-zinc-400 px-3 py-1 rounded-full shadow-2xs transition-all cursor-pointer hover:text-zinc-950"
+            className="text-[11px] font-medium text-zinc-600 bg-white/90 hover:bg-white border border-zinc-200 hover:border-zinc-400 px-3 py-1.5 rounded-full shadow-2xs transition-all cursor-pointer hover:text-zinc-950 shrink-0 touch-manipulation active:scale-95"
           >
             {prompt}
           </button>

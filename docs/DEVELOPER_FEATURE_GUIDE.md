@@ -1,4 +1,4 @@
-# Cora Platform — Developer Feature & Optimization Guide (v4.9.374)
+# Cora Platform — Developer Feature & Optimization Guide (v4.9.381)
 
 This guide defines the standardized architectural patterns, blueprints, and performance guidelines for engineering new modules and extending features across the Cora SaaS Workspace (`app/public/wp-content/plugins/cora-workspace`) and Marketing Frontend (`cora-frontend`).
 
@@ -19,7 +19,7 @@ This guide defines the standardized architectural patterns, blueprints, and perf
 8. **High-Speed Micro-Cache Layer**: Use `cora_cache_get()` and `cora_cache_set()` for sub-millisecond query caching.
 9. **Semantic RESTful Routing**: Always use semantic path routing (`/workspace/{subpage}`) rather than JavaScript void links.
 10. **Phone Input Validation**: Enforce numeric regex checks (`/^[0-9+ -]{7,15}$/`) across all contact forms and profiles.
-11. **Security URL Masking**: Ensure all internal asset and core requests route through `/assets/` and `/core/` without exposing raw WordPress paths.
+11. **Security URL Masking**: Ensure all internal asset and core requests route through `/assets/` and `/core/` without exposing raw backend paths.
 12. **Strict Single Workspace Owner Policy**: Every agency must have exactly one Workspace Owner. Never allow multiple owners per tenant or expose the Workspace Owner role in standard member assignment dropdowns.
 13. **Free Map Tiles & Geolocation SOP**: All GIS/mapping features must utilize free, unmetered tiles (Esri World Imagery, Esri Streets, OpenStreetMap, CartoDB Dark) with zero watermarks and zero external API keys.
 14. **Strict Role Scoping & Terminal Isolation**: For operational field roles (such as `cora_field_vendor`), implement server-side route redirection, omit central administrative containers from the DOM, lock mobile island navigation strictly to terminal/AI tools, strip topbar chrome (`.cora-driver-mode-active`), suppress simulation banners, and ground the AI Copilot strictly to route and sales operations.
@@ -30,7 +30,7 @@ This guide defines the standardized architectural patterns, blueprints, and perf
 19. **Tab Customization Engine Pattern**: Desktop and mobile tab reordering drawers must support drag-and-drop handles, toggleable visibility, and dual-layer persistence (localStorage for instant 0ms painting + asynchronous user meta AJAX updates).
 20. **Dedicated CRM Group Navigation Hierarchy**: The platform establishes CRM as an independent first-class navigation group housing Leads Pipeline, Calendar, and Finance across all industry verticals, ensuring high-velocity deal tracking and revenue visibility.
 21. **Floating Resizable Task Drawer Pattern (v4.9.124)**: When building detailed subtask drawers or item inspectors, anchor below the 48px top navbar (`top: 48px`), implement a left-edge rounded arc (`rounded-l-2xl`) and ambient shadow, use zero dark backdrop to preserve underlying board context, and wire an interactive left drag handle (`window.coraInitTaskDrawerResize`) with `localStorage` width persistence.
-22. **White-Labeled Public Client Portal Routing (v4.9.122)**: Public guest access (deliverables, proofing, invoices) must use tokenized URLs (`?token=cora_clt_*`, slug, or ID) bypassing WordPress authentication while enforcing tenant-scoped security. Pages must strictly adhere to the Anthropic Claude aesthetic (`#FBFaf7`) and provide official vector SVG marks for payment gateways.
+22. **White-Labeled Public Client Portal Routing (v4.9.122)**: Public guest access (deliverables, proofing, invoices) must use tokenized URLs (`?token=cora_clt_*`, slug, or ID) bypassing session authentication while enforcing tenant-scoped security. Pages must strictly adhere to the Anthropic Claude aesthetic (`#FBFaf7`) and provide official vector SVG marks for payment gateways.
 23. **Dual-Reward Affiliate Attribution Pattern (v4.9.119)**: Affiliate mechanisms must implement dual-rewards (+100 AI credits on free signup, 40% commission on paid plans), 3-step partner screening before dashboard unlock, 30-day attribution cookies, and geolocation-based pricing tiers.
 24. **Universal AI Drawer Background Scroll Lock SOP (v4.9.133)**: Invocations of the AI Co-Founder drawer or modals must call `window.coraLockScroll()` on open and `window.coraUnlockScroll()` on close, with momentum touch scroll preserved on inner containers.
 25. **Enterprise AI Safety Guardrails & Dual Escalation (v4.9.139)**: All user interactions with conversational AI systems must be validated against the 6 core policy violation categories (`explosives_weapons`, `terrorism_violence`, `nudity_explicit`, `religious_defamation_conflict`, `self_harm`, `jailbreak_injection`). Breaches must be recorded in `wp_cora_security_incidents` and concurrently escalated in real-time to Platform Super Admins and Workspace Owners. AI-executed backend mutations must undergo RBAC action permission verification (`cora_user_can_execute_ai_action`).
@@ -41,7 +41,7 @@ This guide defines the standardized architectural patterns, blueprints, and perf
 30. **Native Touch Scroll & Past-Time Scheduling Guarding (v4.9.140, v4.9.150)**: Eliminate synthetic touch-intercepting pull-to-refresh JS engines in favor of fluid native hardware scrolling. Task schedulers and milestone creators must evaluate timestamps against the current local time to prevent accidental scheduling of past times on the current date, accompanied by auto-calculated upcoming time slot defaults.
 31. **Full-Width Sticky Sub-Tabs Bar & `pan-x` Touch Swipe Standard (v4.9.179)**: Sub-navigation bars across complex modules must span 100% of workspace content width, pin cleanly below the global topbar on scroll, enforce `touch-action: pan-x` for frictionless one-thumb horizontal swiping on mobile screens, and eliminate focus rings/harsh outline borders.
 32. **Universal Foundation Modules Locking & Immutable Domain Hardening (v4.9.189, v4.9.200)**: Core operational features (`blogs`, `forms`, `team-roles`, `media`, `vault`, and `affiliates` alongside `dashboard`) are permanently declared immutable across all 6 industry domain class files. `cora_get_custom_enabled_features()` acts as a runtime micro-guard to ensure foundation modules are always active, displaying locked badges in the Feature Hub and preventing accidental tenant disabling.
-33. **Public Media Route Interception & Telemetry Tracking Pattern (v4.9.187 - v4.9.188)**: Guest-accessible proofing routes (`/workspace/shared-media/{token}`, `share-media.php?cora_share={token}`) must resolve without WordPress login barriers using tokenized lookups. Telemetry engines must record both total and unique impressions and high-resolution asset downloads, feeding real-time KPI scorecards and audit activity trails.
+33. **Public Media Route Interception & Telemetry Tracking Pattern (v4.9.187 - v4.9.188)**: Guest-accessible proofing routes (`/workspace/shared-media/{token}`, `share-media.php?cora_share={token}`) must resolve without standard login barriers using tokenized lookups. Telemetry engines must record both total and unique impressions and high-resolution asset downloads, feeding real-time KPI scorecards and audit activity trails.
 34. **Multi-Dimensional Digital Storage Footprint Calculator (v4.9.183)**: Storage auditing must not be limited to media uploads alone; always calculate total digital footprint across media attachments, vault documents, AI chats/vector memory, and user activity/telemetry logs using `cora_get_workspace_storage_details()`.
 35. **Field Ops Telemetry Lifecycle: Session Login Auto-Start & Beacon-Backed Flush (v4.9.182)**: Field tracking engines must detect active sessions on dashboard initialization to start background GPS logging automatically. Upon tab close, logout, or navigation (`beforeunload` / `pagehide`), the client must use `navigator.sendBeacon` to reliably deliver final location points and punch-out timestamps without risking dropped network packets.
 36. **Active-Only Equal AI Token Budget Distribution Architecture (v4.9.180)**: Token pools must be divided equally across verified active workspace members (`status === 'active'`), strictly filtering out pending invitations, suspended accounts, or inactive users to maximize computing resources for working staff.
@@ -53,7 +53,7 @@ This guide defines the standardized architectural patterns, blueprints, and perf
 42. **Canvas Themes Single-Stream Library & CWV Diagnostic Pattern (v4.9.199)**: Theme builders must unify draft and live themes into a single-stream library accompanied by a 4-card Speed/Core Web Vitals diagnostic strip (CWV score, LCP velocity, quota, published pages), 1-click optimization recommendations, and viewable-only fallback on mobile viewports.
 43. **Permanent Foundation Lock Expansion & Alphanumeric Badge Pattern (v4.9.200)**: Foundation locks must protect both administrative core and growth infrastructure (`affiliates`), displaying dynamic alphanumeric partner rank badges in sidebar navigation.
 44. **Gamified Partner Growth & Milestone Reward Architecture (v4.9.202 - v4.9.206)**: Partner growth ecosystems must combine tiered progress meters (Bronze → Silver → Gold → Diamond), streak velocity multipliers, Top 3 podium leaderboards, dual sign-up rewards (+100 Runes), recurring commissions (20% monthly / 30% annual), and milestone cash bonuses (₹1,000 / ₹5,000 / ₹10,000).
-45. **Early Route Interception & Cryptographic CSPRNG Verification (v4.9.201, v4.9.208)**: Public token validation endpoints (`/workspace/verify`) must intercept requests before WordPress template routing, validate 32-byte CSPRNG token hashes (`hash_equals`), handle email security pre-fetches safely, set authentication cookies, and seamlessly redirect to authenticated dashboards.
+45. **Early Route Interception & Cryptographic CSPRNG Verification (v4.9.201, v4.9.208)**: Public token validation endpoints (`/workspace/verify`) must intercept requests before standard template routing, validate 32-byte CSPRNG token hashes (`hash_equals`), handle email security pre-fetches safely, set authentication cookies, and seamlessly redirect to authenticated dashboards.
 46. **Central Tenant Authorization & Outbound HTTP SSRF Filter Framework (v4.9.209 / SEC-001 - SEC-023)**: Replace fragmented SQL tenancy checks with central policy assertions (`Cora_Authorization::assert_agency_context`). Wrap all outbound HTTP calls with `Cora_SSRF_Filter::is_safe_url()` to block private IPv4/IPv6 subnets, link-local addresses, and cloud provider metadata services (`169.254.169.254`).
 47. **Next.js Headless Git Repository Integration & Route Scanner Pattern (v4.9.308 - v4.9.313)**: Remote GitHub repositories connect directly into Cora Canvas via GitHub REST APIs. The engine dynamically queries branches, scans recursive Git trees for App Router (`app/**/page.tsx`, `page.jsx`, `page.js`) and Pages Router (`pages/**.tsx`) paths while filtering out route groups (`(marketing)`, `(auth)`), supports public and private repositories using Personal Access Tokens (PAT) with dual authorization header fallback (`token <pat>` and `Bearer <pat>`), and synchronizes routes directly into the Canvas pages registry.
 48. **Incremental Static Regeneration (ISR) Webhook Revalidation Architecture (v4.9.308)**: Content and theme configuration changes trigger on-demand Next.js ISR webhooks (`POST /api/revalidate?secret=...&path=...`) with sub-15-second timeouts, timing diagnostics (`duration_ms`), and automatic revalidation on page prop updates, keeping edge CDN caches synchronized without requiring complete production site rebuilds.
@@ -101,6 +101,19 @@ This guide defines the standardized architectural patterns, blueprints, and perf
 90. **Dynamic Affiliate Referral Tracking, Coupon Deductions & Multi-Tier Attribution (v4.9.374)**: Referral attribution engine (`POST /wp-json/cora/v1/referrals/track`, `cora-frontend/lib/referral.ts`) capturing query parameters (`cora_ref`, `ref`, `via`, `partner`), persisting to 30-day cookies, automatically deducting 10%–20% coupon discounts in checkout sheets (`CheckoutSheet.tsx`, `FastRazorpayModal.tsx`), and reporting conversion back to partners.
 91. **Pricing SaaS Hierarchy Pills, Bandwidth/Storage Specs & Migration Badging (Oct 2026)**: Plan cards enforce SaaS hierarchy pills, active-voice copy, explicit storage (5GB–50GB) and bandwidth (25GB–500GB) specs, floating "Free Site Migration" badge on Scale, and pure monochromatic switcher pills.
 92. **Unified Global Resources Hero Section Architecture (Oct 2026)**: Standardized `GlobalResourcesHero.tsx` component unifying top banner presentation across Templates, Tools, Guides, Blog, Newsletter, and Articles with consistent typography, search, and category filter chips.
+93. **Canonical Industry Solutions Directory & 301 Redirect Parity Standard (v4.9.380)**: Primary industry vertical hub relocated from legacy `/use-cases` to canonical `/industries`, backed by automated 301 redirect mapping in `.htaccess` and Next.js route configuration to maintain 100% SEO link equity across all 10+ vertical paths.
+94. **Refined Industries Mega-Menu & Icon Tile Navigation Standard (v4.9.380)**: Desktop navigation implements a multi-column dropdown matching production design specifications with dedicated icon tiles, subtle colored pill indicators, and synchronized mobile drawer links.
+95. **Autonomous AI Multi-Agent Workforce & 4-Row Infinite Skills Marquee Pattern (v4.9.379)**: Multi-agent landing page (`/ai-agent`) showcasing dedicated domain agent personas, high-resolution neural cutout hero graphics seamlessly blended into the canvas, and a 4-row hardware-accelerated infinite CSS marquee highlighting verified capabilities across Operations, Sales, Finance, and Creative Delivery.
+96. **Lenis Smooth-Scroll Boundary Isolation & Independent Sidebar Scrolling SOP (v4.9.378)**: Complex directory sidebars (such as `FeaturesSidebar.tsx`) must be encapsulated with `data-lenis-prevent` and explicit height boundaries (`max-h-[calc(100vh-120px)] overflow-y-auto`) to isolate inner wheel/touch scrolling from the global Lenis smooth-scroll instance, preventing scroll trapping.
+97. **Enterprise Brand Asset Registry & 1-Click SVG Vector Kit Architecture (v4.9.377)**: Public brand center (`/brand`) provides 1-click clipboard SVG copy and direct `.svg` downloads for Primary, Inverted, and Symbol wordmarks, complete design tokens documentation, and authentic production captures adhering strictly to Rule 13 zero-outline styling.
+98. **Agency Story Canvas & Connected Chronological Journey Ribbon Standard (v4.9.376)**: Full-width storytelling canvas (`/about`) featuring a continuous vertical milestone timeline ribbon (`ScrollDrivenTimeline.tsx`) with seamless rail segments eliminating floating tick gaps, accompanied by a mobile timeline spine, Core Values bento cards, and dynamic operational week calendar.
+99. **Robust Multi-Field Contact Form Validation & State Feedback Engine (v4.9.375)**: Public inquiry forms implement strict client-side and server-side validation across Full Name, RFC 5322 Work Email, numeric Phone regex (`/^[0-9+ -]{7,15}$/`), Company/Studio, and Topic dropdown, paired with accessible ARIA alerts and monochromatic toast dispatch.
+100. **Unified Agency Portfolio & 4-Act Storytelling Architecture (v4.9.381)**: Agency case studies must strictly adhere to the 4-act transformation narrative (Act 1: Executive Summary, Act 2: Challenge / Friction Narrative, Act 3: Strategic Solution Narrative, Act 4: Tangible Deliverables List). Case study metrics must render numerical proof in high-contrast `JetBrains Mono` font (`font-mono font-bold tracking-tight text-zinc-950`). Client NDA confidentiality must be strictly enforceable via `is_confidential = 1`, which automatically redacts brand identities and swaps client names with anonymized industry monikers without compromising verified outcome metrics. Editing interfaces must employ a 6-tab drawer editor (`views/view-projects.php`) adhering to Rule 12 mobile bottom-sheet and desktop side-drawer specifications.
+101. **Public Micro-Tools Growth Engine & Zero-PII Telemetry Governance (v4.9.381)**: Public micro-tools in `tools-canonical-registry.ts` operate as frictionless organic acquisition utilities solving concrete agency operational bottlenecks (TCO calculation, speed-to-lead modeling, scope creep economics, margin reverse-engineering, crawler audit). Tools must strictly enforce client-side calculation with zero mandatory registration. All tool analytics (`lib/tools-analytics.ts`) must adhere to strict Zero-PII governance: NEVER transmit submitted URLs, client identities, file contents, prompts, or revenue figures; transmit only sanitized operational metadata (`tool_id`, `category`, `execution_mode`, `result_band`, `duration_ms`, `cta_target`).
+102. **GitHub CI/CD Full-Lifecycle PR, Merge & Rollback Engine (v4.9.381)**: The Canvas themes ecosystem integrates enterprise Git lifecycle capabilities via `Cora_GitHub_Integration`. Development workflows must support RFC 8628 OAuth 2.0 Device Authorization Grant (`cora_github_initiate_device_flow`, `cora_github_poll_device_token`) with user-code authorization, secure PAT persistence with Bearer fallback, dynamic branch creation, automated Pull Request generation (`cora_github_create_pr`) with structured diff summaries, 1-click administrative merging (`cora_github_merge_pr`) supporting merge/squash/rebase, automated commit rollback/revert (`cora_github_revert_commit`) creating clean revert commits to restore stable production states, atomic workspace synchronization (`cora_github_sync_entire_workspace`), and multi-tenant organization repository provisioning (`cora_github_provision_org_repo`).
+103. **Dynamic Forms-to-Lead CRM Auto-Conversion Pipeline (v4.9.381)**: Public and embedded form submissions intercepted in `cora_rest_submit_form()` must automatically bridge into the CRM Sales Pipeline (`wp_cora_leads`). Field detection must case-insensitively map or auto-detect contact details (`name`, `email`, `phone`, `notes`, `budget`, `city`, `service`). Records must enforce tenant isolation by `agency_id` and `branch_id`. The engine must resolve assignees via direct assignment or round-robin workload balancing, compute predictive deal qualification (`hot`, `warm`, `cold`), invalidate lead caches immediately via `cora_db_get_leads(true)`, prepend to `cora_workspace_leads` for 0ms reactivity, and ingest lead creation events into `cora_rag_ingest_event` for real-time AI Co-Founder awareness.
+104. **Editorial Generative Engine Optimization (GEO) & Knowledge Graph Engine (v4.9.381)**: Long-form editorial assets in `articles-data.ts` must be structured for Generative Engine Optimization (GEO) to maximize direct extraction and attribution by AI search engines (Perplexity, ChatGPT Search, Claude, Gemini AI Overviews). Articles must enforce rich technical depth, explicit reading times, difficulty indicators, structured key takeaways, interactive widget bindings (GST calculators, margin simulators), verified author credentials with Rule 3 compliance (`Aarav Mehta`, `Kavya Patel`, `Rohan Verma`, editorial teams), and Schema.org `FAQPage` and `Article` JSON-LD schemas.
+105. **Multi-Submission Aggregated REST Data Routing (v4.9.381)**: Form data pipelines must expose centralized multi-submission aggregation endpoints (`GET /wp-json/cora/v1/forms/all-submissions` and `/forms/submissions`) that consolidate entries across all tenant forms. Handlers must support tenant-scoped isolation, pagination (`page`, `per_page`), date filtering, keyword search, and CSV streaming, powering the universal 5th tab "All Entries" registry in `views/view-forms.php` without degrading per-form performance.
 
 ---
 ---
@@ -449,7 +462,7 @@ function coraUpdateSubtaskProgress() {
 ## 14. White-Labeled Public Client Portal Blueprint (`public-client-portal.php`)
 
 When engineering guest or client-facing views:
-1. **Tokenized Authentication**: Authenticate via `token` query parameters against encrypted tenant access keys without requiring WordPress accounts.
+1. **Tokenized Authentication**: Authenticate via `token` query parameters against encrypted tenant access keys without requiring internal user accounts.
 2. **Claude Cream Aesthetics**: Enforce Anthropic Claude warm cream backgrounds (`#FBFaf7`), minimal container cards, and `#E8E5DE` borders.
 3. **Official SVG Marks Only**: Always use official SVG paths for external integrations (WhatsApp, Google Pay, PhonePe, Paytm, LinkedIn, X). Native emojis are strictly forbidden.
 
@@ -496,7 +509,7 @@ When defining, modifying, or registering industry domain modules:
 ## 18. Public Media Route Interception & Telemetry Blueprint (v4.9.187 - v4.9.188)
 
 When engineering public share routes and proofing suites:
-1. **Public Route Interception**: Intercept public routes via `template_redirect` or rewrite endpoints (`/workspace/shared-media/{token}`, `/workspace/share-media/{token}`, `share-media.php?cora_share={token}`) without requiring WordPress user authentication.
+1. **Public Route Interception**: Intercept public routes via `template_redirect` or rewrite endpoints (`/workspace/shared-media/{token}`, `/workspace/share-media/{token}`, `share-media.php?cora_share={token}`) without requiring user session authentication.
 2. **Client Impression Telemetry**: On page load, dispatch asynchronous AJAX request `cora_track_media_share_impression` with the share token. The backend increments total impressions, logs unique visitors via IP hashing/session identifiers, and records client user-agents.
 3. **Download Tracking**: Download button triggers must call `cora_track_media_share_download` before triggering the asset stream to record download events.
 4. **Audit KPI Cards & Filter Chips**: `view-media.php` must render 4 real-time scorecards (*Total Views*, *Unique Views*, *Total Downloads*, *Unique Downloads*) and interactive filter chips (`All`, `Downloads`, `Views`) to inspect public client interaction.
@@ -570,7 +583,7 @@ When fetching external resources (URL migrators, webhooks, logo scrapers, RSS fe
 ## 23. Dedicated Early Route Interception (`/workspace/verify`) & Token Validation Blueprint (v4.9.201, v4.9.208)
 
 When implementing public verification links, one-time passwords, or magic links:
-1. **Early Route Hooking**: Intercept routes at priority `1` inside `cora_workspace_handle_workspace_route()` in `cora-workspace.php` before standard WordPress `template_redirect` or login guards execute.
+1. **Early Route Hooking**: Intercept routes at priority `1` inside `cora_workspace_handle_workspace_route()` in `cora-workspace.php` before standard framework `template_redirect` or login guards execute.
 2. **CSPRNG Cryptographic Entropy**:
    - Generate tokens using `bin2hex(random_bytes(32))` (64 hexadecimal characters / 256-bit entropy).
    - Store SHA-256 hash in user meta: `update_user_meta($user_id, 'cora_email_verification_token_hash', hash('sha256', $raw_token));`.
@@ -711,7 +724,7 @@ When integrating Cora with AI agents via the Model Context Protocol (MCP) and se
    - Unauthorized requests return HTTP 401 with explicit header:
      `WWW-Authenticate: Bearer resource_metadata=".../.well-known/oauth-protected-resource", realm="cora-mcp", error="invalid_token"`
 5. **Tenant Context Hydration & Rate Limiting**:
-   - Bearer token authentication automatically hydrates tenant scoping (`cora_set_current_tenant_agency_id`) and sets the active WordPress user context.
+   - Bearer token authentication automatically hydrates tenant scoping (`cora_set_current_tenant_agency_id`) and sets the active user session context.
    - Transient-backed sliding window rate limiter strictly enforces 120 requests per minute (`RATE_LIMIT_RPM = 120`).
 
 ---
@@ -820,7 +833,7 @@ When updating primary administration email addresses across workspace tenants:
    - Stores the SHA-256 hash in option `cora_pending_admin_email_hash_{agency_id}` with expiration timestamp `cora_pending_admin_email_expires_{agency_id}`.
 4. **Early Route Interception & Atomic Migration**:
    - The verification email links to `/workspace/verify?admin_email_token={raw_token}&agency_id={id}`.
-   - Intercepted early in `cora_workspace_handle_workspace_route()` prior to standard WordPress template execution.
+   - Intercepted early in `cora_workspace_handle_workspace_route()` prior to standard framework template execution.
    - Validates token using timing-safe `hash_equals()`.
    - On successful verification, atomically updates the administration email, deletes pending options, logs an audit event, and redirects to Settings with a monochromatic confirmation toast.
 
@@ -851,7 +864,7 @@ When executing native static compilation of modern web frameworks on Cora hostin
    - Automatically cleans stale npm caches (`~/.npm/_cacache`) before compilation to prevent Inode quota exhaustion (`-122 EDQUOT`).
 3. **Static Distribution Extraction**:
    - Bundles compiled static files (`out/`, `dist/`, `build/`) directly into localized workspace storage (`wp-content/uploads/cora-canvas/{theme_id}/dist`).
-   - Streams static JS/CSS assets (`/_next/*`, `/_expo/*`) directly on `init` priority 1 with zero WordPress template overhead.
+   - Streams static JS/CSS assets (`/_next/*`, `/_expo/*`) directly on `init` priority 1 with zero CMS template overhead.
 
 ---
 
@@ -1004,7 +1017,7 @@ When implementing and extending conversational lead acquisition components:
    - Routes user queries through `cora-frontend/app/api/ai-preview/route.ts` with domain-specific system prompts.
    - Responses must be concise, active-voice, and under 3 sentences with clear next steps.
 3. **Automated Objection Vector Handling**:
-   - Address common switching hurdles (e.g. Notion/HoneyBook vs Cora, white-glove migration, annual discounts, WordPress multi-plugin stability).
+   - Address common switching hurdles (e.g. Notion/HoneyBook vs Cora, white-glove migration, annual discounts, legacy multi-plugin instability).
 4. **Dynamic Promotional Offer Generation**:
    - Attach structured `DedicatedOffer` cards (`MIGRATEFREE`, `CORA10`) that auto-apply coupon query parameters when routing to `/pricing`.
 
@@ -1126,4 +1139,397 @@ Deployed in **v4.9.374**, the Entry Inspector (`#cora-entry-inspector`) provides
 
 ---
 
-*Cora Developer Feature Guide v4.9.374 — Last updated: October 2026.*
+## 56. Industry Solutions Directory & 301 Redirect Parity Blueprint (`cora-frontend/app/industries/*`, `lib/industry-data.ts`)
+
+When expanding or modifying industry vertical directories:
+1. **Canonical `/industries` Route Structure**:
+   - Root index at `cora-frontend/app/industries/page.tsx` rendering `IndustriesPageClient.tsx`.
+   - Dynamic dynamic routes at `cora-frontend/app/industries/[slug]/page.tsx` rendering `IndustryDetailClient.tsx`.
+2. **Backward-Compatible 301 Redirects**:
+   - Maintain route rewrites in `cora-frontend/public/.htaccess` and Next.js route mapping:
+     ```apache
+     RewriteRule ^use-cases/?$ /industries [R=301,L]
+     RewriteRule ^use-cases/(.*)$ /industries/$1 [R=301,L]
+     ```
+   - Retain legacy `/use-cases` page handlers delegating directly to industry data, preserving external inbound links and organic rank.
+3. **10+ Verified Vertical Schemas (`lib/industry-data.ts`)**:
+   - Enforce plain-English, active-voice copy across all verticals (Real Estate, Photography, Architecture, Creative Agency, Consulting, Salons, Fitness, Events, Hospitality, DTC).
+   - Structure data objects with `hero`, `capabilities`, `workflows`, `metrics`, `comparison`, and `faqs`.
+4. **Desktop Mega-Menu & Mobile Drawer Alignment (`Navbar.tsx`)**:
+   - Synchronize dropdown categories with vertical icon tiles, subtle pill indicators, and high-contrast hover states adhering strictly to Rule 13 tonal backgrounds.
+
+---
+
+## 57. Autonomous AI Multi-Agent Workforce & 4-Row Infinite Skills Marquee Architecture (`cora-frontend/app/ai-agent/page.tsx`)
+
+When developing agent workforce canvases and skills visualizers:
+1. **High-Resolution Neural Cutout Assets**:
+   - Store segmented PNG cutouts at `cora-frontend/public/images/cora_hero_agent_cutout.png`.
+   - Blend cutouts into the canvas using CSS background gradients and soft lighting radial blends without harsh container bounding lines.
+2. **4-Row Infinite Skills Marquee Engine (`InfiniteSkillsSection.tsx`)**:
+   - Implement staggered continuous CSS animation (`@keyframes marquee`) across 4 distinct operational streams:
+     * Stream 1: Operations, shifts, and scheduling logistics.
+     * Stream 2: Sales pipeline, lead capture, and outreach automation.
+     * Stream 3: GST invoicing, contract vaults, and tax math.
+     * Stream 4: Creative asset proofing, storage accounting, and deliverables.
+   - Use `will-change: transform; transform: translate3d(0, 0, 0);` to ensure smooth 60fps rendering without jank on mobile viewports.
+3. **Deployment Asset Bundling & Health Check (`scripts/deploy_frontend.py`)**:
+   - Ensure all agent portraits and artwork assets are packaged in the deployment payload.
+   - Run pre-release curl check against `/api/health` before updating the production symlink.
+
+---
+
+## 58. Features Interactive Directory & Lenis Scroll Boundary Isolation Blueprint (`cora-frontend/app/features/page.tsx`)
+
+When engineering high-density capability catalogs with sticky sidebars:
+1. **Lenis Scroll Isolation Standard**:
+   - Wrap interactive sidebar containers with `data-lenis-prevent`:
+     ```tsx
+     <aside 
+       data-lenis-prevent 
+       className="max-h-[calc(100vh-120px)] overflow-y-auto pr-3 scrollbar-thin"
+     >
+     ```
+   - This ensures inner wheel and touch scroll events are consumed locally, preventing Lenis from intercepting and locking the parent window scroll.
+2. **High-Density Sidebar Navigation (`FeaturesSidebar.tsx`)**:
+   - Single-line list items with icon glyphs and active tonal pills (`bg-zinc-100 dark:bg-zinc-800`).
+   - Segmented status pill filter (`All`, `Released`, `Beta`, `Upcoming`).
+   - Search input with positioned vector SVG preventing text overlap.
+3. **Natural Active-Voice Benefit Copywriting**:
+   - Module cards must use active voice titles (e.g., "Collect GST-Compliant Retainers" instead of "Retainer Billing Module").
+   - Action buttons must state direct value ("Get Started for Free").
+
+---
+
+## 59. Enterprise Brand Asset Registry & SVG Vector Download Kit Blueprint (`cora-frontend/app/brand/page.tsx`)
+
+When deploying public brand registries and digital press kits:
+1. **Turnkey Vector SVG Kit (`BrandLogosSection.tsx`)**:
+   - Provide raw inline SVG markup accessible via 1-click clipboard copy (`navigator.clipboard.writeText(svgString)`).
+   - Provide direct `.svg` blob download triggers (`URL.createObjectURL(blob)`).
+   - Include Primary Wordmark, Inverted Wordmark, and Symbol Mark in both light and dark variants.
+2. **Design Tokens Reference**:
+   - Document the 11-step neutral zinc color scale, typographic hierarchy, co-branding guidelines, and clearspace rules.
+3. **Production Capture Showcase**:
+   - Showcase authentic workspace UI captures rather than ungrounded marketing renders.
+   - Adhere strictly to Rule 13: zero heavy black border outlines or dark bounding strokes.
+
+---
+
+## 60. Agency Storytelling Canvas & Connected Chronological Journey Ribbon Blueprint (`cora-frontend/app/about/page.tsx`)
+
+When constructing timeline narratives and founder story canvases:
+1. **Connected Chronological Timeline Ribbon (`ScrollDrivenTimeline.tsx`)**:
+   - Maintain a single, continuous vertical rail connecting all chronological milestone cards.
+   - Unify rail segments to eliminate gaps between tick marks and cards.
+   - Provide a responsive mobile timeline spine ensuring clear vertical narrative flow on screens `< 768px`.
+2. **Structured Bento Grid Architecture**:
+   - Core Values bento grid (`CoreValuesSection.tsx`) with high-contrast vector icons and concise value statements.
+   - Dynamic operational week calendar (`DynamicWeekCalendar.tsx`) showing Monday-to-Sunday workflow cadence.
+
+---
+
+## 61. Robust Multi-Field Contact Form Validation & State Feedback Blueprint (`cora-frontend/app/contact/page.tsx`)
+
+When implementing public inquiry and contact lead capture forms:
+1. **Field Validation Matrix**:
+   - **Full Name**: Trimmed length >= 2, validating standard personal naming conventions.
+   - **Work Email**: Strict RFC 5322 regex test (`/^[^\s@]+@[^\s@]+\.[^\s@]+$/`).
+   - **Phone Number**: International phone pattern validation (`/^[0-9+ -]{7,15}$/`).
+   - **Company / Studio**: Mandatory non-empty string.
+   - **Topic**: Mandatory selection from pre-defined inquiry topics.
+2. **Accessible Monochromatic Feedback**:
+   - Render field-level error messages with `aria-live="polite"` and `role="alert"`.
+   - Dispatch feedback via the custom monochromatic Toast notification system (`window.coraShowToast`).
+   - Zero browser default popups (`alert()`, `confirm()`, `prompt()`) in accordance with Rule 1.
+
+---
+
+## 62. Public Documentation Mobile Floating Island Clearance & Navigation Blueprint (`cora-frontend/components/docs/DocsClient.tsx`)
+
+When building public documentation reading interfaces:
+1. **Non-Wrapping Sidebar Tabs & Badges**:
+   - Ensure category headers, subpage titles, and status badges (`Core`, `REST`, `Beta`) wrap gracefully without layout clipping.
+2. **Mobile Floating Island Bottom Clearance**:
+   - Ensure the article content container provides generous bottom padding (`pb-28`) so text and next/previous pagination buttons remain completely unobstructed by mobile floating island bars.
+3. **Unconditional React Hook Lifecycle (`Navbar.tsx`)**:
+   - Ensure all React hooks (`useState`, `useEffect`, `useCallback`) are declared unconditionally before any early returns, avoiding React error #310 hook violations.
+
+---
+
+## 63. Agency Projects & Portfolio Case Studies Module Blueprint (`views/view-projects.php` & `cora-frontend/app/projects/`)
+
+When developing agency portfolio showcase modules, case study management panels, and Next.js frontend presentation layers:
+
+### 1. Database Schema Specification (`wp_cora_projects`)
+The database layer isolates case study records in a dedicated multi-tenant table initialized via `dbDelta`:
+```sql
+CREATE TABLE wp_cora_projects (
+    id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+    agency_id varchar(100) NOT NULL DEFAULT 'super',
+    title varchar(255) NOT NULL,
+    slug varchar(255) NOT NULL,
+    subtitle varchar(255) DEFAULT '',
+    client_name varchar(255) NOT NULL,
+    client_logo_url text DEFAULT NULL,
+    client_industry varchar(100) NOT NULL DEFAULT 'SaaS / B2B',
+    project_duration varchar(100) DEFAULT '',
+    year_completed varchar(20) DEFAULT '',
+    services longtext DEFAULT NULL,
+    live_url varchar(500) DEFAULT '',
+    is_confidential tinyint(1) NOT NULL DEFAULT 0,
+    is_featured tinyint(1) NOT NULL DEFAULT 0,
+    status varchar(20) NOT NULL DEFAULT 'published',
+    executive_summary text DEFAULT NULL,
+    challenge_content longtext DEFAULT NULL,
+    solution_content longtext DEFAULT NULL,
+    deliverables longtext DEFAULT NULL,
+    kpis longtext DEFAULT NULL,
+    testimonial_quote text DEFAULT NULL,
+    testimonial_author varchar(255) DEFAULT '',
+    testimonial_role varchar(255) DEFAULT '',
+    testimonial_company varchar(255) DEFAULT '',
+    testimonial_avatar text DEFAULT NULL,
+    testimonial_verified tinyint(1) NOT NULL DEFAULT 1,
+    hero_media_type varchar(20) NOT NULL DEFAULT 'image',
+    hero_image_url text DEFAULT NULL,
+    hero_video_url text DEFAULT NULL,
+    gallery_images longtext DEFAULT NULL,
+    before_image_url text DEFAULT NULL,
+    before_label varchar(100) DEFAULT 'Previous Baseline',
+    after_image_url text DEFAULT NULL,
+    after_label varchar(100) DEFAULT 'Agency Overhaul',
+    video_embed_url text DEFAULT NULL,
+    cta_type varchar(50) NOT NULL DEFAULT 'book_audit',
+    cta_title varchar(255) DEFAULT 'Ready for Similar Growth Results?',
+    cta_subtitle text DEFAULT NULL,
+    cta_button_text varchar(100) DEFAULT 'Schedule Strategy Audit',
+    cta_button_url varchar(500) DEFAULT '/contact',
+    meta_title varchar(255) DEFAULT '',
+    meta_description text DEFAULT NULL,
+    target_keywords text DEFAULT NULL,
+    canonical_url varchar(500) DEFAULT '',
+    views_count int(11) NOT NULL DEFAULT 0,
+    cta_clicks int(11) NOT NULL DEFAULT 0,
+    sort_order int(11) NOT NULL DEFAULT 0,
+    created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_slug (slug),
+    KEY idx_agency_status (agency_id, status),
+    KEY idx_industry (client_industry),
+    KEY idx_featured (is_featured)
+);
+```
+
+### 2. AJAX & REST Controllers (`Cora_Projects_Module`)
+- **AJAX Actions**:
+  * `cora_ajax_get_projects`: Fetches tenant projects with KPI aggregations.
+  * `cora_ajax_save_project`: Atomic upsert with JSON encoding for `services`, `deliverables`, `kpis`, and `gallery_images`.
+  * `cora_ajax_delete_project`: Tenant-scoped hard deletion with nonce verification.
+  * `cora_ajax_toggle_project_publish`: Fast status toggle between `published` and `draft`.
+  * `cora_ajax_duplicate_project`: Clones an existing case study with appended `-copy` slug.
+- **REST Endpoints**:
+  * `GET /wp-json/cora-api/v1/projects`: Public endpoint returning all published projects ordered by `is_featured DESC, sort_order ASC, created_at DESC`.
+  * `GET /wp-json/cora-api/v1/projects/(?P<slug>[a-zA-Z0-9_-]+)`: Fetches a single case study by unique slug.
+
+### 3. Stealth NDA Masking & 4-Act Storytelling Architecture
+- **Confidentiality Masking**: When `is_confidential = 1`, client names are masked with anonymized descriptors (e.g. *"Confidential Real Estate Enterprise"*), logos are redacted, proprietary links are omitted, and demo URLs are masked, protecting client NDAs.
+- **Numerical Proof in JetBrains Mono**: KPIs render values in `font-mono font-bold text-zinc-950` with contextual baseline metrics and directional arrows (`up`, `down`, `neutral`).
+- **4-Act Narrative Arc**: Case study prose enforces a 4-act progression:
+  * Act 1: Executive Summary (high-level transformation impact).
+  * Act 2: Challenge Narrative (operational bottlenecks and baseline friction).
+  * Act 3: Solution Narrative (agency architecture and custom interventions).
+  * Act 4: Deliverables List (concrete list of shipped assets and automations).
+
+### 4. 6-Tab Drawer Editor (`views/view-projects.php`)
+The management interface implements a 6-tab editing drawer conforming to Rule 12 (desktop slide-over drawer `w-[640px]`, mobile bottom sheet `max-h-[88vh] rounded-t-3xl`):
+* Tab 1: Overview (`proj-tab-overview`)
+* Tab 2: Narrative Story (`proj-tab-narrative`)
+* Tab 3: Impact KPIs (`proj-tab-kpis`)
+* Tab 4: Media & Visuals (`proj-tab-media`)
+* Tab 5: Endorsement (`proj-tab-testimonial`)
+* Tab 6: SEO & CTA (`proj-tab-seo`)
+
+---
+
+## 64. Public Micro-Tools Growth Engine & Canonical Tool Registry Blueprint (`cora-frontend/lib/tools-canonical-registry.ts`)
+
+When engineering organic acquisition micro-tools, calculation engines, and lead generation utilities:
+
+### 1. Canonical Registry Architecture
+All public tools must be declared in `cora-frontend/lib/tools-canonical-registry.ts` conforming to the 24-field `CanonicalToolRecord` schema:
+```typescript
+export interface CanonicalToolRecord {
+  slug: string;
+  publicTitle: string;
+  shortTitle: string;
+  category: ToolCategory;
+  categoryLabel: string;
+  status: ToolStatus;
+  owner: string;
+  icp: string[];
+  jobToBeDone: string;
+  targetSearchCluster: string[];
+  metadataTitle: string;
+  metadataDescription: string;
+  canonicalUrl: string;
+  inputs: ToolIOField[];
+  outputs: ToolIOField[];
+  features: string[];
+  methodologyVersion: string;
+  executionMode: ExecutionMode; // 'browser-only' | 'remote-audit' | 'ai-assisted'
+  privacyDisclosure: string;
+  securityRisk: SecurityRisk;
+  relatedTools: string[];
+  supportingArticles: string[];
+  supportingDocs: string[];
+  contextualCoraAction: ContextualCoraAction;
+}
+```
+The registry defines **63 verified tools across 10 problem domains**: `agency_economics`, `wordpress_stack`, `ai_discovery`, `finance_tax`, `contracts_legal`, `developer_embed`, `pdf_tools`, `sheets_tools`, `image_tools`, and `real_estate`.
+
+### 2. Core Framework Components (`cora-frontend/components/tools/`)
+- `ToolInputGroup`: Controlled inputs with real-time validation, numeric steppers, and range sliders.
+- `ToolResultSummary`: Immediate scorecard cards with high-contrast numerical highlights in JetBrains Mono.
+- `ToolActionBanner`: Conversion bridge connecting the calculated pain point to Cora's workspace platform.
+- `ToolFaqAccordion`: Semantic FAQ accordion embedding Schema.org `FAQPage` JSON-LD.
+- `ToolBreakdownTable`: Tabular financial ledger breaking down formula variables and calculations.
+
+### 3. Zero-PII Analytics Governance (`cora-frontend/lib/tools-analytics.ts`)
+To protect user privacy and comply with enterprise data governance:
+- **Strict Prohibition**: Never transmit URLs, client names, email addresses, uploaded documents, prompt text, or raw financial figures.
+- **Allowed Telemetry Payload**:
+  ```typescript
+  export interface ToolAnalyticsPayload {
+    tool_id: string;
+    category?: string;
+    execution_mode?: 'browser-only' | 'remote-audit' | 'ai-assisted';
+    result_band?: string;
+    step_completed?: number;
+    duration_ms?: number;
+    cta_target?: string;
+    error_code?: string;
+  }
+  ```
+- **Logging Method**: Use `logToolEvent(eventName, payload)` wrapping `trackEvent` from `@/components/analytics/Analytics`.
+
+### 4. 6 Flagship Growth Tools
+1. `wp-plugin-cost-calculator`: 3-year TCO computation of plugin bloat and maintenance overhead.
+2. `lead-leakage-calculator`: Pipeline decay simulator based on speed-to-lead benchmarks.
+3. `scope-creep-calculator`: Profit margin erosion model across unbilled scope iterations.
+4. `service-pricing-calculator`: Margin target reverse-engineer computing hourly billable floor.
+5. `wp-publishing-friction-calculator`: Editorial turnaround friction scoring and bottleneck detector.
+6. `ai-crawler-checker`: User-agent robots.txt analyzer checking GPTBot, ClaudeBot, PerplexityBot, and Google-Extended.
+
+---
+
+## 65. Canvas Frontend Themes Engine & GitHub CI/CD Full-Lifecycle Architecture (`views/view-canvas.php` & `Cora_GitHub_Integration`)
+
+When building visual website theme customizers, PageSpeed diagnostics, and Git deployment integrations:
+
+### 1. Analytical 4-KPI Overview Bar
+Positioned in `tab-canvas-overview` of `views/view-canvas.php`:
+- **Core Web Vitals Score**: Live mobile performance score with target threshold badge (`> 89`).
+- **Largest Contentful Paint (LCP)**: Millisecond paint speed (`420ms`) with live/simulated connection indicator.
+- **Themes Library Count**: Live vs Draft count with draft quota limit.
+- **Published Pages & SEO Readiness**: Live published pages count with real-time SEO readiness indicator (`100% SEO Ready`).
+
+### 2. Sticky ~40px Subtab Navigation
+Pinned below the global topbar at ~40px height:
+- `Theme Library` (`tab-canvas-overview`)
+- `Speed & Core Web Vitals` (`tab-canvas-vitals`)
+- `Migration & Tools` (`tab-canvas-migration`)
+- `GitHub Integration` (`tab-canvas-github`)
+
+### 3. Full-Lifecycle GitHub Integration (`Cora_GitHub_Integration`)
+Implemented in `includes/class-cora-github-integration.php`:
+- **Device Authorization Grant**: RFC 8628 OAuth 2.0 Device Flow (`cora_github_initiate_device_flow`, `cora_github_poll_device_token`) with user-code authorization.
+- **PAT Storage**: Encrypted token persistence in user meta and `cora_git_sync_token` option.
+- **Branch Management**: Remote branch creation (`cora_github_create_branch`) and listing (`cora_github_get_branches`).
+- **Automated PR Generation**: `cora_github_create_pr` stages changes and creates pull requests against the target base branch with structured markdown diff logs.
+- **1-Click Merge Engine**: `cora_github_merge_pr` executes atomic merges via GitHub REST API supporting `merge`, `squash`, and `rebase` strategies.
+- **Commit Rollback & Revert Engine**: `cora_github_revert_commit` generates automated git revert commits to restore previous known-good production states upon error.
+- **Workspace Synchronization**: `cora_github_sync_entire_workspace` bundles active themes, template assets, and page HTML into an atomic git tree commit.
+- **Organization Repository Provisioning**: `cora_github_provision_org_repo` provisions dedicated private repositories under agency GitHub organizations for white-label client projects.
+
+---
+
+## 66. Forms to CRM Lead Pipeline Dynamic Automation & Multi-Submission Aggregation Blueprint (`cora_rest_submit_form` & `wp_cora_leads`)
+
+When connecting public form submissions into the sales CRM pipeline and aggregating submission records:
+
+### 1. Forms-to-CRM Auto-Conversion Pipeline (`cora_rest_submit_form`)
+Inbound submissions to `POST /wp-json/cora-api/v1/forms/{id}/submit` or `POST /wp-json/cora/v1/forms/{id}/submit` trigger automated CRM lead creation:
+- **Honeypot & Rate Limiting**: Validates `cora_hp_verify` honeypot and enforces IP rate limiting (max 10 submissions/minute).
+- **Intelligent Field Extraction**: Discovers contact details across submitted payload case-insensitively:
+  * Full Name: Maps `name`, `full_name`, `client_name`, `prospect_name`.
+  * Email: Maps `email`, `user_email`, `email_address`.
+  * Phone: Maps `phone`, `mobile`, `whatsapp`, `contact`.
+  * Budget: Regex extracts numbers from `budget`, `price`, `amount`, `investment`.
+  * City / Location: Maps `city`, `location`, `venue`, `address`.
+  * Service Scope: Maps `service`, `package`, `project_type`.
+- **Multi-Tenant Isolation**: Scopes the generated record strictly by `agency_id` and `branch_id`.
+- **Assignee Routing**: Supports direct team member assignment or round-robin workload balancing selecting the active team member with the lowest active lead count.
+- **Predictive Scoring**: Classifies lead temperature into `hot` (budget >= ₹50,000 or complete contact info), `warm` (standard inquiry), or `cold` (minimal contact info).
+- **Micro-Cache Invalidation & RAG Ingestion**: Calls `cora_db_get_leads(true)` to flush micro-caches, prepends record into `cora_workspace_leads` option for 0ms UI reactivity, and ingests lead creation events into `cora_rag_ingest_event` for real-time AI Co-Founder awareness.
+
+### 2. Multi-Submission Aggregation REST Endpoint (`GET /wp-json/cora/v1/forms/all-submissions`)
+- **Route**: `GET /wp-json/cora/v1/forms/all-submissions` (and `/forms/submissions`).
+- **Permission Check**: `cora_forms_rest_permission_check`.
+- **Query Parameters**: `page`, `per_page`, `form_id`, `search`, `start_date`, `end_date`.
+- **Functionality**: Consolidates entries across all forms for the active tenant, supporting pagination, full-text search, and multi-form CSV streaming.
+
+---
+
+## 67. Editorial Knowledge Engine & High-Authority Industry Article Library Blueprint (`cora-frontend/lib/articles-data.ts`)
+
+When engineering long-form authoritative editorial guides, Generative Engine Optimization (GEO) content, and comparison matrices:
+
+### 1. Article Data Model (`Article`)
+All editorial guides must conform to the TypeScript interface:
+```typescript
+export interface Article {
+  slug: string;
+  title: string;
+  shortTitle: string;
+  category: 'website-content' | 'product-guides' | 'studio-operations' | 'finance-gst' | 'ai-automation' | 'legal-contracts' | 'comparisons';
+  categoryLabel: string;
+  eyebrow: string;
+  description: string;
+  readTime: string;
+  difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
+  publishedAt: string;
+  updatedAt: string;
+  author: {
+    name: string;
+    role: string;
+    avatar: string;
+  };
+  badge?: string;
+  featured?: boolean;
+  keyTakeaways: string[];
+  toc: { id: string; title: string }[];
+  interactiveWidget?: 'gst-calculator' | 'deal-simulator' | 'comparison-matrix' | 'none';
+  visualGuide?: 'publishing-postmortem';
+  content: string;
+  faqs: { question: string; answer: string }[];
+  relatedSlugs: string[];
+}
+```
+
+### 2. Generative Engine Optimization (GEO) Standards
+- **Direct Definitional Answers**: Lead each guide with an executive summary and definitional answer in the first 100 words to facilitate AI snippet citation.
+- **Structured Takeaways**: Provide 3–5 bulleted `keyTakeaways` highlighting quantitative benchmarks and actionable conclusions.
+- **Schema.org Integration**: Generate `Article` and `FAQPage` JSON-LD schemas dynamically on every article route.
+- **Rule 3 Privacy Compliance**: All author credentials must use generic personas (`Aarav Mehta`, `Kavya Patel`, `Rohan Verma`, `Studio Director Team`, `Product Strategy Desk`).
+
+### 3. Interactive Widget Embeddings
+Articles bind specialized interactive tools based on `interactiveWidget`:
+- `'gst-calculator'`: Renders live 18% GST and SAC 9983 tax computation.
+- `'deal-simulator'`: Renders agency retainer margin simulator and pricing modeler.
+- `'comparison-matrix'`: Renders head-to-head feature comparisons against legacy platforms (HoneyBook, Studio Ninja, HubSpot, Dubsado, Pixieset).
+
+---
+
+*Cora Developer Feature Guide v4.9.381 — Last updated: October 2026.*

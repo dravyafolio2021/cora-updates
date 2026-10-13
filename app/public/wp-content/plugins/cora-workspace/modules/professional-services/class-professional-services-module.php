@@ -144,6 +144,14 @@ class Cora_Professional_Services_Module implements Cora_Module_Interface {
             );
         }
 
+        if ( $is_enabled( 'projects' ) || $is_enabled( 'portfolio' ) || $is_enabled( 'case-studies' ) ) {
+            $sales_items['projects'] = array(
+                'title' => 'Portfolio',
+                'badge' => 'Live',
+                'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path><line x1="12" y1="11" x2="12" y2="17"></line><line x1="9" y1="14" x2="15" y2="14"></line></svg>'
+            );
+        }
+
         if ( ! empty( $sales_items ) ) {
             $groups[] = array( 'label' => 'Sales Channel', 'items' => $sales_items );
         }

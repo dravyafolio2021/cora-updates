@@ -1,7 +1,7 @@
 # Cora Platform — Comprehensive Platform & Onboarding Strategic Brief
 > **Target Audience for this Document**: AI Product & Growth Strategist Agent  
 > **Objective**: Comprehensive platform architectural overview, feature breakdown, and onboarding evaluation brief to formulate optimal user onboarding, product activation, and launch strategies for Cora.  
-> **Platform Version**: `v4.9.374` | **Date**: October 2026
+> **Platform Version**: `v4.9.381` | **Date**: October 2026
 
 ---
 
@@ -59,6 +59,18 @@ Cora consolidates the entire agency lifecycle into a single, unified, white-labe
 36. **Universal Edge-Docked Entry Inspector & Zero-Backdrop Clarity Shield (v4.9.374)**: Edge-docked right sheet drawer (`#form-submission-inspector-drawer`) for inspecting form submissions with transparent zero-backdrop clarity shield (`bg-transparent pointer-events-none`), allowing full visibility of underlying table rows while viewing questions, answers, metadata, IP, user-agent, and delete actions.
 37. **Client Timezone Engine & Localized Timestamps (v4.9.374)**: Client-side timezone detection (`Intl.DateTimeFormat().resolvedOptions().timeZone`) and formatting engine automatically converting all submission timestamps to the user's localized date/time format with UTC tooltip disclosures.
 38. **Dynamic Affiliate Referral Tracking, Coupon Discount Engine & Checkout Attribution (v4.9.374)**: Ingests `ref` parameters across URL queries, localStorage, and cookies (`cora_ref`, `cora_referral`, `endorsely_ref`), exposes `POST /wp-json/cora/v1/referrals/track` for click/conversion logging, and applies automated partner coupon discounts (10%–20%) directly in checkout sheets with instant price adjustments.
+39. **Canonical Industry Solutions Directory & 301 Redirect Architecture (v4.9.380)**: Primary industry vertical directory migration from `/use-cases` to canonical `/industries` with 301 permanent redirect parity, refined desktop mega-menu with dedicated vector icon tiles and status pills, and 10+ operational vertical models with live cross-industry capability matrix.
+40. **Autonomous AI Multi-Agent Workforce & 4-Row Infinite Skills Marquee (v4.9.379)**: Dedicated `/ai-agent` landing canvas with neural portrait cutout blend (`cora_hero_agent_cutout.png`), hardware-accelerated 4-row infinite skills marquee across Operations, Sales, Finance, and Creative Delivery, and deployment health check telemetry (`/api/health/agent`).
+41. **Features Catalog Directory & Lenis Scroll Boundary Isolation (v4.9.378)**: Overhauled `/features` capability catalog with compact single-line sidebar navigation, `data-lenis-prevent` scroll boundary isolation eliminating wheel-scroll trapping, search icon overlap fix, and 40+ active-voice visual capability cards.
+42. **Enterprise Brand Asset Registry & Turnkey Vector SVG Kit (v4.9.377)**: Modernized `/brand` center with 1-click turnkey SVG vector download kit for Primary, Inverted, and Symbol marks, official design token reference, and Rule 13 zero-outline styling compliance.
+43. **Agency Story Canvas & Chronological Journey Ribbon (v4.9.376)**: Redesigned `/about` full-width narrative layout with connected vertical milestone rail ribbon eliminating floating tick gaps, responsive mobile spine on 375px+ viewports, Core Values bento cards, and dynamic operational week calendar.
+44. **Contact Form Multi-Field Validation Suite & Navigation Synchronization (v4.9.375)**: Multi-field client/server validation suite on `/contact` across Name, Email, Phone, Company, and Topic with monochromatic alerts and ARIA accessibility, unified global navigation across desktop/mobile/footer, and documentation layout polish.
+45. **Agency Projects & Portfolio Case Studies Module (`/workspace/projects`, `/projects`) (v4.9.381)**: Full-lifecycle agency case study management in `wp_cora_projects` with 6-tab studio editor (Overview, Narrative Story, Impact KPIs, Media Gallery, Testimonial, SEO/CTA), live publish toggling, and public frontend showcase gallery featuring 4-Act transformation storytelling (Executive Summary, Challenge, Solution, Deliverables), verified client testimonials, numerical KPI cards in `JetBrains Mono` (`+340% ROAS`, `₹4.2 Cr Revenue`), and connected JSON-LD schemas.
+46. **Public Micro-Tools Growth Engine & Canonical Tool Registry (`/tools`) (v4.9.381)**: Reconciled, 63 search-optimized client-side micro-tools across 11 categories (GST calculator, retainer margin tool, scope creep calculator, PDF/Sheets/Image suites) with zero-PII privacy architecture, canonical tool registry (`lib/tools-canonical-registry.ts`), deterministic mathematical modeling, and seamless contextual conversion bridges to Cora workspace modules without intrusive paywalls.
+47. **Canvas Themes GitHub CI/CD & Full-Lifecycle Integration (`/workspace/canvas`) (v4.9.381)**: Native Git version control docked at extreme right edge of Canvas sub-navigation (`includes/class-cora-github-integration.php`), supporting Personal GitHub PAT vs Organisation Managed Workspace modes, dynamic branch discovery, automated Pull Request creation with visual layout diffs, 1-click merging, and 1-click snapshot rollback (`cora_github_revert_commit`) with tenant-scoped cryptographic sandboxing (`ws-{agency_id}`).
+48. **Dynamic Forms-to-Lead CRM Auto-Conversion Pipeline (v4.9.381)**: Inbound submissions from public lead capture forms and embedded widgets automatically synthesize into high-velocity CRM lead records (`wp_cora_leads`), extracting client contact details, projected deal value, and source attribution while triggering instantaneous top-floating monochromatic toast feedback (`window.coraShowToast`) and Web Push alerts without third-party webhooks.
+49. **Canvas Themes 4-KPI Analytical Bar & Sticky 3-Tab Sub-Navigation (v4.9.381)**: High-density 2x2 mobile / 1x4 desktop diagnostic scorecard bar (`CWV Score`, `LCP Velocity`, `Themes Library Quota`, `Published Pages & SEO`) paired with sleek ~40px sticky sub-navigation bar (`Theme Library`, `Speed & Core Web Vitals`, `Migration & Tools`) with extreme-edge GitHub docking and touch-action swipe support.
+50. **Editorial Knowledge Engine & High-Authority Article Library (`/articles`) (v4.9.381)**: Structured long-form editorial library (`lib/articles-data.ts`) with schema-validated JSON-LD Knowledge Graphs, semantic entity linking, answer-first executive summaries, and citation anchors optimized for Generative Engine Optimization (GEO) across ChatGPT Search, Perplexity, and Google AI Overviews.
 
 ---
 
@@ -80,7 +92,7 @@ Cora consolidates the entire agency lifecycle into a single, unified, white-labe
 +-------------------------------------------v-------------------------------------------+
 |                                   CORA WORKSPACE CORE                                 |
 |  • Modular PHP 8.2 Views (50+ Modular Subviews)   • Custom Routing & Multi-Tenant RBAC|
-|  • High-Speed Micro-Cache Memory Layer            • Locked Down WordPress Backend     |
+|  • High-Speed Micro-Cache Memory Layer            • Locked Down Modular PHP Engine    |
 |  • Strict Tenant Isolation (`agency_id` = %d)     • Standardized Header Action Bar    |
 |  • Super Admin Menu & Analytics Isolation         • Default Hostinger SMTP Relay      |
 |  • Universal HTML Multi-Page Website Migrator     • Strict Single Workspace Owner     |
@@ -102,7 +114,7 @@ Cora consolidates the entire agency lifecycle into a single, unified, white-labe
 ```
 
 ### Core Stack Details
-* **Backend Engine**: WordPress 6.x headless/hybrid engine on PHP 8.2 with high-performance custom MySQL schema (`cora_agencies`, `cora_leads`, `cora_clients`, `cora_referral_links`, `cora_referrals`, `cora_affiliate_payouts`, `cora_bookings`, `cora_ledger`, `cora_documents`, `cora_canvas_themes`, `cora_canvas_pages`, `cora_inventory_products`, `cora_inventory_consignments`, `cora_notifications`, `cora_roles`).
+* **Backend Engine**: Enterprise PHP Framework & High-Performance Engine on PHP 8.2 with custom MySQL multi-tenant schema (`cora_agencies`, `cora_leads`, `cora_clients`, `cora_referral_links`, `cora_referrals`, `cora_affiliate_payouts`, `cora_bookings`, `cora_ledger`, `cora_documents`, `cora_canvas_themes`, `cora_canvas_pages`, `cora_inventory_products`, `cora_inventory_consignments`, `cora_notifications`, `cora_roles`).
 * **Frontend Architecture**: Monochromatic Vanilla CSS / Tailwind (strictly light-mode Notion/Shopify aesthetic; 11-step neutral `zinc` ramp `#ffffff` to `#09090b`), ES6+ JavaScript, Leaflet.js mapping, Quill.js rich WYSIWYG, SVG vector iconography (`stroke-width: 1.8-2.2`).
 * **PWA & Mobile Ergonomics**: Progressive Web App with VAPID ES256 Push notifications, dynamic version-stamped manifests, docked top-right update pill, bottom-up slide sheets (`translate-y-full` to `translate-y-0`), top-down floating banners, and 0ms touch response (`touch-action: manipulation;`).
 * **AI Orchestration**: Multi-provider fallback router (Google Gemini 3.5 Flash / Pro Multimodal, Anthropic Claude 3.5 Sonnet, OpenAI GPT-4o) with continuous hands-free duplex voice discussion, 1-click conversation reset, tenant-scoped situational RAG, and MCP gateway.
@@ -186,4 +198,4 @@ Cora consolidates the entire agency lifecycle into a single, unified, white-labe
 
 ---
 
-*Cora Strategic Onboarding Brief v4.9.374 — Architecture & Growth Team. Last updated: October 2026.*
+*Cora Strategic Onboarding Brief v4.9.381 — Architecture & Growth Team. Last updated: October 2026.*

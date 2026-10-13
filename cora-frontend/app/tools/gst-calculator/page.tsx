@@ -11,6 +11,7 @@ export default function GstCalculatorPage() {
   const [taxMode, setTaxMode] = useState<'exclusive' | 'inclusive'>('exclusive');
   const [isInterstate, setIsInterstate] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
+  const [mobileTab, setMobileTab] = useState<'inputs' | 'results'>('inputs');
   const { showToast } = useToast();
 
   // Math Calculations
@@ -67,11 +68,37 @@ Generated via Cora Tools (https://heycora.in/tools/gst-calculator)`;
       subtitle="Calculate instant 18%, 12%, 5%, and 28% GST breakdowns with CGST/SGST vs IGST segregation for B2B client invoices and freelance retainers."
       faqItems={gstFaqs}
     >
+      {/* Mobile Segmented Toggle */}
+      <div className="flex items-center gap-1.5 p-1 bg-zinc-100 rounded-xl mb-4 md:hidden">
+        <button
+          type="button"
+          onClick={() => setMobileTab('inputs')}
+          className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all touch-manipulation cursor-pointer ${
+            mobileTab === 'inputs'
+              ? 'bg-white text-zinc-950 shadow-2xs font-bold'
+              : 'text-zinc-600 hover:text-zinc-950'
+          }`}
+        >
+          Transaction Inputs
+        </button>
+        <button
+          type="button"
+          onClick={() => setMobileTab('results')}
+          className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all touch-manipulation cursor-pointer ${
+            mobileTab === 'results'
+              ? 'bg-white text-zinc-950 shadow-2xs font-bold'
+              : 'text-zinc-600 hover:text-zinc-950'
+          }`}
+        >
+          Tax Breakdown (₹{Math.round(totalAmount).toLocaleString('en-IN')})
+        </button>
+      </div>
+
       {/* ── 70% Tool Engine (Interactive 2-Card Layout) ── */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
         
         {/* Left Inputs Console (7 Cols) */}
-        <div className="md:col-span-7 rounded-3xl bg-white border border-zinc-200/90 p-5 sm:p-6 shadow-xs space-y-5">
+        <div className={`md:col-span-7 rounded-3xl bg-white border border-zinc-200/90 p-5 sm:p-6 shadow-xs space-y-5 ${mobileTab === 'results' ? 'hidden md:block' : 'block'}`}>
           
           {/* Input Amount */}
           <div>
@@ -178,7 +205,7 @@ Generated via Cora Tools (https://heycora.in/tools/gst-calculator)`;
         </div>
 
         {/* Right Output Engine Card (5 Cols — Clean Light Minimal Design) */}
-        <div className="md:col-span-5 rounded-3xl bg-white border border-zinc-200/90 p-5 sm:p-6 shadow-xs flex flex-col justify-between">
+        <div className={`md:col-span-5 rounded-3xl bg-white border border-zinc-200/90 p-5 sm:p-6 shadow-xs flex flex-col justify-between ${mobileTab === 'inputs' ? 'hidden md:flex' : 'flex'}`}>
           <div>
             <div className="flex items-center justify-between pb-3 mb-4 border-b border-zinc-200 text-xs">
               <span className="font-mono text-zinc-500 uppercase tracking-wider font-semibold">
@@ -236,7 +263,7 @@ Generated via Cora Tools (https://heycora.in/tools/gst-calculator)`;
           <button
             type="button"
             onClick={copyBreakdown}
-            className="w-full mt-6 py-3 px-4 rounded-2xl bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-xs"
+            className="w-full mt-6 py-3 px-4 rounded-2xl bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-xs touch-manipulation active:scale-[0.98]"
           >
             {copied ? (
               <>
@@ -252,6 +279,35 @@ Generated via Cora Tools (https://heycora.in/tools/gst-calculator)`;
           </button>
         </div>
 
+      </div>
+
+      {/* Mobile Sticky Live Summary Bar */}
+      <div className="fixed bottom-3 inset-x-3 z-30 md:hidden animate-in fade-in slide-in-from-bottom-3 duration-200">
+        <div className="rounded-2xl bg-zinc-950/95 backdrop-blur-xl border border-zinc-800 p-2.5 px-3.5 shadow-xl text-white flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <span className="block text-[10px] font-mono text-zinc-400 uppercase tracking-wider">Gross Total</span>
+            <span className="block font-mono text-sm font-bold text-white truncate">
+              ₹{totalAmount.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+            </span>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={copyBreakdown}
+              className="p-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-semibold touch-manipulation cursor-pointer transition-colors"
+              title="Copy Breakdown"
+            >
+              {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+            </button>
+            <button
+              type="button"
+              onClick={() => setMobileTab(mobileTab === 'inputs' ? 'results' : 'inputs')}
+              className="px-3 py-2 rounded-xl bg-white text-zinc-950 text-xs font-bold touch-manipulation cursor-pointer transition-all active:scale-95 shadow-xs"
+            >
+              {mobileTab === 'inputs' ? 'View Breakdown' : 'Edit Inputs'}
+            </button>
+          </div>
+        </div>
       </div>
     </ToolPageShell>
   );

@@ -291,7 +291,7 @@ if (!in_array($current_user_role, $allowed_roles) && !cora_is_super_owner()) {
           <div class="flex items-center gap-2 flex-wrap">
             <span class="text-[10px] font-bold px-2 py-0.5 bg-zinc-100 text-zinc-600 rounded-full">v1.6.3</span>
           </div>
-          <h4 class="text-sm font-bold text-zinc-900 m-0">White-Labeling & WordPress Concealment</h4>
+          <h4 class="text-sm font-bold text-zinc-900 m-0">White-Labeling & Backend Framework Concealment</h4>
           <ul class="space-y-1.5 pl-0 m-0 list-none">
             <li class="flex items-start gap-2 text-xs text-zinc-500 "><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 text-zinc-400 "><polyline points="20 6 9 17 4 12"></polyline></svg>Custom fatal error handler</li>
             <li class="flex items-start gap-2 text-xs text-zinc-500 "><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 text-zinc-400 "><polyline points="20 6 9 17 4 12"></polyline></svg>Email sender white-labeling</li>

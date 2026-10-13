@@ -32,6 +32,7 @@ const FOOTER_SECTIONS: FooterSection[] = [
     title: 'Resources',
     links: [
       { label: 'Documentation & API', href: '/docs', highlight: true },
+      { label: 'Design System & Agent Contract', href: '/design-system' },
       { label: '34 Free Micro-Tools', href: '/tools' },
       { label: 'Playbooks & Guides', href: '/guides' },
       { label: 'Editorial Blog', href: '/blog' },
@@ -113,7 +114,7 @@ export function Footer() {
   }
 
   const is404 = pathname === '/404' || pathname?.includes('_not-found');
-  const isDocsPage = pathname?.startsWith('/docs');
+  const isDocsPage = pathname?.startsWith('/docs') || pathname?.startsWith('/design-system');
   const isLegalPage = [
     '/terms',
     '/privacy',

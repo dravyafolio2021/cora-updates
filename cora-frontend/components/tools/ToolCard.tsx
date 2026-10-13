@@ -34,55 +34,9 @@ const ICONS_MAP: Record<string, any> = {
   Stamp,
 };
 
-const THEME_MAP: Record<string, { iconBg: string; borderHover: string }> = {
-  'gst-calculator': {
-    iconBg: 'bg-emerald-50 text-emerald-700 border border-emerald-200/60',
-    borderHover: 'hover:border-emerald-300 hover:shadow-[0_8px_24px_rgba(16,185,129,0.06)]',
-  },
-  'retainer-calculator': {
-    iconBg: 'bg-orange-50 text-orange-700 border border-orange-200/60',
-    borderHover: 'hover:border-orange-300 hover:shadow-[0_8px_24px_rgba(249,115,22,0.06)]',
-  },
-  'contract-builder': {
-    iconBg: 'bg-blue-50 text-blue-700 border border-blue-200/60',
-    borderHover: 'hover:border-blue-300 hover:shadow-[0_8px_24px_rgba(37,99,235,0.06)]',
-  },
-  'listing-ai': {
-    iconBg: 'bg-rose-50 text-rose-700 border border-rose-200/60',
-    borderHover: 'hover:border-rose-300 hover:shadow-[0_8px_24px_rgba(244,63,94,0.06)]',
-  },
-  'upi-qr-generator': {
-    iconBg: 'bg-purple-50 text-purple-700 border border-purple-200/60',
-    borderHover: 'hover:border-purple-300 hover:shadow-[0_8px_24px_rgba(147,51,234,0.06)]',
-  },
-  'embed-builder': {
-    iconBg: 'bg-teal-50 text-teal-700 border border-teal-200/60',
-    borderHover: 'hover:border-teal-300 hover:shadow-[0_8px_24px_rgba(13,148,136,0.06)]',
-  },
-  'merge-pdf': {
-    iconBg: 'bg-rose-50 text-rose-700 border border-rose-200/60',
-    borderHover: 'hover:border-rose-300 hover:shadow-[0_8px_24px_rgba(225,29,72,0.06)]',
-  },
-  'split-pdf': {
-    iconBg: 'bg-amber-50 text-amber-700 border border-amber-200/60',
-    borderHover: 'hover:border-amber-300 hover:shadow-[0_8px_24px_rgba(245,158,11,0.06)]',
-  },
-  'rotate-pdf': {
-    iconBg: 'bg-blue-50 text-blue-700 border border-blue-200/60',
-    borderHover: 'hover:border-blue-300 hover:shadow-[0_8px_24px_rgba(59,130,246,0.06)]',
-  },
-  'images-to-pdf': {
-    iconBg: 'bg-emerald-50 text-emerald-700 border border-emerald-200/60',
-    borderHover: 'hover:border-emerald-300 hover:shadow-[0_8px_24px_rgba(16,185,129,0.06)]',
-  },
-  'esign-pdf': {
-    iconBg: 'bg-indigo-50 text-indigo-700 border border-indigo-200/60',
-    borderHover: 'hover:border-indigo-300 hover:shadow-[0_8px_24px_rgba(99,102,241,0.06)]',
-  },
-  'watermark-pdf': {
-    iconBg: 'bg-violet-50 text-violet-700 border border-violet-200/60',
-    borderHover: 'hover:border-violet-300 hover:shadow-[0_8px_24px_rgba(139,92,246,0.06)]',
-  },
+const DEFAULT_THEME = {
+  iconBg: 'bg-zinc-100 text-zinc-900 border border-zinc-200/80',
+  borderHover: 'hover:border-zinc-300 hover:shadow-xs',
 };
 
 const CLEAN_DESCRIPTIONS: Record<string, string> = {
@@ -106,21 +60,17 @@ interface ToolCardProps {
 
 export function ToolCard({ tool }: ToolCardProps) {
   const Icon = ICONS_MAP[tool.iconName] || Sparkles;
-  const theme = THEME_MAP[tool.slug] || {
-    iconBg: 'bg-zinc-100 text-zinc-800 border border-zinc-200',
-    borderHover: 'hover:border-zinc-400 hover:shadow-xs',
-  };
   const cleanDesc = CLEAN_DESCRIPTIONS[tool.slug] || tool.tagline;
 
   return (
     <Link
       href={`/tools/${tool.slug}`}
-      className={`group rounded-2xl bg-white border border-zinc-200/80 ${theme.borderHover} p-3.5 sm:p-4.5 lg:p-5 flex flex-col justify-between shadow-2xs hover:-translate-y-0.5 transition-all duration-200 min-h-[125px] sm:min-h-[140px]`}
+      className={`group rounded-2xl bg-white border border-zinc-200/80 ${DEFAULT_THEME.borderHover} p-3.5 sm:p-4.5 lg:p-5 flex flex-col justify-between shadow-2xs hover:-translate-y-0.5 transition-all duration-200 min-h-[125px] sm:min-h-[140px] touch-manipulation active:scale-[0.99]`}
     >
       <div>
         {/* Top Header: Icon & Top-Right Arrow */}
         <div className="flex items-center justify-between gap-2 mb-2.5 sm:mb-3">
-          <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl ${theme.iconBg} flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform`}>
+          <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl ${DEFAULT_THEME.iconBg} flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform`}>
             <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[1.8]" />
           </div>
 

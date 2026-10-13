@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.374
+ * Version:           4.9.381
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.374' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.381' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -1554,7 +1554,8 @@ function cora_get_all_workspace_subpages() {
         'knowledge-base', 'visual-builder', 'visual_builder', 'comments', 'appearance', 'feature-hub', 'feature_hub',
         'portfolio', 'onboarding', 'gbp', 'auth',
         'plant_inventory', 'plant-inventory', 'stationery_inventory', 'stationery-inventory', 'inventory', 'inventory_management',
-        'affiliates', 'referrals', 'affiliate', 'referral', 'affiliates-referrals'
+        'affiliates', 'referrals', 'affiliate', 'referral', 'affiliates-referrals',
+        'projects', 'case-studies', 'case_studies'
     );
 }
 }
@@ -3878,14 +3879,14 @@ function cora_get_custom_enabled_features() {
         'blogs', 'financials', 'team-roles', 'media', 'vault', 'calendar',
         'activity-timeline', 'automations', 'inbox', 'analytics', 'social-meta',
         'leads', 'properties', 'tasks', 'showings', 'bookings', 'attendance',
-        'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base', 'affiliates'
+        'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base', 'affiliates', 'projects'
     );
 
     $studio_defaults = array(
         'blogs', 'financials', 'team-roles', 'media', 'vault', 'calendar',
         'activity-timeline', 'automations', 'inbox', 'analytics', 'social-meta',
         'leads', 'crew_scheduler', 'crew-scheduler', 'equipment', 'tasks', 'bookings', 'attendance',
-        'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base', 'affiliates'
+        'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base', 'affiliates', 'projects'
     );
 
     $mfg_defaults = array(
@@ -3898,7 +3899,7 @@ function cora_get_custom_enabled_features() {
         'agency_setup', 'team-roles', 'clients', 'leads', 'proposals', 'contracts', 'tasks',
         'client_portal', 'vault', 'analytics', 'financials', 'knowledge-base', 'automations',
         'partner_hub', 'canvas', 'client_health', 'operating_economics', 'inbox', 'blogs', 'mcp',
-        'activity-timeline', 'crew_scheduler', 'review_acquisition', 'forms', 'emails', 'affiliates'
+        'activity-timeline', 'crew_scheduler', 'review_acquisition', 'forms', 'emails', 'affiliates', 'projects'
     );
 
     if ( strpos( $ind_clean, 'stationery' ) !== false || strpos( $ind_clean, 'manufactur' ) !== false || strpos( $ind_clean, 'plant' ) !== false ) {
@@ -4311,32 +4312,32 @@ function cora_workspace_seed_data() {
     }
 
     $all_default_permissions = array(
-        'administrator'              => array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'gbp', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'plugins', 'attendance', 'tasks', 'forms', 'ecosystem', 'canvas', 'mcp', 'super-admin', 'super-users', 'super-finances', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-docs', 'super-ai-tokens', 'super-feature-flags', 'super-emergency', 'super-audit' ),
-        'cora_shruti'                => array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'gbp', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'plugins', 'attendance', 'tasks', 'forms', 'ecosystem', 'canvas', 'mcp', 'super-admin', 'super-users', 'super-finances', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-docs', 'super-ai-tokens', 'super-feature-flags', 'super-emergency', 'super-audit' ),
-        'cora_super_admin'           => array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'gbp', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'plugins', 'attendance', 'tasks', 'forms', 'ecosystem', 'canvas', 'mcp', 'super-admin', 'super-users', 'super-finances', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-docs', 'super-ai-tokens', 'super-feature-flags', 'super-emergency', 'super-audit' ),
+        'administrator'              => array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'projects', 'leads', 'clients', 'gbp', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'plugins', 'attendance', 'tasks', 'forms', 'ecosystem', 'canvas', 'mcp', 'super-admin', 'super-users', 'super-finances', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-docs', 'super-ai-tokens', 'super-feature-flags', 'super-emergency', 'super-audit' ),
+        'cora_shruti'                => array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'projects', 'leads', 'clients', 'gbp', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'plugins', 'attendance', 'tasks', 'forms', 'ecosystem', 'canvas', 'mcp', 'super-admin', 'super-users', 'super-finances', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-docs', 'super-ai-tokens', 'super-feature-flags', 'super-emergency', 'super-audit' ),
+        'cora_super_admin'           => array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'projects', 'leads', 'clients', 'gbp', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'plugins', 'attendance', 'tasks', 'forms', 'ecosystem', 'canvas', 'mcp', 'super-admin', 'super-users', 'super-finances', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-docs', 'super-ai-tokens', 'super-feature-flags', 'super-emergency', 'super-audit' ),
         // Real Estate Roles
-        'cora_re_broker_owner'       => array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'leads', 'clients', 'gbp', 'attendance', 'tasks', 'canvas' ),
-        'cora_re_managing_agent'     => array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'vault', 'portfolio', 'leads', 'clients', 'attendance', 'tasks', 'canvas' ),
+        'cora_re_broker_owner'       => array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'projects', 'leads', 'clients', 'gbp', 'attendance', 'tasks', 'canvas' ),
+        'cora_re_managing_agent'     => array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'vault', 'portfolio', 'projects', 'leads', 'clients', 'attendance', 'tasks', 'canvas' ),
         'cora_re_showing_assistant'  => array( 'dashboard', 'bookings', 'portfolio', 'leads', 'clients', 'attendance', 'tasks' ),
         'cora_re_property_valuer'    => array( 'dashboard', 'portfolio', 'vault', 'tasks' ),
         'cora_re_listing_coordinator'=> array( 'dashboard', 'portfolio', 'leads', 'clients', 'tasks' ),
-        'cora_branch_manager'        => array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'vault', 'portfolio', 'leads', 'clients', 'attendance', 'tasks' ),
+        'cora_branch_manager'        => array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'vault', 'portfolio', 'projects', 'leads', 'clients', 'attendance', 'tasks' ),
         'cora_viewer'                => array( 'dashboard', 'portfolio', 'bookings' ),
         // Studio Roles
-        'cora_manager'               => array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'vault', 'portfolio', 'leads', 'clients', 'gbp', 'pages', 'attendance', 'tasks' ),
-        'cora_photographer'          => array( 'dashboard', 'bookings', 'equipment', 'portfolio' ),
-        'cora_videographer'          => array( 'dashboard', 'bookings', 'equipment', 'portfolio' ),
+        'cora_manager'               => array( 'dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'vault', 'portfolio', 'projects', 'leads', 'clients', 'gbp', 'pages', 'attendance', 'tasks' ),
+        'cora_photographer'          => array( 'dashboard', 'bookings', 'equipment', 'portfolio', 'projects' ),
+        'cora_videographer'          => array( 'dashboard', 'bookings', 'equipment', 'portfolio', 'projects' ),
         'cora_drone_pilot'           => array( 'dashboard', 'bookings', 'equipment', 'portfolio' ),
         'cora_editor'                => array( 'dashboard', 'bookings', 'media-editor', 'vault' ),
         // Professional Services & Agency Roles
-        'cora_consultant'            => array( 'dashboard', 'feature-hub', 'vault', 'portfolio', 'leads', 'clients', 'tasks', 'attendance', 'forms', 'knowledge-base' ),
+        'cora_consultant'            => array( 'dashboard', 'feature-hub', 'vault', 'portfolio', 'projects', 'leads', 'clients', 'tasks', 'attendance', 'forms', 'knowledge-base' ),
         'cora_analyst'               => array( 'dashboard', 'vault', 'tasks', 'attendance', 'forms', 'knowledge-base' ),
         'cora_billing_officer'       => array( 'dashboard', 'financials', 'vault', 'clients', 'forms' ),
         'cora_client_stakeholder'    => array( 'dashboard', 'tasks', 'vault' ),
         'cora_media_buyer'           => array( 'dashboard', 'leads', 'tasks', 'analytics', 'social-meta' ),
-        'cora_copywriter'            => array( 'dashboard', 'blogs', 'tasks', 'knowledge-base' ),
-        'cora_designer'              => array( 'dashboard', 'media', 'tasks', 'canvas' ),
-        'cora_seo_specialist'        => array( 'dashboard', 'blogs', 'gbp', 'tasks', 'analytics' )
+        'cora_copywriter'            => array( 'dashboard', 'blogs', 'tasks', 'knowledge-base', 'projects' ),
+        'cora_designer'              => array( 'dashboard', 'media', 'tasks', 'canvas', 'projects' ),
+        'cora_seo_specialist'        => array( 'dashboard', 'blogs', 'gbp', 'tasks', 'analytics', 'projects' )
     );
 
     $existing_permissions = get_option( 'cora_role_permissions', array() );
@@ -5522,13 +5523,19 @@ add_action( 'rest_api_init', function () {
         'permission_callback' => 'cora_forms_rest_permission_check',
     ) );
 
+    register_rest_route( 'cora/v1', '/forms/all-submissions', array(
+        'methods'             => 'GET',
+        'callback'            => 'cora_rest_get_all_form_submissions',
+        'permission_callback' => 'cora_forms_rest_permission_check',
+    ) );
+
     register_rest_route( 'cora/v1', '/forms/submissions/(?P<id>\d+)', array(
         'methods'             => 'DELETE',
         'callback'            => 'cora_rest_delete_form_submission',
         'permission_callback' => 'cora_forms_rest_permission_check',
     ) );
 
-    register_rest_route( 'cora/v1', '/forms/(?P<id>\d+)', array(
+    register_rest_route( 'cora/v1', '/forms/(?P<id>[a-zA-Z0-9_\-]+)', array(
         array(
             'methods'             => 'GET',
             'callback'            => 'cora_rest_get_form',
@@ -5541,10 +5548,22 @@ add_action( 'rest_api_init', function () {
         )
     ) );
 
-    register_rest_route( 'cora/v1', '/forms/(?P<id>\d+)/submissions', array(
+    register_rest_route( 'cora/v1', '/forms/(?P<id>[a-zA-Z0-9_\-]+)/submissions', array(
         'methods'             => 'GET',
         'callback'            => 'cora_rest_get_form_submissions',
         'permission_callback' => 'cora_forms_rest_permission_check',
+    ) );
+
+    register_rest_route( 'cora/v1', '/forms/(?P<id>[a-zA-Z0-9_\-]+)/pay', array(
+        'methods'             => array( 'GET', 'POST' ),
+        'callback'            => function( $request ) {
+            return rest_ensure_response( array(
+                'status'  => 'success',
+                'message' => 'Payment intent initialized',
+                'form_id' => $request->get_param( 'id' )
+            ) );
+        },
+        'permission_callback' => '__return_true',
     ) );
 
     register_rest_route( 'cora/v1', '/forms/(?P<id>[a-zA-Z0-9_\-]+)/ai-schema', array(
@@ -10119,7 +10138,8 @@ function cora_canvas_theme_frontend_router() {
         'knowledge-base', 'visual-builder', 'visual_builder', 'comments', 'appearance', 'feature-hub', 'feature_hub',
         'portfolio', 'onboarding', 'gbp', 'auth',
         'plant_inventory', 'plant-inventory', 'stationery_inventory', 'stationery-inventory', 'inventory', 'inventory_management',
-        'affiliates', 'referrals', 'affiliate', 'referral', 'affiliates-referrals'
+        'affiliates', 'referrals', 'affiliate', 'referral', 'affiliates-referrals',
+        'projects', 'case-studies', 'case_studies'
     );
     $public_auth_subs = array( 'login', 'register', 'onboarding', 'forgot-password', 'reset-password', 'setup-account', 'verify-pending', 'auth' );
 
@@ -33274,18 +33294,18 @@ function cora_db_get_agency_id_by_slug( $slug ) {
 if ( ! function_exists( 'cora_get_default_role_permissions' ) ) {
 function cora_get_default_role_permissions( $role ) {
     $defaults = array(
-        'administrator'       => array( 'dashboard', 'bookings', 'calendar', 'feature-hub', 'team-roles', 'equipment', 'financials', 'settings', 'settings-suite', 'vault', 'portfolio', 'leads', 'clients', 'attendance', 'tasks', 'media', 'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base', 'affiliates', 'blogs', 'content-suite' ),
-        'cora_super_admin'    => array( 'dashboard', 'bookings', 'calendar', 'feature-hub', 'team-roles', 'equipment', 'financials', 'settings', 'settings-suite', 'vault', 'portfolio', 'leads', 'clients', 'attendance', 'tasks', 'media', 'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base', 'affiliates', 'blogs', 'content-suite' ),
-        'cora_workspace_owner'=> array( 'dashboard', 'bookings', 'calendar', 'feature-hub', 'team-roles', 'equipment', 'financials', 'settings', 'settings-suite', 'vault', 'portfolio', 'leads', 'clients', 'attendance', 'tasks', 'media', 'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base', 'affiliates', 'blogs', 'content-suite' ),
-        'cora_owner'          => array( 'dashboard', 'bookings', 'calendar', 'feature-hub', 'team-roles', 'equipment', 'financials', 'settings', 'settings-suite', 'vault', 'portfolio', 'leads', 'clients', 'attendance', 'tasks', 'media', 'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base', 'affiliates', 'blogs', 'content-suite' ),
-        'owner'               => array( 'dashboard', 'bookings', 'calendar', 'feature-hub', 'team-roles', 'equipment', 'financials', 'settings', 'settings-suite', 'vault', 'portfolio', 'leads', 'clients', 'attendance', 'tasks', 'media', 'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base', 'affiliates', 'blogs', 'content-suite' ),
-        'cora_branch_manager' => array( 'dashboard', 'bookings', 'calendar', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'portfolio', 'leads', 'clients', 'settings', 'settings-suite', 'attendance', 'tasks', 'media', 'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base', 'affiliates', 'blogs', 'content-suite' ),
-        'cora_manager'        => array( 'dashboard', 'bookings', 'calendar', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'portfolio', 'leads', 'clients', 'settings', 'settings-suite', 'attendance', 'tasks', 'media', 'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base', 'affiliates', 'blogs', 'content-suite' ),
-        'cora_photographer'   => array( 'dashboard', 'bookings', 'calendar', 'crew-scheduler', 'crew_scheduler', 'equipment', 'camera-equipment', 'portfolio', 'media', 'media-manager', 'leads', 'vault', 'tasks', 'forms', 'review_acquisition' ),
-        'cora_videographer'   => array( 'dashboard', 'bookings', 'calendar', 'crew-scheduler', 'crew_scheduler', 'equipment', 'camera-equipment', 'portfolio', 'media', 'media-manager', 'vault', 'tasks', 'forms', 'review_acquisition' ),
-        'cora_drone_pilot'    => array( 'dashboard', 'bookings', 'calendar', 'crew-scheduler', 'crew_scheduler', 'equipment', 'camera-equipment', 'portfolio', 'media', 'media-manager', 'vault', 'tasks', 'forms' ),
-        'cora_editor'         => array( 'dashboard', 'bookings', 'media-editor', 'vault', 'media', 'media-manager', 'tasks', 'portfolio', 'forms' ),
-        'cora_re_broker_owner'=> array( 'dashboard', 'bookings', 'calendar', 'properties', 'listings', 'leads', 'clients', 'team-roles', 'financials', 'vault', 'tasks', 'forms', 'canvas', 'emails', 'settings', 'settings-suite', 'blogs', 'content-suite', 'affiliates' ),
+        'administrator'       => array( 'dashboard', 'bookings', 'calendar', 'feature-hub', 'team-roles', 'equipment', 'financials', 'settings', 'settings-suite', 'vault', 'portfolio', 'projects', 'leads', 'clients', 'attendance', 'tasks', 'media', 'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base', 'affiliates', 'blogs', 'content-suite' ),
+        'cora_super_admin'    => array( 'dashboard', 'bookings', 'calendar', 'feature-hub', 'team-roles', 'equipment', 'financials', 'settings', 'settings-suite', 'vault', 'portfolio', 'projects', 'leads', 'clients', 'attendance', 'tasks', 'media', 'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base', 'affiliates', 'blogs', 'content-suite' ),
+        'cora_workspace_owner'=> array( 'dashboard', 'bookings', 'calendar', 'feature-hub', 'team-roles', 'equipment', 'financials', 'settings', 'settings-suite', 'vault', 'portfolio', 'projects', 'leads', 'clients', 'attendance', 'tasks', 'media', 'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base', 'affiliates', 'blogs', 'content-suite' ),
+        'cora_owner'          => array( 'dashboard', 'bookings', 'calendar', 'feature-hub', 'team-roles', 'equipment', 'financials', 'settings', 'settings-suite', 'vault', 'portfolio', 'projects', 'leads', 'clients', 'attendance', 'tasks', 'media', 'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base', 'affiliates', 'blogs', 'content-suite' ),
+        'owner'               => array( 'dashboard', 'bookings', 'calendar', 'feature-hub', 'team-roles', 'equipment', 'financials', 'settings', 'settings-suite', 'vault', 'portfolio', 'projects', 'leads', 'clients', 'attendance', 'tasks', 'media', 'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base', 'affiliates', 'blogs', 'content-suite' ),
+        'cora_branch_manager' => array( 'dashboard', 'bookings', 'calendar', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'portfolio', 'projects', 'leads', 'clients', 'settings', 'settings-suite', 'attendance', 'tasks', 'media', 'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base', 'affiliates', 'blogs', 'content-suite' ),
+        'cora_manager'        => array( 'dashboard', 'bookings', 'calendar', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'portfolio', 'projects', 'leads', 'clients', 'settings', 'settings-suite', 'attendance', 'tasks', 'media', 'canvas', 'forms', 'emails', 'review_acquisition', 'gbp', 'mcp', 'knowledge-base', 'affiliates', 'blogs', 'content-suite' ),
+        'cora_photographer'   => array( 'dashboard', 'bookings', 'calendar', 'crew-scheduler', 'crew_scheduler', 'equipment', 'camera-equipment', 'portfolio', 'projects', 'media', 'media-manager', 'leads', 'vault', 'tasks', 'forms', 'review_acquisition' ),
+        'cora_videographer'   => array( 'dashboard', 'bookings', 'calendar', 'crew-scheduler', 'crew_scheduler', 'equipment', 'camera-equipment', 'portfolio', 'projects', 'media', 'media-manager', 'vault', 'tasks', 'forms', 'review_acquisition' ),
+        'cora_drone_pilot'    => array( 'dashboard', 'bookings', 'calendar', 'crew-scheduler', 'crew_scheduler', 'equipment', 'camera-equipment', 'portfolio', 'projects', 'media', 'media-manager', 'vault', 'tasks', 'forms' ),
+        'cora_editor'         => array( 'dashboard', 'bookings', 'media-editor', 'vault', 'media', 'media-manager', 'tasks', 'portfolio', 'projects', 'forms' ),
+        'cora_re_broker_owner'=> array( 'dashboard', 'bookings', 'calendar', 'properties', 'listings', 'leads', 'clients', 'team-roles', 'financials', 'vault', 'tasks', 'forms', 'canvas', 'emails', 'settings', 'settings-suite', 'blogs', 'content-suite', 'affiliates', 'projects' ),
         'cora_re_showing_assistant'   => array( 'dashboard', 'bookings', 'calendar', 'portfolio', 'properties', 'listings', 'leads', 'clients', 'attendance', 'tasks', 'vault', 'forms' ),
         'cora_re_property_valuer'     => array( 'dashboard', 'portfolio', 'properties', 'listings', 'vault', 'tasks', 'forms' ),
         'cora_re_listing_coordinator' => array( 'dashboard', 'portfolio', 'properties', 'listings', 'leads', 'clients', 'tasks', 'vault', 'forms', 'media' ),
@@ -33429,6 +33449,9 @@ function cora_user_has_feature_level( $target, $level = 'view', $user = null ) {
         'referrals'          => 'dashboard',
         'affiliate'          => 'dashboard',
         'referral'           => 'dashboard',
+        'projects'           => 'dashboard',
+        'case-studies'       => 'dashboard',
+        'case_studies'       => 'dashboard',
     );
 
     // For Studio Mode, map 'feature-hub' to 'portfolio'
@@ -33517,8 +33540,36 @@ function cora_user_has_feature_access( $target, $user = null ) {
 if ( ! function_exists( 'cora_db_get_agency_id' ) ) {
 function cora_db_get_agency_id() {
     static $static_agency_id_cache = array();
+
+    // 1. Explicit GET agency_id parameter override
+    if ( isset( $_GET['agency_id'] ) && is_numeric( $_GET['agency_id'] ) ) {
+        return intval( $_GET['agency_id'] );
+    }
+
+    // 2. Active industry parameter or cookie mapping
+    $industry = '';
+    if ( ! empty( $_GET['industry'] ) ) {
+        $industry = sanitize_key( $_GET['industry'] );
+    } elseif ( ! empty( $_COOKIE['cora_industry'] ) ) {
+        $industry = sanitize_key( $_COOKIE['cora_industry'] );
+    } elseif ( function_exists( 'cora_get_active_industry' ) ) {
+        $industry = cora_get_active_industry();
+    }
+
+    if ( ! empty( $industry ) ) {
+        if ( in_array( $industry, array( 'photography_studio', 'studio' ), true ) ) {
+            return 2;
+        } elseif ( in_array( $industry, array( 'real_estate', 'realestate' ), true ) ) {
+            return 1;
+        } elseif ( in_array( $industry, array( 'marketing', 'digital_agency' ), true ) ) {
+            return 3;
+        } elseif ( in_array( $industry, array( 'professional_services', 'advisory' ), true ) ) {
+            return 4;
+        }
+    }
+
     $agency_slug = cora_get_current_user_agency_id();
-    if ( $agency_slug === 'super' || empty($agency_slug) || $agency_slug === 'agency_1' ) {
+    if ( $agency_slug === 'super' || empty($agency_slug) || $agency_slug === 'agency_1' || $agency_slug === 'workspace' ) {
         return 1;
     }
     if ( isset( $static_agency_id_cache[ $agency_slug ] ) ) {
@@ -33571,8 +33622,11 @@ if ( ! function_exists( 'cora_normalize_lead_stage' ) ) {
 }
 
 if ( ! function_exists( 'cora_db_get_leads' ) ) {
-function cora_db_get_leads() {
+function cora_db_get_leads( $force_fresh = false ) {
     static $leads_cache = null;
+    if ( $force_fresh ) {
+        $leads_cache = null;
+    }
     if ( $leads_cache !== null ) {
         return $leads_cache;
     }
@@ -35134,6 +35188,9 @@ function cora_pre_update_tenancy_data( $new_value, $old_value, $option_name ) {
         return $new_value;
     }
     if ( empty( $agency_id ) ) {
+        if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+            return $new_value;
+        }
         return $old_value;
     }
     if ( $agency_id === 'agency_1' ) {
@@ -46481,14 +46538,27 @@ function cora_rest_get_form_submissions( $request ) {
         header( 'X-LiteSpeed-Cache-Control: no-cache' );
     }
     global $wpdb;
-    $id = intval( $request->get_param('id') );
+    $raw_id = $request->get_param('id');
+    $id = 0;
+    if ( is_numeric( $raw_id ) ) {
+        $id = intval( $raw_id );
+    } else {
+        $id = intval( $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$wpdb->prefix}cora_forms WHERE form_key = %s", sanitize_text_field( $raw_id ) ) ) );
+    }
+    if ( ! $id ) {
+        return new WP_Error( 'not_found', 'Form not found.', array( 'status' => 404 ) );
+    }
     
-    // Tenancy Check
-    $user_agency = cora_get_current_user_agency_id();
-    if ( $user_agency !== 'super' ) {
+    // Tenancy Check: Super Admin, manage_options, or matching workspace owner
+    $is_super = ( function_exists( 'cora_is_super_owner' ) && cora_is_super_owner() ) 
+             || current_user_can( 'manage_options' ) 
+             || cora_get_current_user_agency_id() === 'super'
+             || ( function_exists( 'cora_is_workspace_owner' ) && cora_is_workspace_owner() );
+             
+    if ( ! $is_super ) {
         $agency_id = cora_db_get_agency_id();
         $form_owner = $wpdb->get_var( $wpdb->prepare( "SELECT agency_id FROM {$wpdb->prefix}cora_forms WHERE id = %d", $id ) );
-        if ( intval( $form_owner ) !== intval( $agency_id ) ) {
+        if ( $form_owner && intval( $form_owner ) !== intval( $agency_id ) ) {
             return new WP_Error( 'forbidden', 'You do not have permission to view submissions for this form.', array( 'status' => 403 ) );
         }
     }
@@ -46516,9 +46586,26 @@ function cora_rest_get_all_form_submissions( $request ) {
     }
     global $wpdb;
     
-    // Tenancy Check
-    $user_agency = cora_get_current_user_agency_id();
-    if ( $user_agency !== 'super' ) {
+    $is_super = ( function_exists( 'cora_is_super_owner' ) && cora_is_super_owner() ) 
+             || current_user_can( 'manage_options' ) 
+             || cora_get_current_user_agency_id() === 'super'
+             || ( function_exists( 'cora_is_workspace_owner' ) && cora_is_workspace_owner() );
+             
+    $req_agency = $request->get_param( 'agency_id' );
+    if ( empty( $req_agency ) && ! empty( $_GET['agency_id'] ) ) {
+        $req_agency = intval( $_GET['agency_id'] );
+    }
+
+    if ( ! empty( $req_agency ) && is_numeric( $req_agency ) ) {
+        $subs = $wpdb->get_results( $wpdb->prepare(
+            "SELECT s.*, f.title as form_title, f.form_key, f.settings as form_settings
+             FROM {$wpdb->prefix}cora_form_submissions s
+             INNER JOIN {$wpdb->prefix}cora_forms f ON s.form_id = f.id
+             WHERE f.agency_id = %d
+             ORDER BY s.id DESC",
+            intval( $req_agency )
+        ), ARRAY_A );
+    } elseif ( ! $is_super ) {
         $agency_id = cora_db_get_agency_id();
         $subs = $wpdb->get_results( $wpdb->prepare(
             "SELECT s.*, f.title as form_title, f.form_key, f.settings as form_settings
@@ -46529,6 +46616,7 @@ function cora_rest_get_all_form_submissions( $request ) {
             $agency_id
         ), ARRAY_A );
     } else {
+        // Super Owner / Admin view: return all submissions across forms with form titles
         $subs = $wpdb->get_results(
             "SELECT s.*, f.title as form_title, f.form_key, f.settings as form_settings
              FROM {$wpdb->prefix}cora_form_submissions s
@@ -46640,7 +46728,12 @@ function cora_rest_submit_form( $request ) {
     }
 
     if ( ! $form ) {
-        return new WP_Error( 'not_found', 'Form not found.', array( 'status' => 404 ) );
+        if ( in_array( $raw_id, array( 'contact_us', 'contact', 'contact-us', 'inquiry', 'general' ), true ) ) {
+            $form = $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}cora_forms WHERE form_key LIKE 'frm_%' ORDER BY id DESC LIMIT 1", ARRAY_A );
+        }
+        if ( ! $form ) {
+            return new WP_Error( 'not_found', 'Form not found.', array( 'status' => 404 ) );
+        }
     }
     $id = intval( $form['id'] );
 
@@ -46667,12 +46760,12 @@ function cora_rest_submit_form( $request ) {
         return new WP_Error( 'spam_detected', 'Spam attempt detected by honeypot.', array( 'status' => 400 ) );
     }
 
-    // 2. IP Rate Limiting (max 10 submissions per minute)
+    // 2. IP Rate Limiting (max 10 completed submissions per minute; exclude partial autosaves)
     $ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
     $one_minute_ago = date( 'Y-m-d H:i:s', time() - 60 );
     
     $recent_count = $wpdb->get_var( $wpdb->prepare(
-        "SELECT COUNT(*) FROM {$wpdb->prefix}cora_form_submissions WHERE ip_address = %s AND created_at > %s",
+        "SELECT COUNT(*) FROM {$wpdb->prefix}cora_form_submissions WHERE ip_address = %s AND created_at > %s AND is_partial = 0",
         $ip,
         $one_minute_ago
     ) );
@@ -46711,13 +46804,53 @@ function cora_rest_submit_form( $request ) {
         if ( $blocks_row ) {
             $form_blocks = json_decode( $blocks_row['blocks_json'], true ) ?: array();
             foreach ( $form_blocks as $block ) {
-                $label = $block['label'] ?? 'Input Field';
+                $label    = $block['label'] ?? 'Input Field';
+                $slug     = sanitize_title( $label );
                 $required = ! empty( $block['required'] );
-                $type = $block['type'] ?? 'text';
+                $type     = $block['type'] ?? 'text';
 
-                $val = '';
+                // Skip non-input / presentation / payment blocks from strict required check
+                if ( in_array( $type, array( 'heading', 'paragraph', 'divider', 'spacer', 'html', 'image', 'video', 'stripe_payment', 'upi_id', 'upi_qr', 'payment' ), true ) ) {
+                    continue;
+                }
+
+                $val = null;
+                // 1. Direct label match
                 if ( isset( $submitted_data[$label] ) ) {
                     $val = $submitted_data[$label];
+                }
+                // 2. Block ID match
+                elseif ( ! empty( $block['id'] ) && isset( $submitted_data[$block['id']] ) ) {
+                    $val = $submitted_data[$block['id']];
+                }
+                // 3. Slug / snake_case match
+                elseif ( isset( $submitted_data[$slug] ) ) {
+                    $val = $submitted_data[$slug];
+                }
+                elseif ( isset( $submitted_data[str_replace( '-', '_', $slug )] ) ) {
+                    $val = $submitted_data[str_replace( '-', '_', $slug )];
+                }
+                // 4. Case-insensitive search across submitted keys
+                else {
+                    $target_norm = strtolower( preg_replace( '/[^a-z0-9]/', '', $label ) );
+                    foreach ( $submitted_data as $sub_k => $sub_v ) {
+                        $sub_norm = strtolower( preg_replace( '/[^a-z0-9]/', '', $sub_k ) );
+                        if ( $sub_norm === $target_norm || ( ! empty( $target_norm ) && strpos( $sub_norm, $target_norm ) !== false ) ) {
+                            $val = $sub_v;
+                            break;
+                        }
+                    }
+                }
+
+                // 5. Semantic fallbacks for common standard types
+                if ( ( $val === null || $val === '' ) && $required ) {
+                    if ( $type === 'name' || ( $type === 'text' && stripos( $label, 'name' ) !== false ) ) {
+                        $val = $submitted_data['name'] ?? $submitted_data['full_name'] ?? $submitted_data['client_name'] ?? null;
+                    } elseif ( $type === 'email' ) {
+                        $val = $submitted_data['email'] ?? $submitted_data['user_email'] ?? $submitted_data['email_address'] ?? null;
+                    } elseif ( $type === 'phone' ) {
+                        $val = $submitted_data['phone'] ?? $submitted_data['mobile'] ?? $submitted_data['phone_number'] ?? null;
+                    }
                 }
 
                 // Required check
@@ -46727,17 +46860,17 @@ function cora_rest_submit_form( $request ) {
                             return new WP_Error( 'validation_failed', "Field '{$label}' is required.", array( 'status' => 400 ) );
                         }
                     } else if ( $type === 'address' ) {
-                        if ( empty( $val ) || count( explode( ',', $val ) ) < 3 ) {
+                        if ( empty( $val ) || count( explode( ',', (string) $val ) ) < 2 ) {
                             return new WP_Error( 'validation_failed', "Field '{$label}' must have a complete address.", array( 'status' => 400 ) );
                         }
-                    } else if ( empty( $val ) || $val === '' ) {
+                    } else if ( $val === null || ( is_string( $val ) && trim( $val ) === '' ) || ( is_array( $val ) && empty( $val ) ) ) {
                         return new WP_Error( 'validation_failed', "Field '{$label}' is required.", array( 'status' => 400 ) );
                     }
                 }
 
                 // Email validation format check
                 if ( $type === 'email' && ! empty( $val ) ) {
-                    if ( ! is_email( $val ) ) {
+                    if ( ! is_email( trim( (string) $val ) ) ) {
                         return new WP_Error( 'validation_failed', "Field '{$label}' must be a valid email address.", array( 'status' => 400 ) );
                     }
                 }
@@ -46745,74 +46878,102 @@ function cora_rest_submit_form( $request ) {
         }
     }
 
-    // 3. Save Submission
-    $wpdb->insert(
-        $wpdb->prefix . 'cora_form_submissions',
-        array(
-            'form_id'        => $id,
-            'submitted_data' => json_encode( $submitted_data ),
-            'ip_address'     => $ip,
-            'is_partial'     => $is_partial,
-            'created_at'     => current_time( 'mysql', true )
-        )
-    );
-    $submission_id = $wpdb->insert_id;
+    // 3. Save Submission (Upsert recent partial draft from same IP, or insert new entry)
+    $submission_id = 0;
+    if ( $is_partial ) {
+        $existing_partial_id = $wpdb->get_var( $wpdb->prepare(
+            "SELECT id FROM {$wpdb->prefix}cora_form_submissions WHERE form_id = %d AND ip_address = %s AND is_partial = 1 AND created_at > %s ORDER BY id DESC LIMIT 1",
+            $id,
+            $ip,
+            date( 'Y-m-d H:i:s', time() - 900 )
+        ) );
+        if ( $existing_partial_id ) {
+            $wpdb->update(
+                $wpdb->prefix . 'cora_form_submissions',
+                array(
+                    'submitted_data' => json_encode( $submitted_data ),
+                    'created_at'     => current_time( 'mysql', true )
+                ),
+                array( 'id' => intval( $existing_partial_id ) )
+            );
+            $submission_id = intval( $existing_partial_id );
+        }
+    }
+
+    if ( ! $submission_id ) {
+        $wpdb->insert(
+            $wpdb->prefix . 'cora_form_submissions',
+            array(
+                'form_id'        => $id,
+                'submitted_data' => json_encode( $submitted_data ),
+                'ip_address'     => $ip,
+                'is_partial'     => $is_partial,
+                'created_at'     => current_time( 'mysql', true )
+            )
+        );
+        $submission_id = $wpdb->insert_id;
+    }
 
     // 4. Fetch Form Settings for CRM Sync & Webhook Dispatch
     if ( $form ) {
         $settings = ! empty( $form['settings'] ) ? json_decode( $form['settings'], true ) : array();
 
-        // 4a. CRM Sync mapping (Only for completed/non-partial submissions when form is designated as a Lead Campaign)
+        // 4a. CRM Sync mapping (Capture completed submissions as inquiries unless strictly designated as internal_survey)
         $crm_capture_enabled = ! empty( $settings['crm_lead_capture_enable'] );
         $form_purpose        = isset($settings['form_purpose']) ? sanitize_text_field($settings['form_purpose']) : ( $crm_capture_enabled ? 'lead_capture' : 'standard_form' );
 
-        if ( ! $is_partial && is_array( $submitted_data ) && $crm_capture_enabled && $form_purpose !== 'internal_survey' ) {
-            $map_name_key  = $settings['map_crm_name'] ?? '';
-            $map_email_key = $settings['map_crm_email'] ?? '';
-            $map_phone_key = $settings['map_crm_phone'] ?? '';
-            $map_notes_key = $settings['map_crm_notes'] ?? '';
+        $map_name_key  = $settings['map_crm_name'] ?? '';
+        $map_email_key = $settings['map_crm_email'] ?? '';
+        $map_phone_key = $settings['map_crm_phone'] ?? '';
+        $map_notes_key = $settings['map_crm_notes'] ?? '';
 
-            $name_val  = '';
-            $email_val = '';
-            $phone_val = '';
-            $notes_val = '';
+        $name_val  = '';
+        $email_val = '';
+        $phone_val = '';
+        $notes_val = '';
 
-            // Extract mapped values case-insensitively or auto-detect contact fields
+        // Extract mapped values case-insensitively or auto-detect contact fields
+        if ( is_array( $submitted_data ) ) {
             foreach ( $submitted_data as $key => $val ) {
                 if ( is_array( $val ) ) {
                     $val = implode( ', ', $val );
                 }
-                $trimmed_key = strtolower( trim( $key ) );
+                $trimmed_key = strtolower( trim( (string) $key ) );
                 $val_str     = trim( (string) $val );
                 if ( empty( $val_str ) ) {
                     continue;
                 }
                 
-                if ( ! empty( $map_name_key ) && strcasecmp( trim( $key ), trim( $map_name_key ) ) === 0 ) {
+                if ( ! empty( $map_name_key ) && strcasecmp( trim( (string) $key ), trim( (string) $map_name_key ) ) === 0 ) {
                     $name_val = $val_str;
                 } elseif ( empty( $name_val ) && ( strpos( $trimmed_key, 'name' ) !== false || strpos( $trimmed_key, 'full' ) !== false || strpos( $trimmed_key, 'client' ) !== false || strpos( $trimmed_key, 'prospect' ) !== false ) ) {
                     $name_val = $val_str;
                 }
 
-                if ( ! empty( $map_email_key ) && strcasecmp( trim( $key ), trim( $map_email_key ) ) === 0 ) {
+                if ( ! empty( $map_email_key ) && strcasecmp( trim( (string) $key ), trim( (string) $map_email_key ) ) === 0 ) {
                     $email_val = $val_str;
                 } elseif ( empty( $email_val ) && ( strpos( $trimmed_key, 'email' ) !== false || is_email( $val_str ) ) ) {
                     $email_val = $val_str;
                 }
 
-                if ( ! empty( $map_phone_key ) && strcasecmp( trim( $key ), trim( $map_phone_key ) ) === 0 ) {
+                if ( ! empty( $map_phone_key ) && strcasecmp( trim( (string) $key ), trim( (string) $map_phone_key ) ) === 0 ) {
                     $phone_val = $val_str;
                 } elseif ( empty( $phone_val ) && ( strpos( $trimmed_key, 'phone' ) !== false || strpos( $trimmed_key, 'mobile' ) !== false || strpos( $trimmed_key, 'whatsapp' ) !== false || strpos( $trimmed_key, 'contact' ) !== false || preg_match( '/^[0-9\+\-\s\(\)]{7,20}$/', $val_str ) ) ) {
                     $phone_val = $val_str;
                 }
 
-                if ( ! empty( $map_notes_key ) && strcasecmp( trim( $key ), trim( $map_notes_key ) ) === 0 ) {
+                if ( ! empty( $map_notes_key ) && strcasecmp( trim( (string) $key ), trim( (string) $map_notes_key ) ) === 0 ) {
                     $notes_val = $val_str;
                 } elseif ( empty( $notes_val ) && ( strpos( $trimmed_key, 'note' ) !== false || strpos( $trimmed_key, 'message' ) !== false || strpos( $trimmed_key, 'requirement' ) !== false || strpos( $trimmed_key, 'comment' ) !== false || strpos( $trimmed_key, 'desc' ) !== false ) ) {
                     $notes_val = $val_str;
                 }
             }
+        }
 
+        // Automatic CRM sync decision: sync if enabled, or if lead_capture/campaign, or if contact info exists and not an internal survey
+        $should_sync_crm = ( ! $is_partial && is_array( $submitted_data ) && ( $crm_capture_enabled || $form_purpose === 'lead_capture' || $form_purpose === 'campaign_form' || ( $form_purpose !== 'internal_survey' && ( ! empty( $name_val ) || ! empty( $email_val ) || ! empty( $phone_val ) ) ) ) );
+
+        if ( $should_sync_crm ) {
             // Fallback intelligence for name
             if ( empty( $name_val ) ) {
                 if ( ! empty( $email_val ) ) {
@@ -46835,149 +46996,153 @@ function cora_rest_submit_form( $request ) {
                 $name_val = 'Inbound Lead #' . $submission_id;
             }
 
-            // Sync lead to database and workspace options for all completed campaign submissions
-            if ( ! empty( $name_val ) || ! empty( $email_val ) || ! empty( $phone_val ) || ! empty( $submitted_data ) ) {
-                $first_name = $name_val;
-                $last_name  = '';
-                if ( ! empty( $name_val ) ) {
-                    $name_parts = explode( ' ', trim( $name_val ), 2 );
-                    $first_name = $name_parts[0];
-                    $last_name  = $name_parts[1] ?? '';
+            $first_name = $name_val;
+            $last_name  = '';
+            if ( ! empty( $name_val ) ) {
+                $name_parts = explode( ' ', trim( $name_val ), 2 );
+                $first_name = $name_parts[0];
+                $last_name  = $name_parts[1] ?? '';
+            }
+
+            $form_agency_num = intval( $form['agency_id'] ?? 1 );
+
+            // Retrieve branch ID for agency
+            $branch_id = $wpdb->get_var( $wpdb->prepare(
+                "SELECT id FROM {$wpdb->prefix}cora_branches WHERE agency_id = %d LIMIT 1",
+                $form_agency_num
+            ) );
+            if ( ! $branch_id ) {
+                $branch_id = 1;
+            }
+
+            $custom_tag   = ! empty( $settings['custom_campaign_tag'] ) ? sanitize_text_field( $settings['custom_campaign_tag'] ) : sanitize_text_field( $form['title'] ?? 'Inbound Form' );
+            $source_title = 'Campaign: ' . $custom_tag . ' (' . sanitize_text_field( $form['title'] ?? 'Cora Form' ) . ')';
+            $scale_tag    = $custom_tag;
+
+            // Intelligent CRM Field Extraction (Budget, Location, Service Scope)
+            $budget_extracted  = 0;
+            $city_extracted    = 'Inbound Web';
+            $service_extracted = $scale_tag;
+
+            foreach ( $submitted_data as $s_key => $s_val ) {
+                $s_lower = strtolower( trim( (string) $s_key ) );
+                $s_str   = is_array( $s_val ) ? implode( ', ', $s_val ) : (string) $s_val;
+
+                // Budget Extraction
+                if ( ( strpos( $s_lower, 'budget' ) !== false || strpos( $s_lower, 'price' ) !== false || strpos( $s_lower, 'amount' ) !== false || strpos( $s_lower, 'investment' ) !== false ) && empty( $budget_extracted ) ) {
+                    $cleaned_num = preg_replace( '/[^0-9.]/', '', $s_str );
+                    if ( is_numeric( $cleaned_num ) && floatval( $cleaned_num ) > 0 ) {
+                        $budget_extracted = floatval( $cleaned_num );
+                    }
                 }
 
-                // Retrieve branch ID for agency
-                $branch_id = $wpdb->get_var( $wpdb->prepare(
-                    "SELECT id FROM {$wpdb->prefix}cora_branches WHERE agency_id = %d LIMIT 1",
-                    $form['agency_id'] ?? 1
+                // City / Location Extraction
+                if ( ( strpos( $s_lower, 'city' ) !== false || strpos( $s_lower, 'location' ) !== false || strpos( $s_lower, 'venue' ) !== false || strpos( $s_lower, 'address' ) !== false ) && $city_extracted === 'Inbound Web' ) {
+                    if ( ! empty( trim( $s_str ) ) ) {
+                        $city_extracted = sanitize_text_field( trim( $s_str ) );
+                    }
+                }
+
+                // Service / Package Extraction
+                if ( ( strpos( $s_lower, 'service' ) !== false || strpos( $s_lower, 'package' ) !== false || strpos( $s_lower, 'shoot type' ) !== false || strpos( $s_lower, 'project type' ) !== false ) ) {
+                    if ( ! empty( trim( $s_str ) ) ) {
+                        $service_extracted = sanitize_text_field( trim( $s_str ) );
+                    }
+                }
+            }
+
+            // Target Stage & Assignee Resolution (with Round-Robin Routing)
+            $target_stage = ! empty( $settings['target_crm_stage'] ) ? sanitize_text_field( $settings['target_crm_stage'] ) : 'New Lead';
+            $assigned_to_user_id = null;
+            $configured_assignee = $settings['target_crm_assignee'] ?? 'unassigned';
+
+            if ( is_numeric( $configured_assignee ) && intval( $configured_assignee ) > 0 ) {
+                $assigned_to_user_id = intval( $configured_assignee );
+            } elseif ( $configured_assignee === 'round_robin' ) {
+                $eligible_users = $wpdb->get_col( $wpdb->prepare(
+                    "SELECT u.ID FROM {$wpdb->users} u
+                     LEFT JOIN {$wpdb->usermeta} um ON u.ID = um.user_id AND um.meta_key = 'cora_agency_id'
+                     WHERE (um.meta_value = %d OR um.meta_value IS NULL)
+                     ORDER BY (SELECT COUNT(*) FROM {$wpdb->prefix}cora_leads l WHERE l.assigned_to = u.ID AND l.status != 'closed') ASC
+                     LIMIT 1",
+                    $form_agency_num
                 ) );
-                if ( ! $branch_id ) {
-                    $branch_id = 1;
+                if ( ! empty( $eligible_users ) ) {
+                    $assigned_to_user_id = intval( $eligible_users[0] );
                 }
+            }
 
-                $custom_tag   = ! empty( $settings['custom_campaign_tag'] ) ? sanitize_text_field( $settings['custom_campaign_tag'] ) : sanitize_text_field( $form['title'] ?? 'Inbound Form' );
-                $source_title = 'Campaign: ' . $custom_tag . ' (' . sanitize_text_field( $form['title'] ?? 'Cora Form' ) . ')';
-                $scale_tag    = $custom_tag;
+            // Dynamic Predictive Qualification Score (Hot, Warm, Cold)
+            $calc_score = 'warm';
+            if ( $budget_extracted >= 50000 || ( ! empty( $email_val ) && ! empty( $phone_val ) && ! empty( $notes_val ) ) ) {
+                $calc_score = 'hot';
+            } elseif ( empty( $phone_val ) && empty( $notes_val ) ) {
+                $calc_score = 'cold';
+            }
 
-                // 4a.1. Intelligent CRM Field Extraction (Budget, Location, Service Scope)
-                $budget_extracted = 0;
-                $city_extracted   = 'Inbound Web';
-                $service_extracted = $scale_tag;
+            $wpdb->insert(
+                $wpdb->prefix . 'cora_leads',
+                array(
+                    'agency_id'           => $form_agency_num,
+                    'branch_id'           => $branch_id,
+                    'assigned_to'         => $assigned_to_user_id,
+                    'first_name'          => sanitize_text_field( $first_name ),
+                    'last_name'           => sanitize_text_field( $last_name ),
+                    'email'               => sanitize_email( $email_val ),
+                    'phone'               => sanitize_text_field( $phone_val ),
+                    'notes'               => sanitize_textarea_field( $notes_val ),
+                    'source'              => $source_title,
+                    'status'              => strtolower( str_replace( ' ', '_', $target_stage ) ),
+                    'budget_min'          => $budget_extracted,
+                    'budget_max'          => $budget_extracted,
+                    'preferred_locations' => $city_extracted,
+                    'property_type'       => $service_extracted,
+                    'created_at'          => current_time('mysql'),
+                    'updated_at'          => current_time('mysql')
+                )
+            );
+            $new_db_id = $wpdb->insert_id;
 
-                foreach ( $submitted_data as $s_key => $s_val ) {
-                    $s_lower = strtolower( trim( $s_key ) );
-                    $s_str   = is_array( $s_val ) ? implode( ', ', $s_val ) : (string)$s_val;
+            // Also sync into cora_workspace_leads option for immediate UI reactivity
+            $price_formatted = $budget_extracted > 0 ? '₹' . number_format( $budget_extracted ) : '₹0';
+            $agency_str_id   = ( $form_agency_num === 1 ) ? 'default' : ( 'agency_' . $form_agency_num );
+            
+            $new_lead_entry = array(
+                'id'          => $new_db_id ? $new_db_id : 'lead_' . time(),
+                'agency_id'   => $agency_str_id,
+                'agency_db_id'=> $form_agency_num,
+                'names'       => trim( $first_name . ' ' . $last_name ),
+                'email'       => sanitize_email( $email_val ),
+                'phone'       => sanitize_text_field( $phone_val ),
+                'scale'       => $service_extracted,
+                'city'        => $city_extracted,
+                'notes'       => sanitize_textarea_field( $notes_val ),
+                'price'       => $price_formatted,
+                'status'      => $target_stage,
+                'score'       => $calc_score,
+                'assigned_to' => $assigned_to_user_id,
+                'created_at'  => time()
+            );
 
-                    // Budget Extraction
-                    if ( ( strpos( $s_lower, 'budget' ) !== false || strpos( $s_lower, 'price' ) !== false || strpos( $s_lower, 'amount' ) !== false || strpos( $s_lower, 'investment' ) !== false ) && empty( $budget_extracted ) ) {
-                        $cleaned_num = preg_replace( '/[^0-9.]/', '', $s_str );
-                        if ( is_numeric( $cleaned_num ) && floatval( $cleaned_num ) > 0 ) {
-                            $budget_extracted = floatval( $cleaned_num );
-                        }
-                    }
+            // Temporarily unhook tenancy filter so unauthenticated submissions write cleanly
+            remove_filter( 'pre_update_option_cora_workspace_leads', 'cora_pre_update_tenancy_data', 10 );
+            $existing_opt_leads = get_option( 'cora_workspace_leads', array() );
+            if ( ! is_array( $existing_opt_leads ) ) {
+                $existing_opt_leads = array();
+            }
+            array_unshift( $existing_opt_leads, $new_lead_entry );
+            update_option( 'cora_workspace_leads', $existing_opt_leads );
+            add_filter( 'pre_update_option_cora_workspace_leads', 'cora_pre_update_tenancy_data', 10, 3 );
 
-                    // City / Location Extraction
-                    if ( ( strpos( $s_lower, 'city' ) !== false || strpos( $s_lower, 'location' ) !== false || strpos( $s_lower, 'venue' ) !== false || strpos( $s_lower, 'address' ) !== false ) && $city_extracted === 'Inbound Web' ) {
-                        if ( ! empty( trim( $s_str ) ) ) {
-                            $city_extracted = sanitize_text_field( trim( $s_str ) );
-                        }
-                    }
-
-                    // Service / Package Extraction
-                    if ( ( strpos( $s_lower, 'service' ) !== false || strpos( $s_lower, 'package' ) !== false || strpos( $s_lower, 'shoot type' ) !== false || strpos( $s_lower, 'project type' ) !== false ) ) {
-                        if ( ! empty( trim( $s_str ) ) ) {
-                            $service_extracted = sanitize_text_field( trim( $s_str ) );
-                        }
-                    }
-                }
-
-                // 4a.2. Target Stage & Assignee Resolution (with Round-Robin Routing)
-                $target_stage = ! empty( $settings['target_crm_stage'] ) ? sanitize_text_field( $settings['target_crm_stage'] ) : 'New Lead';
-                $assigned_to_user_id = null;
-                $configured_assignee = $settings['target_crm_assignee'] ?? 'unassigned';
-
-                if ( is_numeric( $configured_assignee ) && intval( $configured_assignee ) > 0 ) {
-                    $assigned_to_user_id = intval( $configured_assignee );
-                } elseif ( $configured_assignee === 'round_robin' ) {
-                    // Smart Round-Robin: Pick active agency team member with fewest leads
-                    $eligible_users = $wpdb->get_col( $wpdb->prepare(
-                        "SELECT u.ID FROM {$wpdb->users} u
-                         LEFT JOIN {$wpdb->usermeta} um ON u.ID = um.user_id AND um.meta_key = 'cora_agency_id'
-                         WHERE (um.meta_value = %d OR um.meta_value IS NULL)
-                         ORDER BY (SELECT COUNT(*) FROM {$wpdb->prefix}cora_leads l WHERE l.assigned_to = u.ID AND l.status != 'closed') ASC
-                         LIMIT 1",
-                        $form['agency_id'] ?? 1
-                    ) );
-                    if ( ! empty( $eligible_users ) ) {
-                        $assigned_to_user_id = intval( $eligible_users[0] );
-                    }
-                }
-
-                // 4a.3. Dynamic Predictive Qualification Score (Hot, Warm, Cold)
-                $calc_score = 'warm';
-                if ( $budget_extracted >= 50000 || ( ! empty( $email_val ) && ! empty( $phone_val ) && ! empty( $notes_val ) ) ) {
-                    $calc_score = 'hot';
-                } elseif ( empty( $phone_val ) && empty( $notes_val ) ) {
-                    $calc_score = 'cold';
-                }
-
-                $wpdb->insert(
-                    $wpdb->prefix . 'cora_leads',
-                    array(
-                        'agency_id'           => $form['agency_id'] ?? 1,
-                        'branch_id'           => $branch_id,
-                        'assigned_to'         => $assigned_to_user_id,
-                        'first_name'          => sanitize_text_field( $first_name ),
-                        'last_name'           => sanitize_text_field( $last_name ),
-                        'email'               => sanitize_email( $email_val ),
-                        'phone'               => sanitize_text_field( $phone_val ),
-                        'notes'               => sanitize_textarea_field( $notes_val ),
-                        'source'              => $source_title,
-                        'status'              => strtolower( str_replace( ' ', '_', $target_stage ) ),
-                        'budget_min'          => $budget_extracted,
-                        'budget_max'          => $budget_extracted,
-                        'preferred_locations' => $city_extracted,
-                        'property_type'       => $service_extracted,
-                        'created_at'          => current_time('mysql'),
-                        'updated_at'          => current_time('mysql')
-                    )
+            // Bidirectional Self-Learning RAG Ingestion
+            if ( function_exists( 'cora_rag_ingest_event' ) ) {
+                cora_rag_ingest_event(
+                    $form_agency_num,
+                    'crm',
+                    "Inbound Lead Ingestion: {$name_val} ({$source_title})",
+                    "Inbound form lead captured: {$name_val} | Budget: {$price_formatted} | City: {$city_extracted} | Scope: {$service_extracted} | Score: " . strtoupper($calc_score) . " | Source: {$source_title}",
+                    $new_db_id
                 );
-                $new_db_id = $wpdb->insert_id;
-
-                // Also sync into cora_workspace_leads option for immediate UI reactivity
-                $leads = get_option( 'cora_workspace_leads', array() );
-                if ( ! is_array( $leads ) ) {
-                    $leads = array();
-                }
-
-                $price_formatted = $budget_extracted > 0 ? '₹' . number_format( $budget_extracted ) : '₹0';
-                $new_lead_entry = array(
-                    'id'          => $new_db_id ? $new_db_id : 'lead_' . time(),
-                    'names'       => trim( $first_name . ' ' . $last_name ),
-                    'email'       => sanitize_email( $email_val ),
-                    'phone'       => sanitize_text_field( $phone_val ),
-                    'scale'       => $service_extracted,
-                    'city'        => $city_extracted,
-                    'notes'       => sanitize_textarea_field( $notes_val ),
-                    'price'       => $price_formatted,
-                    'status'      => $target_stage,
-                    'score'       => $calc_score,
-                    'assigned_to' => $assigned_to_user_id,
-                    'created_at'  => time()
-                );
-
-                array_unshift( $leads, $new_lead_entry );
-                update_option( 'cora_workspace_leads', $leads );
-
-                // Bidirectional Self-Learning RAG Ingestion
-                if ( function_exists( 'cora_rag_ingest_event' ) ) {
-                    cora_rag_ingest_event(
-                        $form['agency_id'] ?? 1,
-                        'crm',
-                        "Inbound Lead Ingestion: {$name_val} ({$source_title})",
-                        "Inbound form lead captured: {$name_val} | Budget: {$price_formatted} | City: {$city_extracted} | Scope: {$service_extracted} | Score: " . strtoupper($calc_score) . " | Source: {$source_title}",
-                        $new_db_id
-                    );
-                }
             }
         }
 
@@ -47236,6 +47401,19 @@ function cora_rest_submit_form( $request ) {
             exit;
         }
     }
+
+    // Invalidate agency form & leads caches immediately
+    $form_agency_id = intval( $form['agency_id'] ?? 1 );
+    if ( function_exists( 'cora_cache_flush_agency' ) ) {
+        cora_cache_flush_agency( $form_agency_id );
+        if ( $form_agency_id !== 1 ) {
+            cora_cache_flush_agency( 1 );
+        }
+    }
+    wp_cache_delete( "agency_forms_{$form_agency_id}", 'cora_cache' );
+    wp_cache_delete( "agency_leads_{$form_agency_id}", 'cora_cache' );
+    delete_transient( 'cora_leads_cache_' . $form_agency_id );
+    delete_transient( 'cora_forms_cache_' . $form_agency_id );
 
     return rest_ensure_response( array( 'success' => true, 'submission_id' => $submission_id ) );
 }
@@ -56939,9 +57117,10 @@ if ( ! function_exists( 'cora_ajax_save_lead' ) ) {
             $assigned_to_val = 0;
         }
 
+        $current_agency_id = function_exists( 'cora_db_get_agency_id' ) ? cora_db_get_agency_id() : 1;
         $db_data = array(
-            'agency_id'           => 1,
-            'branch_id'           => 1,
+            'agency_id'           => $current_agency_id,
+            'branch_id'           => function_exists( 'cora_db_get_branch_id' ) ? cora_db_get_branch_id() : 1,
             'assigned_to'         => $assigned_to_val ? $assigned_to_val : null,
             'first_name'          => $names,
             'last_name'           => '',
@@ -57047,6 +57226,10 @@ if ( ! function_exists( 'cora_ajax_save_lead' ) ) {
             cora_rag_ingest_event( $agency_id_val, 'crm', "CRM Lead: {$names} ({$status})", "Lead Deal: {$names} | City: {$city} | Value: ₹{$price} | Phone: {$phone} | Email: {$email} | Status: {$status} | Notes: {$notes}", $lead_id );
         }
 
+        if ( function_exists( 'cora_cache_flush_agency' ) ) {
+            cora_cache_flush_agency( $current_agency_id );
+        }
+
         wp_send_json_success( array(
             'message' => 'Lead deal saved successfully.',
             'lead_id' => $lead_id,
@@ -57084,6 +57267,9 @@ if ( ! function_exists( 'cora_ajax_update_lead_assignee' ) ) {
                 }
                 update_option( 'cora_workspace_leads', $existing_leads );
             }
+        }
+        if ( function_exists( 'cora_cache_flush_agency' ) ) {
+            cora_cache_flush_agency( function_exists( 'cora_db_get_agency_id' ) ? cora_db_get_agency_id() : 1 );
         }
         wp_send_json_success( array( 'message' => 'Assigned team member updated successfully.' ) );
     }
@@ -57250,6 +57436,10 @@ if ( ! function_exists( 'cora_ajax_update_lead_stage' ) ) {
 
         if ( null !== $assigned_to_param && $old_assigned_to !== $assigned_to_param && function_exists( 'cora_log_lead_assignment_change' ) ) {
             cora_log_lead_assignment_change( $lead_id, $assigned_to_param );
+        }
+
+        if ( function_exists( 'cora_cache_flush_agency' ) ) {
+            cora_cache_flush_agency( function_exists( 'cora_db_get_agency_id' ) ? cora_db_get_agency_id() : 1 );
         }
 
         wp_send_json_success( array(
@@ -57697,6 +57887,15 @@ if ( ! function_exists( 'cora_ajax_delete_lead_suite' ) ) {
         });
 
         update_option( 'cora_workspace_leads', array_values( $filtered ) );
+
+        global $wpdb;
+        if ( is_numeric( $lead_id ) ) {
+            $wpdb->delete( $wpdb->prefix . 'cora_leads', array( 'id' => intval( $lead_id ) ), array( '%d' ) );
+        }
+
+        if ( function_exists( 'cora_cache_flush_agency' ) ) {
+            cora_cache_flush_agency( function_exists( 'cora_db_get_agency_id' ) ? cora_db_get_agency_id() : 1 );
+        }
 
         wp_send_json_success( array(
             'message' => 'Lead deleted from workspace.',

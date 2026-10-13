@@ -212,22 +212,24 @@
 
             // 1. Overlay Backdrop
             var overlay = document.createElement('div');
+            var isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+
             overlay.id = 'cora-form-overlay';
             overlay.style.position = 'fixed';
             overlay.style.top = '0';
             overlay.style.left = '0';
             overlay.style.width = '100vw';
             overlay.style.height = '100vh';
-            overlay.style.backgroundColor = 'rgba(9, 9, 11, 0.5)';
-            overlay.style.backdropFilter = 'blur(6px)';
-            overlay.style.webkitBackdropFilter = 'blur(6px)';
+            overlay.style.backgroundColor = 'rgba(9, 9, 11, 0.45)';
+            overlay.style.backdropFilter = 'blur(8px)';
+            overlay.style.webkitBackdropFilter = 'blur(8px)';
             overlay.style.zIndex = '999999';
             overlay.style.opacity = '0';
             overlay.style.transition = 'opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1)';
             overlay.style.display = 'flex';
-            overlay.style.alignItems = mode === 'drawer' ? 'stretch' : 'center';
-            overlay.style.justifyContent = mode === 'drawer' ? 'flex-end' : 'center';
-            overlay.style.padding = mode === 'drawer' ? '0' : '16px';
+            overlay.style.alignItems = isMobile ? 'flex-end' : (mode === 'drawer' ? 'stretch' : 'center');
+            overlay.style.justifyContent = isMobile ? 'center' : (mode === 'drawer' ? 'flex-end' : 'center');
+            overlay.style.padding = isMobile ? '0' : (mode === 'drawer' ? '0' : '16px');
             overlay.style.boxSizing = 'border-box';
 
             // 2. Sheet / Card Container
@@ -240,7 +242,16 @@
             sheet.style.transition = 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
             sheet.style.overflow = 'hidden';
 
-            if (mode === 'drawer') {
+            if (isMobile) {
+                // Rule 12: Zero mobile side drawers, bottom-up slide sheets with rounded-t-3xl
+                sheet.style.width = '100%';
+                sheet.style.maxWidth = '100%';
+                sheet.style.height = '90vh';
+                sheet.style.maxHeight = '92vh';
+                sheet.style.borderRadius = '24px 24px 0 0';
+                sheet.style.transform = 'translateY(100%)';
+                sheet.style.borderTop = '1px solid #e4e4e7';
+            } else if (mode === 'drawer') {
                 sheet.style.width = '100%';
                 sheet.style.maxWidth = '580px';
                 sheet.style.height = '100%';
@@ -255,7 +266,26 @@
                 sheet.style.border = '1px solid #e4e4e7';
             }
 
-            // 3. Header Bar with Close Button
+            // 3. Header Bar with Close Button (and drag handle on mobile)
+            if (isMobile) {
+                var dragHandleWrapper = document.createElement('div');
+                dragHandleWrapper.style.display = 'flex';
+                dragHandleWrapper.style.justifyContent = 'center';
+                dragHandleWrapper.style.alignItems = 'center';
+                dragHandleWrapper.style.paddingTop = '10px';
+                dragHandleWrapper.style.paddingBottom = '4px';
+                dragHandleWrapper.style.backgroundColor = '#fafafa';
+                dragHandleWrapper.style.flexShrink = '0';
+
+                var dragHandle = document.createElement('div');
+                dragHandle.style.width = '40px';
+                dragHandle.style.height = '4px';
+                dragHandle.style.borderRadius = '9999px';
+                dragHandle.style.backgroundColor = '#d4d4d8';
+                dragHandleWrapper.appendChild(dragHandle);
+                sheet.appendChild(dragHandleWrapper);
+            }
+
             var header = document.createElement('div');
             header.style.display = 'flex';
             header.style.alignItems = 'center';
@@ -322,6 +352,7 @@
             overlay._onKeydown = onKeydown;
             overlay._sheet = sheet;
             overlay._mode = mode;
+            overlay._isMobile = isMobile;
             overlay._autoClose = autoClose;
 
             document.body.appendChild(overlay);
@@ -330,7 +361,9 @@
             // Trigger smooth animation
             requestAnimationFrame(function() {
                 overlay.style.opacity = '1';
-                if (mode === 'drawer') {
+                if (isMobile) {
+                    sheet.style.transform = 'translateY(0)';
+                } else if (mode === 'drawer') {
                     sheet.style.transform = 'translateX(0)';
                 } else {
                     sheet.style.transform = 'scale(1)';
@@ -346,10 +379,13 @@
             var overlay = this.activeOverlay;
             var sheet = overlay._sheet;
             var mode = overlay._mode;
+            var isMobile = overlay._isMobile;
 
             overlay.style.opacity = '0';
             if (sheet) {
-                if (mode === 'drawer') {
+                if (isMobile) {
+                    sheet.style.transform = 'translateY(100%)';
+                } else if (mode === 'drawer') {
                     sheet.style.transform = 'translateX(100%)';
                 } else {
                     sheet.style.transform = 'scale(0.95)';

@@ -1415,12 +1415,12 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                             <span class="text-[9px] font-semibold text-zinc-400">Real-time sync</span>
                         </div>
                         <div class="grid grid-cols-2 gap-1.5 pt-1">
-                            <button type="button" class="btn-theme-preset p-2.5 rounded-xl border border-zinc-950 bg-zinc-950 text-white text-left flex flex-col gap-1 transition-all cursor-pointer shadow-xs" data-preset="light">
+                            <button type="button" class="btn-theme-preset p-2.5 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-left flex flex-col gap-1 transition-all cursor-pointer shadow-xs" data-preset="light">
                                 <div class="flex items-center justify-between">
                                     <span class="text-[11px] font-bold">Notion Minimal</span>
-                                    <span class="w-2 h-2 rounded-full bg-white"></span>
+                                    <span class="w-2 h-2 rounded-full bg-zinc-900 dark:bg-white"></span>
                                 </div>
-                                <span class="text-[9px] text-zinc-400">Clean light surface</span>
+                                <span class="text-[9px] text-zinc-500">Clean light surface</span>
                             </button>
                             <button type="button" class="btn-theme-preset p-2.5 rounded-xl border border-zinc-200 bg-zinc-900 text-white text-left flex flex-col gap-1 transition-all cursor-pointer hover:border-zinc-400" data-preset="dark">
                                 <div class="flex items-center justify-between">
@@ -1490,10 +1490,10 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                     <div class="space-y-2 pt-3 border-t border-zinc-100">
                         <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Accent & Action Color</label>
                         <div class="flex items-center gap-2">
-                            <button type="button" class="btn-accent-swatch w-7 h-7 rounded-full bg-zinc-950 ring-2 ring-zinc-950 ring-offset-2 transition-all cursor-pointer border-0" data-color="#09090B" title="Pure Black"></button>
-                            <button type="button" class="btn-accent-swatch w-7 h-7 rounded-full bg-zinc-700 hover:ring-2 hover:ring-zinc-400 ring-offset-2 transition-all cursor-pointer border-0" data-color="#27272A" title="Charcoal"></button>
-                            <button type="button" class="btn-accent-swatch w-7 h-7 rounded-full bg-slate-800 hover:ring-2 hover:ring-slate-400 ring-offset-2 transition-all cursor-pointer border-0" data-color="#1E293B" title="Midnight Slate"></button>
-                            <button type="button" class="btn-accent-swatch w-7 h-7 rounded-full bg-emerald-800 hover:ring-2 hover:ring-emerald-400 ring-offset-2 transition-all cursor-pointer border-0" data-color="#065F46" title="Forest Emerald"></button>
+                            <button type="button" class="btn-accent-swatch w-7 h-7 rounded-full bg-zinc-950 border border-zinc-400 dark:border-zinc-600 shadow-2xs transition-all cursor-pointer" data-color="#09090B" title="Pure Black"></button>
+                            <button type="button" class="btn-accent-swatch w-7 h-7 rounded-full bg-zinc-700 border border-zinc-200 dark:border-zinc-800 transition-all cursor-pointer" data-color="#27272A" title="Charcoal"></button>
+                            <button type="button" class="btn-accent-swatch w-7 h-7 rounded-full bg-slate-800 border border-zinc-200 dark:border-zinc-800 transition-all cursor-pointer" data-color="#1E293B" title="Midnight Slate"></button>
+                            <button type="button" class="btn-accent-swatch w-7 h-7 rounded-full bg-emerald-800 border border-zinc-200 dark:border-zinc-800 transition-all cursor-pointer" data-color="#065F46" title="Forest Emerald"></button>
                             <div class="flex-1 flex items-center gap-1.5 h-7 px-2 border border-zinc-200 rounded-lg bg-white ml-1">
                                 <input type="color" id="style-accent-picker" value="#09090B" class="w-4 h-4 rounded border-0 p-0 cursor-pointer outline-none" />
                                 <input type="text" id="style-accent-hex" value="#09090B" class="text-[10px] font-mono text-zinc-800 uppercase outline-none w-full bg-transparent" />
@@ -1505,7 +1505,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                     <div class="space-y-2 pt-3 border-t border-zinc-100">
                         <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Container Framing</label>
                         <div class="grid grid-cols-3 gap-1.5">
-                            <button type="button" class="btn-card-style py-2 px-1 rounded-lg border border-zinc-950 bg-zinc-950 text-white text-center text-[10.5px] font-bold transition-all cursor-pointer shadow-2xs" data-style="bordered">
+                            <button type="button" class="btn-card-style py-2 px-1 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-center text-[10.5px] font-semibold transition-all cursor-pointer shadow-2xs" data-style="bordered">
                                 Bordered
                             </button>
                             <button type="button" class="btn-card-style py-2 px-1 rounded-lg border border-zinc-200 bg-white text-zinc-700 hover:text-zinc-950 text-center text-[10.5px] font-medium transition-all cursor-pointer" data-style="borderless">
@@ -1523,7 +1523,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         <div class="grid grid-cols-4 gap-1">
                             <button type="button" class="btn-radius py-1.5 rounded-lg border border-zinc-200 bg-white text-zinc-700 text-center text-[10px] font-medium transition-all cursor-pointer" data-radius="none">Sharp 0</button>
                             <button type="button" class="btn-radius py-1.5 rounded-lg border border-zinc-200 bg-white text-zinc-700 text-center text-[10px] font-medium transition-all cursor-pointer" data-radius="sm">Subtle 8</button>
-                            <button type="button" class="btn-radius py-1.5 rounded-lg border border-zinc-950 bg-zinc-950 text-white text-center text-[10px] font-bold transition-all cursor-pointer" data-radius="md">Modern 16</button>
+                            <button type="button" class="btn-radius py-1.5 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-center text-[10px] font-semibold transition-all cursor-pointer" data-radius="md">Modern 16</button>
                             <button type="button" class="btn-radius py-1.5 rounded-lg border border-zinc-200 bg-white text-zinc-700 text-center text-[10px] font-medium transition-all cursor-pointer" data-radius="pill">Pill 28</button>
                         </div>
                     </div>
@@ -1532,7 +1532,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                     <div class="space-y-2 pt-3 border-t border-zinc-100">
                         <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Typography</label>
                         <div class="grid grid-cols-3 gap-1.5">
-                            <button type="button" class="btn-font py-2 rounded-lg border border-zinc-950 bg-zinc-950 text-white text-center text-[10.5px] font-bold transition-all cursor-pointer" data-font="sans">Modern Sans</button>
+                            <button type="button" class="btn-font py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-center text-[10.5px] font-semibold transition-all cursor-pointer" data-font="sans">Modern Sans</button>
                             <button type="button" class="btn-font py-2 rounded-lg border border-zinc-200 bg-white text-zinc-700 text-center text-[10.5px] font-mono font-medium transition-all cursor-pointer" data-font="mono">Mono</button>
                             <button type="button" class="btn-font py-2 rounded-lg border border-zinc-200 bg-white text-zinc-700 text-center text-[10.5px] font-serif font-medium transition-all cursor-pointer" data-font="serif">Serif</button>
                         </div>
@@ -1543,7 +1543,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         <label class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Spacing Density</label>
                         <div class="grid grid-cols-3 gap-1.5">
                             <button type="button" class="btn-density py-1.5 rounded-lg border border-zinc-200 bg-white text-zinc-700 text-center text-[10.5px] font-medium transition-all cursor-pointer" data-density="compact">Compact</button>
-                            <button type="button" class="btn-density py-1.5 rounded-lg border border-zinc-950 bg-zinc-950 text-white text-center text-[10.5px] font-bold transition-all cursor-pointer" data-density="normal">Standard</button>
+                            <button type="button" class="btn-density py-1.5 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-center text-[10.5px] font-semibold transition-all cursor-pointer" data-density="normal">Standard</button>
                             <button type="button" class="btn-density py-1.5 rounded-lg border border-zinc-200 bg-white text-zinc-700 text-center text-[10.5px] font-medium transition-all cursor-pointer" data-density="spacious">Spacious</button>
                         </div>
                     </div>
@@ -4002,12 +4002,13 @@ function deleteForm(id) {
     }
 
     window.openSubmissionsDrawer = function(formId) {
-        const formObj = formsData.find(f => f.id == formId);
-        if (!formObj) return;
+        const list = Array.isArray(formsData) ? formsData : [];
+        const formObj = list.find(f => f && (f.id == formId || f.form_key == formId));
+        const formTitle = formObj ? (formObj.title || 'Form ' + formId) : ('Form #' + formId);
 
-        currentSubmissionsFormTitle = formObj.title;
+        currentSubmissionsFormTitle = formTitle;
         const titleEl = document.getElementById('drawer-form-title');
-        if (titleEl) titleEl.textContent = formObj.title;
+        if (titleEl) titleEl.textContent = formTitle;
         
         const searchInput = document.getElementById('submissions-search-input');
         if (searchInput) searchInput.value = '';
@@ -5398,7 +5399,7 @@ let currentFormFilter = 'all';
         const onScroll = function() {
             const rect = tabs.getBoundingClientRect();
             const topbarH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cora-topbar-height')) || 48;
-            const threshold = (window.innerWidth >= 1024) ? 5 : (topbarH + 2);
+            const threshold = (window.innerWidth >= 1024) ? 2 : (topbarH + 2);
             if (rect.top <= threshold) {
                 tabs.classList.add('cora-tabs-stuck');
             } else {
@@ -5674,7 +5675,13 @@ let currentFormFilter = 'all';
             title: 'Untitled Form',
             status: 'draft',
             currentStepIndex: 0,
-            settings: { steps: ['Step 1'] },
+            settings: {
+                steps: ['Step 1'],
+                crm_lead_capture_enable: true,
+                form_purpose: 'lead_capture',
+                target_crm_stage: 'New Lead',
+                target_crm_assignee: 'round_robin'
+            },
             blocks: [],
             logic: []
         };
@@ -5945,7 +5952,7 @@ let currentFormFilter = 'all';
         document.querySelectorAll('.btn-theme-preset').forEach(btn => {
             const p = btn.dataset.preset;
             if (p === s.theme) {
-                btn.className = "btn-theme-preset p-2.5 rounded-xl border border-zinc-950 bg-zinc-950 text-white text-left flex flex-col gap-1 transition-all cursor-pointer shadow-xs";
+                btn.className = "btn-theme-preset p-2.5 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-left flex flex-col gap-1 transition-all cursor-pointer shadow-xs";
             } else {
                 let bgClass = 'bg-white text-zinc-900';
                 if (p === 'dark') bgClass = 'bg-zinc-900 text-white';
@@ -5984,7 +5991,7 @@ let currentFormFilter = 'all';
         document.querySelectorAll('.btn-card-style').forEach(btn => {
             const cs = btn.dataset.style;
             if (cs === s.card_style) {
-                btn.className = "btn-card-style py-2 px-1 rounded-lg border border-zinc-950 bg-zinc-950 text-white text-center text-[10.5px] font-bold transition-all cursor-pointer shadow-2xs";
+                btn.className = "btn-card-style py-2 px-1 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-center text-[10.5px] font-semibold transition-all cursor-pointer shadow-2xs";
             } else {
                 btn.className = "btn-card-style py-2 px-1 rounded-lg border border-zinc-200 bg-white text-zinc-700 hover:text-zinc-950 text-center text-[10.5px] font-medium transition-all cursor-pointer";
             }
@@ -5994,7 +6001,7 @@ let currentFormFilter = 'all';
         document.querySelectorAll('.btn-radius').forEach(btn => {
             const r = btn.dataset.radius;
             if (r === s.border_radius) {
-                btn.className = "btn-radius py-1.5 rounded-lg border border-zinc-950 bg-zinc-950 text-white text-center text-[10px] font-bold transition-all cursor-pointer";
+                btn.className = "btn-radius py-1.5 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-center text-[10px] font-semibold transition-all cursor-pointer";
             } else {
                 btn.className = "btn-radius py-1.5 rounded-lg border border-zinc-200 bg-white text-zinc-700 text-center text-[10px] font-medium transition-all cursor-pointer";
             }
@@ -6005,7 +6012,7 @@ let currentFormFilter = 'all';
             const f = btn.dataset.font;
             const fontClass = f === 'mono' ? 'font-mono' : (f === 'serif' ? 'font-serif' : 'font-sans');
             if (f === s.font_family) {
-                btn.className = `btn-font py-2 rounded-lg border border-zinc-950 bg-zinc-950 text-white text-center text-[10.5px] font-bold ${fontClass} transition-all cursor-pointer`;
+                btn.className = `btn-font py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-center text-[10.5px] font-semibold ${fontClass} transition-all cursor-pointer`;
             } else {
                 btn.className = `btn-font py-2 rounded-lg border border-zinc-200 bg-white text-zinc-700 text-center text-[10.5px] ${fontClass} font-medium transition-all cursor-pointer`;
             }
@@ -6015,7 +6022,7 @@ let currentFormFilter = 'all';
         document.querySelectorAll('.btn-density').forEach(btn => {
             const d = btn.dataset.density;
             if (d === s.density) {
-                btn.className = "btn-density py-1.5 rounded-lg border border-zinc-950 bg-zinc-950 text-white text-center text-[10.5px] font-bold transition-all cursor-pointer";
+                btn.className = "btn-density py-1.5 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-center text-[10.5px] font-semibold transition-all cursor-pointer";
             } else {
                 btn.className = "btn-density py-1.5 rounded-lg border border-zinc-200 bg-white text-zinc-700 text-center text-[10.5px] font-medium transition-all cursor-pointer";
             }
@@ -8240,7 +8247,7 @@ document.getElementById('cora-connect-form-${formKey}').addEventListener('submit
             st.card_style = btn.dataset.style;
             document.querySelectorAll('.btn-card-style').forEach(b => {
                 if (b.dataset.style === st.card_style) {
-                    b.className = "btn-card-style py-2 px-1 rounded-lg border border-zinc-950 bg-zinc-950 text-white text-center text-[10.5px] font-bold transition-all cursor-pointer shadow-2xs";
+                    b.className = "btn-card-style py-2 px-1 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-center text-[10.5px] font-semibold transition-all cursor-pointer shadow-2xs";
                 } else {
                     b.className = "btn-card-style py-2 px-1 rounded-lg border border-zinc-200 bg-white text-zinc-700 hover:text-zinc-950 text-center text-[10.5px] font-medium transition-all cursor-pointer";
                 }
@@ -8258,7 +8265,7 @@ document.getElementById('cora-connect-form-${formKey}').addEventListener('submit
             st.border_radius = btn.dataset.radius;
             document.querySelectorAll('.btn-radius').forEach(b => {
                 if (b.dataset.radius === st.border_radius) {
-                    b.className = "btn-radius py-1.5 rounded-lg border border-zinc-950 bg-zinc-950 text-white text-center text-[10px] font-bold transition-all cursor-pointer";
+                    b.className = "btn-radius py-1.5 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-center text-[10px] font-semibold transition-all cursor-pointer";
                 } else {
                     b.className = "btn-radius py-1.5 rounded-lg border border-zinc-200 bg-white text-zinc-700 text-center text-[10px] font-medium transition-all cursor-pointer";
                 }
@@ -8278,7 +8285,7 @@ document.getElementById('cora-connect-form-${formKey}').addEventListener('submit
                 const f = b.dataset.font;
                 const fontClass = f === 'mono' ? 'font-mono' : (f === 'serif' ? 'font-serif' : 'font-sans');
                 if (f === st.font_family) {
-                    b.className = `btn-font py-2 rounded-lg border border-zinc-950 bg-zinc-950 text-white text-center text-[10.5px] font-bold ${fontClass} transition-all cursor-pointer`;
+                    b.className = `btn-font py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-center text-[10.5px] font-semibold ${fontClass} transition-all cursor-pointer`;
                 } else {
                     b.className = `btn-font py-2 rounded-lg border border-zinc-200 bg-white text-zinc-700 text-center text-[10.5px] ${fontClass} font-medium transition-all cursor-pointer`;
                 }
@@ -8296,7 +8303,7 @@ document.getElementById('cora-connect-form-${formKey}').addEventListener('submit
             st.density = btn.dataset.density;
             document.querySelectorAll('.btn-density').forEach(b => {
                 if (b.dataset.density === st.density) {
-                    b.className = "btn-density py-1.5 rounded-lg border border-zinc-950 bg-zinc-950 text-white text-center text-[10.5px] font-bold transition-all cursor-pointer";
+                    b.className = "btn-density py-1.5 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-center text-[10.5px] font-semibold transition-all cursor-pointer";
                 } else {
                     b.className = "btn-density py-1.5 rounded-lg border border-zinc-200 bg-white text-zinc-700 text-center text-[10.5px] font-medium transition-all cursor-pointer";
                 }
@@ -8472,12 +8479,27 @@ document.getElementById('cora-connect-form-${formKey}').addEventListener('submit
             const block = { ...f, id: 'field_' + Math.random().toString(36).substr(2, 6) };
             return block;
         });
+
+        if (!currentEditingForm.settings) currentEditingForm.settings = {};
+        currentEditingForm.settings = {
+            ...currentEditingForm.settings,
+            crm_lead_capture_enable: true,
+            form_purpose: currentEditingForm.settings.form_purpose || 'lead_capture',
+            target_crm_stage: currentEditingForm.settings.target_crm_stage || 'New Lead',
+            target_crm_assignee: currentEditingForm.settings.target_crm_assignee || 'round_robin'
+        };
+
+        if (tpl.name && (!currentEditingForm.title || currentEditingForm.title === 'Untitled Form')) {
+            currentEditingForm.title = tpl.name;
+            const titleInput = document.getElementById('form-title-input');
+            if (titleInput) titleInput.value = tpl.name;
+        }
         
         switchEditorView('build');
         switchLeftTab('fields');
         renderEditorBlocks();
         triggerAutoSave();
-        window.coraShowToast && window.coraShowToast("Template applied!", "success");
+        window.coraShowToast && window.coraShowToast("Template applied with CRM integration enabled!", "success");
     }
 
     // --- Integrations View ---

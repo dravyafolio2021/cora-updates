@@ -29,7 +29,7 @@ export const DOCS_DATA: DocArticle[] = [
     shortTitle: 'Architecture & Stack',
     category: 'overview',
     categoryLabel: 'Getting Started',
-    description: 'Comprehensive architectural guide to Cora’s single-plugin WordPress backend runtime, Next.js 16 SSG edge layer, and isolated MySQL schemas.',
+    description: 'Comprehensive architectural guide to Cora’s high-performance PHP framework backend runtime, Next.js 16 SSG edge layer, and isolated MySQL schemas.',
     readTime: '7 min read',
     lastUpdated: 'August 2026',
     badge: 'Core',
@@ -45,9 +45,13 @@ export const DOCS_DATA: DocArticle[] = [
       { id: 'forms-all-entries', title: '9. Forms Architect & Universal All Entries' },
       { id: 'entry-inspector-timezone', title: '10. Edge-Docked Inspector & Timezone Engine' },
       { id: 'affiliate-referral-discounts', title: '11. Dynamic Referral Tracking & Checkout Discounts' },
+      { id: 'industries-canonical-directory', title: '12. Canonical Industry Solutions & 301 Redirects' },
+      { id: 'ai-workforce-marquee', title: '13. Autonomous AI Workforce & Infinite Skills Marquee' },
+      { id: 'features-lenis-isolation', title: '14. Features Catalog & Lenis Scroll Boundary Isolation' },
+      { id: 'brand-registry-svg-kit', title: '15. Enterprise Brand Registry & Turnkey SVG Kit' },
     ],
     content: `
-Cora is engineered as an enterprise-grade autonomous operating system for Indian creative studios and agencies. It operates on a **hybrid decoupled architecture** where a high-performance Next.js marketing and documentation layer is paired with a resilient, single-plugin WordPress/PHP 8.2 backend runtime.
+Cora is engineered as an enterprise-grade autonomous operating system for Indian creative studios and agencies. It operates on a **hybrid decoupled architecture** where a high-performance Next.js marketing and documentation layer is paired with a resilient, high-performance PHP 8.2 framework backend runtime.
 
 ---
 
@@ -61,8 +65,8 @@ The Cora platform consists of four primary decoupled layers:
    - Sub-50ms Time-To-First-Byte (TTFB) globally with zero server compute overhead.
    - Houses the public website, interactive comparison benchmarks, calculator tools, and Developer Documentation Hub (\`/docs\`).
 
-2. **WordPress Core Application Engine (\`app.heycora.in\` & \`cora.local\`)**:
-   - Single, consolidated core plugin (\`cora-workspace\`) containing all 20+ operational modules.
+2. **Enterprise PHP Application Engine (\`app.heycora.in\` & \`cora.local\`)**:
+   - Single, consolidated backend workspace engine (\`cora-workspace\`) containing all 20+ operational modules.
    - Custom Single Page Application (SPA) shell rendered at \`/workspace/dashboard\`.
    - Zero dependency on external bloated third-party plugins.
 
@@ -84,7 +88,7 @@ The Cora platform consists of four primary decoupled layers:
         [heycora.in/*]                 [app.heycora.in/*]
                ▼                              ▼
 ┌─────────────────────────────┐ ┌─────────────────────────────┐
-│  Next.js 16 SSG Frontend    │ │  WordPress / LiteSpeed PHP  │
+│  Next.js 16 SSG Frontend    │ │  PHP Framework / LiteSpeed  │
 │  - Marketing Site           │ │  - Single 'cora-workspace'  │
 │  - Interactive Benchmarks   │ │  - 20+ Modular Views (SPA)  │
 │  - Developer Docs (/docs)   │ │  - REST API & VAPID Push    │
@@ -106,7 +110,7 @@ Inbound requests are handled via strict virtual host separation:
 | Host / Subdomain | Target Layer | Handler File | Purpose |
 |---|---|---|---|
 | \`heycora.in\` | Next.js Frontend | \`out/index.html\`, \`out/docs/*\` | Marketing, Docs, Tools |
-| \`app.heycora.in\` | WordPress Backend | \`cora-workspace.php\` | Production SaaS Tenant SPA |
+| \`app.heycora.in\` | PHP Framework Backend | \`cora-workspace.php\` | Production SaaS Tenant SPA |
 | \`staging.heycora.in\` | Staging Instance | \`cora-workspace.php\` | QA & Feature Release Previews |
 | \`cora.local\` | Local Docker Environment | \`admin-dashboard.php\` | Local Development & Tests |
 
@@ -191,6 +195,38 @@ The \`/templates\` directory provides 16+ production-grade frontend assets acros
 - **Attribution API**: Dedicated REST endpoint \`POST /wp-json/cora/v1/referrals/track\` with frontend proxy route.
 - **Multi-Parameter Capture**: Ingests referral codes (\`cora_ref\`, \`ref\`, \`via\`, \`partner\`) and stores 30-day secure cookies.
 - **Automatic Checkout Discounts**: Automatically applies 10%–20% coupon discount deductions across pricing checkout sheets with dual conversion attribution to Endorsely and Cora backends.
+
+---
+
+## 12. Canonical Industry Solutions & 301 Redirects (v4.9.380)
+
+- **Directory Migration**: Migrated primary industry hub from \`/use-cases\` to canonical \`/industries\`.
+- **Backward-Compatible 301 Redirects**: Configured in \`.htaccess\` and Next.js routing, guaranteeing all legacy \`/use-cases\` links permanently redirect with 100% SEO link equity.
+- **10+ Verified Vertical Schemas**: Complete plain-English active-voice directories across Real Estate, Photography, Architecture, Creative Agency, Consulting, Salons, Fitness, Events, Hospitality, and DTC E-Commerce.
+- **Desktop Mega-Menu**: Multi-column dropdown in \`Navbar.tsx\` with dedicated icon tiles and subtle colored pill indicators.
+
+---
+
+## 13. Autonomous AI Workforce & Infinite Skills Marquee (v4.9.379)
+
+- **Dedicated AI Agent Hub (\`/ai-agent\`)**: Visualizes Cora's multi-agent autonomous workforce.
+- **Neural Portrait Blended Cutout**: Seamless high-DPI portrait cutout (\`cora_hero_agent_cutout.png\`) blended into the canvas container with responsive gradient lighting.
+- **4-Row Infinite Skills Marquee**: Hardware-accelerated CSS marquee (\`InfiniteSkillsSection.tsx\`) highlighting verified capabilities across Operations, Sales, Finance, and Creative Delivery.
+
+---
+
+## 14. Features Catalog & Lenis Scroll Boundary Isolation (v4.9.378)
+
+- **Directory Overhaul (\`/features\`)**: High-density directory presenting 40+ operational modules.
+- **Lenis Smooth-Scroll Boundary Isolation (\`data-lenis-prevent\`)**: Encapsulates the features sidebar to isolate inner wheel and touch scroll from global Lenis page scrolling, eliminating scroll trapping.
+- **High-Density Sidebar Navigation**: Single-line items with segmented status filters (*All*, *Released*, *Beta*, *Upcoming*) and zero-overlap search input icons.
+
+---
+
+## 15. Enterprise Brand Registry & Turnkey SVG Kit (v4.9.377)
+
+- **Brand Asset Center (\`/brand\`)**: Complete brand guidelines, typographic hierarchy, and neutral zinc color tokens.
+- **1-Click Turnkey SVG Download Kit**: Raw inline SVG clipboard copy and instant \`.svg\` file downloads for Primary, Inverted, and Symbol wordmarks.
     `,
   },
   {
@@ -402,6 +438,164 @@ If even a single character or metadata byte is altered post-signature, the check
 - **Zero Third-Party Trackers**: No third-party ad pixels or tracking scripts operate inside the private workspace SaaS shell.
     `,
   },
+  {
+    slug: 'features-catalog',
+    title: 'Features Directory & Capability Matrix',
+    shortTitle: 'Features Catalog',
+    category: 'overview',
+    categoryLabel: 'Getting Started',
+    description: 'Explore Cora’s 40+ operational modules with high-density sidebar navigation and Lenis scroll boundary isolation.',
+    readTime: '6 min read',
+    lastUpdated: 'October 2026',
+    badge: 'Features',
+    toc: [
+      { id: 'features-overview', title: '1. Capability Matrix Overview' },
+      { id: 'sidebar-navigation', title: '2. High-Density Sidebar Navigation' },
+      { id: 'lenis-isolation', title: '3. Lenis Smooth-Scroll Boundary Isolation' },
+      { id: 'active-voice-cards', title: '4. Active-Voice Visual Cards & CTA' },
+    ],
+    content: `
+The \`/features\` catalog provides an interactive, full-spectrum inspection of Cora’s 40+ core SaaS modules.
+
+---
+
+## 1. Capability Matrix Overview
+
+Cora organizes its feature suite across five primary agency domains:
+- **Foundations**: Multi-tenant RBAC, custom roles, single-owner governance, and audit trails.
+- **Client Operations**: Visual Kanban CRM, interactive calendar, crew dispatch, and equipment custody.
+- **Financial Intelligence**: GST-compliant invoicing (SAC 9983), e-sign contract vault, and margin calculators.
+- **Autonomous AI**: Continuous Living Memory RAG, voice-to-scope briefings, and multi-agent workflows.
+- **Website & Growth**: White-labeled Canvas builder, Next.js headless Git sync, and affiliate referral engines.
+
+---
+
+## 2. High-Density Sidebar Navigation
+
+The features sidebar (\`FeaturesSidebar.tsx\`) is built for rapid discovery:
+- **Single-Line Density**: Compact navigation links with vector icon glyphs and active tonal pills.
+- **Segmented Status Filter**: 1-click toggling between *All*, *Released*, *Beta*, and *Upcoming* features.
+- **Zero-Overlap Search**: Integrated vector SVG search input preventing layout overlapping.
+
+---
+
+## 3. Lenis Smooth-Scroll Boundary Isolation
+
+To eliminate wheel-scroll trapping when browsing long module lists:
+- The sidebar container is encapsulated with \`data-lenis-prevent\` and explicit viewport boundaries: \`max-h-[calc(100vh-120px)] overflow-y-auto\`.
+- This ensures inner wheel and touch scroll events are consumed locally without propagating to the parent window's Lenis instance.
+
+---
+
+## 4. Active-Voice Visual Cards & CTA
+
+Every module card features active-voice benefit headlines, clear operational badges, and a direct "Get Started for Free" call-to-action.
+    `,
+  },
+  {
+    slug: 'brand-registry',
+    title: 'Enterprise Brand Asset Registry & SVG Kit',
+    shortTitle: 'Brand Registry',
+    category: 'overview',
+    categoryLabel: 'Getting Started',
+    description: 'Official brand guidelines, 1-click vector SVG download kit, design tokens reference, and production captures.',
+    readTime: '4 min read',
+    lastUpdated: 'October 2026',
+    badge: 'Brand',
+    toc: [
+      { id: 'brand-overview', title: '1. Brand Positioning & Philosophy' },
+      { id: 'svg-kit', title: '2. Turnkey SVG Vector Download Kit' },
+      { id: 'design-tokens', title: '3. Master Design Tokens Scale' },
+      { id: 'rule-13-standards', title: '4. Rule 13 Tonal Surface Standards' },
+    ],
+    content: `
+The \`/brand\` center provides official brand marks, design system references, and assets for press, partners, and creators.
+
+---
+
+## 1. Brand Positioning & Philosophy
+
+Cora represents understated elegance and ruthless utility for creative agencies. It rejects bloated legacy enterprise software in favor of modern, monochromatic, high-speed agency operating software.
+
+---
+
+## 2. Turnkey SVG Vector Download Kit
+
+Direct 1-click downloads and clipboard copy for official vector brand assets:
+- **Primary Wordmark**: Monochromatic wordmark optimized for high-DPI displays.
+- **Inverted Wordmark**: High-contrast white wordmark for dark backgrounds.
+- **Symbol Mark**: Distinctive Cora emblem.
+
+---
+
+## 3. Master Design Tokens Scale
+
+- **Zinc Neutral Ramp**: 11-step palette (\`zinc-50\` to \`zinc-950\`).
+- **Typography**: Inter for UI controls, Outfit for display titles, JetBrains Mono for metrics and code.
+- **Iconography**: Thin vector SVGs (\`stroke-width: 1.8\` or \`2.2\`).
+
+---
+
+## 4. Rule 13 Tonal Surface Standards
+
+All selected states, focus elements, and cards strictly avoid harsh black outline borders (\`border-zinc-900\`, \`ring-2\`), using soft tonal background fills (\`bg-zinc-100\`) and subtle structural borders (\`border-zinc-200\`).
+    `,
+  },
+  {
+    slug: 'micro-tools-growth-engine',
+    title: 'Public Micro-Tools Growth Engine & Canonical Tool Registry',
+    shortTitle: 'Micro-Tools Registry',
+    category: 'overview',
+    categoryLabel: 'Getting Started',
+    description: 'Explore Cora’s 63 in-browser public micro-tools, flagship calculators, and zero-PII client-side computing architecture.',
+    readTime: '6 min read',
+    lastUpdated: 'October 2026',
+    badge: 'Tools',
+    toc: [
+      { id: 'portfolio-overview', title: '1. Growth Engine Architecture & Inventory' },
+      { id: 'flagship-tools', title: '2. 6 Priority Flagship Tools' },
+      { id: 'privacy-architecture', title: '3. Browser-Only Computing & Privacy Modes' },
+      { id: 'zero-pii-analytics', title: '4. Zero-PII Analytics Governance' },
+    ],
+    content: `
+The **Cora Public Micro-Tools Growth Engine** provides high-utility, search-optimized tools directly in the browser. Rather than gated PDF downloads or shallow AI wrappers, each tool runs client-side calculations to resolve operational and financial bottlenecks for creative service firms.
+
+---
+
+## 1. Growth Engine Architecture & Inventory
+
+The portfolio spans **63 verified public micro-tools** across 10 problem domains indexed in \`tools-canonical-registry.ts\`:
+- **WordPress & Stack Health**: TCO calculator, publishing friction, and Elementor migration.
+- **Conversion & Lead Funnel**: Lead response time leakage and intake calculators.
+- **Agency Margins & Economics**: Scope creep exposure, effective hourly rate, and service pricing.
+- **AI Search & GEO**: AI crawler access checker for OpenAI, Claude, and Perplexity bots.
+- **PDF & Document Processing**: 28 in-browser PDF manipulation and compression utilities.
+- **Finance & GST Tax**: SAC 9983 18% GST calculators and retainer models.
+
+---
+
+## 2. 6 Priority Flagship Tools
+
+1. **WordPress Plugin Stack Cost Calculator** (\`/tools/wp-plugin-cost-calculator\`): Analyzes total cost of ownership including plugin renewals, security maintenance, and consolidation savings.
+2. **Website Lead-Leakage Calculator** (\`/tools/lead-leakage-calculator\`): Quantifies pipeline losses from inquiry response latency.
+3. **Agency Scope-Creep Calculator** (\`/tools/scope-creep-calculator\`): Computes unbilled revision hours and margin contraction.
+4. **Service Project Pricing Calculator** (\`/tools/service-pricing-calculator\`): Models healthy service margins and generates milestone payment structures.
+5. **WordPress Publishing Friction Calculator** (\`/tools/wp-publishing-friction-calculator\`): Pinpoints formatting and copy-paste bottlenecks between Google Docs and CMS.
+6. **AI Crawler Access Checker** (\`/tools/ai-crawler-checker\`): Diagnoses \`robots.txt\` directives for LLM bots (OAI-SearchBot, ClaudeBot, PerplexityBot).
+
+---
+
+## 3. Browser-Only Computing & Privacy Modes
+
+Tools execute deterministic models entirely in client browser memory (JavaScript and HTML5 Canvas). No proprietary figures, hourly rates, client quotes, or uploaded PDFs leave the visitor's local machine.
+
+---
+
+## 4. Zero-PII Analytics Governance
+
+Telemetry via \`lib/tools-analytics.ts\` records strictly anonymous lifecycle events (tool started, calculation mode, and anonymous diagnostic tier). Input figures, business names, and financial metrics are never collected.
+    `,
+  },
 
   // ════════════════════════════════════════════════════════════════════════
   // ── 2. INTELLIGENCE & AUTONOMOUS AI SUITE ──────────────────────────────
@@ -473,7 +667,7 @@ You can switch the underlying reasoning engine in the sticky administrator popov
 
 On the public web surface, the AI Co-Founder also powers the bottom-docked sticky AI SDR assistant:
 - **Portaled Viewport Docking**: Rendered directly via \`createPortal\` into \`document.body\`, maintaining true viewport bottom centering with zero background overlay interference.
-- **Real-Time Objection Handling**: Automatically counters platform comparison queries (HoneyBook, Notion, custom WordPress multi-plugin stacks) and explains migration procedures.
+- **Real-Time Objection Handling**: Automatically counters platform comparison queries (HoneyBook, Notion, legacy multi-plugin stacks) and explains migration procedures.
 - **Automated Coupon Generation**: Surfaces dynamic promotion incentives (\`MIGRATEFREE\`, \`CORA10\`) that auto-populate into checkout query parameters upon selection.
     `,
   },
@@ -517,7 +711,7 @@ Traditional SEO is no longer sufficient. Cora’s **GEO Inspector** scores pages
 
 ## 3. Multi-Channel Social Calendar
 
-Schedule and preview posts across Instagram, LinkedIn, and WordPress with brand voice continuity preserved across all channels.
+Schedule and preview posts across Instagram, LinkedIn, and native blog channels with brand voice continuity preserved across all channels.
     `,
   },
   {
@@ -607,6 +801,68 @@ Creative clients frequently send chaotic 5-minute audio voice notes instead of w
    - Commercial Budget & Payment Milestones.
     `,
   },
+  {
+    slug: 'autonomous-ai-workforce',
+    title: 'Autonomous AI Multi-Agent Workforce & Skills Marquee',
+    shortTitle: 'AI Workforce',
+    category: 'intelligence',
+    categoryLabel: 'Intelligence & AI',
+    description: 'Autonomous multi-agent operational workforce, neural portrait cutouts, 4-row infinite skills marquee, and background agent heartbeat monitor.',
+    readTime: '6 min read',
+    lastUpdated: 'October 2026',
+    badge: 'New',
+    toc: [
+      { id: 'workforce-architecture', title: '1. Multi-Agent Workforce Architecture' },
+      { id: 'neural-portrait', title: '2. Neural Portrait Cutout & Visual Canvas' },
+      { id: 'skills-marquee', title: '3. 4-Row Infinite Skills Marquee' },
+      { id: 'agent-heartbeat', title: '4. Autonomous Agent Heartbeat & Telemetry' },
+    ],
+    content: `
+Deployed in **v4.9.379–v4.9.380**, the **Autonomous AI Workforce** canvas (\`/ai-agent\`) models Cora’s autonomous multi-agent operating engine, demonstrating how independent AI agents execute studio operations, sales outreach, financial reconciliation, and media delivery in parallel without human bottlenecks.
+
+---
+
+## 1. Multi-Agent Workforce Architecture
+
+Cora deploys specialized autonomous agents configured to run in isolated micro-routines:
+- **Operations & Logistics Agent**: Automatically coordinates crew call sheets, validates attendance punch logs, and enforces equipment custody checklists.
+- **Sales & Inbound SDR Agent**: Synthesizes incoming voice notes and WhatsApp inquiries, qualifies intent, calculates SAC 9983 commercial budgets, and drafts agreements.
+- **Finance & Tax Agent**: Reconciles dual-rate GST (18% / 12%), verifies SHA-256 digital signature hashes, and outputs client invoices upon shoot wrap.
+- **Media Delivery & Storage Agent**: Applies client proofing watermarks, tracks hot cloud storage usage, and manages selective client download keys.
+
+---
+
+## 2. Neural Portrait Cutout & Visual Canvas
+
+The \`/ai-agent\` landing experience pairs clean typography with cutting-edge visual presentation:
+- **High-Resolution Cutout Blend**: Uses neural portrait cutout assets (\`cora_hero_agent_cutout.png\`) rendered with radial alpha masking that blends seamlessly into the monochromatic canvas (\`#ffffff\` light / \`#09090b\` dark).
+- **Rule 13 Zero-Outline Design**: Replaces harsh box strokes with soft tonal surface layers (\`bg-zinc-100/90 dark:bg-zinc-800/80\`) and subtle structural borders.
+- **Dynamic Status Indicator**: Displays a pulsating green connectivity badge (\`bg-emerald-500\`) validating live agent runtime uptime.
+
+---
+
+## 3. 4-Row Infinite Skills Marquee
+
+The **InfiniteSkillsSection** component renders an automated, hardware-accelerated 4-row skill stream verifying production capabilities across every studio vertical:
+
+1. **Stream 01 (Operations & Logistics)**:
+   - Crew Shift Roster Coordination, Gear Asset Check-In/Check-Out, Studio Bay Power Management, Logistics Van Dispatch, and Restock Reorder Triggers.
+2. **Stream 02 (CRM & Sales Pipeline)**:
+   - Multi-Channel Lead Ingestion, WhatsApp Instant Auto-Responder, Intent-Based Deal Scoring, Dynamic Rate Sheet Quotations, and Contract Follow-Up Cadences.
+3. **Stream 03 (Finance & Legal Compliance)**:
+   - SAC 9983 GST Split Calculations, Instant UPI Deep-Link QR Generation, SHA-256 E-Sign Verification, Vendor TDS Ledgering, and Automated Expense Auditing.
+4. **Stream 04 (Creative Delivery & Proofing)**:
+   - Non-Destructive Watermark Rendering, Batch Multi-Ratio Aspect Export (1:1, 4:5, 16:9), Client Proofing Star Selects, and Expiring Access Vault Tokens.
+
+---
+
+## 4. Autonomous Agent Heartbeat & Telemetry
+
+The platform provides a dedicated health check and telemetry heartbeat endpoint at \`/api/health/agent\`:
+- Returns live JSON metadata regarding active model latency, queued operational routines, and system uptime.
+- Emits real-time diagnostic pings ensuring 100% agent responsiveness across all connected client workspaces.
+    `,
+  },
 
   // ════════════════════════════════════════════════════════════════════════
   // ── 3. SALES, FUNNELS & CRM ────────────────────────────────────────────
@@ -653,6 +909,118 @@ Starting in **v4.9.300–v4.9.302**, lead inspection features:
     `,
   },
   {
+    slug: 'projects-portfolio-module',
+    title: 'Agency Projects & Portfolio Case Studies Module',
+    shortTitle: 'Projects & Case Studies',
+    category: 'sales',
+    categoryLabel: 'Sales & CRM',
+    description: 'Curate high-converting agency case studies in the workspace and publish them instantly to your public portfolio.',
+    readTime: '6 min read',
+    lastUpdated: 'October 2026',
+    badge: 'New',
+    toc: [
+      { id: 'projects-overview', title: '1. Case Studies Architecture & Lifecycle' },
+      { id: 'drawer-workflow', title: '2. 6-Tab Drawer Editor Workflow' },
+      { id: 'storytelling-framework', title: '3. 4-Act Transformation Storytelling' },
+      { id: 'nda-stealth-mode', title: '4. Stealth NDA & Confidentiality Mode' },
+      { id: 'frontend-showcase', title: '5. Public Portfolio & Strategy Audit Bridge' },
+    ],
+    content: `
+The **Agency Projects & Portfolio Case Studies Module** bridges internal workspace delivery with public marketing proof, enabling agencies to turn completed work into high-converting case studies.
+
+---
+
+## 1. Case Studies Architecture & Lifecycle
+
+Case studies are persisted in the database (\`wp_cora_projects\`) and managed via the workspace at \`/workspace/projects\`:
+- **Published**: Live on the public showcase at \`/projects\` and dynamic slugs \`/projects/[slug]\`.
+- **Draft / In Review**: Work-in-progress drafts visible only to authorized workspace team members.
+- **Archived**: Historical records removed from the live public gallery.
+
+---
+
+## 2. 6-Tab Drawer Editor Workflow
+
+Editing is handled in a full-featured drawer sheet (desktop side-drawer, mobile bottom-sheet) with six dedicated tabs:
+1. **Overview & Metadata**: Project title, URL slug, client name, industry, and featured status.
+2. **4-Act Story Narrative**: Executive Summary, Challenge, Solution, and Deliverables scope.
+3. **Impact KPIs**: Big numerical metric highlights rendered in JetBrains Mono with context labels.
+4. **Media & Visual Gallery**: High-resolution hero image URL and supporting media gallery.
+5. **Verified Client Testimonial**: Client quotation, executive name, title, and organization avatar.
+6. **SEO & Conversion Bridge**: Custom Strategy Audit headline, button label, and destination URL.
+
+---
+
+## 3. 4-Act Transformation Storytelling
+
+Rather than generic image grids, case studies follow an agency transformation framework:
+- **Executive Summary**: High-level problem and outcome summary.
+- **The Challenge**: Core operational or commercial hurdles faced by the client.
+- **The Solution**: Strategic initiatives and systems deployed by the agency.
+- **Deliverables & Scope**: Concrete assets, code, or campaigns delivered.
+
+---
+
+## 4. Stealth NDA & Confidentiality Mode
+
+When a client project is governed by non-disclosure agreements, toggling **Stealth NDA** masks the client's corporate identity (e.g. "Confidential Enterprise FinTech") while preserving verified KPI statistics and narrative structure.
+
+---
+
+## 5. Public Portfolio & Strategy Audit Bridge
+
+Published case studies render at \`/projects\` with responsive filter pills, search, and JetBrains Mono KPI badges. Every single study concludes with a high-converting **Free Strategy Audit CTA** linking prospective clients directly to your booking or inquiry pipeline.
+    `,
+  },
+  {
+    slug: 'forms-crm-lead-pipeline',
+    title: 'Forms to CRM Lead Pipeline Dynamic Automation',
+    shortTitle: 'Forms Lead Bridge',
+    category: 'sales',
+    categoryLabel: 'Sales & CRM',
+    description: 'Automatically convert inbound form submissions into qualified CRM leads with instant pipeline synchronization.',
+    readTime: '5 min read',
+    lastUpdated: 'October 2026',
+    toc: [
+      { id: 'lead-bridge-overview', title: '1. Inbound Auto-Conversion Pipeline' },
+      { id: 'tenant-isolation', title: '2. Multi-Tenant Scoping & Stage Normalization' },
+      { id: 'all-submissions-api', title: '3. Universal All-Submissions REST API' },
+      { id: 'embed-integration', title: '4. Embed Script & Cross-Origin Forms' },
+    ],
+    content: `
+The **Forms to CRM Lead Pipeline** bridges web lead generation directly into the Cora Lead CRM with zero manual data entry.
+
+---
+
+## 1. Inbound Auto-Conversion Pipeline
+
+Whenever an inquiry is submitted via \`POST /wp-json/cora/v1/forms/submit\` or \`cora_rest_submit_form()\`:
+- The submission payload is parsed for contact information (name, email, phone, company, message).
+- A normalized lead record is automatically upserted into \`wp_cora_leads\`.
+- Inbound form submissions trigger automatic lead cache invalidation (\`cora_db_get_leads(true)\`), rendering new cards immediately on the Kanban pipeline without requiring manual page reload.
+
+---
+
+## 2. Multi-Tenant Scoping & Stage Normalization
+
+- **Workspace Isolation**: Submissions are strictly scoped to the active workspace \`agency_id\`.
+- **Stage Assignment**: New inquiries enter the canonical 'New' lead stage via \`cora_normalize_lead_stage()\`.
+- **Assignee Routing**: Workspaces can automatically assign leads to specific team members or round-robin across account managers.
+
+---
+
+## 3. Universal All-Submissions REST API
+
+The \`GET /wp-json/cora/v1/forms/all-submissions\` endpoint enables administrative consoles and reporting pipelines to retrieve aggregated submissions across all workspace forms with pagination, search, and form metadata.
+
+---
+
+## 4. Embed Script & Cross-Origin Forms
+
+Forms can be embedded on any external website using the lightweight \`cora-form-embed.js\` script, which features resilient iframe auto-resizing, postMessage communication, and zero layout shift.
+    `,
+  },
+  {
     slug: 'canvas-builder',
     title: 'Funnel Canvas Builder & Web Creator',
     shortTitle: 'Canvas Builder',
@@ -682,7 +1050,7 @@ The **Canvas Builder** enables creative agencies to design and publish lightning
 
 - **Visual HTML Engine**: In-browser inline editing with code-split view and live DOM synchronization.
 - **Universal Migrator**: Ingest public websites into editable draft themes with 1 click.
-- **Elementor Reskin**: 100% white-labeled builder sandboxed from WordPress branding.
+- **Elementor Reskin**: 100% white-labeled builder sandboxed from CMS branding.
 
 ---
 
@@ -872,6 +1240,69 @@ Shipped in **v4.9.374**, the Entry Inspector (\`#cora-entry-inspector\`) provide
     ],
     content: `
 Automate 5-star Google review collection. When a client rates their experience 4 or 5 stars, they are seamlessly guided to Google Maps. Negative feedback (1–3 stars) is captured privately for internal resolution.
+    `,
+  },
+  {
+    slug: 'industry-verticals-directory',
+    title: 'Industry Solutions Directory & 301 Redirect Architecture',
+    shortTitle: 'Industry Solutions',
+    category: 'sales',
+    categoryLabel: 'Sales & CRM',
+    description: 'Canonical industry verticals hub at /industries, 301 redirect parity from /use-cases, desktop mega-menu with dedicated icons, and 10+ vertical operational models.',
+    readTime: '6 min read',
+    lastUpdated: 'October 2026',
+    badge: 'New',
+    toc: [
+      { id: 'canonical-migration', title: '1. Canonical /industries Migration & 301 Parity' },
+      { id: 'desktop-mega-menu', title: '2. Desktop Mega-Menu & Mobile Drawer Parity' },
+      { id: 'vertical-blueprints', title: '3. 10+ Production Industry Solutions' },
+      { id: 'comparison-matrix', title: '4. Dynamic Industry Comparison Matrix' },
+    ],
+    content: `
+Shipped in **v4.9.380**, this release establishes **\`/industries\`** as the canonical industry directory for Cora, migrating all legacy \`/use-cases\` endpoints with 301 redirect parity while deploying 10+ dedicated operational blueprints.
+
+---
+
+## 1. Canonical /industries Migration & 301 Parity
+
+To elevate enterprise positioning and consolidate search authority, the directory URL structure was overhauled:
+- **Canonical Slug Structure**: All solution hubs now reside under \`/industries/[slug]\` (e.g. \`/industries/real-estate\`, \`/industries/photography-studio\`).
+- **301 Permanent Redirect Parity**: Server-level \`.htaccess\` rules and Next.js route mapping enforce immediate 301 redirects from \`/use-cases\` and \`/use-cases/*\` to \`/industries\`, preventing 404 errors and preserving 100% SEO link equity.
+- **Internal Link Audit**: All internal navigation links, buttons, footer anchors, and sitemaps were synchronized to use the new \`/industries\` namespace.
+
+---
+
+## 2. Desktop Mega-Menu & Mobile Drawer Parity
+
+The primary navigation (\`Navbar.tsx\`) features a redesigned high-density **Industries Mega-Menu**:
+- **Multi-Column Visual Grid**: Categorizes solutions into logical clusters with dedicated vector SVG icon tiles and subtle category pill badges.
+- **Active-Voice Microcopy**: Replaces vague marketing jargon with clear, active-voice descriptions (e.g. "Geocoded property listings & WhatsApp showing alerts" instead of "Real estate solutions").
+- **Zero Heavy Outlines**: Adheres strictly to Rule 13, utilizing soft tonal background transitions (\`hover:bg-zinc-100 dark:hover:bg-zinc-800/60\`) rather than high-contrast border strokes.
+- **Mobile Drawer Synchronization**: Replicates all 10+ industry verticals within the responsive mobile navigation sheet with bottom-padded clearance (\`pb-28\`).
+
+---
+
+## 3. 10+ Production Industry Solutions
+
+Each vertical directory in \`industry-data.ts\` defines a complete operational blueprint:
+1. **Real Estate & Property Developers** (\`/industries/real-estate\`): Geocoded property listings, virtual site tour schedules, WhatsApp showing alerts, and client inquiry pipelines.
+2. **Photography & Film Studios** (\`/industries/photography-studio\`): Full-resolution media proofing, digital client contracts, multi-ratio crop presets, and shoot gear custody registries.
+3. **Architecture & Interior Design** (\`/industries/architecture-interior-design\`): Material moodboards, revision milestone sign-offs, contractor tenders, and project phase tracking.
+4. **Digital Marketing & Creative Agencies** (\`/industries/creative-agency\`): Retainer margin calculators, commercial proposals, multi-client campaign tracking, and GST SAC 9983 tax invoicing.
+5. **Consulting & Professional Services** (\`/industries/consulting\`): Advisory engagement logs, client milestone deliverables, confidential vault contracts, and auto-scheduled call links.
+6. **Salons, Spas & Wellness Clinics** (\`/industries/salon-wellness\`): Chair/therapist booking slots, customer loyalty memberships, automated reminder WhatsApps, and spot UPI billing.
+7. **Fitness Studios & Personal Trainers** (\`/industries/fitness-studio\`): Session packs, automated membership renewals, client progress metrics, and trainer shift coordination.
+8. **Event Production & Wedding Management** (\`/industries/events-weddings\`): Multi-vendor dispatch schedules, client milestone approvals, budget reconciliation, and run-sheet coordination.
+9. **Hospitality & Boutique Restaurants** (\`/industries/hospitality\`): Table reservation workflows, private event catering agreements, distributor inventory tracking, and daily reconciliation sheets.
+10. **E-Commerce & DTC Brands** (\`/industries/ecommerce-dtc\`): SKU catalog management, volume discount tiers, factory van sales dispatch, and automated GST billing.
+
+---
+
+## 4. Dynamic Industry Comparison Matrix
+
+The directory features an interactive matrix component comparing capability sets across verticals:
+- Displays feature coverage across Invoicing, Lead CRM, Contract E-Signing, Client Proofing, Booking Schedules, and RAG Knowledge Memory.
+- Allows agency founders to quickly identify the exact operational setup suited for their business model.
     `,
   },
 
@@ -1246,6 +1677,70 @@ The background compiler (\`cora_nextjs_build_repo\`) supports Next.js, Expo, Vit
     `,
   },
   {
+    slug: 'canvas-github-cicd',
+    title: 'Canvas Themes & GitHub CI/CD Full-Lifecycle Integration',
+    shortTitle: 'Canvas GitHub CI/CD',
+    category: 'developers',
+    categoryLabel: 'Developer APIs & PWA',
+    description: 'Connect GitHub repositories to Canvas Themes with automated branch creation, PR reviews, 1-click merging, and commit rollback.',
+    readTime: '7 min read',
+    lastUpdated: 'October 2026',
+    badge: 'CI/CD',
+    toc: [
+      { id: 'kpi-analytics-bar', title: '1. 4-KPI Analytical Header & Navigation' },
+      { id: 'github-auth-flow', title: '2. OAuth Device Flow & PAT Authentication' },
+      { id: 'pr-workflow', title: '3. Automated Branch & PR Review Workflow' },
+      { id: 'merge-and-rollback', title: '4. 1-Click Merge & Commit Rollback Engine' },
+      { id: 'workspace-sync', title: '5. Safe Full-Workspace Synchronization' },
+    ],
+    content: `
+The **Canvas Themes GitHub CI/CD Integration** provides continuous deployment and version control between the Cora Visual Canvas and GitHub repositories.
+
+---
+
+## 1. 4-KPI Analytical Header & Navigation
+
+The Canvas interface at \`/workspace/canvas\` features 4 real-time analytical scorecards:
+- **PageSpeed Performance Score**: Production Lighthouse performance rating.
+- **LCP Speed (Largest Contentful Paint)**: Core Web Vitals paint metric.
+- **Total Themes & Draft Versions**: Count of active and staged template versions.
+- **Theme Storage Footprint**: Asset storage consumption.
+
+A sticky 3-subtab bar enables seamless switching between **Theme Library**, **Speed & Core Web Vitals**, and **Migration & Tools**.
+
+---
+
+## 2. OAuth Device Flow & PAT Authentication
+
+GitHub integration supports dual authentication paths:
+- **Device Flow OAuth 2.0**: RFC 8628 device authorization for fast, passwordless setup.
+- **Personal Access Token (PAT)**: Scoped token storage with dual authentication header fallbacks (\`Bearer <token>\` and \`token <pat>\`).
+- **Organization Repositories**: Provision dedicated organization repositories (\`cora_github_provision_org_repo\`) or connect personal profiles.
+
+---
+
+## 3. Automated Branch & PR Review Workflow
+
+Developers and agencies can isolate theme edits from production:
+- **Branch Creation**: Auto-create isolated staging branches (\`cora_github_create_branch\`).
+- **Automated Pull Requests**: Generate rich PRs with automated change descriptions (\`cora_github_create_pr\`).
+- **PR Inspector**: Review open PRs, diff summaries, and branch statuses directly within the workspace (\`cora_github_get_prs\`).
+
+---
+
+## 4. 1-Click Merge & Commit Rollback Engine
+
+- **1-Click Merge**: Safely merge approved pull requests directly into the main production branch (\`cora_github_merge_pr\`).
+- **Commit Rollback**: If an issue arises in production, revert any commit with one click (\`cora_github_revert_commit\`), instantly restoring the previous stable state.
+
+---
+
+## 5. Safe Full-Workspace Synchronization
+
+The \`cora_github_sync_entire_workspace\` action commits and pushes all workspace templates, styles, and configurations to GitHub in an atomic, non-destructive operation.
+    `,
+  },
+  {
     slug: 'rest-api-reference',
     title: 'REST API & AJAX Endpoint Reference',
     shortTitle: 'REST API Reference',
@@ -1261,9 +1756,10 @@ The background compiler (\`cora_nextjs_build_repo\`) supports Next.js, Expo, Vit
       { id: 'invoicing-endpoints', title: '3. Invoicing & GST Endpoints' },
       { id: 'pwa-endpoints', title: '4. PWA Push Endpoints' },
       { id: 'mcp-endpoints', title: '5. Universal MCP & OAuth Endpoints' },
+      { id: 'github-ajax', title: '6. GitHub CI/CD AJAX Actions' },
     ],
     content: `
-All endpoints are accessible via WordPress REST API (\`/wp-json/cora/v1/\` or \`/wp-json/cora-pwa/v1/\` or \`/wp-json/cora-mcp/v1/\`) and standard AJAX actions.
+All endpoints are accessible via platform REST API (\`/wp-json/cora/v1/\` or \`/wp-json/cora-pwa/v1/\` or \`/wp-json/cora-mcp/v1/\`) and standard AJAX actions.
 
 ---
 
@@ -1279,6 +1775,8 @@ All endpoints are accessible via WordPress REST API (\`/wp-json/cora/v1/\` or \`
 
 | Method | Route / Action | Required Permission | Description |
 |---|---|---|---|
+| \`GET\` | \`/cora-api/v1/projects\` | \`cora_view_dashboard\` | Query published case studies with industry, tag, and status filters |
+| \`GET\` | \`/cora-api/v1/projects/{slug}\` | Public | Retrieve single 4-act project case study, numerical KPIs, and testimonial |
 | \`GET\` | \`/wp-json/cora/v1/invoices\` | \`cora_manage_financials\` | Fetch agency tax invoices |
 | \`POST\` | \`/wp-json/cora/v1/invoices\` | \`cora_manage_financials\` | Create 18% GST invoice |
 | \`GET\` | \`/wp-json/cora/v1/forms/all-submissions\` | \`cora_view_dashboard\` | Fetch all workspace form submissions with form metadata JOINed |
@@ -1291,6 +1789,25 @@ All endpoints are accessible via WordPress REST API (\`/wp-json/cora/v1/\` or \`
 | \`POST\` | \`/wp-json/cora-mcp/v1/rpc\` | Bearer Token (OAuth 2.1) | MCP JSON-RPC 2.0 tool execution gateway |
 | \`GET\` | \`/wp-json/cora-mcp/v1/tools\` | Bearer Token (OAuth 2.1) | Canonical tool registry and capabilities |
 | \`GET\` | \`/.well-known/oauth-authorization-server\` | Public | RFC 8414 & RFC 9728 OAuth 2.1 server metadata |
+| \`GET\` | \`/api/health\` | Public | Production edge deployment and AI agent health probe |
+| \`POST\` | \`/api/ai-preview\` | Public | Sticky AI SDR query handler with objection vector analysis & coupon dispatch |
+| \`POST\` | \`/api/partner-application\` | Public | Partner & creator coaching accelerator enrollment intake |
+
+---
+
+## 3. GitHub CI/CD AJAX Actions
+
+| AJAX Action | Method | Description |
+|---|---|---|
+| \`cora_github_initiate_device_flow\` | POST | Initiate OAuth 2.0 device flow authentication |
+| \`cora_github_poll_device_token\` | POST | Poll token exchange state for active device code |
+| \`cora_github_create_branch\` | POST | Create isolated feature/theme branch |
+| \`cora_github_create_pr\` | POST | Generate GitHub Pull Request with change summary |
+| \`cora_github_get_prs\` | POST | Fetch list of active pull requests and review states |
+| \`cora_github_merge_pr\` | POST | Safely merge approved pull request into main branch |
+| \`cora_github_revert_commit\` | POST | Revert target commit SHA with automated rollback |
+| \`cora_github_sync_entire_workspace\` | POST | Atomically commit and sync all workspace themes to GitHub |
+| \`cora_github_provision_org_repo\` | POST | Provision new dedicated theme repository under organization |
     `,
   },
   {
@@ -1460,7 +1977,7 @@ The Canvas Template Editor includes a native AI Tools MCP Gateway & Live Action 
   },
   {
     slug: 'website-connectors',
-    title: 'Website Connectors: Framer, Webflow & WordPress',
+    title: 'Website Connectors: Framer, Webflow & Custom Sites',
     shortTitle: 'Website Connectors',
     category: 'developers',
     categoryLabel: 'Developer APIs & PWA',
@@ -1470,7 +1987,7 @@ The Canvas Template Editor includes a native AI Tools MCP Gateway & Live Action 
     toc: [
       { id: 'framer-embed', title: '1. Framer 1-Line Embed' },
       { id: 'webflow-webhooks', title: '2. Webflow Webhook Integration' },
-      { id: 'wordpress-plugin', title: '3. WordPress Connector' },
+      { id: 'custom-embed', title: '3. Custom CMS Connector' },
     ],
     content: `
 Connect your existing website or portfolio directly to your Cora backend with a single script embed or webhook URL.

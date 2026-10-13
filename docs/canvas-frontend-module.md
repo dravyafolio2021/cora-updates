@@ -1,10 +1,10 @@
-# Cora Platform — Canvas & Frontend Module Documentation (v4.9.374)
+# Cora Platform — Canvas & Frontend Module Documentation (v4.9.381)
 
 ## Section 1: Overview & Multi-Engine Architecture
 
-Cora Canvas is a unified frontend website and theme creation engine providing a 100% white-labeled builder experience for agencies and workspace owners. Hardened through **v4.9.374**, Canvas operates across five core architectural engines:
+Cora Canvas is a unified frontend website and theme creation engine providing a 100% white-labeled builder experience for agencies and workspace owners. Hardened through **v4.9.381**, Canvas operates across five core architectural engines:
 
-1. **Engine A: Elementor White-Labeled Engine**: Wraps native Elementor in a sandboxed, two-row monochromatic toolbar (`cora-elementor-reskin.js` and `.css`), stripping out all WordPress headers, admin bars, upsell notices, and third-party references.
+1. **Engine A: White-Labeled Visual Drag-and-Drop Engine**: Operates within a sandboxed, two-row monochromatic toolbar (`cora-elementor-reskin.js` and `.css`), stripping out all CMS headers, admin chrome, upsell notices, and third-party references.
 2. **Engine B: Visual HTML Canvas Engine (Lovable-Compatible)**: In-browser visual HTML editor rendering semantic HTML5/Tailwind inside an isolated sandboxed iframe (`#cora-html-canvas-iframe`) with inline `contenteditable` editing, media inventory scanning, 1-click image swapping, code-split editing, URL edit state persistence, and AI rewriting.
 3. **Engine C: Universal Website Multi-Page Migrator Engine**: 1-click ingestion and crawler engine (`class-cora-html-website-migrator.php`) that scrapes external HTML/CSS/JS websites, downloads/isolates assets, sanitizes DOM code, and provisions editable draft themes.
 4. **Engine D: Next.js & Expo Headless Static Build Engine (`class-cora-nextjs-integration.php`)**: Connects modern Next.js (App/Pages Router) and Expo React Native Web repositories via Git, providing dynamic GitHub tree scanning, public/private PAT authorization with dual-header fallback, automated static compilation into standalone distributions (`out/`, `dist/`), on-demand ISR webhooks, sub-150ms dev server probe detection, and cookie-isolated live preview proxies.
@@ -48,7 +48,7 @@ graph TD
     F -->|Dev Server Probe| Y[Sub-150ms Ping & Proxy Frame]
     
     A -->|Manages| T
-    A -->|Syncs Menus| Z[WordPress Nav Menus]
+    A -->|Syncs Menus| Z[Navigation Menus]
 ```
 
 ---
@@ -215,7 +215,7 @@ To prevent editor state tags from leaking into production:
 
 For complex visual layouts, Elementor is wrapped in a dedicated white-label skin:
 * Injects `cora-elementor-reskin.js` and `cora-elementor-reskin.css`.
-* Suppresses default WordPress admin bars, logos, help popovers, and promotional up-sell banners.
+* Suppresses default legacy admin bars, logos, help popovers, and promotional up-sell banners.
 * Injects a dual-row monochromatic top bar with Workspace navigation, Draft/Live status toggles, device preview switchers, and Git commit actions.
 
 ---
@@ -280,7 +280,7 @@ CREATE TABLE wp_cora_canvas_pages (
 | **Get HTML Page Data**| `cora_ajax_get_html_page_data` | `page_id`, `nonce` | Returns raw HTML and SEO metadata for editor. |
 | **AI Element Rewrite**| `cora_ajax_canvas_ai_rewrite_element`| `element_text`, `tone`, `prompt` | Returns AI rewritten copy variants. |
 | **AI SEO / CWV Optimize**| `cora_ajax_canvas_ai_optimize_page`| `page_id`, `html_content` | Performs automated Core Web Vitals optimizations. |
-| **Create Nav Menu** | `cora_ajax_create_nav_menu` | `menu_name`, `items_json`, `nonce` | Synchronizes menu with WordPress `nav_menu`. |
+| **Create Nav Menu** | `cora_ajax_create_nav_menu` | `menu_name`, `items_json`, `nonce` | Synchronizes navigation menu with backend menu store. |
 | **Scan Next.js Routes** | `cora_nextjs_scan_routes` | `repo`, `branch`, `pat`, `nonce` | Scans GitHub repo tree for App/Pages Router routes. |
 | **Trigger ISR Revalidation** | `cora_nextjs_trigger_isr` | `theme_id`, `path`, `nonce` | Calls remote Next.js ISR revalidation webhook with secret. |
 | **Save Page Props** | `cora_nextjs_save_page_props` | `page_id`, `theme_id`, `props`, `auto_revalidate`, `nonce` | Commits headless props JSON and optionally triggers live ISR. |
@@ -316,7 +316,7 @@ The Next.js Native & Headless Integration Engine (`class-cora-nextjs-integration
 ```
 
 ### 9.1 Headless Architecture & Class Structure (`class-cora-nextjs-integration.php`)
-* **Singleton Lifecycle**: Instantiated via `Cora_NextJS_Integration::get_instance()`, hooking into WordPress `rest_api_init` and registering administrative AJAX actions.
+* **Singleton Lifecycle**: Instantiated via `Cora_NextJS_Integration::get_instance()`, hooking into framework `rest_api_init` and registering administrative AJAX actions.
 * **Namespace Standardization**: Standardized on REST namespace `cora-canvas/v1`, exposing dedicated headless endpoints for theme manifests, page props, ISR revalidation, and CRM form submission.
 
 ### 9.2 GitHub App Router Tree Scanner & Dynamic Branch Discovery
@@ -469,7 +469,7 @@ When running local development environments (`http://localhost:3000` or `http://
      - Direct external launcher: `Open localhost:3000 ↗`.
 3. **Next.js Proxy Router (`cora_canvas_theme_frontend_router`)**:
    - In `cora-workspace.php`, the frontend router inspects active and preview themes.
-   - If the theme source is `nextjs`, it renders `cora_render_nextjs_live_frame()` or `cora_render_nextjs_connector_screen()` immediately, completely eliminating random WordPress default template fallbacks.
+   - If the theme source is `nextjs`, it renders `cora_render_nextjs_live_frame()` or `cora_render_nextjs_connector_screen()` immediately, completely eliminating random default template fallbacks.
 4. **Bidirectional PostMessage Bridge**:
    - The host workspace communicates with the child Next.js iframe using `postMessage`:
      - `CORA_INIT`: Transmits API URL, REST nonces, theme ID, and initial route.
@@ -613,7 +613,7 @@ Replaces passive, ambiguous options with four explicit, action-driven paths:
 1. **Build with AI Prompts**: Calibrated HTML/Tailwind starter prompts with 1-click clipboard copying for Claude and ChatGPT, dual-mode code connector, and 1-click live launch.
 2. **Connect Headless Code**: Link production Next.js and Expo React Native Web Git repositories with dynamic route discovery and automated static site compilation.
 3. **Scrape & Migrate Website**: 1-click multi-page crawler that ingests any live URL, downloads and isolates assets, sanitizes DOM code, and provisions editable draft themes.
-4. **White-Labeled Visual Builder**: Launch sandboxed Elementor in an isolated workspace with a custom two-row monochromatic toolbar and zero WordPress admin chrome.
+4. **White-Labeled Visual Builder**: Launch sandboxed visual drag-and-drop builder in an isolated workspace with a custom two-row monochromatic toolbar and zero CMS admin chrome.
 
 ### 16.2 Edge-to-Edge Sticky Bottom Bar
 Modal action controls anchor permanently to the bottom of the viewport (`sticky bottom-0 bg-white border-t border-zinc-200`) with high-contrast `Cancel` and `Continue` buttons, preventing layout shifts or obscured CTA triggers on smaller laptop screens.
@@ -745,7 +745,7 @@ The AI pipeline evaluates the existing DOM structure, generates target code diff
 Guarantees that CSS resets, typography rendering, and responsive media queries behave identically between the local editor preview iframe and the exported production static distribution (`out/`, `dist/`).
 
 ### 24.2 Host Stylesheet Encapsulation
-Enforces strict CSS containment on preview iframes, preventing WordPress admin styles or workspace dashboard utilities from leaking into the sandboxed website DOM.
+Enforces strict CSS containment on preview iframes, preventing host admin styles or workspace dashboard utilities from leaking into the sandboxed website DOM.
 
 ---
 
@@ -774,7 +774,7 @@ Every pre-seeded template includes integrated contact and booking forms. Submiss
 Starting in October 2026, Canvas templates are distributed in 4 interoperable formats across the `/templates` directory:
 1. **Native Tailwind / Next.js Pages (`native_page`)**: Fully functional static HTML/JSX pages featuring sub-50ms paint times and accessible components.
 2. **AI Section Prompts (`section_prompts`)**: Structured, token-aware prompts for AI code assistants (Claude 3.5 Sonnet, Cursor Composer) allowing rapid generation of custom sections matching Cora design tokens.
-3. **Elementor Template Kits (`elementor_kit`)**: Standardized JSON blueprints enabling 1-click import into WordPress Elementor workflows.
+3. **Visual Builder Template Kits (`elementor_kit`)**: Standardized JSON blueprints enabling 1-click import into visual drag-and-drop builder workflows.
 4. **Lovable & React Projects (`lovable_project`)**: Clean React project configurations designed for Lovable.dev and v0.dev rapid app prototyping.
 
 ### 26.2 Interactive Modal Preview Engine
@@ -799,9 +799,133 @@ Forms created in Form AI Architect or embedded in Canvas pages can be tested in 
 - **Immediate DOM Sync**: Reflects form field updates, CSS styling, and validation rules in real time.
 
 ### 27.3 Static Styling Parity & Isolated CSS Containment
-- **Zero Style Leakage**: All iframe containers enforce strict shadow containment, preventing WordPress admin stylesheets and theme defaults from corrupting client-facing form elements.
+- **Zero Style Leakage**: All iframe containers enforce strict shadow containment, preventing host admin stylesheets and theme defaults from corrupting client-facing form elements.
 - **Notion/Shopify Design Token Compliance**: Form inputs, radio chips, progress indicators, and submit buttons adhere to Cora design tokens with soft tonal surfaces and Rule 13 zero-outline borders.
 
 ---
 
-*Cora Canvas Documentation v4.9.374 — Last updated: October 2026.*
+## Section 28: Industry Solutions Hub, Canonical Slug Migration & 301 Redirect Architecture (v4.9.380)
+
+### 28.1 Canonical `/industries` Migration & Search Parity
+Shipped in **v4.9.380**, Cora transitioned its core multi-vertical catalog from legacy `/use-cases` to canonical `/industries`:
+- **Search & Enterprise Nomenclature**: Positions Cora as a comprehensive operating system across 10+ distinct creative and commercial verticals rather than simple feature use cases.
+- **Permanent 301 Redirect Parity**: Server-level `.htaccess` configurations and Next.js middleware rules enforce instant, seamless 301 redirects for `/use-cases` and `/use-cases/[slug]` to `/industries` and `/industries/[slug]`, guaranteeing zero broken backlinks and full SEO authority retention.
+- **10+ Turnkey Vertical Hubs**: Deep-dive operational models covering Real Estate, Photography & Film, Architecture & Interior Design, Creative Agencies, Consulting, Salons & Spas, Fitness Studios, Events & Weddings, Hospitality, and DTC Brands.
+
+### 28.2 Desktop Mega-Menu & Mobile Drawer Parity
+- **Desktop Mega-Menu Grid**: Redesigned multi-column dropdown assembly in `Navbar.tsx` featuring dedicated vector SVG icon tiles, subtle status pills, active-voice capability descriptions, and Rule 13 zero-outline tonal transitions.
+- **Mobile Drawer Synchronization**: Replicates the complete industry vertical directory inside the mobile drawer sheet with bottom clearance padding (`pb-28`) ensuring the mobile floating island navigation bar never occludes bottom items.
+
+---
+
+## Section 29: Lenis Smooth-Scroll Boundary Isolation & Features Directory Architecture (v4.9.378–v4.9.380)
+
+### 29.1 Lenis Smooth-Scroll Boundary Isolation (`data-lenis-prevent`)
+Shipped in **v4.9.378**, this major UX update prevents wheel-scroll trapping within scrollable sidebars and code inspectors:
+- **Wheel Trapping Elimination**: In complex layouts featuring Lenis smooth scrolling (e.g. `/features` sidebar), nested scrollable containers are wrapped with `data-lenis-prevent` and explicit height bounds (`max-h-[calc(100vh-120px)] overflow-y-auto`).
+- **Independent Scroll Lifecycle**: When users scroll through internal filter lists or capability categories, wheel-scroll events are isolated within the target element without propagating upward to disrupt global page positioning.
+
+### 29.2 Features Capability Directory & Turnkey Brand Kit
+- **Compact Single-Line Navigation**: Features catalog sidebar (`FeaturesSidebar.tsx`) utilizes compact, single-line typography with vector SVG status glyphs and segmented status filters (*All*, *Released*, *Beta*, *Upcoming*).
+- **Search Glyph Alignment**: Standardizes search inputs with positioned SVG search icons, eliminating text overlapping.
+- **40+ Active-Voice Capability Cards**: Overhauls capability descriptions to use clear, punchy active voice paired with unified monochromatic calls-to-action.
+- **Turnkey Brand Asset Registry (`/brand`)**: 1-click clipboard SVG copy and direct `.svg` downloads for Primary, Inverted, and Symbol marks adhering strictly to Rule 13 zero-outline guidelines.
+
+---
+
+## Section 30: Canvas Themes 4-KPI Analytical Bar & Sticky 3-Tab Sub-Navigation Architecture (v4.9.381)
+
+### 30.1 Canvas Themes 4-KPI Analytical Scorecard Architecture (`#canvas-level-1`)
+In **v4.9.381**, the top of the Canvas Themes management view introduces a high-density, 4-metric diagnostic scorecard bar arranged in a 2x2 grid on mobile viewports and a single 1x4 horizontal row on desktop (`grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3`):
+
+1. **Card 1: Core Web Vitals (CWV) Score**:
+   - **Metrics**: Displays aggregate Google Core Web Vitals rating (`#pagespeed-val-score`, e.g., `99/100`) accompanied by an active status badge (`#pagespeed-badge-score`) and clear operational benchmark (`Target > 89 Score`).
+   - **Visuals**: Contained in a soft tonal card (`bg-white border border-zinc-200/80 rounded-xl p-3 shadow-3xs`) with a dedicated emerald shield icon tile (`w-7 h-7 rounded-lg bg-emerald-50 border border-emerald-200/50`).
+   - **Interactivity**: Clicking the scorecard executes `coraSwitchCanvasSubTab('tab-canvas-vitals')` to smoothly navigate into deep performance telemetry without page reloads.
+
+2. **Card 2: Largest Contentful Paint (LCP) Load Benchmark**:
+   - **Metrics**: Displays real-time Largest Contentful Paint duration (`#pagespeed-val-lcp`, e.g., `0.8s Target`) with an animated connection status indicator (`#pagespeed-conn-indicator`, emerald for connected APIs, amber for simulated benchmarks).
+   - **Visuals**: Clean clock vector SVG in a zinc tile (`w-7 h-7 rounded-lg bg-zinc-100`).
+   - **Interactivity**: Clicking smoothly jumps to the Speed & Core Web Vitals diagnostic tab.
+
+3. **Card 3: Themes Library Quota & Volume Monitoring**:
+   - **Metrics**: Real-time counter of production and staged themes (`1 Live · N Drafts`) alongside workspace draft quota tracking (`N / 10 Draft Quota`).
+   - **Visuals**: Grid layout vector SVG tile adhering to Rule 13 zero-outline specifications.
+   - **Interactivity**: Clicking automatically scrolls down to the Draft Themes Library card (`#draft-themes-library-card`) via smooth browser behavior.
+
+4. **Card 4: Published Pages & SEO Readiness**:
+   - **Metrics**: Total published live pages (`N Pages Live`) paired with an instant SEO readiness indicator (`✓ 100% SEO Ready` or itemized SEO warning count).
+   - **Visuals**: Document vector SVG with subtle structural borders.
+   - **Interactivity**: Clicking triggers `editTheme(...)` and switches directly to the Pages management tab (`switchTab('pages')`) for immediate page editing.
+
+---
+
+### 30.2 Sticky 3-Tab Sub-Navigation SOP (`#cora-canvas-subtabs`)
+Positioned directly below the global workspace header, the Canvas sub-navigation adheres strictly to the platform's ~40px sleek height standard (`height: 40px; min-height: 40px`):
+
+* **Sticky Viewport Pinning**: Pins seamlessly on scroll (`position: sticky; top: var(--cora-sticky-tabs-top, 0px); z-index: 40`), eliminating awkward top-edge collisions.
+* **Edge-to-Edge Flush Alignment**: Extends negative horizontal margins (`-mx-3 sm:-mx-4 md:-mx-5`) with matching padding on mobile devices, ensuring sub-tabs span 100% of the screen width with zero floating gaps.
+* **Touch-Action Swipe Standard**: Enforces `touch-action: pan-x pan-y; -webkit-overflow-scrolling: touch; scrollbar-width: none;` for friction-free horizontal scrolling on mobile viewports.
+* **The 3 Core Sub-Tabs**:
+  1. `tab-canvas-overview`: **Theme Library** (`subtab-btn-tab-canvas-overview`) — Displays active live theme preview, Next.js dev server status, and draft template cards.
+  2. `tab-canvas-vitals`: **Speed & Core Web Vitals** (`subtab-btn-tab-canvas-vitals`) — Detailed performance diagnostics, render-blocking script inspections, and 1-click optimization tools.
+  3. `tab-canvas-migration`: **Migration & Tools** (`subtab-btn-tab-canvas-migration`) — Multi-page crawler and visual scraper engine (hidden on mobile `< 768px`, active on desktop `md:inline-flex`).
+* **Extreme-Edge GitHub Navigation**: Docked at the far right edge of the bar via `sm:ml-auto` (`#subtab-btn-tab-canvas-github`) with a monospace `Sync` status badge, seamlessly routing into the GitHub CI/CD engine.
+
+---
+
+## Section 31: GitHub CI/CD Full-Lifecycle Integration: Branch Management, PR Review Workflow, 1-Click Merging & Commit Rollback (v4.9.381)
+
+### 31.1 Architecture & Dual Operating Modes (`class-cora-github-integration.php`)
+Shipped in **v4.9.381**, Canvas provides native, full-lifecycle Git integration directly from the workspace UI without requiring CLI terminal access:
+
+1. **Personal GitHub Account Mode**:
+   - Agencies connect using a GitHub Personal Access Token (PAT) with `repo` scope.
+   - Enables linking existing private/public repositories or provisioning brand-new repositories directly from the Canvas dashboard.
+   - Authenticated via secure dual-header fallback (`Authorization: Bearer <PAT>` and `Authorization: token <PAT>`).
+2. **Organisation Managed Workspace Mode**:
+   - Zero-configuration sync directly into Cora's official managed organization (`cora-platform`).
+   - Automatically provisions tenant-isolated branches and private repositories for turn-key deployment.
+
+---
+
+### 31.2 Branch Management & Discovery Engine
+* **Dynamic Tree & Branch Scanning (`cora_github_get_branches`)**: Live query against GitHub REST API to list all active branches with latest commit hashes and commit author telemetry.
+* **1-Click Branch Creation (`cora_github_create_branch`)**: Agencies can branch off production or staging branches directly from Canvas (e.g. `feature/redesign-2026`, `staging/client-review`), ensuring experimental edits never compromise active production sites.
+* **Tenant Branch Isolation**: In multi-tenant environments, workspace branches are automatically prefixed with tenant keys (`ws-{agency_id}/branch-name`) to prevent name collisions across workspaces.
+
+---
+
+### 31.3 Pull Request Review Workflow & Layout Diffing
+* **Granular Layout & Asset Diffing**: Every change in Canvas HTML pages, theme settings (`theme-settings.json`), and PWA manifests (`cora-manifest.json`) is recorded with precise line and structural diffs.
+* **Automated Pull Request Creation (`cora_github_create_pr`)**:
+  - Automatically compiles commit logs, layout diff telemetry, and staging URLs into a structured Pull Request.
+  - Automatically assigns base and target branches with PR title and description.
+* **In-Dashboard PR Review Registry (`cora_github_get_prs`)**: Workspace admins can view active PRs, review visual diff previews, inspect changed files, and track reviewer status directly inside the Canvas UI.
+
+---
+
+### 31.4 1-Click Merging Engine (`cora_github_merge_pr`)
+* **Instant In-Dashboard Merging**: Approved Pull Requests can be merged directly from the Canvas GitHub sub-tab with a single click.
+* **Fast-Forward & Merge Commits**: Executes GitHub merge API (`PUT /repos/{owner}/{repo}/pulls/{pull_number}/merge`), verifying mergeability, triggering automated Webhook builds, and deploying updates to production static distributions.
+* **Dual Execution Modes**:
+  - **Direct Commit Workflow (`direct`)**: Directly pushes changes to the active branch for solo founders needing rapid iteration.
+  - **Strict PR Review Workflow (`pr`)**: Enforces branch protection rules and requires PR verification before code reaches the live production branch.
+
+---
+
+### 31.5 1-Click Commit Snapshot Rollback (`cora_github_revert_commit`)
+* **Complete Reversibility**: Reverts any layout, copy, or styling regression back to an exact historical commit SHA with a single tap.
+* **Live Post Meta Synchronization**: Fetches design JSON from the historical commit tree and atomically hydrates active WordPress post meta (`wp_cora_canvas_pages`), instantly restoring previous layouts without rebuilding.
+* **Cryptographic Git Audit Trail**: Writes a dedicated reversion commit back to GitHub (`Revert to snapshot <SHA>`), ensuring an immutable, tamper-evident version history.
+
+---
+
+### 31.6 Enterprise Multi-Tenant Security & Namespace Sandboxing
+* **Cryptographic Tenant Isolation**: Each workspace is sandboxed with an immutable tenant key (`ws-{agency_id}` / `ws-{user_id}`).
+* **Strict Token Scoping**: GitHub PATs and OAuth tokens are stored encrypted at rest, isolated strictly to the issuing workspace owner, and never shared or exposed to client-side scripts.
+* **Scale Architecture**: Engineered to isolate 100,000+ simultaneous agency workspaces with zero cross-tenant contamination.
+
+---
+
+*Cora Canvas Documentation v4.9.381 — Last updated: October 2026.*

@@ -145,7 +145,7 @@ const ALL_PDF_TOOLS: PdfToolItem[] = [
   },
   {
     id: 'organize-pdf',
-    slug: 'extract-pages',
+    slug: 'organize-pdf',
     name: 'Organize PDF',
     description: 'Sort, reorder, delete, and rearrange page sequences visually in browser memory.',
     category: 'organize',
@@ -287,7 +287,7 @@ const ALL_PDF_TOOLS: PdfToolItem[] = [
   },
   {
     id: 'crop-pdf',
-    slug: 'split-pdf',
+    slug: 'crop-pdf',
     name: 'Crop PDF',
     description: 'Trim page margins and adjust printable boundary boxes for uniform print presentation.',
     category: 'edit',
@@ -297,7 +297,7 @@ const ALL_PDF_TOOLS: PdfToolItem[] = [
   // ── 6. PDF SECURITY ──
   {
     id: 'unlock-pdf',
-    slug: 'repair-pdf',
+    slug: 'unlock-pdf',
     name: 'Unlock PDF',
     description: 'Remove permission passwords and restriction flags from protected PDF documents.',
     category: 'security',
@@ -305,7 +305,7 @@ const ALL_PDF_TOOLS: PdfToolItem[] = [
   },
   {
     id: 'protect-pdf',
-    slug: 'esign-pdf',
+    slug: 'protect-pdf',
     name: 'Protect PDF',
     description: 'Encrypt confidential agreements with robust password protection and access permissions.',
     category: 'security',
@@ -322,7 +322,7 @@ const ALL_PDF_TOOLS: PdfToolItem[] = [
   },
   {
     id: 'redact-pdf',
-    slug: 'watermark-pdf',
+    slug: 'redact-pdf',
     name: 'Redact PDF',
     description: 'Permanently obscure sensitive numbers, Aadhaar figures, or proprietary trade secrets.',
     category: 'security',
@@ -330,7 +330,7 @@ const ALL_PDF_TOOLS: PdfToolItem[] = [
   },
   {
     id: 'compare-pdf',
-    slug: 'translate-pdf',
+    slug: 'compare-pdf',
     name: 'Compare PDF',
     description: 'Side-by-side visual diff scanner highlighting clause additions and contract alterations.',
     category: 'security',

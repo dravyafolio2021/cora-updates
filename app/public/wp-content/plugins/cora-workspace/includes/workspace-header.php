@@ -208,7 +208,7 @@ function cora_render_workspace_header( $args = array() ) {
         };
 
         window.coraInitSubTabsDragScroll = function() {
-            var tabContainers = document.querySelectorAll('.cora-sub-tabs-container, .cora-sticky-sub-tabs, #cora-forms-tabs, #cora-content-tabs');
+            var tabContainers = document.querySelectorAll('.cora-sub-tabs-container, .cora-sticky-sub-tabs, #cora-forms-tabs, #cora-content-tabs, #cora-settings-tabs, #cora-emails-subtabs, #cora-canvas-subtabs');
             tabContainers.forEach(function(container) {
                 if (!container || container.dataset.coraDragInit === 'true') return;
                 container.dataset.coraDragInit = 'true';
@@ -241,6 +241,22 @@ function cora_render_workspace_header( $args = array() ) {
                     }
                 });
 
+                // Stuck state handler for subtle elevation shadow
+                var checkStuck = function() {
+                    var rect = container.getBoundingClientRect();
+                    var topbarH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cora-topbar-height')) || 48;
+                    var threshold = (window.innerWidth >= 1024) ? 2 : (topbarH + 2);
+                    if (rect.top <= threshold) {
+                        container.classList.add('cora-tabs-stuck');
+                    } else {
+                        container.classList.remove('cora-tabs-stuck');
+                    }
+                };
+                window.addEventListener('scroll', checkStuck, { passive: true });
+                var mainEl = document.querySelector('main.cora-main');
+                if (mainEl) mainEl.addEventListener('scroll', checkStuck, { passive: true });
+                checkStuck();
+
                 // Auto-center active tab on load or switch
                 var activeTab = container.querySelector('.cora-sub-tab.active, .cora-tab-btn.active');
                 if (activeTab) {
@@ -267,7 +283,7 @@ function cora_render_workspace_header( $args = array() ) {
         <!-- Desktop Header -->
         <?php 
         $desktop_header_classes = ! empty( $visible_tabs ) 
-            ? 'hidden md:flex items-center justify-between border-b border-zinc-200/50 pb-2 mb-0 select-none' 
+            ? 'hidden md:flex items-center justify-between pb-2 mb-0 select-none' 
             : 'hidden md:flex items-center justify-between border-b border-zinc-200/50 pb-3 mb-2 select-none';
         ?>
         <div class="<?php echo esc_attr( $desktop_header_classes ); ?>">
@@ -418,12 +434,12 @@ function cora_render_workspace_header( $args = array() ) {
 
     <!-- Sub Navigation Tabs (Sticky Bar) -->
     <?php if ( ! empty( $visible_tabs ) ) : ?>
-        <div class="cora-sub-tabs-container cora-sticky-sub-tabs flex items-center gap-1 border-b border-zinc-200/80 dark:border-zinc-800 overflow-x-auto scrollbar-hide bg-[#FBFaf7] dark:bg-[#0c0c0e]" id="<?php echo esc_attr( $args['tabs_dom_id'] ?? 'cora-sub-navigation-tabs' ); ?>" style="position: -webkit-sticky; position: sticky; left: 0; right: 0; z-index: 35; display: flex; flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; touch-action: pan-x pan-y; overscroll-behavior-x: contain; scrollbar-width: none; min-height: 38px;">
+        <div class="cora-sub-tabs-container cora-sticky-sub-tabs flex items-center gap-1 border-b border-zinc-200/80 dark:border-zinc-800 overflow-x-auto scrollbar-hide bg-[#FBFaf7] dark:bg-[#0c0c0e] -mx-3 sm:-mx-4 md:-mx-5 px-3 sm:px-4 md:px-5 w-[calc(100%+1.5rem)] sm:w-[calc(100%+2rem)] md:w-[calc(100%+2.5rem)] max-w-[calc(100%+1.5rem)] sm:max-w-[calc(100%+2rem)] md:max-w-[calc(100%+2.5rem)]" id="<?php echo esc_attr( $args['tabs_dom_id'] ?? 'cora-sub-navigation-tabs' ); ?>" style="position: -webkit-sticky; position: sticky; left: 0; right: 0; z-index: 40; display: flex; flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; touch-action: pan-x pan-y; overscroll-behavior-x: contain; scrollbar-width: none; min-height: 40px; height: 40px; padding-top: 0; padding-bottom: 0;">
             <?php foreach ( $visible_tabs as $tab ) : 
                 $active_class = ! empty( $tab['active'] ) ? 'active border-zinc-950 text-zinc-900 dark:border-white dark:text-white font-semibold' : 'border-transparent text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 font-semibold';
                 $onclick_attr = ! empty( $tab['onclick'] ) ? 'onclick="' . esc_attr( $tab['onclick'] ) . '"' : '';
             ?>
-                <button <?php if ( ! empty( $tab['dom_id'] ) ) : ?>id="<?php echo esc_attr( $tab['dom_id'] ); ?>"<?php endif; ?> class="cora-sub-tab cora-tab-btn px-2.5 sm:px-3.5 py-2 border-b-2 text-xs font-semibold cursor-pointer transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 outline-none focus:outline-none focus-visible:outline-none select-none <?php echo $active_class; ?>" data-target="<?php echo esc_attr( $tab['id'] ); ?>" <?php echo $onclick_attr; ?> style="touch-action: pan-x pan-y; -webkit-tap-highlight-color: transparent;">
+                <button <?php if ( ! empty( $tab['dom_id'] ) ) : ?>id="<?php echo esc_attr( $tab['dom_id'] ); ?>"<?php endif; ?> class="cora-sub-tab cora-tab-btn px-2.5 sm:px-3.5 h-[40px] py-0 -mb-px border-b-2 text-xs font-semibold cursor-pointer transition-all inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 outline-none focus:outline-none focus-visible:outline-none select-none <?php echo $active_class; ?>" data-target="<?php echo esc_attr( $tab['id'] ); ?>" <?php echo $onclick_attr; ?> style="touch-action: pan-x pan-y; -webkit-tap-highlight-color: transparent;">
                     <?php if ( ! empty( $tab['icon'] ) ) : ?>
                         <span class="pointer-events-none flex items-center shrink-0"><?php echo $tab['icon']; ?></span>
                     <?php endif; ?>

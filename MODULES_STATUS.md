@@ -9,8 +9,17 @@
 
 | Module Name | Branch Name | Status | Main Touchpoint Files | Assigned Agent / Chat |
 |---|---|---|---|---|
-| **Core Platform** | `main` | 🟢 Stable (v4.9.374) | `cora-workspace.php`, `admin-dashboard.php` | Main Orchestrator |
+| **Core Platform** | `main` | 🟢 Stable (v4.9.381) | `cora-workspace.php`, `admin-dashboard.php` | Main Orchestrator |
 <!-- MODULE_ROWS_START -->
+| **Agency Projects & Portfolio Case Studies Module** | `main` | 🟢 100% Production Ready (v4.9.381) | `modules/projects/*`, `views/view-projects.php`, `cora-frontend/app/projects/*` | Portfolio & Case Studies Agent |
+| **Public Micro-Tools Growth Engine** | `main` | 🟢 100% Production Ready (v4.9.381) | `cora-frontend/app/tools/*`, `cora-frontend/lib/tools-canonical-registry.ts` | Growth & Micro-Tools Agent |
+| **Canvas Themes GitHub CI/CD & Rollback Engine** | `main` | 🟢 100% Production Ready (v4.9.381) | `includes/class-cora-github-integration.php`, `views/view-canvas.php` | Canvas Integration & DevOps Agent |
+| **Canonical Industry Directory & Slug Migration** | `main` | 🟢 Complete & Active (v4.9.380) | `cora-frontend/app/industries/*`, `cora-frontend/lib/industry-data.ts`, `cora-frontend/components/layout/Navbar.tsx` | Industry Hub & Navigation Agent |
+| **Autonomous AI Workforce & Infinite Skills Marquee** | `main` | 🟢 Complete & Active (v4.9.379) | `cora-frontend/app/ai-agent/page.tsx`, `components/ai-agent/InfiniteSkillsSection.tsx`, `scripts/deploy_frontend.py` | AI Workforce & Deployment Agent |
+| **Features Interactive Catalog & Lenis Scroll Isolation** | `main` | 🟢 Complete & Active (v4.9.378) | `cora-frontend/app/features/page.tsx`, `components/features/FeaturesSidebar.tsx` | Features & Performance Agent |
+| **Enterprise Brand Registry & SVG Download Kit** | `main` | 🟢 Complete & Active (v4.9.377) | `cora-frontend/app/brand/page.tsx`, `components/brand/*` | Brand & Design System Agent |
+| **Agency Story Canvas & Chronological Journey Ribbon** | `main` | 🟢 Complete & Active (v4.9.376) | `cora-frontend/app/about/page.tsx`, `components/about/ScrollDrivenTimeline.tsx` | Storytelling & UX Agent |
+| **Contact Multi-Field Validation & Feedback Suite** | `main` | 🟢 Complete & Active (v4.9.375) | `cora-frontend/app/contact/page.tsx` | Forms & Client Validation Agent |
 | **Universal Edge-Docked Entry Inspector & Timezone Engine** | `main` | 🟢 Complete & Active (v4.9.374) | `views/view-forms.php`, `assets/css/admin-style.css`, `cora-workspace.php` | Forms & Telemetry Agent |
 | **Dynamic Affiliate Referral Tracking & Checkout Discounts** | `main` | 🟢 Complete & Active (v4.9.374) | `includes/affiliate-referral-engine.php`, `views/view-affiliate-referrals.php`, `cora-frontend/app/api/referral/track/route.ts`, `cora-frontend/lib/referral.ts` | Growth & Affiliate Agent |
 | **Forms Cards Overhaul & Universal 5th Tab All Entries** | `main` | 🟢 Complete & Active (v4.9.372) | `views/view-forms.php`, `cora-workspace.php` | Forms UX & Performance Agent |
@@ -143,8 +152,8 @@
 ## 3. Branch Activity & Progress Log
 
 ### `main` (Production Base)
-- **Platform Version**: `4.9.316`
-- **Health**: 100% Operational & Clean Slate Base (HEAD commit `a54aeceeb` on `feat/workspace-v4.9.316`). Canvas Live Next.js preview & proxy router, offline dev server detection, preview cookie isolation, 3-step Van Dispatch Wizard, weight allocation, sales register, manifest printing, Universal Remote MCP, and OAuth 2.1 PKCE server verified ✅.
+- **Platform Version**: `4.9.381`
+- **Health**: 100% Operational & Clean Slate Base (HEAD commit `96d19ab78` on `main`). Agency Projects & Portfolio Case Studies (`wp_cora_projects`, `/workspace/projects`), Public Micro-Tools Growth Engine (63 tools, canonical registry), Canvas GitHub CI/CD (`class-cora-github-integration.php`), Forms CRM lead pipeline, and Canonical Industry Directory verified ✅.
 
 <!-- BRANCH_LOGS_START -->
 ### `feat/workspace-v4.9.316` (Active Working Base)
@@ -204,7 +213,7 @@
   - **SEC-009**: Comprehensive SSRF Protection Filter (`class-cora-ssrf-filter.php`) blocking RFC1918 private subnets, loopback, link-local, and cloud metadata (169.254.169.254) addresses.
   - **SEC-010**: Plugin updater download host allowlisting preventing remote code execution.
   - **SEC-011**: Document Vault 500KB payload caps and SHA-256 contract immutability enforcement.
-  - **SEC-012**: Scoped WordPress custom capabilities preventing tenant admin roles from gaining global site-admin or plugin installation privileges.
+  - **SEC-012**: Scoped custom role capabilities preventing tenant admin roles from gaining global site-admin or administrative privileges.
   - **SEC-013**: Client gallery password verification using `wp_check_password` and HMAC-SHA256 HttpOnly session cookies.
   - **SEC-014**: Exact hostname origin validation on Next.js frontend API proxy preventing unauthorized internal data disclosure.
   - **SEC-015**: Hardened HTTP security headers (`X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`) and Service Worker query exclusion preventing token leakage in caches.
@@ -312,6 +321,18 @@
 
 | Version | Date | Key Changes |
 | :--- | :--- | :--- |
+| **v4.9.381**<br>`CORA-1227` | Oct 2026 | **Agency Projects & Portfolio Case Studies Module**: Complete multi-tenant workspace project management (`wp_cora_projects`, `/workspace/projects`) and public Next.js portfolio (`/projects`, `/portfolio`), 6-tab studio editor, 4-Act narrative architecture (Summary, Challenge, Solution, Deliverables), verified testimonials, big numerical KPI cards in JetBrains Mono, and connected JSON-LD schemas. |
+| **v4.9.381**<br>`CORA-1228` | Oct 2026 | **Public Micro-Tools Growth Engine & Canonical Tool Registry**: Physical audit, reconciliation, and verification of 63 search-optimized client-side micro-tools across 11 categories (`cora-frontend/app/tools/*`, `lib/tools-canonical-registry.ts`) with zero-PII privacy architecture and contextual conversion hooks into Cora workspaces. |
+| **v4.9.381**<br>`CORA-1229` | Oct 2026 | **Canvas Themes GitHub CI/CD Full-Lifecycle PR & Rollback Engine**: Full Git version control docked at extreme right edge of Canvas sub-navigation (`includes/class-cora-github-integration.php`), supporting Personal PAT vs Organisation modes, branch management, automated PR creation with visual diffs, 1-click merging, and 1-click snapshot rollback (`cora_github_revert_commit`). |
+| **v4.9.381**<br>`CORA-1230` | Oct 2026 | **Forms to CRM Lead Pipeline Automation & All-Submissions REST Endpoint**: Seamless inbound bridge auto-converting public form submissions into `wp_cora_leads` CRM records with client detail extraction, deal sizing, top-floating monochromatic toasts, and unified aggregate REST submissions API (`/wp-json/cora/v1/forms/submissions`). |
+| **v4.9.381**<br>`CORA-1231` | Oct 2026 | **Editorial Knowledge Engine & High-Authority Article Library**: Structured long-form editorial library (`/articles`, `lib/articles-data.ts`) with schema-validated JSON-LD Knowledge Graphs, semantic entity linking, answer-first summaries, and citation anchors optimized for Generative Engine Optimization (GEO). |
+| **v4.9.381**<br>`CORA-1232` | Oct 2026 | **Content Suite & Email Infrastructure Hardening**: Hardened Content AI Suite and transactional email routing with tenant context isolation, Hostinger SMTP delivery verification, and multi-tenant telemetry stability. |
+| **v4.9.380** | Oct 2026 | Canonical Industry Directory Overhaul & Slug Migration: Migrated primary industry hub from `/use-cases` to canonical `/industries` with full 301 redirect parity in `.htaccess` and Next.js, refined desktop Industries Mega-Menu in `Navbar.tsx` matching exact production mockup with dedicated icon tiles and colored pill indicators, comprehensive plain-English active-voice copy across all 10+ industry verticals (`cora-frontend/lib/industry-data.ts`), and dynamic industry comparison matrix (`IndustryComparisonTable.tsx`) |
+| **v4.9.379** | Oct 2026 | Autonomous AI Workforce & 4-Row Infinite Skills Marquee: Dedicated `/ai-agent` landing canvas showcasing Cora's multi-agent operating system, high-resolution neural portrait cutout asset (`cora_hero_agent_cutout.png`) seamlessly blended into canvas container, 4-row infinite skills marquee (`InfiniteSkillsSection.tsx`) displaying verified capabilities across operations, sales, finance, and creative delivery, and automated asset bundling with `/api/health` responsiveness check |
+| **v4.9.378** | Oct 2026 | Features Catalog & Lenis Smooth-Scroll Boundary Isolation: Overhauled `/features` capability catalog, compact single-line sidebar navigation (`FeaturesSidebar.tsx`) with segmented status filters (*All*, *Released*, *Beta*, *Upcoming*), Lenis scroll isolation via `data-lenis-prevent` and explicit viewport height boundaries eliminating wheel-scroll trapping, search icon overlap fix, and active-voice nontechnical benefits across 40+ visual capability cards with a unified "Get Started for Free" CTA |
+| **v4.9.377** | Oct 2026 | Enterprise Brand Asset Registry: Modernized `/brand` center with latest agency positioning, 1-click turnkey SVG vector download kit (`BrandLogosSection.tsx`) for Primary Wordmark, Inverted Wordmark, and Symbol Mark, complete design tokens reference (neutral color scale, typography hierarchy, co-branding standards, logo clearspace/misuse rules), and authentic production UI captures adhering strictly to Rule 13 zero-outline styling |
+| **v4.9.376** | Oct 2026 | Agency Story Canvas & Connected Chronological Journey Ribbon: Redesigned `/about` page with full-width narrative layout, connected chronological timeline ribbon (`ScrollDrivenTimeline.tsx`) with seamless rail segments eliminating floating tick gaps, responsive mobile spine layout on 375px+ screens, Core Values bento cards, and dynamic operational week calendar |
+| **v4.9.375** | Oct 2026 | Contact Form Validation & Documentation Mobile Optimization: Robust multi-field client/server validation suite on `/contact` (Full Name, Work Email, Phone with dialing codes, Company/Studio, Topic dropdown) with monochromatic alerts and ARIA accessibility, streamlined docs sidebar navigation and badge wrapping in `DocsClient.tsx`, mobile floating island clearance (`pb-28`), and React Hook order violation resolution in `Navbar.tsx` |
 | **v4.9.374** | Oct 2026 | Universal Edge-Docked Entry Inspector with zero-backdrop clarity, Client Timezone Engine with localized relative and absolute timestamps, Dynamic Affiliate Referral Tracking (`POST /wp-json/cora/v1/referrals/track`), multi-cookie referral attribution (`cora-frontend/lib/referral.ts`), automated checkout coupon discount deductions (10%–20% off plans in Razorpay checkout and pricing), and unified global resources hero across all resource directories |
 | **v4.9.373** | Oct 2026 | Submissions data sanitization, base64 digital signature preview rendering, table-fixed explicit layout preventing horizontal blowouts, and REST deletion endpoint (`DELETE /wp-json/cora/v1/forms/submissions/{id}`) with tenant isolation |
 | **v4.9.372** | Oct 2026 | Forms Cards Overhaul & Universal 5th Tab "All Entries" Registry (`#all-entries`): Expanded form card padding (`p-5 sm:p-6`), fully clickable form cards navigating to editor, unlocked mobile form editing across all screen widths, live interactive form preview modal with device switchers, metric summary strip, Notion-style filter toolbar, and dynamic multi-form CSV export |
@@ -416,4 +437,4 @@
 
 ---
 
-*Cora Platform Release Manifest v4.9.374 — Architecture & Engineering Team.*
+*Cora Platform Release Manifest v4.9.381 — Architecture & Engineering Team.*
