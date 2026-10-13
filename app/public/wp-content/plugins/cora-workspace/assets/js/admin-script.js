@@ -20379,12 +20379,19 @@ jQuery(document).on('click', '#mobile-tabs-more-dropdown .cora-sub-tab, .mobile-
     // Dynamic Topbar and Sticky Tab Offset Synchronizer
     window.coraUpdateStickyOffsets = function() {
         const topbar = document.getElementById('cora-global-topbar');
+        const header = document.querySelector('.cora-workspace-header');
         if (topbar) {
-            const h = Math.round(topbar.getBoundingClientRect().height) || 52;
+            const h = Math.round(topbar.getBoundingClientRect().height) || 48;
             document.documentElement.style.setProperty('--cora-topbar-height', h + 'px');
             if (window.innerWidth < 1024) {
-                document.documentElement.style.setProperty('--cora-sticky-tabs-top', h + 'px');
+                let headerH = 0;
+                if (header && header.offsetParent !== null) {
+                    headerH = Math.round(header.getBoundingClientRect().height) || 44;
+                }
+                document.documentElement.style.setProperty('--cora-mobile-header-height', headerH + 'px');
+                document.documentElement.style.setProperty('--cora-sticky-tabs-top', (h + headerH) + 'px');
             } else {
+                document.documentElement.style.setProperty('--cora-mobile-header-height', '0px');
                 document.documentElement.style.setProperty('--cora-sticky-tabs-top', '0px');
             }
         }

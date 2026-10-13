@@ -221,6 +221,26 @@ $frontend_base = home_url();
     display: block !important;
     margin: 0 auto !important;
 }
+
+/* Mobile Search Bar Expansion in Sub-Tabs */
+@media (max-width: 639px) {
+    #cora-proj-search-wrapper.mobile-expanded {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 70px;
+        z-index: 30;
+        display: flex !important;
+        align-items: center;
+        background: #FBFaf7;
+        padding-left: 12px;
+        padding-right: 6px;
+    }
+    .dark #cora-proj-search-wrapper.mobile-expanded {
+        background: #0c0c0e;
+    }
+}
 </style>
 
 <div id="cora-projects-module" class="w-full flex-1 min-h-0 flex flex-col gap-4">
@@ -241,17 +261,48 @@ $frontend_base = home_url();
             'visible'     => true,
         ),
         'tabs_extra_html'    => '<div class="h-full flex items-center gap-1.5 sm:gap-2">
-            <div class="relative w-32 xs:w-40 sm:w-52 md:w-60 flex items-center">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                <input 
-                    type="text" 
-                    id="cora-proj-search-input"
-                    placeholder="Search projects..." 
-                    class="h-7 w-full pl-8 pr-2.5 rounded-lg border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-xs text-zinc-900 dark:text-white placeholder:text-zinc-400 outline-none focus:border-zinc-400 transition-all shadow-2xs"
-                    onkeyup="coraFilterProjectsList()"
-                />
+            <!-- Mobile Search Trigger Button (< 640px) -->
+            <button 
+                type="button" 
+                id="cora-proj-search-trigger-btn"
+                onclick="coraToggleMobileSearch(true)"
+                class="h-7 w-7 flex sm:hidden items-center justify-center rounded-lg border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white transition-all cursor-pointer shadow-2xs shrink-0 select-none"
+                title="Search projects"
+                aria-label="Search projects"
+            >
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            </button>
+
+            <!-- Search Input Wrapper (Responsive: Expands on mobile, permanent inline on desktop) -->
+            <div id="cora-proj-search-wrapper" class="cora-proj-search-wrapper hidden sm:flex items-center">
+                <div class="relative w-full sm:w-48 md:w-56 lg:w-60 flex items-center">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none shrink-0"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input 
+                        type="text" 
+                        id="cora-proj-search-input"
+                        placeholder="Search projects..." 
+                        class="h-7 w-full pl-8 pr-7 sm:pr-2.5 rounded-lg border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-xs text-zinc-900 dark:text-white placeholder:text-zinc-400 outline-none focus:border-zinc-400 transition-all shadow-2xs"
+                        oninput="coraFilterProjectsList()"
+                        onkeyup="coraFilterProjectsList()"
+                        onkeydown="if(event.key===\'Escape\'){ coraToggleMobileSearch(false); }"
+                        autocomplete="off"
+                    />
+                    <!-- Mobile Close Button -->
+                    <button 
+                        type="button" 
+                        id="cora-proj-search-close-btn"
+                        onclick="coraToggleMobileSearch(false)"
+                        class="absolute right-1 top-1/2 -translate-y-1/2 h-5 w-5 flex sm:hidden items-center justify-center rounded-md text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all cursor-pointer"
+                        title="Close search"
+                        aria-label="Close search"
+                    >
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
             </div>
-            <div class="h-7 inline-flex items-center p-0.5 bg-zinc-200/60 dark:bg-zinc-800/80 rounded-lg border border-zinc-200/70 dark:border-zinc-700/70 shrink-0 box-border">
+
+            <!-- Level 01 Segmented Switcher (Table vs Grid) -->
+            <div class="h-7 inline-flex items-center p-0.5 bg-zinc-200/60 dark:bg-zinc-800/80 rounded-lg border border-zinc-200/70 dark:border-zinc-700/70 shrink-0 box-border select-none">
                 <button type="button" onclick="coraSetViewMode(\'table\')" id="view-mode-table-btn" class="h-[22px] w-[26px] p-0 m-0 rounded-md bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white shadow-2xs border-0 cursor-pointer inline-flex items-center justify-center transition-all" title="Table View">
                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
                 </button>
@@ -1287,6 +1338,29 @@ function coraApplyProjectsFilter() {
 
 function coraFilterProjectsList() {
     coraApplyProjectsFilter();
+}
+
+// MOBILE EXPANDABLE SEARCH TOGGLE (< 640px)
+function coraToggleMobileSearch(open) {
+    var wrapper = document.getElementById('cora-proj-search-wrapper');
+    var triggerBtn = document.getElementById('cora-proj-search-trigger-btn');
+    var input = document.getElementById('cora-proj-search-input');
+    
+    if (open) {
+        if (wrapper) wrapper.classList.add('mobile-expanded');
+        if (triggerBtn) triggerBtn.classList.add('hidden');
+        if (input) {
+            input.focus();
+        }
+    } else {
+        if (wrapper) wrapper.classList.remove('mobile-expanded');
+        if (triggerBtn) triggerBtn.classList.remove('hidden');
+        if (input) {
+            input.value = '';
+            input.blur();
+        }
+        coraFilterProjectsList();
+    }
 }
 
 // OPEN DRAWER FOR CREATE
