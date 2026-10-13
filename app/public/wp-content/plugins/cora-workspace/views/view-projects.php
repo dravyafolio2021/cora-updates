@@ -37,12 +37,13 @@ if ( empty( $projects_raw ) ) {
     $projects_raw = array();
 }
 
-// Calculate KPI summary stats
-$total_projects  = count( $projects_raw );
-$published_count = 0;
-$drafts_count    = 0;
-$total_views     = 0;
-$total_inquiries = 0;
+// Calculate real, verifiable workspace portfolio metrics (Zero fabricated data)
+$total_projects     = count( $projects_raw );
+$published_count    = 0;
+$drafts_count       = 0;
+$featured_count     = 0;
+$testimonials_count = 0;
+$unique_services    = array();
 
 foreach ( $projects_raw as $p ) {
     if ( ( $p['status'] ?? 'draft' ) === 'published' ) {
@@ -50,9 +51,24 @@ foreach ( $projects_raw as $p ) {
     } else {
         $drafts_count++;
     }
-    $total_views     += intval( $p['views_count'] ?? 0 );
-    $total_inquiries += intval( $p['cta_clicks'] ?? 0 );
+    if ( ! empty( $p['is_featured'] ) ) {
+        $featured_count++;
+    }
+    if ( ! empty( $p['testimonial_quote'] ) ) {
+        $testimonials_count++;
+    }
+    $decoded_services = json_decode( $p['services'] ?? '[]', true );
+    if ( is_array( $decoded_services ) ) {
+        foreach ( $decoded_services as $s ) {
+            $s_clean = trim( strval( $s ) );
+            if ( $s_clean !== '' && ! in_array( $s_clean, $unique_services, true ) ) {
+                $unique_services[] = $s_clean;
+            }
+        }
+    }
 }
+$services_count = count( $unique_services );
+$published_pct  = $total_projects > 0 ? round( ( $published_count / $total_projects ) * 100 ) : 0;
 
 $frontend_base = home_url();
 ?>
@@ -86,17 +102,17 @@ $frontend_base = home_url();
     --cora-main-height: calc(100vh - 52px);
 }
 
-/* MAIN-AREA DOCKED DRAWER PANEL */
+/* MAIN-AREA DOCKED DRAWER PANEL (Shopify Inspired - Canvas Docked) */
 #cora-project-drawer {
     position: fixed !important;
-    top: 52px !important;
+    top: var(--cora-main-top, 52px) !important;
     bottom: 0 !important;
-    left: 16rem !important; /* Sidebar expanded default (256px / w-64) */
+    left: var(--cora-main-left, 16rem) !important;
     right: 0 !important;
-    width: calc(100vw - 16rem) !important;
-    max-width: calc(100vw - 16rem) !important;
-    height: calc(100vh - 52px) !important;
-    max-height: calc(100vh - 52px) !important;
+    width: var(--cora-main-width, calc(100vw - 16rem)) !important;
+    max-width: var(--cora-main-width, calc(100vw - 16rem)) !important;
+    height: var(--cora-main-height, calc(100vh - 52px)) !important;
+    max-height: var(--cora-main-height, calc(100vh - 52px)) !important;
     margin: 0 !important;
     padding: 0 !important;
     border-radius: 0 !important;
@@ -105,7 +121,7 @@ $frontend_base = home_url();
     border-right: none !important;
     border-bottom: none !important;
     background-color: #ffffff !important;
-    z-index: 100050 !important;
+    z-index: 40 !important; /* Kept strictly below sidebar (z-index: 60) and topbar (z-index: 9999) */
     box-shadow: none !important;
     -webkit-box-shadow: none !important;
     transition: left 0.2s cubic-bezier(0.4, 0, 0.2, 1), width 0.2s cubic-bezier(0.4, 0, 0.2, 1), max-width 0.2s cubic-bezier(0.4, 0, 0.2, 1), transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.15s ease !important;
@@ -138,7 +154,7 @@ $frontend_base = home_url();
     width: 100vw !important;
     max-width: 100vw !important;
     border-left: none !important;
-    z-index: 100060 !important;
+    z-index: 70 !important;
 }
 
 /* MOBILE / TABLET (< 1024px): Full viewport width */
@@ -152,6 +168,7 @@ $frontend_base = home_url();
         width: 100vw !important;
         max-width: 100vw !important;
         border-left: none !important;
+        z-index: 55 !important;
     }
 }
 
@@ -236,47 +253,67 @@ $frontend_base = home_url();
     }
     ?>
 
-    <!-- 2. COMPACT ANALYTICAL BAR (Sleek Monochromatic Strip - Level 02 Molecule) -->
-    <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-2.5 sm:p-3 flex flex-wrap sm:flex-nowrap items-center justify-between gap-3 shadow-2xs">
-        <div class="flex items-center gap-4 sm:gap-6 divide-x divide-zinc-200/80 dark:divide-zinc-800">
-            <!-- Showcase Views Metric -->
-            <div class="flex items-center gap-2.5">
-                <div class="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-600 dark:text-zinc-400 shrink-0">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                </div>
-                <div>
-                    <span class="text-[9.5px] font-bold text-zinc-400 uppercase tracking-wider block leading-tight">Showcase Views</span>
-                    <span class="text-xs sm:text-sm font-bold font-mono text-zinc-900 dark:text-white leading-tight"><?php echo esc_html( number_format( $total_views ) ); ?></span>
-                </div>
+    <!-- 2. WORKSPACE KPI METRIC CARDS (Sleek Monochromatic Cards - Atomic Level 02) -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3.5">
+        <!-- 1. Total Case Studies -->
+        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3 sm:p-3.5 flex items-center gap-3 shadow-2xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors">
+            <div class="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-700 dark:text-zinc-300 shrink-0 border border-zinc-200/60 dark:border-zinc-700/60">
+                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
             </div>
-
-            <!-- Published Health -->
-            <div class="pl-4 sm:pl-6 flex items-center gap-2.5">
-                <div class="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-600 dark:text-zinc-400 shrink-0">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                </div>
-                <div>
-                    <span class="text-[9.5px] font-bold text-zinc-400 uppercase tracking-wider block leading-tight">Live Readiness</span>
-                    <span class="text-xs sm:text-sm font-bold font-mono text-zinc-900 dark:text-white leading-tight"><?php echo $total_projects > 0 ? round(($published_count / $total_projects) * 100) : 0; ?>% Published</span>
-                </div>
-            </div>
-
-            <!-- Schema Health -->
-            <div class="hidden sm:flex pl-6 items-center gap-2.5">
-                <div class="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-600 dark:text-zinc-400 shrink-0">
-                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
-                </div>
-                <div>
-                    <span class="text-[9.5px] font-bold text-zinc-400 uppercase tracking-wider block leading-tight">AI & GEO Discovery</span>
-                    <span class="text-xs font-semibold text-zinc-800 dark:text-zinc-200 leading-tight">CaseStudy Schema Active</span>
+            <div class="min-w-0 flex-1">
+                <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block truncate">Total Projects</span>
+                <div class="flex items-baseline gap-1.5 mt-0.5">
+                    <span class="text-sm sm:text-base font-bold font-mono text-zinc-950 dark:text-zinc-50"><?php echo esc_html( $total_projects ); ?></span>
+                    <span class="text-[10.5px] text-zinc-500 font-sans truncate"><?php echo esc_html( $featured_count ); ?> featured</span>
                 </div>
             </div>
         </div>
 
-        <!-- Quick Status Link -->
-        <div class="hidden sm:flex items-center gap-2 shrink-0">
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-zinc-700">Indexed</span>
-            <a href="<?php echo esc_url( $frontend_base . '/portfolio' ); ?>" target="_blank" class="px-2.5 py-1 rounded-lg text-xs font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition">Live Showcase &rarr;</a>
+        <!-- 2. Live Showcase Readiness -->
+        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3 sm:p-3.5 flex items-center gap-3 shadow-2xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors">
+            <div class="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-700 dark:text-zinc-300 shrink-0 border border-zinc-200/60 dark:border-zinc-700/60">
+                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            </div>
+            <div class="min-w-0 flex-1">
+                <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block truncate">Live Readiness</span>
+                <div class="flex items-baseline gap-1.5 mt-0.5">
+                    <span class="text-sm sm:text-base font-bold font-mono text-zinc-950 dark:text-zinc-50"><?php echo esc_html( $published_count ); ?>/<?php echo esc_html( $total_projects ); ?></span>
+                    <span class="text-[10.5px] text-zinc-500 font-sans truncate"><?php echo esc_html( $published_pct ); ?>% Live</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Client Testimonials Proof -->
+        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3 sm:p-3.5 flex items-center gap-3 shadow-2xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors">
+            <div class="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-700 dark:text-zinc-300 shrink-0 border border-zinc-200/60 dark:border-zinc-700/60">
+                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+            </div>
+            <div class="min-w-0 flex-1">
+                <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block truncate">Client Social Proof</span>
+                <div class="flex items-baseline gap-1.5 mt-0.5">
+                    <span class="text-sm sm:text-base font-bold font-mono text-zinc-950 dark:text-zinc-50"><?php echo esc_html( $testimonials_count ); ?></span>
+                    <span class="text-[10.5px] text-zinc-500 font-sans truncate">verified quote<?php echo $testimonials_count === 1 ? '' : 's'; ?></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Active Capabilities & Showcase Link -->
+        <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3 sm:p-3.5 flex items-center justify-between gap-3 shadow-2xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors">
+            <div class="flex items-center gap-3 min-w-0 flex-1">
+                <div class="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-700 dark:text-zinc-300 shrink-0 border border-zinc-200/60 dark:border-zinc-700/60">
+                    <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="1.8" fill="none"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block truncate">Capabilities</span>
+                    <div class="flex items-baseline gap-1.5 mt-0.5">
+                        <span class="text-sm sm:text-base font-bold font-mono text-zinc-950 dark:text-zinc-50"><?php echo esc_html( $services_count ); ?></span>
+                        <span class="text-[10.5px] text-zinc-500 font-sans truncate">services</span>
+                    </div>
+                </div>
+            </div>
+            <a href="<?php echo esc_url( $frontend_base . '/portfolio' ); ?>" target="_blank" class="shrink-0 p-1.5 rounded-lg text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition" title="Open live showcase">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+            </a>
         </div>
     </div>
 
@@ -1343,7 +1380,6 @@ function coraEditProject(id) {
     coraShowProjectDrawer();
 }
 
-// BODY PORTAL & SHOW DRAWER (FULL SCREEN BLUR & EDGE-TO-EDGE)
 // DYNAMIC BOUNDS SYNCHRONIZER (BOUND TO AVAILABLE MAIN WORKSPACE AREA)
 function coraSyncMainAreaBounds() {
     var drawer = document.getElementById('cora-project-drawer');
@@ -1378,7 +1414,7 @@ function coraSyncMainAreaBounds() {
         var targetLeft = 0;
         if (!isMobile && sidebarEl) {
             var sRect = sidebarEl.getBoundingClientRect();
-            // Use actual right edge of the sidebar so drawer aligns flush with sidebar border
+            // Use precise right boundary of the sidebar so drawer seamlessly docks with 0 gap
             targetLeft = Math.round(sRect.right);
             if (targetLeft <= 0 || isNaN(targetLeft)) {
                 targetLeft = isSidebarCollapsed ? 64 : 256;
@@ -1401,23 +1437,37 @@ function coraSyncMainAreaBounds() {
         drawer.style.maxHeight = targetHeight + 'px';
     }
 }
+
+// Continuously sync bounds over a duration (e.g. during a 250ms CSS animation)
+function coraAnimateSyncBounds(durationMs) {
+    var start = Date.now();
+    var duration = durationMs || 280;
+    function frame() {
+        coraSyncMainAreaBounds();
+        if (Date.now() - start < duration) {
+            requestAnimationFrame(frame);
+        } else {
+            coraSyncMainAreaBounds();
+        }
+    }
+    requestAnimationFrame(frame);
+}
+
 window.addEventListener('resize', coraSyncMainAreaBounds);
 window.addEventListener('cora:sidebar-toggle', function() {
-    coraSyncMainAreaBounds();
+    coraAnimateSyncBounds(300);
 });
 
 // Observe sidebar changes (expand/collapse) to sync available space in real time
 if (window.MutationObserver) {
     var coraSidebarObserver = new MutationObserver(function() {
-        coraSyncMainAreaBounds();
+        coraAnimateSyncBounds(250);
     });
     var sidebarEl = document.querySelector('.cora-sidebar');
     if (sidebarEl) {
         coraSidebarObserver.observe(sidebarEl, { attributes: true, attributeFilter: ['class', 'style'] });
         sidebarEl.addEventListener('transitionend', function(e) {
-            if (e.propertyName === 'width' || e.propertyName === 'transform') {
-                coraSyncMainAreaBounds();
-            }
+            coraSyncMainAreaBounds();
         });
     }
     coraSidebarObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });

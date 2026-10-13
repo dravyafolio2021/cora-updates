@@ -2663,6 +2663,17 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         /* Sidebar collapse transitions and width resets */
         .cora-sidebar {
             transition: width 0.2s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            pointer-events: auto !important;
+        }
+        @media (min-width: 1024px) {
+            .cora-sidebar {
+                z-index: 60 !important;
+                pointer-events: auto !important;
+            }
+            #cora-sidebar-scroll-container {
+                pointer-events: auto !important;
+                overscroll-behavior: contain !important;
+            }
         }
 
         /* Collapsed sidebar classes */
@@ -3750,7 +3761,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             backdrop-filter: blur(20px) !important;
             -webkit-backdrop-filter: blur(20px) !important;
             box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.28), 0 0 0 1px rgba(0, 0, 0, 0.05) !important;
-            z-index: 99995 !important;
+            z-index: 100025 !important;
             box-sizing: border-box !important;
             flex-direction: column !important;
             transform-origin: top right !important;
@@ -5026,7 +5037,7 @@ textarea,
     </script>
 
     <!-- Global Brand & Customized Blocks Top Navbar (Shopify Style Unified Header) -->
-    <header id="cora-global-topbar" class="cora-topbar bg-[#09090b] text-white px-4 md:px-6 py-2 flex items-center justify-between border-b border-zinc-800/80 sticky top-0 z-50 shrink-0 select-none" style="position: sticky !important; top: 0 !important; background-color: #09090b !important; z-index: 9999 !important; min-height: 48px;">
+    <header id="cora-global-topbar" class="cora-topbar bg-[#09090b] text-white px-4 md:px-6 py-2 flex items-center justify-between border-b border-zinc-800/80 sticky top-0 z-50 shrink-0 select-none" style="position: sticky !important; top: 0 !important; background-color: #09090b !important; z-index: 100000 !important; min-height: 48px;">
         <div class="cora-topbar-desktop w-full items-center justify-between gap-4">
             <!-- Universal Driver Topbar Strip (Desktop) -->
             <div class="cora-driver-topbar-strip <?php echo ( ! empty( $is_driver_user ) || $is_driver_url_param ) ? 'flex' : 'hidden'; ?> items-center justify-between w-full">
@@ -5078,7 +5089,7 @@ textarea,
             <!-- Right Section: Actions & User Profile on the Edge -->
             <div class="cora-topbar-actions flex items-center gap-2.5 shrink-0">
                 <!-- Cora AI Copilot Shortcut -->
-                <button id="cora-quick-ai-btn" class="w-8 h-8 flex items-center justify-center border border-zinc-800 rounded-lg hover:bg-zinc-800 bg-zinc-900 text-zinc-300 hover:text-white transition-all active:scale-[0.98] shadow-2xs cursor-pointer shrink-0" title="Cora AI Copilot">
+                <button id="cora-quick-ai-btn" onclick="if(event) event.stopPropagation(); if(typeof window.coraToggleSidebar==='function'){ var sb = document.getElementById('cora-ai-sidebar'); window.coraToggleSidebar(sb ? sb.classList.contains('collapsed') : true); }" class="w-8 h-8 flex items-center justify-center border border-zinc-800 rounded-lg hover:bg-zinc-800 bg-zinc-900 text-zinc-300 hover:text-white transition-all active:scale-[0.98] shadow-2xs cursor-pointer shrink-0" title="Cora AI Copilot">
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path stroke-linecap="round" stroke-linejoin="round" d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"/></svg>
                 </button>
                 <!-- Notifications Bell -->
@@ -5198,8 +5209,8 @@ textarea,
 
     <?php if ( ! $is_driver_user ) : ?>
     <!-- Universal Header Profile Popover Card (Modal Document Root Level - Global Across All Workspace Pages) -->
-    <div id="cora-header-profile-backdrop" onclick="window.coraCloseProfilePopover()" class="hidden" style="display:none; position:fixed; inset:0; z-index:99990; background:transparent; pointer-events:none;"></div>
-    <div id="cora-header-profile-popover" class="hidden bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border border-zinc-200/90 dark:border-zinc-800 p-3.5 gap-2.5 animate-in fade-in zoom-in-95 duration-150 select-none">
+    <div id="cora-header-profile-backdrop" onclick="window.coraCloseProfilePopover()" class="hidden" style="display:none; position:fixed; inset:0; z-index:100020; background:transparent; pointer-events:none;"></div>
+    <div id="cora-header-profile-popover" class="hidden bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border border-zinc-200/90 dark:border-zinc-800 p-3.5 gap-2.5 animate-in fade-in zoom-in-95 duration-150 select-none" style="z-index:100025 !important;">
         <!-- 1. Executive User Profile Header -->
         <div class="flex items-center gap-3 px-1 py-0.5 select-none">
             <div class="relative w-10 h-10 shrink-0">
@@ -11388,7 +11399,7 @@ textarea,
 
             <!-- SECTION: TASKS -->
     <!-- Local backdrop for AI bottom sheet sidebar (mobile/tablet only) -->
-    <div id="cora-ai-sidebar-backdrop" onclick="window.coraToggleSidebar(false)" class="hidden" style="display:none; position:fixed; inset:0; z-index:9960; background:transparent; backdrop-filter:none; -webkit-backdrop-filter:none; pointer-events:none;"></div>
+    <div id="cora-ai-sidebar-backdrop" onclick="window.coraToggleSidebar(false)" class="hidden" style="display:none; position:fixed; inset:0; z-index:100005; background:transparent; backdrop-filter:none; -webkit-backdrop-filter:none; pointer-events:none;"></div>
 
     <script>
     window.coraToggleConversationsDropdown = function(e) {
@@ -11804,7 +11815,7 @@ textarea,
     </div>
 
     <!-- Unified Cora AI Co-Founder Panel (Mobile Bottom Sheet + Desktop Side Panel) -->
-    <aside id="cora-ai-sidebar" class="cora-ai-sidebar collapsed fixed top-0 lg:top-[52px] right-0 left-0 z-[9999] h-full lg:h-[calc(100vh-52px)] w-full max-w-full bg-white dark:bg-zinc-950 border-t lg:border-t-0 lg:border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-all duration-300 ease-in-out" style="display:none; pointer-events:none;">
+    <aside id="cora-ai-sidebar" class="cora-ai-sidebar collapsed fixed top-0 lg:top-[52px] right-0 left-0 z-[100010] h-full lg:h-[calc(100vh-52px)] w-full max-w-full bg-white dark:bg-zinc-950 border-t lg:border-t-0 lg:border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col transition-all duration-300 ease-in-out" style="display:none; pointer-events:none; z-index:100010 !important;">
         
         <!-- Mobile Native Drag Handle (Visible only on mobile) -->
         <div class="lg:hidden flex items-center justify-center pt-2.5 pb-1 shrink-0 bg-zinc-50 dark:bg-zinc-900 cursor-grab select-none" onclick="window.coraToggleSidebar(false)">
@@ -12238,10 +12249,10 @@ textarea,
     </aside>
 
     <!-- Notifications Backdrop (Desktop Only) -->
-    <div id="cora-notif-backdrop" onclick="window.coraToggleNotificationDrawer(false)" class="hidden" style="display:none; position:fixed; inset:0; z-index:9998; background:transparent; backdrop-filter:none; -webkit-backdrop-filter:none; pointer-events:none;"></div>
+    <div id="cora-notif-backdrop" onclick="window.coraToggleNotificationDrawer(false)" class="hidden" style="display:none; position:fixed; inset:0; z-index:100005; background:transparent; backdrop-filter:none; -webkit-backdrop-filter:none; pointer-events:none;"></div>
 
     <!-- Notifications Side Drawer Panel -->
-    <aside id="cora-notif-dropdown" class="collapsed fixed top-0 right-0 z-[9999] h-full w-[400px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-all duration-300 ease-in-out">
+    <aside id="cora-notif-dropdown" class="collapsed fixed top-0 right-0 z-[100010] h-full w-[400px] max-w-[90vw] bg-white border-l border-zinc-200 shadow-2xl flex flex-col transition-all duration-300 ease-in-out" style="z-index:100010 !important;">
         <div class="px-5 py-4 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/60 shrink-0 select-none">
             <div class="flex items-center gap-2">
                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-700">
@@ -17509,11 +17520,23 @@ window.coraCurrentUserId = <?php echo intval( get_current_user_id() ); ?>;
         if (isHidden) {
             popover.classList.remove('hidden');
             popover.style.display = 'flex';
-            if (backdrop) backdrop.classList.add('active');
+            popover.style.pointerEvents = 'auto';
+            if (backdrop) {
+                backdrop.classList.remove('hidden');
+                backdrop.classList.add('active');
+                backdrop.style.display = 'block';
+                backdrop.style.pointerEvents = 'auto';
+            }
         } else {
             popover.classList.add('hidden');
             popover.style.display = 'none';
-            if (backdrop) backdrop.classList.remove('active');
+            popover.style.pointerEvents = 'none';
+            if (backdrop) {
+                backdrop.classList.remove('active');
+                backdrop.classList.add('hidden');
+                backdrop.style.display = 'none';
+                backdrop.style.pointerEvents = 'none';
+            }
         }
     };
 
@@ -17523,9 +17546,13 @@ window.coraCurrentUserId = <?php echo intval( get_current_user_id() ); ?>;
         if (popover) {
             popover.classList.add('hidden');
             popover.style.display = 'none';
+            popover.style.pointerEvents = 'none';
         }
         if (backdrop) {
             backdrop.classList.remove('active');
+            backdrop.classList.add('hidden');
+            backdrop.style.display = 'none';
+            backdrop.style.pointerEvents = 'none';
         }
     };
 
