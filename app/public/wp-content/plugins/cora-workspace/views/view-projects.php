@@ -122,14 +122,23 @@ $frontend_base = home_url();
 
 /* SIDEBAR COLLAPSED: Dynamically adjust to 4rem (64px / w-16) on desktop */
 @media (min-width: 1024px) {
-    body:has(.cora-sidebar.collapsed-sidebar) #cora-project-drawer,
-    body.cora-sidebar-collapsed #cora-project-drawer,
-    .cora-sidebar.collapsed-sidebar ~ .cora-main #cora-project-drawer,
-    #cora-project-drawer.sidebar-collapsed {
+    body:has(.cora-sidebar.collapsed-sidebar) #cora-project-drawer:not(.maximized),
+    body.cora-sidebar-collapsed #cora-project-drawer:not(.maximized),
+    .cora-sidebar.collapsed-sidebar ~ .cora-main #cora-project-drawer:not(.maximized),
+    #cora-project-drawer.sidebar-collapsed:not(.maximized) {
         left: 4rem !important;
         width: calc(100vw - 4rem) !important;
         max-width: calc(100vw - 4rem) !important;
     }
+}
+
+/* MAXIMIZED FULLSCREEN VIEW (Shopify Expand ⤢ Mode) */
+#cora-project-drawer.maximized {
+    left: 0 !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    border-left: none !important;
+    z-index: 100060 !important;
 }
 
 /* MOBILE / TABLET (< 1024px): Full viewport width */
@@ -683,7 +692,7 @@ $frontend_base = home_url();
      ========================================================================= -->
 <aside id="cora-project-drawer" class="collapsed">
     
-    <!-- Drawer Header (Shopify-Inspired Main Area Header) -->
+    <!-- Drawer Header (Shopify-Inspired Main Area Header with Expand & Close) -->
     <div class="px-6 sm:px-8 py-3.5 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-between shrink-0">
         <div>
             <div class="flex items-center gap-2 mb-1">
@@ -693,14 +702,28 @@ $frontend_base = home_url();
             <h2 class="text-base font-bold text-zinc-950 dark:text-zinc-50 leading-tight" id="cora-proj-drawer-title">New Project</h2>
             <p class="text-[11px] text-zinc-500 mt-0.5">Configure deliverables, transformation metrics, and narrative acts.</p>
         </div>
-        <button 
-            type="button" 
-            onclick="coraCloseProjectDrawer()"
-            class="w-8 h-8 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 flex items-center justify-center text-zinc-500 hover:text-zinc-950 dark:hover:text-white transition-all cursor-pointer border border-zinc-200/80 dark:border-zinc-700 shadow-2xs active:scale-95 shrink-0"
-            title="Close Drawer (Esc)"
-        >
-            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-        </button>
+        <div class="flex items-center gap-1.5 shrink-0">
+            <!-- Fullscreen / Maximize Toggle Button (Shopify Expand ⤢) -->
+            <button 
+                type="button" 
+                onclick="coraToggleProjectDrawerMaximize()"
+                id="cora-proj-maximize-btn"
+                class="w-8 h-8 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 flex items-center justify-center text-zinc-500 hover:text-zinc-950 dark:hover:text-white transition-all cursor-pointer border border-zinc-200/80 dark:border-zinc-700 shadow-2xs active:scale-95 shrink-0"
+                title="Expand / Restore Canvas"
+            >
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"></path><path d="M9 21H3v-6"></path><path d="M21 3l-7 7"></path><path d="M3 21l7-7"></path></svg>
+            </button>
+
+            <!-- Close Button (Esc) -->
+            <button 
+                type="button" 
+                onclick="coraCloseProjectDrawer()"
+                class="w-8 h-8 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 flex items-center justify-center text-zinc-500 hover:text-zinc-950 dark:hover:text-white transition-all cursor-pointer border border-zinc-200/80 dark:border-zinc-700 shadow-2xs active:scale-95 shrink-0"
+                title="Close Drawer (Esc)"
+            >
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
     </div>
 
     <!-- Drawer Sub-Navigation Tabs (Segmented Control Group - Level 01 Atom) -->
@@ -1336,6 +1359,17 @@ function coraSyncMainAreaBounds() {
             drawer.classList.remove('sidebar-collapsed');
         }
 
+        // If drawer is currently maximized (fullscreen ⤢), keep full viewport bounds
+        if (drawer.classList.contains('maximized')) {
+            drawer.style.left = '0px';
+            drawer.style.top = '52px';
+            drawer.style.width = '100vw';
+            drawer.style.maxWidth = '100vw';
+            drawer.style.height = (window.innerHeight - 52) + 'px';
+            drawer.style.maxHeight = (window.innerHeight - 52) + 'px';
+            return;
+        }
+
         // Calculate available main canvas bounds
         var mainEl = document.querySelector('main.cora-main') || document.querySelector('.cora-main');
         if (mainEl) {
@@ -1359,6 +1393,9 @@ function coraSyncMainAreaBounds() {
     }
 }
 window.addEventListener('resize', coraSyncMainAreaBounds);
+window.addEventListener('cora:sidebar-toggle', function() {
+    coraSyncMainAreaBounds();
+});
 
 // Observe sidebar changes (expand/collapse) to sync available space in real time
 if (window.MutationObserver) {
@@ -1400,6 +1437,30 @@ function coraShowProjectDrawer() {
     }
 }
 
+// TOGGLE EXPAND / MAXIMIZE CANVAS (SHOPIFY EXPAND ⤢ MODE)
+function coraToggleProjectDrawerMaximize() {
+    var drawer = document.getElementById('cora-project-drawer');
+    var maxBtn = document.getElementById('cora-proj-maximize-btn');
+    if (!drawer) return;
+
+    var isMax = drawer.classList.toggle('maximized');
+    if (isMax) {
+        drawer.style.left = '0px';
+        drawer.style.width = '100vw';
+        drawer.style.maxWidth = '100vw';
+        if (maxBtn) {
+            maxBtn.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h6v6"></path><path d="M20 10h-6V4"></path><path d="M14 10l7-7"></path><path d="M3 21l7-7"></path></svg>';
+            maxBtn.title = "Restore Docked Canvas";
+        }
+    } else {
+        if (maxBtn) {
+            maxBtn.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"></path><path d="M9 21H3v-6"></path><path d="M21 3l-7 7"></path><path d="M3 21l7-7"></path></svg>';
+            maxBtn.title = "Expand / Fullscreen Canvas";
+        }
+        coraSyncMainAreaBounds();
+    }
+}
+
 // HIDE MAIN-AREA DOCKED DRAWER PANEL & RESTORE MAIN SCROLL
 function coraCloseProjectDrawer() {
     var drawer = document.getElementById('cora-project-drawer');
@@ -1408,6 +1469,7 @@ function coraCloseProjectDrawer() {
     if (drawer) {
         drawer.classList.remove('open');
         drawer.classList.add('collapsed');
+        drawer.classList.remove('maximized');
 
         // Restore main content area scroll
         if (mainEl) {

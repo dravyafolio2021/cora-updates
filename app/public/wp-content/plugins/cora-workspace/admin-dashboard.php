@@ -4263,6 +4263,8 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 if (typeof $ !== 'undefined') {
                     $('#cora-workspace-popover, #cora-profile-popover, #cora-sidebar-floating-tooltip').addClass('hidden');
                 }
+                // Notify dependent docked panels and views immediately
+                window.dispatchEvent(new CustomEvent('cora:sidebar-toggle', { detail: { isCollapsed: isCollapsed } }));
             }
             return false;
         };
