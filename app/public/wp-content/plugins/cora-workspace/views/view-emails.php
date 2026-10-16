@@ -292,7 +292,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                 <button onclick="openEmailTemplateDrawer()" 
                         class="h-9 px-3.5 rounded-lg bg-zinc-950 hover:bg-zinc-900 text-white text-xs font-bold flex items-center gap-2 border-0 cursor-pointer shadow-xs shrink-0 transition-colors">
                     <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                    + Create Template
+                    Create Template
                 </button>
             </div>
 

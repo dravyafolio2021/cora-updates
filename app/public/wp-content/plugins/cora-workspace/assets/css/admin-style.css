@@ -157,11 +157,48 @@
     }
 }
 
-/* Platform AI Stack display hook */
-@media (min-width: 768px) {
-    .cora-platform-stack {
-        display: flex !important;
+/* =============================================================================
+   AI PLATFORM STACK & HOVER ELEVATION
+   ============================================================================= */
+.cora-platform-stack {
+    position: relative;
+    display: inline-flex !important;
+    align-items: center !important;
+    isolation: auto;
+}
+
+.cora-platform-stack > button {
+    position: relative !important;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, z-index 0s !important;
+}
+
+.cora-platform-stack > button:nth-child(1) { z-index: 5; margin-left: 0 !important; }
+.cora-platform-stack > button:nth-child(2) { z-index: 4; margin-left: -10px !important; }
+.cora-platform-stack > button:nth-child(3) { z-index: 3; margin-left: -10px !important; }
+.cora-platform-stack > button:nth-child(4) { z-index: 2; margin-left: -10px !important; }
+.cora-platform-stack > button:nth-child(5) { z-index: 1; margin-left: -10px !important; }
+
+/* Mobile AI stack tighter overlap */
+@media (max-width: 767.98px) {
+    .cora-workspace-header-mobile .cora-platform-stack > button:nth-child(2),
+    .cora-workspace-header-mobile .cora-platform-stack > button:nth-child(3),
+    .cora-workspace-header-mobile .cora-platform-stack > button:nth-child(4),
+    .cora-workspace-header-mobile .cora-platform-stack > button:nth-child(5) {
+        margin-left: -7px !important;
     }
+}
+
+/* Hover & Focus Elevation: elevated above all sibling buttons */
+.cora-platform-stack > button:hover,
+.cora-platform-stack > button:focus-visible,
+.cora-platform-stack > button:active {
+    z-index: 60 !important;
+}
+
+.cora-platform-stack .group:hover > span,
+.cora-platform-stack .group:focus-visible > span {
+    opacity: 1 !important;
+    visibility: visible !important;
 }
 
 /* =============================================================================
@@ -707,7 +744,8 @@ body.cora-skeleton-active .cora-page-section {
         z-index: 50 !important;
     }
     .cora-workspace-header {
-        position: static !important;
+        position: relative !important;
+        z-index: 45 !important;
         margin-left: 0 !important;
         margin-right: 0 !important;
         padding-left: 0 !important;
@@ -769,7 +807,8 @@ body.cora-skeleton-active .cora-page-section {
         box-sizing: border-box !important;
     }
     .cora-workspace-header {
-        position: static !important;
+        position: relative !important;
+        z-index: 45 !important;
         margin-left: 0 !important;
         margin-right: 0 !important;
         padding-left: 0 !important;
@@ -1809,10 +1848,12 @@ body.cora-scroll-locked {
 .cora-settings-nav-mobile,
 .cora-email-sub-tab,
 .cora-canvas-sub-tab,
-.cora-sub-tabs-container button,
-.cora-sub-tabs-container a,
-.cora-sticky-sub-tabs button,
-.cora-sticky-sub-tabs a,
+.cora-sub-tabs-nav button,
+.cora-sub-tabs-nav a,
+.cora-sub-tabs-container button:not(.cora-sub-tabs-extra *),
+.cora-sub-tabs-container a:not(.cora-sub-tabs-extra *),
+.cora-sticky-sub-tabs button:not(.cora-sub-tabs-extra *),
+.cora-sticky-sub-tabs a:not(.cora-sub-tabs-extra *),
 #cora-forms-tabs button,
 #cora-forms-tabs a,
 #cora-settings-tabs a,
@@ -1841,8 +1882,8 @@ body.cora-scroll-locked {
 .cora-tab-btn > *,
 .cora-email-sub-tab > *,
 .cora-canvas-sub-tab > *,
-.cora-sticky-sub-tabs button > *,
-.cora-sub-tabs-container button > * {
+.cora-sticky-sub-tabs button:not(.cora-sub-tabs-extra *) > *,
+.cora-sub-tabs-container button:not(.cora-sub-tabs-extra *) > * {
     pointer-events: none !important;
 }
 
@@ -2312,8 +2353,338 @@ body,
     }
 }
 
+/* =========================================================================
+   STANDARDIZED SUB-TABS TOOLBAR & CONTROLS (Level 01 Search & Switcher)
+   ========================================================================= */
+.cora-sub-tabs-container .cora-sub-tabs-extra,
+.cora-sticky-sub-tabs .cora-sub-tabs-extra {
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
 
+.cora-subtabs-toolbar {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 100%;
+    box-sizing: border-box;
+}
 
+/* Mobile Search Trigger Button */
+.cora-sub-tabs-container .cora-subtabs-search-trigger,
+.cora-sticky-sub-tabs .cora-subtabs-search-trigger,
+.cora-subtabs-search-trigger {
+    width: 28px !important;
+    min-width: 28px !important;
+    max-width: 28px !important;
+    height: 28px !important;
+    min-height: 28px !important;
+    max-height: 28px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border-radius: 8px !important;
+    border: 1px solid rgba(228, 228, 231, 0.8) !important;
+    background-color: #ffffff !important;
+    color: #52525b !important;
+    display: none !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03) !important;
+    cursor: pointer !important;
+    user-select: none !important;
+    transition: all 0.15s ease !important;
+    flex-shrink: 0 !important;
+    line-height: 1 !important;
+}
 
+.dark .cora-sub-tabs-container .cora-subtabs-search-trigger,
+.dark .cora-sticky-sub-tabs .cora-subtabs-search-trigger,
+.dark .cora-subtabs-search-trigger {
+    border-color: #27272a !important;
+    background-color: #18181b !important;
+    color: #d4d4d8 !important;
+}
+
+.cora-subtabs-search-trigger:hover {
+    color: #09090b !important;
+    border-color: #d4d4d8 !important;
+}
+
+.dark .cora-subtabs-search-trigger:hover {
+    color: #ffffff !important;
+    border-color: #3f3f46 !important;
+}
+
+/* Sub-tabs Search Container */
+.cora-subtabs-search {
+    position: relative;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.cora-subtabs-search-inner {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 200px;
+    box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+    .cora-subtabs-search-inner {
+        width: 220px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .cora-subtabs-search-inner {
+        width: 240px;
+    }
+}
+
+/* Sub-tabs Search Input */
+.cora-sub-tabs-container input.cora-subtabs-search-input,
+.cora-sticky-sub-tabs input.cora-subtabs-search-input,
+input.cora-subtabs-search-input {
+    height: 28px !important;
+    min-height: 28px !important;
+    max-height: 28px !important;
+    width: 100% !important;
+    padding-left: 28px !important;
+    padding-right: 10px !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    border-radius: 8px !important;
+    border: 1px solid rgba(228, 228, 231, 0.8) !important;
+    background-color: #ffffff !important;
+    color: #09090b !important;
+    font-size: 12px !important;
+    line-height: 26px !important;
+    font-family: inherit !important;
+    outline: none !important;
+    box-sizing: border-box !important;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03) !important;
+    transition: all 0.15s ease !important;
+    margin: 0 !important;
+}
+
+.dark .cora-sub-tabs-container input.cora-subtabs-search-input,
+.dark .cora-sticky-sub-tabs input.cora-subtabs-search-input,
+.dark input.cora-subtabs-search-input {
+    border-color: #27272a !important;
+    background-color: #18181b !important;
+    color: #ffffff !important;
+}
+
+input.cora-subtabs-search-input::placeholder {
+    color: #a1a1aa !important;
+    font-size: 12px !important;
+}
+
+input.cora-subtabs-search-input:focus {
+    border-color: #a1a1aa !important;
+}
+
+.dark input.cora-subtabs-search-input:focus {
+    border-color: #52525b !important;
+}
+
+/* Search Icon */
+.cora-subtabs-search-icon {
+    position: absolute !important;
+    left: 8px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    width: 13px !important;
+    height: 13px !important;
+    color: #a1a1aa !important;
+    pointer-events: none !important;
+    flex-shrink: 0 !important;
+}
+
+/* Search Close Button inside input (Mobile Only) */
+.cora-sub-tabs-container .cora-subtabs-search-close,
+.cora-sticky-sub-tabs .cora-subtabs-search-close,
+.cora-subtabs-search-close {
+    position: absolute !important;
+    right: 4px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    height: 20px !important;
+    min-height: 20px !important;
+    max-height: 20px !important;
+    width: 20px !important;
+    min-width: 20px !important;
+    max-width: 20px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border-radius: 6px !important;
+    border: none !important;
+    background: transparent !important;
+    color: #a1a1aa !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: all 0.15s ease !important;
+    box-sizing: border-box !important;
+}
+
+.cora-subtabs-search-close:hover {
+    color: #3f3f46 !important;
+    background-color: rgba(244, 244, 245, 0.8) !important;
+}
+
+.dark .cora-subtabs-search-close:hover {
+    color: #e4e4e7 !important;
+    background-color: rgba(39, 39, 42, 0.8) !important;
+}
+
+/* Level 01 Segmented Switcher (Table vs Grid) */
+.cora-subtabs-switcher {
+    height: 28px !important;
+    min-height: 28px !important;
+    max-height: 28px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    padding: 2px !important;
+    background-color: rgba(228, 228, 231, 0.6) !important;
+    border: 1px solid rgba(228, 228, 231, 0.7) !important;
+    border-radius: 8px !important;
+    box-sizing: border-box !important;
+    flex-shrink: 0 !important;
+    user-select: none !important;
+    gap: 2px !important;
+}
+
+.dark .cora-subtabs-switcher {
+    background-color: rgba(39, 39, 42, 0.8) !important;
+    border-color: rgba(63, 63, 70, 0.7) !important;
+}
+
+/* Switcher Buttons */
+.cora-sub-tabs-container .cora-subtabs-switcher-btn,
+.cora-sticky-sub-tabs .cora-subtabs-switcher-btn,
+.cora-subtabs-switcher-btn {
+    height: 22px !important;
+    min-height: 22px !important;
+    max-height: 22px !important;
+    width: 26px !important;
+    min-width: 26px !important;
+    max-width: 26px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    border-radius: 6px !important;
+    background-color: transparent !important;
+    color: #71717a !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    box-sizing: border-box !important;
+    transition: all 0.15s ease !important;
+    line-height: 1 !important;
+}
+
+.cora-subtabs-switcher-btn svg {
+    display: block !important;
+    margin: 0 auto !important;
+    pointer-events: none !important;
+}
+
+.cora-subtabs-switcher-btn:hover {
+    color: #09090b !important;
+}
+
+.dark .cora-subtabs-switcher-btn:hover {
+    color: #ffffff !important;
+}
+
+.cora-subtabs-switcher-btn.active,
+.cora-sub-tabs-container .cora-subtabs-switcher-btn.active,
+.cora-sticky-sub-tabs .cora-subtabs-switcher-btn.active {
+    background-color: #ffffff !important;
+    color: #09090b !important;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+}
+
+.dark .cora-subtabs-switcher-btn.active,
+.dark .cora-sub-tabs-container .cora-subtabs-switcher-btn.active,
+.dark .cora-sticky-sub-tabs .cora-subtabs-switcher-btn.active {
+    background-color: #18181b !important;
+    color: #ffffff !important;
+}
+
+/* Responsive Behaviors: Desktop (>= 640px) vs Mobile (< 640px) */
+@media (min-width: 640px) {
+    .cora-sub-tabs-container .cora-subtabs-search-trigger,
+    .cora-sticky-sub-tabs .cora-subtabs-search-trigger,
+    .cora-sub-tabs-extra .cora-subtabs-search-trigger,
+    .cora-subtabs-search-trigger {
+        display: none !important;
+    }
+    .cora-sub-tabs-container .cora-subtabs-search-close,
+    .cora-sticky-sub-tabs .cora-subtabs-search-close,
+    .cora-subtabs-search-close {
+        display: none !important;
+    }
+    .cora-sub-tabs-container .cora-subtabs-search,
+    .cora-sticky-sub-tabs .cora-subtabs-search,
+    .cora-subtabs-search {
+        display: flex !important;
+    }
+    .cora-subtabs-search-input {
+        padding-right: 10px !important;
+    }
+}
+
+@media (max-width: 639px) {
+    .cora-sub-tabs-container .cora-subtabs-search-trigger,
+    .cora-sticky-sub-tabs .cora-subtabs-search-trigger,
+    .cora-sub-tabs-extra .cora-subtabs-search-trigger,
+    .cora-subtabs-search-trigger {
+        display: inline-flex !important;
+    }
+    .cora-sub-tabs-container .cora-subtabs-search-trigger.search-active,
+    .cora-sticky-sub-tabs .cora-subtabs-search-trigger.search-active,
+    .cora-sub-tabs-extra .cora-subtabs-search-trigger.search-active,
+    .cora-subtabs-search-trigger.search-active {
+        display: none !important;
+    }
+    .cora-sub-tabs-container .cora-subtabs-search:not(.mobile-expanded),
+    .cora-sticky-sub-tabs .cora-subtabs-search:not(.mobile-expanded),
+    .cora-subtabs-search:not(.mobile-expanded) {
+        display: none !important;
+    }
+    .cora-subtabs-search.mobile-expanded {
+        position: absolute !important;
+        top: 0 !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 72px !important;
+        z-index: 30 !important;
+        display: flex !important;
+        align-items: center !important;
+        background-color: #FBFaf7 !important;
+        padding-left: 12px !important;
+        padding-right: 6px !important;
+    }
+    .dark .cora-subtabs-search.mobile-expanded {
+        background-color: #0c0c0e !important;
+    }
+    .cora-subtabs-search.mobile-expanded .cora-subtabs-search-inner {
+        width: 100% !important;
+    }
+    .cora-subtabs-search.mobile-expanded .cora-subtabs-search-input {
+        padding-right: 28px !important;
+    }
+    .cora-subtabs-search.mobile-expanded .cora-subtabs-search-close {
+        display: inline-flex !important;
+    }
+}
 
 

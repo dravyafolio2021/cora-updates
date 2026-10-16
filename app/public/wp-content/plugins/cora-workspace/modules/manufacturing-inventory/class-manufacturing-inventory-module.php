@@ -97,6 +97,12 @@ class Cora_Manufacturing_Inventory_Module implements Cora_Module_Interface {
                 'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>'
             );
         }
+        if ( $is_enabled( 'projects' ) || $is_enabled( 'portfolio' ) || $is_enabled( 'case-studies' ) ) {
+            $crm_items['projects'] = array(
+                'title' => 'Portfolio',
+                'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="14" height="14" rx="2"></rect><path d="M7 3h12a2 2 0 0 1 2 2v12"></path></svg>'
+            );
+        }
         if ( $is_enabled( 'tasks' ) || $is_enabled( 'client_tasks' ) ) {
             $crm_items['tasks'] = array(
                 'title' => 'Tasks',

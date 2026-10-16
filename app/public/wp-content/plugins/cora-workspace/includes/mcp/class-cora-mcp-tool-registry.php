@@ -22,7 +22,7 @@ class Cora_MCP_Tool_Registry {
      * @return array
      */
     public static function get_tools() {
-        return array(
+        $tools = array(
             // ── 1. Workspace Overview ──────────────────────────────────────────
             'cora_get_workspace_overview' => array(
                 'name'          => 'cora_get_workspace_overview',
@@ -897,6 +897,16 @@ class Cora_MCP_Tool_Registry {
                 'handler'       => array( __CLASS__, 'handle_update_website_settings' ),
             ),
         );
+
+        // Dynamically register workspace plugins & custom AI skills
+        if ( class_exists( 'Cora_Plugins_Skills_Engine' ) ) {
+            $dynamic_tools = Cora_Plugins_Skills_Engine::get_mcp_tools();
+            if ( ! empty( $dynamic_tools ) ) {
+                $tools = array_merge( $tools, $dynamic_tools );
+            }
+        }
+
+        return apply_filters( 'cora_mcp_tools', $tools );
     }
 
     /**
@@ -1139,6 +1149,14 @@ class Cora_MCP_Tool_Registry {
         }
         if ( isset( $map[ $name ] ) ) {
             return $map[ $name ];
+        }
+
+        // Support dynamic skill and plugin prefixes
+        if ( strpos( $normalized, 'skill_' ) === 0 && strpos( $normalized, 'cora_skill_' ) !== 0 ) {
+            return 'cora_' . $normalized;
+        }
+        if ( strpos( $normalized, 'plugin_' ) === 0 && strpos( $normalized, 'cora_plugin_' ) !== 0 ) {
+            return 'cora_' . $normalized;
         }
 
         return $normalized;

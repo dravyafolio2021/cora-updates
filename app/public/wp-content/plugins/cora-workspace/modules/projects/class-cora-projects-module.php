@@ -74,6 +74,7 @@ class Cora_Projects_Module {
         $sql = "CREATE TABLE IF NOT EXISTS {$table_name} (
             id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
             agency_id varchar(100) NOT NULL DEFAULT '1',
+            client_id bigint(20) unsigned NOT NULL DEFAULT 0,
             title varchar(255) NOT NULL,
             slug varchar(255) NOT NULL,
             subtitle varchar(255) DEFAULT '',
@@ -84,6 +85,7 @@ class Cora_Projects_Module {
             year_completed varchar(20) DEFAULT '',
             services longtext DEFAULT NULL,
             live_url varchar(500) DEFAULT '',
+            project_links longtext DEFAULT NULL,
             is_confidential tinyint(1) NOT NULL DEFAULT 0,
             is_featured tinyint(1) NOT NULL DEFAULT 0,
             status varchar(20) NOT NULL DEFAULT 'published',
@@ -130,6 +132,20 @@ class Cora_Projects_Module {
 
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
         dbDelta( $sql );
+
+        // Ensure client_id, project_links and story_type columns exist on existing installations
+        $col_client_id_check = $wpdb->get_results( "SHOW COLUMNS FROM {$table_name} LIKE 'client_id'" );
+        if ( empty( $col_client_id_check ) ) {
+            $wpdb->query( "ALTER TABLE {$table_name} ADD COLUMN client_id bigint(20) unsigned NOT NULL DEFAULT 0 AFTER agency_id" );
+        }
+        $col_check = $wpdb->get_results( "SHOW COLUMNS FROM {$table_name} LIKE 'project_links'" );
+        if ( empty( $col_check ) ) {
+            $wpdb->query( "ALTER TABLE {$table_name} ADD COLUMN project_links longtext DEFAULT NULL AFTER live_url" );
+        }
+        $col_story_check = $wpdb->get_results( "SHOW COLUMNS FROM {$table_name} LIKE 'story_type'" );
+        if ( empty( $col_story_check ) ) {
+            $wpdb->query( "ALTER TABLE {$table_name} ADD COLUMN story_type varchar(50) DEFAULT 'pas' AFTER executive_summary" );
+        }
 
         // Migrate any legacy 'super' records to proper workspace IDs
         self::migrate_legacy_records();
@@ -625,6 +641,7 @@ class Cora_Projects_Module {
         return array(
             'id'                => $row['id'],
             'agencyId'          => $row['agency_id'],
+            'clientId'          => ! empty( $row['client_id'] ) ? intval( $row['client_id'] ) : 0,
             'title'             => $row['title'],
             'slug'              => $row['slug'],
             'subtitle'          => $row['subtitle'],
@@ -635,9 +652,15 @@ class Cora_Projects_Module {
             'yearCompleted'     => $row['year_completed'],
             'services'          => json_decode( $row['services'] ?? '[]', true ) ?: array(),
             'liveUrl'           => $row['live_url'],
+            'projectLinks'      => ! empty( $row['project_links'] ) 
+                ? ( json_decode( $row['project_links'], true ) ?: array() ) 
+                : ( ! empty( $row['live_url'] ) 
+                    ? array( array( 'platform' => 'website', 'url' => $row['live_url'], 'label' => 'Live Website' ) ) 
+                    : array() ),
             'isConfidential'    => (bool) $row['is_confidential'],
             'isFeatured'        => (bool) $row['is_featured'],
             'status'            => $row['status'],
+            'storyType'         => ! empty( $row['story_type'] ) ? $row['story_type'] : 'pas',
             'executiveSummary'  => $row['executive_summary'],
             'challengeContent'  => $row['challenge_content'],
             'solutionContent'   => $row['solution_content'],
@@ -737,6 +760,20 @@ class Cora_Projects_Module {
             $slug = 'project-' . time();
         }
 
+        $client_id = isset( $_POST['client_id'] ) ? intval( $_POST['client_id'] ) : 0;
+        if ( $client_id <= 0 && ! empty( $client_name ) ) {
+            $matched_client = $wpdb->get_row( $wpdb->prepare(
+                "SELECT id FROM {$wpdb->prefix}cora_clients 
+                 WHERE (LOWER(TRIM(CONCAT_WS(' ', first_name, last_name))) = LOWER(TRIM(%s)) 
+                    OR LOWER(TRIM(company_name)) = LOWER(TRIM(%s)))
+                 LIMIT 1",
+                $client_name, $client_name
+            ) );
+            if ( $matched_client ) {
+                $client_id = intval( $matched_client->id );
+            }
+        }
+
         // Services array
         $services_raw = isset( $_POST['services'] ) ? $_POST['services'] : array();
         $services = is_array( $services_raw ) ? $services_raw : array_filter( array_map( 'trim', explode( ',', (string) $services_raw ) ) );
@@ -753,8 +790,15 @@ class Cora_Projects_Module {
         $gallery_raw = isset( $_POST['gallery_images'] ) ? $_POST['gallery_images'] : '[]';
         $gallery_images = is_string( $gallery_raw ) ? $gallery_raw : json_encode( $gallery_raw );
 
+        // Smart Project Links JSON array
+        $links_raw = isset( $_POST['project_links'] ) ? $_POST['project_links'] : ( isset( $_POST['smart_links'] ) ? $_POST['smart_links'] : '[]' );
+        $project_links = is_string( $links_raw ) ? $links_raw : json_encode( $links_raw );
+        $parsed_links = json_decode( $project_links, true ) ?: array();
+        $first_url = ! empty( $parsed_links[0]['url'] ) ? esc_url_raw( $parsed_links[0]['url'] ) : ( isset( $_POST['live_url'] ) ? esc_url_raw( $_POST['live_url'] ) : '' );
+
         $data = array(
             'agency_id'            => $agency_id,
+            'client_id'            => $client_id,
             'title'                => $title,
             'slug'                 => $slug,
             'subtitle'             => isset( $_POST['subtitle'] ) ? sanitize_text_field( wp_unslash( $_POST['subtitle'] ) ) : '',
@@ -763,16 +807,18 @@ class Cora_Projects_Module {
             'project_duration'     => isset( $_POST['project_duration'] ) ? sanitize_text_field( wp_unslash( $_POST['project_duration'] ) ) : '',
             'year_completed'       => isset( $_POST['year_completed'] ) ? sanitize_text_field( wp_unslash( $_POST['year_completed'] ) ) : date( 'Y' ),
             'services'             => json_encode( array_values( $services ) ),
-            'live_url'             => isset( $_POST['live_url'] ) ? esc_url_raw( $_POST['live_url'] ) : '',
+            'live_url'             => $first_url,
+            'project_links'        => $project_links,
             'is_confidential'      => ! empty( $_POST['is_confidential'] ) ? 1 : 0,
             'is_featured'          => ! empty( $_POST['is_featured'] ) ? 1 : 0,
             'status'               => isset( $_POST['status'] ) && in_array( $_POST['status'], array( 'draft', 'published', 'archived' ), true ) ? $_POST['status'] : 'published',
-            'executive_summary'    => isset( $_POST['executive_summary'] ) ? sanitize_textarea_field( wp_unslash( $_POST['executive_summary'] ) ) : '',
+            'story_type'           => isset( $_POST['story_type'] ) ? sanitize_text_field( wp_unslash( $_POST['story_type'] ) ) : 'pas',
+            'executive_summary'    => isset( $_POST['executive_summary'] ) ? wp_kses_post( wp_unslash( $_POST['executive_summary'] ) ) : '',
             'challenge_content'    => isset( $_POST['challenge_content'] ) ? wp_kses_post( wp_unslash( $_POST['challenge_content'] ) ) : '',
             'solution_content'     => isset( $_POST['solution_content'] ) ? wp_kses_post( wp_unslash( $_POST['solution_content'] ) ) : '',
             'deliverables'         => $deliverables,
             'kpis'                 => $kpis,
-            'testimonial_quote'    => isset( $_POST['testimonial_quote'] ) ? sanitize_textarea_field( wp_unslash( $_POST['testimonial_quote'] ) ) : '',
+            'testimonial_quote'    => isset( $_POST['testimonial_quote'] ) ? wp_kses_post( wp_unslash( $_POST['testimonial_quote'] ) ) : '',
             'testimonial_author'   => isset( $_POST['testimonial_author'] ) ? sanitize_text_field( wp_unslash( $_POST['testimonial_author'] ) ) : '',
             'testimonial_role'     => isset( $_POST['testimonial_role'] ) ? sanitize_text_field( wp_unslash( $_POST['testimonial_role'] ) ) : '',
             'testimonial_company'  => isset( $_POST['testimonial_company'] ) ? sanitize_text_field( wp_unslash( $_POST['testimonial_company'] ) ) : '',
@@ -780,6 +826,7 @@ class Cora_Projects_Module {
             'hero_media_type'      => isset( $_POST['hero_media_type'] ) && $_POST['hero_media_type'] === 'video' ? 'video' : 'image',
             'hero_image_url'       => isset( $_POST['hero_image_url'] ) ? esc_url_raw( $_POST['hero_image_url'] ) : '',
             'gallery_images'       => $gallery_images,
+            'video_embed_url'      => isset( $_POST['video_url'] ) ? esc_url_raw( $_POST['video_url'] ) : ( isset( $_POST['video_embed_url'] ) ? esc_url_raw( $_POST['video_embed_url'] ) : '' ),
             'cta_title'            => isset( $_POST['cta_title'] ) ? sanitize_text_field( wp_unslash( $_POST['cta_title'] ) ) : 'Ready for a Custom Production?',
             'cta_subtitle'         => isset( $_POST['cta_subtitle'] ) ? sanitize_text_field( wp_unslash( $_POST['cta_subtitle'] ) ) : '',
             'cta_button_text'      => isset( $_POST['cta_button_text'] ) ? sanitize_text_field( wp_unslash( $_POST['cta_button_text'] ) ) : 'Request Consultation',

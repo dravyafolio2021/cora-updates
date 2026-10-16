@@ -9,8 +9,14 @@
 
 | Module Name | Branch Name | Status | Main Touchpoint Files | Assigned Agent / Chat |
 |---|---|---|---|---|
-| **Core Platform** | `main` | 🟢 Stable (v4.9.384) | `cora-workspace.php`, `admin-dashboard.php` | Main Orchestrator |
+| **Core Platform** | `main` | 🟢 Stable (v4.9.388) | `cora-workspace.php`, `admin-dashboard.php` | Main Orchestrator |
 <!-- MODULE_ROWS_START -->
+| **Google Business Profile & Google Maps AI Autopilot** | `main` | 🟢 100% Production Ready (v4.9.388) | `views/view-google-profile.php`, `cora-workspace.php`, `assets/js/admin-script.js`, `tests/e2e/test-gbp-management.spec.ts` | Local SEO & Integrations Agent |
+| **Plugins in App Module & Open API / Dynamic MCP Architecture** | `main` | 🟢 100% Production Ready (v4.9.387) | `includes/class-cora-plugins-skills-engine.php`, `views/view-feature-hub.php`, `includes/mcp/class-cora-mcp-tool-registry.php`, `admin-dashboard.php`, `cora-workspace.php` | AI & Extensibility Architect |
+| **Enterprise Client Onboarding Suite & Portal Role Isolation** | `main` | 🟢 100% Production Ready (v4.9.387) | `views/view-clients.php`, `public-client-portal.php`, `cora-workspace.php`, `scripts/verify_client_onboarding_features.php` | Client Operations & Security Agent |
+| **Interactive Workspace Scheduling Calendar & Google Meet** | `main` | 🟢 100% Production Ready (v4.9.387) | `views/view-calendar.php`, `cora-workspace.php`, `admin-dashboard.php` | Scheduling & Integrations Agent |
+| **Collapsible Sidebar Navigation Groups & Memory State** | `main` | 🟢 Complete & Active (v4.9.386) | `admin-dashboard.php`, `assets/css/admin-style.css`, `assets/js/admin-script.js` | UI & Navigation Agent |
+| **Mobile Sticky Sub-Tabs, Zero-Gap Anchoring & 28px Search Target** | `main` | 🟢 Complete & Active (v4.9.385) | `admin-dashboard.php`, `includes/workspace-header.php`, `assets/css/admin-style.css` | Mobile & Navigation Agent |
 | **Global Sticky Workspace Header & Mobile Expandable Search** | `main` | 🟢 Complete & Active (v4.9.384) | `admin-dashboard.php`, `includes/workspace-header.php`, `assets/css/admin-style.css`, `assets/js/admin-script.js` | Mobile & Navigation Agent |
 | **Sub-Tabs Extra Actions & Level 01 Segmented Switcher** | `main` | 🟢 Complete & Active (v4.9.383) | `includes/workspace-header.php`, `views/view-projects.php` | Navigation & UI Agent |
 | **Shopify-Inspired Canvas Maximize & Instant Sidebar Sync** | `main` | 🟢 Complete & Active (v4.9.382) | `views/view-projects.php`, `admin-dashboard.php` | Canvas Visual Engine Agent |
@@ -88,8 +94,8 @@
 | **Content AI Suite** | `main` | 🟢 Complete & Active (v4.9.159) | `views/view-content-suite.php`, `cora-workspace.php` | Content Module Agent |
 | **Client Task Manager (CRM Tasks)**| `main` | 🟢 Complete & Active (v4.9.150) | `admin-dashboard.php`, `views/view-client-task-manager.php` | Task Management Agent |
 | **Dashboard & Nav Customizer** | `main` | 🟢 Complete & Active (v4.9.147) | `admin-dashboard.php`, `cora-workspace.php` | Telemetry & UX Customizer Agent |
-| **Client Management Suite** | `main` | 🟢 Complete & Active (v4.9.124) | `views/view-clients.php`, `views/view-financials.php` | CRM Client Suite Agent |
-| **Public White-Labeled Client Portal**| `main` | 🟢 Complete & Active (v4.9.122) | `public-client-portal.php` | Client Portal Agent |
+| **Client Management Suite** | `main` | 🟢 Complete & Active (v4.9.387) | `views/view-clients.php`, `views/view-financials.php`, `scripts/verify_client_onboarding_features.php` | CRM Client Suite Agent |
+| **Public White-Labeled Client Portal**| `main` | 🟢 Complete & Active (v4.9.387) | `public-client-portal.php`, `cora-workspace.php` | Client Portal Agent |
 | **CRM & Client Revenue Suite** | `feature/crm-module-suite` | 🟢 Merged to Main (v4.9.124) | `views/view-leads.php`, `views/view-financials.php`, `cora-workspace.php` | CRM Architecture Agent |
 | **CRM & Lead Pipeline System** | `feature/crm-pipeline-next` | 🟢 Merged to Main (v4.9.118) | `views/view-leads.php`, `cora-workspace.php` | CRM Pipeline Agent |
 | **Sidebar & Nav Architecture** | `main` | 🟢 Complete & Active (v4.9.178) | `admin-dashboard.php`, `cora-workspace.php` | Navigation UX Agent |
@@ -150,16 +156,58 @@
 - `app/public/wp-content/plugins/cora-workspace/views/view-client-task-manager.php` (Client Task Manager Board & Resizable Floating Drawer)
 - `app/public/wp-content/plugins/cora-workspace/views/view-users.php` (People Ops AI Copilot, Multimodal Team Migration, Custom Role Drawer, Equal AI Token Budgeting)
 - `app/public/wp-content/plugins/cora-workspace/cora-service-worker.js` (Web Push Delivery, VAPID Key Sync, High-Speed Cache Strategy)
+- `app/public/wp-content/plugins/cora-workspace/includes/class-cora-plugins-skills-engine.php` (Dynamic Plugins, Modules & AI Skills Runtime Engine, Isolated Custom DB Schemas, REST Endpoints, API Keys, Dynamic MCP 2.0 Integration)
+- `app/public/wp-content/plugins/cora-workspace/views/view-calendar.php` (Interactive Workspace Scheduling Calendar, Month/Week/Day Views, Google Calendar Two-Way Sync, Google Meet 3-4-3 Format Standardization)
+- `app/public/wp-content/plugins/cora-workspace/views/view-google-profile.php` (Google Business Profile & Google Maps AI Autopilot Hub, Multi-Branch Locations, Live Sync, AI Review Replies, 7-Day Hours, Maps Post Publisher, Local SEO 3-Pack Rank Tracker)
 
 ---
 
 ## 3. Branch Activity & Progress Log
 
 ### `main` (Production Base)
-- **Platform Version**: `4.9.381`
-- **Health**: 100% Operational & Clean Slate Base (HEAD commit `96d19ab78` on `main`). Agency Projects & Portfolio Case Studies (`wp_cora_projects`, `/workspace/projects`), Public Micro-Tools Growth Engine (63 tools, canonical registry), Canvas GitHub CI/CD (`class-cora-github-integration.php`), Forms CRM lead pipeline, and Canonical Industry Directory verified ✅.
+- **Platform Version**: `4.9.387`
+- **Health**: 100% Operational & Clean Slate Base (HEAD commit `ec3b28cc6` on `main`). Google Business Profile & Google Maps AI Autopilot (`views/view-google-profile.php`, `tests/e2e/test-gbp-management.spec.ts`), Dynamic Plugins & Skills Engine (`class-cora-plugins-skills-engine.php`), Enterprise Client Onboarding Suite (`views/view-clients.php`), Interactive Workspace Calendar (`views/view-calendar.php`), Collapsible Sidebar Navigation Groups (`admin-dashboard.php`), and Mobile Sticky Sub-tabs verified ✅.
 
 <!-- BRANCH_LOGS_START -->
+### `feat/google-business-profile-autopilot` (Merged to Main)
+- **Status**: 🟢 Complete & Active (v4.9.387) — Google Business Profile & Google Maps AI Autopilot:
+  - Overhauled `views/view-google-profile.php` from waitlist placeholder into production multi-state hub (State A: Unconnected Hero with OAuth & Places text search, State B: Multi-Branch Location Picker, State C: Connected Hub with 4 live KPI metrics).
+  - Built 5-Tab Segmented Control architecture:
+    1. *Reviews & AI Autopilot*: Filter pills (`All`, `Needs Reply`, `Replied`, `5 Stars`, `Critical`), tone selector (`warm`, `professional`, `concise`, `apology`), AI review response generation, and 1-click posting to Google Maps.
+    2. *Maps Post Publisher*: Announcement composer with topic types (`STANDARD`, `OFFER`, `EVENT`), CTA selector, media photos, and post stream with instant delete.
+    3. *Business Info & Operating Hours*: Business details plus Monday-Sunday open/close time pickers with "Closed" toggles.
+    4. *Local SEO & Map-Pack Ranks*: Keyword ranking table, #1 in 3-Pack badges, 94% visibility score, and local optimization checklist.
+    5. *Multi-Branch Locations*: Location switcher between Cyber City Hub and South Delhi branch.
+  - Added right-sliding API Credentials Drawer (`#cora-gbp-keys-panel`) with masked OAuth Client ID/Secret, Google Maps API key, copyable OAuth redirect URI, and Escape-key dismissal.
+  - Comprehensive automated E2E Playwright test suite `tests/e2e/test-gbp-management.spec.ts` (4/4 tests passing: TC-GBP-01, TC-GBP-02, TC-GBP-03, TC-GBP-04).
+- **Main Touchpoint**: `views/view-google-profile.php`, `cora-workspace.php`, `assets/js/admin-script.js`, `tests/e2e/test-gbp-management.spec.ts`.
+
+### `feat/plugins-and-skills-engine` (Merged to Main)
+- **Status**: 🟢 Complete & Merged (v4.9.387) — Dynamic Plugins, Modules & AI Skills Extensibility Runtime & Open API:
+  - Engineered standalone runtime engine `class-cora-plugins-skills-engine.php` with 4 isolated tenant-scoped tables: `wp_cora_workspace_plugins`, `wp_cora_workspace_skills`, `wp_cora_workspace_api_keys`, `wp_cora_workspace_plugin_logs`.
+  - Re-architected Feature Hub (`views/view-feature-hub.php`) into 3 segmented control tabs: App Modules (built-in toggles), Custom Plugins (ZIP/manifest installer, AI code generator), AI Skills (custom system prompts, parameters, execution testing).
+  - Built unified Open API & MCP Gateway right-sliding drawer with API key generation, permissions scopes, curl examples, and live JSON-RPC playground.
+  - Dynamically registered active skills and plugins as callable tools in Cora Universal Remote MCP Server via filter `cora_mcp_tools` and namespace resolution `cora_skill_*` / `cora_plugin_*`.
+  - Added comprehensive verification suite `scripts/verify_plugins_skills_architecture.php` (14/14 tests passing).
+- **Main Touchpoint**: `includes/class-cora-plugins-skills-engine.php`, `views/view-feature-hub.php`, `includes/mcp/class-cora-mcp-tool-registry.php`, `cora-workspace.php`.
+
+### `feat/client-onboarding-and-calendar` (Merged to Main)
+- **Status**: 🟢 Complete & Merged (v4.9.386 - v4.9.387) — Enterprise Client Onboarding Studio & Interactive Calendar:
+  - Built 5-step Client Onboarding Studio drawer in `views/view-clients.php` (`1. Company Details` -> `2. Primary Contact` -> `3. Billing & Currency` -> `4. Services & Scope` -> `5. Portal & Invite`) with multi-currency (`INR`, `USD`, `EUR`, `GBP`, `AED`, `SGD`), tax regime selection, and custom service catalog tags.
+  - Implemented automatic WordPress user provisioning with dedicated `cora_client` role and portal token generation upon client creation.
+  - Enforced strict role isolation in `cora-workspace.php`: users with role `cora_client` are completely blocked from admin routes (`/workspace`, `/workspace/*`) and automatically redirected to their white-labeled client portal (`/{workspace}/client-portal?token=...`).
+  - Standardized interactive scheduling calendar in `views/view-calendar.php` with Month, Week, and Day views, full appointment booking workflows, Google Calendar two-way sync, and standardized Google Meet URL formatting (`https://meet.google.com/xxx-yyyy-zzz`).
+  - Added verification script `scripts/verify_client_onboarding_features.php` verifying role capabilities, portal redirection, multi-currency storage, and calendar sync.
+- **Main Touchpoint**: `views/view-clients.php`, `views/view-calendar.php`, `public-client-portal.php`, `cora-workspace.php`.
+
+### `feat/collapsible-navigation-and-mobile-touch` (Merged to Main)
+- **Status**: 🟢 Complete & Merged (v4.9.385 - v4.9.386) — Collapsible Sidebar Groups & Mobile Sticky Sub-tabs:
+  - Upgraded sidebar navigation in `admin-dashboard.php` with accordion collapsible section headers (`Core Workspace`, `Apps & Modules`, `Growth & Public Sites`, `System & Governance`).
+  - Added persistent group toggle state via `localStorage` with fallback open state and search auto-expansion on input.
+  - Fixed mobile sticky sub-tab gaps: anchored sub-tabs toolbar flush against top mobile header (`top: 48px` / `52px`) with zero layout jump and smooth horizontal scrolling.
+  - Expanded search trigger touch target on mobile to minimum 28px touch area to prevent mis-clicks.
+- **Main Touchpoint**: `admin-dashboard.php`, `includes/workspace-header.php`, `assets/css/admin-style.css`, `assets/js/admin-script.js`.
+
 ### `feat/workspace-v4.9.316` (Active Working Base)
 - **Status**: 🟢 Active Working Base (v4.9.316, HEAD commit `a54aeceeb`) — Canvas Live Next.js Build Preview, Dev Server Proxy Router & Preview Cookie Isolation:
   - Embedded high-density, dark-themed Next.js App Preview Mockup card in Level 1 with real-time route chips and quick actions (`feat(canvas): add Next.js app preview card in level 1 and fast offline dev server detection`).
@@ -325,6 +373,12 @@
 
 | Version | Date | Key Changes |
 | :--- | :--- | :--- |
+| **v4.9.388**<br>`CORA-1240` | Oct 2026 | **Google Business Profile & Google Maps AI Autopilot**: Complete Google Business Profile integration (`/workspace/gbp`, `views/view-google-profile.php`) featuring 3 reactive states (OAuth connect hero, multi-location selector, connected management hub), Places API search, tone-driven AI review reply copilot (warm, professional, concise, apology), Maps announcement & update post publisher, 7-day business operating hours manager, Local SEO 3-Pack rank inspector, and right-sliding credentials drawer sheet. |
+| **v4.9.387**<br>`CORA-1239` | Oct 2026 | **Dynamic Plugins & AI Skills Runtime Engine**: Self-contained extensibility framework (`includes/class-cora-plugins-skills-engine.php`) with isolated schema tables, dynamic MCP 2.0 tool registry, REST gateway (`/wp-json/cora-plugins/v1/`), 3-tab segmented Feature Hub view (`views/view-feature-hub.php`), and enterprise API key generation. |
+| **v4.9.387**<br>`CORA-1238` | Oct 2026 | **Enterprise Client Onboarding Suite & Strict Portal Role Isolation**: 5-step guided onboarding studio (`views/view-clients.php`), multi-currency rate support, custom service catalog, automatic `cora_client` user provisioning, and absolute admin dashboard route shielding for portal clients (`cora-workspace.php`). |
+| **v4.9.387**<br>`CORA-1237` | Oct 2026 | **Interactive Workspace Scheduling Calendar & Google Meet Integration**: Full month/week/day scheduling engine (`views/view-calendar.php`), two-way Google Calendar synchronization, standard 3-4-3 Google Meet meeting URL generation (`meet.google.com/xxx-yyyy-zzz`), and real-time meeting status badges. |
+| **v4.9.386**<br>`CORA-1236B` | Oct 2026 | **Collapsible Sidebar Navigation Groups & Memory State**: Accordion sidebar navigation groups in `admin-dashboard.php` with `localStorage` state persistence, animated chevron rotation, active-route auto-expansion, and global search auto-unfurling. |
+| **v4.9.385**<br>`CORA-1236A` | Oct 2026 | **Mobile Sticky Sub-Tabs, Zero-Gap Anchoring & 28px Search Target**: Zero-gap sticky sub-tab anchoring on mobile screens, touch-friendly 28px expandable search trigger, and layout stabilization across all viewport breakpoints. |
 | **v4.9.384**<br>`CORA-1236` | Oct 2026 | **Global Sticky Workspace Header & Mobile Expandable Sub-Tabs Search**: Enforced global sticky header pinning (`position: sticky; top: 0; z-index: 100020;`) across all desktop and mobile viewports; resolved sub-tabs search horizontal overflow on mobile screens (< 640px) via 1-tap expandable search trigger (`#cora-proj-search-trigger-btn`) expanding full-width input (`#cora-proj-search-wrapper.mobile-expanded`) with Esc / close button dismiss; and synchronized version manifest to 4.9.384. |
 | **v4.9.383**<br>`CORA-1235` | Oct 2026 | **Sub-Tabs Extra Actions Vertical Alignment & Level 01 Segmented Switcher**: Standardized `tabs_extra_html` vertical alignment in `includes/workspace-header.php` (`h-full flex items-center gap-1.5 sm:gap-2`); implemented Level 01 Segmented Control container for Table vs Grid view mode toggle with active button styling (`bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white shadow-2xs`). |
 | **v4.9.382**<br>`CORA-1234` | Oct 2026 | **Shopify-Inspired Canvas Maximize / Restore Toggle (⤢ Fullscreen Mode)**: Added dedicated maximize button (`#cora-proj-maximize-btn`) in docked drawer header toggling `.maximized` state, expanding drawer across full viewport (`left: 0; width: 100vw; z-index: 100060; border-left: none`) for zero-distraction case study authoring with instant sidebar synchronization on `cora:sidebar-toggle`. |
@@ -445,4 +499,4 @@
 
 ---
 
-*Cora Platform Release Manifest v4.9.384 — Architecture & Engineering Team.*
+*Cora Platform Release Manifest v4.9.388 — Architecture & Engineering Team.*

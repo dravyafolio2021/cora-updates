@@ -36,6 +36,9 @@ $sub_page = $sub_page ?? $GLOBALS['sub_page'] ?? $_GET['sub_page'] ?? $_GET['sub
 if ( cora_is_super_owner() && ( empty( $sub_page ) || $sub_page === 'dashboard' ) ) {
     $sub_page = 'super-admin';
 }
+if ( in_array( $sub_page, array( 'plugins', 'skills', 'modules' ), true ) && empty( $_GET['tab'] ) ) {
+    $_GET['tab'] = $sub_page;
+}
 $cora_auto_update = isset( $_GET['cora_auto_update'] ) && $_GET['cora_auto_update'] === '1';
 $cora_target_version = sanitize_text_field( $_GET['target_version'] ?? '' );
 $cora_user_can_update = cora_is_super_owner();
@@ -3948,6 +3951,47 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             margin-top: 0.75rem !important;
             margin-bottom: 0.25rem !important;
             padding-left: 1.5rem !important;
+            padding-right: 0.85rem !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            cursor: pointer !important;
+            border-radius: 6px !important;
+            transition: color 0.15s ease, background-color 0.15s ease !important;
+            user-select: none !important;
+        }
+        .cora-nav-group-label:hover {
+            color: #18181b !important;
+        }
+        .dark .cora-nav-group-label {
+            color: #a1a1aa !important;
+        }
+        .dark .cora-nav-group-label:hover {
+            color: #ffffff !important;
+        }
+        .cora-nav-group .cora-group-chevron {
+            transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.15s ease !important;
+            transform: rotate(0deg) !important;
+            opacity: 0.5;
+            flex-shrink: 0 !important;
+        }
+        .cora-nav-group-label:hover .cora-group-chevron {
+            opacity: 1;
+        }
+        .cora-nav-group.is-collapsed .cora-group-chevron {
+            transform: rotate(-90deg) !important;
+        }
+        .cora-nav-group.is-collapsed .cora-nav-list {
+            display: none !important;
+        }
+        .cora-sidebar-nav.is-searching .cora-nav-group.is-collapsed .cora-nav-list {
+            display: block !important;
+        }
+        .cora-sidebar.collapsed-sidebar .cora-group-chevron {
+            display: none !important;
+        }
+        .cora-sidebar.collapsed-sidebar .cora-nav-group.is-collapsed .cora-nav-list {
+            display: flex !important;
         }
         .cora-nav-group:first-child .cora-nav-group-label,
         .cora-sidebar-nav > .cora-nav-group:first-of-type .cora-nav-group-label {
@@ -5687,27 +5731,41 @@ textarea,
                     );
                 }
                 
+                $rendered_group_count = 0;
                 foreach ( $nav_groups as $group ) :
                     $visible_items = array();
+                    $group_has_active = false;
                     foreach ( $group['items'] as $target => $item ) {
                         $super_pages = array( 'super-admin', 'super-users', 'super-finances', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-docs', 'super-ai-tokens', 'super-feature-flags', 'super-emergency', 'super-audit' );
                         if ( ! in_array( $target, $super_pages ) && function_exists( 'cora_user_has_feature_access' ) && ! cora_user_has_feature_access( $target ) ) {
                             continue;
+                        }
+                        if ( $sub_page === $target || str_replace('_', '-', $sub_page) === str_replace('_', '-', $target) || ( $target === 'feature-hub' && in_array( $sub_page, array( 'plugins', 'skills', 'modules', 'feature_hub' ), true ) ) ) {
+                            $group_has_active = true;
                         }
                         $visible_items[$target] = $item;
                     }
                     if ( empty( $visible_items ) ) {
                         continue;
                     }
+                    $is_primary_group = ( $rendered_group_count === 0 );
+                    $rendered_group_count++;
+                    $group_slug = sanitize_title( $group['label'] );
+                    $initial_collapsed = ( ! $is_primary_group );
                 ?>
-                <div class="cora-nav-group select-none">
-                    <div class="cora-nav-group-label px-3 text-[11px] font-bold text-zinc-500 uppercase select-none"><?php echo esc_html($group['label']); ?></div>
-                    <ul class="cora-nav-list space-y-0.5 mt-1 select-none">
+                <div class="cora-nav-group select-none <?php echo $is_primary_group ? 'cora-primary-group' : ( $initial_collapsed ? 'is-collapsed' : '' ); ?>" data-group="<?php echo esc_attr( $group_slug ); ?>" data-collapsible="<?php echo $is_primary_group ? '0' : '1'; ?>">
+                    <?php if ( ! $is_primary_group ) : ?>
+                    <div class="cora-nav-group-label px-3 text-[11px] font-bold text-zinc-500 uppercase select-none flex items-center justify-between cursor-pointer" onclick="window.coraToggleSidebarGroup('<?php echo esc_js( $group_slug ); ?>')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.coraToggleSidebarGroup('<?php echo esc_js( $group_slug ); ?>');}">
+                        <span><?php echo esc_html($group['label']); ?></span>
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none" class="cora-group-chevron"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
+                    <?php endif; ?>
+                    <ul class="cora-nav-list space-y-0.5 <?php echo $is_primary_group ? 'mt-0' : 'mt-1'; ?> select-none">
                         <?php foreach ( $visible_items as $target => $item ) : 
                             $nav_url = home_url( $cora_nav_prefix . '/' . $target );
                         ?>
                         <li class="list-none" data-target="<?php echo esc_attr($target); ?>">
-                            <a href="<?php echo esc_url($nav_url); ?>" onclick="if(event.target.closest && event.target.closest('.cora-canvas-hover-actions')) { return; } if(typeof window.coraNavigateTo==='function' && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0){ event.preventDefault(); window.coraNavigateTo('<?php echo esc_js($target); ?>'); }" class="cora-nav-item <?php echo ( $sub_page === $target || str_replace('_', '-', $sub_page) === str_replace('_', '-', $target) ) ? 'cora-active' : ''; ?> group flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer select-none no-underline text-zinc-800 hover:text-zinc-950" data-target="<?php echo esc_attr($target); ?>" data-tooltip="<?php echo esc_attr($item['title']); ?>">
+                            <a href="<?php echo esc_url($nav_url); ?>" onclick="if(event.target.closest && event.target.closest('.cora-canvas-hover-actions')) { return; } if(typeof window.coraNavigateTo==='function' && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0){ event.preventDefault(); window.coraNavigateTo('<?php echo esc_js($target); ?>'); }" class="cora-nav-item <?php echo ( $sub_page === $target || str_replace('_', '-', $sub_page) === str_replace('_', '-', $target) || ( $target === 'feature-hub' && in_array( $sub_page, array( 'plugins', 'skills', 'modules', 'feature_hub' ), true ) ) ) ? 'cora-active' : ''; ?> group flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer select-none no-underline text-zinc-800 hover:text-zinc-950" data-target="<?php echo esc_attr($target); ?>" data-tooltip="<?php echo esc_attr($item['title']); ?>">
                                 <div class="flex items-center gap-3 select-none min-w-0 flex-1">
                                     <span class="cora-nav-icon select-none">
                                         <?php echo $item['icon']; ?>
@@ -10576,8 +10634,8 @@ textarea,
             </section>
             <?php endif; ?>
 
-            <!-- SECTION 6: FEATURE HUB -->
-            <?php if ( $sub_page === 'feature-hub' ) : ?>
+            <!-- SECTION 6: FEATURE HUB (PLUGINS, MODULES, SKILLS) -->
+            <?php if ( in_array( $sub_page, array( 'feature-hub', 'feature_hub', 'plugins', 'skills', 'modules' ), true ) ) : ?>
             <section id="cora-page-feature-hub" class="cora-page-section cora-active">
                 <?php include CORA_WORKSPACE_PATH . 'views/view-feature-hub.php'; ?>
             </section>
@@ -10974,7 +11032,7 @@ textarea,
             <?php endif; ?>
 
             <!-- SECTION: CLIENTS DIRECTORY & PORTALS -->
-            <?php if ( $sub_page === 'clients' || in_array( $sub_page, array( 'bookings' ) ) ) : ?>
+            <?php if ( in_array( $sub_page, array( 'clients', 'client-portal', 'client_portal', 'portals', 'bookings' ), true ) ) : ?>
             <section id="cora-page-clients" class="cora-page-section cora-active space-y-2.5">
                 <?php include CORA_WORKSPACE_PATH . 'views/view-clients.php'; ?>
             </section>
@@ -10987,8 +11045,8 @@ textarea,
             </section>
             <?php endif; ?>
 
-            <!-- SECTION: APPS & MCP (EXTENSION WORKSPACE) -->
-            <?php if ( $sub_page === 'plugins' ) : ?>
+            <!-- SECTION: APPS & MCP (LEGACY PLACEHOLDER) -->
+            <?php if ( $sub_page === 'legacy-mcp-store' ) : ?>
             <section id="cora-page-plugins" class="cora-page-section cora-active space-y-6">
                 <div class="flex items-center justify-between">
                     <div class="cora-page-header flex items-center gap-3">
@@ -16515,7 +16573,7 @@ if ( $is_super_mode ) {
             <div style="display:flex; flex-direction:column; gap:8px;">
                 <?php foreach ( $cora_mobile_drawer_items as $target => $item ) :
                     $nav_url = $cora_nav_prefix . '/' . $target;
-                    $is_active = ( $sub_page === $target || str_replace('_','-',$sub_page) === str_replace('_','-',$target) );
+                    $is_active = ( $sub_page === $target || str_replace('_','-',$sub_page) === str_replace('_','-',$target) || ( $target === 'feature-hub' && in_array( $sub_page, array( 'plugins', 'skills', 'modules', 'feature_hub' ), true ) ) );
                     if ( $is_super_mode && empty($sub_page) && $target === 'super-admin' ) {
                         $is_active = true;
                     }
@@ -20146,6 +20204,43 @@ window.coraCurrentUserId = <?php echo intval( get_current_user_id() ); ?>;
             });
         });
 
+        // Collapsible Sidebar Navigation Groups Engine
+        window.coraToggleSidebarGroup = function(groupKey) {
+            if (!groupKey) return;
+            var groupEl = document.querySelector('.cora-nav-group[data-group="' + groupKey + '"]');
+            if (!groupEl || groupEl.getAttribute('data-collapsible') === '0') return;
+
+            var isCollapsed = groupEl.classList.toggle('is-collapsed');
+            try {
+                var states = JSON.parse(localStorage.getItem('cora_sidebar_group_states') || '{}');
+                // Store true for expanded, false for collapsed
+                states[groupKey] = !isCollapsed;
+                localStorage.setItem('cora_sidebar_group_states', JSON.stringify(states));
+            } catch(e) {}
+        };
+
+        window.coraInitSidebarGroupToggles = function() {
+            try {
+                var states = JSON.parse(localStorage.getItem('cora_sidebar_group_states') || '{}');
+                var groups = document.querySelectorAll('.cora-nav-group[data-collapsible="1"]');
+                groups.forEach(function(g) {
+                    var key = g.getAttribute('data-group');
+                    if (key in states) {
+                        if (states[key] === true) {
+                            g.classList.remove('is-collapsed');
+                        } else {
+                            g.classList.add('is-collapsed');
+                        }
+                    } else {
+                        // Keep collapsed by default
+                        g.classList.add('is-collapsed');
+                    }
+                });
+            } catch(e) {}
+        };
+
+        coraInitSidebarGroupToggles();
+
         // Sidebar Menu Search Filtering (Dynamic unified search)
         const sidebarSearchInput = document.getElementById('cora-sidebar-search-input');
         const sidebarNav = document.querySelector('.cora-sidebar-nav');
@@ -20194,6 +20289,7 @@ window.coraCurrentUserId = <?php echo intval( get_current_user_id() ); ?>;
                 const navItems = sidebarNav.querySelectorAll('li[data-target]');
                 
                 if (query === '') {
+                    sidebarNav.classList.remove('is-searching');
                     navItems.forEach(item => item.classList.remove('hidden'));
                     const groups = sidebarNav.querySelectorAll('.cora-nav-group');
                     groups.forEach(group => {
@@ -20208,6 +20304,8 @@ window.coraCurrentUserId = <?php echo intval( get_current_user_id() ); ?>;
                     sidebarNav.classList.remove('hidden');
                     return;
                 }
+
+                sidebarNav.classList.add('is-searching');
 
                 // Client-side filtering of sidebar menu items matching the query text
                 let matchedAny = false;

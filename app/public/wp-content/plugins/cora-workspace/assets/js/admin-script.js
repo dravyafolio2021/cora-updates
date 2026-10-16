@@ -7167,7 +7167,10 @@ jQuery(document).ready(function($) {
 
         // Hide empty nav group headers if all items in that group are restricted/hidden
         $('.cora-nav-group').each(function() {
-            if ($(this).find('.cora-nav-item:visible').length === 0) {
+            var $allowedItems = $(this).find('li').filter(function() {
+                return this.style.display !== 'none';
+            });
+            if ($allowedItems.length === 0) {
                 $(this).hide();
             } else {
                 $(this).show();
@@ -7487,9 +7490,9 @@ jQuery(document).ready(function($) {
 
     // Save Google API credentials (Maps Key + Client ID + Secret)
     window.coraGbpSaveApiCredentials = function() {
-        const mapsKey      = $('#cora-gbp-maps-api-key').val().trim();
-        const clientId     = $('#cora-gbp-client-id').val().trim();
-        const clientSecret = $('#cora-gbp-client-secret').val().trim();
+        const mapsKey      = ($('#cora-gbp-maps-api-key').val() || $('#cora-gbp-input-api-key').val() || '').trim();
+        const clientId     = ($('#cora-gbp-client-id').val() || $('#cora-gbp-input-client-id').val() || '').trim();
+        const clientSecret = ($('#cora-gbp-client-secret').val() || $('#cora-gbp-input-client-secret').val() || '').trim();
         
         if ( !mapsKey && !clientId ) {
             window.coraShowToast('At least a Google Maps API Key is required to enable business search.');
@@ -7540,7 +7543,7 @@ jQuery(document).ready(function($) {
         const resultsWrap = $('#cora-gbp-search-results-wrap');
         
         btn.prop('disabled', true).html('<svg class="animate-spin mr-2 inline" viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>Searching...');
-        resultsWrap.html(`
+        resultsWrap.removeClass('hidden').html(`
             <div class="flex flex-col items-center justify-center py-12 gap-3 text-zinc-400">
                 <svg class="animate-spin" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
                 <p class="text-xs">Searching Google Maps...</p>
@@ -7561,7 +7564,7 @@ jQuery(document).ready(function($) {
                     coraGbpRenderPlacesResults(res.data);
                 } else {
                     window.coraShowToast(res.data || 'Search failed.', 'error');
-                    resultsWrap.html(`
+                    resultsWrap.removeClass('hidden').html(`
                         <div class="text-center py-8 text-sm text-red-650">
                             ${res.data || 'Search failed.'}
                         </div>
@@ -7571,7 +7574,7 @@ jQuery(document).ready(function($) {
             error: function() {
                 btn.prop('disabled', false).html('<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none" class="inline mr-1"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Search Google');
                 window.coraShowToast('Network error. Please try again.', 'error');
-                resultsWrap.html('<div class="text-center py-8 text-sm text-red-650">Network error. Please try again.</div>');
+                resultsWrap.removeClass('hidden').html('<div class="text-center py-8 text-sm text-red-650">Network error. Please try again.</div>');
             }
         });
     };
@@ -7579,6 +7582,7 @@ jQuery(document).ready(function($) {
     // Render Places Search Results
     window.coraGbpRenderPlacesResults = function(places) {
         const resultsWrap = $('#cora-gbp-search-results-wrap');
+        resultsWrap.removeClass('hidden');
         if (!places || places.length === 0) {
             resultsWrap.html(`
                 <div class="flex flex-col items-center justify-center gap-2 py-10 text-zinc-400">
@@ -7695,7 +7699,7 @@ jQuery(document).ready(function($) {
                     if ($('#cora-google-oauth-modal').length) {
                         $('#cora-google-oauth-modal').removeClass('hidden').addClass('flex');
                     } else {
-                        window.coraGbpAuthorizeDemoAccount('nitinaroraphotography@gmail.com');
+                        window.coraGbpAuthorizeDemoAccount('studio.director@elitestudio.local');
                     }
                     btn.prop('disabled', false).html('<svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg> Sign in with Google');
                 }
@@ -7704,7 +7708,7 @@ jQuery(document).ready(function($) {
                 if ($('#cora-google-oauth-modal').length) {
                     $('#cora-google-oauth-modal').removeClass('hidden').addClass('flex');
                 } else {
-                    window.coraGbpAuthorizeDemoAccount('nitinaroraphotography@gmail.com');
+                    window.coraGbpAuthorizeDemoAccount('studio.director@elitestudio.local');
                 }
                 btn.prop('disabled', false).text('Sign in with Google');
             }
@@ -7924,11 +7928,60 @@ jQuery(document).ready(function($) {
     };
 
     // Submit a reply to a real Google review
-    window.coraGbpSubmitReply = function(reviewName, btn) {
-        const box = $(btn).closest('.space-y-2');
+    window.coraGbpSubmitReply = function(reviewName, btnOrKey) {
+        if (typeof btnOrKey === 'string' && document.getElementById('reply-textarea-' + btnOrKey)) {
+            var revKey = btnOrKey;
+            var ta = document.getElementById('reply-textarea-' + revKey);
+            var replyText = ta ? ta.value.trim() : '';
+
+            if (!replyText) {
+                if (window.coraShowToast) window.coraShowToast('Please write or generate a reply first.', 'warning');
+                return;
+            }
+
+            if (window.coraShowToast) window.coraShowToast('Publishing reply to Google Maps...', 'info');
+
+            var ajaxUrl = (window.cora_vars && window.cora_vars.ajax_url) || (window.coraREData && window.coraREData.ajaxUrl) || '/wp-admin/admin-ajax.php';
+            var nonce   = (window.cora_vars && window.cora_vars.nonce) || (window.coraREData && window.coraREData.ajaxNonce) || '';
+
+            jQuery.ajax({
+                url: ajaxUrl,
+                type: 'POST',
+                data: {
+                    action: 'cora_gbp_reply_review',
+                    security: nonce,
+                    review_name: reviewName,
+                    reply: replyText
+                },
+                success: function(res) {
+                    if (res && res.success) {
+                        if (window.coraShowToast) window.coraShowToast('Reply posted to Google successfully!', 'success');
+                        var box = document.getElementById('reply-box-' + revKey);
+                        if (box) {
+                            box.outerHTML = '<div class="ml-13 p-3 bg-zinc-50 rounded-xl border border-zinc-200/70 space-y-1">' +
+                                '<div class="flex items-center justify-between">' +
+                                '<span class="text-[9px] font-bold text-zinc-500 uppercase tracking-wider">Your Google Response</span>' +
+                                '<span class="text-[9px] text-zinc-400">Just now</span>' +
+                                '</div>' +
+                                '<p class="text-xs text-zinc-800 font-medium leading-relaxed italic">"' + replyText + '"</p>' +
+                                '</div>';
+                        }
+                    } else {
+                        var err = (res && res.data) ? res.data : 'Could not submit reply.';
+                        if (window.coraShowToast) window.coraShowToast(err, 'error');
+                    }
+                },
+                error: function() {
+                    if (window.coraShowToast) window.coraShowToast('Network error while posting reply.', 'error');
+                }
+            });
+            return;
+        }
+
+        const box = $(btnOrKey).closest('.space-y-2');
         const text = box.find('.gbp-reply-textarea').val().trim();
         if (!text) { window.coraShowToast('Please write a reply first.'); return; }
-        $(btn).prop('disabled', true).text('Posting...');
+        $(btnOrKey).prop('disabled', true).text('Posting...');
         $.ajax({
             url: coraREData.ajaxUrl,
             method: 'POST',
@@ -7939,18 +7992,67 @@ jQuery(document).ready(function($) {
                     box.html(`<div class="bg-zinc-50 border border-zinc-100 rounded-lg p-2.5 text-xs text-zinc-600 space-y-0.5"><span class="text-[10px] font-bold text-zinc-400 block">Your Reply</span><p class="italic">"${text}"</p></div>`);
                 } else {
                     window.coraShowToast('Error: ' + (res.data || 'Could not post reply.'));
-                    $(btn).prop('disabled', false).text('Post Reply to Google');
+                    $(btnOrKey).prop('disabled', false).text('Post Reply to Google');
                 }
             },
             error: function() {
                 window.coraShowToast('Network error.');
-                $(btn).prop('disabled', false).text('Post Reply to Google');
+                $(btnOrKey).prop('disabled', false).text('Post Reply to Google');
             }
         });
     };
 
     // AI draft a review reply using Cora AI
     window.coraGbpAiDraftReply = function(reviewerName, btn) {
+        const taById = document.getElementById('reply-textarea-' + reviewerName);
+        if (taById) {
+            var toneSelect = document.getElementById('tone-' + reviewerName);
+            var tone = toneSelect ? toneSelect.value : 'warm';
+            taById.value = 'Drafting personalized AI reply...';
+
+            var targetRev = null;
+            if (typeof coraGbpAllReviews !== 'undefined' && coraGbpAllReviews && coraGbpAllReviews.length) {
+                for (var i = 0; i < coraGbpAllReviews.length; i++) {
+                    var r = coraGbpAllReviews[i];
+                    var k = r.reviewId || ('rev_' + i);
+                    if (k === reviewerName || r.name === reviewerName) {
+                        targetRev = r;
+                        break;
+                    }
+                }
+            }
+            var author = targetRev && targetRev.reviewer && targetRev.reviewer.displayName ? targetRev.reviewer.displayName : (targetRev ? (targetRev.authorName || 'Google User') : 'Google User');
+            var ratingNum = targetRev ? ((targetRev.starRating === 'FIVE') ? 5 : ((targetRev.starRating === 'FOUR') ? 4 : ((targetRev.starRating === 'THREE') ? 3 : ((targetRev.starRating === 'TWO') ? 2 : 1)))) : 5;
+            var comment = targetRev && targetRev.comment ? targetRev.comment : '';
+
+            var ajaxUrl = (window.cora_vars && window.cora_vars.ajax_url) || (window.coraREData && window.coraREData.ajaxUrl) || '/wp-admin/admin-ajax.php';
+            var nonce   = (window.cora_vars && window.cora_vars.nonce) || (window.coraREData && window.coraREData.ajaxNonce) || '';
+
+            jQuery.ajax({
+                url: ajaxUrl,
+                type: 'POST',
+                data: {
+                    action: 'cora_gbp_generate_ai_reply',
+                    security: nonce,
+                    reviewer_name: author,
+                    star_rating: ratingNum,
+                    comment: comment,
+                    tone: tone
+                },
+                success: function(res) {
+                    if (res && res.success && res.data && res.data.reply) {
+                        taById.value = res.data.reply;
+                    } else {
+                        taById.value = 'Thank you so much for the ' + ratingNum + '-star review, ' + author + '! The team at Elite Studio truly appreciates your support.';
+                    }
+                },
+                error: function() {
+                    taById.value = 'Thank you so much for the ' + ratingNum + '-star review, ' + author + '! The team at Elite Studio truly appreciates your support.';
+                }
+            });
+            return;
+        }
+
         const box = $(btn).closest('.space-y-2');
         const ta = box.find('.gbp-reply-textarea');
         ta.val('Drafting with AI...');

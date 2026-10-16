@@ -84,6 +84,30 @@ class Cora_OAuth_Server {
                 'category'    => 'operations',
                 'level'       => 'write',
             ),
+            'plugins:read' => array(
+                'label'       => 'View Workspace Plugins',
+                'description' => 'Inspect installed workspace plugins, webhook listeners, and MCP tool bridges.',
+                'category'    => 'plugins',
+                'level'       => 'read',
+            ),
+            'plugins:write' => array(
+                'label'       => 'Manage Workspace Plugins',
+                'description' => 'Create, configure, toggle, and install workspace plugins and API webhooks.',
+                'category'    => 'plugins',
+                'level'       => 'write',
+            ),
+            'skills:read' => array(
+                'label'       => 'View Workspace AI Skills',
+                'description' => 'Inspect custom AI agent skills, system prompt instructions, and tool bindings.',
+                'category'    => 'skills',
+                'level'       => 'read',
+            ),
+            'skills:write' => array(
+                'label'       => 'Manage Workspace AI Skills',
+                'description' => 'Create, edit, toggle, and configure custom AI agent skills and parameter schemas.',
+                'category'    => 'skills',
+                'level'       => 'write',
+            ),
             'tasks:read' => array(
                 'label'       => 'View Kanban Tasks',
                 'description' => 'Read workspace task boards, assignments, priorities, and deadlines.',

@@ -217,174 +217,174 @@ $initial_selected_client = isset( $_GET['client_name'] ) ? sanitize_text_field( 
     border-radius: 4px;
 }
 
-/* Responsive Drawers & Bottom Sheets (Rule 12 SOP) */
+/* =========================================================================
+   SHOPIFY-INSPIRED MAIN-AREA DOCKED VIEW PANEL (GLOBAL CORA STANDARD - RULE 15)
+   - Universal bottom-slide motion: translateY(100%) -> translateY(0)
+   - Zero overlay or floating blur: no backdrop element (backdrop: false)
+   - Docks directly below header: top: var(--cora-main-top, 52px); height: calc(100vh - 52px);
+   - Occupies EXACT available workspace width based on sidebar:
+     * Desktop Sidebar Expanded: left: 16rem; width: calc(100vw - 16rem);
+     * Desktop Sidebar Collapsed: left: 4rem; width: calc(100vw - 4rem);
+     * Mobile / Tablet (< 1024px): left: 0; width: 100vw;
+   - Zero shadow, square corners (border-radius: 0 !important; box-shadow: none !important;)
+   - Clear formal structural borders: border-left: 1px solid #e4e4e7; border-top: 1px solid #e4e4e7;
+   - Sidebar remains 100% visible, clickable, and accessible at all times (z-index: 40)
+   - Scoped scroll lock strictly on main.cora-main (leaving body & sidebar unlocked)
+   ========================================================================= */
+
 :root {
-    --cora-task-drawer-width: 480px;
-}
-.cora-task-drawer {
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    width: 100%;
-    max-width: var(--cora-task-drawer-width, 480px);
-    background: #ffffff;
-    border-left: 1px solid #e4e4e7;
-    box-shadow: -8px 0 35px rgba(0, 0, 0, 0.08);
-    z-index: 9999;
-    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-}
-@media (max-width: 639px) {
-    .cora-task-drawer {
-        top: auto;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        max-width: 100%;
-        max-height: 90vh;
-        border-radius: 1.5rem 1.5rem 0 0;
-        border-left: none;
-        border-top: 1px solid #e4e4e7;
-        box-shadow: 0 -8px 35px rgba(0, 0, 0, 0.1);
-    }
-    .cora-task-drawer.collapsed,
-    .cora-task-drawer:not(.open) {
-        transform: translateY(100%) !important;
-    }
-    .cora-task-drawer.open:not(.collapsed) {
-        transform: translateY(0) !important;
-        visibility: visible !important;
-        display: flex !important;
-        pointer-events: auto !important;
-    }
-}
-@media (min-width: 640px) {
-    aside#cora-task-drawer,
-    aside#cora-create-task-drawer,
-    aside.cora-task-drawer,
-    #cora-task-drawer,
-    #cora-create-task-drawer {
-        top: 48px !important;
-        bottom: 0 !important;
-        right: 0 !important;
-        height: calc(100vh - 48px) !important;
-        width: var(--cora-task-drawer-width, 480px) !important;
-        max-width: 90vw !important;
-        min-width: 380px !important;
-        overflow: hidden !important;
-        border-top-left-radius: 1.25rem !important;
-        border-bottom-left-radius: 0 !important;
-        border-top-right-radius: 0 !important;
-        border-bottom-right-radius: 0 !important;
-        border-left: 1px solid #e4e4e7 !important;
-        border-top: 1px solid #e4e4e7 !important;
-        border-right: none !important;
-        border-bottom: none !important;
-        box-shadow: -8px 0 35px rgba(0, 0, 0, 0.08) !important;
-    }
-    aside#cora-task-drawer.collapsed,
-    aside#cora-create-task-drawer.collapsed,
-    aside#cora-task-drawer:not(.open),
-    aside#cora-create-task-drawer:not(.open) {
-        transform: translateX(100%) !important;
-    }
-    aside#cora-task-drawer.open:not(.collapsed),
-    aside#cora-create-task-drawer.open:not(.collapsed) {
-        transform: translateX(0) !important;
-        visibility: visible !important;
-        display: flex !important;
-        pointer-events: auto !important;
-    }
-    #cora-task-drawer-backdrop {
-        top: 48px !important;
-        height: calc(100vh - 48px) !important;
-    }
+    --cora-main-left: 16rem;
+    --cora-main-top: 52px;
+    --cora-main-width: calc(100vw - 16rem);
+    --cora-main-height: calc(100vh - 52px);
 }
 
-/* Left-Edge Resizer Drag Handle */
-.cora-drawer-resizer {
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 12px;
-    cursor: col-resize;
-    cursor: ew-resize;
-    z-index: 99999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    touch-action: none;
-    user-select: none;
-    pointer-events: auto !important;
-}
-.cora-drawer-resizer::after {
-    content: '';
-    width: 4px;
-    height: 48px;
-    background: #d4d4d8;
-    border-radius: 9999px;
-    transition: background-color 0.15s, height 0.15s, width 0.15s;
-}
-.cora-drawer-resizer:hover::after,
-.cora-drawer-resizer.dragging::after {
-    background: #18181b;
-    height: 64px;
-    width: 5px;
-}
-#cora-task-drawer-backdrop {
-    background: transparent !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-}
-#cora-task-drawer-backdrop.open {
-    visibility: visible !important;
-    display: block !important;
-    opacity: 0 !important;
-    pointer-events: auto !important;
-}
-
-/* Mobile Filter Bottom Sheet per Rule 1 & Rule 12 */
-#cora-task-mobile-filter-backdrop {
+/* MAIN-AREA DOCKED TASK DETAILS & TASK CREATOR PANELS (RULE 15 SOP) */
+#cora-task-drawer,
+#cora-create-task-drawer,
+aside.cora-task-drawer {
     position: fixed !important;
-    inset: 0 !important;
-    background: transparent !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    z-index: 999998 !important;
-    transition: opacity 0.3s ease;
-    opacity: 0 !important;
-    pointer-events: none !important;
-    display: none !important;
-}
-#cora-task-mobile-filter-backdrop.open {
-    opacity: 1 !important;
-    pointer-events: auto !important;
-    display: block !important;
-}
-#cora-task-mobile-filter-sheet {
-    position: fixed !important;
+    top: var(--cora-main-top, 52px) !important;
     bottom: 0 !important;
-    left: 0 !important;
+    left: var(--cora-main-left, 16rem) !important;
     right: 0 !important;
-    z-index: 999999 !important;
-    background: #ffffff !important;
-    border-top-left-radius: 1.5rem !important;
-    border-top-right-radius: 1.5rem !important;
+    width: var(--cora-main-width, calc(100vw - 16rem)) !important;
+    max-width: var(--cora-main-width, calc(100vw - 16rem)) !important;
+    height: var(--cora-main-height, calc(100vh - 52px)) !important;
+    max-height: var(--cora-main-height, calc(100vh - 52px)) !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
     border-top: 1px solid #e4e4e7 !important;
-    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.2) !important;
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
-    transform: translateY(100%) !important;
-    --tw-translate-y: 100% !important;
-    max-height: 85vh !important;
+    border-left: 1px solid #e4e4e7 !important;
+    border-right: none !important;
+    border-bottom: none !important;
+    background-color: #ffffff !important;
+    z-index: 40 !important; /* Kept strictly below sidebar (z-index: 60) and topbar (z-index: 9999) */
+    box-shadow: none !important;
+    -webkit-box-shadow: none !important;
+    transition: left 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+                width 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+                max-width 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+                opacity 0.15s ease !important;
     display: flex !important;
     flex-direction: column !important;
+    overflow: hidden !important;
+}
+
+.dark #cora-task-drawer,
+.dark #cora-create-task-drawer,
+.dark aside.cora-task-drawer {
+    background-color: #18181b !important;
+    border-top: 1px solid #27272a !important;
+    border-left: 1px solid #27272a !important;
+}
+
+#cora-task-drawer.collapsed,
+#cora-create-task-drawer.collapsed,
+#cora-task-drawer:not(.open),
+#cora-create-task-drawer:not(.open) {
+    transform: translateY(100%) !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+}
+
+#cora-task-drawer.open:not(.collapsed),
+#cora-create-task-drawer.open:not(.collapsed) {
+    transform: translateY(0) !important;
+    pointer-events: auto !important;
+    visibility: visible !important;
+}
+
+/* Maximized Canvas Mode (⤢ Fullscreen) */
+#cora-task-drawer.maximized,
+#cora-create-task-drawer.maximized {
+    left: 0 !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    z-index: 70 !important;
+    border-left: none !important;
+}
+
+/* Mobile & Tablet Overrides (< 1024px) */
+@media (max-width: 1023px) {
+    #cora-task-drawer,
+    #cora-create-task-drawer,
+    aside.cora-task-drawer {
+        left: 0 !important;
+        width: 100vw !important;
+        max-width: 100vw !important;
+        border-left: none !important;
+    }
+}
+
+/* Zero Backdrop Overlay per Rule 15 */
+#cora-task-drawer-backdrop {
+    display: none !important;
+    visibility: hidden !important;
     pointer-events: none !important;
 }
-#cora-task-mobile-filter-sheet.open {
-    transform: translateY(0) !important;
-    --tw-translate-y: 0px !important;
-    pointer-events: auto !important;
+
+
+/* Mobile Filter Bottom Sheet per Rule 1 & Rule 12 */
+@media (min-width: 768px) {
+    #cora-task-mobile-filter-backdrop,
+    #cora-task-mobile-filter-sheet {
+        display: none !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+        opacity: 0 !important;
+        transform: translateY(100%) !important;
+    }
+}
+@media (max-width: 767px) {
+    #cora-task-mobile-filter-backdrop {
+        position: fixed !important;
+        inset: 0 !important;
+        background: rgba(9, 9, 11, 0.45) !important;
+        backdrop-filter: blur(4px) !important;
+        -webkit-backdrop-filter: blur(4px) !important;
+        z-index: 999998 !important;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+        display: none !important;
+    }
+    #cora-task-mobile-filter-backdrop.open {
+        opacity: 1 !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+        display: block !important;
+    }
+    #cora-task-mobile-filter-sheet {
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        z-index: 999999 !important;
+        background: #ffffff !important;
+        border-top-left-radius: 1.5rem !important;
+        border-top-right-radius: 1.5rem !important;
+        border-top: 1px solid #e4e4e7 !important;
+        box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.2) !important;
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s ease !important;
+        transform: translateY(100%) !important;
+        --tw-translate-y: 100% !important;
+        visibility: hidden !important;
+        max-height: 85vh !important;
+        display: none !important;
+        flex-direction: column !important;
+        pointer-events: none !important;
+    }
+    #cora-task-mobile-filter-sheet.open {
+        transform: translateY(0) !important;
+        --tw-translate-y: 0px !important;
+        visibility: visible !important;
+        display: flex !important;
+        pointer-events: auto !important;
+    }
 }
 </style>
 
@@ -722,239 +722,279 @@ $initial_selected_client = isset( $_GET['client_name'] ) ? sanitize_text_field( 
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════════
-     RESPONSIVE TASK DETAILS & WORK MANAGEMENT DRAWER
+     6. MAIN-AREA DOCKED TASK DETAILS VIEW PANEL (GLOBAL CORA STANDARD - RULE 15)
      ═══════════════════════════════════════════════════════════════════ -->
-<div id="cora-task-drawer-backdrop" onclick="window.closeTaskDrawer(); window.closeCreateTaskDrawer();" class="fixed inset-0 bg-transparent z-[9990] opacity-0 pointer-events-none"></div>
-
-<aside id="cora-task-drawer" class="cora-task-drawer collapsed flex flex-col pointer-events-none">
-    <!-- Desktop Left-Edge Drag-to-Resize Handle -->
-    <div id="cora-task-drawer-resizer" class="hidden sm:flex cora-drawer-resizer" title="Drag to resize drawer"></div>
-
-    <!-- Mobile Drag Handle -->
-    <div class="sm:hidden w-10 h-1 bg-zinc-300 rounded-full mx-auto mt-2.5 mb-1 shrink-0"></div>
-
-    <!-- Drawer Header Toolbar -->
-    <div class="h-14 sm:h-16 px-4 sm:px-6 border-b border-zinc-200/90 flex items-center justify-between shrink-0 bg-white gap-2 sm:rounded-tl-[1.25rem]">
-        <div class="flex items-center gap-2 min-w-0">
-            <span class="px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-600 font-mono font-bold text-[10px]" id="drawer-task-id">#TASK-101</span>
+<aside id="cora-task-drawer" class="cora-task-drawer collapsed">
+    
+    <!-- 1. UNIFIED ULTRA-COMPACT DOCKED HEADER (52px Desktop / Responsive Mobile) -->
+    <div class="cora-drawer-header px-3 sm:px-6 py-2 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shrink-0 sticky top-0 z-30">
+        <div class="flex flex-wrap lg:flex-nowrap items-center min-h-[38px] lg:min-h-[44px] w-full gap-y-2 justify-between">
             
-            <!-- Quick Status Selector -->
-            <select id="drawer-task-status-select" onchange="window.coraDrawerStatusChange(this.value)" class="h-7 px-2 bg-zinc-50 border border-zinc-200 rounded-lg text-xs font-semibold text-zinc-800 outline-none cursor-pointer hover:bg-zinc-100 transition-colors">
-                <option value="todo">To Do / Backlog</option>
-                <option value="in_progress">In Execution</option>
-                <option value="review">Review & QA</option>
-                <option value="done">Completed</option>
-            </select>
+            <!-- Left: Task ID, Category Badge, Status Selector & Priority Selector -->
+            <div class="flex items-center gap-2 sm:gap-2.5 cora-drawer-header-left min-w-0">
+                <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold tracking-wider uppercase bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 shrink-0 border border-zinc-200/60 dark:border-zinc-700/60" id="drawer-task-id">#TASK-101</span>
+                
+                <span id="drawer-task-category-badge" class="hidden sm:inline-block px-2 py-0.5 rounded text-[9.5px] font-mono font-bold tracking-wider uppercase bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 shrink-0">POST_PRODUCTION</span>
 
-            <!-- Quick Priority Selector -->
-            <select id="drawer-task-priority-select" onchange="window.coraDrawerPriorityChange(this.value)" class="h-7 px-2 bg-zinc-50 border border-zinc-200 rounded-lg text-xs font-semibold text-zinc-800 outline-none cursor-pointer hover:bg-zinc-100 transition-colors">
-                <option value="urgent">Urgent</option>
-                <option value="high">High Priority</option>
-                <option value="medium">Medium</option>
-                <option value="low">Low</option>
-            </select>
-        </div>
+                <!-- Quick Status Selector -->
+                <select id="drawer-task-status-select" onchange="window.coraDrawerStatusChange(this.value)" class="h-7 px-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-xs font-semibold text-zinc-800 dark:text-zinc-200 outline-none cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors shadow-2xs">
+                    <option value="todo">To Do / Backlog</option>
+                    <option value="in_progress">In Execution</option>
+                    <option value="review">Review & QA</option>
+                    <option value="done">Completed</option>
+                </select>
 
-        <button id="btn-close-task-drawer" onclick="window.closeTaskDrawer()" class="w-8 h-8 rounded-lg hover:bg-zinc-100 text-zinc-400 hover:text-zinc-900 flex items-center justify-center cursor-pointer transition-colors border-0 bg-transparent shrink-0">
-            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-        </button>
-    </div>
-
-    <!-- Drawer Body -->
-    <div class="flex-1 overflow-y-auto flex flex-col text-xs">
-        
-        <!-- Top Fixed Details Block (Title & Properties Matrix) -->
-        <div class="p-4 sm:p-6 space-y-4 border-b border-zinc-100 bg-white shrink-0">
-            <!-- Editable Title & Category -->
-            <div class="space-y-1.5">
-                <div class="flex items-center gap-2">
-                    <span id="drawer-task-category-badge" class="px-2 py-0.5 rounded bg-zinc-100 text-zinc-600 font-mono font-bold text-[9px] uppercase">POST_PRODUCTION</span>
-                    <span class="text-[10px] text-zinc-400 font-medium">Click title to edit</span>
-                </div>
-                <input type="text" id="drawer-task-title-input" onblur="window.coraSaveTaskField('title', this.value)" class="w-full text-base sm:text-lg font-bold text-zinc-950 bg-transparent border-b border-transparent hover:border-zinc-300 focus:border-zinc-900 focus:bg-white px-1 py-1 rounded outline-none transition-all" placeholder="Task title...">
+                <!-- Quick Priority Selector -->
+                <select id="drawer-task-priority-select" onchange="window.coraDrawerPriorityChange(this.value)" class="h-7 px-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-xs font-semibold text-zinc-800 dark:text-zinc-200 outline-none cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors shadow-2xs">
+                    <option value="urgent">Urgent</option>
+                    <option value="high">High Priority</option>
+                    <option value="medium">Medium</option>
+                    <option value="low">Low</option>
+                </select>
             </div>
 
-            <!-- Notion/Linear Style Properties Matrix -->
-            <div class="bg-zinc-50/80 border border-zinc-200/70 rounded-2xl p-3.5 space-y-2.5">
-                <div class="grid grid-cols-2 gap-3">
-                    <!-- Assignee -->
-                    <div>
-                        <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Assignee</label>
-                        <select id="drawer-task-assignee-select" onchange="window.coraSaveTaskField('assignee', this.value)" class="w-full h-8 px-2 bg-white border border-zinc-200 rounded-lg text-xs font-medium text-zinc-800 outline-none cursor-pointer">
-                            <option value="Studio Admin">Studio Admin</option>
-                            <option value="Rohan Verma">Rohan Verma</option>
-                            <option value="Kavya Patel">Kavya Patel</option>
-                            <option value="Aarav Mehta">Aarav Mehta</option>
-                        </select>
-                    </div>
-
-                    <!-- Client -->
-                    <div>
-                        <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Client</label>
-                        <input type="text" id="drawer-task-client-input" onblur="window.coraSaveTaskField('client', this.value)" class="w-full h-8 px-2 bg-white border border-zinc-200 rounded-lg text-xs font-medium text-zinc-800 outline-none">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-3 pt-2 border-t border-zinc-200/50">
-                    <!-- Due Date -->
-                    <div>
-                        <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Due Date</label>
-                        <input type="date" id="drawer-task-due-date-input" onchange="window.coraSaveTaskField('due_date', this.value)" class="w-full h-8 px-2 bg-white border border-zinc-200 rounded-lg text-xs font-medium text-zinc-800 outline-none cursor-pointer">
-                    </div>
-
-                    <!-- Deliverable Category -->
-                    <div>
-                        <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Category</label>
-                        <select id="drawer-task-category-select" onchange="window.coraSaveTaskField('category', this.value)" class="w-full h-8 px-2 bg-white border border-zinc-200 rounded-lg text-xs font-medium text-zinc-800 outline-none cursor-pointer">
-                            <?php foreach ( ( $curr_cfg['categories'] ?? array('PHOTOSHOOT', 'POST_PRODUCTION', 'RETOUCHING', 'COLOR_GRADING', 'PORTAL_UPLOAD', 'ADMIN') ) as $cat ) : ?>
-                                <option value="<?php echo esc_attr( $cat ); ?>"><?php echo esc_html( $cat ); ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Sticky Segmented 4-Tab Navigation Bar -->
-        <div class="sticky top-0 z-10 bg-white/95 backdrop-blur border-b border-zinc-200/80 px-4 sm:px-6 flex items-center gap-1 overflow-x-auto no-scrollbar shrink-0">
-            <button type="button" onclick="window.coraSetTaskDrawerTab('checklist')" id="task-tab-btn-checklist" class="task-drawer-tab-btn active px-3 py-2.5 text-xs font-semibold text-zinc-950 border-b-2 border-zinc-950 transition-all flex items-center gap-1.5 cursor-pointer bg-transparent border-0 border-b-2 whitespace-nowrap">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
-                <span>Checklist</span>
-                <span id="tab-badge-checklist-count" class="px-1.5 py-0.2 rounded-full bg-zinc-100 text-zinc-700 text-[10px] font-mono font-bold">0</span>
-            </button>
-            <button type="button" onclick="window.coraSetTaskDrawerTab('scope')" id="task-tab-btn-scope" class="task-drawer-tab-btn px-3 py-2.5 text-xs font-medium text-zinc-500 hover:text-zinc-900 border-b-2 border-transparent transition-all flex items-center gap-1.5 cursor-pointer bg-transparent border-0 border-b-2 whitespace-nowrap">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-                <span>Scope & Specs</span>
-            </button>
-            <button type="button" onclick="window.coraSetTaskDrawerTab('assets')" id="task-tab-btn-assets" class="task-drawer-tab-btn px-3 py-2.5 text-xs font-medium text-zinc-500 hover:text-zinc-900 border-b-2 border-transparent transition-all flex items-center gap-1.5 cursor-pointer bg-transparent border-0 border-b-2 whitespace-nowrap">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
-                <span>Assets & Links</span>
-                <span id="tab-badge-assets-count" class="px-1.5 py-0.2 rounded-full bg-zinc-100 text-zinc-700 text-[10px] font-mono font-bold">0</span>
-            </button>
-            <button type="button" onclick="window.coraSetTaskDrawerTab('activity')" id="task-tab-btn-activity" class="task-drawer-tab-btn px-3 py-2.5 text-xs font-medium text-zinc-500 hover:text-zinc-900 border-b-2 border-transparent transition-all flex items-center gap-1.5 cursor-pointer bg-transparent border-0 border-b-2 whitespace-nowrap">
-                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                <span>Activity & Notes</span>
-                <span id="tab-badge-activity-count" class="px-1.5 py-0.2 rounded-full bg-zinc-100 text-zinc-700 text-[10px] font-mono font-bold">0</span>
-            </button>
-        </div>
-
-        <!-- Tab Panels Container -->
-        <div class="p-4 sm:p-6 flex-1 flex flex-col">
-            
-            <!-- ── TAB 1: CHECKLIST ── -->
-            <div id="task-tab-panel-checklist" class="task-drawer-tab-panel space-y-4">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-1.5">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-600"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
-                        <span class="font-bold text-zinc-900 text-xs">Subtasks & Execution Checklist</span>
-                    </div>
-                    <span id="drawer-subtask-progress-label" class="font-mono text-[11px] font-bold text-zinc-700">3 of 5 (60%)</span>
-                </div>
-
-                <!-- Animated Progress Bar -->
-                <div class="w-full h-1.5 bg-zinc-100 rounded-full overflow-hidden">
-                    <div id="drawer-subtask-progress-bar" class="h-full bg-zinc-950 rounded-full transition-all duration-300" style="width: 60%;"></div>
-                </div>
-
-                <!-- Subtask Items List -->
-                <div id="drawer-subtasks-list" class="space-y-2">
-                    <!-- Dynamically rendered checkable subtask items -->
-                </div>
-
-                <!-- Add Subtask Input Form -->
-                <form onsubmit="window.coraAddSubtask(event)" class="flex items-center gap-2 pt-2">
-                    <input type="text" id="drawer-new-subtask-input" placeholder="+ Add a subtask checklist item (press Enter)..." class="flex-1 h-9 px-3 bg-zinc-50 hover:bg-white focus:bg-white border border-dashed border-zinc-300 focus:border-zinc-500 rounded-xl text-xs outline-none transition-all">
-                    <button type="submit" class="px-3 h-9 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-xl text-xs cursor-pointer transition-colors border-0 shadow-2xs">Add Item</button>
-                </form>
-            </div>
-
-            <!-- ── TAB 2: SCOPE & SPECS ── -->
-            <div id="task-tab-panel-scope" class="task-drawer-tab-panel hidden space-y-4">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-1.5">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-600"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-                        <span class="font-bold text-zinc-900 text-xs">Technical Scope & Requirements</span>
-                    </div>
-                    <span class="text-[10px] text-zinc-400 font-mono">Auto-saved</span>
-                </div>
-
-                <div class="space-y-2">
-                    <label class="block text-[11px] font-semibold text-zinc-600">Work Instructions & Deliverable Specifications</label>
-                    <textarea id="drawer-task-notes-input" onblur="window.coraSaveTaskField('notes', this.value)" rows="8" placeholder="Provide checklist requirements, format specifications (4K ProRes, JPG, sRGB), camera angles, color grading LUT references, and deliverable notes..." class="w-full p-3.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs text-zinc-800 outline-none focus:border-zinc-400 focus:bg-white transition-all resize-none leading-relaxed"></textarea>
-                </div>
-
-                <div class="p-3 bg-zinc-50/80 rounded-xl border border-zinc-200/60 text-[11px] text-zinc-500 space-y-1">
-                    <span class="font-bold text-zinc-700 block">Pro Tip for Deliverables:</span>
-                    <p class="leading-relaxed">Keep instructions structured with clear deliverable resolutions, color profiles, and client feedback notes.</p>
+            <!-- Center: Level 01 Segmented Pill Tabs (Dead Center on Desktop / Responsive Horizontal Scroll on Mobile) -->
+            <div class="flex items-center justify-start sm:justify-center overflow-x-auto no-scrollbar py-0.5 cora-drawer-header-center">
+                <div class="p-1 bg-zinc-100/90 dark:bg-zinc-800/80 rounded-xl border border-zinc-200/70 dark:border-zinc-800/80 flex items-center gap-1 sm:gap-1.5 select-none shrink-0" id="task-drawer-tabs-bar">
+                    <button type="button" onclick="window.coraSetTaskDrawerTab('checklist')" id="task-tab-btn-checklist" class="task-drawer-tab-btn active px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white shadow-2xs border-0 cursor-pointer whitespace-nowrap flex items-center gap-1.5">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+                        <span>Checklist</span>
+                        <span id="tab-badge-checklist-count" class="px-1.5 py-0.2 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[9.5px] font-mono font-bold">0</span>
+                    </button>
+                    <button type="button" onclick="window.coraSetTaskDrawerTab('scope')" id="task-tab-btn-scope" class="task-drawer-tab-btn px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-medium transition-all text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50 bg-transparent border-0 cursor-pointer whitespace-nowrap flex items-center gap-1.5">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                        <span>Scope & Specs</span>
+                    </button>
+                    <button type="button" onclick="window.coraSetTaskDrawerTab('assets')" id="task-tab-btn-assets" class="task-drawer-tab-btn px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-medium transition-all text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50 bg-transparent border-0 cursor-pointer whitespace-nowrap flex items-center gap-1.5">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                        <span>Assets & Links</span>
+                        <span id="tab-badge-assets-count" class="px-1.5 py-0.2 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[9.5px] font-mono font-bold">0</span>
+                    </button>
+                    <button type="button" onclick="window.coraSetTaskDrawerTab('activity')" id="task-tab-btn-activity" class="task-drawer-tab-btn px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-medium transition-all text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50 bg-transparent border-0 cursor-pointer whitespace-nowrap flex items-center gap-1.5">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                        <span>Activity & Notes</span>
+                        <span id="tab-badge-activity-count" class="px-1.5 py-0.2 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[9.5px] font-mono font-bold">0</span>
+                    </button>
                 </div>
             </div>
 
-            <!-- ── TAB 3: ASSETS & LINKS ── -->
-            <div id="task-tab-panel-assets" class="task-drawer-tab-panel hidden space-y-4">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-1.5">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-600"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
-                        <span class="font-bold text-zinc-900 text-xs">Deliverable Asset Links & Galleries</span>
-                    </div>
-                </div>
+            <!-- Right: Maximize Toggle & Close Buttons Pinned Right -->
+            <div class="flex items-center gap-1.5 shrink-0 cora-drawer-header-right">
+                <!-- Maximize / Restore Toggle Button -->
+                <button 
+                    type="button" 
+                    onclick="window.coraToggleTaskDrawerMaximize()"
+                    id="cora-task-maximize-btn"
+                    class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 flex items-center justify-center text-zinc-500 hover:text-zinc-950 dark:hover:text-white transition-all cursor-pointer border border-zinc-200/80 dark:border-zinc-700 shadow-2xs active:scale-95 shrink-0"
+                    title="Expand / Fullscreen Canvas"
+                >
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"></path><path d="M9 21H3v-6"></path><path d="M21 3l-7 7"></path><path d="M3 21l7-7"></path></svg>
+                </button>
 
-                <!-- Asset Links List -->
-                <div id="drawer-asset-links-list" class="space-y-2">
-                    <!-- Dynamically rendered asset links -->
-                </div>
-
-                <!-- Inline Add Link Form (No browser prompt) -->
-                <div class="p-3.5 bg-zinc-50 rounded-2xl border border-zinc-200 space-y-2.5">
-                    <span class="font-bold text-zinc-800 text-[11px] block">+ Attach Deliverable Asset URL</span>
-                    <div class="space-y-2">
-                        <input type="text" id="drawer-new-link-title" placeholder="Link Title (e.g. Master Drive, Frame.io Review, RAW Proofs)" class="w-full h-8 px-3 bg-white border border-zinc-200 rounded-lg text-xs outline-none focus:border-zinc-400">
-                        <input type="url" id="drawer-new-link-url" placeholder="URL (e.g. https://drive.google.com/...)" class="w-full h-8 px-3 bg-white border border-zinc-200 rounded-lg text-xs outline-none focus:border-zinc-400">
-                        <button type="button" onclick="window.coraAddAssetLinkSubmit()" class="w-full h-8 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer border-0 shadow-2xs">
-                            Add Asset Link
-                        </button>
-                    </div>
-                </div>
+                <!-- Close Button (Esc) -->
+                <button 
+                    type="button" 
+                    onclick="window.closeTaskDrawer()"
+                    id="btn-close-task-drawer"
+                    class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 flex items-center justify-center text-zinc-500 hover:text-zinc-950 dark:hover:text-white transition-all cursor-pointer border border-zinc-200/80 dark:border-zinc-700 shadow-2xs active:scale-95 shrink-0"
+                    title="Close Drawer (Esc)"
+                >
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
             </div>
-
-            <!-- ── TAB 4: ACTIVITY & NOTES ── -->
-            <div id="task-tab-panel-activity" class="task-drawer-tab-panel hidden space-y-4">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-1.5">
-                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-600"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                        <span class="font-bold text-zinc-900 text-xs">Team Activity & Collaboration Feed</span>
-                    </div>
-                    <span id="drawer-comments-count" class="text-[10px] text-zinc-400 font-mono">0 updates</span>
-                </div>
-
-                <!-- Comments Feed -->
-                <div id="drawer-comments-feed" class="space-y-2.5 max-h-72 overflow-y-auto pr-1">
-                    <!-- Dynamically rendered comments -->
-                </div>
-
-                <!-- Post New Comment Input Form -->
-                <form onsubmit="window.coraAddComment(event)" class="space-y-2 pt-2 border-t border-zinc-100">
-                    <textarea id="drawer-new-comment-input" rows="2" placeholder="Write an update, note, or collaboration comment..." class="w-full p-2.5 bg-zinc-50 focus:bg-white border border-zinc-200 focus:border-zinc-400 rounded-xl text-xs outline-none transition-all resize-none"></textarea>
-                    <div class="flex justify-end">
-                        <button type="submit" class="px-3.5 h-8 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-xl text-xs cursor-pointer transition-colors border-0 shadow-2xs">
-                            Post Update
-                        </button>
-                    </div>
-                </form>
-            </div>
-
         </div>
     </div>
 
-    <!-- Drawer Footer Actions -->
-    <div class="p-4 sm:p-5 border-t border-zinc-200/90 bg-zinc-50/90 flex items-center justify-between gap-2 shrink-0 sm:rounded-bl-[1.25rem]">
-        <button type="button" onclick="window.coraDeleteActiveTask()" class="px-3 py-2 text-xs font-bold text-red-600 hover:bg-red-50 rounded-xl transition-colors border border-transparent hover:border-red-200 cursor-pointer">
+    <!-- 2. Drawer Body (Full Canvas Responsive Scrollable Content - 2-Column SaaS Architecture) -->
+    <div class="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-6 text-xs text-zinc-800 dark:text-zinc-200">
+        <div class="max-w-7xl mx-auto w-full space-y-5">
+            
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                <!-- Left Column (5 cols): Title, Properties Matrix & Progress Overview -->
+                <div class="lg:col-span-5 space-y-4">
+                    
+                    <!-- Task Title Card -->
+                    <div class="p-4 sm:p-5 bg-zinc-50 dark:bg-zinc-950/50 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 space-y-2.5">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">Task Title & Scope</span>
+                            <span class="text-[10px] text-zinc-400 font-medium">Click to edit</span>
+                        </div>
+                        <input type="text" id="drawer-task-title-input" onblur="window.coraSaveTaskField('title', this.value)" class="w-full text-base sm:text-lg font-bold text-zinc-950 dark:text-white bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3.5 py-2.5 outline-none focus:border-zinc-400 dark:focus:border-zinc-600 transition-all" placeholder="Enter task title...">
+                    </div>
+
+                    <!-- Notion/Linear Style Properties Matrix -->
+                    <div class="p-4 sm:p-5 bg-zinc-50 dark:bg-zinc-950/50 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 space-y-3.5">
+                        <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">Operational Metadata</span>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <!-- Assignee -->
+                            <div>
+                                <label class="block text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-1">Assignee</label>
+                                <select id="drawer-task-assignee-select" onchange="window.coraSaveTaskField('assignee', this.value)" class="w-full h-9 px-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs font-medium text-zinc-800 dark:text-zinc-200 outline-none cursor-pointer">
+                                    <option value="Studio Admin">Studio Admin</option>
+                                    <option value="Rohan Verma">Rohan Verma</option>
+                                    <option value="Kavya Patel">Kavya Patel</option>
+                                    <option value="Aarav Mehta">Aarav Mehta</option>
+                                </select>
+                            </div>
+
+                            <!-- Client -->
+                            <div>
+                                <label class="block text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-1">Client</label>
+                                <input type="text" id="drawer-task-client-input" onblur="window.coraSaveTaskField('client', this.value)" class="w-full h-9 px-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs font-medium text-zinc-800 dark:text-zinc-200 outline-none">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2.5 border-t border-zinc-200/60 dark:border-zinc-800">
+                            <!-- Due Date -->
+                            <div>
+                                <label class="block text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-1">Due Date</label>
+                                <input type="date" id="drawer-task-due-date-input" onchange="window.coraSaveTaskField('due_date', this.value)" class="w-full h-9 px-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs font-medium text-zinc-800 dark:text-zinc-200 outline-none cursor-pointer">
+                            </div>
+
+                            <!-- Deliverable Category -->
+                            <div>
+                                <label class="block text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-1">Category</label>
+                                <select id="drawer-task-category-select" onchange="window.coraSaveTaskField('category', this.value)" class="w-full h-9 px-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs font-medium text-zinc-800 dark:text-zinc-200 outline-none cursor-pointer">
+                                    <?php foreach ( ( $curr_cfg['categories'] ?? array('PHOTOSHOOT', 'POST_PRODUCTION', 'RETOUCHING', 'COLOR_GRADING', 'PORTAL_UPLOAD', 'ADMIN') ) as $cat ) : ?>
+                                        <option value="<?php echo esc_attr( $cat ); ?>"><?php echo esc_html( $cat ); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Execution Progress Card -->
+                    <div class="p-4 sm:p-5 bg-zinc-50 dark:bg-zinc-950/50 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">Execution Health & Completion</span>
+                            <span id="drawer-subtask-progress-label" class="font-mono text-[11px] font-bold text-zinc-800 dark:text-zinc-200">3 of 5 (60%)</span>
+                        </div>
+                        <div class="w-full h-2 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
+                            <div id="drawer-subtask-progress-bar" class="h-full bg-zinc-950 dark:bg-white rounded-full transition-all duration-300" style="width: 60%;"></div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Right Column (7 cols): Active Tab Panel (Checklist, Scope, Assets, Activity) -->
+                <div class="lg:col-span-7">
+                    <div class="p-5 sm:p-6 bg-zinc-50 dark:bg-zinc-950/50 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 min-h-[440px]">
+                        
+                        <!-- TAB 1: CHECKLIST -->
+                        <div id="task-tab-panel-checklist" class="task-drawer-tab-panel space-y-4">
+                            <div class="flex items-center justify-between pb-2 border-b border-zinc-200/60 dark:border-zinc-800">
+                                <div class="flex items-center gap-1.5">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-600 dark:text-zinc-400"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+                                    <span class="font-bold text-zinc-900 dark:text-white text-xs">Subtasks & Execution Checklist</span>
+                                </div>
+                            </div>
+
+                            <!-- Subtask Items List -->
+                            <div id="drawer-subtasks-list" class="space-y-2">
+                                <!-- Dynamically rendered checkable subtask items -->
+                            </div>
+
+                            <!-- Add Subtask Input Form -->
+                            <form onsubmit="window.coraAddSubtask(event)" class="flex items-center gap-2 pt-3 border-t border-zinc-200/60 dark:border-zinc-800">
+                                <input type="text" id="drawer-new-subtask-input" placeholder="+ Add a subtask checklist item (press Enter)..." class="flex-1 h-9 px-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 focus:border-zinc-400 dark:focus:border-zinc-600 rounded-xl text-xs outline-none transition-all">
+                                <button type="submit" class="px-3.5 h-9 bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 font-bold rounded-xl text-xs cursor-pointer transition-colors border-0 shadow-2xs">Add Item</button>
+                            </form>
+                        </div>
+
+                        <!-- TAB 2: SCOPE & SPECS -->
+                        <div id="task-tab-panel-scope" class="task-drawer-tab-panel hidden space-y-4">
+                            <div class="flex items-center justify-between pb-2 border-b border-zinc-200/60 dark:border-zinc-800">
+                                <div class="flex items-center gap-1.5">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-600 dark:text-zinc-400"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                                    <span class="font-bold text-zinc-900 dark:text-white text-xs">Technical Scope & Requirements</span>
+                                </div>
+                                <span class="text-[10px] text-zinc-400 font-mono">Auto-saved</span>
+                            </div>
+
+                            <div class="space-y-2">
+                                <label class="block text-[11px] font-semibold text-zinc-600 dark:text-zinc-400">Work Instructions & Deliverable Specifications</label>
+                                <textarea id="drawer-task-notes-input" onblur="window.coraSaveTaskField('notes', this.value)" rows="10" placeholder="Provide checklist requirements, format specifications (4K ProRes, JPG, sRGB), camera angles, color grading LUT references, and deliverable notes..." class="w-full p-3.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs text-zinc-800 dark:text-zinc-200 outline-none focus:border-zinc-400 dark:focus:border-zinc-600 transition-all resize-none leading-relaxed"></textarea>
+                            </div>
+
+                            <div class="p-3 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/80 dark:border-zinc-800 text-[11px] text-zinc-500 space-y-1">
+                                <span class="font-bold text-zinc-700 dark:text-zinc-300 block">Pro Tip for Deliverables:</span>
+                                <p class="leading-relaxed">Keep instructions structured with clear deliverable resolutions, color profiles, and client feedback notes.</p>
+                            </div>
+                        </div>
+
+                        <!-- TAB 3: ASSETS & LINKS -->
+                        <div id="task-tab-panel-assets" class="task-drawer-tab-panel hidden space-y-4">
+                            <div class="flex items-center justify-between pb-2 border-b border-zinc-200/60 dark:border-zinc-800">
+                                <div class="flex items-center gap-1.5">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-600 dark:text-zinc-400"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                                    <span class="font-bold text-zinc-900 dark:text-white text-xs">Deliverable Asset Links & Proofs</span>
+                                </div>
+                            </div>
+
+                            <!-- Asset Links List -->
+                            <div id="drawer-asset-links-list" class="space-y-2">
+                                <!-- Dynamically rendered asset links -->
+                            </div>
+
+                            <!-- Inline Add Link Form -->
+                            <div class="p-3.5 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/80 dark:border-zinc-800 space-y-2.5">
+                                <span class="font-bold text-zinc-800 dark:text-zinc-200 text-[11px] block">+ Attach Deliverable Asset URL</span>
+                                <div class="space-y-2">
+                                    <input type="text" id="drawer-new-link-title" placeholder="Link Title (e.g. Master Drive, Frame.io Review, RAW Proofs)" class="w-full h-8 px-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs outline-none focus:border-zinc-400">
+                                    <input type="url" id="drawer-new-link-url" placeholder="URL (e.g. https://drive.google.com/...)" class="w-full h-8 px-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs outline-none focus:border-zinc-400">
+                                    <button type="button" onclick="window.coraAddAssetLinkSubmit()" class="w-full h-8 bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 font-bold rounded-lg text-xs transition-colors cursor-pointer border-0 shadow-2xs">
+                                        Add Asset Link
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TAB 4: ACTIVITY & NOTES -->
+                        <div id="task-tab-panel-activity" class="task-drawer-tab-panel hidden space-y-4">
+                            <div class="flex items-center justify-between pb-2 border-b border-zinc-200/60 dark:border-zinc-800">
+                                <div class="flex items-center gap-1.5">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-600 dark:text-zinc-400"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                                    <span class="font-bold text-zinc-900 dark:text-white text-xs">Team Activity & Collaboration Feed</span>
+                                </div>
+                                <span id="drawer-comments-count" class="text-[10px] text-zinc-400 font-mono">0 updates</span>
+                            </div>
+
+                            <!-- Comments Feed -->
+                            <div id="drawer-comments-feed" class="space-y-2.5 max-h-72 overflow-y-auto pr-1">
+                                <!-- Dynamically rendered comments -->
+                            </div>
+
+                            <!-- Post New Comment Input Form -->
+                            <form onsubmit="window.coraAddComment(event)" class="space-y-2 pt-2 border-t border-zinc-200/60 dark:border-zinc-800">
+                                <textarea id="drawer-new-comment-input" rows="2" placeholder="Write an update, note, or collaboration comment..." class="w-full p-2.5 bg-white dark:bg-zinc-900 focus:bg-white border border-zinc-200 dark:border-zinc-800 focus:border-zinc-400 rounded-xl text-xs outline-none transition-all resize-none"></textarea>
+                                <div class="flex justify-end">
+                                    <button type="submit" class="px-3.5 h-8 bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 font-bold rounded-xl text-xs cursor-pointer transition-colors border-0 shadow-2xs">
+                                        Post Update
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 3. Drawer Sticky Footer Actions -->
+    <div class="px-4 sm:px-8 py-3.5 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 flex items-center justify-between gap-3 shrink-0">
+        <button type="button" onclick="window.coraDeleteActiveTask()" class="px-3.5 py-2 text-xs font-bold text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-xl transition-colors border border-transparent hover:border-red-200 cursor-pointer">
             Delete Task
         </button>
-        <div class="flex items-center gap-2">
-            <button type="button" id="drawer-advance-stage-btn" onclick="window.coraAdvanceTaskStage()" class="px-3.5 py-2 text-xs font-bold text-zinc-800 bg-white hover:bg-zinc-100 border border-zinc-200 rounded-xl transition-all cursor-pointer shadow-2xs">
-                Advance Stage →
+        <div class="flex items-center gap-2.5">
+            <button type="button" id="drawer-advance-stage-btn" onclick="window.coraAdvanceTaskStage()" class="px-4 py-2 text-xs font-bold text-zinc-800 dark:text-zinc-200 bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 rounded-xl transition-all cursor-pointer shadow-2xs">
+                Advance Stage &rarr;
             </button>
-            <button type="button" onclick="window.closeTaskDrawer()" class="px-4 py-2 text-xs font-bold text-white bg-zinc-950 hover:bg-zinc-800 rounded-xl transition-all cursor-pointer shadow-2xs">
+            <button type="button" onclick="window.closeTaskDrawer()" class="px-5 py-2 text-xs font-bold text-white dark:text-zinc-950 bg-zinc-950 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-100 rounded-xl transition-all cursor-pointer shadow-2xs">
                 Done
             </button>
         </div>
@@ -962,86 +1002,112 @@ $initial_selected_client = isset( $_GET['client_name'] ) ? sanitize_text_field( 
 </aside>
 
 <!-- ═══════════════════════════════════════════════════════════════════
-     NEW TASK CREATION DRAWER SHEET (Bottom Sheet on Mobile)
+     7. MAIN-AREA DOCKED NEW TASK CREATION PANEL (RULE 15 SOP)
      ═══════════════════════════════════════════════════════════════════ -->
-<aside id="cora-create-task-drawer" class="cora-task-drawer collapsed flex flex-col pointer-events-none">
-    <!-- Mobile Drag Handle -->
-    <div class="sm:hidden w-10 h-1 bg-zinc-300 rounded-full mx-auto mt-2.5 mb-1 shrink-0"></div>
-
-    <div class="h-14 sm:h-16 px-4 sm:px-6 border-b border-zinc-200/90 flex items-center justify-between shrink-0 bg-white sm:rounded-tl-[1.25rem]">
-        <div class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-lg bg-zinc-950 text-white flex items-center justify-center font-bold text-xs">
-                +
+<aside id="cora-create-task-drawer" class="cora-task-drawer collapsed">
+    
+    <!-- 1. Header Toolbar -->
+    <div class="cora-drawer-header px-3 sm:px-6 py-2 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shrink-0 sticky top-0 z-30">
+        <div class="flex items-center justify-between min-h-[38px] lg:min-h-[44px] w-full">
+            <div class="flex items-center gap-2.5">
+                <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center font-bold text-sm shadow-2xs">
+                    +
+                </div>
+                <div>
+                    <h3 class="text-xs sm:text-sm font-bold text-zinc-950 dark:text-white">New Operational Task</h3>
+                    <p class="text-[10px] text-zinc-400">Assign deliverable or milestone to team</p>
+                </div>
             </div>
-            <div>
-                <h3 class="text-xs sm:text-sm font-bold text-zinc-950">New Client Task</h3>
-                <p class="text-[10px] text-zinc-400">Assign operational work item to team</p>
+
+            <div class="flex items-center gap-1.5 shrink-0">
+                <!-- Maximize / Restore Toggle Button -->
+                <button 
+                    type="button" 
+                    onclick="window.coraToggleCreateTaskDrawerMaximize()"
+                    id="cora-create-task-maximize-btn"
+                    class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 flex items-center justify-center text-zinc-500 hover:text-zinc-950 dark:hover:text-white transition-all cursor-pointer border border-zinc-200/80 dark:border-zinc-700 shadow-2xs active:scale-95 shrink-0"
+                    title="Expand / Fullscreen Canvas"
+                >
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"></path><path d="M9 21H3v-6"></path><path d="M21 3l-7 7"></path><path d="M3 21l7-7"></path></svg>
+                </button>
+
+                <!-- Close Button (Esc) -->
+                <button 
+                    type="button" 
+                    onclick="window.closeCreateTaskDrawer()"
+                    id="btn-close-create-task"
+                    class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 flex items-center justify-center text-zinc-500 hover:text-zinc-950 dark:hover:text-white transition-all cursor-pointer border border-zinc-200/80 dark:border-zinc-700 shadow-2xs active:scale-95 shrink-0"
+                    title="Close Drawer (Esc)"
+                >
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
             </div>
         </div>
-        <button id="btn-close-create-task" onclick="window.closeCreateTaskDrawer()" class="w-8 h-8 rounded-lg hover:bg-zinc-100 text-zinc-400 hover:text-zinc-900 flex items-center justify-center cursor-pointer transition-colors border-0 bg-transparent">
-            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-        </button>
     </div>
 
-    <form id="cora-create-task-form" onsubmit="window.coraCreateTaskSubmit(event)" class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 text-xs sm:rounded-bl-[1.25rem]">
+    <!-- 2. Form Body -->
+    <form id="cora-create-task-form" onsubmit="window.coraCreateTaskSubmit(event)" class="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-6 text-xs text-zinc-800 dark:text-zinc-200 flex flex-col justify-between">
         <input type="hidden" id="create-task-stage" value="todo">
 
-        <div>
-            <label class="block font-bold text-zinc-700 mb-1">Client Name *</label>
-            <input type="text" id="create-task-client" required placeholder="e.g. Rohan Verma, Kavya Patel" class="w-full h-9 px-3 bg-zinc-50 border border-zinc-200 rounded-xl text-xs text-zinc-800 outline-none focus:border-zinc-400 focus:bg-white transition-all">
-        </div>
-
-        <div>
-            <label class="block font-bold text-zinc-700 mb-1">Task Title & Scope *</label>
-            <input type="text" id="create-task-title" required placeholder="e.g. Export final 4K masters and color grading" class="w-full h-9 px-3 bg-zinc-50 border border-zinc-200 rounded-xl text-xs text-zinc-800 outline-none focus:border-zinc-400 focus:bg-white transition-all">
-        </div>
-
-        <div class="grid grid-cols-2 gap-3">
+        <div class="max-w-3xl mx-auto w-full p-6 sm:p-8 bg-zinc-50 dark:bg-zinc-950/50 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 space-y-4">
             <div>
-                <label class="block font-bold text-zinc-700 mb-1">Category</label>
-                <select id="create-task-category" class="w-full h-9 px-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs text-zinc-800 outline-none focus:border-zinc-400 cursor-pointer">
-                    <?php foreach ( ( $curr_cfg['categories'] ?? array('GENERAL', 'DELIVERABLE', 'REVIEW') ) as $cat ) : ?>
-                        <option value="<?php echo esc_attr( $cat ); ?>"><?php echo esc_html( $cat ); ?></option>
-                    <?php endforeach; ?>
-                </select>
+                <label class="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Client Name *</label>
+                <input type="text" id="create-task-client" required placeholder="e.g. Rohan Verma, Kavya Patel" class="w-full h-9 px-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs text-zinc-800 dark:text-zinc-200 outline-none focus:border-zinc-400 focus:bg-white transition-all">
             </div>
+
             <div>
-                <label class="block font-bold text-zinc-700 mb-1">Priority</label>
-                <select id="create-task-priority" class="w-full h-9 px-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs text-zinc-800 outline-none focus:border-zinc-400 cursor-pointer">
-                    <option value="urgent">Urgent</option>
-                    <option value="high" selected>High Priority</option>
-                    <option value="medium">Medium</option>
-                    <option value="low">Low</option>
-                </select>
+                <label class="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Task Title & Scope *</label>
+                <input type="text" id="create-task-title" required placeholder="e.g. Export final 4K masters and color grading" class="w-full h-9 px-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs text-zinc-800 dark:text-zinc-200 outline-none focus:border-zinc-400 focus:bg-white transition-all">
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Category</label>
+                    <select id="create-task-category" class="w-full h-9 px-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs text-zinc-800 dark:text-zinc-200 outline-none focus:border-zinc-400 cursor-pointer">
+                        <?php foreach ( ( $curr_cfg['categories'] ?? array('GENERAL', 'DELIVERABLE', 'REVIEW') ) as $cat ) : ?>
+                            <option value="<?php echo esc_attr( $cat ); ?>"><?php echo esc_html( $cat ); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Priority</label>
+                    <select id="create-task-priority" class="w-full h-9 px-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs text-zinc-800 dark:text-zinc-200 outline-none focus:border-zinc-400 cursor-pointer">
+                        <option value="urgent">Urgent</option>
+                        <option value="high" selected>High Priority</option>
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Assignee</label>
+                    <select id="create-task-assignee" class="w-full h-9 px-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs text-zinc-800 dark:text-zinc-200 outline-none focus:border-zinc-400 cursor-pointer">
+                        <option value="Studio Admin">Studio Admin</option>
+                        <option value="Rohan Verma">Rohan Verma</option>
+                        <option value="Kavya Patel">Kavya Patel</option>
+                        <option value="Aarav Mehta">Aarav Mehta</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Due Date</label>
+                    <input type="date" id="create-task-due-date" value="<?php echo date('Y-m-d'); ?>" class="w-full h-9 px-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs text-zinc-800 dark:text-zinc-200 outline-none focus:border-zinc-400 cursor-pointer">
+                </div>
+            </div>
+
+            <div>
+                <label class="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">Detailed Instructions & Notes</label>
+                <textarea id="create-task-notes" rows="4" placeholder="Provide checklist requirements, format specifications, and deliverables..." class="w-full p-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs text-zinc-800 dark:text-zinc-200 outline-none focus:border-zinc-400 focus:bg-white transition-all resize-none"></textarea>
             </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-3">
-            <div>
-                <label class="block font-bold text-zinc-700 mb-1">Assignee</label>
-                <select id="create-task-assignee" class="w-full h-9 px-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs text-zinc-800 outline-none focus:border-zinc-400 cursor-pointer">
-                    <option value="Studio Admin">Studio Admin</option>
-                    <option value="Rohan Verma">Rohan Verma</option>
-                    <option value="Kavya Patel">Kavya Patel</option>
-                    <option value="Aarav Mehta">Aarav Mehta</option>
-                </select>
-            </div>
-            <div>
-                <label class="block font-bold text-zinc-700 mb-1">Due Date</label>
-                <input type="date" id="create-task-due-date" value="<?php echo date('Y-m-d'); ?>" class="w-full h-9 px-3 bg-zinc-50 border border-zinc-200 rounded-xl text-xs text-zinc-800 outline-none focus:border-zinc-400 cursor-pointer">
-            </div>
-        </div>
-
-        <div>
-            <label class="block font-bold text-zinc-700 mb-1">Detailed Instructions & Notes</label>
-            <textarea id="create-task-notes" rows="3" placeholder="Provide checklist requirements, format specifications, and deliverables..." class="w-full p-3 bg-zinc-50 border border-zinc-200 rounded-xl text-xs text-zinc-800 outline-none focus:border-zinc-400 focus:bg-white transition-all resize-none"></textarea>
-        </div>
-
-        <div class="pt-3 border-t border-zinc-100 flex items-center justify-end gap-2">
-            <button type="button" onclick="window.closeCreateTaskDrawer()" class="px-3.5 py-2 rounded-xl border border-zinc-200 text-zinc-600 hover:bg-zinc-50 font-bold transition-all cursor-pointer">
+        <!-- 3. Sticky Footer Actions -->
+        <div class="px-4 sm:px-8 py-3.5 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 flex items-center justify-end gap-3 shrink-0 mt-6">
+            <button type="button" onclick="window.closeCreateTaskDrawer()" class="px-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 font-bold transition-all cursor-pointer">
                 Cancel
             </button>
-            <button type="submit" class="px-4 py-2 rounded-xl bg-zinc-950 text-white font-bold hover:bg-zinc-800 transition-all cursor-pointer shadow-2xs">
+            <button type="submit" class="px-5 py-2 rounded-xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-bold hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-all cursor-pointer shadow-2xs">
                 Create Task
             </button>
         </div>
@@ -1051,9 +1117,9 @@ $initial_selected_client = isset( $_GET['client_name'] ) ? sanitize_text_field( 
 <!-- ═══════════════════════════════════════════════════════════════════
      MOBILE FILTER BOTTOM-UP SLIDE SHEET (Per Rule 1 & Rule 12)
      ═══════════════════════════════════════════════════════════════════ -->
-<div id="cora-task-mobile-filter-backdrop" class="fixed inset-0 bg-zinc-950/45 backdrop-blur-xs z-99990 transition-opacity duration-300 opacity-0 pointer-events-none md:hidden" onclick="window.coraCloseMobileFiltersSheet()"></div>
+<div id="cora-task-mobile-filter-backdrop" class="fixed inset-0 bg-zinc-950/45 backdrop-blur-xs z-99990 transition-opacity duration-300 opacity-0 pointer-events-none hidden md:!hidden" onclick="window.coraCloseMobileFiltersSheet()"></div>
 
-<div id="cora-task-mobile-filter-sheet" class="fixed bottom-0 left-0 right-0 z-99995 bg-white rounded-t-3xl border-t border-zinc-200/80 shadow-2xl transition-transform duration-300 ease-out translate-y-full max-h-[85vh] flex flex-col pointer-events-none md:hidden">
+<div id="cora-task-mobile-filter-sheet" class="fixed bottom-0 left-0 right-0 z-99995 bg-white rounded-t-3xl border-t border-zinc-200/80 shadow-2xl transition-transform duration-300 ease-out translate-y-full max-h-[85vh] flex flex-col pointer-events-none hidden md:!hidden">
     <!-- Drag Indicator Handle -->
     <div class="pt-3 pb-1 flex justify-center cursor-grab active:cursor-grabbing" onclick="window.coraCloseMobileFiltersSheet()">
         <div class="w-10 h-1 rounded-full bg-zinc-300"></div>
@@ -1704,6 +1770,7 @@ window.coraResetAllTaskFilters = function() {
 
 // 10. Mobile Filter Bottom-Up Slide Sheet Engine (Rule 1 & Rule 12)
 window.coraOpenMobileFiltersSheet = function() {
+    if (window.innerWidth >= 768) return; // Strict: Never trigger on desktop
     const backdrop = document.getElementById('cora-task-mobile-filter-backdrop');
     const sheet = document.getElementById('cora-task-mobile-filter-sheet');
     if (!sheet) return;
@@ -1754,13 +1821,18 @@ window.coraOpenMobileFiltersSheet = function() {
     }
 
     if (backdrop) {
-        backdrop.classList.add('open');
-        backdrop.classList.remove('pointer-events-none');
+        backdrop.style.display = 'block';
+        backdrop.classList.remove('hidden', 'pointer-events-none');
+        requestAnimationFrame(() => {
+            backdrop.classList.add('open');
+        });
     }
-    sheet.classList.add('open');
-    sheet.classList.remove('pointer-events-none', 'translate-y-full');
-    sheet.classList.add('translate-y-0');
-    sheet.style.transform = 'translateY(0)';
+    sheet.style.display = 'flex';
+    sheet.classList.remove('hidden', 'pointer-events-none', 'translate-y-full');
+    requestAnimationFrame(() => {
+        sheet.classList.add('open', 'translate-y-0');
+        sheet.style.transform = 'translateY(0)';
+    });
     document.body.style.overflow = 'hidden';
 };
 
@@ -1770,11 +1842,23 @@ window.coraCloseMobileFiltersSheet = function() {
     if (backdrop) {
         backdrop.classList.remove('open');
         backdrop.classList.add('pointer-events-none');
+        setTimeout(() => {
+            if (!backdrop.classList.contains('open')) {
+                backdrop.classList.add('hidden');
+                backdrop.style.display = 'none';
+            }
+        }, 300);
     }
     if (sheet) {
         sheet.classList.remove('open', 'translate-y-0');
         sheet.classList.add('pointer-events-none', 'translate-y-full');
         sheet.style.transform = 'translateY(100%)';
+        setTimeout(() => {
+            if (!sheet.classList.contains('open')) {
+                sheet.classList.add('hidden');
+                sheet.style.display = 'none';
+            }
+        }, 300);
     }
     document.body.style.overflow = '';
 };
@@ -1938,45 +2022,73 @@ window.openTaskDrawer = function(taskId) {
     window.coraRenderDrawerComments();
     window.coraUpdateAdvanceButtonLabel();
 
-    // Open Drawer
+    // Open Main-Area Docked Task Drawer (Rule 15 SOP)
     const drawer = document.getElementById('cora-task-drawer');
-    drawer.classList.remove('pointer-events-none', 'collapsed');
-    drawer.classList.add('open');
+    const mainEl = document.querySelector('main.cora-main') || document.querySelector('.cora-main');
 
-    const backdrop = document.getElementById('cora-task-drawer-backdrop');
-    backdrop.classList.remove('pointer-events-none');
-    backdrop.classList.add('open');
+    // Body Portaling: Guarantee drawer sits at document.body level with no clipping or layout offset
+    if (drawer && drawer.parentNode !== document.body) {
+        document.body.appendChild(drawer);
+    }
 
-    if (window.coraInitDrawerResizer) {
-        window.coraInitDrawerResizer();
+    if (drawer) {
+        drawer.classList.remove('pointer-events-none', 'collapsed');
+        drawer.classList.add('open');
+
+        // Hide mobile floating bottom bar so it never overlaps or intercepts drawer touches
+        var island = document.getElementById('cora-mobile-floating-island');
+        if (island) {
+            island.classList.add('cora-island-hidden');
+        }
+
+        // Immediately sync bounds to sidebar edge
+        if (window.coraSyncTaskDrawerBounds) {
+            window.coraSyncTaskDrawerBounds();
+        }
+
+        // Lock ONLY main content area scroll; SIDEBAR REMAINS UNLOCKED & FULLY ACCESSIBLE
+        if (mainEl) {
+            mainEl.classList.add('overflow-hidden');
+        }
     }
 };
 
 window.closeTaskDrawer = function() {
     const drawer = document.getElementById('cora-task-drawer');
-    drawer.classList.add('pointer-events-none', 'collapsed');
-    drawer.classList.remove('open');
+    const mainEl = document.querySelector('main.cora-main') || document.querySelector('.cora-main');
 
-    const backdrop = document.getElementById('cora-task-drawer-backdrop');
-    backdrop.classList.add('pointer-events-none');
-    backdrop.classList.remove('open');
+    if (drawer) {
+        drawer.classList.add('pointer-events-none', 'collapsed');
+        drawer.classList.remove('open', 'maximized');
+
+        // Restore mobile floating bottom bar
+        var island = document.getElementById('cora-mobile-floating-island');
+        if (island) {
+            island.classList.remove('cora-island-hidden');
+        }
+
+        // Restore main content area scroll
+        if (mainEl) {
+            mainEl.classList.remove('overflow-hidden');
+        }
+    }
     window.coraActiveTask = null;
 };
 
-// 11. Tab Switching Engine for Task Details Drawer
+// 11. Tab Switching Engine for Task Details Drawer (Level 01 Segmented Pill Tabs)
 window.coraActiveTaskDrawerTab = 'checklist';
 window.coraSetTaskDrawerTab = function(tabKey) {
     window.coraActiveTaskDrawerTab = tabKey;
     
     document.querySelectorAll('.task-drawer-tab-btn').forEach(btn => {
-        btn.classList.remove('active', 'text-zinc-950', 'border-zinc-950', 'font-semibold');
-        btn.classList.add('text-zinc-500', 'border-transparent', 'font-medium');
+        btn.classList.remove('active', 'bg-white', 'dark:bg-zinc-900', 'text-zinc-950', 'dark:text-white', 'shadow-2xs', 'font-bold');
+        btn.classList.add('text-zinc-600', 'dark:text-zinc-400', 'font-medium', 'bg-transparent');
     });
     
     const activeBtn = document.getElementById('task-tab-btn-' + tabKey);
     if (activeBtn) {
-        activeBtn.classList.add('active', 'text-zinc-950', 'border-zinc-950', 'font-semibold');
-        activeBtn.classList.remove('text-zinc-500', 'border-transparent', 'font-medium');
+        activeBtn.classList.add('active', 'bg-white', 'dark:bg-zinc-900', 'text-zinc-950', 'dark:text-white', 'shadow-2xs', 'font-bold');
+        activeBtn.classList.remove('text-zinc-600', 'dark:text-zinc-400', 'font-medium', 'bg-transparent');
     }
     
     document.querySelectorAll('.task-drawer-tab-panel').forEach(panel => {
@@ -2365,27 +2477,60 @@ function escapeHtml(text) {
         .replace(/'/g, "&#039;");
 }
 
-// 11. Create Task Drawer Sheet
+// 11. Create Task Main-Area Docked Panel (Rule 15 SOP)
 window.openCreateTaskDrawer = function(stage) {
     document.getElementById('create-task-stage').value = stage || 'todo';
     document.getElementById('cora-create-task-form').reset();
+    
     const drawer = document.getElementById('cora-create-task-drawer');
-    drawer.classList.remove('pointer-events-none', 'collapsed');
-    drawer.classList.add('open');
+    const mainEl = document.querySelector('main.cora-main') || document.querySelector('.cora-main');
 
-    const backdrop = document.getElementById('cora-task-drawer-backdrop');
-    backdrop.classList.remove('pointer-events-none');
-    backdrop.classList.add('open');
+    // Body Portaling: Guarantee drawer sits at document.body level with no clipping or layout offset
+    if (drawer && drawer.parentNode !== document.body) {
+        document.body.appendChild(drawer);
+    }
+
+    if (drawer) {
+        drawer.classList.remove('pointer-events-none', 'collapsed');
+        drawer.classList.add('open');
+
+        // Hide mobile floating bottom bar so it never overlaps or intercepts drawer touches
+        var island = document.getElementById('cora-mobile-floating-island');
+        if (island) {
+            island.classList.add('cora-island-hidden');
+        }
+
+        // Immediately sync bounds to sidebar edge
+        if (window.coraSyncTaskDrawerBounds) {
+            window.coraSyncTaskDrawerBounds();
+        }
+
+        // Lock ONLY main content area scroll; SIDEBAR REMAINS UNLOCKED & FULLY ACCESSIBLE
+        if (mainEl) {
+            mainEl.classList.add('overflow-hidden');
+        }
+    }
 };
 
 window.closeCreateTaskDrawer = function() {
     const drawer = document.getElementById('cora-create-task-drawer');
-    drawer.classList.add('pointer-events-none', 'collapsed');
-    drawer.classList.remove('open');
+    const mainEl = document.querySelector('main.cora-main') || document.querySelector('.cora-main');
 
-    const backdrop = document.getElementById('cora-task-drawer-backdrop');
-    backdrop.classList.add('pointer-events-none');
-    backdrop.classList.remove('open');
+    if (drawer) {
+        drawer.classList.add('pointer-events-none', 'collapsed');
+        drawer.classList.remove('open', 'maximized');
+
+        // Restore mobile floating bottom bar
+        var island = document.getElementById('cora-mobile-floating-island');
+        if (island) {
+            island.classList.remove('cora-island-hidden');
+        }
+
+        // Restore main content area scroll
+        if (mainEl) {
+            mainEl.classList.remove('overflow-hidden');
+        }
+    }
 };
 
 window.coraCreateTaskSubmit = function(e) {
@@ -3008,102 +3153,168 @@ document.addEventListener('contextmenu', function(e) {
     }
 });
 
-// 18. Draggable Drawer Resizing Engine
-(function() {
-    let isResizing = false;
-    let startX = 0;
-    let startWidth = 480;
+// =========================================================================
+// 18. SHOPIFY-INSPIRED MAIN-AREA DOCKED VIEW PANEL SYNCHRONIZER (RULE 15 SOP)
+// =========================================================================
 
-    // Load persisted width
-    try {
-        const savedWidth = localStorage.getItem('cora_task_drawer_width');
-        if (savedWidth && window.innerWidth >= 640) {
-            const parsed = parseInt(savedWidth, 10);
-            if (parsed >= 380 && parsed <= Math.min(1200, window.innerWidth * 0.92)) {
-                document.documentElement.style.setProperty('--cora-task-drawer-width', parsed + 'px');
+// DYNAMIC BOUNDS SYNCHRONIZER (BOUND TO AVAILABLE MAIN WORKSPACE AREA)
+window.coraSyncTaskDrawerBounds = function() {
+    var drawer = document.getElementById('cora-task-drawer');
+    var createDrawer = document.getElementById('cora-create-task-drawer');
+    var sidebarEl = document.querySelector('.cora-sidebar');
+    var isMobile = window.innerWidth < 1024;
+    var isSidebarCollapsed = sidebarEl && sidebarEl.classList.contains('collapsed-sidebar');
+
+    [drawer, createDrawer].forEach(function(d) {
+        if (!d) return;
+
+        // Reflect collapsed state class on drawer element directly
+        if (isSidebarCollapsed) {
+            d.classList.add('sidebar-collapsed');
+        } else {
+            d.classList.remove('sidebar-collapsed');
+        }
+
+        // If drawer is currently maximized (fullscreen ⤢), keep full viewport bounds
+        if (d.classList.contains('maximized')) {
+            d.style.left = '0px';
+            d.style.top = '52px';
+            d.style.width = '100vw';
+            d.style.maxWidth = '100vw';
+            d.style.height = (window.innerHeight - 52) + 'px';
+            d.style.maxHeight = (window.innerHeight - 52) + 'px';
+            return;
+        }
+
+        // Calculate available main canvas bounds directly against sidebar boundary
+        var topbarEl = document.getElementById('cora-global-topbar');
+        var actualTop = topbarEl ? Math.round(topbarEl.getBoundingClientRect().bottom) : 52;
+        if (actualTop < 0 || isNaN(actualTop)) actualTop = 52;
+
+        var targetLeft = 0;
+        if (!isMobile && sidebarEl) {
+            var sRect = sidebarEl.getBoundingClientRect();
+            targetLeft = Math.round(sRect.right);
+            if (targetLeft <= 0 || isNaN(targetLeft)) {
+                targetLeft = isSidebarCollapsed ? 64 : 256;
             }
         }
-    } catch(e) {}
+        var targetWidth = window.innerWidth - targetLeft;
+        var targetHeight = window.innerHeight - actualTop;
 
-    window.coraInitDrawerResizer = function() {
-        const resizer = document.getElementById('cora-task-drawer-resizer');
-        const drawer = document.getElementById('cora-task-drawer');
-        if (!resizer || !drawer) return;
-        if (resizer.dataset.initialized === 'true') return;
-        resizer.dataset.initialized = 'true';
+        document.documentElement.style.setProperty('--cora-main-left', targetLeft + 'px');
+        document.documentElement.style.setProperty('--cora-main-top', actualTop + 'px');
+        document.documentElement.style.setProperty('--cora-main-width', targetWidth + 'px');
+        document.documentElement.style.setProperty('--cora-main-height', targetHeight + 'px');
 
-        const onStart = function(e) {
-            if (window.innerWidth < 640) return;
-            if (isResizing) return;
-            isResizing = true;
-            if (e.preventDefault) e.preventDefault();
+        d.style.left = targetLeft + 'px';
+        d.style.top = actualTop + 'px';
+        d.style.width = targetWidth + 'px';
+        d.style.maxWidth = targetWidth + 'px';
+        d.style.height = targetHeight + 'px';
+        d.style.maxHeight = targetHeight + 'px';
+    });
+};
 
-            startX = (e.touches && e.touches[0]) ? e.touches[0].clientX : e.clientX;
-            startWidth = drawer.getBoundingClientRect().width;
-            
-            resizer.classList.add('dragging');
-            document.body.classList.add('select-none');
-            document.body.style.cursor = 'col-resize';
-            drawer.style.transition = 'none';
-
-            const onMove = function(moveEvent) {
-                if (!isResizing) return;
-                const currentX = (moveEvent.touches && moveEvent.touches[0]) ? moveEvent.touches[0].clientX : moveEvent.clientX;
-                const deltaX = startX - currentX; // Dragging left increases width
-                let newWidth = startWidth + deltaX;
-                const minWidth = 380;
-                const maxWidth = Math.min(1200, window.innerWidth * 0.92);
-                if (newWidth < minWidth) newWidth = minWidth;
-                if (newWidth > maxWidth) newWidth = maxWidth;
-
-                document.documentElement.style.setProperty('--cora-task-drawer-width', newWidth + 'px');
-                drawer.style.setProperty('--cora-task-drawer-width', newWidth + 'px');
-                drawer.style.width = newWidth + 'px';
-                drawer.style.maxWidth = newWidth + 'px';
-            };
-
-            const onEnd = function() {
-                if (!isResizing) return;
-                isResizing = false;
-                resizer.classList.remove('dragging');
-                document.body.classList.remove('select-none');
-                document.body.style.cursor = '';
-                drawer.style.transition = '';
-
-                const finalWidth = drawer.getBoundingClientRect().width;
-                try {
-                    localStorage.setItem('cora_task_drawer_width', Math.round(finalWidth));
-                } catch(e) {}
-
-                document.removeEventListener('mousemove', onMove);
-                document.removeEventListener('mouseup', onEnd);
-                document.removeEventListener('pointermove', onMove);
-                document.removeEventListener('pointerup', onEnd);
-                document.removeEventListener('touchmove', onMove);
-                document.removeEventListener('touchend', onEnd);
-            };
-
-            document.addEventListener('mousemove', onMove, { passive: false });
-            document.addEventListener('mouseup', onEnd);
-            document.addEventListener('pointermove', onMove, { passive: false });
-            document.addEventListener('pointerup', onEnd);
-            document.addEventListener('touchmove', onMove, { passive: false });
-            document.addEventListener('touchend', onEnd);
-        };
-
-        resizer.addEventListener('pointerdown', onStart);
-        resizer.addEventListener('mousedown', onStart);
-        resizer.addEventListener('touchstart', onStart, { passive: false });
-    };
-
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', window.coraInitDrawerResizer);
-    } else {
-        setTimeout(window.coraInitDrawerResizer, 50);
+// Continuously sync bounds over a duration (e.g. during a 250ms CSS animation)
+window.coraAnimateTaskDrawerBounds = function(durationMs) {
+    var start = Date.now();
+    var duration = durationMs || 280;
+    function frame() {
+        window.coraSyncTaskDrawerBounds();
+        if (Date.now() - start < duration) {
+            requestAnimationFrame(frame);
+        } else {
+            window.coraSyncTaskDrawerBounds();
+        }
     }
-})();
+    requestAnimationFrame(frame);
+};
 
-// Auto-hydrate initial filter state on load
+// TOGGLE EXPAND / MAXIMIZE CANVAS (SHOPIFY EXPAND ⤢ MODE)
+window.coraToggleTaskDrawerMaximize = function() {
+    var drawer = document.getElementById('cora-task-drawer');
+    var maxBtn = document.getElementById('cora-task-maximize-btn');
+    if (!drawer) return;
+
+    var isMax = drawer.classList.toggle('maximized');
+    if (isMax) {
+        drawer.style.left = '0px';
+        drawer.style.width = '100vw';
+        drawer.style.maxWidth = '100vw';
+        if (maxBtn) {
+            maxBtn.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h6v6"></path><path d="M20 10h-6V4"></path><path d="M14 10l7-7"></path><path d="M3 21l7-7"></path></svg>';
+            maxBtn.title = "Restore Docked Canvas";
+        }
+    } else {
+        if (maxBtn) {
+            maxBtn.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"></path><path d="M9 21H3v-6"></path><path d="M21 3l-7 7"></path><path d="M3 21l7-7"></path></svg>';
+            maxBtn.title = "Expand / Fullscreen Canvas";
+        }
+        window.coraSyncTaskDrawerBounds();
+    }
+};
+
+window.coraToggleCreateTaskDrawerMaximize = function() {
+    var drawer = document.getElementById('cora-create-task-drawer');
+    var maxBtn = document.getElementById('cora-create-task-maximize-btn');
+    if (!drawer) return;
+
+    var isMax = drawer.classList.toggle('maximized');
+    if (isMax) {
+        drawer.style.left = '0px';
+        drawer.style.width = '100vw';
+        drawer.style.maxWidth = '100vw';
+        if (maxBtn) {
+            maxBtn.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h6v6"></path><path d="M20 10h-6V4"></path><path d="M14 10l7-7"></path><path d="M3 21l7-7"></path></svg>';
+            maxBtn.title = "Restore Docked Canvas";
+        }
+    } else {
+        if (maxBtn) {
+            maxBtn.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"></path><path d="M9 21H3v-6"></path><path d="M21 3l-7 7"></path><path d="M3 21l7-7"></path></svg>';
+            maxBtn.title = "Expand / Fullscreen Canvas";
+        }
+        window.coraSyncTaskDrawerBounds();
+    }
+};
+
+// Window & Sidebar Event Listeners for Dynamic Main-Area Docking
+window.addEventListener('cora:sidebar-toggle', function() {
+    window.coraAnimateTaskDrawerBounds(300);
+});
+
+// Observe sidebar changes (expand/collapse) to sync available space in real time
+if (window.MutationObserver) {
+    var coraTaskSidebarObserver = new MutationObserver(function() {
+        window.coraAnimateTaskDrawerBounds(250);
+    });
+    var sidebarEl = document.querySelector('.cora-sidebar');
+    if (sidebarEl) {
+        coraTaskSidebarObserver.observe(sidebarEl, { attributes: true, attributeFilter: ['class', 'style'] });
+        sidebarEl.addEventListener('transitionend', function() {
+            window.coraSyncTaskDrawerBounds();
+        });
+    }
+    coraTaskSidebarObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+}
+
+// Global ESC Key Listener to Dismiss Docked Drawers per Rule 15 SOP
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' || e.key === 'Esc') {
+        var createDrawer = document.getElementById('cora-create-task-drawer');
+        if (createDrawer && createDrawer.classList.contains('open')) {
+            window.closeCreateTaskDrawer();
+            return;
+        }
+        var taskDrawer = document.getElementById('cora-task-drawer');
+        if (taskDrawer && taskDrawer.classList.contains('open')) {
+            window.closeTaskDrawer();
+            return;
+        }
+    }
+});
+
+// Auto-hydrate initial filter state on load & ensure mobile filter sheet is cleanly portaled and hidden
 document.addEventListener('DOMContentLoaded', function() {
     const urlParams = new URLSearchParams(window.location.search);
     const clientParam = urlParams.get('client_name') || urlParams.get('client_id');
@@ -3113,6 +3324,27 @@ document.addEventListener('DOMContentLoaded', function() {
             clientSel.value = clientParam.toLowerCase();
             window.coraFilterTaskClient(clientParam);
         }
+    }
+
+    const sheet = document.getElementById('cora-task-mobile-filter-sheet');
+    const backdrop = document.getElementById('cora-task-mobile-filter-backdrop');
+    if (sheet) {
+        sheet.style.display = 'none';
+        sheet.classList.add('hidden');
+        if (sheet.parentElement !== document.body) {
+            if (backdrop) document.body.appendChild(backdrop);
+            document.body.appendChild(sheet);
+        }
+    }
+    if (backdrop) {
+        backdrop.style.display = 'none';
+        backdrop.classList.add('hidden');
+    }
+});
+
+window.addEventListener('resize', function() {
+    if (window.innerWidth >= 768) {
+        window.coraCloseMobileFiltersSheet();
     }
 });
 </script>

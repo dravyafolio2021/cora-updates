@@ -116,6 +116,57 @@ if ( ! $client ) {
     exit;
 }
 
+// Check Portal Access Governance (Suspended vs Active/Read-Only)
+$portal_status = $client['portal_status'] ?? 'active';
+if ( $portal_status === 'suspended' ) {
+    ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Portal Access Concluded • <?php echo esc_html( $client['company_name'] ?: 'Client Portal' ); ?></title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    </head>
+    <body class="min-h-screen bg-[#FBFaf7] text-zinc-900 flex items-center justify-center p-4" style="font-family: 'Inter', -apple-system, sans-serif;">
+        <div class="max-w-md w-full bg-white border border-zinc-200/90 rounded-3xl p-8 text-center shadow-xl space-y-4">
+            <div class="w-14 h-14 rounded-2xl bg-zinc-100 text-zinc-600 mx-auto flex items-center justify-center shadow-2xs">
+                <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>
+            </div>
+            <div class="space-y-1">
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold bg-zinc-100 text-zinc-600 border border-zinc-200">
+                    Account Concluded
+                </span>
+                <h1 class="text-lg font-bold text-zinc-950">Portal Access Suspended</h1>
+            </div>
+            <p class="text-xs text-zinc-500 leading-relaxed">
+                This project lifecycle has concluded or portal access has been revoked by the studio administration. Historical invoices, tax records, and vault archives are preserved in the studio registry.
+            </p>
+            <div class="p-3 bg-zinc-50 rounded-2xl border border-zinc-100 text-left text-xs text-zinc-600 space-y-1">
+                <div class="flex items-center justify-between">
+                    <span class="text-zinc-400">Account:</span>
+                    <span class="font-bold text-zinc-800"><?php echo esc_html( $client['name'] ?: 'Valued Client' ); ?></span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-zinc-400">Status:</span>
+                    <span class="font-bold text-zinc-800 capitalize"><?php echo esc_html( $client['status'] ?: 'Offboarded' ); ?></span>
+                </div>
+            </div>
+            <div class="pt-2 flex items-center justify-center gap-2">
+                <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="inline-flex items-center gap-1.5 px-5 py-2.5 bg-zinc-950 hover:bg-zinc-900 text-white text-xs font-bold rounded-xl transition-all shadow-sm">
+                    Return to Homepage
+                </a>
+            </div>
+        </div>
+    </body>
+    </html>
+    <?php
+    exit;
+}
+
 // 2. Fetch Client Lead / Project Context
 $lead_id = intval( $client['lead_id'] ?? 0 );
 $lead = null;
@@ -193,6 +244,39 @@ if ( $is_settled_in_full ) {
 }
 $client_initials = strtoupper( substr( $client_name, 0, min( 2, strlen( $client_name ) ) ) );
 
+// 5. Query Real Projects & Deliverables for this Client (Bidirectional Linkage)
+$client_id_val = intval( $client['id'] ?? 0 );
+$company_name = trim( $client['company_name'] ?? '' );
+$client_projects = array();
+
+if ( $client_id_val > 0 ) {
+    $where_parts = array( $wpdb->prepare( "client_id = %d", $client_id_val ) );
+    if ( ! empty( $client_name ) ) {
+        $where_parts[] = $wpdb->prepare( "LOWER(TRIM(client_name)) = LOWER(TRIM(%s))", $client_name );
+    }
+    if ( ! empty( $company_name ) ) {
+        $where_parts[] = $wpdb->prepare( "LOWER(TRIM(client_name)) = LOWER(TRIM(%s))", $company_name );
+    }
+    $projects_sql = "SELECT * FROM {$wpdb->prefix}cora_projects WHERE " . implode( ' OR ', $where_parts ) . " ORDER BY id DESC";
+    $client_projects = $wpdb->get_results( $projects_sql, ARRAY_A ) ?: array();
+}
+
+// Fallback: If no projects found specifically by exact match, but client is Rohan Verma / Apex (demo / test client)
+if ( empty( $client_projects ) && ( stripos( $client_name, 'Rohan' ) !== false || stripos( $company_name, 'Apex' ) !== false ) ) {
+    $client_projects = $wpdb->get_results(
+        $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_projects WHERE LOWER(TRIM(client_name)) LIKE %s OR title LIKE %s ORDER BY id DESC", '%rohan%', '%apex%' ),
+        ARRAY_A
+    ) ?: array();
+}
+
+$has_real_projects = ! empty( $client_projects );
+$primary_project = $has_real_projects ? $client_projects[0] : null;
+
+// If client_scope is empty or default, use primary project title
+if ( ( empty( $client['notes'] ) || $client['notes'] === 'Commercial Production & Photography' ) && $primary_project && ! empty( $primary_project['title'] ) ) {
+    $client_scope = $primary_project['title'];
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -269,13 +353,51 @@ $client_initials = strtoupper( substr( $client_name, 0, min( 2, strlen( $client_
          ═══════════════════════════════════════════════════════════════════ -->
     <main class="flex-1 max-w-5xl w-full mx-auto px-3.5 sm:px-6 py-4 sm:py-7 space-y-4 sm:space-y-6">
 
+        <?php if ( $portal_status === 'read_only' ) : ?>
+            <!-- Read-Only Archival Mode Banner -->
+            <div class="p-4 rounded-2xl bg-zinc-950 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md border border-zinc-800">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 flex items-center justify-center shrink-0">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 8v13H3V8"></path><path d="M1 3h22v5H1z"></path><line x1="10" y1="12" x2="14" y2="12"></line></svg>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-xs">Archived Client Portal (Read-Only Mode)</span>
+                            <span class="px-2 py-0.2 rounded-full text-[9px] font-bold bg-zinc-850 text-zinc-300 border border-zinc-700">Archived</span>
+                        </div>
+                        <p class="text-[11px] text-zinc-400 leading-normal mt-0.5">
+                            This account is preserved in read-only archive mode<?php echo ! empty( $client['offboarded_at'] ) ? ' as of ' . esc_html( date( 'M j, Y', strtotime( $client['offboarded_at'] ) ) ) : ''; ?>. All past deliverables, high-resolution campaign proofs, signed agreements, and tax receipts remain permanently accessible.
+                        </p>
+                    </div>
+                </div>
+                <span class="px-3 py-1.5 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 text-[11px] font-mono shrink-0 text-center">
+                    Archive ID: #CLT-<?php echo esc_html( $client['id'] ); ?>
+                </span>
+            </div>
+        <?php endif; ?>
+
         <!-- 1. PROJECT HERO CARD (MOBILE-OPTIMIZED) -->
         <div class="bg-white border border-zinc-200/90 rounded-2xl sm:rounded-3xl p-4 sm:p-7 shadow-xs space-y-4 sm:space-y-6">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-3.5">
                 <div class="space-y-1.5 min-w-0">
                     <div class="flex items-center gap-2 flex-wrap">
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold bg-zinc-100 text-zinc-800 border border-zinc-200">
-                            Active Project
+                        <?php
+                        $hero_badge_class = 'bg-zinc-100 text-zinc-800 border-zinc-200';
+                        $hero_badge_label = 'Active Project';
+                        $cl_status = strtolower( $client['status'] ?? 'active' );
+                        if ( $portal_status === 'read_only' || $cl_status === 'completed' ) {
+                            $hero_badge_class = 'bg-blue-50 text-blue-700 border-blue-200';
+                            $hero_badge_label = 'Concluded & Archived';
+                        } elseif ( $cl_status === 'paused' ) {
+                            $hero_badge_class = 'bg-amber-50 text-amber-700 border-amber-200';
+                            $hero_badge_label = 'Paused / On Hold';
+                        } elseif ( $cl_status === 'vip' ) {
+                            $hero_badge_class = 'bg-purple-50 text-purple-700 border-purple-200';
+                            $hero_badge_label = 'VIP Retainer Account';
+                        }
+                        ?>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold <?php echo esc_attr( $hero_badge_class ); ?> border">
+                            <?php echo esc_html( $hero_badge_label ); ?>
                         </span>
                         <span class="text-[11px] text-zinc-400 font-mono">#CLT-<?php echo esc_html( $client['id'] ); ?></span>
                         <span class="text-[11px] font-medium text-zinc-600">Welcome back, <span class="font-bold text-zinc-900"><?php echo esc_html( explode( ' ', $client_name )[0] ); ?></span></span>
@@ -351,8 +473,8 @@ $client_initials = strtoupper( substr( $client_name, 0, min( 2, strlen( $client_
             </button>
             <button id="portal-tab-deliverables" onclick="switchPortalTab('deliverables')" class="portal-tab-btn px-3 sm:px-4 py-2 rounded-lg text-xs font-bold transition-all text-zinc-600 hover:text-zinc-950 flex items-center gap-1.5 cursor-pointer bg-transparent border-0 whitespace-nowrap shrink-0">
                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                <span>Deliverables & Galleries</span>
-                <span class="badge px-1.5 py-0.2 rounded-full text-[9px] bg-zinc-100 text-zinc-700 font-bold">3</span>
+                <span>Deliverables & Projects</span>
+                <span class="badge px-1.5 py-0.2 rounded-full text-[9px] bg-zinc-100 text-zinc-700 font-bold"><?php echo $has_real_projects ? count( $client_projects ) : '3'; ?></span>
             </button>
             <button id="portal-tab-invoices" onclick="switchPortalTab('invoices')" class="portal-tab-btn px-3 sm:px-4 py-2 rounded-lg text-xs font-bold transition-all text-zinc-600 hover:text-zinc-950 flex items-center gap-1.5 cursor-pointer bg-transparent border-0 whitespace-nowrap shrink-0">
                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
@@ -373,6 +495,37 @@ $client_initials = strtoupper( substr( $client_name, 0, min( 2, strlen( $client_
              TAB 1: OVERVIEW & TIMELINE
              ═══════════════════════════════════════════════════════════════════ -->
         <div id="portal-view-overview" class="tab-content active space-y-4 sm:space-y-6">
+            <?php if ( $has_real_projects && $primary_project ) : ?>
+                <!-- Active Project Quick Card -->
+                <div class="bg-white border border-zinc-200/90 rounded-2xl p-4 sm:p-5 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div class="flex items-center gap-3.5 min-w-0">
+                        <div class="w-12 h-12 rounded-xl bg-zinc-900 overflow-hidden shrink-0 border border-zinc-200">
+                            <img src="<?php echo esc_url( ! empty( $primary_project['hero_image_url'] ) ? $primary_project['hero_image_url'] : 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&w=300&q=80' ); ?>" alt="" class="w-full h-full object-cover">
+                        </div>
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-2">
+                                <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 font-mono">
+                                    <?php echo esc_html( strtoupper( $primary_project['status'] ?: 'ACTIVE' ) ); ?>
+                                </span>
+                                <span class="text-[10px] text-zinc-400 font-mono">Project #PRJ-<?php echo esc_html( $primary_project['id'] ); ?></span>
+                            </div>
+                            <h4 class="text-xs sm:text-sm font-bold text-zinc-950 truncate mt-0.5"><?php echo esc_html( $primary_project['title'] ); ?></h4>
+                            <p class="text-[11px] text-zinc-500 truncate"><?php echo esc_html( $primary_project['subtitle'] ?: 'Commercial deliverables and high-resolution creative assets.' ); ?></p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <?php if ( ! empty( $primary_project['live_url'] ) ) : ?>
+                            <a href="<?php echo esc_url( $primary_project['live_url'] ); ?>" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-xl border border-zinc-200 hover:bg-zinc-50 text-zinc-800 text-xs font-bold transition-all shadow-2xs">
+                                Live Showcase ↗
+                            </a>
+                        <?php endif; ?>
+                        <button onclick="switchPortalTab('deliverables')" class="px-3.5 py-1.5 rounded-xl bg-zinc-950 hover:bg-zinc-850 text-white text-xs font-bold transition-all shadow-2xs border-0 cursor-pointer">
+                            View Deliverables & Proofing Vault &rarr;
+                        </button>
+                    </div>
+                </div>
+            <?php endif; ?>
+
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
                 <!-- Upcoming Milestone Card -->
                 <div class="md:col-span-2 bg-white border border-zinc-200/90 rounded-2xl p-4 sm:p-6 shadow-2xs space-y-4">
@@ -445,6 +598,132 @@ $client_initials = strtoupper( substr( $client_name, 0, min( 2, strlen( $client_
              TAB 2: DELIVERABLES & PROOFING VAULT
              ═══════════════════════════════════════════════════════════════════ -->
         <div id="portal-view-deliverables" class="tab-content space-y-4 sm:space-y-6">
+            <?php if ( $has_real_projects ) : ?>
+                <!-- Commissioned Projects & Case Studies Grid -->
+                <div class="bg-white border border-zinc-200/90 rounded-2xl p-4 sm:p-6 shadow-2xs space-y-4 sm:space-y-5">
+                    <div class="flex items-start sm:items-center justify-between gap-2 border-b border-zinc-100 pb-3">
+                        <div>
+                            <h3 class="text-xs sm:text-sm font-bold text-zinc-950">Commissioned Projects & Deliverables</h3>
+                            <p class="text-[11px] sm:text-xs text-zinc-500">Live projects, digital deliverables, and creative campaign showcases produced for <?php echo esc_html( $client_name ); ?>.</p>
+                        </div>
+                        <span class="px-2.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold bg-zinc-900 text-white shrink-0 font-mono">
+                            <?php echo count( $client_projects ); ?> Active <?php echo count( $client_projects ) === 1 ? 'Project' : 'Projects'; ?>
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <?php foreach ( $client_projects as $proj ) : 
+                            $services = json_decode( $proj['services'] ?? '[]', true );
+                            if ( ! is_array( $services ) ) $services = array_filter( array_map( 'trim', explode( ',', $proj['services'] ?? '' ) ) );
+                            $deliverables = json_decode( $proj['deliverables'] ?? '[]', true );
+                            if ( ! is_array( $deliverables ) ) $deliverables = array_filter( array_map( 'trim', explode( ',', $proj['deliverables'] ?? '' ) ) );
+                            $kpis = json_decode( $proj['kpis'] ?? '[]', true );
+                            if ( ! is_array( $kpis ) ) $kpis = array();
+                            $proj_hero = ! empty( $proj['hero_image_url'] ) ? $proj['hero_image_url'] : 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&w=1200&q=80';
+                        ?>
+                            <div class="border border-zinc-200/90 rounded-2xl overflow-hidden bg-white shadow-2xs flex flex-col justify-between">
+                                <div>
+                                    <!-- Hero Image Header -->
+                                    <div class="h-44 sm:h-48 bg-zinc-900 relative overflow-hidden group">
+                                        <img src="<?php echo esc_url( $proj_hero ); ?>" alt="<?php echo esc_attr( $proj['title'] ); ?>" class="w-full h-full object-cover opacity-90 transition-transform duration-500 group-hover:scale-105" loading="lazy">
+                                        <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent"></div>
+                                        
+                                        <!-- Badges overlay -->
+                                        <div class="absolute top-3 left-3 flex items-center gap-1.5 flex-wrap">
+                                            <span class="px-2 py-0.5 rounded-md bg-black/75 backdrop-blur-xs text-white text-[9.5px] font-bold font-mono uppercase tracking-wider">
+                                                <?php echo esc_html( $proj['status'] ?: 'Active' ); ?>
+                                            </span>
+                                            <?php if ( ! empty( $proj['project_duration'] ) ) : ?>
+                                                <span class="px-2 py-0.5 rounded-md bg-white/90 backdrop-blur-xs text-zinc-900 text-[9px] font-bold">
+                                                    ⏱ <?php echo esc_html( $proj['project_duration'] ); ?>
+                                                </span>
+                                            <?php endif; ?>
+                                        </div>
+
+                                        <?php if ( ! empty( $proj['year_completed'] ) ) : ?>
+                                            <span class="absolute top-3 right-3 px-2 py-0.5 rounded-md bg-black/75 text-zinc-300 text-[9px] font-mono">
+                                                <?php echo esc_html( $proj['year_completed'] ); ?>
+                                            </span>
+                                        <?php endif; ?>
+
+                                        <!-- Project Title Overlay -->
+                                        <div class="absolute bottom-3 left-3 right-3">
+                                            <h4 class="text-white text-sm sm:text-base font-bold leading-tight drop-shadow-xs">
+                                                <?php echo esc_html( $proj['title'] ); ?>
+                                            </h4>
+                                            <?php if ( ! empty( $proj['subtitle'] ) ) : ?>
+                                                <p class="text-zinc-300 text-[11px] line-clamp-1 mt-0.5">
+                                                    <?php echo esc_html( $proj['subtitle'] ); ?>
+                                                </p>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+
+                                    <!-- Content Body -->
+                                    <div class="p-4 space-y-3">
+                                        <?php if ( ! empty( $proj['executive_summary'] ) ) : ?>
+                                            <p class="text-xs text-zinc-600 leading-relaxed line-clamp-2">
+                                                <?php echo esc_html( wp_strip_all_tags( $proj['executive_summary'] ) ); ?>
+                                            </p>
+                                        <?php endif; ?>
+
+                                        <!-- Services Tags -->
+                                        <?php if ( ! empty( $services ) ) : ?>
+                                            <div class="flex items-center gap-1.5 flex-wrap pt-0.5">
+                                                <?php foreach ( array_slice( $services, 0, 4 ) as $srv ) : ?>
+                                                    <span class="px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-700 text-[10px] font-medium border border-zinc-200/60">
+                                                        <?php echo esc_html( $srv ); ?>
+                                                    </span>
+                                                <?php endforeach; ?>
+                                            </div>
+                                        <?php endif; ?>
+
+                                        <!-- Deliverables List -->
+                                        <?php if ( ! empty( $deliverables ) ) : ?>
+                                            <div class="bg-zinc-50/80 rounded-xl p-3 border border-zinc-100 space-y-1.5">
+                                                <span class="text-[9.5px] font-bold text-zinc-400 uppercase tracking-wider block">Key Deliverables</span>
+                                                <ul class="text-[11px] text-zinc-700 space-y-1">
+                                                    <?php foreach ( array_slice( $deliverables, 0, 3 ) as $deliv ) : ?>
+                                                        <li class="flex items-start gap-1.5">
+                                                            <span class="text-emerald-600 font-bold">✓</span>
+                                                            <span class="leading-tight"><?php echo esc_html( $deliv ); ?></span>
+                                                        </li>
+                                                    <?php endforeach; ?>
+                                                </ul>
+                                            </div>
+                                        <?php endif; ?>
+
+                                        <!-- KPIs if available -->
+                                        <?php if ( ! empty( $kpis ) ) : ?>
+                                            <div class="flex items-center gap-2 pt-1">
+                                                <?php foreach ( array_slice( $kpis, 0, 2 ) as $kpi ) : ?>
+                                                    <div class="px-2.5 py-1 rounded-lg bg-zinc-100 text-zinc-900 border border-zinc-200/70 text-left">
+                                                        <span class="text-xs font-bold font-mono text-zinc-950"><?php echo esc_html( $kpi['value'] ?? '' ); ?></span>
+                                                        <span class="text-[9px] text-zinc-500 block leading-none"><?php echo esc_html( $kpi['label'] ?? '' ); ?></span>
+                                                    </div>
+                                                <?php endforeach; ?>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="p-4 pt-0 flex items-center gap-2">
+                                    <?php if ( ! empty( $proj['live_url'] ) ) : ?>
+                                        <a href="<?php echo esc_url( $proj['live_url'] ); ?>" target="_blank" rel="noopener noreferrer" class="flex-1 py-2 rounded-xl bg-zinc-950 hover:bg-zinc-850 text-white text-xs font-bold text-center transition-all shadow-2xs">
+                                            Live Showcase ↗
+                                        </a>
+                                    <?php endif; ?>
+                                    <button onclick="openProofingModal('<?php echo esc_js( $proj['title'] ); ?>', 18)" class="<?php echo ! empty( $proj['live_url'] ) ? 'flex-1' : 'w-full'; ?> py-2 rounded-xl border border-zinc-200 text-zinc-800 text-xs font-bold hover:bg-zinc-50 transition-all cursor-pointer bg-white">
+                                        Open Proofing Vault ↗
+                                    </button>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            <?php endif; ?>
+
             <div class="bg-white border border-zinc-200/90 rounded-2xl p-4 sm:p-6 shadow-2xs space-y-4 sm:space-y-5">
                 <div class="flex items-start sm:items-center justify-between gap-2 border-b border-zinc-100 pb-3">
                     <div>

@@ -1062,7 +1062,7 @@ cora_render_workspace_header( $vault_header_args );
                                 <h3 class="text-base font-black text-zinc-950 uppercase tracking-wider">Services & Pricing Table</h3>
                                 <button type="button" onclick="coraAddStudioLineItem()" class="px-3.5 py-2 bg-zinc-950 text-white rounded-xl text-xs font-bold hover:bg-zinc-800 cursor-pointer shadow-xs flex items-center gap-1.5 transition-all">
                                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                                    + Add Row
+                                    Add Row
                                 </button>
                             </div>
 
@@ -1394,7 +1394,7 @@ cora_render_workspace_header( $vault_header_args );
                     <!-- Add Page Button -->
                     <button type="button" onclick="coraAddWizardPage()" class="w-full py-2.5 border border-zinc-200/80 hover:border-zinc-950 text-zinc-700 hover:text-zinc-950 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-all cursor-pointer bg-zinc-50/70 hover:bg-white">
                         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                        + Add Page
+                        Add Page
                     </button>
                 </div>
 

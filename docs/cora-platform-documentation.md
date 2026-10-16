@@ -1,6 +1,6 @@
 # Cora Platform — Comprehensive Platform Documentation
 
-This document serves as the master technical specification and architectural manual for the Cora Workspace Platform (v4.9.384).
+This document serves as the master technical specification and architectural manual for the Cora Workspace Platform (v4.9.387).
 
 ---
 
@@ -837,6 +837,98 @@ Hardened in **v4.9.383** and **v4.9.384**, workspace headers and sub-navigation 
 
 ---
 
+### 1.50 Mobile Sticky Offsets, Sub-Tabs Stacking & Touch Target Sizing (v4.9.385)
+Hardened in **v4.9.385**, workspace sub-navigation sticky positioning and mobile touch targets received targeted optimizations:
+* **Elimination of Mobile Header Double-Stack Gap**:
+  - The runtime calculation in `window.coraUpdateStickyOffsets` (`admin-script.js`) sets `--cora-sticky-tabs-top` directly to the topbar height (`h + 'px'`) while pinning `--cora-mobile-header-height` to `0px`.
+  - Guarantees sticky sub-navigation tabs pin seamlessly beneath the top navigation bar with zero layout gap or double-header overlap on mobile viewports.
+* **Preservation of Mobile Search Touch Target Sizing**:
+  - In `workspace-header.php`, the global `.cora-sub-tabs-extra button` 22px height constraint now explicitly exempts `#cora-proj-search-trigger-btn` and `#cora-proj-search-close-btn` (`:not(#cora-proj-search-trigger-btn):not(#cora-proj-search-close-btn)`).
+  - Preserves comfortable 28px (`w-7 h-7`) tap targets for mobile search triggers, ensuring effortless 1-tap engagement on touchscreens.
+* **Root Canvas Page Mount Layout (`view-projects.php`)**:
+  - Relocated `<div id="cora-projects-module">` to mount directly below the standard workspace header organism with `mt-4`, maintaining consistent vertical canvas rhythm across all viewports.
+
+---
+
+### 1.51 Collapsible Sidebar Navigation Groups & Memory State Persistence (v4.9.386 - v4.9.387)
+Hardened in **v4.9.386** and **v4.9.387**, the workspace sidebar navigation received enhanced grouping ergonomics:
+* **Interactive Section Collapsibility**:
+  - Sidebar group headers (`.cora-nav-group-label`) feature a smooth chevron vector icon (`.cora-group-chevron`) with spring transition (`transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1)`).
+  - Tapping/clicking any group header toggles `.is-collapsed`, rotating the chevron 90 degrees (`rotate(-90deg)`) and collapsing the child navigation list (`display: none !important;`).
+  - Headers enforce `user-select: none !important;` and clean hover states, preventing text selection during quick collapses.
+* **Persistent LocalStorage State Memory**:
+  - The toggle state of each navigation group is saved immediately to browser `localStorage` using keys `cora_sidebar_group_{group_id}`.
+  - On page load and route changes, collapsed groups hydrate instantly from storage, eliminating layout shift and preserving the operator's preferred workspace density.
+* **Instant Auto-Expansion on Search**:
+  - When the user focuses the sidebar search input (`#cora-nav-search-input`), the parent navigation container enters `.is-searching` mode.
+  - CSS rule `.cora-sidebar-nav.is-searching .cora-nav-group.is-collapsed .cora-nav-list { display: block !important; }` automatically expands all collapsed groups while searching, ensuring every matching item is visible.
+  - Clearing the search automatically restores each group's saved collapsed state.
+* **Closed-by-Default Information Architecture Standard**:
+  - Standardizes accordion controls across complex drawers, settings panels, and inspection views to be closed by default, presenting high-density executive summaries upfront and revealing granular details only upon operator intent.
+
+---
+
+### 1.52 Dynamic Plugins, Modules & AI Skills Extensibility Architecture (v4.9.387)
+Introduced in **v4.9.387**, the Cora platform overhauled its modular engine into a multi-dimensional extensibility hub:
+* **Level 01 Segmented Control Matrix (`views/view-feature-hub.php`)**:
+  - Replaces flat module toggles with a standardized 3-tab segmented control: **Plugins**, **Modules**, and **Skills**.
+  - Accessible via semantic paths `/workspace/plugins`, `/workspace/modules`, and `/workspace/skills`.
+* **Workspace-Level Isolation & Dedicated Schema**:
+  - Backed by isolated multi-tenant tables (`wp_cora_workspace_plugins`, `wp_cora_workspace_skills`, `wp_cora_workspace_api_keys`, and `wp_cora_workspace_plugin_logs`).
+  - Plugins and skills belong strictly to the tenant's `agency_id`, preventing cross-tenant leakage.
+* **Open Architecture for REST APIs & Model Context Protocol (MCP) 2.0**:
+  - Active workspace plugins dynamically inject custom MCP tools into `Cora_MCP_Tool_Registry::get_tools()` via the `cora_mcp_tools` filter hook.
+  - Tool names automatically resolve with dynamic prefixes (`cora_plugin_*`, `cora_skill_*`).
+* **API & MCP Gateway Drawer**:
+  - Provides tenant administrators with self-service API key provisioning (`cora_ws_live_...`), custom RBAC scopes (`plugins:read`, `plugins:write`, `skills:read`, `skills:write`), configurable rate limits, and real-time usage telemetry.
+  - Generates live OpenAPI 3.0.1 specifications at `/wp-json/cora/v1/workspace/openapi` for instant agent connection.
+* **Multi-Format Ingestion & AI Generation**:
+  - **JSON Plugin Manifest**: Ingest and export plugins containing metadata, configuration schemas, and MCP tool definitions.
+  - **Antigravity SKILL.md Format**: Upload agent skills formatted with YAML frontmatter (`name`, `skill_slug`, `description`, `trigger_phrases`, `bound_mcp_tools`, `model_preference`) and prompt bodies.
+  - **Autonomous AI Generator**: Built-in prompts allowing operators to generate complete, validated plugins or skills directly from natural language operational briefs.
+
+---
+
+### 1.53 Enterprise Client Onboarding Studio & Strict Role Isolation (v4.9.386 - v4.9.387)
+Introduced in **v4.9.386** and perfected in **v4.9.387**, client relationship operations were transformed into an enterprise onboarding pipeline:
+* **Guided 5-Step Client Creation Studio (`views/view-clients.php`)**:
+  - **Step 1: Entity & Contact**: Client name, primary contact person, company name, agency partner name, and engagement type (Direct Client vs Agency Sub-Contract).
+  - **Step 2: Commercial & Tax Regimes**: Multi-currency support (INR, USD, EUR, GBP, AED, SGD) with automatic tax handling (Domestic GST 18%, Zero-Rated Export LUT 0%, Custom VAT), GSTIN validation, and customizable milestone payment terms (e.g. 50/50, 25/50/25, Net 30).
+  - **Step 3: Production Service Matrix**: Pre-configured services (Commercial Photography, Video Production, Creative Direction, Post-Production CGI, Client Portal Vault, Monthly Retainer) with automatic persistence of custom services to `cora_workspace_services_{agency_id}`.
+  - **Step 4: Initial Project Showcase**: Option to simultaneously initialize an active showcase record in `wp_cora_projects`, linking the client to their first portfolio case study.
+  - **Step 5: User Account Provisioning & Invitation**: Automatic creation of a dedicated WordPress user account with role `cora_client`, temporary password generation, tokenized portal linkage (`cora_portal_token`), and welcome email delivery with direct login credentials.
+* **Strict Client Role Security Isolation (`cora_client`)**:
+  - Clients with the `cora_client` role are strictly quarantined from workspace administration interfaces.
+  - Server-side route handler in `cora-workspace.php` intercepts any client visiting `/workspace/*` and automatically redirects them to their private portal (`/{workspace}/client-portal?token={portal_token}`).
+  - Standard WordPress login redirect (`login_redirect` filter) guarantees clients logging in via `wp-login.php` are seamlessly routed to their personal client portal.
+* **CRM Lead Conversion Linkage**:
+  - 1-click conversion from CRM pipeline leads (`wp_cora_leads`) automatically marks the lead as `won`, records `converted_to_client = 1`, and synchronizes options caches for zero-latency dashboard reflection.
+* **Portal Lifecycle & Access Governance**:
+  - Public Client Portal (`public-client-portal.php`) verifies client `portal_status`. If marked as `suspended` or concluded, renders a clean, respectful monochromatic account conclusion screen while preserving historical records in studio registries.
+
+---
+
+### 1.54 Interactive Workspace Scheduling Calendar & Google Meet Standardization (v4.9.386 - v4.9.387)
+Deployed in **v4.9.386** and stabilized in **v4.9.387**, workspace scheduling received a full interactive engine in `views/view-calendar.php`:
+* **Multi-View Interactive Calendar**:
+  - Comprehensive view switcher supporting Month, Week, and Day calendar grids with real-time event markers.
+  - Color-coded event categorization adhering to monochromatic neutral tones and subtle functional status accents.
+* **2-Way Bidirectional Google Calendar Synchronization**:
+  - Real-time two-way synchronization bridge cross-referencing studio bookings, production shoots, and team shifts with external Google Calendar accounts.
+  - Automatic conflict guard checking for overlapping appointments before confirming client bookings.
+* **Standard 3-4-3 Google Meet URL Format**:
+  - Enforces official Google Meet URL syntax (`https://meet.google.com/xxx-yyyy-zzz`), eliminating non-standard meeting slugs.
+  - Generates valid virtual consultation links automatically upon booking discovery calls.
+* **Public Appointment Booking Flows**:
+  - Pre-configured, shareable booking links (e.g. 1-Hour Studio Session, 15-Min Quick Intro Call, Half-Day Editorial Shoot, Portfolio Review Session).
+  - Configurable durations, setup/teardown buffers, pricing tags, and location specifications (Physical Bay vs Google Meet).
+* **Automated CRM Reflection**:
+  - Appointments booked via public links automatically reflect into the CRM sales pipeline as qualified leads, bridging client scheduling directly into revenue forecasting.
+* **Shopify-Inspired Docked Drawer Architecture**:
+  - Appointment creation and event inspection modals follow SOP Rule 15, docking below the header with sticky non-clipped footers and `Escape` key dismissal.
+
+---
+
 ## Section 2: Core SaaS Business Modules
 
 ### 2.1 Content AI Suite & Myra Assistant
@@ -1015,26 +1107,34 @@ To maximize vertical density and minimize layout friction, lead cards use an ult
 * **Financials**: Revenue tracking, payment status monitoring, cash flow runway.
 * **Event Timeline**: Chronological activity feed across all platform operations.
 
-### 2.11 App Modules & Feature Hub Matrix (v4.9.104 - v4.9.106, v4.9.141 - v4.9.144, v4.9.189, v4.9.200)
-Located in `views/view-feature-hub.php`, the Feature Hub provides full tenant-level feature governance across **24 Core Foundation & Domain Modules**:
-* **Structured 5-Category Matrix (24 Modules)**:
-  1. *Core Foundation*: Dashboard, Users & Roles, Document Vault, Media Library (Foundation Asset Hub), Affiliates & Referrals (v4.9.200), App Settings.
-  2. *Operations & Delivery*: Crew Scheduler, Equipment Manager, Property Listings (Real Estate), Field Ops & Live Tracking, Stationery & Plant Inventory.
-  3. *CRM & Revenue*: Lead Management (CRM Pipeline), Interactive Calendar, Financial Ledger, Client Management, Client Tasks Kanban.
-  4. *Studio & Content*: Canvas Dual Theme Builder, Content AI Suite & Myra Assistant, Forms & Reviews 2.0, Photo Proofing Vault.
-  5. *AI & Automation*: Dynamic AI Co-Founder (Cora AI), AI Tools MCP Gateway & Voice, Continuous Voice Discussion Engine, Email Suite & Hostinger Relay, AI Conversion Doctor.
+### 2.11 App Modules & Extensibility Engine (Plugins, Modules, Skills & MCP 2.0) (v4.9.104 - v4.9.387)
+Located in `views/view-feature-hub.php` and powered by `includes/class-cora-plugins-skills-engine.php`, the Feature Hub provides tenant-level feature governance, dynamic modular extension, and open Model Context Protocol (MCP) 2.0 execution:
+
+* **Level 01 Segmented Control Extensibility Matrix**:
+  1. **Plugins (`/workspace/plugins`)**: Dynamic workspace-level extensions, third-party webhook dispatchers, payment gateway listeners, and remote MCP tool bridges.
+  2. **Modules (`/workspace/modules`)**: The 24 Core Foundation & Domain Modules toggle matrix across 5 functional categories with strict 6 Foundation Modules locking.
+  3. **Skills (`/workspace/skills`)**: Custom AI Agent skills with behavioral system prompts, input parameter JSON schemas, model preferences (Gemini 3.5 Flash, Claude 3.5 Sonnet, GPT-4o), and bound MCP tools.
 * **Core Foundation Modules Permanent Locking Architecture (v4.9.189, v4.9.200)**:
-  - Starting in **v4.9.189** and expanded in **v4.9.200**, the Cora platform enforces a permanent architecture lock on **6 foundational operational modules**: `blogs`, `forms`, `team-roles`, `media`, `vault`, and `affiliates` (alongside `dashboard`).
+  - The Cora platform enforces a permanent architecture lock on **6 foundational operational modules**: `blogs`, `forms`, `team-roles`, `media`, `vault`, and `affiliates` (alongside `dashboard`).
   - **Universal Domain Hardening**: Across all 6 industry domain class files (`class-custom-module.php`, `class-manufacturing-inventory-module.php`, `class-marketing-agency-module.php`, `class-studio-module.php`, `class-professional-services-module.php`, `class-re-module.php`), these foundation modules are permanently declared active and immutable.
   - **Tenant Capability Micro-Guard**: In `cora-workspace.php`, `cora_get_custom_enabled_features()` automatically merges foundation features into the enabled tenant feature array, ensuring core capabilities remain available even if tenant meta has outdated entries.
-  - **Feature Hub Immutable UI**: In `views/view-feature-hub.php`, locked foundation cards display an immutable `Foundation` badge with a clean lock vector SVG and disabled toggle switches.
+  - **Feature Hub Immutable UI**: Locked foundation cards display an immutable `Foundation` badge with a clean lock vector SVG and disabled toggle switches.
   - **Batch Operation Immunity**: Global actions (*Select All*, *Deselect All*, *Reset Defaults*, *Discard*) preserve the active state of foundation modules, preventing tenants from disabling essential infrastructure.
-* **24-Module Compact Mobile Grid (v4.9.141 - v4.9.143)**: Re-architected mobile layout into a compact single-column horizontal card list (`flex-row items-center gap-3 p-3`), eliminating excessive vertical scrolling and visual clutter on mobile screens.
-* **Unified Search & Control Bar (v4.9.142)**: Global search input coupled with live status filtering (*All Modules*, *Active Only*, *Inactive Only*) and dynamic industry preset tags.
-* **Rule 13 Zero-Outline Tonal Selection Compliance (v4.9.144)**: Active and selected states strictly use soft monochromatic tonal background fills (`bg-zinc-100/90 dark:bg-zinc-800/80`) with subtle borders (`border-zinc-200/80`), completely eliminating heavy black outlines, `ring-2`, and dark border strokes.
+* **API & MCP Gateway Drawer (`#cora-api-gateway-drawer`)**:
+  - High-density administrative drawer for generating, inspecting, and revoking tenant-scoped API keys (`cora_ws_live_...`).
+  - Granular RBAC API Scopes: `workspace:read`, `plugins:read`, `plugins:write`, `skills:read`, `skills:write`, `webhooks:read`, `webhooks:write`.
+  - Configurable rate limits (default 1,000 req/hr) and telemetry audit logging (`wp_cora_workspace_plugin_logs`).
+  - Real-time OpenAPI 3.0.1 schema generation at `/wp-json/cora/v1/workspace/openapi` and dynamic MCP tool resolution.
+* **Multi-Format Plugin & Skill Ingestion**:
+  - **Visual Creation Drawer**: Clean UI forms for authoring webhooks, custom bridges, or agent behaviors.
+  - **JSON Manifest & MCP Import/Export**: Standardized JSON manifests for one-click installation and export.
+  - **Antigravity SKILL.md Format**: Native support for importing Anthropic/Google Antigravity skills with YAML frontmatter.
+  - **Autonomous AI Generator**: In-drawer prompt builder allowing operators to generate complete, validated code or skill instructions from natural language briefs.
+* **24-Module Compact Mobile Grid**: Re-architected mobile layout into a compact single-column horizontal card list (`flex-row items-center gap-3 p-3`), eliminating excessive vertical scrolling and visual clutter on mobile screens.
+* **Unified Search & Control Bar**: Global search input coupled with live status filtering (*All*, *Active Only*, *Inactive Only*) and dynamic industry preset tags.
+* **Rule 13 Zero-Outline Tonal Selection Compliance**: Active and selected states strictly use soft monochromatic tonal background fills (`bg-zinc-100/90 dark:bg-zinc-800/80`) with subtle borders (`border-zinc-200/80`), completely eliminating heavy black outlines, `ring-2`, and dark border strokes.
 * **Strict Navigation Decoupling**: Enabling or disabling any module automatically mounts or unmounts its corresponding navigation item from the sidebar and mobile island nav, preventing ghost routes or 404 dead ends.
-* **Category Filter Bar & Search**: Instant zero-lag category filtering (*All*, *Foundation*, *Operations*, *CRM*, *Studio*, *AI*) and real-time module keyword search.
-* **Explicit Save & Staging Workflow**: Toggle modifications trigger a sticky bottom unsaved changes banner (`.cora-fh-save-banner`). Changes stage cleanly in memory and commit atomically via AJAX to `cora_agency_modules_{agency_id}`.
+* **Explicit Save & Staging Workflow**: Toggle modifications stage cleanly in memory and commit atomically via AJAX to `cora_agency_modules_{agency_id}`.
 * **Batch Controls**: 1-click "Enable All Recommended", "Deselect All", and "Reset to Industry Defaults".
 
 ### 2.12 Users, Team Governance & Dynamic Role Engine (v4.9.104 - v4.9.108, v4.9.180 - v4.9.186, v4.9.190)
@@ -1289,59 +1389,71 @@ To eliminate notification fatigue, guarantee inbox hygiene, and deliver high-val
 
 ---
 
-### 2.18 Client Management Suite & Client Task Manager (v4.9.119 - v4.9.124)
+### 2.18 Client Management Suite, Enterprise Onboarding Studio & Task Manager (v4.9.119 - v4.9.387)
 The **Client Management Suite** (`views/view-clients.php`) and **Client Task Manager** (`views/view-client-task-manager.php`, `views/partials/partial-clients-kanban-tasks.php`) provide a unified CRM operations platform tailored to agencies and service studios:
 
 ```
-+-----------------------------------------------------------------------------------+
-|               CLIENT MANAGEMENT SUITE & CLIENT TASK MANAGER (CRM)                 |
-+----------------------+-----------------------------+------------------------------+
-| 4-Subtab Client Hub  | Client Tasks Kanban Pipeline| Floating Task Details Drawer |
-| • Directory Overview | • Stage Progression Columns | • Left-Edge Drag Resize Handle|
-| • Active Deals/Vault | • In-Column Counter & Deals | • Anchored 48px Below Topbar |
-| • Client Tasks Board | • Multi-Filter Popover      | • Rounded-l-2xl Arc & Shadow |
-| • Ledger Recon Sync  | • Context Command Menu      | • Checklist, Scope, Assets   |
-+----------------------+-----------------------------+------------------------------+
++------------------------------------------------------------------------------------------------------+
+|                     CLIENT MANAGEMENT SUITE & ENTERPRISE ONBOARDING STUDIO (CRM)                     |
++----------------------+-----------------------------+------------------------------+------------------+
+| 4-Subtab Client Hub  | Guided 5-Step Creator Studio| Client Tasks Kanban Pipeline | Strict Isolation |
+| • Directory Overview | • 1. Entity & Contact       | • Stage Progression Columns  | • Role: cora_client
+| • Active Deals/Vault | • 2. Multi-Currency / Tax   | • In-Column Counter & Deals  | • Zero /workspace
+| • Client Tasks Board | • 3. Service Catalog Matrix | • Multi-Filter Popover       | • Auto Portal Redir
+| • Ledger Recon Sync  | • 4. Initial Project Linked | • Context Command Menu       | • Welcome Email  |
+|                      | • 5. User Account & Password| • Checklist, Scope, Assets   |   & Credentials  |
++----------------------+-----------------------------+------------------------------+------------------+
 ```
 
-1. **4-Subtab Client Management Hub (`views/view-clients.php`)**:
-   - **Subtab 1: Directory Overview**: Client search, industry tags, contact cards, outstanding balance summaries, and activity counters.
-   - **Subtab 2: Active Projects & Deals**: Contract milestone tracking, deal values, and pipeline stage progression.
-   - **Subtab 3: Client Tasks Board**: High-performance Kanban pipeline synced directly to client records.
-   - **Subtab 4: Financials & Ledger Synchronization**: Direct bridge to `views/view-financials.php`, calculating real-time reconciliation metrics, total invoiced amounts, settled revenues, and outstanding receivables per client account.
-2. **Client Task Manager (`views/view-client-task-manager.php`)**:
+1. **Guided 5-Step Client Onboarding Studio (`views/view-clients.php`)**:
+   - **Step 1: Entity & Contact Profile**: Captures primary contact person, client firm name, optional agency partner name, and engagement classification (Direct Client vs Agency Sub-Contract).
+   - **Step 2: International Tax Regimes & Commercial Terms**:
+     - **Multi-Currency Support**: Full localization across INR (`₹`), USD (`$`), EUR (`€`), GBP (`£`), AED (`AED`), and SGD (`S$`).
+     - **Tax Regimes**: Supports Domestic GST (18% SAC 9983), Zero-Rated Export LUT (0% under Letter of Undertaking for foreign clients), and Custom VAT.
+     - **GSTIN Validation**: Enforces standardized 15-character alphanumeric GSTIN formatting for Indian corporate clients.
+     - **Milestone Payment Terms**: Configurable terms (100% Upfront, 50% Advance / 50% Delivery, 25% Advance / 50% Wrap / 25% Delivery, Net 15, Net 30, or Custom Retainer).
+   - **Step 3: Production Service Matrix & Dynamic Catalog**:
+     - Pre-populated standard services (*Commercial Photography*, *Video Production*, *Creative Direction*, *Post-Production CGI*, *Client Portal Vault*, *Monthly Retainer*).
+     - Allows on-the-fly authoring of custom workspace production services, automatically persisting them to the agency's catalog option (`cora_workspace_services_{agency_id}`) for future reuse.
+   - **Step 4: Multi-Project Showcase Linking**:
+     - Offers simultaneous initialization of an active project case study in `wp_cora_projects`, automatically linking client identity, deliverables, and industry.
+   - **Step 5: User Account Provisioning & Invitation**:
+     - Automatically creates a secure WordPress user account with role `cora_client`.
+     - Generates cryptographically secure temporary passwords and binds metadata (`cora_portal_token`, `cora_workspace_slug`, `cora_agency_id`, `cora_client_id`).
+     - Dispatches a professional transactional welcome email with direct portal link and credentials.
+2. **Strict Client Role Security Isolation (`cora_client`)**:
+   - Users with the `cora_client` role are quarantined strictly to their personalized portal.
+   - Server-side route handler in `cora-workspace.php` intercepts clients attempting to access `/workspace/*` (dashboard, financials, leads, settings) and immediately redirects them to `/{workspace}/client-portal?token={portal_token}`.
+   - WordPress `login_redirect` hook seamlessly directs `cora_client` logins directly into their private portal.
+3. **CRM Lead Conversion Linkage**:
+   - 1-click conversion from CRM pipeline leads (`wp_cora_leads`) automatically marks the lead as `won`, records `converted_to_client = 1`, and synchronizes options caches for zero-latency dashboard reflection.
+4. **Client Task Manager (`views/view-client-task-manager.php`)**:
    - High-density Kanban board columns with live task counters and aggregated deal values.
    - Smooth drag-and-drop and 1-tap stage progression across industry lifecycle stages.
    - **Multi-Filter Popover**: Filter by status, assigned team member, priority level, or client account with zero emojis.
    - **Right-Click Context Command Menu (`#cora-task-context-menu`)**: Quick action popover enabling 1-click stage advancement, priority reassignment, member delegation, and task deletion.
    - **Multi-Industry Dictionaries**: Industry-specific stage terminology (`photography_studio`, `real_estate`, `marketing_agency`, `stationery_inventory`, `professional_services`).
-3. **Resizable Floating Task Details Drawer**:
+5. **Resizable Floating Task Details Drawer**:
    - Floating ergonomic panel anchored 48px below the top navigation bar (`top: 48px`).
    - Distinctive left-edge arc (`rounded-l-2xl`) and ambient drop-shadow (`shadow-2xl`).
    - Zero dark backdrop overlay (`backdrop: none`), allowing full visibility of underlying board columns during active inspection.
    - Drag-to-Resize Left Handle (`#cora-task-drawer-resize-handle`, `window.coraInitTaskDrawerResize`) with persisted width in `localStorage`.
-   - **4 Dedicated In-Drawer Tabs**:
-     - `Checklist`: Interactive subtask list with automated progress percentage bar, 1-click completion toggle, and inline subtask adder.
-     - `Scope`: Core project metadata, deal values, and property/deliverable requirements.
-     - `Assets`: Proofing asset review vault, download links, and revision tracker.
-     - `Activity`: Immutable timestamped audit trail of task transitions, assignees, and comments.
-   - **Mobile Form Factor**: Automatically switches to an ergonomic bottom-up slide sheet with top drag handle on screens < 768px.
-4. **Task Scheduling Past-Time Validation & Auto-Slot Selection (v4.9.150)**:
-   - **Past-Time Prevention for Today's Date**: Evaluates selected task dates against current system timestamps, preventing accidental scheduling of tasks at past times on the current day.
-   - **Auto-Computed Next Time Slot**: When opening task creation or rescheduling drawers, dynamically calculates the next clean 15-minute or 30-minute upcoming interval (e.g. if current time is 11:18 AM, automatically selects 11:30 AM).
-   - **Client & Server Guarding**: Enforces dual-layer validation with instant monochromatic feedback toasts (`coraShowToast`), preventing invalid time submissions from entering the task ledger.
+   - **4 Dedicated In-Drawer Tabs**: `Checklist`, `Scope`, `Assets`, and `Activity`.
 
 ---
 
 ### 2.19 Public White-Labeled Client Portal (`public-client-portal.php`)
 The **Public Client Portal** delivers a branded, mobile-first, passwordless experience for agency and studio clients:
-1. **White-Labeled Client Routing**:
-   - Tokenized URLs (`?token=cora_clt_*`, slug, or ID) allow clients to review deliverables, project progress, and invoices securely without requiring internal user accounts.
+1. **White-Labeled Client Routing & Governance**:
+   - Tokenized URLs (`/{slug}/client-portal?token=cora_clt_*`) allow clients to review deliverables, project progress, and invoices securely without requiring internal user accounts.
+   - **Portal Access Governance**: The portal inspects `$client['portal_status']`. If marked as `suspended` or concluded, it renders an elegant, respectful account conclusion screen (`Portal Access Suspended • Account Concluded`), preserving historical invoices and documents in studio registries while preventing active deliverable modification.
 2. **Claude Cream Design Aesthetic**:
    - Strict adherence to the Anthropic Claude design theme: warm cream background (`#FBFaf7`), minimal container cards with thin border strokes (`#E8E5DE`), and high-contrast typography.
-3. **Proofing Vault & Deliverables Review**:
+3. **Active Projects & Deliverables Showcase**:
+   - Embedded showcase cards for client projects, displaying completed deliverables, verified KPI proof tags, external live links (`Live Showcase ↗`), and direct triggers to open the Proofing Vault.
+4. **Proofing Vault & Deliverables Review**:
    - High-resolution gallery preview, client approval triggers, revision notes input, and batch asset downloads.
-4. **Official Vector Payment Gateways (India & Global)**:
+5. **Official Vector Payment Gateways (India & Global)**:
    - Integrated payment options for instant settlement.
    - Uses official vector SVG brand marks for Indian payment rails: **WhatsApp Pay**, **Google Pay**, **PhonePe**, and **Paytm**, alongside international Stripe/Card gateways.
 
@@ -1565,6 +1677,69 @@ Located in `includes/mcp/class-cora-universal-mcp-server.php`, `class-cora-oauth
   - Exposes 25+ structured tools spanning CRM Leads (`cora_crm_create_lead`, `cora_crm_get_leads`), Finance & Invoicing (`cora_finance_create_invoice`, `cora_finance_get_financials`), Inventory (`cora_inventory_get_catalog`, `cora_inventory_create_consignment`), and Content Marketing (`cora_content_create_article`).
 * **1-Click Assistant Setup Matrix**:
   - The AI Tools MCP view provides ready-to-copy setup instructions, prompt directives, and live connection test buttons for ChatGPT, Claude, and Gemini.
+
+---
+
+### 2.33 Dynamic Plugins & AI Skills Runtime Engine (v4.9.387)
+Implemented in `includes/class-cora-plugins-skills-engine.php` and managed in `views/view-feature-hub.php`:
+* **Multi-Tenant Extensibility Architecture**:
+  - Provides tenant-isolated database tables (`wp_cora_workspace_plugins`, `wp_cora_workspace_skills`, `wp_cora_workspace_api_keys`, `wp_cora_workspace_plugin_logs`) scoped strictly by `agency_id`.
+  - Supports custom plugins, external webhooks, MCP tool bridges, and AI agent prompt skills with parameter validation.
+* **Dynamic MCP Tool Registration & Filter**:
+  - Automatically hooks into `cora_mcp_tools` filter in `Cora_MCP_Tool_Registry::get_tools()`.
+  - Active workspace plugins inject their defined MCP tools into Cora's Universal MCP Server dynamically without code modifications.
+  - Normalized tool name resolution handles `skill_*` and `plugin_*` prefixes seamlessly (`cora_skill_*`, `cora_plugin_*`).
+* **Pre-Seeded Starter Plugins & AI Skills**:
+  - **Starter Plugins**: `webhook-dispatcher` (real-time HTTP POST webhooks to Zapier, Make, Slack), `google-calendar-sync` (2-way calendar sync bridge), `payment-gateway-listener` (Stripe/Razorpay webhook ingestion clearing GST SAC 9983 invoices), `client-portal-notifier` (milestone updates), and `daily-ledger-reconciler` (daily bank feed audit).
+  - **Starter AI Skills**: `client-intake-specialist` (production scope extraction), `gst-invoice-auditor` (18% GST SAC 9983 validation), `high-ticket-lead-qualifier` (deal sizing and intent scoring), `shoot-gear-readiness-auditor` (equipment checklist verification), and `portfolio-storyteller` (4-act narrative generation).
+* **Workspace Scoped API Keys (`cora_ws_live_...`)**:
+  - Self-service API key provisioning with custom cryptographic SHA-256 hashing at rest.
+  - Configurable RBAC permission scopes (`plugins:read`, `plugins:write`, `skills:read`, `skills:write`, `workspace:read`) and per-key rate limits (default 1,000 req/hr).
+* **Multi-Format Upload & Ingestion**:
+  - Supports standard **JSON Plugin Manifests** and **Antigravity SKILL.md** files (YAML frontmatter + Markdown instruction prompt).
+  - Built-in AI generation endpoints (`/workspace/ai/generate-plugin`, `/workspace/ai/generate-skill`) enabling natural language prompt-to-code creation.
+* **Audit Logging & Telemetry Engine**:
+  - Every skill execution, webhook dispatch, and API key authentication records an audit log entry in `wp_cora_workspace_plugin_logs` with payload details, caller model, and execution status.
+
+---
+
+### 2.34 Interactive Workspace Calendar & Google Scheduling Engine (v4.9.386 - v4.9.387)
+Implemented in `views/view-calendar.php`:
+* **Multi-View Interactive Calendar (Month, Week, Day)**:
+  - Interactive grid switcher supporting full Month, Week, and Day calendar views with responsive event rendering.
+  - Pure monochromatic Notion/Shopify styling with subtle functional status indicators.
+* **2-Way Bidirectional Google Calendar Synchronization**:
+  - Real-time synchronization bridge cross-referencing studio bookings, production shoots, and team shifts with external Google Calendar accounts.
+  - Built-in conflict guard preventing overlapping booking requests.
+* **Standard 3-4-3 Google Meet Syntax**:
+  - Enforces official Google Meet URL format (`https://meet.google.com/xxx-yyyy-zzz`), eliminating arbitrary meeting slugs.
+  - Automatically attaches valid Google Meet consultation links to video discovery appointments.
+* **Public Appointment Booking Flows**:
+  - Shareable client booking links (1-Hour Studio Session, 15-Min Quick Intro Call, Half-Day Editorial Shoot, Portfolio Review & Retouching Session).
+  - Configurable durations, buffer times, pricing tags, and meeting location scopes (Physical Studio Bay vs Google Meet).
+* **Direct CRM Reflection**:
+  - Bookings made via public flows automatically log into `wp_cora_leads` as qualified CRM leads, linking calendar appointments directly to pipeline deal stages.
+* **Shopify-Inspired Docked Drawer Architecture**:
+  - Follows SOP Rule 15 with full docked view panel below the header, sticky non-clipped footers, and `Escape` key dismissal.
+
+---
+
+### 2.35 Agency Projects & Portfolio Case Studies Production Suite (v4.9.381 - v4.9.385)
+Implemented in `views/view-projects.php` and `modules/projects/class-cora-projects-module.php`:
+* **Dedicated Multi-Tenant Schema (`wp_cora_projects`)**:
+  - 46-column database table capturing project metadata, title, slug, client name, industry, services, status (published, draft, archived), featured flags, and confidentiality settings.
+* **4-Act Case Study Storytelling Framework**:
+  - **Act 1: Background & Strategic Challenge**: Executive summary and organizational friction.
+  - **Act 2: Strategic Intervention**: Creative and operational solution narrative.
+  - **Act 3: Execution & Deliverables**: Structured deliverable breakdown list.
+  - **Act 4: Verified ROI Metrics & Proof KPIs**: High-contrast numerical proof rendered in `JetBrains Mono` font.
+* **Dual-Surface Integration**:
+  - Synchronizes seamlessly with the Next.js marketing frontend at `cora-frontend/app/projects/[slug]`.
+  - Links directly into the Client Management Suite (`views/view-clients.php`), Public Client Portal (`public-client-portal.php`), and Proofing Vault.
+* **Confidentiality / Stealth NDA Masking (`is_confidential = 1`)**:
+  - Automatically redacts brand names and logos for sensitive client engagements, replacing identities with generic industry monikers without compromising verified outcome metrics.
+* **Shopify-Inspired Docked Drawer Editor**:
+  - 6-tab editing drawer (Overview, Narrative Story, Impact KPIs, Media & Visuals, Endorsement, SEO & CTA) with maximize / restore toggle (`⤢`), responsive sidebar sync, and zero backdrop overlay.
 
 ---
 
@@ -1817,6 +1992,11 @@ On mobile devices (`< 768px`), all bottom controls are consolidated into a singl
 | `wp_cora_inventory_sales_items` | Line items per spot invoice with product ID, qty, rate, and tax slab |
 | `wp_cora_inventory_daily_audits` | 24-hour daily supply recon snapshots, total dispatched, sold, restocked, and variance metrics |
 | `wp_cora_security_incidents` | Security incident and policy violation audit logs (ref, agency, user, IP, category, severity, prompt excerpt, dual escalation flags) |
+| `wp_cora_projects` | Workspace portfolio case studies, 4-act transformation narratives, proof KPIs, and client testimonials |
+| `wp_cora_workspace_plugins` | Isolated workspace-level dynamic plugins, webhook connectors, and custom MCP tool bridges |
+| `wp_cora_workspace_skills` | Custom AI agent skills, system prompt behaviors, parameter schemas, and bound MCP tools |
+| `wp_cora_workspace_api_keys` | Tenant-scoped API keys (`cora_ws_live_...`) with rate limiting and RBAC permission scopes |
+| `wp_cora_workspace_plugin_logs` | Audit logging of plugin executions, webhook dispatches, and AI skill telemetry |
 
 ### 6.2 Strict Agency Isolation & Tenant-Scoped Queries
 All SQL queries and AI contextual retrievers strictly filter by `agency_id = %d`. Data from one tenant is cryptographically and logically isolated from all other workspaces.
@@ -1900,10 +2080,59 @@ To enforce strict enterprise compliance, mitigate liability, and protect agency 
 
 ---
 
-## Section 8: Testing & Quality Assurance
+## Section 8: Testing, Automated Verification & Quality Assurance
 
-* **Playwright E2E**: Tiered test suites (Tier 1-4) covering auth, CRUD, integration, and workload flows.
-* **Build Validation**: `scripts/build.sh` verifies version consistency across plugin header, constants, and release manifests.
+Cora maintains an extensive, multi-tier testing framework ensuring zero regressions, strict multi-tenant isolation, and complete architectural compliance:
+
+### 8.1 Automated Backend & Architectural Verification Suites (PHP CLI)
+* **Client Onboarding & Role Isolation Suite (`scripts/verify_client_onboarding_features.php`)**:
+  - Validates active registration of WordPress role `cora_client`.
+  - Tests dynamic service catalog persistence (`cora_workspace_services_{agency_id}`) via `cora_ajax_save_workspace_custom_service`.
+  - Tests end-to-end client creation with multi-currency (USD), Zero-Rated Export LUT (0%), custom milestone payment terms, and direct `wp_cora_clients` insertion.
+  - Verifies linked project showcase auto-creation in `wp_cora_projects`.
+  - Verifies WordPress user account provisioning (`role: cora_client`), password hashing, and server-side login redirection to the client portal.
+* **Plugins, Modules & AI Skills Engine Suite (`scripts/verify_plugins_skills_architecture.php`)**:
+  - 14 automated test cases covering the entire extensibility subsystem:
+    1. *Database Schema*: Confirms existence and column definitions for `wp_cora_workspace_plugins`, `wp_cora_workspace_skills`, `wp_cora_workspace_api_keys`, `wp_cora_workspace_plugin_logs`.
+    2. *Starter Plugins Seeding*: Verifies automatic seeding of 5 starter plugins (`webhook-dispatcher`, `google-calendar-sync`, `payment-gateway-listener`, `client-portal-notifier`, `daily-ledger-reconciler`).
+    3. *Starter Skills Seeding*: Verifies automatic seeding of 5 starter skills (`client-intake-specialist`, `gst-invoice-auditor`, `high-ticket-lead-qualifier`, `shoot-gear-readiness-auditor`, `portfolio-storyteller`).
+    4. *Custom Plugin CRUD*: Verifies creation, status toggling, and deletion.
+    5. *Custom Skill CRUD*: Verifies custom agent skill authoring, trigger phrases, and parameter schemas.
+    6. *Execution Runtime & Telemetry*: Tests execution of prompt and script skills, verifying audit logging in `wp_cora_workspace_plugin_logs`.
+    7. *AI Plugin Generator*: Validates natural language prompt-to-plugin compilation.
+    8. *AI Skill Generator*: Validates natural language prompt-to-skill compilation.
+    9. *Workspace Scoped API Keys*: Validates cryptographic generation (`cora_ws_live_...`), request header authentication (`X-Cora-API-Key`), scope gating, and revocation.
+    10. *Dynamic MCP Tool Registration*: Confirms dynamic injection into `Cora_MCP_Tool_Registry::get_tools()` via `cora_mcp_tools` filter and prefix mapping (`cora_skill_*`, `cora_plugin_*`).
+    11. *Rule 3 Privacy Compliance*: Verifies zero owner names across newly introduced engine code.
+    12. *JSON Plugin Manifest Upload*: Tests ingestion of standardized JSON plugin specifications.
+    13. *Antigravity SKILL.md Upload*: Tests ingestion of YAML frontmatter + Markdown instruction prompt files.
+    14. *Cross-Tenant Isolation*: Verifies absolute isolation between Tenant A and Tenant B, guaranteeing zero asset leakage.
+* **Remote MCP & OAuth 2.1 Suite (`scripts/test_mcp_full_access.php`)**:
+  - Validates RFC 7591 dynamic client registration, RFC 6749 / RFC 7636 OAuth 2.1 PKCE authorization flows, token issuance, and MCP JSON-RPC 2.0 tool execution.
+* **Local Test Accounts Provisioning (`scripts/setup_local_accounts.php`)**:
+  - Provisions seed accounts for Super Admin, Real Estate Owner, and Photography Studio Owner.
+
+### 8.2 Playwright End-to-End (E2E) Test Harness (`tests/e2e/`)
+* **Interactive Calendar & Scheduling MVP (`test-calendar-mvp.spec.ts`)**:
+  - Verifies Month, Week, and Day grid rendering, 2-way Google sync trigger, valid 3-4-3 Google Meet URLs (`https://meet.google.com/xxx-yyyy-zzz`), appointment creation drawers, and non-clipped sticky footers.
+* **Agency Projects Multi-Step Drawer (`test-project-multistep-drawer.spec.ts`)**:
+  - Tests the 6-tab portfolio case study editor in `views/view-projects.php`, Shopify-inspired docked panel architecture, fullscreen maximize toggle (`⤢`), dynamic sidebar space bounds synchronization, and form input retention.
+* **Collapsible Sidebar Groups (`test-sidebar-group-toggle.spec.ts`)**:
+  - Validates interactive chevron rotation, per-group `localStorage` state persistence, and automatic group expansion during active navigation search (`.is-searching`).
+* **Sub-Tabs Extra Actions & AI Hover (`test-subtabs-toolbar-and-ai-hover.spec.ts`)**:
+  - Validates pixel-perfect vertical centering of sub-tabs action bars, Level 01 Segmented Control view mode switchers (Table vs Grid), comfortable 28px search trigger tap targets, and AI quick action popovers.
+* **Closed-by-Default Accordion Standard (`test-accordions-closed-by-default.spec.ts`)**:
+  - Enforces closed-by-default state across drawers and cards to preserve high-density visual hierarchy.
+* **Workspace Media Asset Picker (`test-workspace-media-picker.spec.ts`)**:
+  - Validates media selection modal integration, aspect ratio presets, and responsive thumbnail grids.
+* **Compact Mobile Multi-Step Drawers (`test-mobile-all-steps-compact.spec.ts`)**:
+  - Tests mobile drawer transitions (`translate-y-full` to `translate-y-0`), bottom drag handles, safe-area elevation, and zero horizontal scroll overflow.
+
+### 8.3 Design System & Build Verification
+* **Frontend Design System Validator (`npm run check:design-system` in `cora-frontend`)**:
+  - Validates strict token usage, typography enforcement (Inter for workspace, General Sans for marketing), semantic color scales, and contrast compliance.
+* **Core Build Pipeline (`scripts/build.sh`)**:
+  - Verifies version consistency across plugin headers, PHP constants (`CORA_WORKSPACE_VERSION`), PWA manifests, and release packages.
 
 ---
 
@@ -2035,6 +2264,9 @@ When authenticated as Super Admin (`cora_admin` / `admin@cora.local`), the platf
 
 | Version | Release Date | Key Features & Enhancements |
 | :--- | :--- | :--- |
+| **v4.9.387 (CORA-1239)** | Oct 2026 | Plugins in App Module, Dynamic MCP 2.0 & AI Skills Engine: Level 01 Segmented Control (Plugins, Modules, Skills) at `/workspace/plugins`, `/workspace/modules`, `/workspace/skills`; isolated multi-tenant schema (`wp_cora_workspace_plugins`, `wp_cora_workspace_skills`, `wp_cora_workspace_api_keys`, `wp_cora_workspace_plugin_logs`); dynamic MCP tool filter (`cora_mcp_tools`) registering dynamic tools into `Cora_MCP_Tool_Registry`; API & MCP Gateway drawer with tenant API key provisioning (`cora_ws_live_...`), scopes, rate limits, and live OpenAPI 3.0.1 export (`/workspace/openapi`); multi-format ingestion (JSON Plugin Manifests, Antigravity SKILL.md, Autonomous AI generator); 5 starter plugins (Webhook Dispatcher, Google Calendar Sync, Payment Gateway Listener, Client Portal Notifier, Daily Ledger Reconciler) and 5 starter skills (Client Intake Specialist, GST Invoice Auditor, High-Ticket Lead Qualifier, Shoot Gear Readiness Auditor, Portfolio Storyteller) |
+| **v4.9.386 (CORA-1238)** | Oct 2026 | Enterprise Client Onboarding Suite, Strict Role Isolation & Two-Way Calendar Synchronization: Guided 5-step client onboarding studio in `views/view-clients.php` (Entity, Multi-Currency / Tax Regimes, Production Service Matrix & Catalog, Initial Project Showcase, User Account Provisioning & Credentials); strict WordPress role `cora_client` portal isolation with server-side `/workspace` redirection and login redirect filter; dynamic service catalog persistence (`cora_workspace_services_{agency_id}`); multi-currency (INR, USD, EUR, GBP, AED, SGD) and tax regimes (Domestic GST 18%, Zero-Rated Export LUT 0%, Custom VAT); public client portal deliverables showcase, proofing vault button, and suspended account state; full interactive scheduling calendar in `views/view-calendar.php` (Month, Week, Day), 2-way Google Calendar sync, and standard 3-4-3 Google Meet syntax (`https://meet.google.com/xxx-yyyy-zzz`) |
+| **v4.9.385 (CORA-1237)** | Oct 2026 | Mobile Sticky Offsets, Sub-Tabs Stacking & Search Touch Target Sizing: Resolved mobile header double-stack gap via dynamic `--cora-sticky-tabs-top` calculation in `admin-script.js`; preserved comfortable 28px (`w-7 h-7`) tap target sizing for mobile search trigger and close buttons (`#cora-proj-search-trigger-btn`, `#cora-proj-search-close-btn`); relocated projects canvas module mount directly below workspace header with `mt-4`; collapsible sidebar navigation groups with per-group localStorage state persistence (`cora_sidebar_group_{key}`) and instant auto-expansion during active navigation search (`.is-searching`) |
 | **v4.9.384 (CORA-1236)** | Oct 2026 | Global Sticky Workspace Header & Mobile Expandable Sub-Tabs Search: Enforced global sticky header pinning (`position: sticky; top: 0; z-index: 100020;`) across all desktop and mobile viewports; resolved sub-tabs search horizontal overflow on mobile screens (< 640px) via 1-tap expandable search trigger (`#cora-proj-search-trigger-btn`) expanding full-width input (`#cora-proj-search-wrapper.mobile-expanded`) with Esc / close button dismiss; and synchronized version manifest to 4.9.384 |
 | **v4.9.383 (CORA-1235)** | Oct 2026 | Sub-Tabs Extra Actions Vertical Alignment & Level 01 Segmented Switcher: Standardized `tabs_extra_html` vertical alignment in `includes/workspace-header.php` (`h-full flex items-center gap-1.5 sm:gap-2`); implemented Level 01 Segmented Control container for Table vs Grid view mode toggle with active button styling (`bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white shadow-2xs`) |
 | **v4.9.382 (CORA-1234)** | Oct 2026 | Shopify-Inspired Canvas Maximize / Restore Toggle (⤢ Fullscreen Mode): Added dedicated maximize button (`#cora-proj-maximize-btn`) in docked drawer header toggling `.maximized` state, expanding drawer across full viewport (`left: 0; width: 100vw; z-index: 100060; border-left: none`) for zero-distraction case study authoring with instant sidebar synchronization on `cora:sidebar-toggle` |
@@ -2295,4 +2527,4 @@ When authenticated as Super Admin (`cora_admin` / `admin@cora.local`), the platf
 
 ---
 
-*Cora Platform v4.9.384 — Master Architectural Manual. Last updated: October 2026.*
+*Cora Platform v4.9.387 — Master Architectural Manual. Last updated: October 2026.*
