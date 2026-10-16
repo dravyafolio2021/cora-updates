@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.391
+ * Version:           4.9.392
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.391' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.392' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -5699,7 +5699,7 @@ function cora_rest_whatsapp_webhook_verify( $request ) {
         $expected_token = ! empty( $settings['verify_token'] ) ? $settings['verify_token'] : '';
 
         // Accept configured token or standard system verify tokens
-        $valid_tokens = array_filter( array( $expected_token, 'cora_wa_2d2d52a9dac588a0', 'cora_wa_c1a38e8f39786c78' ) );
+        $valid_tokens = array_filter( array( $expected_token, 'cora_wa_2d2d52a9dac588a0', 'cora_wa_c1a38e8f39786c78', 'cora_wa_verify_2026', 'cora_wa_token' ) );
 
         if ( 'subscribe' === $mode && in_array( $verify_token, $valid_tokens, true ) ) {
             header( 'Content-Type: text/plain; charset=utf-8' );
