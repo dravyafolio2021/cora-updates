@@ -280,8 +280,15 @@ $cora_wa_phone_id       = $cora_wa_settings['phone_number_id'] ?? '';
 $cora_wa_waba_id        = $cora_wa_settings['waba_id'] ?? '';
 $cora_wa_access_token   = $cora_wa_settings['access_token'] ?? '';
 $cora_wa_verify_token   = $cora_wa_settings['verify_token'] ?? '';
-$cora_wa_webhook_url    = $cora_wa_settings['webhook_url'] ?? rest_url( 'cora/v1/whatsapp/webhook' );
-$cora_wa_cached_status  = get_transient( 'cora_wa_connection_status' );
+$cora_wa_cached_status     = get_transient( 'cora_wa_connection_status' );
+$cora_wa_admin_phone       = $cora_wa_settings['admin_phone'] ?? '';
+$cora_wa_default_tpl       = $cora_wa_settings['default_template'] ?? 'jaspers_market_order_confirmation_v1';
+$cora_wa_auto_leads        = ! empty( $cora_wa_settings['auto_leads_enabled'] );
+$cora_wa_auto_client       = ! empty( $cora_wa_settings['auto_client_confirmation'] );
+$cora_wa_webhook_url       = home_url( '/wp-json/cora-workspace/v1/whatsapp-webhook' );
+$cora_wa_activation_url    = class_exists( 'Cora_WhatsApp_Gateway' ) ? Cora_WhatsApp_Gateway::instance()->get_activation_url() : 'https://wa.me/15556698957?text=Activate%20Daily%20Briefing%20%26%20Workspace%20Alerts%20%F0%9F%9A%80';
+$cora_wa_activation_redirect = class_exists( 'Cora_WhatsApp_Gateway' ) ? Cora_WhatsApp_Gateway::instance()->get_activation_redirect_url() : home_url( '/workspace/wa-activate' );
+$cora_wa_session_window    = ( class_exists( 'Cora_WhatsApp_Gateway' ) && ! empty( $cora_wa_admin_phone ) ) ? Cora_WhatsApp_Gateway::instance()->get_session_window( $cora_wa_admin_phone ) : array( 'active' => false, 'remaining_seconds' => 0, 'remaining_human' => 'Outside 24h Window' );
 
 // AI model display label for sidebar
 $cora_active_ai_model = get_option( 'cora_workspace_active_ai_model', 'cora-core-v2' );
@@ -649,6 +656,51 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             } else {
                 window.location.href = '<?php echo esc_js( home_url( $cora_nav_prefix . '/canvas?cv_action=edit_live' ) ); ?>';
             }
+        };
+
+        window.coraOpenWhatsAppActivation = function(customText) {
+            var activationUrl = '<?php echo esc_js( $cora_wa_activation_url ); ?>';
+            if (customText) {
+                activationUrl = 'https://wa.me/15556698957?text=' + encodeURIComponent(customText);
+            }
+            if (window.coraShowToast) {
+                window.coraShowToast('Opening WhatsApp... Send the pre-filled message to activate your 24-hour free window.', 'info');
+            }
+            window.open(activationUrl, '_blank');
+        };
+
+        window.coraTriggerDailyWhatsAppPush = function() {
+            var ajaxUrl = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : (window.ajaxurl || '/wp-admin/admin-ajax.php');
+            var nonce = (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : '';
+
+            if (window.coraShowToast) {
+                window.coraShowToast('Dispatching 24-Hour WhatsApp activation push to all users...', 'info');
+            }
+
+            jQuery.ajax({
+                url: ajaxUrl,
+                type: 'POST',
+                data: {
+                    action: 'cora_whatsapp_trigger_daily_push',
+                    nonce: nonce
+                },
+                success: function(r) {
+                    if (r.success && r.data) {
+                        if (window.coraShowToast) {
+                            window.coraShowToast(r.data.message || 'WhatsApp activation push dispatched to all workspace users!', 'success');
+                        }
+                    } else {
+                        if (window.coraShowToast) {
+                            window.coraShowToast((r.data && r.data.message) ? r.data.message : 'Error dispatching push notification.', 'error');
+                        }
+                    }
+                },
+                error: function() {
+                    if (window.coraShowToast) {
+                        window.coraShowToast('Network error while dispatching daily WhatsApp push.', 'error');
+                    }
+                }
+            });
         };
     </script>
 
@@ -5081,7 +5133,7 @@ textarea,
     </script>
 
     <!-- Global Brand & Customized Blocks Top Navbar (Shopify Style Unified Header) -->
-    <header id="cora-global-topbar" class="cora-topbar bg-[#09090b] text-white px-4 md:px-6 py-2 flex items-center justify-between border-b border-zinc-800/80 sticky top-0 z-50 shrink-0 select-none" style="position: sticky !important; top: 0 !important; background-color: #09090b !important; z-index: 100000 !important; min-height: 48px;">
+    <header id="cora-global-topbar" class="cora-topbar bg-[#09090b] text-white px-4 md:px-6 py-2 flex items-center justify-between border-b border-zinc-800/80 sticky top-0 z-50 shrink-0 select-none" style="position: sticky !important; top: 0 !important; background-color: #09090b !important; z-index: 100020 !important; min-height: 48px;">
         <div class="cora-topbar-desktop w-full items-center justify-between gap-4">
             <!-- Universal Driver Topbar Strip (Desktop) -->
             <div class="cora-driver-topbar-strip <?php echo ( ! empty( $is_driver_user ) || $is_driver_url_param ) ? 'flex' : 'hidden'; ?> items-center justify-between w-full">
@@ -5133,7 +5185,7 @@ textarea,
             <!-- Right Section: Actions & User Profile on the Edge -->
             <div class="cora-topbar-actions flex items-center gap-2.5 shrink-0">
                 <!-- Cora AI Copilot Shortcut -->
-                <button id="cora-quick-ai-btn" onclick="if(event) event.stopPropagation(); if(typeof window.coraToggleSidebar==='function'){ var sb = document.getElementById('cora-ai-sidebar'); window.coraToggleSidebar(sb ? sb.classList.contains('collapsed') : true); }" class="w-8 h-8 flex items-center justify-center border border-zinc-800 rounded-lg hover:bg-zinc-800 bg-zinc-900 text-zinc-300 hover:text-white transition-all active:scale-[0.98] shadow-2xs cursor-pointer shrink-0" title="Cora AI Copilot">
+                <button id="cora-quick-ai-btn" onclick="if(event){event.stopPropagation();event.preventDefault();} if(typeof window.coraToggleSidebar==='function'){ window.coraToggleSidebar(); }" class="w-8 h-8 flex items-center justify-center border border-zinc-800 rounded-lg hover:bg-zinc-800 bg-zinc-900 text-zinc-300 hover:text-white transition-all active:scale-[0.98] shadow-2xs cursor-pointer shrink-0" title="Cora AI Copilot">
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path stroke-linecap="round" stroke-linejoin="round" d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"/></svg>
                 </button>
                 <!-- Notifications Bell -->
@@ -5292,6 +5344,21 @@ textarea,
         </div>
         <div id="cora-punch-popover-feedback" class="hidden w-full"></div>
 
+        <!-- WhatsApp 24-Hour Free Window Quick Activator Card -->
+        <div class="p-2 bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/70 dark:border-zinc-700/60 rounded-xl flex items-center justify-between select-none">
+            <div class="space-y-0.5 pl-1">
+                <div class="flex items-center gap-1.5">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" class="text-emerald-500 shrink-0"><path d="M17.472 14.382c-.301-.15-1.78-.878-2.056-.979-.275-.1-.475-.15-.675.15-.2.3-.775.979-.95 1.18-.175.2-.35.225-.65.075-.3-.15-1.267-.467-2.414-1.489-.893-.796-1.496-1.78-1.671-2.08-.175-.3-.019-.462.131-.611.135-.134.3-.35.45-.525.15-.175.2-.3.3-.5.1-.2.05-.375-.025-.525-.075-.15-.675-1.625-.925-2.225-.244-.584-.492-.505-.675-.514-.175-.009-.375-.01-.575-.01s-.525.075-.8.375c-.275.3-1.05 1.025-1.05 2.5s1.075 2.898 1.225 3.1c.15.2 2.115 3.23 5.125 4.53.716.31 1.275.495 1.71.633.72.228 1.375.196 1.893.118.577-.087 1.78-.727 2.03-1.428.25-.7.25-1.3.175-1.428-.075-.128-.275-.203-.575-.353zM12.04 2C6.516 2 2.022 6.49 2.022 12c0 1.954.563 3.78 1.541 5.334L2 22l4.81-1.523A9.972 9.972 0 0 0 12.04 22c5.523 0 10.018-4.49 10.018-10S17.563 2 12.04 2zm0 18.232c-1.62 0-3.13-.48-4.404-1.312l-.316-.208-2.854.903.92-2.78-.205-.327A8.212 8.212 0 0 1 3.822 12c0-4.53 3.687-8.216 8.218-8.216 4.53 0 8.218 3.686 8.218 8.216 0 4.53-3.688 8.232-8.218 8.232z"/></svg>
+                    <span class="text-xs font-bold text-zinc-800 dark:text-zinc-200">WhatsApp Alerts</span>
+                </div>
+                <div class="text-[10px] text-zinc-400 dark:text-zinc-500 font-mono">24h Free Window (₹0)</div>
+            </div>
+            <button type="button" onclick="if(window.coraCloseProfilePopover) window.coraCloseProfilePopover(); coraOpenWhatsAppActivation();" class="bg-zinc-900 hover:bg-black text-white dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-white text-[10.5px] font-bold px-2.5 py-1 rounded-md transition-all cursor-pointer shadow-3xs select-none inline-flex items-center gap-1 active:scale-95" title="Click to open WhatsApp and activate 24-hour free alerts window">
+                <span>Activate</span>
+                <span class="text-emerald-400 dark:text-emerald-600 font-mono text-[9.5px]">₹0</span>
+            </button>
+        </div>
+
         <!-- 3. Workspace AI & Quick Links List (Linear / Notion Style) -->
         <div class="flex flex-col gap-0.5 pt-0.5">
             <!-- AI Status Indicator -->
@@ -5319,6 +5386,15 @@ textarea,
                     <span>Workspace Settings</span>
                 </div>
                 <span class="text-[10px] text-zinc-400 font-mono px-1 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800">⌘.</span>
+            </button>
+
+            <!-- Activate WhatsApp Alerts (24h Free Window) -->
+            <button type="button" class="w-full text-left px-2.5 py-1.5 text-xs text-zinc-700 dark:text-zinc-300 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100 font-medium flex items-center justify-between cursor-pointer transition-colors" onclick="if(window.coraCloseProfilePopover) window.coraCloseProfilePopover(); coraOpenWhatsAppActivation();">
+                <div class="flex items-center gap-2.5">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" class="text-emerald-500 shrink-0"><path d="M17.472 14.382c-.301-.15-1.78-.878-2.056-.979-.275-.1-.475-.15-.675.15-.2.3-.775.979-.95 1.18-.175.2-.35.225-.65.075-.3-.15-1.267-.467-2.414-1.489-.893-.796-1.496-1.78-1.671-2.08-.175-.3-.019-.462.131-.611.135-.134.3-.35.45-.525.15-.175.2-.3.3-.5.1-.2.05-.375-.025-.525-.075-.15-.675-1.625-.925-2.225-.244-.584-.492-.505-.675-.514-.175-.009-.375-.01-.575-.01s-.525.075-.8.375c-.275.3-1.05 1.025-1.05 2.5s1.075 2.898 1.225 3.1c.15.2 2.115 3.23 5.125 4.53.716.31 1.275.495 1.71.633.72.228 1.375.196 1.893.118.577-.087 1.78-.727 2.03-1.428.25-.7.25-1.3.175-1.428-.075-.128-.275-.203-.575-.353zM12.04 2C6.516 2 2.022 6.49 2.022 12c0 1.954.563 3.78 1.541 5.334L2 22l4.81-1.523A9.972 9.972 0 0 0 12.04 22c5.523 0 10.018-4.49 10.018-10S17.563 2 12.04 2zm0 18.232c-1.62 0-3.13-.48-4.404-1.312l-.316-.208-2.854.903.92-2.78-.205-.327A8.212 8.212 0 0 1 3.822 12c0-4.53 3.687-8.216 8.218-8.216 4.53 0 8.218 3.686 8.218 8.216 0 4.53-3.688 8.232-8.218 8.232z"/></svg>
+                    <span>Activate WhatsApp Alerts</span>
+                </div>
+                <span class="text-[9px] font-semibold text-emerald-600 dark:text-emerald-400 px-1.5 py-0.2 bg-emerald-50 dark:bg-emerald-950/40 rounded border border-emerald-200/50 dark:border-emerald-800/50">24h Free</span>
             </button>
 
             <?php if ( cora_is_super_owner() ) : ?>
@@ -5841,6 +5917,18 @@ textarea,
                     <span class="text-[10px] font-medium px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60">AI Connected</span>
                 </div>
 
+                <!-- WhatsApp 24-Hour Free Session Quick Activator Card -->
+                <div class="px-2.5 py-1.5 bg-zinc-50/80 dark:bg-zinc-800/40 border border-zinc-200/60 dark:border-zinc-700/60 rounded-xl flex items-center justify-between text-xs select-none">
+                    <div class="flex items-center gap-1.5">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" class="text-emerald-500 shrink-0"><path d="M17.472 14.382c-.301-.15-1.78-.878-2.056-.979-.275-.1-.475-.15-.675.15-.2.3-.775.979-.95 1.18-.175.2-.35.225-.65.075-.3-.15-1.267-.467-2.414-1.489-.893-.796-1.496-1.78-1.671-2.08-.175-.3-.019-.462.131-.611.135-.134.3-.35.45-.525.15-.175.2-.3.3-.5.1-.2.05-.375-.025-.525-.075-.15-.675-1.625-.925-2.225-.244-.584-.492-.505-.675-.514-.175-.009-.375-.01-.575-.01s-.525.075-.8.375c-.275.3-1.05 1.025-1.05 2.5s1.075 2.898 1.225 3.1c.15.2 2.115 3.23 5.125 4.53.716.31 1.275.495 1.71.633.72.228 1.375.196 1.893.118.577-.087 1.78-.727 2.03-1.428.25-.7.25-1.3.175-1.428-.075-.128-.275-.203-.575-.353zM12.04 2C6.516 2 2.022 6.49 2.022 12c0 1.954.563 3.78 1.541 5.334L2 22l4.81-1.523A9.972 9.972 0 0 0 12.04 22c5.523 0 10.018-4.49 10.018-10S17.563 2 12.04 2zm0 18.232c-1.62 0-3.13-.48-4.404-1.312l-.316-.208-2.854.903.92-2.78-.205-.327A8.212 8.212 0 0 1 3.822 12c0-4.53 3.687-8.216 8.218-8.216 4.53 0 8.218 3.686 8.218 8.216 0 4.53-3.688 8.232-8.218 8.232z"/></svg>
+                        <span class="text-[11px] font-medium text-zinc-700 dark:text-zinc-300">WhatsApp Alerts</span>
+                    </div>
+                    <button type="button" onclick="$('#cora-profile-popover').addClass('hidden'); coraOpenWhatsAppActivation();" class="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 hover:bg-black dark:hover:bg-white transition-all cursor-pointer inline-flex items-center gap-1 shadow-3xs active:scale-95" title="Click to open WhatsApp and activate 24-hour free alerts window">
+                        <span>Activate</span>
+                        <span class="text-emerald-400 dark:text-emerald-600 font-mono text-[9px]">₹0</span>
+                    </button>
+                </div>
+
                 <!-- 3. Streamlined Menu Items List -->
                 <div class="flex flex-col gap-0.5 pt-0.5">
                     <button class="w-full text-left px-2.5 py-1.5 text-xs text-zinc-700 dark:text-zinc-300 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100 font-medium flex items-center justify-between cursor-pointer transition-colors" onclick="coraNavigateTo('profile'); $('#cora-profile-popover').addClass('hidden');">
@@ -5857,6 +5945,15 @@ textarea,
                             <span>Workspace Settings</span>
                         </div>
                         <span class="text-[10px] text-zinc-400 font-mono px-1 py-0.2 rounded bg-zinc-100 dark:bg-zinc-800">⌘.</span>
+                    </button>
+
+                    <!-- Activate WhatsApp Alerts (24h Free Window) -->
+                    <button type="button" class="w-full text-left px-2.5 py-1.5 text-xs text-zinc-700 dark:text-zinc-300 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100 font-medium flex items-center justify-between cursor-pointer transition-colors" onclick="$('#cora-profile-popover').addClass('hidden'); coraOpenWhatsAppActivation();">
+                        <div class="flex items-center gap-2.5">
+                            <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" class="text-emerald-500 shrink-0"><path d="M17.472 14.382c-.301-.15-1.78-.878-2.056-.979-.275-.1-.475-.15-.675.15-.2.3-.775.979-.95 1.18-.175.2-.35.225-.65.075-.3-.15-1.267-.467-2.414-1.489-.893-.796-1.496-1.78-1.671-2.08-.175-.3-.019-.462.131-.611.135-.134.3-.35.45-.525.15-.175.2-.3.3-.5.1-.2.05-.375-.025-.525-.075-.15-.675-1.625-.925-2.225-.244-.584-.492-.505-.675-.514-.175-.009-.375-.01-.575-.01s-.525.075-.8.375c-.275.3-1.05 1.025-1.05 2.5s1.075 2.898 1.225 3.1c.15.2 2.115 3.23 5.125 4.53.716.31 1.275.495 1.71.633.72.228 1.375.196 1.893.118.577-.087 1.78-.727 2.03-1.428.25-.7.25-1.3.175-1.428-.075-.128-.275-.203-.575-.353zM12.04 2C6.516 2 2.022 6.49 2.022 12c0 1.954.563 3.78 1.541 5.334L2 22l4.81-1.523A9.972 9.972 0 0 0 12.04 22c5.523 0 10.018-4.49 10.018-10S17.563 2 12.04 2zm0 18.232c-1.62 0-3.13-.48-4.404-1.312l-.316-.208-2.854.903.92-2.78-.205-.327A8.212 8.212 0 0 1 3.822 12c0-4.53 3.687-8.216 8.218-8.216 4.53 0 8.218 3.686 8.218 8.216 0 4.53-3.688 8.232-8.218 8.232z"/></svg>
+                            <span>Activate WhatsApp Alerts</span>
+                        </div>
+                        <span class="text-[9px] font-semibold text-emerald-600 dark:text-emerald-400 px-1.5 py-0.2 bg-emerald-50 dark:bg-emerald-950/40 rounded border border-emerald-200/50 dark:border-emerald-800/50">24h Free</span>
                     </button>
 
                     <button type="button" class="w-full text-left px-2.5 py-1.5 text-xs text-zinc-700 dark:text-zinc-300 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100 font-medium flex items-center justify-between cursor-pointer transition-colors" onclick="$('#cora-profile-popover').addClass('hidden'); window.coraTriggerPwaInstall();">
@@ -10191,6 +10288,51 @@ textarea,
                     </div>
 
                     <div class="p-5 space-y-4">
+                        <!-- ═══ 24-Hour Free Session Quick Activator Card ═══ -->
+                        <div class="p-4 bg-zinc-50 border border-zinc-200/80 rounded-xl space-y-3" id="cora-wa-activator-card">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                                <div class="flex items-start sm:items-center gap-2.5">
+                                    <div class="w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0 mt-0.5 sm:mt-0">
+                                        <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" class="text-emerald-600"><path d="M17.472 14.382c-.301-.15-1.78-.878-2.056-.979-.275-.1-.475-.15-.675.15-.2.3-.775.979-.95 1.18-.175.2-.35.225-.65.075-.3-.15-1.267-.467-2.414-1.489-.893-.796-1.496-1.78-1.671-2.08-.175-.3-.019-.462.131-.611.135-.134.3-.35.45-.525.15-.175.2-.3.3-.5.1-.2.05-.375-.025-.525-.075-.15-.675-1.625-.925-2.225-.244-.584-.492-.505-.675-.514-.175-.009-.375-.01-.575-.01s-.525.075-.8.375c-.275.3-1.05 1.025-1.05 2.5s1.075 2.898 1.225 3.1c.15.2 2.115 3.23 5.125 4.53.716.31 1.275.495 1.71.633.72.228 1.375.196 1.893.118.577-.087 1.78-.727 2.03-1.428.25-.7.25-1.3.175-1.428-.075-.128-.275-.203-.575-.353zM12.04 2C6.516 2 2.022 6.49 2.022 12c0 1.954.563 3.78 1.541 5.334L2 22l4.81-1.523A9.972 9.972 0 0 0 12.04 22c5.523 0 10.018-4.49 10.018-10S17.563 2 12.04 2zm0 18.232c-1.62 0-3.13-.48-4.404-1.312l-.316-.208-2.854.903.92-2.78-.205-.327A8.212 8.212 0 0 1 3.822 12c0-4.53 3.687-8.216 8.218-8.216 4.53 0 8.218 3.686 8.218 8.216 0 4.53-3.688 8.232-8.218 8.232z"/></svg>
+                                    </div>
+                                    <div>
+                                        <div class="flex items-center gap-2">
+                                            <h4 class="text-xs font-bold text-zinc-900">24-Hour Free Session Activator</h4>
+                                            <span class="text-[9.5px] px-2 py-0.5 rounded-full font-semibold bg-emerald-100 text-emerald-800">₹0 Free Window</span>
+                                        </div>
+                                        <p class="text-[11px] text-zinc-500 mt-0.5">Clicking Activate opens WhatsApp with a pre-filled activation message. Sending it starts Meta's 24-hour Free Customer Service Window (1,000 free monthly messages, 0 extra fees).</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-1.5 shrink-0 self-start sm:self-center">
+                                    <span id="cora-wa-live-window-badge" class="text-[10px] px-2.5 py-1 rounded-full font-bold border inline-flex items-center gap-1.5 <?php echo $cora_wa_session_window['active'] ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200'; ?>">
+                                        <span class="w-1.5 h-1.5 rounded-full <?php echo $cora_wa_session_window['active'] ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'; ?>"></span>
+                                        <span id="cora-wa-live-window-text"><?php echo $cora_wa_session_window['active'] ? 'Active (' . esc_html( $cora_wa_session_window['remaining_human'] ) . ')' : 'Outside 24h Window (Click Activate)'; ?></span>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Action Row: 1-Click WhatsApp Activation (Default) + Send Daily Push to All Users + Copy Link -->
+                            <div class="flex flex-wrap items-center gap-2 pt-1 border-t border-zinc-200/60">
+                                <button type="button" id="cora-wa-activate-btn" onclick="coraOpenWhatsAppActivation()" class="px-3.5 py-2 rounded-lg bg-zinc-900 hover:bg-black text-white text-xs font-semibold transition-all shadow-2xs inline-flex items-center gap-2 cursor-pointer active:scale-[0.98]">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" class="text-emerald-400"><path d="M17.472 14.382c-.301-.15-1.78-.878-2.056-.979-.275-.1-.475-.15-.675.15-.2.3-.775.979-.95 1.18-.175.2-.35.225-.65.075-.3-.15-1.267-.467-2.414-1.489-.893-.796-1.496-1.78-1.671-2.08-.175-.3-.019-.462.131-.611.135-.134.3-.35.45-.525.15-.175.2-.3.3-.5.1-.2.05-.375-.025-.525-.075-.15-.675-1.625-.925-2.225-.244-.584-.492-.505-.675-.514-.175-.009-.375-.01-.575-.01s-.525.075-.8.375c-.275.3-1.05 1.025-1.05 2.5s1.075 2.898 1.225 3.1c.15.2 2.115 3.23 5.125 4.53.716.31 1.275.495 1.71.633.72.228 1.375.196 1.893.118.577-.087 1.78-.727 2.03-1.428.25-.7.25-1.3.175-1.428-.075-.128-.275-.203-.575-.353zM12.04 2C6.516 2 2.022 6.49 2.022 12c0 1.954.563 3.78 1.541 5.334L2 22l4.81-1.523A9.972 9.972 0 0 0 12.04 22c5.523 0 10.018-4.49 10.018-10S17.563 2 12.04 2zm0 18.232c-1.62 0-3.13-.48-4.404-1.312l-.316-.208-2.854.903.92-2.78-.205-.327A8.212 8.212 0 0 1 3.822 12c0-4.53 3.687-8.216 8.218-8.216 4.53 0 8.218 3.686 8.218 8.216 0 4.53-3.688 8.232-8.218 8.232z"/></svg>
+                                    <span>Activate WhatsApp Session</span>
+                                </button>
+                                <button type="button" id="cora-wa-push-btn" onclick="coraTriggerDailyWhatsAppPush()" class="px-3 py-2 rounded-lg border border-zinc-200 hover:bg-zinc-100 text-zinc-700 text-xs font-semibold transition-all inline-flex items-center gap-1.5 cursor-pointer">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                                    <span id="cora-wa-push-label">Send 24h Push to All Users</span>
+                                </button>
+                                <button type="button" onclick="coraCopyText('cora-wa-activation-link-hidden', 'WhatsApp activation link copied to clipboard!')" class="px-3 py-2 rounded-lg border border-zinc-200 hover:bg-zinc-100 text-zinc-700 text-xs font-semibold transition-all inline-flex items-center gap-1.5 cursor-pointer">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                    <span>Copy Activation Link</span>
+                                </button>
+                                <button type="button" onclick="coraRefreshWhatsAppSessionStatus()" class="px-2.5 py-2 rounded-lg border border-zinc-200 hover:bg-zinc-100 text-zinc-500 hover:text-zinc-800 text-xs transition-all inline-flex items-center gap-1" title="Refresh Session Window Status">
+                                    <svg id="cora-wa-refresh-icon" viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                                </button>
+                                <input type="hidden" id="cora-wa-activation-link-hidden" value="<?php echo esc_attr( $cora_wa_activation_url ); ?>">
+                                <input type="hidden" id="cora-wa-activation-redirect-hidden" value="<?php echo esc_attr( $cora_wa_activation_redirect ); ?>">
+                            </div>
+                        </div>
+
                         <!-- Credentials Grid -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div class="flex flex-col gap-1.5">
@@ -10221,6 +10363,42 @@ textarea,
                                     <svg id="cora-wa-eye-icon" viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                                 </button>
                             </div>
+                        </div>
+
+                        <!-- Automation Defaults Grid -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                            <div class="flex flex-col gap-1.5">
+                                <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider flex items-center justify-between">
+                                    <span>Admin Alert WhatsApp Number</span>
+                                    <span class="text-[9.5px] font-normal lowercase text-zinc-400">e.g. +91 98170 59266</span>
+                                </label>
+                                <input type="text" id="cora-wa-admin-phone" class="w-full border border-zinc-200 rounded-lg px-3 py-2 text-sm bg-white focus:border-zinc-400 focus:outline-none font-mono text-zinc-800 placeholder:font-sans placeholder:text-zinc-300 transition-all" value="<?php echo esc_attr( $cora_wa_admin_phone ); ?>" placeholder="+91 98170 59266">
+                            </div>
+                            <div class="flex flex-col gap-1.5">
+                                <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider flex items-center justify-between">
+                                    <span>Default Meta Template Name</span>
+                                    <span class="text-[9.5px] font-normal lowercase text-zinc-400">for automated outreach</span>
+                                </label>
+                                <input type="text" id="cora-wa-default-template" class="w-full border border-zinc-200 rounded-lg px-3 py-2 text-sm bg-white focus:border-zinc-400 focus:outline-none font-mono text-zinc-800 placeholder:font-sans placeholder:text-zinc-300 transition-all" value="<?php echo esc_attr( $cora_wa_default_tpl ); ?>" placeholder="jaspers_market_order_confirmation_v1">
+                            </div>
+                        </div>
+
+                        <!-- Automation Toggles -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 bg-zinc-50/70 border border-zinc-200/80 rounded-xl">
+                            <label class="flex items-start gap-2.5 cursor-pointer text-left">
+                                <input type="checkbox" id="cora-wa-auto-leads" class="mt-0.5 rounded border-zinc-300 text-zinc-900 focus:ring-0" <?php checked( $cora_wa_auto_leads ); ?>>
+                                <div class="text-[11px] leading-snug">
+                                    <span class="font-bold text-zinc-900 block">Instant Lead Alerts to Admin</span>
+                                    <span class="text-zinc-500 text-[10.5px]">Automatically send WhatsApp alerts when a visitor or client submits a form.</span>
+                                </div>
+                            </label>
+                            <label class="flex items-start gap-2.5 cursor-pointer text-left">
+                                <input type="checkbox" id="cora-wa-auto-client" class="mt-0.5 rounded border-zinc-300 text-zinc-900 focus:ring-0" <?php checked( $cora_wa_auto_client ); ?>>
+                                <div class="text-[11px] leading-snug">
+                                    <span class="font-bold text-zinc-900 block">Client Automated Confirmations</span>
+                                    <span class="text-zinc-500 text-[10.5px]">Auto-dispatch WhatsApp confirmation / order template to client mobile.</span>
+                                </div>
+                            </label>
                         </div>
 
                         <!-- Webhook Setup Banner for Meta Developers -->
@@ -10299,24 +10477,59 @@ textarea,
                         <div class="p-5 space-y-4">
                             <div>
                                 <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-1">Recipient Mobile Number <span class="text-rose-500">*</span></label>
-                                <input type="text" id="cora-wa-test-phone" class="w-full border border-zinc-200 rounded-lg px-3 py-2 text-sm bg-white focus:border-zinc-400 focus:outline-none font-mono text-zinc-900 placeholder:font-sans placeholder:text-zinc-300" placeholder="+91 98765 43210" oninput="coraCheckTestPhoneWindow(this.value)">
-                                <p class="text-[10px] text-zinc-400 mt-1">Include country code (e.g. 91 for India, 1 for US/Canada). If using a Meta test number, make sure this recipient is added to your verified test recipient list.</p>
+                                <input type="text" id="cora-wa-test-phone" class="w-full border border-zinc-200 rounded-lg px-3 py-2 text-sm bg-white focus:border-zinc-400 focus:outline-none font-mono text-zinc-900 placeholder:font-sans placeholder:text-zinc-300" value="<?php echo esc_attr( $cora_wa_admin_phone ?: '919817059266' ); ?>" placeholder="+91 98170 59266" oninput="coraCheckTestPhoneWindow(this.value)">
+                                <p class="text-[10px] text-zinc-400 mt-1">Include country code without special characters (e.g. 919817059266).</p>
                             </div>
 
                             <!-- 24-hour Window Status Indicator for Target Number -->
                             <div id="cora-wa-test-window-box" class="p-2.5 bg-zinc-50 border border-zinc-200/80 rounded-xl flex items-center justify-between text-[11px]">
-                                <span class="text-zinc-500">24-Hour Window Status:</span>
-                                <span id="cora-wa-test-window-badge" class="font-bold text-zinc-700">Enter number above</span>
+                                <span class="text-zinc-500">24-Hour Service Window:</span>
+                                <span id="cora-wa-test-window-badge" class="font-bold text-zinc-700">Checking...</span>
                             </div>
 
-                            <div>
-                                <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-1">Message Preview / Custom Text</label>
-                                <textarea id="cora-wa-test-body" rows="3" class="w-full border border-zinc-200 rounded-lg px-3 py-2 text-xs bg-white focus:border-zinc-400 focus:outline-none text-zinc-800 placeholder:text-zinc-300 leading-relaxed font-sans" placeholder="Cora Workspace WhatsApp Test: Your connection is live and active!"></textarea>
+                            <!-- Level 01 Segmented Control: Template vs Free-form -->
+                            <div class="p-1 bg-zinc-100/90 rounded-xl border border-zinc-200/70 grid grid-cols-2 gap-1 text-center">
+                                <button type="button" id="cora-wa-tab-tpl" onclick="coraSwitchWaTestTab('template')" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-white shadow-2xs text-zinc-950 transition-all">
+                                    Meta Template (Orders/Leads)
+                                </button>
+                                <button type="button" id="cora-wa-tab-ses" onclick="coraSwitchWaTestTab('session')" class="px-3 py-1.5 text-xs font-semibold rounded-lg text-zinc-600 hover:text-zinc-900 transition-all">
+                                    Free-form Text (24h Window)
+                                </button>
+                            </div>
+
+                            <!-- Template Mode Fields -->
+                            <div id="cora-wa-test-template-fields" class="space-y-3">
+                                <div>
+                                    <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-1">Template Name</label>
+                                    <input type="text" id="cora-wa-test-template-name" class="w-full border border-zinc-200 rounded-lg px-3 py-1.5 text-xs font-mono bg-white text-zinc-800" value="<?php echo esc_attr( $cora_wa_default_tpl ?: 'jaspers_market_order_confirmation_v1' ); ?>">
+                                </div>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <div>
+                                        <label class="text-[9.5px] font-bold text-zinc-400 uppercase tracking-wider block mb-1">Param 1: Name</label>
+                                        <input type="text" id="cora-wa-test-param-name" class="w-full border border-zinc-200 rounded-lg px-2.5 py-1 text-xs bg-white text-zinc-800" value="Rohan Verma">
+                                    </div>
+                                    <div>
+                                        <label class="text-[9.5px] font-bold text-zinc-400 uppercase tracking-wider block mb-1">Param 2: Ref ID</label>
+                                        <input type="text" id="cora-wa-test-param-order" class="w-full border border-zinc-200 rounded-lg px-2.5 py-1 text-xs bg-white text-zinc-800" value="123456">
+                                    </div>
+                                    <div>
+                                        <label class="text-[9.5px] font-bold text-zinc-400 uppercase tracking-wider block mb-1">Param 3: Date</label>
+                                        <input type="text" id="cora-wa-test-param-date" class="w-full border border-zinc-200 rounded-lg px-2.5 py-1 text-xs bg-white text-zinc-800" value="<?php echo esc_attr( current_time( 'M j, Y' ) ); ?>">
+                                    </div>
+                                </div>
+                                <p class="text-[10px] text-zinc-400">Pre-approved Meta templates can be dispatched immediately to any verified recipient, even without an active 24h conversation.</p>
+                            </div>
+
+                            <!-- Session Mode Fields -->
+                            <div id="cora-wa-test-session-fields" style="display:none;" class="space-y-2">
+                                <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-1">Custom Message Body</label>
+                                <textarea id="cora-wa-test-body" rows="3" class="w-full border border-zinc-200 rounded-lg px-3 py-2 text-xs bg-white focus:border-zinc-400 focus:outline-none text-zinc-800 placeholder:text-zinc-300 leading-relaxed font-sans" placeholder="Cora Workspace WhatsApp Test: Your automated connection is live and active!"></textarea>
+                                <p class="text-[10px] text-zinc-400">Free-form messages require that the customer has sent a message within the last 24 hours.</p>
                             </div>
 
                             <div class="flex items-center justify-end gap-2 pt-2 border-t border-zinc-100">
                                 <button type="button" onclick="coraCloseWhatsAppTestModal()" class="px-3 py-2 rounded-lg border border-zinc-200 text-zinc-600 hover:bg-zinc-50 text-xs font-semibold transition-colors">Cancel</button>
-                                <button type="button" id="cora-wa-send-test-btn" onclick="coraSendWhatsAppTestMessage()" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-all shadow-2xs inline-flex items-center gap-1.5">
+                                <button type="button" id="cora-wa-send-test-btn" onclick="coraSendWhatsAppTestMessage()" class="px-4 py-2 rounded-lg bg-zinc-900 hover:bg-black text-white text-xs font-semibold transition-all shadow-2xs inline-flex items-center gap-1.5">
                                     <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                                     <span id="cora-wa-send-test-label">Send Message</span>
                                 </button>
@@ -10326,6 +10539,8 @@ textarea,
                 </div>
 
                 <script>
+                window.coraWaActiveTestTab = 'template';
+
                 window.coraToggleWaTokenVisibility = function() {
                     var input = document.getElementById('cora-wa-access-token');
                     if (!input) return;
@@ -10348,6 +10563,10 @@ textarea,
                     var wabaId      = (document.getElementById('cora-wa-waba-id') || {}).value || '';
                     var token       = (document.getElementById('cora-wa-access-token') || {}).value || '';
                     var verifyToken = (document.getElementById('cora-wa-verify-token') || {}).value || '';
+                    var adminPhone  = (document.getElementById('cora-wa-admin-phone') || {}).value || '';
+                    var defaultTpl  = (document.getElementById('cora-wa-default-template') || {}).value || '';
+                    var autoLeads   = (document.getElementById('cora-wa-auto-leads') || {}).checked ? '1' : '0';
+                    var autoClient  = (document.getElementById('cora-wa-auto-client') || {}).checked ? '1' : '0';
                     var saveBtn     = document.getElementById('cora-wa-save-btn');
                     var saveLabel   = document.getElementById('cora-wa-save-label');
 
@@ -10369,6 +10588,10 @@ textarea,
                             waba_id: wabaId,
                             access_token: token,
                             verify_token: verifyToken,
+                            admin_phone: adminPhone,
+                            default_template: defaultTpl,
+                            auto_leads_enabled: autoLeads,
+                            auto_client_confirmation: autoClient,
                             enabled: '1'
                         },
                         success: function(r) {
@@ -10439,12 +10662,38 @@ textarea,
 
                 window.coraOpenWhatsAppTestModal = function() {
                     var modal = document.getElementById('cora-wa-test-modal');
-                    if (modal) modal.style.display = 'flex';
+                    if (modal) {
+                        modal.style.display = 'flex';
+                        var phoneInput = document.getElementById('cora-wa-test-phone');
+                        if (phoneInput && phoneInput.value) {
+                            coraCheckTestPhoneWindow(phoneInput.value);
+                        }
+                    }
                 };
 
                 window.coraCloseWhatsAppTestModal = function() {
                     var modal = document.getElementById('cora-wa-test-modal');
                     if (modal) modal.style.display = 'none';
+                };
+
+                window.coraSwitchWaTestTab = function(mode) {
+                    window.coraWaActiveTestTab = mode;
+                    var tplTab = document.getElementById('cora-wa-tab-tpl');
+                    var sesTab = document.getElementById('cora-wa-tab-ses');
+                    var tplFields = document.getElementById('cora-wa-test-template-fields');
+                    var sesFields = document.getElementById('cora-wa-test-session-fields');
+
+                    if (mode === 'template') {
+                        if (tplTab) { tplTab.className = 'px-3 py-1.5 text-xs font-bold rounded-lg bg-white shadow-2xs text-zinc-950 transition-all'; }
+                        if (sesTab) { sesTab.className = 'px-3 py-1.5 text-xs font-semibold rounded-lg text-zinc-600 hover:text-zinc-900 transition-all'; }
+                        if (tplFields) tplFields.style.display = 'block';
+                        if (sesFields) sesFields.style.display = 'none';
+                    } else {
+                        if (tplTab) { tplTab.className = 'px-3 py-1.5 text-xs font-semibold rounded-lg text-zinc-600 hover:text-zinc-900 transition-all'; }
+                        if (sesTab) { sesTab.className = 'px-3 py-1.5 text-xs font-bold rounded-lg bg-white shadow-2xs text-zinc-950 transition-all'; }
+                        if (tplFields) tplFields.style.display = 'none';
+                        if (sesFields) sesFields.style.display = 'block';
+                    }
                 };
 
                 window.coraCheckTestPhoneWindow = function(phone) {
@@ -10472,7 +10721,7 @@ textarea,
                                         badge.textContent = 'Active (' + sw.remaining_human + ' - Free Tier)';
                                     } else {
                                         badge.className = 'font-bold text-amber-600';
-                                        badge.textContent = 'Expired (Template / Re-engagement)';
+                                        badge.textContent = 'Outside 24h Window (Template Mode)';
                                     }
                                 }
                             }
@@ -10482,7 +10731,7 @@ textarea,
 
                 window.coraSendWhatsAppTestMessage = function() {
                     var phone = (document.getElementById('cora-wa-test-phone') || {}).value || '';
-                    var body  = (document.getElementById('cora-wa-test-body') || {}).value || '';
+                    var mode  = window.coraWaActiveTestTab || 'template';
                     var btn   = document.getElementById('cora-wa-send-test-btn');
                     var label = document.getElementById('cora-wa-send-test-label');
 
@@ -10494,21 +10743,32 @@ textarea,
                     if (btn) btn.disabled = true;
                     if (label) label.textContent = 'Sending…';
 
+                    var postData = {
+                        action: 'cora_whatsapp_send_test',
+                        nonce: coraREData.ajaxNonce,
+                        recipient_phone: phone,
+                        message_type: mode
+                    };
+
+                    if (mode === 'template') {
+                        postData.template_name  = (document.getElementById('cora-wa-test-template-name') || {}).value || 'jaspers_market_order_confirmation_v1';
+                        postData.param_name     = (document.getElementById('cora-wa-test-param-name') || {}).value || 'Rohan Verma';
+                        postData.param_order_id = (document.getElementById('cora-wa-test-param-order') || {}).value || '123456';
+                        postData.param_date     = (document.getElementById('cora-wa-test-param-date') || {}).value || 'Oct 17, 2026';
+                    } else {
+                        postData.custom_message = (document.getElementById('cora-wa-test-body') || {}).value || '';
+                    }
+
                     jQuery.ajax({
                         url: coraREData.ajaxUrl,
                         type: 'POST',
-                        data: {
-                            action: 'cora_whatsapp_send_test',
-                            nonce: coraREData.ajaxNonce,
-                            recipient_phone: phone,
-                            custom_message: body
-                        },
+                        data: postData,
                         success: function(r) {
                             if (btn) btn.disabled = false;
                             if (label) label.textContent = 'Send Message';
 
                             if (r.success) {
-                                if (window.coraShowToast) window.coraShowToast(r.data.message || 'WhatsApp message sent successfully!', 'success');
+                                if (window.coraShowToast) window.coraShowToast(r.data.message || 'WhatsApp message dispatched successfully!', 'success');
                                 coraCloseWhatsAppTestModal();
                             } else {
                                 if (window.coraShowToast) window.coraShowToast((r.data && r.data.message) ? r.data.message : 'Failed to send message.', 'error');
@@ -10518,6 +10778,101 @@ textarea,
                             if (btn) btn.disabled = false;
                             if (label) label.textContent = 'Send Message';
                             if (window.coraShowToast) window.coraShowToast('Network error while dispatching test message.', 'error');
+                        }
+                    });
+                };
+
+                window.coraOpenWhatsAppActivation = function() {
+                    var hiddenInput = document.getElementById('cora-wa-activation-link-hidden');
+                    var activationUrl = hiddenInput ? hiddenInput.value : '';
+                    if (!activationUrl) {
+                        activationUrl = 'https://wa.me/15556698957?text=' + encodeURIComponent('Activate Daily Briefing & Workspace Alerts 🚀');
+                    }
+                    if (window.coraShowToast) {
+                        window.coraShowToast('Opening WhatsApp... Send the pre-filled message to activate your 24-hour free window.', 'info');
+                    }
+                    window.open(activationUrl, '_blank');
+                };
+
+                window.coraTriggerDailyWhatsAppPush = function() {
+                    var btn = document.getElementById('cora-wa-push-btn');
+                    var label = document.getElementById('cora-wa-push-label');
+                    if (btn) btn.disabled = true;
+                    if (label) label.textContent = 'Sending Push…';
+
+                    var ajaxUrl = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : (window.ajaxurl || '/wp-admin/admin-ajax.php');
+                    var nonce = (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : '';
+
+                    jQuery.ajax({
+                        url: ajaxUrl,
+                        type: 'POST',
+                        data: {
+                            action: 'cora_whatsapp_trigger_daily_push',
+                            nonce: nonce
+                        },
+                        success: function(r) {
+                            if (btn) btn.disabled = false;
+                            if (label) label.textContent = 'Send 24h Push to All Users';
+
+                            if (r.success && r.data) {
+                                if (window.coraShowToast) {
+                                    window.coraShowToast(r.data.message || 'WhatsApp activation push dispatched to all workspace users!', 'success');
+                                }
+                            } else {
+                                if (window.coraShowToast) {
+                                    window.coraShowToast((r.data && r.data.message) ? r.data.message : 'Error dispatching push notification.', 'error');
+                                }
+                            }
+                        },
+                        error: function() {
+                            if (btn) btn.disabled = false;
+                            if (label) label.textContent = 'Send 24h Push to All Users';
+                            if (window.coraShowToast) {
+                                window.coraShowToast('Network error while dispatching daily WhatsApp push.', 'error');
+                            }
+                        }
+                    });
+                };
+
+                window.coraRefreshWhatsAppSessionStatus = function() {
+                    var adminPhone = (document.getElementById('cora-wa-admin-phone') || {}).value || '919817059266';
+                    var icon = document.getElementById('cora-wa-refresh-icon');
+                    if (icon) icon.classList.add('animate-spin');
+
+                    var ajaxUrl = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : (window.ajaxurl || '/wp-admin/admin-ajax.php');
+                    var nonce = (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : '';
+
+                    jQuery.ajax({
+                        url: ajaxUrl,
+                        type: 'POST',
+                        data: {
+                            action: 'cora_whatsapp_get_status',
+                            nonce: nonce,
+                            phone: adminPhone
+                        },
+                        success: function(r) {
+                            if (icon) icon.classList.remove('animate-spin');
+                            if (r.success && r.data && r.data.session_window) {
+                                var sw = r.data.session_window;
+                                var badge = document.getElementById('cora-wa-live-window-badge');
+                                var text = document.getElementById('cora-wa-live-window-text');
+                                if (badge && text) {
+                                    if (sw.active) {
+                                        badge.className = 'text-[10px] px-2.5 py-1 rounded-full font-bold border inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 border-emerald-200';
+                                        text.textContent = 'Active (' + sw.remaining_human + ')';
+                                    } else {
+                                        badge.className = 'text-[10px] px-2.5 py-1 rounded-full font-bold border inline-flex items-center gap-1.5 bg-amber-50 text-amber-700 border-amber-200';
+                                        text.textContent = 'Outside 24h Window (Click Activate)';
+                                    }
+                                }
+                                if (window.coraShowToast) {
+                                    window.coraShowToast(sw.active ? '24-Hour window is ACTIVE (' + sw.remaining_human + ' remaining).' : 'Window expired. Click Activate to unlock a free 24-hour session.', sw.active ? 'success' : 'info');
+                                }
+                            }
+                        },
+                        error: function() {
+                            if (icon) icon.classList.remove('animate-spin');
+                            if (window.coraShowToast) window.coraShowToast('Failed to check WhatsApp session status.', 'error');
                         }
                     });
                 };
@@ -11457,7 +11812,7 @@ textarea,
 
             <!-- SECTION: TASKS -->
     <!-- Local backdrop for AI bottom sheet sidebar (mobile/tablet only) -->
-    <div id="cora-ai-sidebar-backdrop" onclick="window.coraToggleSidebar(false)" class="hidden" style="display:none; position:fixed; inset:0; z-index:100005; background:transparent; backdrop-filter:none; -webkit-backdrop-filter:none; pointer-events:none;"></div>
+    <div id="cora-ai-sidebar-backdrop" onclick="window.coraToggleSidebar(false)" class="hidden" style="display:none; position:fixed; top:52px; right:0; bottom:0; left:0; z-index:100005; background:transparent; backdrop-filter:none; -webkit-backdrop-filter:none; pointer-events:none;"></div>
 
     <script>
     window.coraToggleConversationsDropdown = function(e) {

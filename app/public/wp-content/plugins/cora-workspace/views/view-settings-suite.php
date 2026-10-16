@@ -1668,7 +1668,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                                 </label>
                                 <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200/50">
                                     <span class="w-1 h-1 rounded-full bg-emerald-500 animate-pulse"></span>
-                                    Graph v20.0
+                                    Graph v25.0
                                 </span>
                             </div>
                             <?php $wa_token = get_option('cora_whatsapp_api_token', ''); ?>
@@ -1789,7 +1789,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         </div>
 
                         <!-- WhatsApp Cloud Alerts -->
-                        <div class="p-4 rounded-xl border border-zinc-200 bg-zinc-50/60 flex flex-col justify-between space-y-4">
+                        <div class="p-4 rounded-xl border border-zinc-200 bg-zinc-50/60 flex flex-col justify-between space-y-3">
                             <div class="flex items-start justify-between gap-2">
                                 <div>
                                     <div class="flex items-center gap-1.5 flex-wrap">
@@ -1802,6 +1802,19 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                                 </div>
                                 <span class="w-2.5 h-2.5 rounded-full <?php echo ( $global_whatsapp && $wa_configured ) ? 'bg-emerald-500' : 'bg-zinc-300'; ?> shrink-0 mt-0.5"></span>
                             </div>
+
+                            <!-- 1-Click WhatsApp Session Quick Activator -->
+                            <div class="pt-2 border-t border-zinc-200/60 flex items-center justify-between gap-2">
+                                <button type="button" onclick="if(window.coraOpenWhatsAppActivation){window.coraOpenWhatsAppActivation();}else{window.open('<?php echo esc_url( class_exists('Cora_WhatsApp_Gateway') ? Cora_WhatsApp_Gateway::instance()->get_activation_url() : 'https://wa.me/15556698957' ); ?>', '_blank');}" class="px-2.5 py-1.5 rounded-lg bg-zinc-900 hover:bg-black text-white text-[11px] font-semibold transition-all inline-flex items-center gap-1.5 cursor-pointer shadow-3xs active:scale-[0.98]">
+                                    <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" class="text-emerald-400"><path d="M17.472 14.382c-.301-.15-1.78-.878-2.056-.979-.275-.1-.475-.15-.675.15-.2.3-.775.979-.95 1.18-.175.2-.35.225-.65.075-.3-.15-1.267-.467-2.414-1.489-.893-.796-1.496-1.78-1.671-2.08-.175-.3-.019-.462.131-.611.135-.134.3-.35.45-.525.15-.175.2-.3.3-.5.1-.2.05-.375-.025-.525-.075-.15-.675-1.625-.925-2.225-.244-.584-.492-.505-.675-.514-.175-.009-.375-.01-.575-.01s-.525.075-.8.375c-.275.3-1.05 1.025-1.05 2.5s1.075 2.898 1.225 3.1c.15.2 2.115 3.23 5.125 4.53.716.31 1.275.495 1.71.633.72.228 1.375.196 1.893.118.577-.087 1.78-.727 2.03-1.428.25-.7.25-1.3.175-1.428-.075-.128-.275-.203-.575-.353zM12.04 2C6.516 2 2.022 6.49 2.022 12c0 1.954.563 3.78 1.541 5.334L2 22l4.81-1.523A9.972 9.972 0 0 0 12.04 22c5.523 0 10.018-4.49 10.018-10S17.563 2 12.04 2zm0 18.232c-1.62 0-3.13-.48-4.404-1.312l-.316-.208-2.854.903.92-2.78-.205-.327A8.212 8.212 0 0 1 3.822 12c0-4.53 3.687-8.216 8.218-8.216 4.53 0 8.218 3.686 8.218 8.216 0 4.53-3.688 8.232-8.218 8.232z"/></svg>
+                                    <span>Activate Session</span>
+                                </button>
+                                <button type="button" onclick="if(window.coraTriggerDailyWhatsAppPush){window.coraTriggerDailyWhatsAppPush();}" class="text-[10px] font-bold text-zinc-700 bg-white border border-zinc-200 hover:bg-zinc-100 px-2 py-1.5 rounded-lg transition-all shadow-3xs cursor-pointer active:scale-95 inline-flex items-center gap-1" title="Send 24-Hour WhatsApp Activation Push Notification to All Users">
+                                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                                    <span>24h Push</span>
+                                </button>
+                            </div>
+
                             <div class="flex items-center justify-between pt-1">
                                 <span class="text-xs font-medium text-zinc-600">Active</span>
                                 <label class="cora-switch">
@@ -2100,7 +2113,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         </div>
                         <div class="text-[11px] text-zinc-400 font-mono flex items-center gap-3">
                             <span>VAPID Web Push: <strong class="text-zinc-700 font-semibold">ES256</strong></span>
-                            <span>Meta WhatsApp: <strong class="text-zinc-700 font-semibold">Graph v20.0</strong></span>
+                            <span>Meta WhatsApp: <strong class="text-zinc-700 font-semibold">Graph v25.0</strong></span>
                         </div>
                     </div>
                 </div>

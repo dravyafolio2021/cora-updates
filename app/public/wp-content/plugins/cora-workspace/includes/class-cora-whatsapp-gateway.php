@@ -25,7 +25,7 @@ class Cora_WhatsApp_Gateway {
     /**
      * Meta Graph API Version
      */
-    const GRAPH_API_VERSION = 'v21.0';
+    const GRAPH_API_VERSION = 'v25.0';
     const GRAPH_API_BASE    = 'https://graph.facebook.com';
 
     /**
@@ -63,6 +63,10 @@ class Cora_WhatsApp_Gateway {
         $verify_token = get_option( 'cora_wa_verify_token', '' );
         $app_secret   = get_option( 'cora_wa_app_secret', '' );
         $enabled      = get_option( 'cora_wa_enabled', '1' ) === '1';
+        $admin_phone  = get_option( 'cora_wa_admin_phone', '' );
+        $default_tpl  = get_option( 'cora_wa_default_template', 'jaspers_market_order_confirmation_v1' );
+        $auto_leads   = get_option( 'cora_wa_auto_leads_enabled', '1' ) === '1';
+        $auto_client  = get_option( 'cora_wa_auto_client_confirmation', '1' ) === '1';
 
         // Auto-generate default verify token if empty
         if ( empty( $verify_token ) ) {
@@ -71,14 +75,18 @@ class Cora_WhatsApp_Gateway {
         }
 
         return array(
-            'phone_number_id' => trim( $phone_id ),
-            'waba_id'         => trim( $waba_id ),
-            'access_token'    => trim( $access_token ),
-            'verify_token'    => trim( $verify_token ),
-            'app_secret'      => trim( $app_secret ),
-            'enabled'         => $enabled,
-            'is_configured'   => ! empty( $phone_id ) && ! empty( $access_token ),
-            'webhook_url'     => rest_url( 'cora/v1/whatsapp/webhook' ),
+            'phone_number_id'          => trim( $phone_id ),
+            'waba_id'                  => trim( $waba_id ),
+            'access_token'             => trim( $access_token ),
+            'verify_token'             => trim( $verify_token ),
+            'app_secret'               => trim( $app_secret ),
+            'enabled'                  => $enabled,
+            'is_configured'            => ! empty( $phone_id ) && ! empty( $access_token ),
+            'webhook_url'              => rest_url( 'cora/v1/whatsapp/webhook' ),
+            'admin_phone'              => trim( $admin_phone ),
+            'default_template'         => trim( $default_tpl ),
+            'auto_leads_enabled'       => $auto_leads,
+            'auto_client_confirmation' => $auto_client,
         );
     }
 
@@ -91,12 +99,19 @@ class Cora_WhatsApp_Gateway {
      * @param string $verify_token
      * @param bool   $enabled
      * @param string $app_secret
+     * @param string|null $admin_phone
+     * @param string|null $default_template
+     * @param bool|null   $auto_leads_enabled
+     * @param bool|null   $auto_client_confirmation
      * @return bool
      */
-    public function save_settings( $phone_number_id, $waba_id, $access_token, $verify_token = '', $enabled = true, $app_secret = '' ) {
+    public function save_settings( $phone_number_id, $waba_id, $access_token, $verify_token = '', $enabled = true, $app_secret = '', $admin_phone = null, $default_template = null, $auto_leads_enabled = null, $auto_client_confirmation = null ) {
         update_option( 'cora_wa_phone_number_id', sanitize_text_field( trim( $phone_number_id ) ) );
         update_option( 'cora_wa_waba_id', sanitize_text_field( trim( $waba_id ) ) );
         update_option( 'cora_wa_access_token', sanitize_text_field( trim( $access_token ) ) );
+        // Synchronize legacy options for complete backward-compatibility across all modules
+        update_option( 'cora_whatsapp_phone_number_id', sanitize_text_field( trim( $phone_number_id ) ) );
+        update_option( 'cora_whatsapp_api_token', sanitize_text_field( trim( $access_token ) ) );
         if ( ! empty( $verify_token ) ) {
             update_option( 'cora_wa_verify_token', sanitize_text_field( trim( $verify_token ) ) );
         }
@@ -104,6 +119,19 @@ class Cora_WhatsApp_Gateway {
             update_option( 'cora_wa_app_secret', sanitize_text_field( trim( $app_secret ) ) );
         }
         update_option( 'cora_wa_enabled', $enabled ? '1' : '0' );
+
+        if ( null !== $admin_phone ) {
+            update_option( 'cora_wa_admin_phone', sanitize_text_field( trim( $admin_phone ) ) );
+        }
+        if ( null !== $default_template ) {
+            update_option( 'cora_wa_default_template', sanitize_text_field( trim( $default_template ) ) );
+        }
+        if ( null !== $auto_leads_enabled ) {
+            update_option( 'cora_wa_auto_leads_enabled', $auto_leads_enabled ? '1' : '0' );
+        }
+        if ( null !== $auto_client_confirmation ) {
+            update_option( 'cora_wa_auto_client_confirmation', $auto_client_confirmation ? '1' : '0' );
+        }
 
         // Clear connection cache
         delete_transient( 'cora_wa_connection_status' );
@@ -126,11 +154,6 @@ class Cora_WhatsApp_Gateway {
 
             if ( empty( $app_secret ) && defined( 'CORA_WA_APP_SECRET' ) && ! empty( CORA_WA_APP_SECRET ) ) {
                 $app_secret = CORA_WA_APP_SECRET;
-            }
-
-            // If no explicit app_secret is set, use verify_token as fallback signing key
-            if ( empty( $app_secret ) && ! empty( $settings['verify_token'] ) ) {
-                $app_secret = $settings['verify_token'];
             }
         }
 
@@ -271,6 +294,139 @@ class Cora_WhatsApp_Gateway {
     }
 
     /**
+     * Get direct WhatsApp deep-link URL to initiate or activate the 24h Free Window
+     *
+     * @param string $custom_text Pre-filled message text
+     * @return string
+     */
+    public function get_activation_url( $custom_text = '' ) {
+        $status = get_transient( 'cora_wa_connection_status' );
+        $phone_digits = '';
+        if ( ! empty( $status['display_phone_number'] ) ) {
+            $phone_digits = preg_replace( '/[^\d]/', '', $status['display_phone_number'] );
+        }
+        if ( empty( $phone_digits ) ) {
+            $settings = $this->get_settings();
+            // Default to test number digits if available
+            $phone_digits = ! empty( $settings['phone_number_id'] ) ? '15556698957' : '15556698957';
+        }
+
+        $text = ! empty( $custom_text )
+            ? $custom_text
+            : 'Activate Daily Briefing & Workspace Alerts 🚀';
+
+        return 'https://wa.me/' . $phone_digits . '?text=' . rawurlencode( $text );
+    }
+
+    /**
+     * Get local redirect URL for PWA and web push notifications
+     *
+     * @return string
+     */
+    public function get_activation_redirect_url() {
+        return home_url( '/workspace/wa-activate' );
+    }
+
+    /**
+     * Auto-respond to incoming activation message to confirm 24h window
+     *
+     * @param string $to Recipient phone number
+     * @return array
+     */
+    public function send_daily_activation_reply( $to ) {
+        $clean_to = $this->clean_phone_number( $to );
+        if ( empty( $clean_to ) ) {
+            return array( 'success' => false, 'error' => 'Invalid recipient phone.' );
+        }
+
+        $time_str = current_time( 'g:i A, d M Y' );
+        $workspace = get_bloginfo( 'name' ) ?: 'Cora Workspace';
+
+        $body = "✅ *24-Hour Free Workspace Alerts Activated!*\n\n"
+            . "Hi! Your WhatsApp session for *{$workspace}* is now live.\n\n"
+            . "• *Status*: Active (₹0 Free Tier)\n"
+            . "• *Window*: Valid for 24 Hours\n"
+            . "• *Activated At*: {$time_str}\n"
+            . "• *Alerts Enabled*: New Leads, Project Updates, Booking Reminders\n\n"
+            . "_All notifications today will be delivered directly here. Reply anytime to refresh your 24h window._";
+
+        return $this->send_session_message( $clean_to, $body );
+    }
+
+    /**
+     * Trigger 24-Hour WhatsApp Activation Push Notification to All Users across All Workspaces
+     *
+     * @return int Number of users notified
+     */
+    public function trigger_daily_activation_push_to_all_users() {
+        if ( ! function_exists( 'get_users' ) ) {
+            return 0;
+        }
+
+        $users = get_users( array(
+            'fields' => array( 'ID', 'display_name', 'user_email' ),
+        ) );
+
+        if ( empty( $users ) ) {
+            return 0;
+        }
+
+        $title      = '🔔 Activate Today\'s WhatsApp Alerts & Daily Digest';
+        $body       = 'Tap to open WhatsApp and unlock your 24-hour free workspace updates & reminders.';
+        $action_url = $this->get_activation_redirect_url();
+        $notified   = 0;
+
+        foreach ( $users as $u ) {
+            $user_id = $u->ID;
+
+            // 1. Send native Web Push / PWA Notification if subscribed
+            if ( function_exists( 'cora_pwa_send_push_notification' ) ) {
+                cora_pwa_send_push_notification( $user_id, $title, $body, $action_url );
+            }
+
+            // 2. Also register in-app notification record for instant visibility
+            $user_notifs = get_user_meta( $user_id, 'cora_user_notifications', true );
+            if ( ! is_array( $user_notifs ) ) {
+                $user_notifs = array();
+            }
+            array_unshift( $user_notifs, array(
+                'id'         => 'wa_act_' . time() . '_' . wp_rand( 100, 999 ),
+                'type'       => 'whatsapp_activation',
+                'title'      => $title,
+                'message'    => $body,
+                'action_url' => $action_url,
+                'created_at' => current_time( 'mysql' ),
+                'read'       => false,
+            ) );
+            $user_notifs = array_slice( $user_notifs, 0, 30 );
+            update_user_meta( $user_id, 'cora_user_notifications', $user_notifs );
+
+            $notified++;
+        }
+
+        // Global workspace alert log
+        $global_notifs = get_option( 'cora_workspace_notifications', array() );
+        if ( ! is_array( $global_notifs ) ) {
+            $global_notifs = array();
+        }
+        array_unshift( $global_notifs, array(
+            'id'         => 'wa_act_global_' . time(),
+            'type'       => 'whatsapp_activation',
+            'title'      => $title,
+            'message'    => "Dispatched to {$notified} workspace users.",
+            'action_url' => $action_url,
+            'created_at' => current_time( 'mysql' ),
+            'read'       => false,
+        ) );
+        update_option( 'cora_workspace_notifications', array_slice( $global_notifs, 0, 50 ) );
+
+        // Track last dispatched time
+        update_option( 'cora_wa_last_daily_push_time', time() );
+
+        return $notified;
+    }
+
+    /**
      * Record inbound interaction to open / reset the 24-Hour Free Service Window
      *
      * @param string $phone
@@ -379,17 +535,25 @@ class Cora_WhatsApp_Gateway {
         
         // Add body parameters
         if ( ! empty( $body_parameters ) ) {
-            $params = array();
-            foreach ( $body_parameters as $param ) {
-                $params[] = array(
-                    'type' => 'text',
-                    'text' => (string) $param,
+            if ( isset( $body_parameters[0]['type'] ) && isset( $body_parameters[0]['parameters'] ) ) {
+                $components = $body_parameters;
+            } else {
+                $params = array();
+                foreach ( $body_parameters as $param ) {
+                    if ( is_array( $param ) && isset( $param['type'] ) ) {
+                        $params[] = $param;
+                    } else {
+                        $params[] = array(
+                            'type' => 'text',
+                            'text' => (string) $param,
+                        );
+                    }
+                }
+                $components[] = array(
+                    'type'       => 'body',
+                    'parameters' => $params,
                 );
             }
-            $components[] = array(
-                'type'       => 'body',
-                'parameters' => $params,
-            );
         }
 
         $payload = array(
@@ -410,6 +574,86 @@ class Cora_WhatsApp_Gateway {
         }
 
         return $this->execute_post_request( $payload );
+    }
+
+    /**
+     * Send an Automated Order / Booking / Lead Confirmation Template Message
+     *
+     * @param string $to Recipient phone number
+     * @param string $customer_name Customer / Client name
+     * @param string $reference_id Order, Booking, or Submission reference number
+     * @param string $date Date string (e.g. Oct 17, 2026)
+     * @param string $template_name Meta approved template name
+     * @param string $language_code Language code (default en_US)
+     * @return array
+     */
+    public function send_order_confirmation( $to, $customer_name, $reference_id = '', $date = '', $template_name = '', $language_code = 'en_US' ) {
+        if ( empty( $template_name ) ) {
+            $settings      = $this->get_settings();
+            $template_name = ! empty( $settings['default_template'] ) ? $settings['default_template'] : 'jaspers_market_order_confirmation_v1';
+        }
+        if ( empty( $date ) ) {
+            $date = current_time( 'M j, Y' );
+        }
+        if ( empty( $reference_id ) ) {
+            $reference_id = 'CORA-' . wp_rand( 100000, 999999 );
+        }
+
+        $parameters = array(
+            $customer_name ?: 'Valued Client',
+            (string) $reference_id,
+            $date,
+        );
+
+        return $this->send_template_message( $to, $template_name, $parameters, $language_code );
+    }
+
+    /**
+     * Dispatch an Automated Lead / Inquiry Notification via WhatsApp
+     *
+     * @param string $recipient_phone Admin or Lead phone
+     * @param array  $lead_data Array containing title, name, phone, email, date, source
+     * @param bool   $is_admin_alert True if sending to business admin, False if client confirmation
+     * @return array
+     */
+    public function send_lead_alert( $recipient_phone, $lead_data = array(), $is_admin_alert = true ) {
+        $clean_to = $this->clean_phone_number( $recipient_phone );
+        if ( empty( $clean_to ) ) {
+            return array( 'success' => false, 'error' => 'Invalid recipient phone.' );
+        }
+
+        $name   = $lead_data['name'] ?? 'Client';
+        $title  = $lead_data['title'] ?? 'Inquiry';
+        $ref_id = $lead_data['id'] ?? ( 'L-' . wp_rand( 1000, 9999 ) );
+        $date   = $lead_data['date'] ?? current_time( 'M j, Y' );
+
+        if ( $is_admin_alert ) {
+            // For admin alert, check if 24h window is open or send session text
+            $win = $this->get_session_window( $clean_to );
+            $alert_body = "*New Lead Alert: {$title}*\n\n"
+                . "• *Client*: {$name}\n"
+                . ( ! empty( $lead_data['phone'] ) ? "• *Phone*: {$lead_data['phone']}\n" : "" )
+                . ( ! empty( $lead_data['email'] ) ? "• *Email*: {$lead_data['email']}\n" : "" )
+                . "• *Ref*: #{$ref_id}\n"
+                . "• *Date*: {$date}\n\n"
+                . "_Cora Automated Messaging Gateway_";
+
+            $res = $this->send_session_message( $clean_to, $alert_body );
+            // If window expired, fall back to template
+            if ( ! $res['success'] && ! empty( $res['raw']['error']['code'] ) && 131047 === (int) $res['raw']['error']['code'] ) {
+                return $this->send_order_confirmation( $clean_to, $name, $ref_id, $date );
+            }
+            return $res;
+        } else {
+            // Client confirmation: check if session is open, else send template
+            $win = $this->get_session_window( $clean_to );
+            if ( $win['active'] ) {
+                $client_body = "Hi {$name},\n\nThank you for reaching out! We received your submission for *{$title}* (Ref: #{$ref_id}). Our team will review your inquiry and follow up shortly.";
+                return $this->send_session_message( $clean_to, $client_body );
+            } else {
+                return $this->send_order_confirmation( $clean_to, $name, $ref_id, $date );
+            }
+        }
     }
 
     /**
