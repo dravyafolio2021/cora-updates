@@ -48,6 +48,5 @@ Conduct a comprehensive analysis of the entire Cora platform (`/Users/shrutian/D
 - [x] **Maps Post Publisher & Business Hours**: Implemented standard/offer/event announcements, 7-day operating hours editor, and Local SEO 3-Pack rank tracker.
 - [x] **API Credentials Drawer**: Integrated right-sliding docked panel with masked secrets and copyable OAuth redirect URI.
 - [x] **Automated E2E Testing**: Verified with `tests/e2e/test-gbp-management.spec.ts` (4/4 passing, 100% green).
-- [x] **Release Packaging**: Bumped version to `4.9.388` in `cora-workspace.php` and `updates/cora-workspace.json`, packaged via `scripts/build.sh` creating `updates/cora-workspace.zip`.
-- [/] **Remote Server Deployment**: Safely commit to `main`, push to origin, and deploy via `scripts/deploy.sh` to Hostinger production server.
+- [x] **Remote Server Deployment**: Safely committed to `main`, pushed to `origin/main`, and deployed via `scripts/run_deploy.py all` across all Hostinger production targets (`heycora.in`, `app.heycora.in`, `stagging.heycora.in`, `claraverse.in`) with zero errors.
 
