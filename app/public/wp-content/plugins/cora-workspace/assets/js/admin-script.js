@@ -7748,7 +7748,46 @@ jQuery(document).ready(function($) {
             data: { action: 'cora_gbp_fetch_accounts', security: coraREData.ajaxNonce },
             success: function(res) {
                 if (!res.success) {
-                    picker.html('<div class="text-center py-8 text-sm text-red-600">' + (res.data || 'Could not load accounts.') + ' <button onclick="coraGbpDisconnect()" class="underline">Disconnect and retry</button></div>');
+                    const rawMsg = String(res.data || 'Could not load accounts.');
+                    const isQuotaErr = rawMsg.toLowerCase().includes('quota') || rawMsg.toLowerCase().includes('mybusinessaccountmanagement') || rawMsg.includes('429');
+                    if (isQuotaErr) {
+                        picker.html(`
+                            <div class="max-w-xl mx-auto my-4 border border-zinc-200 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-900/60 rounded-2xl p-6 text-left space-y-4">
+                                <div class="flex items-start gap-3.5">
+                                    <div class="w-9 h-9 rounded-xl bg-zinc-200/80 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 flex items-center justify-center shrink-0 mt-0.5">
+                                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="flex items-center gap-2">
+                                            <h4 class="text-sm font-semibold text-zinc-900 dark:text-white">Google API Access Request Pending</h4>
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">0 QPM Default</span>
+                                        </div>
+                                        <p class="text-xs text-zinc-600 dark:text-zinc-400 mt-1 leading-relaxed">
+                                            Google sets a default quota of <strong>0 requests per minute</strong> on newly created Google Cloud projects until basic API access is verified. Once approved by Google (usually 1–3 business days), your real profile listings will appear automatically.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="bg-white dark:bg-zinc-950 rounded-xl p-3 border border-zinc-200/80 dark:border-zinc-800 text-[11px] font-mono text-zinc-600 dark:text-zinc-400 break-words leading-relaxed">
+                                    ${rawMsg}
+                                </div>
+                                <div class="flex flex-wrap items-center gap-2.5 pt-1">
+                                    <button type="button" onclick="window.coraGbpAuthorizeDemoAccount('studio.director@elitestudio.local')" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 text-xs font-semibold rounded-lg hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors shadow-2xs cursor-pointer">
+                                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                                        Test in Sandbox Mode Now
+                                    </button>
+                                    <a href="https://support.google.com/business/contact/api_default" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-700 text-xs font-medium rounded-lg hover:bg-zinc-200/80 dark:hover:bg-zinc-700/80 transition-colors">
+                                        Google Access Request Form
+                                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    </a>
+                                    <button type="button" onclick="coraGbpDisconnect()" class="text-xs text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300 underline px-2 py-1 cursor-pointer">
+                                        Disconnect
+                                    </button>
+                                </div>
+                            </div>
+                        `);
+                        return;
+                    }
+                    picker.html('<div class="text-center py-8 text-sm text-zinc-600 dark:text-zinc-400">' + rawMsg + ' <button onclick="coraGbpDisconnect()" class="underline ml-2 text-zinc-900 dark:text-zinc-100 font-medium">Disconnect and retry</button></div>');
                     return;
                 }
                 const accounts = res.data;

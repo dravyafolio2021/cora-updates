@@ -9,9 +9,9 @@
 
 | Module Name | Branch Name | Status | Main Touchpoint Files | Assigned Agent / Chat |
 |---|---|---|---|---|
-| **Core Platform** | `main` | 🟢 Stable (v4.9.388) | `cora-workspace.php`, `admin-dashboard.php` | Main Orchestrator |
+| **Core Platform** | `main` | 🟢 Stable (v4.9.389) | `cora-workspace.php`, `admin-dashboard.php` | Main Orchestrator |
 <!-- MODULE_ROWS_START -->
-| **Google Business Profile & Google Maps AI Autopilot** | `main` | 🟢 100% Production Ready (v4.9.388) | `views/view-google-profile.php`, `cora-workspace.php`, `assets/js/admin-script.js`, `tests/e2e/test-gbp-management.spec.ts` | Local SEO & Integrations Agent |
+| **Google Business Profile & Google Maps AI Autopilot** | `main` | 🟢 100% Production Ready (v4.9.389) | `views/view-google-profile.php`, `cora-workspace.php`, `assets/js/admin-script.js`, `tests/e2e/test-gbp-management.spec.ts` | Local SEO & Integrations Agent |
 | **Plugins in App Module & Open API / Dynamic MCP Architecture** | `main` | 🟢 100% Production Ready (v4.9.387) | `includes/class-cora-plugins-skills-engine.php`, `views/view-feature-hub.php`, `includes/mcp/class-cora-mcp-tool-registry.php`, `admin-dashboard.php`, `cora-workspace.php` | AI & Extensibility Architect |
 | **Enterprise Client Onboarding Suite & Portal Role Isolation** | `main` | 🟢 100% Production Ready (v4.9.387) | `views/view-clients.php`, `public-client-portal.php`, `cora-workspace.php`, `scripts/verify_client_onboarding_features.php` | Client Operations & Security Agent |
 | **Interactive Workspace Scheduling Calendar & Google Meet** | `main` | 🟢 100% Production Ready (v4.9.387) | `views/view-calendar.php`, `cora-workspace.php`, `admin-dashboard.php` | Scheduling & Integrations Agent |
@@ -373,6 +373,7 @@
 
 | Version | Date | Key Changes |
 | :--- | :--- | :--- |
+| **v4.9.389**<br>`CORA-1241` | Oct 2026 | **Google Business Profile Quota Error Advisory & Sandbox Fallback**: Enhanced `coraGbpLoadAccounts` in `admin-script.js` to proactively detect Google's 0-QPM default quota limit (HTTP 429 `RESOURCE_EXHAUSTED` for `mybusinessaccountmanagement.googleapis.com`), rendering a high-clarity monochromatic callout card with Google access form link and 1-click "Test in Sandbox Mode Now" fallback. |
 | **v4.9.388**<br>`CORA-1240` | Oct 2026 | **Google Business Profile & Google Maps AI Autopilot**: Complete Google Business Profile integration (`/workspace/gbp`, `views/view-google-profile.php`) featuring 3 reactive states (OAuth connect hero, multi-location selector, connected management hub), Places API search, tone-driven AI review reply copilot (warm, professional, concise, apology), Maps announcement & update post publisher, 7-day business operating hours manager, Local SEO 3-Pack rank inspector, and right-sliding credentials drawer sheet. |
 | **v4.9.387**<br>`CORA-1239` | Oct 2026 | **Dynamic Plugins & AI Skills Runtime Engine**: Self-contained extensibility framework (`includes/class-cora-plugins-skills-engine.php`) with isolated schema tables, dynamic MCP 2.0 tool registry, REST gateway (`/wp-json/cora-plugins/v1/`), 3-tab segmented Feature Hub view (`views/view-feature-hub.php`), and enterprise API key generation. |
 | **v4.9.387**<br>`CORA-1238` | Oct 2026 | **Enterprise Client Onboarding Suite & Strict Portal Role Isolation**: 5-step guided onboarding studio (`views/view-clients.php`), multi-currency rate support, custom service catalog, automatic `cora_client` user provisioning, and absolute admin dashboard route shielding for portal clients (`cora-workspace.php`). |
@@ -499,4 +500,4 @@
 
 ---
 
-*Cora Platform Release Manifest v4.9.388 — Architecture & Engineering Team.*
+*Cora Platform Release Manifest v4.9.389 — Architecture & Engineering Team.*
