@@ -1,52 +1,54 @@
-# Platform Task Tracker: Platform Comprehensive Analysis & Documentation Synchronization
+# Platform Task Tracker: Complete Content Suite Audit & Full MCP/API Workspace Compatibility
 
 ## Task Overview
-Conduct a comprehensive analysis of the entire Cora platform (`/Users/shrutian/Desktop/cora`) covering all recent architectural developments and feature rollouts up to `v4.9.387`, and synchronize all core documentation files across the repository (`docs/cora-platform-documentation.md`, `docs/DEVELOPER_FEATURE_GUIDE.md`, `README.md`, `MODULES_STATUS.md`).
+Execute a comprehensive audit and implementation of the AI Content Suite across Cora Platform (`http://cora.local/workspace/blogs?ct=ct-library`), dispatching multiple specialized subagents in parallel to inspect and bridge:
+1. Direct User Operations in Workspace UI (`views/view-content-suite.php`)
+2. Model Context Protocol (MCP) Tools compatibility (`includes/mcp/class-cora-mcp-tool-registry.php`, `class-cora-universal-mcp-server.php`)
+3. Open Workspace REST API (`/wp-json/cora/v1/content/*`)
+Ensure complete parity so that whatever a user wants to do with their content, they can do:
+- Directly inside the Workspace UI
+- By connecting external preferred/referred AI agents (Claude Desktop, Cursor, ChatGPT, etc.) via MCP
+- Programmatically via the fully opened Workspace-Level REST API.
 
 ---
 
-## Subtask Decomposition & Execution Tracker
+## Real-Time Subtask Tracker
 
-### Phase 1: Comprehensive Platform Audit & Architecture Discovery
-- [x] **Core Plugin Version Audit**: Identified version increment to `v4.9.387` in `cora-workspace.php`.
-- [x] **Dynamic Plugins & AI Skills Runtime Engine**: Analyzed `includes/class-cora-plugins-skills-engine.php` (isolated database tables `wp_cora_workspace_*`, REST API `/wp-json/cora-plugins/v1/`, API keys, AI generators, and dynamic MCP 2.0 tool registration).
-- [x] **App Modules & Feature Hub Reform**: Analyzed 3-segmented control tabs (Modules, Plugins, Skills) in `views/view-feature-hub.php` and Open API / MCP Gateway drawer.
-- [x] **Enterprise Client Onboarding Suite & Strict Role Isolation**: Analyzed 5-step onboarding studio in `views/view-clients.php`, multi-currency support, custom service catalogs, automatic `cora_client` user provisioning, and admin route blocking in `cora-workspace.php`.
-- [x] **Interactive Workspace Scheduling Calendar**: Analyzed month/week/day scheduling grids in `views/view-calendar.php`, Google Calendar two-way sync, and standardized 3-4-3 Google Meet link generation (`https://meet.google.com/xxx-yyyy-zzz`).
-- [x] **Collapsible Sidebar Groups & Sticky Navigation**: Analyzed accordion sidebar navigation with `localStorage` memory and search auto-expansion in `admin-dashboard.php`, plus mobile sticky sub-tab zero-gap anchoring (`v4.9.385`).
-- [x] **Verification Script Audit**: Analyzed and executed `scripts/verify_client_onboarding_features.php` and `scripts/verify_plugins_skills_architecture.php` (all tests passing).
+### Phase 1: Parallel Subagent Audit & Discovery
+- [x] **Subagent 1: Content Suite UI & Data Layer Auditor** (Completed by `Content UI Auditor`)
+  - [x] Audited Content Library UI table, filters, bulk actions, search, and DOM pagination.
+  - [x] Audited Article Drawers (Create / Edit), AI Content Generators, and metadata mapping (`_cora_seo_score`, `_cora_focus_keyword`, `_cora_editorial_status`, `_cora_geo_score`).
+  - [x] Audited Opportunities tab, SEO & AI Visibility tab, and unlocked Calendar, Performance, Automations, Brain tabs.
+  - [x] Identified missing AJAX handlers (`cora_update_article_date`, 4 GEO handlers, and brief-to-post creation).
+- [x] **Subagent 2: MCP Tool Registry & Execution Compatibility Auditor** (Completed by `MCP Tools Auditor`)
+  - [x] Analyzed `Cora_MCP_Tool_Registry`, `Cora_Universal_MCP_Server`, and `cora_execute_ai_action`.
+  - [x] Identified critical gap: MCP was routing all content tools to `wp_cora_content_entries` (`growth_cora_main_01`), completely disconnected from the 45 library articles in `wp_posts`.
+  - [x] Formulated 9-tool canonical MCP Content Suite blueprint with dual `source: 'workspace' | 'growth'` support.
+- [x] **Subagent 3: Workspace REST API & Auth Openness Auditor** (Completed by `Workspace API Auditor`)
+  - [x] Analyzed REST namespaces (`/cora/v1`, `/cora-growth/v1`) and auth tables (`wp_cora_workspace_api_keys`).
+  - [x] Identified gap: No `/wp-json/cora/v1/content` REST controller existed for workspace articles, and API keys (`cora_ws_live_...`) lacked universal REST middleware.
+  - [x] Formulated blueprint for universal REST auth filter, full Content REST controller, and Developer Gateway UI drawer.
 
-### Phase 2: Documentation Synchronization Across Repository
-- [x] **Core Master Documentation (`docs/cora-platform-documentation.md`)**:
-  - [x] Updated platform version to `v4.9.387`.
-  - [x] Added Section 1 subsections: 1.51 (Collapsible Sidebar Groups), 1.52 (Dynamic Plugins & AI Skills Engine), 1.53 (Enterprise Client Onboarding Studio & Role Isolation), 1.54 (Interactive Workspace Scheduling Calendar & Google Meet).
-  - [x] Updated Section 2 modules: 2.11 (Feature Hub, Plugins, Skills & Dynamic MCP 2.0), 2.18 (Client Management & Onboarding Studio), 2.19 (Public Client Portal).
-  - [x] Added Section 2 subsections: 2.33 (Dynamic Plugins & Skills Runtime Engine), 2.34 (Interactive Workspace Calendar & Google Scheduling), 2.35 (Agency Projects & Portfolio Case Studies Suite).
-  - [x] Updated Section 6 Database Schema: Added `wp_cora_projects`, `wp_cora_workspace_plugins`, `wp_cora_workspace_skills`, `wp_cora_workspace_api_keys`, `wp_cora_workspace_plugin_logs`.
-  - [x] Expanded Section 8 Automated Testing: Added PHP verification suites and Playwright E2E suites documentation.
-  - [x] Updated Section 16 Release History: Added rows for `v4.9.387`, `v4.9.386`, and `v4.9.385`.
-- [x] **Developer Feature Guide (`docs/DEVELOPER_FEATURE_GUIDE.md`)**:
-  - [x] Updated version header to `v4.9.387`.
-  - [x] Added Principles 109 to 113 covering mobile sticky offsets, collapsible sidebar state, dynamic plugins & skills MCP resolution, client onboarding role isolation, and two-way calendar sync.
-- [x] **Root README (`README.md`)**:
-  - [x] Updated overview version to `v4.9.387`.
-  - [x] Updated repository structure tree to include `class-cora-plugins-skills-engine.php`.
-  - [x] Updated Core Modules table to include Plugins & Extensibility Engine, Enterprise Client Suite, Interactive Scheduling Calendar, and Collapsible Sidebar Navigation.
-- [x] **Module Progress & Branch Synchronization Manifest (`MODULES_STATUS.md`)**:
-  - [x] Updated Table 1: Added entries for Dynamic Plugins Engine (`v4.9.387`), Enterprise Client Onboarding (`v4.9.387`), Interactive Scheduling Calendar (`v4.9.387`), Collapsible Sidebar Navigation (`v4.9.386`), and Mobile Sticky Sub-tabs (`v4.9.385`).
-  - [x] Updated Section 2 Shared Touchpoints: Added `class-cora-plugins-skills-engine.php` and `view-calendar.php`.
-  - [x] Updated Section 3 Branch Activity Log: Updated `main` base to `v4.9.387` and added merge logs for `feat/plugins-and-skills-engine`, `feat/client-onboarding-and-calendar`, and `feat/collapsible-navigation-and-mobile-touch`.
+### Phase 2: Architectural Delivery & Integration
+- [/] **Step 1: Universal REST & MCP Workspace Authentication Bridge**:
+  - [ ] Add `cora_rest_api_key_determine_user` filter in `class-cora-plugins-skills-engine.php` recognizing `X-Cora-API-Key` and `Authorization: Bearer cora_ws_live_...`.
+  - [ ] Update `Cora_OAuth_Server::authenticate_token` to accept `cora_ws_live_...` API keys directly for unified REST and MCP authentication.
+- [ ] **Step 2: Workspace Content REST Controller (`/wp-json/cora/v1/content`)**:
+  - [ ] Create `class-cora-workspace-content-rest-controller.php` in `includes/`.
+  - [ ] Implement `GET /content` (list with filters, search, pagination), `GET /content/{id}`, `POST /content` (create), `PATCH /content/{id}` (update), `DELETE /content/{id}` (delete/trash).
+  - [ ] Implement `POST /content/{id}/publish`, `POST /content/{id}/unpublish`, `POST /content/batch` (bulk actions).
+  - [ ] Implement `POST /content/{id}/seo-audit` (11-point algorithmic audit) and `GET /content/opportunities`.
+- [ ] **Step 3: Unified MCP Content Tools Suite**:
+  - [ ] In `class-cora-mcp-tool-registry.php`, implement the 9 canonical tools: `cora_list_articles`, `cora_get_article`, `cora_create_article`, `cora_update_article`, `cora_delete_article`, `cora_publish_article`, `cora_unpublish_article`, `cora_bulk_update_articles`, `cora_audit_article_seo`, `cora_list_content_opportunities`, `cora_generate_article_outline`.
+  - [ ] Support dual source: workspace `wp_posts` and headless growth `wp_cora_content_entries`.
+  - [ ] Update curated 28-tool priority list in `Cora_Universal_MCP_Server::handle_list_tools()`.
+- [ ] **Step 4: Content Suite UI Enhancements & Missing Handlers**:
+  - [ ] Implement missing AJAX handlers in `cora-workspace.php`: `cora_ajax_update_article_date`, 4 GEO handlers, and link `cora_create_brief_from_opportunity` to `wp_posts`.
+  - [ ] Unlock Calendar, Performance, Automations, and Business Brain tabs in `views/view-content-suite.php`.
+  - [ ] Add "Developer API & MCP Gateway" button in Content Suite header.
+  - [ ] Embed Shopify-inspired docked Developer Gateway drawer (`#cora-developer-gateway-drawer`) per Rule 15 with API key generation, REST endpoint reference, and MCP client config snippets.
 
-### Phase 3: Privacy, Quality Assurance & Design System Verification
-- [x] **Rule 3 Privacy Audit**: Verified zero use of owner name across all modified documentation files (`grep -in "shruti"` returned 0 matches).
-- [x] **Design System Standards**: Verified strict adherence to monochrome-first zinc ramp (`zinc-50` to `zinc-950`), zero heavy bounding outlines, Shopify-inspired docked drawer architecture, and proper semantic links.
-
-### Phase 4: Google Business Profile & Google Maps AI Autopilot (v4.9.388) & Remote Deployment
-- [x] **Backend API & Robust Mock Engine**: Implemented 9 AJAX endpoints in `cora-workspace.php` for OAuth, locations, reviews, AI replies, Maps posts, operating hours, and mock fallbacks.
-- [x] **Production UI & Reactive States**: Built 3 reactive states in `views/view-google-profile.php` adhering to Cora Monochromatic Design System.
-- [x] **AI Review Copilot**: Developed 4-tone draft generator with dynamic ID lookups and 1-click publishing.
-- [x] **Maps Post Publisher & Business Hours**: Implemented standard/offer/event announcements, 7-day operating hours editor, and Local SEO 3-Pack rank tracker.
-- [x] **API Credentials Drawer**: Integrated right-sliding docked panel with masked secrets and copyable OAuth redirect URI.
-- [x] **Automated E2E Testing**: Verified with `tests/e2e/test-gbp-management.spec.ts` (4/4 passing, 100% green).
-- [x] **Remote Server Deployment**: Safely committed to `main`, pushed to `origin/main`, and deployed via `scripts/run_deploy.py all` across all Hostinger production targets (`heycora.in`, `app.heycora.in`, `stagging.heycora.in`, `claraverse.in`) with zero errors.
-
+### Phase 3: Verification & Regression Testing
+- [ ] Run automated PHP test suite (`scripts/test_content_mcp_api_full.php`) validating REST CRUD, MCP tools, and AJAX actions.
+- [ ] Strict Rule 3 Privacy verification (zero owner name).
+- [ ] Monochrome Design System & Shopify Docked Panel standard compliance.

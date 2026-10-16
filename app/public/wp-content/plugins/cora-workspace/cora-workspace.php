@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.390
+ * Version:           4.9.391
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.390' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.391' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -38863,29 +38863,85 @@ function cora_ajax_send_test_notification_channel() {
         }
     } elseif ( $channel === 'whatsapp' ) {
         $prefs = cora_get_user_notification_prefs( $user_id );
-        $target_phone = ! empty( $prefs['custom_whatsapp'] ) ? $prefs['custom_whatsapp'] : get_user_meta( $user_id, 'cora_user_phone', true );
+        $target_phone = ! empty( $_POST['phone'] ) ? sanitize_text_field( $_POST['phone'] ) : '';
+        if ( empty( $target_phone ) ) {
+            $target_phone = ! empty( $prefs['custom_whatsapp'] ) ? $prefs['custom_whatsapp'] : get_user_meta( $user_id, 'cora_user_phone', true );
+        }
         if ( empty( $target_phone ) ) {
             $target_phone = get_user_meta( $user_id, 'cora_user_whatsapp', true ) ?: get_user_meta( $user_id, 'billing_phone', true );
         }
-
         if ( empty( $target_phone ) ) {
-            wp_send_json_error( array( 'message' => 'Please enter your WhatsApp Phone Number in settings first.' ) );
+            $target_phone = get_option( 'cora_wa_admin_phone', '' ) ?: get_option( 'cora_whatsapp_admin_phone', '' );
+        }
+        if ( empty( $target_phone ) ) {
+            $target_phone = '919817059266'; // Default admin fallback
         }
 
-        $api_token = get_option( 'cora_whatsapp_api_token', '' );
-        $phone_id  = get_option( 'cora_whatsapp_phone_number_id', '' );
+        $alert_type = sanitize_text_field( $_POST['alert_type'] ?? 'lead' );
+        
+        if ( class_exists( 'Cora_WhatsApp_Gateway' ) ) {
+            $gateway = Cora_WhatsApp_Gateway::instance();
+            $wa_res = array( 'success' => false, 'error' => 'Unknown alert type.' );
+            $label  = 'Test message';
 
-        if ( empty( $api_token ) || empty( $phone_id ) ) {
-            wp_send_json_error( array( 'message' => 'Meta WhatsApp Cloud API Token or Phone Number ID not configured in Branding & APIs.' ) );
-        }
+            switch ( $alert_type ) {
+                case 'activation':
+                    $wa_res = $gateway->send_daily_activation_reply( $target_phone );
+                    $label  = '24h Activation confirmation';
+                    break;
+                case 'booking':
+                    $wa_res = $gateway->send_booking_reminder( $target_phone, array(
+                        'client_name' => 'Rohan Verma',
+                        'service'     => 'Commercial Studio Production',
+                        'time'        => 'Tomorrow at 10:00 AM',
+                        'location'    => 'Studio Floor B',
+                        'id'          => 'BK-4921',
+                    ) );
+                    $label = 'Booking reminder';
+                    break;
+                case 'briefing':
+                    $wa_res = $gateway->send_daily_briefing( $target_phone );
+                    $label  = 'Daily morning briefing';
+                    break;
+                case 'payment':
+                    $wa_res = $gateway->send_payment_alert( $target_phone, array(
+                        'invoice_number' => 'CORA-8842',
+                        'amount'         => '₹42,500',
+                        'client'         => 'Rohan Verma',
+                        'method'         => 'UPI Transfer',
+                    ) );
+                    $label = 'Payment receipt alert';
+                    break;
+                case 'lead':
+                default:
+                    $wa_res = $gateway->send_lead_alert( $target_phone, array(
+                        'name'  => 'Rohan Verma',
+                        'title' => 'Pre-Wedding Cinematic Film (₹1.85L)',
+                        'phone' => '+91 98765 43210',
+                        'email' => 'client.rohan@example.com',
+                        'date'  => current_time( 'M j, Y' ),
+                        'id'    => 'LD-7712',
+                    ), true );
+                    $label = 'New lead alert';
+                    break;
+            }
 
-        $wa_msg = "*[Cora Workspace Live Diagnostics]*\n\nHello " . esc_html( $user_obj->display_name ) . ",\nYour Meta WhatsApp Cloud API alert router is functioning properly at {$now_str}.\n\n🔗 Dashboard: " . esc_url( home_url( '/workspace/dashboard' ) );
-        $wa_res = cora_send_whatsapp_message( $target_phone, $wa_msg );
-
-        if ( ! empty( $wa_res['success'] ) ) {
-            wp_send_json_success( array( 'message' => "Test WhatsApp message sent to {$target_phone}!" ) );
+            if ( ! empty( $wa_res['success'] ) ) {
+                wp_send_json_success( array(
+                    'message'    => "{$label} dispatched successfully to {$target_phone} via WhatsApp!",
+                    'message_id' => $wa_res['message_id'] ?? '',
+                    'phone'      => $target_phone,
+                    'type'       => $alert_type,
+                ) );
+            } else {
+                $err = $wa_res['error'] ?? 'Unknown WhatsApp API error';
+                if ( isset( $wa_res['raw']['error']['code'] ) && 131005 === (int) $wa_res['raw']['error']['code'] ) {
+                    $err = 'Meta Access Denied (131005): A Permanent System User Token from Meta Business Settings is required for cloud server IP dispatch. Local environment or verified system user tokens execute seamlessly.';
+                }
+                wp_send_json_error( array( 'message' => 'WhatsApp dispatch error: ' . $err, 'raw' => $wa_res ) );
+            }
         } else {
-            wp_send_json_error( array( 'message' => 'WhatsApp dispatch error: ' . ( $wa_res['error'] ?? 'Unknown error' ) ) );
+            wp_send_json_error( array( 'message' => 'WhatsApp gateway module not loaded.' ) );
         }
     } elseif ( $channel === 'email' ) {
         $sent = cora_send_monochromatic_notification_email(

@@ -3484,14 +3484,22 @@ jQuery(document).ready(function($) {
     window.coraCloseCopilot = function() { window.coraToggleSidebar(false); };
     window.coraOpenUniversalVoice = function() { window.coraOpenAIPanel('voice'); };
 
+    let _coraSidebarToggling = false;
     // Toggle Unified AI Panel (Mobile Bottom Sheet + Desktop Side Panel)
     window.coraToggleSidebar = function(show) {
+        if (_coraSidebarToggling) return;
+        _coraSidebarToggling = true;
+        setTimeout(function() { _coraSidebarToggling = false; }, 200);
+
         const sidebar = $('#cora-ai-sidebar');
         const quickBtn = $('#cora-quick-ai-btn');
         const backdrop = $('#cora-ai-sidebar-backdrop');
         const island = $('#cora-mobile-floating-island');
         
-        const isCurrentlyShown = !sidebar.hasClass('collapsed');
+        const isCurrentlyShown = !sidebar.hasClass('collapsed') && sidebar.css('display') !== 'none';
+        if (typeof show === 'undefined') {
+            show = !isCurrentlyShown;
+        }
         if (show === isCurrentlyShown) {
             return;
         }
@@ -3533,14 +3541,6 @@ jQuery(document).ready(function($) {
             $('#cora-sidebar-conversations-dropdown').addClass('hidden');
         }
     };
-
-    // Toggle button opens the unified panel
-    $('#cora-quick-ai-btn').on('click', function(e) {
-        e.preventDefault();
-        const sidebar = $('#cora-ai-sidebar');
-        const isCollapsed = sidebar.hasClass('collapsed');
-        window.coraToggleSidebar(isCollapsed);
-    });
 
     // Expand/Collapse right-side panel width
     window.coraToggleSidebarExpand = function() {
@@ -6045,8 +6045,9 @@ jQuery(document).ready(function($) {
             });
         });
 
-        const enterpriseNewModules = ['event_timeline', 'event-timeline', 'multi-day-timeline', 'review_acquisition', 'smart-reviews', 'crew_scheduler', 'crew-scheduler', 'team_scheduler', 'team-scheduler', 'shifts', 'vault', 'emails', 'calendar', 'activity-timeline', 'automations', 'inbox', 'analytics', 'social-meta', 'plant_inventory', 'plant-inventory', 'stationery_inventory', 'stationery-inventory', 'inventory', 'inventory_management', 'affiliates', 'referrals', 'projects', 'portfolio', 'case-studies', 'case_studies'];
-        permissions['administrator'] = ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'settings', 'vault', 'portfolio', 'projects', 'leads', 'clients', 'attendance', 'tasks', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'canvas', 'audit-panel', 'media', 'forms', 'emails', 'ecosystem', 'mcp', 'affiliates', 'referrals', 'super-admin', 'super-users', 'super-finances', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-docs', ...enterpriseNewModules];
+        const superPages = ['super-admin', 'super-users', 'super-finances', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-docs', 'super-ai-tokens', 'super-feature-flags', 'super-emergency', 'super-audit'];
+        const enterpriseNewModules = ['event_timeline', 'event-timeline', 'multi-day-timeline', 'review_acquisition', 'smart-reviews', 'crew_scheduler', 'crew-scheduler', 'team_scheduler', 'team-scheduler', 'shifts', 'vault', 'emails', 'calendar', 'activity-timeline', 'automations', 'inbox', 'analytics', 'social-meta', 'plant_inventory', 'plant-inventory', 'stationery_inventory', 'stationery-inventory', 'inventory', 'inventory_management', 'affiliates', 'referrals', 'projects', 'portfolio', 'case-studies', 'case_studies', ...superPages];
+        permissions['administrator'] = ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'settings', 'vault', 'portfolio', 'projects', 'leads', 'clients', 'attendance', 'tasks', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'canvas', 'audit-panel', 'media', 'forms', 'emails', 'ecosystem', 'mcp', 'affiliates', 'referrals', ...superPages, ...enterpriseNewModules];
         permissions['cora_super_admin'] = permissions['administrator'];
         permissions['cora_shruti'] = permissions['administrator'];
 
@@ -7132,7 +7133,8 @@ jQuery(document).ready(function($) {
 
     // Role Enforcement capability controller
     window.coraEnforcePermissions = function(role) {
-        const enterpriseNewModules = ['event_timeline', 'event-timeline', 'multi-day-timeline', 'review_acquisition', 'smart-reviews', 'crew_scheduler', 'crew-scheduler', 'team_scheduler', 'team-scheduler', 'shifts', 'vault', 'emails', 'calendar', 'activity-timeline', 'automations', 'inbox', 'analytics', 'social-meta', 'plant_inventory', 'plant-inventory', 'stationery_inventory', 'stationery-inventory', 'inventory', 'inventory_management', 'affiliates', 'referrals', 'projects', 'portfolio', 'case-studies', 'case_studies'];
+        const superPages = ['super-admin', 'super-users', 'super-finances', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-docs', 'super-ai-tokens', 'super-feature-flags', 'super-emergency', 'super-audit'];
+        const enterpriseNewModules = ['event_timeline', 'event-timeline', 'multi-day-timeline', 'review_acquisition', 'smart-reviews', 'crew_scheduler', 'crew-scheduler', 'team_scheduler', 'team-scheduler', 'shifts', 'vault', 'emails', 'calendar', 'activity-timeline', 'automations', 'inbox', 'analytics', 'social-meta', 'plant_inventory', 'plant-inventory', 'stationery_inventory', 'stationery-inventory', 'inventory', 'inventory_management', 'affiliates', 'referrals', 'projects', 'portfolio', 'case-studies', 'case_studies', ...superPages];
         let allowed = (coraREData.userPermissions && coraREData.userPermissions[role]) ? coraREData.userPermissions[role] : [];
         
         if (!allowed || allowed.length === 0) {
@@ -7140,7 +7142,7 @@ jQuery(document).ready(function($) {
         }
 
         if (role === 'administrator' || role === 'cora_super_admin' || role === 'cora_shruti' || role === 'cora_owner' || role === 'owner' || role === 'agency_owner' || role === 'cora_re_broker_owner' || role === 'cora_studio_owner' || role === 'cora_manager' || role === 'cora_plant_manager') {
-            allowed = ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'projects', 'leads', 'clients', 'attendance', 'tasks', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'canvas', 'audit-panel', 'media', 'forms', 'emails', 'ecosystem', 'mcp', 'affiliates', 'referrals', 'super-admin', 'super-users', 'super-finances', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-docs', ...enterpriseNewModules];
+            allowed = ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'vault', 'settings', 'portfolio', 'projects', 'leads', 'clients', 'attendance', 'tasks', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'canvas', 'audit-panel', 'media', 'forms', 'emails', 'ecosystem', 'mcp', 'affiliates', 'referrals', ...superPages, ...enterpriseNewModules];
         }
 
         // Hide/show financial details based on role permissions
@@ -7156,7 +7158,14 @@ jQuery(document).ready(function($) {
         $('.cora-nav-item').each(function() {
             const target = $(this).data('target');
             const $parentLi = $(this).closest('li');
-            if (target && !allowed.includes(target) && !enterpriseNewModules.includes(target) && target !== 'feature-hub' && !$(this).hasClass('cora-nav-soon') && !$(this).hasClass('cora-nav-locked')) {
+            if (target && target.startsWith('super-')) {
+                if (role === 'administrator' || role === 'cora_super_admin' || role === 'cora_shruti' || (window.coraREData && window.coraREData.isSuperOwner)) {
+                    $(this).show();
+                    $parentLi.show();
+                    return;
+                }
+            }
+            if (target && !allowed.includes(target) && !enterpriseNewModules.includes(target) && !superPages.includes(target) && target !== 'feature-hub' && !$(this).hasClass('cora-nav-soon') && !$(this).hasClass('cora-nav-locked')) {
                 $(this).hide();
                 $parentLi.hide();
             } else {
@@ -7180,7 +7189,7 @@ jQuery(document).ready(function($) {
         // Hide mobile navigation items
         $('.cora-bottom-nav-item').each(function() {
             const target = $(this).data('target');
-            if (target && !allowed.includes(target) && !enterpriseNewModules.includes(target)) {
+            if (target && !allowed.includes(target) && !enterpriseNewModules.includes(target) && !superPages.includes(target)) {
                 $(this).hide();
             } else {
                 $(this).show();
@@ -19283,12 +19292,21 @@ jQuery(document).ready(function($) {
         });
     };
 
-    window.coraSendTestChannelNotification = function(channel) {
+    window.coraSendTestChannelNotification = function(channel, alertType, customPhone) {
         const nonce = (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : (typeof coraREWPData !== 'undefined' ? coraREWPData.ajaxNonce : '');
         const ajaxUrl = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : '/wp-admin/admin-ajax.php';
 
+        const labelMap = {
+            'activation': '24-Hour Free Session Confirmation',
+            'lead': 'New High-Intent Lead Alert (₹1.85L)',
+            'booking': 'Client Shoot Booking Reminder',
+            'briefing': 'Daily Morning Operational Briefing',
+            'payment': 'Invoice Payment Received Receipt'
+        };
+        const alertLabel = alertType ? (labelMap[alertType] || alertType) : channel;
+
         if (window.coraShowToast) {
-            window.coraShowToast(`Dispatching test ${channel} payload...`, 'info');
+            window.coraShowToast(`Dispatching ${alertLabel} to your WhatsApp...`, 'info');
         }
 
         $.ajax({
@@ -19298,12 +19316,14 @@ jQuery(document).ready(function($) {
             data: {
                 action: 'cora_send_test_notification_channel',
                 security: nonce,
-                channel: channel
+                channel: channel,
+                alert_type: alertType || 'lead',
+                phone: customPhone || ''
             },
             success: function(res) {
                 if (res.success) {
                     if (window.coraShowToast) {
-                        window.coraShowToast(res.data.message || 'Notification dispatched successfully!', 'success');
+                        window.coraShowToast(res.data.message || 'Alert delivered to WhatsApp! Check your phone.', 'success');
                     }
                 } else {
                     if (window.coraShowToast) {
@@ -19317,6 +19337,10 @@ jQuery(document).ready(function($) {
                 }
             }
         });
+    };
+
+    window.coraSendWhatsAppTestAlert = function(alertType, customPhone) {
+        window.coraSendTestChannelNotification('whatsapp', alertType, customPhone);
     };
 
     window.coraTriggerDigestRun = function() {
@@ -20524,7 +20548,9 @@ jQuery(document).on('click', '#mobile-tabs-more-dropdown .cora-sub-tab, .mobile-
         if (topbar) {
             const h = Math.round(topbar.getBoundingClientRect().height) || 48;
             document.documentElement.style.setProperty('--cora-topbar-height', h + 'px');
-            document.documentElement.style.setProperty('--cora-sticky-tabs-top', h + 'px');
+            const isDesktop = window.innerWidth >= 1024;
+            const stickyTop = isDesktop ? '0px' : (h + 'px');
+            document.documentElement.style.setProperty('--cora-sticky-tabs-top', stickyTop);
             document.documentElement.style.setProperty('--cora-mobile-header-height', '0px');
         }
     };

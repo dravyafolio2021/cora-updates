@@ -1,4 +1,4 @@
-# Cora Platform — Developer Feature & Optimization Guide (v4.9.387)
+# Cora Platform — Developer Feature & Optimization Guide (v4.9.389)
 
 This guide defines the standardized architectural patterns, blueprints, and performance guidelines for engineering new modules and extending features across the Cora SaaS Workspace (`app/public/wp-content/plugins/cora-workspace`) and Marketing Frontend (`cora-frontend`).
 
@@ -122,6 +122,8 @@ This guide defines the standardized architectural patterns, blueprints, and perf
 111. **Dynamic Plugins, Modules & AI Skills Extensibility Engine (v4.9.387)**: Workspace modular engine delivers a 3-tab segmented control matrix: Plugins, Modules, and Skills (`/workspace/plugins`, `/workspace/modules`, `/workspace/skills`). Backed by dedicated isolated schema (`wp_cora_workspace_plugins`, `wp_cora_workspace_skills`, `wp_cora_workspace_api_keys`, `wp_cora_workspace_plugin_logs`) scoped by `agency_id`. Active plugins dynamically inject MCP tools via the `cora_mcp_tools` filter hook into `Cora_MCP_Tool_Registry`. Supports JSON Plugin Manifests and Antigravity `SKILL.md` format ingestion alongside autonomous AI generation. Dedicated API & MCP Gateway drawer manages tenant-scoped API keys (`cora_ws_live_...`), scopes, rate limits, and live OpenAPI discovery.
 112. **Enterprise Client Onboarding Suite & Strict Role Isolation (v4.9.386 - v4.9.387)**: 5-step guided onboarding studio in `views/view-clients.php` (Entity Profile, Multi-Currency / Tax Regimes, Production Service Matrix & Catalog, Initial Project Showcase, User Provisioning & Credentials). Strict WordPress role `cora_client` portal isolation prevents clients from accessing `/workspace` and redirects them to their personal portal. Automatic persistence of custom production services to `cora_workspace_services_{agency_id}` via `cora_ajax_save_workspace_custom_service`. Automatic lead conversion linking `wp_cora_leads` to `wp_cora_clients` with `won` status progression.
 113. **Two-Way Scheduling Calendar & Google Meet Standardization (v4.9.386 - v4.9.387)**: Full Month, Week, and Day calendar grids (`views/view-calendar.php`) with 2-way bidirectional Google Calendar sync. Enforces official 3-4-3 Google Meet syntax (`https://meet.google.com/xxx-yyyy-zzz`). Shareable public client booking flows with duration, buffers, pricing, and locations. Appointments automatically reflect into the CRM sales pipeline as qualified leads.
+114. **Google Business Profile & Google Maps AI Autopilot Suite (v4.9.388)**: Local reputation and Maps SEO hub in `views/view-google-profile.php` featuring a multi-state architecture (Unconnected Hero with OAuth & Places search, Multi-Branch Location Switcher, Connected Operations Hub with 4-KPI analytical scorecards: Total Impressions, Search Views, Directions Requests, Calls), 5-tab segmented control matrix (Reviews & AI Autopilot with 4 tones: Warm, Professional, Concise, Apology; Maps Post Publisher for Standard, Offer, and Event topics; Business Info & 7-Day Operating Hours editor with closed toggles; Local SEO & Map-Pack Ranks with #1 in 3-Pack badges and 94% visibility score; Multi-Branch Locations switcher), and a right-sliding API Credentials Drawer (`#cora-gbp-keys-panel`) with masked OAuth Client ID/Secret, Google Maps API key, copyable redirect URI, and Escape key dismissal.
+115. **Google 0-Quota Proactive Advisory Card & 1-Click Sandbox Simulation Fallback (v4.9.389)**: Google Cloud imposes a strict default quota of 0 requests per minute (0 QPM) on the `mybusinessaccountmanagement` API for newly created projects until verified. When quota limit errors (429 or quota exceeded) are returned during account fetch, Cora presents a proactive monochromatic advisory card (`0 QPM Default`) explaining the review timeline, providing a direct link to the Google Access Request Form, and offering a 1-click **"Test in Sandbox Mode Now"** button (`window.coraGbpAuthorizeDemoAccount('studio.director@elitestudio.local')`). Sandbox mode simulates verified accounts, multi-branch listings, reviews, and post scheduling, enabling 100% test coverage without blocking agency onboarding.
 
 ---
 ---
@@ -1668,4 +1670,183 @@ In `includes/workspace-header.php`, pass `tabs_extra_html` wrapped in `h-full fl
 
 ---
 
-*Cora Developer Feature Guide v4.9.384 — Last updated: October 2026.*
+## 71. Google Business Profile & Google Maps AI Autopilot Engineering Blueprint (v4.9.388 - v4.9.389)
+
+The Google Business Profile (GBP) & Google Maps AI Autopilot module (`views/view-google-profile.php`) provides full-lifecycle local SEO automation, automated customer review replies, and multi-branch management:
+
+### 1. Multi-State Reactive Hub Architecture
+The view dynamically transitions across three states based on authentication and branch selection:
+- **State A (Unconnected Hero)**: Minimalist hero banner with 1-click Google OAuth 2.0 connection (`#cora-gbp-oauth-btn`), Places API text search lookup (`#cora-gbp-search-q`), and a 1-click sandbox demo shortcut (`coraGbpAuthorizeDemoAccount`).
+- **State B (Multi-Branch Location Picker)**: Interactive grid allowing agencies managing multiple studio branches or franchise locations to inspect and activate a specific target location.
+- **State C (Connected Hub)**: Live operational dashboard displaying 4 primary KPI scorecards:
+  - Total Impressions (Search + Maps views)
+  - Direct Search Views vs Discovery Searches
+  - Direction Requests on Google Maps
+  - Direct Phone Calls initiated from the Business Profile
+  All scorecards include 30-day percentage trajectory badges and sparkline indicators.
+
+### 2. 5-Tab Segmented Control Matrix
+The connected interface enforces Level 01 Segmented Control navigation across 5 core workflows:
+1. **Reviews & AI Autopilot**:
+   - Filter pills: `All`, `Needs Reply`, `Replied`, `5 Stars`, `Critical (<=3 Stars)`.
+   - Tone Selector: `Warm`, `Professional`, `Concise`, `Apology`.
+   - 1-Click AI Generation (`coraGbpGenerateAiReply` via `cora_gbp_generate_ai_reply` AJAX endpoint) generating context-aware replies matching agency tone.
+   - 1-Click Instant Publishing (`coraGbpPostReply` via `cora_gbp_reply_review` AJAX endpoint) persisting the reply directly to Google Maps via API.
+2. **Maps Post Publisher**:
+   - Announcement composer supporting 3 topic types: `STANDARD`, `OFFER` (with coupon codes and terms), and `EVENT` (with start/end dates).
+   - Action CTA button selector: `LEARN_MORE`, `CALL_NOW`, `BOOK`, `SIGN_UP`.
+   - Media photo upload attachments and live preview card.
+   - Chronological post stream with instant revocation/deletion (`cora_gbp_delete_post`).
+3. **Business Info & 7-Day Operating Hours**:
+   - Primary business metadata editor (Name, Category, Primary Phone, Website URL, Address).
+   - 7-day schedule editor (Monday through Sunday) with open/close time pickers and dedicated "Closed" toggles.
+   - Single-click atomic persistence (`cora_gbp_update_business_info`).
+4. **Local SEO & Map-Pack Ranks**:
+   - Keyword ranking table tracking target search phrases (e.g. "Photography Studio Gurugram", "Portrait Studio Cyber City").
+   - #1 in 3-Pack badges, 94% local visibility scorecard, and automated local SEO optimization checklist.
+5. **Multi-Branch Locations**:
+   - Multi-branch switcher allowing agencies to toggle between studio locations (e.g. Cyber City Hub and South Delhi branch) with active status badges.
+
+### 3. Right-Sliding API Credentials Drawer (`#cora-gbp-keys-panel`)
+- Allows workspace owners to configure their custom Google Cloud Client ID, Client Secret, and Google Maps API Key.
+- Secure masked inputs with visibility toggle eye buttons.
+- Copyable OAuth redirect URI matching `/workspace/gbp`.
+- Full `Escape` key dismissal and backdrop click handling.
+
+### 4. Google 0-Quota Proactive Advisory Card & 1-Click Sandbox Fallback (v4.9.389)
+When Google Cloud returns 0 requests-per-minute (0 QPM default quota) on newly provisioned projects during account fetch (`cora_gbp_fetch_accounts`), Cora intercepts the error and displays a proactive monochromatic card (`#cora-gbp-quota-advisory`):
+- Explains Google's developer approval timeline (1–3 business days).
+- Provides a direct link to the Google Access Request Form (`https://support.google.com/business/contact/api_default`).
+- Exposes a 1-click **"Test in Sandbox Mode Now"** button (`window.coraGbpAuthorizeDemoAccount('studio.director@elitestudio.local')`).
+- Sandbox mode hydrates simulated verified accounts, multi-branch listings, reviews, and post streams, allowing complete verification of all agency features without waiting for Google Cloud quota approvals.
+
+### 5. Automated E2E Test Suite (`test-gbp-management.spec.ts`)
+Comprehensive 4-test Playwright suite covering:
+- `TC-GBP-01`: Unconnected state, Places search, credentials drawer open/close, and Escape key dismissal.
+- `TC-GBP-02`: Multi-branch location switcher and connected state activation.
+- `TC-GBP-03`: Reviews AI Copilot, 4-tone generation, and 1-click publishing.
+- `TC-GBP-04`: Maps Post Publisher, 7-day business hours editor, and Local SEO 3-Pack rank tracker.
+
+---
+
+## 72. Dynamic Plugins, Modules & AI Skills Extensibility Runtime & Open API Gateway Blueprint (v4.9.387)
+
+The Extensibility Engine (`includes/class-cora-plugins-skills-engine.php` and `views/view-feature-hub.php`) provides an isolated runtime for extending Cora workspaces with custom micro-plugins, AI agent skills, and external API integrations:
+
+### 1. Isolated Multi-Tenant Schema
+Four dedicated tables scoped strictly by `agency_id = %d`:
+- `wp_cora_workspace_plugins`: Custom plugins, slug, version, manifest JSON, execution hooks, and active status.
+- `wp_cora_workspace_skills`: Custom AI agent skills, trigger phrases, system prompts, parameter schemas, and bound MCP tools.
+- `wp_cora_workspace_api_keys`: Tenant-scoped API keys (`cora_ws_live_...`), cryptographic hashes, rate limits, and RBAC permission scopes.
+- `wp_cora_workspace_plugin_logs`: Detailed execution audit trails, webhook dispatches, and execution latencies.
+
+### 2. Feature Hub 3-Segmented Matrix
+Re-architected Feature Hub (`views/view-feature-hub.php`) into 3 segmented control tabs:
+- **App Modules**: Built-in platform modules with toggle switches and universal foundation module locks (6 core modules: `blogs`, `forms`, `team-roles`, `media`, `vault`, `affiliates` + `dashboard`).
+- **Custom Plugins**: ZIP installer, JSON Plugin Manifest uploader, starter plugins (Webhook Dispatcher, Google Calendar Sync, Payment Gateway Listener, Client Portal Notifier, Daily Ledger Reconciler), and an AI Plugin Generator.
+- **AI Skills**: Custom prompt engineering studio, parameter schema builder, Antigravity `SKILL.md` parser, starter skills (Client Intake Specialist, GST Invoice Auditor, High-Ticket Lead Qualifier, Shoot Gear Readiness Auditor, Portfolio Storyteller), and a live execution test runner.
+
+### 3. Dynamic MCP 2.0 Tool Injection (`cora_mcp_tools`)
+Active plugins and skills dynamically register as callable tools in the Cora Universal Remote MCP Server via the `cora_mcp_tools` filter hook:
+- Skills map to `cora_skill_{slug}` with their parameter schemas.
+- Plugins map to `cora_plugin_{slug}` with their declared actions.
+- Automatically exposed to ChatGPT, Claude, and Gemini assistants via `/wp-json/cora-mcp/v1/sse` and live OpenAPI 3.0.1 exports.
+
+### 4. Open API & MCP Gateway Right-Sliding Drawer
+- Slide-out drawer managing tenant-scoped API keys (`cora_ws_live_...`).
+- Configurable permission scopes: `leads:read`, `leads:write`, `calendar:read`, `calendar:write`, `financials:read`, `projects:read`, `vault:read`.
+- Pre-formatted curl code snippets and live JSON-RPC test runner.
+
+---
+
+## 73. Enterprise Client Onboarding Studio & Strict Role Isolation Blueprint (v4.9.386 - v4.9.387)
+
+The Client Management Suite (`views/view-clients.php` and `cora-workspace.php`) delivers a guided 5-step onboarding studio, custom service catalogs, and strict portal role security:
+
+### 1. 5-Step Guided Client Onboarding Studio Drawer
+Replaces legacy single-step forms with a structured 5-step modal wizard:
+- **Step 1: Entity Profile**: Legal business name, brand moniker, registration number (CIN/LLPIN), official contact details, and physical billing address.
+- **Step 2: Primary Contact**: Client lead name, designation, direct phone with country code, work email, and communication preferences (Email vs WhatsApp).
+- **Step 3: Billing & International Currency**: Currency selection (`INR`, `USD`, `EUR`, `GBP`, `AED`, `SGD`), tax regime selection (`Domestic GST 18%`, `Zero-Rated Export LUT 0%`, `Custom VAT`), default billing cycle (milestone, monthly retainer, upfront 100%), and payment terms.
+- **Step 4: Services & Scope Matrix**: Dynamic service catalog multi-select chips with on-the-fly custom service creation persisted to `cora_workspace_services_{agency_id}` via `cora_ajax_save_workspace_custom_service`.
+- **Step 5: Portal Credentials & Welcome Invite**: Automated WordPress user provisioning with role `cora_client`, secure random password generation, unique portal access token, and branded email invitation dispatch.
+
+### 2. Strict Role Isolation & Portal Redirection Architecture
+- Dedicated WordPress user role: `cora_client`.
+- Security interceptor in `cora-workspace.php`: Users authenticated with the `cora_client` role are completely blocked from accessing `/workspace` and all internal admin views.
+- Attempts to access workspace routes trigger an automatic 302 redirection directly to their private white-labeled client portal:
+  ```php
+  if ( in_array( 'cora_client', (array) $current_user->roles, true ) ) {
+      $portal_token = get_user_meta( $current_user->ID, 'cora_client_portal_token', true );
+      wp_safe_redirect( home_url( '/workspace/client-portal?token=' . urlencode( $portal_token ) ) );
+      exit;
+  }
+  ```
+- Protects confidential workspace financial data, team attendance, internal notes, and margins from client visibility.
+
+### 3. Automatic CRM Lead Conversion Bridge
+- Clients created from won leads automatically update `wp_cora_leads` stage to `won`.
+- Preserves complete deal history, communication logs, and original inquiry sources.
+
+---
+
+## 74. Interactive Workspace Scheduling Calendar & Two-Way Google Meet Engine Blueprint (v4.9.386 - v4.9.387)
+
+Unified studio and consulting appointment calendar in `views/view-calendar.php`:
+
+### 1. Interactive Multi-Grid Calendar Engine
+- Native Month, Week, and Day calendar views with smooth transitions.
+- High-density event chips displaying appointment title, client name, service tag, and time slot.
+- Monochromatic neutral cards with functional status indicators (🟢 Confirmed, 🟡 Pending, ⚪ Completed).
+
+### 2. Two-Way Google Calendar Synchronization
+- Bidirectional synchronization checking studio availability against linked external Google Calendar accounts.
+- Automated conflict prevention blocking double-booking across shoot bays and meeting slots.
+
+### 3. Google Meet 3-4-3 Format Standardization
+- Enforces official Google Meet syntax across all virtual consultation appointments:
+  `https://meet.google.com/xxx-yyyy-zzz`
+- Validated via regex pattern `/^https:\/\/meet\.google\.com\/[a-z]{3}-[a-z]{4}-[a-z]{3}$/`.
+
+### 4. Shareable Public Booking Links
+- Shareable client booking links (e.g. 1-Hour Studio Session, 15-Min Quick Intro Call, Half-Day Editorial Shoot, Portfolio Review Session).
+- Configurable appointment duration, setup/teardown buffers, rates, and meeting location (Physical Studio vs Google Meet).
+- Inbound bookings automatically synthesize as qualified CRM leads in `wp_cora_leads`.
+
+---
+
+## 75. Collapsible Navigation Groups & Persistent Sidebar Memory Blueprint (v4.9.385 - v4.9.386)
+
+Sidebar navigation upgrade in `admin-dashboard.php`, `assets/css/admin-style.css`, and `assets/js/admin-script.js`:
+
+### 1. Accordion Group Hierarchy
+Navigation items are structured into 4 logical accordion groups:
+- `Core Workspace` (Dashboard, Clients, Projects, Leads, Calendar, Tasks)
+- `Apps & Modules` (Content Suite, Forms, Media, Inventory, Crew, Equipment, Google Profile)
+- `Growth & Public Sites` (Canvas Themes, Micro-Tools, Affiliates, Brand)
+- `System & Governance` (Users & Roles, Settings Suite, Super Admin, API & MCP)
+
+### 2. Interactive Chevron Animation & Persistence
+- Clicking a group label (`.cora-nav-group-label`) toggles `.is-collapsed`.
+- The chevron vector smoothly rotates:
+  ```css
+  .cora-nav-group-chevron {
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .cora-nav-group.is-collapsed .cora-nav-group-chevron {
+      transform: rotate(-90deg);
+  }
+  .cora-nav-group.is-collapsed .cora-nav-group-items {
+      display: none !important;
+  }
+  ```
+- Toggle state is saved in `localStorage` under `cora_sidebar_group_{key}` for instant 0ms restoration on page reload.
+
+### 3. Active Search Auto-Expansion
+- When the user types in the sidebar search box (`#cora-nav-search-input`), the parent navigation container receives `.is-searching`.
+- In searching mode, all collapsed groups expand automatically to reveal matching child items.
+- Clearing the search input immediately restores the user's customized collapsed/expanded memory state.
+
+---
+
+*Cora Developer Feature Guide v4.9.389 — Last updated: October 2026.*

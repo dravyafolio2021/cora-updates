@@ -2106,6 +2106,52 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         </button>
                     </div>
 
+                    <!-- Real-User WhatsApp Alerts Live Simulator -->
+                    <div class="p-3.5 bg-zinc-50 dark:bg-zinc-800/40 rounded-xl border border-zinc-200/80 dark:border-zinc-700/60 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="text-emerald-500 shrink-0"><path d="M17.472 14.382c-.301-.15-1.78-.878-2.056-.979-.275-.1-.475-.15-.675.15-.2.3-.775.979-.95 1.18-.175.2-.35.225-.65.075-.3-.15-1.267-.467-2.414-1.489-.893-.796-1.496-1.78-1.671-2.08-.175-.3-.019-.462.131-.611.135-.134.3-.35.45-.525.15-.175.2-.3.3-.5.1-.2.05-.375-.025-.525-.075-.15-.675-1.625-.925-2.225-.244-.584-.492-.505-.675-.514-.175-.009-.375-.01-.575-.01s-.525.075-.8.375c-.275.3-1.05 1.025-1.05 2.5s1.075 2.898 1.225 3.1c.15.2 2.115 3.23 5.125 4.53.716.31 1.275.495 1.71.633.72.228 1.375.196 1.893.118.577-.087 1.78-.727 2.03-1.428.25-.7.25-1.3.175-1.428-.075-.128-.275-.203-.575-.353zM12.04 2C6.516 2 2.022 6.49 2.022 12c0 1.954.563 3.78 1.541 5.334L2 22l4.81-1.523A9.972 9.972 0 0 0 12.04 22c5.523 0 10.018-4.49 10.018-10S17.563 2 12.04 2zm0 18.232c-1.62 0-3.13-.48-4.404-1.312l-.316-.208-2.854.903.92-2.78-.205-.327A8.212 8.212 0 0 1 3.822 12c0-4.53 3.687-8.216 8.218-8.216 4.53 0 8.218 3.686 8.218 8.216 0 4.53-3.688 8.232-8.218 8.232z"/></svg>
+                                <div>
+                                    <h4 class="text-xs font-bold text-zinc-900 dark:text-zinc-100 m-0">WhatsApp Real-User Alerts Live Simulator</h4>
+                                    <p class="text-[11px] text-zinc-500 m-0">Experience real client interactions by dispatching realistic live alerts directly to your phone.</p>
+                                </div>
+                            </div>
+                            <span class="text-[10px] font-mono font-medium px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60">Live Mode</span>
+                        </div>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 pt-1">
+                            <button type="button" onclick="coraSendWhatsAppTestAlert('activation')" class="flex flex-col items-start gap-1 p-2.5 bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-left rounded-xl border border-zinc-200/80 dark:border-zinc-700/80 shadow-3xs cursor-pointer transition-all active:scale-[0.98]">
+                                <div class="flex items-center gap-1.5 text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                                    <span>⚡</span> <span>24h Activation</span>
+                                </div>
+                                <span class="text-[10.5px] text-zinc-500 line-clamp-1">₹0 Free Tier Confirmation</span>
+                            </button>
+                            <button type="button" onclick="coraSendWhatsAppTestAlert('lead')" class="flex flex-col items-start gap-1 p-2.5 bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-left rounded-xl border border-zinc-200/80 dark:border-zinc-700/80 shadow-3xs cursor-pointer transition-all active:scale-[0.98]">
+                                <div class="flex items-center gap-1.5 text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                                    <span>🔥</span> <span>Hot Lead Alert</span>
+                                </div>
+                                <span class="text-[10.5px] text-zinc-500 line-clamp-1">₹1.85L Inbound Inquiry</span>
+                            </button>
+                            <button type="button" onclick="coraSendWhatsAppTestAlert('booking')" class="flex flex-col items-start gap-1 p-2.5 bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-left rounded-xl border border-zinc-200/80 dark:border-zinc-700/80 shadow-3xs cursor-pointer transition-all active:scale-[0.98]">
+                                <div class="flex items-center gap-1.5 text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                                    <span>📅</span> <span>Shoot Reminder</span>
+                                </div>
+                                <span class="text-[10.5px] text-zinc-500 line-clamp-1">Tomorrow 10:00 AM Floor B</span>
+                            </button>
+                            <button type="button" onclick="coraSendWhatsAppTestAlert('briefing')" class="flex flex-col items-start gap-1 p-2.5 bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-left rounded-xl border border-zinc-200/80 dark:border-zinc-700/80 shadow-3xs cursor-pointer transition-all active:scale-[0.98]">
+                                <div class="flex items-center gap-1.5 text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                                    <span>📊</span> <span>Morning Briefing</span>
+                                </div>
+                                <span class="text-[10.5px] text-zinc-500 line-clamp-1">₹1.85L Revenue &amp; Tasks</span>
+                            </button>
+                            <button type="button" onclick="coraSendWhatsAppTestAlert('payment')" class="flex flex-col items-start gap-1 p-2.5 bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-left rounded-xl border border-zinc-200/80 dark:border-zinc-700/80 shadow-3xs cursor-pointer transition-all active:scale-[0.98]">
+                                <div class="flex items-center gap-1.5 text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                                    <span>💰</span> <span>Payment Receipt</span>
+                                </div>
+                                <span class="text-[10.5px] text-zinc-500 line-clamp-1">₹42,500 UPI Cleared</span>
+                            </button>
+                        </div>
+                    </div>
+
                     <div class="p-3 bg-zinc-50 rounded-xl border border-zinc-150 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-zinc-600">
                         <div class="flex items-center gap-2">
                             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>

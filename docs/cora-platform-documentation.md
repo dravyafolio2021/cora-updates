@@ -1,6 +1,6 @@
 # Cora Platform — Comprehensive Platform Documentation
 
-This document serves as the master technical specification and architectural manual for the Cora Workspace Platform (v4.9.387).
+This document serves as the master technical specification and architectural manual for the Cora Workspace Platform (v4.9.389).
 
 ---
 
@@ -929,6 +929,31 @@ Deployed in **v4.9.386** and stabilized in **v4.9.387**, workspace scheduling re
 
 ---
 
+### 1.55 Google Business Profile & Google Maps AI Autopilot Suite (v4.9.388 - v4.9.389)
+Deployed in **v4.9.388** and enhanced in **v4.9.389**, the Google Business Profile (GBP) & Google Maps AI Autopilot hub (`views/view-google-profile.php`) provides an enterprise command center for multi-branch local search presence, review management, and automated reputation marketing:
+* **Multi-State Reactive Hub Architecture**:
+  - **State A (Unconnected Hero)**: Minimalist hero banner with 1-click Google OAuth 2.0 connection, Places text search lookup (`#cora-gbp-search-q`), and a dedicated sandbox demo shortcut (`coraGbpAuthorizeDemoAccount`).
+  - **State B (Multi-Branch Location Picker)**: Interactive listing picker allowing agencies with multiple branches/studios to select or switch the active target location.
+  - **State C (Connected Hub)**: Live analytical scorecards showcasing 4 key metrics: Total Impressions, Search Views, Maps Directions Requests, and Direct Phone Calls with 30-day percentage trajectory badges.
+* **5-Tab Segmented Control Navigation**:
+  1. *Reviews & AI Autopilot*: Filter pills (`All`, `Needs Reply`, `Replied`, `5 Stars`, `Critical`), customizable tone engine (`warm`, `professional`, `concise`, `apology`), AI review response generation, and 1-click instant publishing to Google Maps via API.
+  2. *Maps Post Publisher*: Announcement composer supporting 3 topic types (`STANDARD`, `OFFER`, `EVENT`), CTA button selector (`LEARN_MORE`, `CALL_NOW`, `BOOK`), media upload, and chronological post stream with instant deletion.
+  3. *Business Info & Operating Hours*: Business metadata editor plus Monday-through-Sunday open/close time pickers with dedicated "Closed" toggles and single-click persistence.
+  4. *Local SEO & Map-Pack Ranks*: Keyword ranking table tracking target search phrases, #1 in 3-Pack badges, 94% local visibility scorecard, and an automated local SEO optimization checklist.
+  5. *Multi-Branch Locations*: Seamless location switcher between multi-city hubs (e.g. Cyber City Hub and South Delhi branch) with active status badges.
+* **Right-Sliding API Credentials Drawer (`#cora-gbp-keys-panel`)**:
+  - Secure slide-out panel allowing workspace owners to configure their custom Google Cloud Client ID, Client Secret, and Google Maps JavaScript/Places API key.
+  - Displays the copyable OAuth redirect URI (`/workspace/gbp`), input masking with toggle view, and Escape key dismissal.
+* **Google 0-Quota Proactive Advisory Card & 1-Click Sandbox Simulation Fallback (v4.9.389)**:
+  - Google Cloud imposes an initial default quota of **0 requests per minute** on newly created Google Cloud projects for the `mybusinessaccountmanagement` API until explicit developer verification is completed.
+  - When quota limits or 429 status codes are detected during account fetch (`cora_gbp_fetch_accounts`), Cora intercepts the error and displays a proactive monochromatic advisory card (`0 QPM Default`).
+  - The card explains Google's approval timeline (1–3 business days), provides a direct link to the Google Access Request Form, and offers a 1-click **"Test in Sandbox Mode Now"** button (`window.coraGbpAuthorizeDemoAccount('studio.director@elitestudio.local')`).
+  - Activating sandbox mode enables full end-to-end testing of AI review generation, post creation, business hours updating, and map-pack telemetry without blocking workspace evaluation.
+* **Automated Quality Assurance**:
+  - Fully covered by automated Playwright E2E test suite `tests/e2e/test-gbp-management.spec.ts` (TC-GBP-01 through TC-GBP-04, 100% passing).
+
+---
+
 ## Section 2: Core SaaS Business Modules
 
 ### 2.1 Content AI Suite & Myra Assistant
@@ -1743,6 +1768,37 @@ Implemented in `views/view-projects.php` and `modules/projects/class-cora-projec
 
 ---
 
+### 2.36 Google Business Profile & Google Maps AI Autopilot Production Suite (v4.9.388 - v4.9.389)
+Implemented in `views/view-google-profile.php`, `cora-workspace.php` (AJAX controllers), and `assets/js/admin-script.js`:
+* **Controller AJAX Handlers & Security Nonces**:
+  - `cora_gbp_connect_place`: Connects a Google Place or business entity by Place ID, caching profile metadata.
+  - `cora_gbp_search_places`: Queries the Google Maps Places API (or simulated fallback) for business names and returns matching locations with addresses and rating metadata.
+  - `cora_gbp_get_oauth_url`: Generates a cryptographically signed OAuth 2.0 authorization URL with `state` nonce and requested scopes (`https://www.googleapis.com/auth/business.manage`).
+  - `cora_gbp_fetch_accounts`: Interacts with `mybusinessaccountmanagement.googleapis.com` to list Google Business Profile verified accounts. Includes automatic detection of Google Cloud 0-QPM default quota restrictions with proactive advisory cards.
+  - `cora_gbp_fetch_locations`: Retrieves verified branch locations and business IDs under an authorized account.
+  - `cora_gbp_select_location`: Sets the primary operational location for the active workspace.
+  - `cora_gbp_fetch_reviews`: Queries review feeds with author names, star ratings, submission timestamps, and existing replies.
+  - `cora_gbp_generate_ai_reply`: Calls the Cora AI Engine to generate contextual responses across 4 brand tones:
+    - `warm`: Enthusiastic, personalized appreciation mentioning customer satisfaction.
+    - `professional`: Polished, formal executive acknowledgment highlighting studio standards.
+    - `concise`: Crisp 1–2 sentence confirmation adhering to Cora conciseness standards.
+    - `apology`: Empathetic, de-escalating customer service protocol inviting offline resolution.
+  - `cora_gbp_reply_review`: Commits generated or edited review replies directly to Google Maps via API.
+  - `cora_gbp_create_post`: Dispatches Google Maps updates/announcements with topic types (`STANDARD`, `OFFER`, `EVENT`), media URLs, and action CTAs.
+  - `cora_gbp_delete_post`: Instantly revokes/removes active announcements from Google Maps streams.
+  - `cora_gbp_update_business_info`: Updates operating hours, address, phone number, and website links across the knowledge panel.
+  - `cora_gbp_save_keys`: Securely stores Google Cloud OAuth Client ID, Secret, and Maps JavaScript API Key.
+  - `cora_gbp_disconnect`: Cleanly purges tokens and cached profile records upon user request.
+  - `cora_gbp_authorize_demo`: Instant 1-click sandbox simulation setup (`studio.director@elitestudio.local`) for immediate evaluation without external Google credentials.
+* **Option Data Stores**:
+  - `cora_gbp_profile`: Cached business information, rating, review count, address, and place ID.
+  - `cora_gbp_tokens`: OAuth 2.0 access token, refresh token, expiry timestamp, and granted scopes.
+  - `cora_gbp_review_replies`: Associative store of review IDs to published reply text, timestamps, and author signatures.
+  - `cora_gbp_posts`: Array of active and historical Google Maps announcements with engagement metrics.
+  - `cora_gbp_force_mock`: Boolean toggle enabling sandboxed mock data simulation for development and testing.
+
+---
+
 ## Section 3: Canvas Theme Builder, Multi-Engine Architecture & Next.js Headless System (v4.9.38 - v4.9.357)
 
 Canvas is a **Multi-Engine Website & Theme Engineering Platform**, supporting Elementor white-labeled editing, modern Visual HTML Canvas, 1-click site ingestion, high-performance headless Next.js Git repository integration, and AI-assisted prompt template code generation:
@@ -1998,7 +2054,21 @@ On mobile devices (`< 768px`), all bottom controls are consolidated into a singl
 | `wp_cora_workspace_api_keys` | Tenant-scoped API keys (`cora_ws_live_...`) with rate limiting and RBAC permission scopes |
 | `wp_cora_workspace_plugin_logs` | Audit logging of plugin executions, webhook dispatches, and AI skill telemetry |
 
-### 6.2 Strict Agency Isolation & Tenant-Scoped Queries
+### 6.2 Tenant Options & Integration State Storage
+In addition to relational SQL tables, third-party and workspace-level configurations are partitioned per agency using WordPress option stores:
+| Option Key | Scope / Context | Description |
+| :--- | :--- | :--- |
+| `cora_gbp_profile` | Google Business Profile | Cached Google Maps profile metadata, Place ID, ratings, total review count, and physical street address |
+| `cora_gbp_tokens` | Google OAuth 2.0 | Encrypted OAuth access token, refresh token, expiry timestamp, and granted authorization scopes |
+| `cora_gbp_review_replies` | Reputation Management | Map of review IDs to published AI/manual responses, timestamps, and responder author tags |
+| `cora_gbp_posts` | Local SEO & Maps | Published and draft Google Maps announcements, promotional offers, event schedules, and CTAs |
+| `cora_gbp_force_mock` | GBP Sandbox Simulation | 1-click fallback toggle enabling complete end-to-end sandbox testing during Google Cloud 0-QPM quota reviews |
+| `cora_gbp_client_id` / `secret` | Credentials Panel | Tenant-configured Google Cloud OAuth credentials |
+| `cora_gbp_maps_api_key` | Places & Maps API | Google Maps JavaScript API key for location auto-complete and Places search |
+| `cora_workspace_services_{agency_id}` | Client Onboarding | Production service catalog matrix (Service Title, Category, Default Rate, Billing Cycle, SAC Code) |
+| `cora_sidebar_group_{key}` | UI State (`localStorage`) | Persistent collapsed/expanded status of sidebar navigation accordion groups |
+
+### 6.3 Strict Agency Isolation & Tenant-Scoped Queries
 All SQL queries and AI contextual retrievers strictly filter by `agency_id = %d`. Data from one tenant is cryptographically and logically isolated from all other workspaces.
 
 ---
@@ -2127,6 +2197,12 @@ Cora maintains an extensive, multi-tier testing framework ensuring zero regressi
   - Validates media selection modal integration, aspect ratio presets, and responsive thumbnail grids.
 * **Compact Mobile Multi-Step Drawers (`test-mobile-all-steps-compact.spec.ts`)**:
   - Tests mobile drawer transitions (`translate-y-full` to `translate-y-0`), bottom drag handles, safe-area elevation, and zero horizontal scroll overflow.
+* **Google Business Profile & Maps AI Autopilot (`test-gbp-management.spec.ts`)**:
+  - Comprehensive 4-test Playwright suite (TC-GBP-01 through TC-GBP-04):
+    - `TC-GBP-01`: Validates Unconnected State, Places API search results, and API Credentials Drawer opening, field masking, and Escape key dismissal.
+    - `TC-GBP-02`: Validates Multi-Branch location switcher and connected state.
+    - `TC-GBP-03`: Verifies Reviews AI Copilot, 4-tone generation (Warm, Professional, Concise, Apology), and 1-click publishing to Google Maps.
+    - `TC-GBP-04`: Verifies Maps Post Publisher (Standard, Offer, Event), 7-day business hours schedule editor, and Local SEO 3-Pack rank tracker.
 
 ### 8.3 Design System & Build Verification
 * **Frontend Design System Validator (`npm run check:design-system` in `cora-frontend`)**:
@@ -2264,6 +2340,8 @@ When authenticated as Super Admin (`cora_admin` / `admin@cora.local`), the platf
 
 | Version | Release Date | Key Features & Enhancements |
 | :--- | :--- | :--- |
+| **v4.9.389 (CORA-1241)** | Oct 2026 | Google 0-Quota Proactive Advisory Card & 1-Click Sandbox Simulation Fallback: Injected proactive monochromatic advisory card (`#cora-gbp-quota-advisory`) upon detecting Google Cloud 0 requests-per-minute (0 QPM) default API quota limits on `mybusinessaccountmanagement` API during initial Google review periods; added 1-click sandbox testing fallback (`window.coraGbpAuthorizeDemoAccount('studio.director@elitestudio.local')`) enabling full end-to-end testing of AI review replies, Maps post creation, 7-day business hours editing, and local SEO telemetry without blocking agency workflows |
+| **v4.9.388 (CORA-1240)** | Oct 2026 | Google Business Profile & Google Maps AI Autopilot Production Suite: Multi-state reactive hub in `views/view-google-profile.php` (Unconnected Hero with OAuth & Places search, Multi-Branch Location Switcher, Connected Operations Hub with 4-KPI scorecards: Total Impressions, Search Views, Directions Requests, Calls); 5-tab segmented control architecture (Reviews & AI Autopilot with 4 tones: Warm, Professional, Concise, Apology and 1-click Maps publishing; Maps Post Publisher for Standard, Offer, and Event topics with media uploads; Business Info & 7-Day Operating Hours editor with closed toggles; Local SEO & Map-Pack Ranks with #1 in 3-Pack badges and 94% visibility score; Multi-Branch Locations switcher); right-sliding API Credentials Drawer (`#cora-gbp-keys-panel`) with masked OAuth Client ID/Secret, Google Maps API key, copyable redirect URI, and Escape key dismissal; and comprehensive Playwright E2E test suite `tests/e2e/test-gbp-management.spec.ts` (TC-GBP-01 through TC-GBP-04, 100% passing) |
 | **v4.9.387 (CORA-1239)** | Oct 2026 | Plugins in App Module, Dynamic MCP 2.0 & AI Skills Engine: Level 01 Segmented Control (Plugins, Modules, Skills) at `/workspace/plugins`, `/workspace/modules`, `/workspace/skills`; isolated multi-tenant schema (`wp_cora_workspace_plugins`, `wp_cora_workspace_skills`, `wp_cora_workspace_api_keys`, `wp_cora_workspace_plugin_logs`); dynamic MCP tool filter (`cora_mcp_tools`) registering dynamic tools into `Cora_MCP_Tool_Registry`; API & MCP Gateway drawer with tenant API key provisioning (`cora_ws_live_...`), scopes, rate limits, and live OpenAPI 3.0.1 export (`/workspace/openapi`); multi-format ingestion (JSON Plugin Manifests, Antigravity SKILL.md, Autonomous AI generator); 5 starter plugins (Webhook Dispatcher, Google Calendar Sync, Payment Gateway Listener, Client Portal Notifier, Daily Ledger Reconciler) and 5 starter skills (Client Intake Specialist, GST Invoice Auditor, High-Ticket Lead Qualifier, Shoot Gear Readiness Auditor, Portfolio Storyteller) |
 | **v4.9.386 (CORA-1238)** | Oct 2026 | Enterprise Client Onboarding Suite, Strict Role Isolation & Two-Way Calendar Synchronization: Guided 5-step client onboarding studio in `views/view-clients.php` (Entity, Multi-Currency / Tax Regimes, Production Service Matrix & Catalog, Initial Project Showcase, User Account Provisioning & Credentials); strict WordPress role `cora_client` portal isolation with server-side `/workspace` redirection and login redirect filter; dynamic service catalog persistence (`cora_workspace_services_{agency_id}`); multi-currency (INR, USD, EUR, GBP, AED, SGD) and tax regimes (Domestic GST 18%, Zero-Rated Export LUT 0%, Custom VAT); public client portal deliverables showcase, proofing vault button, and suspended account state; full interactive scheduling calendar in `views/view-calendar.php` (Month, Week, Day), 2-way Google Calendar sync, and standard 3-4-3 Google Meet syntax (`https://meet.google.com/xxx-yyyy-zzz`) |
 | **v4.9.385 (CORA-1237)** | Oct 2026 | Mobile Sticky Offsets, Sub-Tabs Stacking & Search Touch Target Sizing: Resolved mobile header double-stack gap via dynamic `--cora-sticky-tabs-top` calculation in `admin-script.js`; preserved comfortable 28px (`w-7 h-7`) tap target sizing for mobile search trigger and close buttons (`#cora-proj-search-trigger-btn`, `#cora-proj-search-close-btn`); relocated projects canvas module mount directly below workspace header with `mt-4`; collapsible sidebar navigation groups with per-group localStorage state persistence (`cora_sidebar_group_{key}`) and instant auto-expansion during active navigation search (`.is-searching`) |
@@ -2527,4 +2605,4 @@ When authenticated as Super Admin (`cora_admin` / `admin@cora.local`), the platf
 
 ---
 
-*Cora Platform v4.9.387 — Master Architectural Manual. Last updated: October 2026.*
+*Cora Platform v4.9.389 — Master Architectural Manual. Last updated: October 2026.*

@@ -819,6 +819,19 @@ body.cora-skeleton-active .cora-page-section {
         box-shadow: none !important;
         border-bottom: none !important;
     }
+    #cora-content-tabs,
+    .cora-sticky-content-tabs,
+    #cora-forms-tabs,
+    #cora-settings-tabs,
+    #cora-emails-subtabs,
+    #cora-canvas-subtabs,
+    .cora-sticky-sub-tabs,
+    .cora-sub-tabs-container {
+        position: -webkit-sticky !important;
+        position: sticky !important;
+        top: 0px !important;
+        z-index: 40 !important;
+    }
 }
 
 #cora-workspace,
@@ -953,8 +966,101 @@ body.cora-skeleton-active .cora-page-section {
     }
 }
 
+/* ==========================================================================
+   RULE 15: SHOPIFY-INSPIRED MAIN-AREA DOCKED VIEW PANEL (GLOBAL SOP)
+   Universal Bottom-Slide Motion, Direct Below-Header Docking, Zero Backdrop
+   ========================================================================== */
+.cora-docked-drawer {
+    position: fixed !important;
+    top: var(--cora-main-top, 52px) !important;
+    bottom: 0 !important;
+    left: var(--cora-main-left, 16rem) !important;
+    right: 0 !important;
+    width: var(--cora-main-width, calc(100vw - 16rem)) !important;
+    max-width: var(--cora-main-width, calc(100vw - 16rem)) !important;
+    height: var(--cora-main-height, calc(100vh - 52px)) !important;
+    max-height: var(--cora-main-height, calc(100vh - 52px)) !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    border-top: 1px solid #e4e4e7 !important;
+    border-left: 1px solid #e4e4e7 !important;
+    border-right: none !important;
+    border-bottom: none !important;
+    background-color: #ffffff !important;
+    z-index: 55 !important;
+    box-shadow: none !important;
+    -webkit-box-shadow: none !important;
+    transition: left 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+                width 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+                max-width 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+                opacity 0.15s ease !important;
+    display: none;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    pointer-events: none;
+    visibility: hidden;
+}
 
+.dark .cora-docked-drawer {
+    background-color: #0c0c0e !important;
+    border-top: 1px solid #27272a !important;
+    border-left: 1px solid #27272a !important;
+}
 
+/* SIDEBAR COLLAPSED: Dynamically adjust to 4rem (64px / w-16) on desktop */
+@media (min-width: 1024px) {
+    body:has(.cora-sidebar.collapsed-sidebar) .cora-docked-drawer:not(.maximized),
+    body.cora-sidebar-collapsed .cora-docked-drawer:not(.maximized),
+    .cora-sidebar.collapsed-sidebar ~ .cora-main .cora-docked-drawer:not(.maximized),
+    .cora-docked-drawer.sidebar-collapsed:not(.maximized) {
+        left: 4rem !important;
+        width: calc(100vw - 4rem) !important;
+        max-width: calc(100vw - 4rem) !important;
+    }
+}
+
+/* MAXIMIZED FULLSCREEN VIEW (Shopify Expand ⤢ Mode) */
+.cora-docked-drawer.maximized {
+    left: 0 !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    border-left: none !important;
+    z-index: 75 !important;
+}
+
+/* MOBILE / TABLET (< 1024px): Full viewport width */
+@media (max-width: 1023px) {
+    .cora-docked-drawer,
+    body:has(.cora-sidebar.collapsed-sidebar) .cora-docked-drawer,
+    body.cora-sidebar-collapsed .cora-docked-drawer,
+    .cora-docked-drawer.sidebar-collapsed {
+        left: 0 !important;
+        right: 0 !important;
+        width: 100vw !important;
+        max-width: 100vw !important;
+        border-left: none !important;
+    }
+}
+
+/* OPEN & COLLAPSED STATES (UNIVERSAL BOTTOM SLIDE MOTION) */
+.cora-docked-drawer.open:not(.collapsed) {
+    display: flex !important;
+    transform: translateY(0) !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+
+.cora-docked-drawer.collapsed,
+.cora-docked-drawer:not(.open) {
+    transform: translateY(100%) !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    display: none !important;
+}
 /* =============================================================================
    12. TOAST NOTIFICATION SYSTEM (Top-Center Floating, Priority-Aware)
    ============================================================================= */
@@ -1800,7 +1906,7 @@ body.cora-scroll-locked {
 .cora-sub-tabs-container {
     position: -webkit-sticky !important;
     position: sticky !important;
-    top: var(--cora-sticky-tabs-top, var(--cora-topbar-height, 48px)) !important;
+    top: var(--cora-sticky-tabs-top, 0px) !important;
     left: 0 !important;
     right: 0 !important;
     z-index: 40 !important;

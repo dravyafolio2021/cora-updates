@@ -702,6 +702,54 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 }
             });
         };
+
+        window.coraSendWhatsAppTestAlert = function(alertType, customPhone) {
+            var ajaxUrl = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : (window.ajaxurl || '/wp-admin/admin-ajax.php');
+            var nonce = (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : '';
+            var type = alertType || 'lead';
+
+            var labelMap = {
+                'activation': '24-Hour Free Session Confirmation',
+                'lead': 'New High-Intent Lead Alert (₹1.85L)',
+                'booking': 'Client Shoot Booking Reminder',
+                'briefing': 'Daily Morning Operational Briefing',
+                'payment': 'Invoice Payment Received Receipt'
+            };
+            var alertLabel = labelMap[type] || type;
+
+            if (window.coraShowToast) {
+                window.coraShowToast('Dispatching ' + alertLabel + ' to WhatsApp...', 'info');
+            }
+
+            jQuery.ajax({
+                url: ajaxUrl,
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    action: 'cora_send_test_notification_channel',
+                    security: nonce,
+                    channel: 'whatsapp',
+                    alert_type: type,
+                    phone: customPhone || ''
+                },
+                success: function(r) {
+                    if (r && r.success) {
+                        if (window.coraShowToast) {
+                            window.coraShowToast(r.data.message || 'WhatsApp alert delivered! Check your phone.', 'success');
+                        }
+                    } else {
+                        if (window.coraShowToast) {
+                            window.coraShowToast((r && r.data && r.data.message) ? r.data.message : 'Error sending WhatsApp alert.', 'error');
+                        }
+                    }
+                },
+                error: function() {
+                    if (window.coraShowToast) {
+                        window.coraShowToast('Network error while dispatching WhatsApp test alert.', 'error');
+                    }
+                }
+            });
+        };
     </script>
 
     <!-- CRITICAL: Reset any WordPress admin-bar margin-top injected by wp_print_styles() -->
@@ -5353,10 +5401,15 @@ textarea,
                 </div>
                 <div class="text-[10px] text-zinc-400 dark:text-zinc-500 font-mono">24h Free Window (₹0)</div>
             </div>
-            <button type="button" onclick="if(window.coraCloseProfilePopover) window.coraCloseProfilePopover(); coraOpenWhatsAppActivation();" class="bg-zinc-900 hover:bg-black text-white dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-white text-[10.5px] font-bold px-2.5 py-1 rounded-md transition-all cursor-pointer shadow-3xs select-none inline-flex items-center gap-1 active:scale-95" title="Click to open WhatsApp and activate 24-hour free alerts window">
-                <span>Activate</span>
-                <span class="text-emerald-400 dark:text-emerald-600 font-mono text-[9.5px]">₹0</span>
-            </button>
+            <div class="flex items-center gap-1">
+                <button type="button" onclick="if(window.coraCloseProfilePopover) window.coraCloseProfilePopover(); coraOpenWhatsAppActivation();" class="bg-zinc-900 hover:bg-black text-white dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-white text-[10.5px] font-bold px-2.5 py-1 rounded-md transition-all cursor-pointer shadow-3xs select-none inline-flex items-center gap-1 active:scale-95" title="Click to open WhatsApp and activate 24-hour free alerts window">
+                    <span>Activate</span>
+                    <span class="text-emerald-400 dark:text-emerald-600 font-mono text-[9.5px]">₹0</span>
+                </button>
+                <button type="button" onclick="if(window.coraCloseProfilePopover) window.coraCloseProfilePopover(); coraSendWhatsAppTestAlert('lead');" class="bg-white hover:bg-zinc-100 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 text-[10.5px] font-bold px-2 py-1 rounded-md transition-all cursor-pointer shadow-3xs select-none inline-flex items-center gap-1 active:scale-95" title="Simulate a live client lead alert to your WhatsApp">
+                    <span>Test</span>
+                </button>
+            </div>
         </div>
 
         <!-- 3. Workspace AI & Quick Links List (Linear / Notion Style) -->
@@ -5923,10 +5976,15 @@ textarea,
                         <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" class="text-emerald-500 shrink-0"><path d="M17.472 14.382c-.301-.15-1.78-.878-2.056-.979-.275-.1-.475-.15-.675.15-.2.3-.775.979-.95 1.18-.175.2-.35.225-.65.075-.3-.15-1.267-.467-2.414-1.489-.893-.796-1.496-1.78-1.671-2.08-.175-.3-.019-.462.131-.611.135-.134.3-.35.45-.525.15-.175.2-.3.3-.5.1-.2.05-.375-.025-.525-.075-.15-.675-1.625-.925-2.225-.244-.584-.492-.505-.675-.514-.175-.009-.375-.01-.575-.01s-.525.075-.8.375c-.275.3-1.05 1.025-1.05 2.5s1.075 2.898 1.225 3.1c.15.2 2.115 3.23 5.125 4.53.716.31 1.275.495 1.71.633.72.228 1.375.196 1.893.118.577-.087 1.78-.727 2.03-1.428.25-.7.25-1.3.175-1.428-.075-.128-.275-.203-.575-.353zM12.04 2C6.516 2 2.022 6.49 2.022 12c0 1.954.563 3.78 1.541 5.334L2 22l4.81-1.523A9.972 9.972 0 0 0 12.04 22c5.523 0 10.018-4.49 10.018-10S17.563 2 12.04 2zm0 18.232c-1.62 0-3.13-.48-4.404-1.312l-.316-.208-2.854.903.92-2.78-.205-.327A8.212 8.212 0 0 1 3.822 12c0-4.53 3.687-8.216 8.218-8.216 4.53 0 8.218 3.686 8.218 8.216 0 4.53-3.688 8.232-8.218 8.232z"/></svg>
                         <span class="text-[11px] font-medium text-zinc-700 dark:text-zinc-300">WhatsApp Alerts</span>
                     </div>
-                    <button type="button" onclick="$('#cora-profile-popover').addClass('hidden'); coraOpenWhatsAppActivation();" class="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 hover:bg-black dark:hover:bg-white transition-all cursor-pointer inline-flex items-center gap-1 shadow-3xs active:scale-95" title="Click to open WhatsApp and activate 24-hour free alerts window">
-                        <span>Activate</span>
-                        <span class="text-emerald-400 dark:text-emerald-600 font-mono text-[9px]">₹0</span>
-                    </button>
+                    <div class="flex items-center gap-1">
+                        <button type="button" onclick="$('#cora-profile-popover').addClass('hidden'); coraOpenWhatsAppActivation();" class="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 hover:bg-black dark:hover:bg-white transition-all cursor-pointer inline-flex items-center gap-1 shadow-3xs active:scale-95" title="Click to open WhatsApp and activate 24-hour free alerts window">
+                            <span>Activate</span>
+                            <span class="text-emerald-400 dark:text-emerald-600 font-mono text-[9px]">₹0</span>
+                        </button>
+                        <button type="button" onclick="$('#cora-profile-popover').addClass('hidden'); coraSendWhatsAppTestAlert('lead');" class="text-[10px] font-semibold px-1.5 py-0.5 rounded-md bg-white hover:bg-zinc-100 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 transition-all cursor-pointer inline-flex items-center gap-1 shadow-3xs active:scale-95" title="Simulate a live client lead alert to your WhatsApp">
+                            <span>Test</span>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- 3. Streamlined Menu Items List -->

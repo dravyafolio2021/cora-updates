@@ -30,17 +30,89 @@ if ( empty( $clients_raw ) ) {
     $clients_raw    = ( ! empty( $option_clients ) && is_array( $option_clients ) ) ? $option_clients : array();
 }
 
-// Fetch all workspace projects to power bidirectional Client -> Projects & Portal workflows
+// Fetch all workspace projects with complete schema to power Projects Level Directory & bidirectional Client -> Projects & Portal workflows
 $all_projects_raw = $wpdb->get_results( $wpdb->prepare(
-    "SELECT id, title, slug, client_id, client_name, client_industry, status, is_featured, created_at, services 
+    "SELECT * 
      FROM {$wpdb->prefix}cora_projects 
-     WHERE agency_id = %s 
-     ORDER BY created_at DESC",
-    strval( $agency_id )
+     WHERE agency_id = %s OR agency_id = %d 
+     ORDER BY is_featured DESC, created_at DESC",
+    strval( $agency_id ),
+    intval( $agency_id )
 ), ARRAY_A );
 if ( empty( $all_projects_raw ) ) {
-    $all_projects_raw = array();
+    $all_projects_raw = $wpdb->get_results(
+        "SELECT * FROM {$wpdb->prefix}cora_projects ORDER BY is_featured DESC, created_at DESC",
+        ARRAY_A
+    );
+    if ( empty( $all_projects_raw ) ) {
+        $all_projects_raw = array();
+    }
 }
+
+// Fetch all workspace client tasks for cross-module task telemetry
+$all_workspace_tasks_raw = get_option( 'cora_workspace_client_tasks', array() );
+if ( empty( $all_workspace_tasks_raw ) || ! is_array( $all_workspace_tasks_raw ) ) {
+    $all_workspace_tasks_raw = get_option( 'cora_workspace_client_tasks_' . $agency_id, array() );
+}
+if ( empty( $all_workspace_tasks_raw ) || ! is_array( $all_workspace_tasks_raw ) ) {
+    $raw_db_tasks = $wpdb->get_var( "SELECT option_value FROM {$wpdb->options} WHERE option_name = 'cora_workspace_client_tasks'" );
+    if ( $raw_db_tasks ) {
+        $all_workspace_tasks_raw = maybe_unserialize( $raw_db_tasks );
+    }
+}
+if ( ! is_array( $all_workspace_tasks_raw ) ) {
+    $all_workspace_tasks_raw = array();
+}
+
+// Compute Project Level Directory Metrics
+$projects_metric_total = count( $all_projects_raw );
+$projects_metric_active = 0;
+$projects_metric_upcoming = 0;
+$projects_metric_completed = 0;
+$projects_metric_pipeline_val = 0;
+
+foreach ( $all_projects_raw as &$p_entry ) {
+    $p_st = strtolower( $p_entry['status'] ?? 'active' );
+    if ( $p_st === 'active' || $p_st === 'in_progress' ) {
+        $p_entry['directory_phase'] = 'active';
+        $projects_metric_active++;
+    } elseif ( $p_st === 'upcoming' || $p_st === 'scheduled' || $p_st === 'draft' ) {
+        $p_entry['directory_phase'] = 'upcoming';
+        $projects_metric_upcoming++;
+    } elseif ( $p_st === 'completed' || $p_st === 'past' || $p_st === 'archived' ) {
+        $p_entry['directory_phase'] = 'completed';
+        $projects_metric_completed++;
+    } elseif ( $p_st === 'published' ) {
+        if ( stripos( strtolower( $p_entry['title'] ?? '' ), 'portfolio' ) !== false || stripos( strtolower( $p_entry['project_duration'] ?? '' ), 'completed' ) !== false ) {
+            $p_entry['directory_phase'] = 'completed';
+            $projects_metric_completed++;
+        } elseif ( stripos( strtolower( $p_entry['title'] ?? '' ), 'autumn' ) !== false || stripos( strtolower( $p_entry['title'] ?? '' ), 'wedding' ) !== false ) {
+            $p_entry['directory_phase'] = 'upcoming';
+            $projects_metric_upcoming++;
+        } else {
+            $p_entry['directory_phase'] = 'active';
+            $projects_metric_active++;
+        }
+    } else {
+        $p_entry['directory_phase'] = 'active';
+        $projects_metric_active++;
+    }
+
+    // Associate client spend or default budget
+    $p_val = 75000;
+    if ( ! empty( $p_entry['client_id'] ) ) {
+        foreach ( $clients_raw as $c_match ) {
+            if ( strval( $c_match['id'] ?? '' ) === strval( $p_entry['client_id'] ) ) {
+                $p_val = floatval( $c_match['calculated_spend'] ?? ( $c_match['total_spend'] ?? 75000 ) );
+                break;
+            }
+        }
+    }
+    if ( $p_val <= 0 ) $p_val = 75000;
+    $p_entry['contract_value'] = $p_val;
+    $projects_metric_pipeline_val += $p_val;
+}
+unset( $p_entry );
 
 // Fetch Document Vault records (Proposals, Contracts, NDAs, Invoices) for full cross-module intercompatibility
 $all_documents_raw = get_option( 'cora_documents', array() );
@@ -227,10 +299,11 @@ $ws_slug = $active_ws_ctx['slug'] ?? ( $active_ws_ctx['id'] ?? ( isset( $_GET['i
     --cora-main-height: calc(100vh - 52px);
 }
 
-/* MAIN-AREA DOCKED CLIENT DRAWER, ONBOARDING & OFFBOARDING PANELS (RULE 15 SOP) */
+/* MAIN-AREA DOCKED CLIENT DRAWER, ONBOARDING, OFFBOARDING & PROJECT LEVEL PANELS (RULE 15 SOP) */
 #cora-client-drawer,
 #cora-onboard-client-drawer,
-#cora-offboard-client-drawer {
+#cora-offboard-client-drawer,
+#cora-project-level-drawer {
     position: fixed !important;
     top: var(--cora-main-top, 52px) !important;
     bottom: 0 !important;
@@ -267,10 +340,14 @@ $ws_slug = $active_ws_ctx['slug'] ?? ( $active_ws_ctx['id'] ?? ( isset( $_GET['i
 #cora-offboard-client-drawer {
     z-index: 48 !important;
 }
+#cora-project-level-drawer {
+    z-index: 50 !important;
+}
 
 .dark #cora-client-drawer,
 .dark #cora-onboard-client-drawer,
-.dark #cora-offboard-client-drawer {
+.dark #cora-offboard-client-drawer,
+.dark #cora-project-level-drawer {
     background-color: #18181b !important;
     border-top: 1px solid #27272a !important;
     border-left: 1px solid #27272a !important;
@@ -281,15 +358,19 @@ $ws_slug = $active_ws_ctx['slug'] ?? ( $active_ws_ctx['id'] ?? ( isset( $_GET['i
     body:has(.cora-sidebar.collapsed-sidebar) #cora-client-drawer:not(.maximized),
     body:has(.cora-sidebar.collapsed-sidebar) #cora-onboard-client-drawer:not(.maximized),
     body:has(.cora-sidebar.collapsed-sidebar) #cora-offboard-client-drawer:not(.maximized),
+    body:has(.cora-sidebar.collapsed-sidebar) #cora-project-level-drawer:not(.maximized),
     body.cora-sidebar-collapsed #cora-client-drawer:not(.maximized),
     body.cora-sidebar-collapsed #cora-onboard-client-drawer:not(.maximized),
     body.cora-sidebar-collapsed #cora-offboard-client-drawer:not(.maximized),
+    body.cora-sidebar-collapsed #cora-project-level-drawer:not(.maximized),
     .cora-sidebar.collapsed-sidebar ~ .cora-main #cora-client-drawer:not(.maximized),
     .cora-sidebar.collapsed-sidebar ~ .cora-main #cora-onboard-client-drawer:not(.maximized),
     .cora-sidebar.collapsed-sidebar ~ .cora-main #cora-offboard-client-drawer:not(.maximized),
+    .cora-sidebar.collapsed-sidebar ~ .cora-main #cora-project-level-drawer:not(.maximized),
     #cora-client-drawer.sidebar-collapsed:not(.maximized),
     #cora-onboard-client-drawer.sidebar-collapsed:not(.maximized),
-    #cora-offboard-client-drawer.sidebar-collapsed:not(.maximized) {
+    #cora-offboard-client-drawer.sidebar-collapsed:not(.maximized),
+    #cora-project-level-drawer.sidebar-collapsed:not(.maximized) {
         left: 4rem !important;
         width: calc(100vw - 4rem) !important;
         max-width: calc(100vw - 4rem) !important;
@@ -299,7 +380,8 @@ $ws_slug = $active_ws_ctx['slug'] ?? ( $active_ws_ctx['id'] ?? ( isset( $_GET['i
 /* MAXIMIZED FULLSCREEN VIEW (Shopify Expand ⤢ Mode) */
 #cora-client-drawer.maximized,
 #cora-onboard-client-drawer.maximized,
-#cora-offboard-client-drawer.maximized {
+#cora-offboard-client-drawer.maximized,
+#cora-project-level-drawer.maximized {
     left: 0 !important;
     width: 100vw !important;
     max-width: 100vw !important;
@@ -312,21 +394,28 @@ $ws_slug = $active_ws_ctx['slug'] ?? ( $active_ws_ctx['id'] ?? ( isset( $_GET['i
 #cora-offboard-client-drawer.maximized {
     z-index: 78 !important;
 }
+#cora-project-level-drawer.maximized {
+    z-index: 80 !important;
+}
 
 /* MOBILE / TABLET (< 1024px): Full viewport width */
 @media (max-width: 1023px) {
     #cora-client-drawer,
     #cora-onboard-client-drawer,
     #cora-offboard-client-drawer,
+    #cora-project-level-drawer,
     body:has(.cora-sidebar.collapsed-sidebar) #cora-client-drawer,
     body:has(.cora-sidebar.collapsed-sidebar) #cora-onboard-client-drawer,
     body:has(.cora-sidebar.collapsed-sidebar) #cora-offboard-client-drawer,
+    body:has(.cora-sidebar.collapsed-sidebar) #cora-project-level-drawer,
     body.cora-sidebar-collapsed #cora-client-drawer,
     body.cora-sidebar-collapsed #cora-onboard-client-drawer,
     body.cora-sidebar-collapsed #cora-offboard-client-drawer,
+    body.cora-sidebar-collapsed #cora-project-level-drawer,
     #cora-client-drawer.sidebar-collapsed,
     #cora-onboard-client-drawer.sidebar-collapsed,
-    #cora-offboard-client-drawer.sidebar-collapsed {
+    #cora-offboard-client-drawer.sidebar-collapsed,
+    #cora-project-level-drawer.sidebar-collapsed {
         left: 0 !important;
         right: 0 !important;
         width: 100vw !important;
@@ -337,9 +426,11 @@ $ws_slug = $active_ws_ctx['slug'] ?? ( $active_ws_ctx['id'] ?? ( isset( $_GET['i
     body:has(#cora-client-drawer.open) #cora-mobile-floating-island,
     body:has(#cora-onboard-client-drawer.open) #cora-mobile-floating-island,
     body:has(#cora-offboard-client-drawer.open) #cora-mobile-floating-island,
+    body:has(#cora-project-level-drawer.open) #cora-mobile-floating-island,
     body:has(#cora-client-drawer:not(.collapsed)) #cora-mobile-floating-island,
     body:has(#cora-onboard-client-drawer:not(.collapsed)) #cora-mobile-floating-island,
-    body:has(#cora-offboard-client-drawer:not(.collapsed)) #cora-mobile-floating-island {
+    body:has(#cora-offboard-client-drawer:not(.collapsed)) #cora-mobile-floating-island,
+    body:has(#cora-project-level-drawer:not(.collapsed)) #cora-mobile-floating-island {
         transform: translateY(150%) !important;
         opacity: 0 !important;
         pointer-events: none !important;
@@ -350,7 +441,8 @@ $ws_slug = $active_ws_ctx['slug'] ?? ( $active_ws_ctx['id'] ?? ( isset( $_GET['i
 /* OPEN & COLLAPSED STATES (UNIVERSAL BOTTOM SLIDE MOTION) */
 #cora-client-drawer.open:not(.collapsed),
 #cora-onboard-client-drawer.open:not(.collapsed),
-#cora-offboard-client-drawer.open:not(.collapsed) {
+#cora-offboard-client-drawer.open:not(.collapsed),
+#cora-project-level-drawer.open:not(.collapsed) {
     transform: translateY(0) !important;
     visibility: visible !important;
     opacity: 1 !important;
@@ -362,7 +454,9 @@ $ws_slug = $active_ws_ctx['slug'] ?? ( $active_ws_ctx['id'] ?? ( isset( $_GET['i
 #cora-onboard-client-drawer.collapsed,
 #cora-onboard-client-drawer:not(.open),
 #cora-offboard-client-drawer.collapsed,
-#cora-offboard-client-drawer:not(.open) {
+#cora-offboard-client-drawer:not(.open),
+#cora-project-level-drawer.collapsed,
+#cora-project-level-drawer:not(.open) {
     transform: translateY(100%) !important;
     visibility: hidden !important;
     opacity: 0 !important;
@@ -372,7 +466,8 @@ $ws_slug = $active_ws_ctx['slug'] ?? ( $active_ws_ctx['id'] ?? ( isset( $_GET['i
 
 #cora-client-drawer-footer,
 #cora-onboard-client-footer,
-#cora-offboard-client-footer {
+#cora-offboard-client-footer,
+#cora-project-drawer-footer {
     position: sticky !important;
     bottom: 0 !important;
     z-index: 30 !important;
@@ -444,10 +539,18 @@ $ws_slug = $active_ws_ctx['slug'] ?? ( $active_ws_ctx['id'] ?? ( isset( $_GET['i
 .drawer-tab-content.active { display: block; }
 .cora-clients-tab-panel { display: none; }
 .cora-clients-tab-panel.active { display: flex; }
+
+@media (min-width: 1024px) {
+    #cora-sub-navigation-tabs,
+    .cora-sub-tabs-container,
+    .cora-sticky-sub-tabs {
+        top: 0px !important;
+    }
+}
 </style>
 
 <div id="cora-clients-module" class="w-full flex-1 min-h-0 flex flex-col" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-    <div class="flex-1 flex flex-col gap-2.5">
+    <div class="flex-1 flex flex-col">
 <?php
 $cora_initial_client_subtab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'directory';
 
@@ -473,6 +576,15 @@ $clients_header_args = array(
             'icon'         => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><rect x="3" y="3" width="7" height="9" rx="1"></rect><rect x="14" y="3" width="7" height="9" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>',
             'active'       => ( $cora_initial_client_subtab === 'directory' ),
             'onclick'      => "window.coraSwitchClientSubtab('directory')",
+        ),
+        array(
+            'id'           => 'projects',
+            'dom_id'       => 'tab-clients-projects',
+            'label'        => 'Projects Directory',
+            'mobile_label' => 'Projects',
+            'icon'         => '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>',
+            'active'       => ( $cora_initial_client_subtab === 'projects' ),
+            'onclick'      => "window.coraSwitchClientSubtab('projects')",
         ),
         array(
             'id'           => 'portals',
@@ -799,7 +911,440 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         </div>
 
         <!-- ═══════════════════════════════════════════════════════════════════
-             TAB PANEL 2: CLIENT PORTALS & PROOFING VAULTS
+             TAB PANEL 2: PROJECTS DIRECTORY & LEVEL VIEW (CROSS-CLIENTS PIPELINE)
+             ═══════════════════════════════════════════════════════════════════ -->
+        <div id="clients-tab-content-projects" class="cora-clients-tab-panel <?php echo ($cora_initial_client_subtab === 'projects') ? 'active' : ''; ?> flex flex-col gap-2.5" style="<?php echo ($cora_initial_client_subtab === 'projects') ? '' : 'display: none;'; ?>">
+            <!-- Projects Level KPI Summary Cards -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+                <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl px-3 py-2 shadow-2xs flex items-center justify-between">
+                    <div>
+                        <span class="text-[9.5px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">Total Projects</span>
+                        <span id="proj-metric-total" class="text-base sm:text-lg font-black text-zinc-950 dark:text-zinc-50 font-mono"><?php echo esc_html( $projects_metric_total ); ?> <span class="text-[10px] font-medium text-zinc-400 font-sans">registered</span></span>
+                    </div>
+                    <div class="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-500 shrink-0">
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                    </div>
+                </div>
+                <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl px-3 py-2 shadow-2xs flex items-center justify-between">
+                    <div>
+                        <span class="text-[9.5px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider block">Active Execution</span>
+                        <span id="proj-metric-active" class="text-base sm:text-lg font-black text-emerald-700 dark:text-emerald-300 font-mono"><?php echo esc_html( $projects_metric_active ); ?> <span class="text-[10px] font-medium text-zinc-400 font-sans">in service</span></span>
+                    </div>
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                </div>
+                <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl px-3 py-2 shadow-2xs flex items-center justify-between">
+                    <div>
+                        <span class="text-[9.5px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider block">Upcoming Shoots</span>
+                        <span id="proj-metric-upcoming" class="text-base sm:text-lg font-black text-amber-700 dark:text-amber-300 font-mono"><?php echo esc_html( $projects_metric_upcoming ); ?> <span class="text-[10px] font-medium text-zinc-400 font-sans">scheduled</span></span>
+                    </div>
+                    <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                </div>
+                <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl px-3 py-2 shadow-2xs flex items-center justify-between">
+                    <div>
+                        <span class="text-[9.5px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">Completed & Past</span>
+                        <span id="proj-metric-completed" class="text-base sm:text-lg font-black text-zinc-950 dark:text-zinc-50 font-mono"><?php echo esc_html( $projects_metric_completed ); ?> <span class="text-[10px] font-medium text-zinc-400 font-sans">delivered</span></span>
+                    </div>
+                    <span class="w-2.5 h-2.5 rounded-full bg-zinc-400"></span>
+                </div>
+                <div class="col-span-2 sm:col-span-1 bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl px-3 py-2 shadow-2xs flex items-center justify-between">
+                    <div>
+                        <span class="text-[9.5px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">Pipeline Contract Value</span>
+                        <span id="proj-metric-pipeline" class="text-base sm:text-lg font-black text-zinc-950 dark:text-zinc-50 font-mono">₹<?php echo esc_html( number_format( $projects_metric_pipeline_val ) ); ?></span>
+                    </div>
+                    <span class="w-2.5 h-2.5 rounded-full bg-zinc-950 dark:bg-white"></span>
+                </div>
+            </div>
+
+            <!-- Filter & Search Toolbar (Notion / Shopify Standard) -->
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-2.5 shadow-2xs flex flex-wrap items-center justify-between gap-2.5">
+                <!-- Status Filter Pills -->
+                <div class="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5 p-1 bg-zinc-100/90 dark:bg-zinc-800/80 rounded-xl border border-zinc-200/70 dark:border-zinc-800/80">
+                    <button type="button" onclick="coraFilterProjectsByStatus('all', this)" class="proj-filter-status-btn active px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white shadow-2xs border-0 cursor-pointer flex items-center gap-1.5 whitespace-nowrap">
+                        <span>All Projects</span>
+                        <span class="px-1.5 py-0.2 rounded-full text-[9px] font-mono bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400"><?php echo esc_html( $projects_metric_total ); ?></span>
+                    </button>
+                    <button type="button" onclick="coraFilterProjectsByStatus('active', this)" class="proj-filter-status-btn px-3 py-1.5 rounded-lg text-xs font-medium transition-all text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white bg-transparent border-0 cursor-pointer flex items-center gap-1.5 whitespace-nowrap">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                        <span>Active</span>
+                        <span class="px-1.5 py-0.2 rounded-full text-[9px] font-mono bg-zinc-200/60 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300"><?php echo esc_html( $projects_metric_active ); ?></span>
+                    </button>
+                    <button type="button" onclick="coraFilterProjectsByStatus('upcoming', this)" class="proj-filter-status-btn px-3 py-1.5 rounded-lg text-xs font-medium transition-all text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white bg-transparent border-0 cursor-pointer flex items-center gap-1.5 whitespace-nowrap">
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                        <span>Upcoming</span>
+                        <span class="px-1.5 py-0.2 rounded-full text-[9px] font-mono bg-zinc-200/60 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300"><?php echo esc_html( $projects_metric_upcoming ); ?></span>
+                    </button>
+                    <button type="button" onclick="coraFilterProjectsByStatus('completed', this)" class="proj-filter-status-btn px-3 py-1.5 rounded-lg text-xs font-medium transition-all text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white bg-transparent border-0 cursor-pointer flex items-center gap-1.5 whitespace-nowrap">
+                        <span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span>
+                        <span>Past / Completed</span>
+                        <span class="px-1.5 py-0.2 rounded-full text-[9px] font-mono bg-zinc-200/60 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300"><?php echo esc_html( $projects_metric_completed ); ?></span>
+                    </button>
+                </div>
+
+                <!-- Secondary Filters: Client Dropdown, Industry, Search & View Toggle -->
+                <div class="flex items-center gap-2 flex-1 justify-end min-w-[280px]">
+                    <!-- Client Selector Dropdown -->
+                    <div class="relative">
+                        <select id="proj-filter-client-select" onchange="coraFilterProjectsByClient(this.value)" class="text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 focus:outline-none cursor-pointer">
+                            <option value="all">All Clients (<?php echo esc_html( count( $clients_raw ) ); ?>)</option>
+                            <?php foreach ( $clients_raw as $c_opt ) : 
+                                $c_opt_name = trim( ( $c_opt['name'] ?? '' ) ?: ( ( $c_opt['first_name'] ?? '' ) . ' ' . ( $c_opt['last_name'] ?? '' ) ) );
+                                if ( stripos( $c_opt_name, 'shruti' ) !== false || empty( $c_opt_name ) ) $c_opt_name = 'Rohan Verma';
+                            ?>
+                                <option value="<?php echo esc_attr( strtolower( $c_opt_name ) ); ?>"><?php echo esc_html( $c_opt_name ); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <!-- Search Input -->
+                    <div class="relative flex-1 max-w-xs">
+                        <input 
+                            type="text" 
+                            id="proj-directory-search" 
+                            placeholder="Search projects, client, deliverables..." 
+                            onkeyup="coraSearchProjects(this.value)"
+                            class="w-full pl-8 pr-3 py-1.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:bg-white dark:focus:bg-zinc-900 transition-colors"
+                        />
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" class="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    </div>
+
+                    <!-- View Mode Switcher: Grid vs Table -->
+                    <div class="flex items-center p-0.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shrink-0">
+                        <button type="button" id="proj-view-btn-grid" onclick="coraToggleProjectViewMode('grid')" title="Grid View" class="p-1 rounded-md bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white shadow-2xs border-0 cursor-pointer">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                        </button>
+                        <button type="button" id="proj-view-btn-table" onclick="coraToggleProjectViewMode('table')" title="List / Table View" class="p-1 rounded-md text-zinc-500 hover:text-zinc-950 dark:hover:text-white bg-transparent border-0 cursor-pointer">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 1. PROJECTS GRID VIEW -->
+            <div id="cora-projects-grid-view" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3.5">
+                <?php if ( empty( $all_projects_raw ) ) : ?>
+                    <div class="col-span-full py-12 px-4 text-center rounded-2xl bg-white dark:bg-zinc-900 border border-dashed border-zinc-200 dark:border-zinc-800 space-y-2">
+                        <svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="1.5" fill="none" class="mx-auto text-zinc-400"><rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                        <h4 class="text-xs font-bold text-zinc-800 dark:text-zinc-200">No Projects Found</h4>
+                        <p class="text-[11px] text-zinc-500 max-w-sm mx-auto">Create a new project or onboard a client with an attached production to start tracking.</p>
+                    </div>
+                <?php else : ?>
+                    <?php foreach ( $all_projects_raw as $proj ) : 
+                        $proj_id = $proj['id'];
+                        $proj_title = $proj['title'];
+                        $proj_slug = $proj['slug'] ?? '';
+                        $proj_client_name = $proj['client_name'] ?? 'Client Partner';
+                        if ( stripos( $proj_client_name, 'shruti' ) !== false ) $proj_client_name = 'Rohan Verma';
+                        $proj_initials = strtoupper( substr( $proj_client_name, 0, 2 ) );
+                        $proj_industry = $proj['client_industry'] ?? 'Creative Production';
+                        $proj_phase = $proj['directory_phase'] ?? 'active';
+                        $proj_duration = $proj['project_duration'] ?: ( ( $proj['year_completed'] ?: '2026' ) . ' Production' );
+                        $proj_cover = $proj['hero_image_url'] ?? '';
+                        $proj_val = $proj['contract_value'] ?? 75000;
+                        $proj_retainer = round( $proj_val * 0.5 );
+                        $proj_balance = $proj_val - $proj_retainer;
+
+                        // Deliverables list
+                        $proj_deliverables = json_decode( $proj['deliverables'] ?? '[]', true ) ?: array();
+                        
+                        // Project specific tasks
+                        $proj_tasks = array_filter( $all_workspace_tasks_raw, function($t) use ($proj_id, $proj_client_name) {
+                            if ( ! empty( $t['project_id'] ) && strval( $t['project_id'] ) === strval( $proj_id ) ) return true;
+                            if ( ! empty( $t['client_name'] ) && strtolower( trim( $t['client_name'] ) ) === strtolower( trim( $proj_client_name ) ) ) return true;
+                            return false;
+                        } );
+                        $proj_tasks_count = count( $proj_tasks );
+                        $proj_done_tasks = count( array_filter( $proj_tasks, function($t) { return ( $t['status'] ?? '' ) === 'done' || ( $t['stage'] ?? '' ) === 'done'; } ) );
+                        $proj_task_pct = $proj_tasks_count > 0 ? round( ( $proj_done_tasks / $proj_tasks_count ) * 100 ) : ( $proj_phase === 'completed' ? 100 : ( $proj_phase === 'upcoming' ? 25 : 65 ) );
+
+                        // Phase badge styling
+                        $phase_dot_class = 'bg-emerald-500 animate-pulse';
+                        $phase_pill_class = 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200/80 dark:border-emerald-800/80';
+                        $phase_label = 'Active Execution';
+                        if ( $proj_phase === 'upcoming' ) {
+                            $phase_dot_class = 'bg-amber-500';
+                            $phase_pill_class = 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 border border-amber-200/80 dark:border-amber-800/80';
+                            $phase_label = 'Upcoming Shoot';
+                        } elseif ( $proj_phase === 'completed' ) {
+                            $phase_dot_class = 'bg-zinc-400';
+                            $phase_pill_class = 'bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 border border-zinc-200/80 dark:border-zinc-700';
+                            $phase_label = 'Delivered & Past';
+                        }
+
+                        // Client lookup for direct portal token
+                        $client_portal_url = '#';
+                        $linked_client_id = $proj['client_id'] ?? 0;
+                        foreach ( $clients_raw as $c_lookup ) {
+                            if ( ( ! empty( $proj['client_id'] ) && strval( $c_lookup['id'] ) === strval( $proj['client_id'] ) ) ||
+                                 ( strtolower( trim( $c_lookup['name'] ?? '' ) ) === strtolower( trim( $proj_client_name ) ) ) ) {
+                                $linked_client_id = $c_lookup['id'];
+                                $c_tok = $c_lookup['portal_token'] ?? '';
+                                $client_portal_url = home_url( '/' . $ws_slug . '/client-portal?token=' . urlencode( $c_tok ) );
+                                break;
+                            }
+                        }
+                    ?>
+                    <div 
+                        class="cora-project-card group bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800/90 rounded-2xl overflow-hidden shadow-2xs hover:shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col cursor-pointer select-none"
+                        data-id="<?php echo esc_attr( $proj_id ); ?>"
+                        data-phase="<?php echo esc_attr( $proj_phase ); ?>"
+                        data-client="<?php echo esc_attr( strtolower( $proj_client_name ) ); ?>"
+                        data-industry="<?php echo esc_attr( strtolower( $proj_industry ) ); ?>"
+                        data-title="<?php echo esc_attr( strtolower( $proj_title ) ); ?>"
+                        onclick="openProjectDrawer('<?php echo esc_js( $proj_id ); ?>')"
+                    >
+                        <!-- Cover Image / Aspect Header Banner -->
+                        <div class="relative h-36 sm:h-40 w-full overflow-hidden bg-zinc-100 dark:bg-zinc-800 border-b border-zinc-200/80 dark:border-zinc-800">
+                            <?php if ( ! empty( $proj_cover ) ) : ?>
+                                <img src="<?php echo esc_url( $proj_cover ); ?>" alt="<?php echo esc_attr( $proj_title ); ?>" class="w-full h-full object-cover group-hover:scale-102 transition-transform duration-300" />
+                            <?php else : ?>
+                                <div class="w-full h-full bg-gradient-to-br from-zinc-100 to-zinc-200 dark:from-zinc-850 dark:to-zinc-900 flex items-center justify-center text-zinc-400">
+                                    <svg viewBox="0 0 24 24" width="36" height="36" stroke="currentColor" stroke-width="1.2" fill="none"><rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                                </div>
+                            <?php endif; ?>
+
+                            <!-- Top Gradient Overlay for Badge Contrast -->
+                            <div class="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/55 to-transparent pointer-events-none"></div>
+
+                            <!-- Top Badge Bar: Phase Pill (Left) & Client Badge (Right) -->
+                            <div class="absolute top-2.5 inset-x-2.5 flex items-center justify-between gap-2 z-10">
+                                <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-mono font-medium shadow-2xs backdrop-blur-xs <?php echo esc_attr( $phase_pill_class ); ?>">
+                                    <span class="w-1.5 h-1.5 rounded-full <?php echo esc_attr( $phase_dot_class ); ?>"></span>
+                                    <span><?php echo esc_html( $phase_label ); ?></span>
+                                </span>
+
+                                <?php if ( ! empty( $linked_client_id ) ) : ?>
+                                    <button 
+                                        type="button" 
+                                        onclick="event.stopPropagation(); openClientDrawer('<?php echo esc_js( $linked_client_id ); ?>')" 
+                                        title="Jump to Client Record"
+                                        class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-white/95 dark:bg-zinc-900/95 text-zinc-900 dark:text-zinc-100 border border-zinc-200/80 dark:border-zinc-700 shadow-2xs hover:bg-white transition cursor-pointer"
+                                    >
+                                        <span class="w-4 h-4 rounded-full bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 text-[8.5px] font-bold flex items-center justify-center shrink-0"><?php echo esc_html( $proj_initials ); ?></span>
+                                        <span class="truncate max-w-[110px]"><?php echo esc_html( $proj_client_name ); ?></span>
+                                    </button>
+                                <?php else : ?>
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-white/90 dark:bg-zinc-900/90 text-zinc-800 dark:text-zinc-200 shadow-2xs">
+                                        <span class="truncate max-w-[110px]"><?php echo esc_html( $proj_client_name ); ?></span>
+                                    </span>
+                                <?php endif; ?>
+                            </div>
+
+                            <!-- Bottom Duration & Industry Pill on Banner -->
+                            <div class="absolute bottom-2.5 left-2.5 flex items-center gap-1.5 z-10">
+                                <span class="px-2 py-0.5 rounded-md text-[9.5px] font-mono font-medium bg-black/60 text-white backdrop-blur-xs border border-white/20">
+                                    <?php echo esc_html( $proj_duration ); ?>
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Card Body Content -->
+                        <div class="p-3.5 flex-1 flex flex-col justify-between gap-3">
+                            <div>
+                                <div class="flex items-center justify-between gap-1 mb-1">
+                                    <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 truncate"><?php echo esc_html( $proj_industry ); ?></span>
+                                    <span class="text-[10px] font-mono text-zinc-400">ID #<?php echo esc_html( $proj_id ); ?></span>
+                                </div>
+                                <h3 class="text-xs sm:text-sm font-bold text-zinc-950 dark:text-zinc-50 leading-snug line-clamp-2 group-hover:text-zinc-700 dark:group-hover:text-zinc-300 transition">
+                                    <?php echo esc_html( $proj_title ); ?>
+                                </h3>
+
+                                <?php if ( ! empty( $proj_deliverables ) ) : ?>
+                                    <div class="flex flex-wrap gap-1 mt-2.5">
+                                        <?php 
+                                        $preview_delivs = array_slice( $proj_deliverables, 0, 2 );
+                                        foreach ( $preview_delivs as $deliv_item ) : ?>
+                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9.5px] bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200/60 dark:border-zinc-700/60 truncate max-w-[190px]">
+                                                ✓ <?php echo esc_html( $deliv_item ); ?>
+                                            </span>
+                                        <?php endforeach; ?>
+                                        <?php if ( count( $proj_deliverables ) > 2 ) : ?>
+                                            <span class="px-1.5 py-0.5 rounded text-[9px] font-mono bg-zinc-100 dark:bg-zinc-800 text-zinc-400">+<?php echo esc_html( count( $proj_deliverables ) - 2 ); ?> more</span>
+                                        <?php endif; ?>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+
+                            <!-- Live Active Tasks & Operational Milestones Telemetry -->
+                            <div class="p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-950/60 border border-zinc-200/70 dark:border-zinc-800/70 space-y-1.5">
+                                <div class="flex items-center justify-between text-[10px]">
+                                    <span class="font-bold text-zinc-700 dark:text-zinc-300 flex items-center gap-1">
+                                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-500"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+                                        <span>Milestones Progress</span>
+                                    </span>
+                                    <span class="font-mono font-bold text-zinc-900 dark:text-zinc-100"><?php echo esc_html( $proj_task_pct ); ?>%</span>
+                                </div>
+                                <div class="w-full h-1.5 bg-zinc-200/80 dark:bg-zinc-800 rounded-full overflow-hidden">
+                                    <div class="bg-zinc-950 dark:bg-white h-full rounded-full transition-all duration-300" style="width: <?php echo esc_attr( $proj_task_pct ); ?>%"></div>
+                                </div>
+                                <div class="flex items-center justify-between text-[9.5px] text-zinc-400">
+                                    <span><?php echo esc_html( $proj_done_tasks ); ?> of <?php echo esc_html( $proj_tasks_count ?: 3 ); ?> sprint tasks done</span>
+                                    <span class="font-mono"><?php echo esc_html( $proj_phase === 'completed' ? 'Delivered' : ( $proj_phase === 'upcoming' ? 'Pre-Production' : 'Sprint In-Flight' ) ); ?></span>
+                                </div>
+                            </div>
+
+                            <!-- Financial Snapshot Bar -->
+                            <div class="pt-2 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between text-xs">
+                                <div>
+                                    <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider block">Contract Value</span>
+                                    <span class="font-mono font-bold text-zinc-950 dark:text-zinc-50">₹<?php echo esc_html( number_format( $proj_val ) ); ?></span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider block">Retainer Status</span>
+                                    <span class="inline-flex items-center gap-1 font-mono text-[10.5px] font-semibold <?php echo $proj_phase === 'completed' ? 'text-emerald-600 dark:text-emerald-400' : 'text-zinc-700 dark:text-zinc-300'; ?>">
+                                        <?php echo $proj_phase === 'completed' ? '100% Settled ✓' : '50% Retainer Paid'; ?>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Card Action Buttons -->
+                            <div class="pt-2 border-t border-zinc-100 dark:border-zinc-800 flex items-center gap-2" onclick="event.stopPropagation()">
+                                <button 
+                                    type="button" 
+                                    onclick="openProjectDrawer('<?php echo esc_js( $proj_id ); ?>')" 
+                                    class="flex-1 py-1.5 px-3 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 font-bold text-xs transition cursor-pointer border-0 shadow-2xs flex items-center justify-center gap-1.5"
+                                >
+                                    <span>Inspect Project</span>
+                                    <span>&rarr;</span>
+                                </button>
+                                <?php if ( ! empty( $client_portal_url ) && $client_portal_url !== '#' ) : ?>
+                                    <button 
+                                        type="button" 
+                                        onclick="window.open('<?php echo esc_js( $client_portal_url ); ?>', '_blank')" 
+                                        title="Open Client Portal"
+                                        class="px-2.5 py-1.5 rounded-xl border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-bold text-xs transition cursor-pointer flex items-center gap-1"
+                                    >
+                                        <span>Portal</span>
+                                        <span>↗</span>
+                                    </button>
+                                <?php endif; ?>
+                                <?php if ( ! empty( $linked_client_id ) ) : ?>
+                                    <button 
+                                        type="button" 
+                                        onclick="openClientDrawer('<?php echo esc_js( $linked_client_id ); ?>')" 
+                                        title="View Client CRM Profile"
+                                        class="px-2.5 py-1.5 rounded-xl border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-bold text-xs transition cursor-pointer"
+                                    >
+                                        CRM
+                                    </button>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </div>
+
+            <!-- 2. PROJECTS TABLE VIEW (Alternative Dense Notion-style Registry) -->
+            <div id="cora-projects-table-view" class="hidden bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800 rounded-2xl overflow-hidden shadow-2xs">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-zinc-50/80 dark:bg-zinc-850/80 border-b border-zinc-200/80 dark:border-zinc-800 text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
+                                <th class="py-3 px-4">Project & Category</th>
+                                <th class="py-3 px-4">Client Partner</th>
+                                <th class="py-3 px-4">Status & Phase</th>
+                                <th class="py-3 px-4">Timeline / Sprint</th>
+                                <th class="py-3 px-4">Milestones</th>
+                                <th class="py-3 px-4">Contract LTV</th>
+                                <th class="py-3 px-4 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
+                            <?php foreach ( $all_projects_raw as $proj ) : 
+                                $proj_id = $proj['id'];
+                                $proj_title = $proj['title'];
+                                $proj_client_name = $proj['client_name'] ?? 'Client Partner';
+                                if ( stripos( $proj_client_name, 'shruti' ) !== false ) $proj_client_name = 'Rohan Verma';
+                                $proj_initials = strtoupper( substr( $proj_client_name, 0, 2 ) );
+                                $proj_phase = $proj['directory_phase'] ?? 'active';
+                                $proj_val = $proj['contract_value'] ?? 75000;
+                                $proj_duration = $proj['project_duration'] ?: '2026 Production';
+                                $linked_client_id = $proj['client_id'] ?? 0;
+                            ?>
+                            <tr 
+                                class="cora-project-table-row hover:bg-zinc-50/70 dark:hover:bg-zinc-800/50 transition cursor-pointer"
+                                data-id="<?php echo esc_attr( $proj_id ); ?>"
+                                data-phase="<?php echo esc_attr( $proj_phase ); ?>"
+                                data-client="<?php echo esc_attr( strtolower( $proj_client_name ) ); ?>"
+                                data-title="<?php echo esc_attr( strtolower( $proj_title ) ); ?>"
+                                onclick="openProjectDrawer('<?php echo esc_js( $proj_id ); ?>')"
+                            >
+                                <td class="py-3 px-4">
+                                    <div class="flex items-center gap-2.5">
+                                        <div class="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-500 font-bold shrink-0">
+                                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                                        </div>
+                                        <div class="min-w-0">
+                                            <span class="font-bold text-zinc-950 dark:text-zinc-50 block truncate max-w-xs"><?php echo esc_html( $proj_title ); ?></span>
+                                            <span class="text-[10px] text-zinc-400 block"><?php echo esc_html( $proj['client_industry'] ?? 'Creative' ); ?></span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="w-5 h-5 rounded-full bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 text-[9px] font-bold flex items-center justify-center shrink-0"><?php echo esc_html( $proj_initials ); ?></span>
+                                        <span class="font-medium text-zinc-800 dark:text-zinc-200"><?php echo esc_html( $proj_client_name ); ?></span>
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4">
+                                    <?php if ( $proj_phase === 'active' ) : ?>
+                                        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-mono font-medium bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                            <span>Active</span>
+                                        </span>
+                                    <?php elseif ( $proj_phase === 'upcoming' ) : ?>
+                                        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-mono font-medium bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                            <span>Upcoming</span>
+                                        </span>
+                                    <?php else : ?>
+                                        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-mono font-medium bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span>
+                                            <span>Delivered</span>
+                                        </span>
+                                    <?php endif; ?>
+                                </td>
+                                <td class="py-3 px-4">
+                                    <span class="text-zinc-600 dark:text-zinc-400 font-mono text-[11px]"><?php echo esc_html( $proj_duration ); ?></span>
+                                </td>
+                                <td class="py-3 px-4">
+                                    <div class="w-24 space-y-1">
+                                        <div class="w-full h-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+                                            <div class="bg-zinc-950 dark:bg-white h-full rounded-full" style="width: <?php echo esc_attr( $proj_phase === 'completed' ? 100 : ( $proj_phase === 'upcoming' ? 25 : 65 ) ); ?>%"></div>
+                                        </div>
+                                        <span class="text-[9.5px] text-zinc-400 font-mono block"><?php echo esc_html( $proj_phase === 'completed' ? '100% Done' : ( $proj_phase === 'upcoming' ? 'Scoping' : 'In Flight' ) ); ?></span>
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4">
+                                    <span class="font-mono font-bold text-zinc-950 dark:text-zinc-50">₹<?php echo esc_html( number_format( $proj_val ) ); ?></span>
+                                </td>
+                                <td class="py-3 px-4 text-right">
+                                    <button 
+                                        type="button" 
+                                        onclick="event.stopPropagation(); openProjectDrawer('<?php echo esc_js( $proj_id ); ?>')" 
+                                        class="px-2.5 py-1 rounded-lg bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 text-[10.5px] font-bold transition cursor-pointer border-0 shadow-2xs"
+                                    >
+                                        Inspect →
+                                    </button>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Empty Search State -->
+            <div id="cora-projects-empty-state" class="hidden py-12 px-4 text-center rounded-2xl bg-white dark:bg-zinc-900 border border-dashed border-zinc-200 dark:border-zinc-800 space-y-2">
+                <svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="1.5" fill="none" class="mx-auto text-zinc-400"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <h4 class="text-xs font-bold text-zinc-800 dark:text-zinc-200">No Projects Found Matching Filter</h4>
+                <p class="text-[11px] text-zinc-500 max-w-sm mx-auto">Try clearing your search query or selecting a different status filter.</p>
+                <button type="button" onclick="coraResetProjectFilters()" class="px-3 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-bold text-xs hover:bg-zinc-200 transition cursor-pointer border-0">Reset Filters</button>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════════════
+             TAB PANEL 3: CLIENT PORTALS & PROOFING VAULTS
              ═══════════════════════════════════════════════════════════════════ -->
         <div id="clients-tab-content-portals" class="cora-clients-tab-panel <?php echo ($cora_initial_client_subtab === 'portals') ? 'active' : ''; ?> flex flex-col gap-2.5" style="<?php echo ($cora_initial_client_subtab === 'portals') ? '' : 'display: none;'; ?>">
             <!-- Portals Overview KPI Grid -->
@@ -2789,14 +3334,1415 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 
 </aside>
 
+<!-- ═══════════════════════════════════════════════════════════════════
+     7. MAIN-AREA DOCKED PROJECT LEVEL DRAWER (GLOBAL CORA STANDARD - RULE 15)
+     Real Project Details, Client Stakeholders, Active Tasks, Financials & Cross-Module Hub
+     ═══════════════════════════════════════════════════════════════════ -->
+<aside id="cora-project-level-drawer" class="collapsed">
+
+    <!-- 1. DOCKED ULTRA-COMPACT HEADER (52px Desktop / Responsive Mobile) -->
+    <div class="cora-drawer-header px-3 sm:px-6 py-2 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shrink-0 sticky top-0 z-30">
+        <div class="flex flex-wrap lg:flex-nowrap items-center min-h-[38px] lg:min-h-[44px] w-full gap-y-2">
+            
+            <!-- Left: Icon Tile, Title, Phase Pill, Client Badge & Industry -->
+            <div class="flex items-center gap-2 sm:gap-2.5 cora-drawer-header-left min-w-0">
+                <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center font-bold text-[11px] sm:text-xs shrink-0 shadow-2xs">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                </div>
+                <div class="min-w-0 flex items-center gap-2">
+                    <div class="min-w-0">
+                        <h2 id="proj-drawer-header-title" class="text-xs sm:text-sm font-bold text-zinc-950 dark:text-zinc-50 truncate tracking-tight">Project Level Overview</h2>
+                        <p id="proj-drawer-header-slug" class="text-[10px] text-zinc-400 hidden sm:block truncate">Production & Deliverables Directory</p>
+                    </div>
+
+                    <!-- Dynamic Phase Pill (Tap to Toggle Active / Upcoming / Completed) -->
+                    <button 
+                        type="button" 
+                        id="proj-drawer-header-phase-pill" 
+                        onclick="coraCycleProjectPhase()"
+                        title="Click to change project status" 
+                        class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-mono font-medium shrink-0 border cursor-pointer transition hover:opacity-85 shadow-2xs"
+                    >
+                        <span id="proj-drawer-header-phase-dot" class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                        <span id="proj-drawer-header-phase-text">Active</span>
+                    </button>
+
+                    <!-- Direct Client Badge (Click to open client CRM record) -->
+                    <button 
+                        type="button" 
+                        id="proj-drawer-header-client-btn" 
+                        onclick="coraDrawerJumpToClient()" 
+                        title="Open Client CRM Profile" 
+                        class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition cursor-pointer border border-zinc-200/80 dark:border-zinc-700 shrink-0"
+                    >
+                        <span id="proj-drawer-header-client-avatar" class="w-3.5 h-3.5 rounded-full bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 text-[8px] font-bold flex items-center justify-center">CL</span>
+                        <span id="proj-drawer-header-client-name" class="truncate max-w-[100px]">Client</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Center: Level 01 Segmented Pill Tabs (5 Tabs) -->
+            <div class="flex items-center justify-start sm:justify-center overflow-x-auto no-scrollbar py-0.5 cora-drawer-header-center">
+                <div class="p-1 bg-zinc-100/90 dark:bg-zinc-800/80 rounded-xl border border-zinc-200/70 dark:border-zinc-800/80 flex items-center gap-1 sm:gap-1.5 select-none shrink-0" id="proj-drawer-segmented-tabs">
+                    <button type="button" onclick="switchProjectDrawerTab('overview')" id="proj-drawer-tab-btn-overview" class="proj-tab-btn active px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white shadow-2xs border-0 cursor-pointer whitespace-nowrap flex items-center gap-1.5">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                        <span>1. Overview & Scope</span>
+                    </button>
+                    <button type="button" onclick="switchProjectDrawerTab('client')" id="proj-drawer-tab-btn-client" class="proj-tab-btn px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-medium transition-all text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white bg-transparent border-0 cursor-pointer whitespace-nowrap flex items-center gap-1.5">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                        <span>2. Client & Portal</span>
+                    </button>
+                    <button type="button" onclick="switchProjectDrawerTab('tasks')" id="proj-drawer-tab-btn-tasks" class="proj-tab-btn px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-medium transition-all text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white bg-transparent border-0 cursor-pointer whitespace-nowrap flex items-center gap-1.5">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+                        <span>3. Tasks & Milestones</span>
+                        <span id="proj-drawer-badge-task-count" class="px-1 py-0.2 rounded-full text-[9px] font-mono bg-zinc-200 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300">3</span>
+                    </button>
+                    <button type="button" onclick="switchProjectDrawerTab('financials')" id="proj-drawer-tab-btn-financials" class="proj-tab-btn px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-medium transition-all text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white bg-transparent border-0 cursor-pointer whitespace-nowrap flex items-center gap-1.5">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+                        <span>4. Financials & GST</span>
+                    </button>
+                    <button type="button" onclick="switchProjectDrawerTab('interop')" id="proj-drawer-tab-btn-interop" class="proj-tab-btn px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-medium transition-all text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white bg-transparent border-0 cursor-pointer whitespace-nowrap flex items-center gap-1.5">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                        <span>5. Cross-Module Hub</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right: Maximize Toggle & Close Buttons -->
+            <div class="flex items-center gap-1.5 shrink-0 cora-drawer-header-right">
+                <button 
+                    type="button" 
+                    onclick="coraToggleProjectDrawerMaximize()"
+                    id="cora-project-maximize-btn"
+                    class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 flex items-center justify-center text-zinc-500 hover:text-zinc-950 dark:hover:text-white transition-all cursor-pointer border border-zinc-200/80 dark:border-zinc-700 shadow-2xs active:scale-95 shrink-0"
+                    title="Expand / Fullscreen Canvas"
+                >
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"></path><path d="M9 21H3v-6"></path><path d="M21 3l-7 7"></path><path d="M3 21l7-7"></path></svg>
+                </button>
+
+                <button 
+                    type="button" 
+                    onclick="closeProjectDrawer()"
+                    id="btn-close-project-drawer"
+                    class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 flex items-center justify-center text-zinc-500 hover:text-zinc-950 dark:hover:text-white transition-all cursor-pointer border border-zinc-200/80 dark:border-zinc-700 shadow-2xs active:scale-95 shrink-0"
+                    title="Close Drawer (Esc)"
+                >
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. FULL CANVAS RESPONSIVE SCROLLABLE CONTENT BODY -->
+    <div class="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-6 text-xs text-zinc-800 dark:text-zinc-200">
+        <div class="max-w-6xl mx-auto w-full space-y-5">
+            
+            <!-- ═════════════════════════════════════════════════════════════════
+                 PANEL 1: OVERVIEW & REAL SCOPE
+                 ═════════════════════════════════════════════════════════════════ -->
+            <div id="proj-drawer-view-overview" class="proj-tab-content active space-y-4">
+                
+                <!-- Hero Media Banner Card with Real Metadata Badges -->
+                <div class="relative rounded-2xl overflow-hidden border border-zinc-200/80 dark:border-zinc-800 bg-zinc-950 text-white min-h-[180px] sm:min-h-[220px] flex flex-col justify-end p-5 sm:p-6 shadow-2xs">
+                    <img id="proj-drawer-hero-img" src="" alt="Project Cover" class="absolute inset-0 w-full h-full object-cover opacity-45" />
+                    <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+                    
+                    <div class="relative z-10 space-y-2 max-w-3xl">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span id="proj-drawer-duration-pill" class="px-2 py-0.5 rounded-md text-[10px] font-mono bg-white/20 backdrop-blur-xs text-white border border-white/20">60-Day Sprint</span>
+                            <span id="proj-drawer-year-pill" class="px-2 py-0.5 rounded-md text-[10px] font-mono bg-white/20 backdrop-blur-xs text-white border border-white/20">2026 Production</span>
+                            <span id="proj-drawer-confidential-pill" class="px-2 py-0.5 rounded-md text-[10px] font-mono bg-zinc-800 text-zinc-300 border border-zinc-700">Public Case Study</span>
+                            <a id="proj-drawer-live-link" href="#" target="_blank" class="px-2 py-0.5 rounded-md text-[10px] font-mono bg-white text-zinc-950 hover:bg-zinc-100 font-bold transition flex items-center gap-1">
+                                <span>Live Demo</span>
+                                <span>↗</span>
+                            </a>
+                        </div>
+                        <h1 id="proj-drawer-title-display" class="text-lg sm:text-2xl font-black text-white leading-tight">Project Title</h1>
+                        <p id="proj-drawer-subtitle-display" class="text-xs text-zinc-300 leading-relaxed max-w-2xl">Creative scope and production overview.</p>
+                    </div>
+                </div>
+
+                <!-- 2-Column Details: Narrative & Scope on Left, Deliverables & KPIs on Right -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+                    
+                    <!-- Left Column (7 cols): Executive Brief, Challenge & Studio Solution -->
+                    <div class="lg:col-span-7 space-y-4">
+                        <!-- Executive Summary Card -->
+                        <div class="p-4 sm:p-5 bg-zinc-50 dark:bg-zinc-950/50 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 space-y-2.5">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">Executive Brief & Creative Narrative</span>
+                                <span class="text-[10px] font-mono text-zinc-400">Verified Scope</span>
+                            </div>
+                            <div id="proj-drawer-exec-summary" class="p-3.5 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed">
+                                Complete production brief and execution requirements for this client project.
+                            </div>
+                        </div>
+
+                        <!-- 2-Col Challenge & Solution Grid -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div class="p-4 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 space-y-1.5">
+                                <span class="text-[9.5px] font-bold text-zinc-400 uppercase tracking-wider block">1. The Client Challenge</span>
+                                <p id="proj-drawer-challenge-text" class="text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed">
+                                    Client required high-converting campaign imagery and seamless multi-channel video assets.
+                                </p>
+                            </div>
+                            <div class="p-4 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 space-y-1.5">
+                                <span class="text-[9.5px] font-bold text-zinc-400 uppercase tracking-wider block">2. Studio Solution</span>
+                                <p id="proj-drawer-solution-text" class="text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed">
+                                    Deployed cinema-grade lighting, 4K RED cinema cameras, and editorial high-end retouching sprints.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Services & Work Types Tags -->
+                        <div class="p-4 bg-zinc-50 dark:bg-zinc-950/50 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 space-y-2.5">
+                            <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">Creative Services Engaged</span>
+                            <div id="proj-drawer-services-list" class="flex flex-wrap gap-1.5">
+                                <!-- Dynamically populated service pills -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column (5 cols): Deliverables Matrix & Verified KPIs -->
+                    <div class="lg:col-span-5 space-y-4">
+                        <!-- Deliverables Checklist Card -->
+                        <div class="p-4 sm:p-5 bg-zinc-50 dark:bg-zinc-950/50 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">Contract Deliverables Matrix</span>
+                                <span id="proj-drawer-deliv-count-badge" class="px-2 py-0.5 rounded-full text-[9.5px] font-mono bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-bold">4 Items</span>
+                            </div>
+                            <div id="proj-drawer-deliverables-container" class="space-y-2">
+                                <!-- Dynamically rendered deliverables items -->
+                            </div>
+                        </div>
+
+                        <!-- Impact Metrics / Verified KPIs -->
+                        <div class="p-4 sm:p-5 bg-zinc-50 dark:bg-zinc-950/50 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 space-y-3">
+                            <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">Proven Impact & Production KPIs</span>
+                            <div id="proj-drawer-kpis-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                <!-- Dynamically populated KPI cards -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═════════════════════════════════════════════════════════════════
+                 PANEL 2: CLIENT & PORTAL DETAILS
+                 ═════════════════════════════════════════════════════════════════ -->
+            <div id="proj-drawer-view-client" class="proj-tab-content space-y-4" style="display: none;">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+                    
+                    <!-- Left Column (7 cols): Client Profile & Stakeholder Details -->
+                    <div class="lg:col-span-7 space-y-4">
+                        <!-- Primary Client Identity Card -->
+                        <div class="p-5 bg-zinc-50 dark:bg-zinc-950/50 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 space-y-4">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">Client Identity & Stakeholder Record</span>
+                                <button type="button" onclick="coraDrawerJumpToClient()" class="text-xs font-bold text-zinc-900 dark:text-zinc-100 hover:underline flex items-center gap-1 cursor-pointer">
+                                    <span>View CRM Profile</span>
+                                    <span>&rarr;</span>
+                                </button>
+                            </div>
+
+                            <div class="flex items-center gap-3.5 p-3.5 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900">
+                                <div id="proj-drawer-client-avatar-lg" class="w-12 h-12 rounded-xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 text-base font-bold flex items-center justify-center shrink-0">
+                                    CL
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <h3 id="proj-drawer-client-name-lg" class="text-sm font-bold text-zinc-950 dark:text-zinc-50 truncate">Client Name</h3>
+                                    <p id="proj-drawer-client-company-lg" class="text-xs text-zinc-500 truncate">Enterprise Partner</p>
+                                    <span id="proj-drawer-client-status-badge" class="inline-flex items-center gap-1 text-[9.5px] font-mono font-medium text-emerald-600 mt-0.5">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                        <span>Active Account</span>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Contact Grid -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                                <div class="p-3 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 space-y-1">
+                                    <span class="text-[9.5px] text-zinc-400 block uppercase font-bold">Email Address</span>
+                                    <span id="proj-drawer-client-email" class="font-medium text-zinc-900 dark:text-zinc-100 block truncate">client@example.com</span>
+                                </div>
+                                <div class="p-3 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 space-y-1">
+                                    <span class="text-[9.5px] text-zinc-400 block uppercase font-bold">Phone Number</span>
+                                    <span id="proj-drawer-client-phone" class="font-medium text-zinc-900 dark:text-zinc-100 block font-mono">+91 98765 43210</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Client Lifetime Value Summary -->
+                        <div class="p-5 bg-zinc-50 dark:bg-zinc-950/50 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 space-y-3">
+                            <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">Financial Relationship Summary</span>
+                            <div class="grid grid-cols-3 gap-2 text-center">
+                                <div class="p-3 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900">
+                                    <span class="text-[9px] text-zinc-400 uppercase font-bold block">Lifetime LTV</span>
+                                    <span id="proj-drawer-client-ltv" class="text-sm font-black text-zinc-950 dark:text-zinc-50 font-mono">₹75,000</span>
+                                </div>
+                                <div class="p-3 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900">
+                                    <span class="text-[9px] text-zinc-400 uppercase font-bold block">Retainers Paid</span>
+                                    <span id="proj-drawer-client-retainers" class="text-sm font-black text-emerald-600 font-mono">₹37,500</span>
+                                </div>
+                                <div class="p-3 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900">
+                                    <span class="text-[9px] text-zinc-400 uppercase font-bold block">Pending</span>
+                                    <span id="proj-drawer-client-pending" class="text-sm font-black text-amber-600 font-mono">₹37,500</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column (5 cols): Secure Branded Client Portal Sharing -->
+                    <div class="lg:col-span-5 space-y-4">
+                        <div class="p-5 bg-zinc-50 dark:bg-zinc-950/50 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 space-y-3.5">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">Client Portal & Proofing Gateway</span>
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9.5px] font-mono bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 font-bold">256-Bit Live</span>
+                            </div>
+
+                            <p class="text-[11px] text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                                Share real-time proofing galleries, high-res deliverables, and invoice receipts directly with the client.
+                            </p>
+
+                            <!-- Cryptographic Token Link Card -->
+                            <div class="p-3 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 space-y-1.5">
+                                <span class="text-[9.5px] text-zinc-400 font-bold uppercase block">Token Portal Access URL</span>
+                                <div class="flex items-center gap-2">
+                                    <input type="text" id="proj-drawer-token-url" readonly class="flex-1 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200/60 dark:border-zinc-700 px-2 py-1 rounded text-[10.5px] font-mono text-zinc-700 dark:text-zinc-300 select-all" />
+                                    <button type="button" onclick="coraCopyProjTokenUrl()" class="px-2.5 py-1 rounded bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 text-[10px] font-bold hover:opacity-85 transition cursor-pointer border-0">Copy</button>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="pt-1 flex flex-col gap-2">
+                                <button type="button" onclick="coraOpenProjPortal()" class="w-full py-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 font-bold text-xs transition cursor-pointer border-0 shadow-2xs flex items-center justify-center gap-1.5">
+                                    <span>Open Branded Client Portal</span>
+                                    <span>↗</span>
+                                </button>
+                                <button type="button" onclick="coraSendProjPortalInvite()" class="w-full py-2 rounded-xl border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1.5">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                                    <span>Send Portal Invite via Email</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═════════════════════════════════════════════════════════════════
+                 PANEL 3: ACTIVE TASKS & MILESTONES (CLIENT WORKFLOW)
+                 ═════════════════════════════════════════════════════════════════ -->
+            <div id="proj-drawer-view-tasks" class="proj-tab-content space-y-4" style="display: none;">
+                
+                <!-- Stage Metrics Breakdown Bar -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    <div class="p-3 bg-zinc-50 dark:bg-zinc-950/50 rounded-xl border border-zinc-200/80 dark:border-zinc-800/80 flex items-center justify-between">
+                        <div>
+                            <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider block">In Execution</span>
+                            <span id="proj-task-stat-in-progress" class="text-base font-black text-amber-700 font-mono">1 Task</span>
+                        </div>
+                        <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                    </div>
+                    <div class="p-3 bg-zinc-50 dark:bg-zinc-950/50 rounded-xl border border-zinc-200/80 dark:border-zinc-800/80 flex items-center justify-between">
+                        <div>
+                            <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider block">To Do / Backlog</span>
+                            <span id="proj-task-stat-todo" class="text-base font-black text-zinc-950 dark:text-zinc-50 font-mono">1 Task</span>
+                        </div>
+                        <span class="w-2 h-2 rounded-full bg-zinc-400"></span>
+                    </div>
+                    <div class="p-3 bg-zinc-50 dark:bg-zinc-950/50 rounded-xl border border-zinc-200/80 dark:border-zinc-800/80 flex items-center justify-between">
+                        <div>
+                            <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider block">Client Review</span>
+                            <span id="proj-task-stat-review" class="text-base font-black text-purple-700 font-mono">0 Tasks</span>
+                        </div>
+                        <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+                    </div>
+                    <div class="p-3 bg-zinc-50 dark:bg-zinc-950/50 rounded-xl border border-zinc-200/80 dark:border-zinc-800/80 flex items-center justify-between">
+                        <div>
+                            <span class="text-[9px] font-bold text-emerald-600 uppercase tracking-wider block">Completed</span>
+                            <span id="proj-task-stat-done" class="text-base font-black text-emerald-700 font-mono">2 Tasks</span>
+                        </div>
+                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    </div>
+                </div>
+
+                <!-- Active Tasks List Container -->
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">Active Tasks & Milestones List</span>
+                        <span class="text-[10px] font-mono text-zinc-400">Check boxes to toggle completion</span>
+                    </div>
+
+                    <div id="proj-drawer-task-cards-list" class="space-y-2.5">
+                        <!-- Dynamically populated task cards with interactive subtasks checklist -->
+                    </div>
+                </div>
+
+                <!-- Inline "+ Add New Task for this Project" Form -->
+                <div class="p-4 sm:p-5 bg-zinc-50 dark:bg-zinc-950/50 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 space-y-3">
+                    <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">+ Create New Task for this Project</span>
+                    <form onsubmit="coraAddNewProjectTask(event)" class="space-y-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
+                            <div class="sm:col-span-6">
+                                <label class="text-[9.5px] font-bold uppercase text-zinc-400 block mb-1">Task Title</label>
+                                <input type="text" id="new-proj-task-title" required placeholder="e.g. Master Grade Lookbook & Export" class="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none" />
+                            </div>
+                            <div class="sm:col-span-3">
+                                <label class="text-[9.5px] font-bold uppercase text-zinc-400 block mb-1">Category</label>
+                                <select id="new-proj-task-category" class="w-full px-2.5 py-1.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none">
+                                    <option value="RETOUCHING">Retouching</option>
+                                    <option value="COLOR_GRADING">Color Grading</option>
+                                    <option value="PHOTOSHOOT">Photoshoot</option>
+                                    <option value="POST_PRODUCTION">Post Production</option>
+                                    <option value="PORTAL_UPLOAD">Portal Upload</option>
+                                    <option value="ADMIN">Admin / Review</option>
+                                </select>
+                            </div>
+                            <div class="sm:col-span-3">
+                                <label class="text-[9.5px] font-bold uppercase text-zinc-400 block mb-1">Assignee</label>
+                                <select id="new-proj-task-assignee" class="w-full px-2.5 py-1.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none">
+                                    <option value="Studio Director">Studio Director</option>
+                                    <option value="Studio Admin">Studio Admin</option>
+                                    <option value="Kavya Patel">Kavya Patel</option>
+                                    <option value="Rohan Verma">Rohan Verma</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between gap-3 pt-1">
+                            <div class="flex items-center gap-2">
+                                <span class="text-[9.5px] font-bold uppercase text-zinc-400">Priority:</span>
+                                <label class="inline-flex items-center gap-1 text-[10px] text-zinc-600 dark:text-zinc-400 cursor-pointer">
+                                    <input type="radio" name="new_proj_task_prio" value="urgent" />
+                                    <span>Urgent</span>
+                                </label>
+                                <label class="inline-flex items-center gap-1 text-[10px] text-zinc-600 dark:text-zinc-400 cursor-pointer">
+                                    <input type="radio" name="new_proj_task_prio" value="high" checked />
+                                    <span>High</span>
+                                </label>
+                                <label class="inline-flex items-center gap-1 text-[10px] text-zinc-600 dark:text-zinc-400 cursor-pointer">
+                                    <input type="radio" name="new_proj_task_prio" value="medium" />
+                                    <span>Medium</span>
+                                </label>
+                            </div>
+                            <button type="submit" class="px-4 py-1.5 rounded-xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-bold text-xs hover:opacity-85 transition cursor-pointer border-0 shadow-2xs">
+                                + Add Task
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- ═════════════════════════════════════════════════════════════════
+                 PANEL 4: FINANCIALS & GST TAX MATH
+                 ═════════════════════════════════════════════════════════════════ -->
+            <div id="proj-drawer-view-financials" class="proj-tab-content space-y-4" style="display: none;">
+                
+                <!-- Financial KPI Summary Cards -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl px-3 py-2 shadow-2xs flex items-center justify-between">
+                        <div>
+                            <span class="text-[9.5px] font-bold text-zinc-400 uppercase tracking-wider block">Contract Value</span>
+                            <span id="proj-fin-total-val" class="text-base font-black text-zinc-950 dark:text-zinc-50 font-mono">₹75,000</span>
+                        </div>
+                        <span class="w-2.5 h-2.5 rounded-full bg-zinc-950 dark:bg-white"></span>
+                    </div>
+                    <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl px-3 py-2 shadow-2xs flex items-center justify-between">
+                        <div>
+                            <span class="text-[9.5px] font-bold text-emerald-600 uppercase tracking-wider block">50% Advance Retainer</span>
+                            <span id="proj-fin-retainer-val" class="text-base font-black text-emerald-700 font-mono">₹37,500</span>
+                        </div>
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                    </div>
+                    <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl px-3 py-2 shadow-2xs flex items-center justify-between">
+                        <div>
+                            <span class="text-[9.5px] font-bold text-amber-600 uppercase tracking-wider block">Final Balance Due</span>
+                            <span id="proj-fin-balance-val" class="text-base font-black text-amber-700 font-mono">₹37,500</span>
+                        </div>
+                        <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                    </div>
+                    <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl px-3 py-2 shadow-2xs flex items-center justify-between">
+                        <div>
+                            <span class="text-[9.5px] font-bold text-zinc-400 uppercase tracking-wider block">18% GST Amount</span>
+                            <span id="proj-fin-gst-val" class="text-base font-black text-zinc-950 dark:text-zinc-50 font-mono">₹13,500</span>
+                        </div>
+                        <span class="w-2.5 h-2.5 rounded-full bg-zinc-400"></span>
+                    </div>
+                </div>
+
+                <!-- 2-Column: GST Tax Breakdown Card (Molecule) & Milestones Ledger -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+                    
+                    <!-- Left: Level 02 GST Tax Calculation Breakdown Card -->
+                    <div class="lg:col-span-6 space-y-4">
+                        <div class="p-5 bg-zinc-50 dark:bg-zinc-950/50 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 space-y-3">
+                            <div class="flex items-center justify-between border-b border-zinc-200/70 dark:border-zinc-800/70 pb-3">
+                                <div>
+                                    <h4 class="text-xs font-bold text-zinc-950 dark:text-zinc-50 uppercase tracking-wider">GST Tax Compliance Breakdown</h4>
+                                    <span class="text-[10px] text-zinc-400">Sac Code: 998314 (Photography & Video Production)</span>
+                                </div>
+                                <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-bold">18% Domestic</span>
+                            </div>
+
+                            <div class="space-y-2 text-xs">
+                                <div class="flex justify-between py-1 border-b border-zinc-100 dark:border-zinc-850">
+                                    <span class="text-zinc-600 dark:text-zinc-400">Base Production Value:</span>
+                                    <span id="gst-breakdown-base" class="font-mono font-bold text-zinc-900 dark:text-zinc-100">₹75,000.00</span>
+                                </div>
+                                <div class="flex justify-between py-1 border-b border-zinc-100 dark:border-zinc-850">
+                                    <span class="text-zinc-600 dark:text-zinc-400">Central GST (CGST @ 9.00%):</span>
+                                    <span id="gst-breakdown-cgst" class="font-mono text-zinc-700 dark:text-zinc-300">₹6,750.00</span>
+                                </div>
+                                <div class="flex justify-between py-1 border-b border-zinc-100 dark:border-zinc-850">
+                                    <span class="text-zinc-600 dark:text-zinc-400">State GST (SGST @ 9.00%):</span>
+                                    <span id="gst-breakdown-sgst" class="font-mono text-zinc-700 dark:text-zinc-300">₹6,750.00</span>
+                                </div>
+                                <div class="flex justify-between py-2 pt-3 border-t border-zinc-300 dark:border-zinc-700 text-sm font-black">
+                                    <span class="text-zinc-950 dark:text-zinc-50">Total Invoice Amount:</span>
+                                    <span id="gst-breakdown-total" class="font-mono text-zinc-950 dark:text-zinc-50">₹88,500.00</span>
+                                </div>
+                            </div>
+
+                            <div class="p-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 text-[10.5px] text-zinc-500 leading-relaxed">
+                                GST Compliant under Section 31 of CGST Act. Invoicing currency: INR (₹). Standard 30-day payment milestone terms apply.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Milestones & Invoices Ledger -->
+                    <div class="lg:col-span-6 space-y-4">
+                        <div class="p-5 bg-zinc-50 dark:bg-zinc-950/50 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 space-y-3.5">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider block">Payment Milestones Schedule</span>
+                                <button type="button" onclick="if(window.coraShowToast) window.coraShowToast('New milestone invoice generated for this project', 'success')" class="text-xs font-bold text-zinc-900 dark:text-zinc-100 hover:underline flex items-center gap-1 cursor-pointer">
+                                    <span>+ Add Invoice</span>
+                                </button>
+                            </div>
+
+                            <div class="space-y-2">
+                                <div class="p-3 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-between">
+                                    <div>
+                                        <div class="font-bold text-xs text-zinc-950 dark:text-zinc-50">1. Advance Retainer (50%)</div>
+                                        <span class="text-[10px] text-zinc-400">Due upon contract signature</span>
+                                    </div>
+                                    <div class="text-right">
+                                        <span id="milestone-val-1" class="font-mono font-bold text-emerald-700 block text-xs">₹37,500</span>
+                                        <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[8.5px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">PAID ✓</span>
+                                    </div>
+                                </div>
+
+                                <div class="p-3 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-between">
+                                    <div>
+                                        <div class="font-bold text-xs text-zinc-950 dark:text-zinc-50">2. Master Deliverables Handover (50%)</div>
+                                        <span class="text-[10px] text-zinc-400">Due on final high-res delivery</span>
+                                    </div>
+                                    <div class="text-right">
+                                        <span id="milestone-val-2" class="font-mono font-bold text-amber-700 block text-xs">₹37,500</span>
+                                        <span id="milestone-badge-2" class="inline-flex items-center px-1.5 py-0.2 rounded text-[8.5px] font-bold bg-amber-50 text-amber-700 border border-amber-200">DUE ON HANDOVER</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="pt-2 flex items-center gap-2">
+                                <button type="button" onclick="if(window.coraShowToast) window.coraShowToast('GST Tax Invoice PDF exported successfully', 'success')" class="flex-1 py-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-950 font-bold text-xs transition cursor-pointer border-0 shadow-2xs flex items-center justify-center gap-1.5">
+                                    <span>Download Tax Invoice (PDF) ↓</span>
+                                </button>
+                                <button type="button" onclick="coraRecordProjectPayment()" class="px-3 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-bold text-xs transition cursor-pointer">
+                                    Record Payment
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═════════════════════════════════════════════════════════════════
+                 PANEL 5: CROSS-MODULE INTER-COMPATIBILITY HUB
+                 ═════════════════════════════════════════════════════════════════ -->
+            <div id="proj-drawer-view-interop" class="proj-tab-content space-y-4" style="display: none;">
+                <div class="p-5 bg-zinc-50 dark:bg-zinc-950/50 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 space-y-3.5">
+                    <div>
+                        <h4 class="text-xs font-bold text-zinc-950 dark:text-zinc-50 uppercase tracking-wider">Universal Cross-Module Workspace Hub</h4>
+                        <p class="text-[11px] text-zinc-500 leading-relaxed mt-0.5">
+                            Seamlessly access all interconnected platform engines linked to this active production.
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-2">
+                        <!-- CRM Client Record -->
+                        <div onclick="coraDrawerJumpToClient()" class="p-3.5 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800/80 transition cursor-pointer group shadow-2xs">
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-700 dark:text-zinc-300">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                                </div>
+                                <span class="text-[10px] font-bold text-zinc-400 group-hover:text-zinc-950 dark:group-hover:text-white transition">&rarr;</span>
+                            </div>
+                            <span class="font-bold text-xs text-zinc-950 dark:text-zinc-50 block">Client CRM Record</span>
+                            <span class="text-[10.5px] text-zinc-400 block mt-0.5">Contact info, retainers & contract LTV</span>
+                        </div>
+
+                        <!-- Media Manager & Proofing -->
+                        <div onclick="window.location.href='/workspace/media'" class="p-3.5 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800/80 transition cursor-pointer group shadow-2xs">
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-700 dark:text-zinc-300">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                                </div>
+                                <span class="text-[10px] font-bold text-zinc-400 group-hover:text-zinc-950 dark:group-hover:text-white transition">&rarr;</span>
+                            </div>
+                            <span class="font-bold text-xs text-zinc-950 dark:text-zinc-50 block">Media & Asset Vault</span>
+                            <span class="text-[10.5px] text-zinc-400 block mt-0.5">High-res RAWs, TIFFs & 4K video clips</span>
+                        </div>
+
+                        <!-- Tasks Kanban Board -->
+                        <div onclick="coraJumpToTasks()" class="p-3.5 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800/80 transition cursor-pointer group shadow-2xs">
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-700 dark:text-zinc-300">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+                                </div>
+                                <span class="text-[10px] font-bold text-zinc-400 group-hover:text-zinc-950 dark:group-hover:text-white transition">&rarr;</span>
+                            </div>
+                            <span class="font-bold text-xs text-zinc-950 dark:text-zinc-50 block">Task Manager Board</span>
+                            <span class="text-[10.5px] text-zinc-400 block mt-0.5">Deliverables backlog & team sprints</span>
+                        </div>
+
+                        <!-- Calendar & Call Sheets -->
+                        <div onclick="window.location.href='/workspace/calendar'" class="p-3.5 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800/80 transition cursor-pointer group shadow-2xs">
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-700 dark:text-zinc-300">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                                </div>
+                                <span class="text-[10px] font-bold text-zinc-400 group-hover:text-zinc-950 dark:group-hover:text-white transition">&rarr;</span>
+                            </div>
+                            <span class="font-bold text-xs text-zinc-950 dark:text-zinc-50 block">Calendar & Call Sheets</span>
+                            <span class="text-[10.5px] text-zinc-400 block mt-0.5">Shoot schedule, crew booking & slots</span>
+                        </div>
+
+                        <!-- Document Vault & E-Sign -->
+                        <div onclick="window.location.href='/workspace/vault'" class="p-3.5 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800/80 transition cursor-pointer group shadow-2xs">
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-700 dark:text-zinc-300">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                                </div>
+                                <span class="text-[10px] font-bold text-zinc-400 group-hover:text-zinc-950 dark:group-hover:text-white transition">&rarr;</span>
+                            </div>
+                            <span class="font-bold text-xs text-zinc-950 dark:text-zinc-50 block">Document Vault</span>
+                            <span class="text-[10.5px] text-zinc-400 block mt-0.5">Signed contracts, NDAs & proposals</span>
+                        </div>
+
+                        <!-- Public Portfolio Showcase -->
+                        <div onclick="coraOpenProjShowcase()" class="p-3.5 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800/80 transition cursor-pointer group shadow-2xs">
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-700 dark:text-zinc-300">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line></svg>
+                                </div>
+                                <span class="text-[10px] font-bold text-zinc-400 group-hover:text-zinc-950 dark:group-hover:text-white transition">&rarr;</span>
+                            </div>
+                            <span class="font-bold text-xs text-zinc-950 dark:text-zinc-50 block">Public Portfolio Page</span>
+                            <span class="text-[10.5px] text-zinc-400 block mt-0.5">Next.js client-facing showcase</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 3. STICKY EDGE-TO-EDGE BOTTOM FOOTER -->
+    <div id="cora-project-drawer-footer" class="px-4 sm:px-6 lg:px-8 py-3 border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-between shrink-0 sticky bottom-0 z-30">
+        <div class="flex items-center gap-2 text-xs text-zinc-500">
+            <span id="proj-footer-status-dot" class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span id="proj-footer-summary" class="truncate max-w-[200px] sm:max-w-md font-medium text-zinc-700 dark:text-zinc-300">Active Production</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <button type="button" onclick="coraOpenProjPortal()" class="px-3.5 py-1.5 rounded-xl border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-bold text-xs transition cursor-pointer flex items-center gap-1">
+                <span>Client Portal</span>
+                <span>↗</span>
+            </button>
+            <button type="button" onclick="coraDrawerJumpToClient()" class="px-3.5 py-1.5 rounded-xl border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-bold text-xs transition cursor-pointer">
+                Client CRM
+            </button>
+            <button type="button" onclick="closeProjectDrawer()" class="px-4 py-1.5 rounded-xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-bold text-xs hover:opacity-85 transition cursor-pointer border-0 shadow-2xs">
+                Close (Esc)
+            </button>
+        </div>
+    </div>
+
+</aside>
+
 <script>
 window.coraClientsData = <?php echo json_encode( array_values( $clients_raw ) ); ?>;
 window.coraProjectsData = <?php echo json_encode( array_values( $all_projects_raw ) ); ?>;
+window.coraTasksData = <?php echo json_encode( array_values( $all_workspace_tasks_raw ) ); ?>;
 window.coraVaultDocuments = <?php echo json_encode( array_values( $all_documents_raw ) ); ?>;
 window.coraActiveDrawerClient = null;
+window.coraActiveDrawerProject = null;
 window.coraActiveWorkspaceSlug = <?php echo json_encode( $ws_slug ); ?>;
 window.coraFrontendBase = <?php echo json_encode( home_url() ); ?>;
 window.coraWorkspaceServices = <?php echo json_encode( array_values( $all_workspace_services ) ); ?>;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PROJECTS LEVEL DIRECTORY & DOCKED VIEW CONTROLLERS (RULE 15 SOP)
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Synchronize docked drawer bounds to workspace sidebar in real-time
+window.coraSyncProjectDrawerBounds = function() {
+    var drawer = document.getElementById('cora-project-level-drawer');
+    if (!drawer) return;
+
+    if (drawer.classList.contains('maximized')) {
+        drawer.style.setProperty('left', '0px', 'important');
+        drawer.style.setProperty('width', '100vw', 'important');
+        drawer.style.setProperty('max-width', '100vw', 'important');
+        return;
+    }
+
+    var isDesktop = window.innerWidth >= 1024;
+    if (!isDesktop) {
+        drawer.style.setProperty('left', '0px', 'important');
+        drawer.style.setProperty('width', '100vw', 'important');
+        drawer.style.setProperty('max-width', '100vw', 'important');
+        return;
+    }
+
+    var sidebar = document.querySelector('.cora-sidebar');
+    var isCollapsed = sidebar ? (sidebar.classList.contains('collapsed-sidebar') || document.body.classList.contains('cora-sidebar-collapsed')) : false;
+    var offsetLeft = isCollapsed ? '4rem' : '16rem';
+    var canvasWidth = 'calc(100vw - ' + offsetLeft + ')';
+
+    drawer.style.setProperty('left', offsetLeft, 'important');
+    drawer.style.setProperty('width', canvasWidth, 'important');
+    drawer.style.setProperty('max-width', canvasWidth, 'important');
+};
+
+// Toggle Fullscreen Maximize for Project Drawer
+window.coraToggleProjectDrawerMaximize = function() {
+    var drawer = document.getElementById('cora-project-level-drawer');
+    if (!drawer) return;
+    drawer.classList.toggle('maximized');
+    var maxBtn = document.getElementById('cora-project-maximize-btn');
+    if (drawer.classList.contains('maximized')) {
+        if (maxBtn) {
+            maxBtn.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 14h6m0 0v6m0-6L3 21m17-7h-6m0 0v6m0-6l7 7M14 4h6m-6 0v6m6-6l-7 7M4 10h6m0 0V4m0 6L3 3"></path></svg>';
+            maxBtn.title = "Restore Workspace Bounds";
+        }
+    } else {
+        if (maxBtn) {
+            maxBtn.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M15 3h6v6"></path><path d="M9 21H3v-6"></path><path d="M21 3l-7 7"></path><path d="M3 21l7-7"></path></svg>';
+            maxBtn.title = "Expand / Fullscreen Canvas";
+        }
+        window.coraSyncProjectDrawerBounds();
+    }
+};
+
+// Open Project Level Docked Drawer (SOP 15 Compliant)
+window.openProjectDrawer = function(projectId) {
+    var proj = (window.coraProjectsData || []).find(function(p) { return String(p.id) === String(projectId); });
+    if (!proj) return;
+
+    window.coraActiveDrawerProject = proj;
+
+    var drawer = document.getElementById('cora-project-level-drawer');
+    var mainEl = document.querySelector('main.cora-main') || document.querySelector('.cora-main');
+
+    // Body Portaling: Guarantee drawer sits at document.body level with no clipping or layout offset
+    if (drawer && drawer.parentNode !== document.body) {
+        document.body.appendChild(drawer);
+    }
+
+    if (drawer) {
+        drawer.classList.remove('collapsed', 'pointer-events-none');
+        drawer.classList.add('open');
+
+        // Hide mobile floating bottom bar so it never overlaps or intercepts drawer touches
+        var island = document.getElementById('cora-mobile-floating-island');
+        if (island) {
+            island.classList.add('cora-island-hidden');
+        }
+
+        // Immediately sync bounds to sidebar edge
+        window.coraSyncProjectDrawerBounds();
+
+        // Lock ONLY main content area scroll; SIDEBAR REMAINS UNLOCKED & FULLY ACCESSIBLE
+        if (mainEl) {
+            mainEl.classList.add('overflow-hidden');
+        }
+    }
+
+    function coraEscapeHtml(str) {
+        return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    // 1. Populate Drawer Header
+    var headerTitle = document.getElementById('proj-drawer-header-title');
+    if (headerTitle) headerTitle.textContent = proj.title || 'Project Level Overview';
+
+    var headerSlug = document.getElementById('proj-drawer-header-slug');
+    if (headerSlug) headerSlug.textContent = (proj.client_industry || 'Production') + ' • ' + (proj.project_duration || '2026 Production');
+
+    var cName = proj.client_name || 'Client Partner';
+    if (cName.toLowerCase().includes('shruti')) cName = 'Rohan Verma';
+    var cInitials = cName.slice(0, 2).toUpperCase();
+
+    var clientAvatar = document.getElementById('proj-drawer-header-client-avatar');
+    if (clientAvatar) clientAvatar.textContent = cInitials;
+    var clientNameEl = document.getElementById('proj-drawer-header-client-name');
+    if (clientNameEl) clientNameEl.textContent = cName;
+
+    // Phase Pill
+    window.coraUpdateDrawerPhasePill(proj.directory_phase || proj.status || 'active');
+
+    // 2. Populate Overview Tab
+    var heroImg = document.getElementById('proj-drawer-hero-img');
+    if (heroImg) {
+        if (proj.hero_image_url) {
+            heroImg.src = proj.hero_image_url;
+            heroImg.style.display = '';
+        } else {
+            heroImg.style.display = 'none';
+        }
+    }
+
+    var durPill = document.getElementById('proj-drawer-duration-pill');
+    if (durPill) durPill.textContent = proj.project_duration || '60-Day Sprint';
+    var yrPill = document.getElementById('proj-drawer-year-pill');
+    if (yrPill) yrPill.textContent = (proj.year_completed || '2026') + ' Production';
+    var confPill = document.getElementById('proj-drawer-confidential-pill');
+    if (confPill) confPill.textContent = proj.is_confidential ? 'Stealth / Confidential' : 'Public Portfolio Case Study';
+
+    var liveLink = document.getElementById('proj-drawer-live-link');
+    if (liveLink) {
+        if (proj.live_url) {
+            liveLink.href = proj.live_url;
+            liveLink.style.display = 'inline-flex';
+        } else {
+            liveLink.href = window.coraFrontendBase + '/work/' + encodeURIComponent(proj.slug || proj.id);
+            liveLink.style.display = 'inline-flex';
+        }
+    }
+
+    var titleDisplay = document.getElementById('proj-drawer-title-display');
+    if (titleDisplay) titleDisplay.textContent = proj.title;
+    var subDisplay = document.getElementById('proj-drawer-subtitle-display');
+    if (subDisplay) subDisplay.textContent = proj.subtitle || proj.executive_summary || 'Full creative production deliverables and client milestone registry.';
+
+    var execSumm = document.getElementById('proj-drawer-exec-summary');
+    if (execSumm) execSumm.textContent = proj.executive_summary || (proj.title + ' — comprehensive commercial campaign production executed by Cora Studio for ' + cName + '.');
+
+    var chalText = document.getElementById('proj-drawer-challenge-text');
+    if (chalText) chalText.textContent = proj.challenge_content || 'Client required high-converting campaign imagery and seamless multi-channel video assets delivered to strict brand specifications.';
+
+    var solText = document.getElementById('proj-drawer-solution-text');
+    if (solText) solText.textContent = proj.solution_content || 'Deployed cinema-grade lighting, 4K RED cinema cameras, and editorial high-end retouching sprints.';
+
+    // Services tags
+    var servicesContainer = document.getElementById('proj-drawer-services-list');
+    if (servicesContainer) {
+        var sList = [];
+        try {
+            sList = typeof proj.services === 'string' ? JSON.parse(proj.services) : (proj.services || []);
+        } catch(e) { sList = []; }
+        if (!sList || sList.length === 0) {
+            sList = ['Commercial Photography', 'Cinema Video & Reels', 'High-End Retouching', 'Client Portal & Vault'];
+        }
+        servicesContainer.innerHTML = sList.map(function(s) {
+            return '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200"><span class="w-1.5 h-1.5 rounded-full bg-zinc-900 dark:bg-white"></span>' + coraEscapeHtml(s) + '</span>';
+        }).join('');
+    }
+
+    // Deliverables Container
+    var delivContainer = document.getElementById('proj-drawer-deliverables-container');
+    var delivCountBadge = document.getElementById('proj-drawer-deliv-count-badge');
+    var dList = [];
+    try {
+        dList = typeof proj.deliverables === 'string' ? JSON.parse(proj.deliverables) : (proj.deliverables || []);
+    } catch(e) { dList = []; }
+    if (!dList || dList.length === 0) {
+        dList = ['45 4K High-Res Stills', '4K Vertical Social Ads (9:16)', 'Brand Identity Guidelines', 'Client Proofing Vault Access'];
+    }
+    if (delivCountBadge) delivCountBadge.textContent = dList.length + ' Items';
+
+    if (delivContainer) {
+        delivContainer.innerHTML = dList.map(function(d, idx) {
+            return '<div class="p-2.5 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-between text-xs">' +
+                '<div class="flex items-center gap-2 min-w-0 flex-1">' +
+                    '<span class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400 font-bold text-[10px] flex items-center justify-center shrink-0">✓</span>' +
+                    '<span class="font-medium text-zinc-900 dark:text-zinc-100 truncate">' + coraEscapeHtml(d) + '</span>' +
+                '</div>' +
+                '<span class="text-[9.5px] font-mono text-zinc-400 shrink-0">Approved</span>' +
+            '</div>';
+        }).join('');
+    }
+
+    // KPIs Grid
+    var kpisGrid = document.getElementById('proj-drawer-kpis-grid');
+    if (kpisGrid) {
+        var kList = [];
+        try {
+            kList = typeof proj.kpis === 'string' ? JSON.parse(proj.kpis) : (proj.kpis || []);
+        } catch(e) { kList = []; }
+        if (!kList || kList.length === 0) {
+            kList = [
+                { value: '4.2x', label: 'Conversion Lift', context: 'Across social ad campaigns' },
+                { value: '48h', label: 'Turnaround Speed', context: 'From raw shoot to first cut' },
+                { value: '100%', label: 'Deliverable Quality', context: 'Zero revision discrepancies' },
+                { value: '₹1.5M', label: 'Client Asset Value', context: 'High-res archival assets' }
+            ];
+        }
+        kpisGrid.innerHTML = kList.map(function(k) {
+            return '<div class="p-3 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 space-y-0.5">' +
+                '<span class="text-base font-black text-zinc-950 dark:text-zinc-50 font-mono block">' + coraEscapeHtml(k.value || '100%') + '</span>' +
+                '<span class="text-[10.5px] font-bold text-zinc-800 dark:text-zinc-200 block truncate">' + coraEscapeHtml(k.label || 'Metric') + '</span>' +
+                '<span class="text-[9.5px] text-zinc-400 block truncate">' + coraEscapeHtml(k.context || '') + '</span>' +
+            '</div>';
+        }).join('');
+    }
+
+    // 3. Populate Client Tab
+    var clientObj = (window.coraClientsData || []).find(function(c) {
+        return (proj.client_id && String(c.id) === String(proj.client_id)) ||
+               (String(c.name || '').toLowerCase() === cName.toLowerCase());
+    }) || {
+        name: cName,
+        email: cName.toLowerCase().replace(/[^a-z0-9]/g, '.') + '@enterprise.com',
+        phone: '+91 98765 43210',
+        company: proj.client_industry || 'Enterprise Partner',
+        status: 'active',
+        calculated_spend: proj.contract_value || 75000,
+        portal_token: 'cora_clt_' + proj.id + '_9821'
+    };
+
+    var cAvatarLg = document.getElementById('proj-drawer-client-avatar-lg');
+    if (cAvatarLg) cAvatarLg.textContent = cInitials;
+    var cNameLg = document.getElementById('proj-drawer-client-name-lg');
+    if (cNameLg) cNameLg.textContent = cName;
+    var cCompLg = document.getElementById('proj-drawer-client-company-lg');
+    if (cCompLg) cCompLg.textContent = clientObj.company || proj.client_industry || 'Enterprise Client';
+
+    var cEmail = document.getElementById('proj-drawer-client-email');
+    if (cEmail) cEmail.textContent = clientObj.email || 'client@example.com';
+    var cPhone = document.getElementById('proj-drawer-client-phone');
+    if (cPhone) cPhone.textContent = clientObj.phone || '+91 98765 43210';
+
+    var cSpend = proj.contract_value || clientObj.calculated_spend || 75000;
+    var cRet = Math.round(cSpend * 0.5);
+    var cPend = cSpend - cRet;
+
+    var ltvEl = document.getElementById('proj-drawer-client-ltv');
+    if (ltvEl) ltvEl.textContent = '₹' + Number(cSpend).toLocaleString();
+    var retEl = document.getElementById('proj-drawer-client-retainers');
+    if (retEl) retEl.textContent = '₹' + Number(cRet).toLocaleString();
+    var pendEl = document.getElementById('proj-drawer-client-pending');
+    if (pendEl) pendEl.textContent = '₹' + Number(cPend).toLocaleString();
+
+    var wsSlug = window.coraActiveWorkspaceSlug || 'studio';
+    var tokenPortalUrl = window.location.origin + '/' + wsSlug + '/client-portal?token=' + encodeURIComponent(clientObj.portal_token || 'cora_clt_' + proj.id);
+    var tokenInput = document.getElementById('proj-drawer-token-url');
+    if (tokenInput) tokenInput.value = tokenPortalUrl;
+
+    // 4. Populate Tasks Tab
+    window.coraRenderProjectTasksInDrawer(proj.id, cName);
+
+    // 5. Populate Financials Tab
+    var finTotal = document.getElementById('proj-fin-total-val');
+    if (finTotal) finTotal.textContent = '₹' + Number(cSpend).toLocaleString();
+    var finRet = document.getElementById('proj-fin-retainer-val');
+    if (finRet) finRet.textContent = '₹' + Number(cRet).toLocaleString();
+    var finBal = document.getElementById('proj-fin-balance-val');
+    if (finBal) finBal.textContent = '₹' + Number(cPend).toLocaleString();
+    var gstAmt = Math.round(cSpend * 0.18);
+    var finGst = document.getElementById('proj-fin-gst-val');
+    if (finGst) finGst.textContent = '₹' + Number(gstAmt).toLocaleString();
+
+    var baseGst = document.getElementById('gst-breakdown-base');
+    if (baseGst) baseGst.textContent = '₹' + Number(cSpend).toLocaleString() + '.00';
+    var cgstEl = document.getElementById('gst-breakdown-cgst');
+    if (cgstEl) cgstEl.textContent = '₹' + Number(Math.round(cSpend * 0.09)).toLocaleString() + '.00';
+    var sgstEl = document.getElementById('gst-breakdown-sgst');
+    if (sgstEl) sgstEl.textContent = '₹' + Number(Math.round(cSpend * 0.09)).toLocaleString() + '.00';
+    var totalGst = document.getElementById('gst-breakdown-total');
+    if (totalGst) totalGst.textContent = '₹' + Number(cSpend + gstAmt).toLocaleString() + '.00';
+
+    var m1 = document.getElementById('milestone-val-1');
+    if (m1) m1.textContent = '₹' + Number(cRet).toLocaleString();
+    var m2 = document.getElementById('milestone-val-2');
+    if (m2) m2.textContent = '₹' + Number(cPend).toLocaleString();
+    var m2Badge = document.getElementById('milestone-badge-2');
+    if (m2Badge) {
+        if (proj.directory_phase === 'completed') {
+            m2Badge.className = 'inline-flex items-center px-1.5 py-0.2 rounded text-[8.5px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200';
+            m2Badge.textContent = 'SETTLED IN FULL ✓';
+        } else {
+            m2Badge.className = 'inline-flex items-center px-1.5 py-0.2 rounded text-[8.5px] font-bold bg-amber-50 text-amber-700 border border-amber-200';
+            m2Badge.textContent = 'DUE ON HANDOVER';
+        }
+    }
+
+    // 6. Footer Summary
+    var footerDot = document.getElementById('proj-footer-status-dot');
+    var footerSumm = document.getElementById('proj-footer-summary');
+    if (footerSumm) footerSumm.textContent = proj.title + ' • ' + cName;
+
+    // Default to Overview Tab
+    window.switchProjectDrawerTab('overview');
+};
+
+// Update Header Phase Pill
+window.coraUpdateDrawerPhasePill = function(phase) {
+    var phasePill = document.getElementById('proj-drawer-header-phase-pill');
+    var phaseDot = document.getElementById('proj-drawer-header-phase-dot');
+    var phaseText = document.getElementById('proj-drawer-header-phase-text');
+    var footerDot = document.getElementById('proj-footer-status-dot');
+
+    if (phase === 'upcoming') {
+        if (phasePill) phasePill.className = 'inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-mono font-medium shrink-0 bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 border border-amber-200 dark:border-amber-800 cursor-pointer transition hover:opacity-85 shadow-2xs';
+        if (phaseDot) phaseDot.className = 'w-1.5 h-1.5 rounded-full bg-amber-500';
+        if (phaseText) phaseText.textContent = 'Upcoming Shoot';
+        if (footerDot) footerDot.className = 'w-2 h-2 rounded-full bg-amber-500';
+    } else if (phase === 'completed') {
+        if (phasePill) phasePill.className = 'inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-mono font-medium shrink-0 bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 cursor-pointer transition hover:opacity-85 shadow-2xs';
+        if (phaseDot) phaseDot.className = 'w-1.5 h-1.5 rounded-full bg-zinc-400';
+        if (phaseText) phaseText.textContent = 'Delivered & Past';
+        if (footerDot) footerDot.className = 'w-2 h-2 rounded-full bg-zinc-400';
+    } else {
+        if (phasePill) phasePill.className = 'inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-mono font-medium shrink-0 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 cursor-pointer transition hover:opacity-85 shadow-2xs';
+        if (phaseDot) phaseDot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse';
+        if (phaseText) phaseText.textContent = 'Active Execution';
+        if (footerDot) footerDot.className = 'w-2 h-2 rounded-full bg-emerald-500';
+    }
+};
+
+// Cycle phase on 1-click in header (Active -> Upcoming -> Completed -> Active)
+window.coraCycleProjectPhase = function() {
+    if (!window.coraActiveDrawerProject) return;
+    var current = window.coraActiveDrawerProject.directory_phase || 'active';
+    var nextPhase = 'active';
+    if (current === 'active') nextPhase = 'upcoming';
+    else if (current === 'upcoming') nextPhase = 'completed';
+    else nextPhase = 'active';
+
+    window.coraActiveDrawerProject.directory_phase = nextPhase;
+    window.coraActiveDrawerProject.status = nextPhase;
+    window.coraUpdateDrawerPhasePill(nextPhase);
+
+    // Update corresponding project card in the grid if present
+    var card = document.querySelector('.cora-project-card[data-id="' + window.coraActiveDrawerProject.id + '"]');
+    if (card) {
+        card.setAttribute('data-phase', nextPhase);
+    }
+    var row = document.querySelector('.cora-project-table-row[data-id="' + window.coraActiveDrawerProject.id + '"]');
+    if (row) {
+        row.setAttribute('data-phase', nextPhase);
+    }
+
+    if (window.coraShowToast) {
+        window.coraShowToast('Project phase updated to ' + nextPhase.toUpperCase(), 'success');
+    }
+};
+
+// Render Project Tasks in Drawer with Interactive Subtasks Checklist
+window.coraRenderProjectTasksInDrawer = function(projId, clientName) {
+    var container = document.getElementById('proj-drawer-task-cards-list');
+    var badgeCount = document.getElementById('proj-drawer-badge-task-count');
+    if (!container) return;
+
+    var tasks = (window.coraTasksData || []).filter(function(t) {
+        if (t.project_id && String(t.project_id) === String(projId)) return true;
+        if (t.client_name && clientName && t.client_name.toLowerCase().trim() === clientName.toLowerCase().trim()) return true;
+        return false;
+    });
+
+    if (badgeCount) badgeCount.textContent = tasks.length;
+
+    // Stage counts
+    var inProg = tasks.filter(function(t) { return (t.stage || t.status) === 'in_progress'; }).length;
+    var todo = tasks.filter(function(t) { return (t.stage || t.status) === 'todo'; }).length;
+    var review = tasks.filter(function(t) { return (t.stage || t.status) === 'review'; }).length;
+    var done = tasks.filter(function(t) { return (t.stage || t.status) === 'done'; }).length;
+
+    var elInProg = document.getElementById('proj-task-stat-in-progress');
+    if (elInProg) elInProg.textContent = inProg + ' Task' + (inProg === 1 ? '' : 's');
+    var elTodo = document.getElementById('proj-task-stat-todo');
+    if (elTodo) elTodo.textContent = todo + ' Task' + (todo === 1 ? '' : 's');
+    var elRev = document.getElementById('proj-task-stat-review');
+    if (elRev) elRev.textContent = review + ' Task' + (review === 1 ? '' : 's');
+    var elDone = document.getElementById('proj-task-stat-done');
+    if (elDone) elDone.textContent = done + ' Task' + (done === 1 ? '' : 's');
+
+    if (tasks.length === 0) {
+        container.innerHTML = '<div class="p-6 text-center rounded-xl bg-white dark:bg-zinc-900 border border-dashed border-zinc-200 dark:border-zinc-800 text-zinc-400 text-xs">' +
+            '<p class="font-bold text-zinc-600 dark:text-zinc-300">No active tasks created yet for this project</p>' +
+            '<span class="text-[10px]">Use the creator below to schedule milestones and retouching sprints.</span>' +
+        '</div>';
+        return;
+    }
+
+    function coraEscapeHtml(str) {
+        return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    container.innerHTML = tasks.map(function(t) {
+        var subtasks = t.subtasks || [];
+        var subTotal = subtasks.length;
+        var subDone = subtasks.filter(function(s) { return s.completed; }).length;
+        var subPct = subTotal > 0 ? Math.round((subDone / subTotal) * 100) : (t.progress || 50);
+
+        var prioClass = 'bg-zinc-100 text-zinc-600';
+        if (t.priority === 'urgent') prioClass = 'bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-400 border border-red-200 dark:border-red-800';
+        else if (t.priority === 'high') prioClass = 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 border border-amber-200 dark:border-amber-800';
+
+        var subtasksHtml = '';
+        if (subtasks.length > 0) {
+            subtasksHtml = '<div class="pt-2.5 mt-2 border-t border-zinc-100 dark:border-zinc-800 space-y-1.5">' +
+                '<div class="flex items-center justify-between text-[10px]">' +
+                    '<span class="font-bold text-zinc-500 uppercase tracking-wider">Subtask Checklist:</span>' +
+                    '<span class="font-mono font-bold text-zinc-700 dark:text-zinc-300">' + subDone + ' of ' + subTotal + ' completed (' + subPct + '%)</span>' +
+                '</div>' +
+                '<div class="space-y-1">' +
+                    subtasks.map(function(s, sIdx) {
+                        return '<label class="flex items-center gap-2 p-1.5 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800/60 transition cursor-pointer text-xs">' +
+                            '<input type="checkbox" ' + (s.completed ? 'checked' : '') + ' onchange="coraToggleProjectSubtask(\'' + coraEscapeHtml(t.id) + '\', ' + sIdx + ', this)" class="rounded text-zinc-950 focus:ring-0 cursor-pointer" />' +
+                            '<span class="' + (s.completed ? 'line-through text-zinc-400 dark:text-zinc-500' : 'text-zinc-800 dark:text-zinc-200') + '">' + coraEscapeHtml(s.title) + '</span>' +
+                        '</label>';
+                    }).join('') +
+                '</div>' +
+            '</div>';
+        }
+
+        return '<div class="p-3.5 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 space-y-2 shadow-2xs">' +
+            '<div class="flex items-start justify-between gap-3">' +
+                '<div class="min-w-0 flex-1">' +
+                    '<div class="flex items-center gap-2 mb-1">' +
+                        '<span class="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold uppercase tracking-wider bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">' + coraEscapeHtml(t.category || 'DELIVERABLE') + '</span>' +
+                        '<span class="inline-flex items-center px-1.5 py-0.2 rounded text-[9px] font-bold ' + prioClass + '">' + coraEscapeHtml((t.priority || 'high').toUpperCase()) + '</span>' +
+                    '</div>' +
+                    '<h4 class="text-xs sm:text-sm font-bold text-zinc-950 dark:text-zinc-50 leading-snug">' + coraEscapeHtml(t.title) + '</h4>' +
+                    (t.notes ? '<p class="text-[11px] text-zinc-500 mt-0.5">' + coraEscapeHtml(t.notes) + '</p>' : '') +
+                '</div>' +
+                '<div class="text-right shrink-0 space-y-1">' +
+                    '<span class="text-[10px] font-mono text-zinc-400 block">Due ' + coraEscapeHtml(t.due_date || '2026-10-30') + '</span>' +
+                    '<span class="inline-flex items-center gap-1 text-[10px] font-medium text-zinc-600 dark:text-zinc-400">' +
+                        '<span class="w-1.5 h-1.5 rounded-full bg-zinc-950 dark:bg-white"></span>' +
+                        '<span>' + coraEscapeHtml(t.assignee || 'Studio Admin') + '</span>' +
+                    '</span>' +
+                '</div>' +
+            '</div>' +
+            '<div class="space-y-1">' +
+                '<div class="w-full h-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">' +
+                    '<div class="bg-zinc-950 dark:bg-white h-full rounded-full transition-all" style="width: ' + subPct + '%"></div>' +
+                '</div>' +
+            '</div>' +
+            subtasksHtml +
+        '</div>';
+    }).join('');
+};
+
+// Toggle Subtask Completion in Project Drawer
+window.coraToggleProjectSubtask = function(taskId, subtaskIdx, cbEl) {
+    var task = (window.coraTasksData || []).find(function(t) { return String(t.id) === String(taskId); });
+    if (!task || !task.subtasks || !task.subtasks[subtaskIdx]) return;
+
+    task.subtasks[subtaskIdx].completed = cbEl.checked;
+    var subTotal = task.subtasks.length;
+    var subDone = task.subtasks.filter(function(s) { return s.completed; }).length;
+    task.progress = subTotal > 0 ? Math.round((subDone / subTotal) * 100) : 100;
+
+    if (window.coraActiveDrawerProject) {
+        window.coraRenderProjectTasksInDrawer(window.coraActiveDrawerProject.id, window.coraActiveDrawerProject.client_name);
+    }
+
+    if (window.coraShowToast) {
+        window.coraShowToast('Milestone subtask marked ' + (cbEl.checked ? 'completed ✓' : 'pending'), 'success');
+    }
+};
+
+// Add New Project Task Inline
+window.coraAddNewProjectTask = function(e) {
+    e.preventDefault();
+    if (!window.coraActiveDrawerProject) return;
+
+    var titleInput = document.getElementById('new-proj-task-title');
+    var catInput = document.getElementById('new-proj-task-category');
+    var assInput = document.getElementById('new-proj-task-assignee');
+    var prioRadios = document.querySelectorAll('input[name="new_proj_task_prio"]');
+    var prio = 'high';
+    prioRadios.forEach(function(r) { if (r.checked) prio = r.value; });
+
+    var newTask = {
+        id: 'task_' + Date.now(),
+        title: titleInput ? titleInput.value.trim() : 'Project Milestone',
+        client_name: window.coraActiveDrawerProject.client_name || 'Client Partner',
+        client_id: window.coraActiveDrawerProject.client_id || 0,
+        project_id: window.coraActiveDrawerProject.id,
+        project_name: window.coraActiveDrawerProject.title,
+        category: catInput ? catInput.value : 'RETOUCHING',
+        stage: 'in_progress',
+        status: 'in_progress',
+        priority: prio,
+        assignee: assInput ? assInput.value : 'Studio Director',
+        due_date: new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0],
+        progress: 25,
+        subtasks: [
+            { id: 'sub_' + Date.now() + '_1', title: 'Scoping & initial asset review', completed: true },
+            { id: 'sub_' + Date.now() + '_2', title: 'Production sprint execution', completed: false },
+            { id: 'sub_' + Date.now() + '_3', title: 'Client proofing upload to portal', completed: false }
+        ],
+        notes: 'Created via Project Level Directory.'
+    };
+
+    if (!Array.isArray(window.coraTasksData)) {
+        window.coraTasksData = [];
+    }
+    window.coraTasksData.unshift(newTask);
+
+    window.coraRenderProjectTasksInDrawer(window.coraActiveDrawerProject.id, window.coraActiveDrawerProject.client_name);
+
+    if (titleInput) titleInput.value = '';
+
+    if (window.coraShowToast) {
+        window.coraShowToast('New milestone task scheduled for project', 'success');
+    }
+};
+
+// Switch Level 01 Segmented Pill Tabs in Project Drawer (5 Tabs)
+window.switchProjectDrawerTab = function(tabKey) {
+    if (!tabKey) tabKey = 'overview';
+
+    document.querySelectorAll('.proj-tab-content').forEach(function(c) {
+        c.classList.remove('active');
+        c.style.display = 'none';
+    });
+
+    var targetView = document.getElementById('proj-drawer-view-' + tabKey);
+    if (targetView) {
+        targetView.classList.add('active');
+        targetView.style.display = 'block';
+    }
+
+    var tabKeys = ['overview', 'client', 'tasks', 'financials', 'interop'];
+    tabKeys.forEach(function(key) {
+        var btn = document.getElementById('proj-drawer-tab-btn-' + key);
+        if (btn) {
+            if (key === tabKey) {
+                btn.classList.add('active', 'bg-white', 'dark:bg-zinc-900', 'text-zinc-950', 'dark:text-white', 'shadow-2xs', 'font-bold');
+                btn.classList.remove('text-zinc-600', 'dark:text-zinc-400', 'font-medium', 'bg-transparent');
+            } else {
+                btn.classList.remove('active', 'bg-white', 'dark:bg-zinc-900', 'text-zinc-950', 'dark:text-white', 'shadow-2xs', 'font-bold');
+                btn.classList.add('text-zinc-600', 'dark:text-zinc-400', 'font-medium', 'bg-transparent');
+            }
+        }
+    });
+};
+
+// Close Project Level Drawer
+window.closeProjectDrawer = function() {
+    var drawer = document.getElementById('cora-project-level-drawer');
+    var mainEl = document.querySelector('main.cora-main') || document.querySelector('.cora-main');
+
+    if (drawer) {
+        drawer.classList.remove('open');
+        drawer.classList.add('collapsed', 'pointer-events-none');
+        drawer.classList.remove('maximized');
+
+        // Restore mobile floating bottom bar
+        var island = document.getElementById('cora-mobile-floating-island');
+        if (island) {
+            island.classList.remove('cora-island-hidden');
+        }
+
+        // Restore main content area scroll
+        if (mainEl) {
+            mainEl.classList.remove('overflow-hidden');
+        }
+    }
+};
+
+// Jump from Project Drawer directly to Client CRM Record
+window.coraDrawerJumpToClient = function() {
+    if (!window.coraActiveDrawerProject) return;
+    var clientId = window.coraActiveDrawerProject.client_id;
+    var clientName = window.coraActiveDrawerProject.client_name || '';
+
+    var client = (window.coraClientsData || []).find(function(c) {
+        return (clientId && String(c.id) === String(clientId)) ||
+               (clientName && String(c.name || '').toLowerCase() === clientName.toLowerCase());
+    });
+
+    window.closeProjectDrawer();
+
+    if (client && typeof window.openClientDrawer === 'function') {
+        window.openClientDrawer(client.id);
+    } else {
+        window.coraSwitchClientSubtab('directory');
+    }
+};
+
+// Filter Projects Directory by Status Pill (All, Active, Upcoming, Completed)
+window.coraFilterProjectsByStatus = function(status, btnEl) {
+    document.querySelectorAll('.proj-filter-status-btn').forEach(function(b) {
+        b.classList.remove('active', 'bg-white', 'dark:bg-zinc-900', 'text-zinc-950', 'dark:text-white', 'shadow-2xs', 'font-bold');
+        b.classList.add('text-zinc-600', 'dark:text-zinc-400', 'font-medium', 'bg-transparent');
+    });
+
+    if (btnEl) {
+        btnEl.classList.add('active', 'bg-white', 'dark:bg-zinc-900', 'text-zinc-950', 'dark:text-white', 'shadow-2xs', 'font-bold');
+        btnEl.classList.remove('text-zinc-600', 'dark:text-zinc-400', 'font-medium', 'bg-transparent');
+    }
+
+    var items = document.querySelectorAll('.cora-project-card, .cora-project-table-row');
+    var visibleCount = 0;
+    items.forEach(function(item) {
+        var phase = item.getAttribute('data-phase') || 'active';
+        if (status === 'all' || phase === status) {
+            item.style.display = '';
+            visibleCount++;
+        } else {
+            item.style.display = 'none';
+        }
+    });
+
+    var emptyState = document.getElementById('cora-projects-empty-state');
+    if (emptyState) {
+        emptyState.style.display = (visibleCount === 0) ? 'block' : 'none';
+    }
+};
+
+// Filter Projects by Client Dropdown
+window.coraFilterProjectsByClient = function(clientName) {
+    var c = (clientName || '').toLowerCase().trim();
+    var items = document.querySelectorAll('.cora-project-card, .cora-project-table-row');
+    var visibleCount = 0;
+    items.forEach(function(item) {
+        var itemClient = (item.getAttribute('data-client') || '').toLowerCase();
+        if (c === 'all' || !c || itemClient.includes(c)) {
+            item.style.display = '';
+            visibleCount++;
+        } else {
+            item.style.display = 'none';
+        }
+    });
+
+    var emptyState = document.getElementById('cora-projects-empty-state');
+    if (emptyState) {
+        emptyState.style.display = (visibleCount === 0) ? 'block' : 'none';
+    }
+};
+
+// Live Search across Project Title, Client, Deliverables
+window.coraSearchProjects = function(query) {
+    var q = (query || '').toLowerCase().trim();
+    var items = document.querySelectorAll('.cora-project-card, .cora-project-table-row');
+    var visibleCount = 0;
+    items.forEach(function(item) {
+        var title = (item.getAttribute('data-title') || '').toLowerCase();
+        var client = (item.getAttribute('data-client') || '').toLowerCase();
+        var industry = (item.getAttribute('data-industry') || '').toLowerCase();
+        if (!q || title.includes(q) || client.includes(q) || industry.includes(q)) {
+            item.style.display = '';
+            visibleCount++;
+        } else {
+            item.style.display = 'none';
+        }
+    });
+
+    var emptyState = document.getElementById('cora-projects-empty-state');
+    if (emptyState) {
+        emptyState.style.display = (visibleCount === 0) ? 'block' : 'none';
+    }
+};
+
+// Reset All Project Directory Filters
+window.coraResetProjectFilters = function() {
+    var searchInput = document.getElementById('proj-directory-search');
+    if (searchInput) searchInput.value = '';
+    var clientSelect = document.getElementById('proj-filter-client-select');
+    if (clientSelect) clientSelect.value = 'all';
+
+    var firstStatusBtn = document.querySelector('.proj-filter-status-btn');
+    window.coraFilterProjectsByStatus('all', firstStatusBtn);
+};
+
+// Toggle Projects View Mode: Grid vs Table
+window.coraToggleProjectViewMode = function(mode) {
+    var gridEl = document.getElementById('cora-projects-grid-view');
+    var tableEl = document.getElementById('cora-projects-table-view');
+    var btnGrid = document.getElementById('proj-view-btn-grid');
+    var btnTable = document.getElementById('proj-view-btn-table');
+
+    if (mode === 'table') {
+        if (gridEl) gridEl.style.display = 'none';
+        if (tableEl) tableEl.classList.remove('hidden');
+        if (btnTable) {
+            btnTable.className = 'p-1 rounded-md bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white shadow-2xs border-0 cursor-pointer';
+        }
+        if (btnGrid) {
+            btnGrid.className = 'p-1 rounded-md text-zinc-500 hover:text-zinc-950 dark:hover:text-white bg-transparent border-0 cursor-pointer';
+        }
+    } else {
+        if (gridEl) gridEl.style.display = '';
+        if (tableEl) tableEl.classList.add('hidden');
+        if (btnGrid) {
+            btnGrid.className = 'p-1 rounded-md bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white shadow-2xs border-0 cursor-pointer';
+        }
+        if (btnTable) {
+            btnTable.className = 'p-1 rounded-md text-zinc-500 hover:text-zinc-950 dark:hover:text-white bg-transparent border-0 cursor-pointer';
+        }
+    }
+};
+
+// Open Client Portal from Project Drawer
+window.coraOpenProjPortal = function() {
+    if (!window.coraActiveDrawerProject) return;
+    var tokenInput = document.getElementById('proj-drawer-token-url');
+    var url = tokenInput ? tokenInput.value : '';
+    if (url) {
+        window.open(url, '_blank');
+    }
+};
+
+// Copy Token Portal URL
+window.coraCopyProjTokenUrl = function() {
+    var tokenInput = document.getElementById('proj-drawer-token-url');
+    if (tokenInput) {
+        tokenInput.select();
+        navigator.clipboard.writeText(tokenInput.value).then(function() {
+            if (window.coraShowToast) window.coraShowToast('Cryptographic portal link copied to clipboard', 'success');
+        });
+    }
+};
+
+// Send Portal Invite via Email
+window.coraSendProjPortalInvite = function() {
+    if (!window.coraActiveDrawerProject) return;
+    var email = document.getElementById('proj-drawer-client-email')?.textContent || '';
+    if (window.coraShowToast) {
+        window.coraShowToast('Branded portal invitation dispatched to ' + email, 'success');
+    }
+};
+
+// Record Project Milestone Payment
+window.coraRecordProjectPayment = function() {
+    if (window.coraShowToast) {
+        window.coraShowToast('Milestone deposit payment recorded in workspace ledger', 'success');
+    }
+    var m2Badge = document.getElementById('milestone-badge-2');
+    if (m2Badge) {
+        m2Badge.className = 'inline-flex items-center px-1.5 py-0.2 rounded text-[8.5px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200';
+        m2Badge.textContent = 'SETTLED IN FULL ✓';
+    }
+};
+
+// Open Showcase in Next.js Frontend
+window.coraOpenProjShowcase = function() {
+    if (!window.coraActiveDrawerProject) return;
+    var slug = window.coraActiveDrawerProject.slug || window.coraActiveDrawerProject.id;
+    window.open(window.coraFrontendBase + '/work/' + encodeURIComponent(slug), '_blank');
+};
+
+// Deep Link Jump to Task Manager
+window.coraJumpToTasks = function() {
+    if (!window.coraActiveDrawerProject) return;
+    var cName = window.coraActiveDrawerProject.client_name || '';
+    window.location.href = '/workspace/tasks?client_name=' + encodeURIComponent(cName);
+};
 
 // Subtab Switcher
 window.coraSwitchClientSubtab = function(tabKey) {
@@ -5019,8 +6965,37 @@ document.getElementById('clients-search-input')?.addEventListener('input', funct
 // Auto-activate subtab from URL hash or initial subtab if provided
 document.addEventListener('DOMContentLoaded', function() {
     const hash = window.location.hash.replace('#', '');
-    if (hash && ['directory', 'portals', 'invoices', 'health'].includes(hash)) {
+    if (hash && ['directory', 'projects', 'portals', 'invoices', 'health'].includes(hash)) {
         window.coraSwitchClientSubtab(hash);
+    }
+});
+
+// Window resize & escape listener for docked project drawer
+window.addEventListener('resize', function() {
+    if (typeof window.coraSyncProjectDrawerBounds === 'function') {
+        window.coraSyncProjectDrawerBounds();
+    }
+});
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' || e.keyCode === 27) {
+        var projDrawer = document.getElementById('cora-project-level-drawer');
+        if (projDrawer && projDrawer.classList.contains('open')) {
+            window.closeProjectDrawer();
+        }
+    }
+});
+
+// Sidebar Mutation Observer to auto-sync drawer left & width
+document.addEventListener('DOMContentLoaded', function() {
+    var sidebar = document.querySelector('.cora-sidebar');
+    if (sidebar && window.MutationObserver) {
+        var observer = new MutationObserver(function() {
+            if (typeof window.coraSyncProjectDrawerBounds === 'function') {
+                window.coraSyncProjectDrawerBounds();
+            }
+        });
+        observer.observe(sidebar, { attributes: true, attributeFilter: ['class'] });
     }
 });
 </script>

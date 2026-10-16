@@ -53,6 +53,18 @@ function cora_render_workspace_header( $args = array() ) {
         $cora_header_script_rendered = true;
     ?>
     <style>
+    @media (min-width: 1024px) {
+        .cora-sub-tabs-container,
+        .cora-sticky-sub-tabs {
+            top: 0px !important;
+        }
+    }
+    @media (max-width: 1023px) {
+        .cora-sub-tabs-container,
+        .cora-sticky-sub-tabs {
+            top: var(--cora-sticky-tabs-top, var(--cora-topbar-height, 48px)) !important;
+        }
+    }
     /* Reset extra action buttons inside sticky sub-tabs from global tab button overrides */
     .cora-sub-tabs-container .cora-sub-tabs-extra button,
     .cora-sticky-sub-tabs .cora-sub-tabs-extra button {
@@ -493,7 +505,7 @@ function cora_render_workspace_header( $args = array() ) {
         $container_extra_class = $has_extra ? ' has-extra-actions' : '';
         $container_overflow = $has_extra ? 'overflow: hidden;' : 'overflow-x: auto; overflow-y: hidden;';
     ?>
-        <div class="cora-sub-tabs-container cora-sticky-sub-tabs<?php echo $container_extra_class; ?> relative flex items-center justify-between border-b border-zinc-200/80 dark:border-zinc-800 bg-[#FBFaf7] dark:bg-[#0c0c0e] -mx-3 sm:-mx-4 md:-mx-5 px-3 sm:px-4 md:px-5 w-[calc(100%+1.5rem)] sm:w-[calc(100%+2rem)] md:w-[calc(100%+2.5rem)] max-w-[calc(100%+1.5rem)] sm:max-w-[calc(100%+2rem)] md:max-w-[calc(100%+2.5rem)]" id="<?php echo esc_attr( $args['tabs_dom_id'] ?? 'cora-sub-navigation-tabs' ); ?>" style="position: -webkit-sticky; position: sticky; top: var(--cora-sticky-tabs-top, var(--cora-topbar-height, 48px)); left: 0; right: 0; z-index: 40; display: flex; flex-wrap: nowrap; <?php echo $container_overflow; ?> -webkit-overflow-scrolling: touch; touch-action: pan-x pan-y; overscroll-behavior-x: contain; scrollbar-width: none; min-height: 40px; height: 40px; padding-top: 0; padding-bottom: 0;">
+        <div class="cora-sub-tabs-container cora-sticky-sub-tabs<?php echo $container_extra_class; ?> relative flex items-center justify-between border-b border-zinc-200/80 dark:border-zinc-800 bg-[#FBFaf7] dark:bg-[#0c0c0e] -mx-3 sm:-mx-4 md:-mx-5 px-3 sm:px-4 md:px-5 w-[calc(100%+1.5rem)] sm:w-[calc(100%+2rem)] md:w-[calc(100%+2.5rem)] max-w-[calc(100%+1.5rem)] sm:max-w-[calc(100%+2rem)] md:max-w-[calc(100%+2.5rem)]" id="<?php echo esc_attr( $args['tabs_dom_id'] ?? 'cora-sub-navigation-tabs' ); ?>" style="position: -webkit-sticky; position: sticky; top: var(--cora-sticky-tabs-top, 0px); left: 0; right: 0; z-index: 40; display: flex; flex-wrap: nowrap; <?php echo $container_overflow; ?> -webkit-overflow-scrolling: touch; touch-action: pan-x pan-y; overscroll-behavior-x: contain; scrollbar-width: none; min-height: 40px; height: 40px; padding-top: 0; padding-bottom: 0;">
             <div class="cora-sub-tabs-nav flex items-center gap-1 <?php echo $has_extra ? 'min-w-0 flex-1' : 'shrink-0'; ?> overflow-x-auto scrollbar-hide" style="touch-action: pan-x pan-y; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; scrollbar-width: none;">
             <?php foreach ( $visible_tabs as $tab ) : 
                 $active_class = ! empty( $tab['active'] ) ? 'active border-zinc-950 text-zinc-900 dark:border-white dark:text-white font-semibold' : 'border-transparent text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 font-semibold';

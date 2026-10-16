@@ -1,7 +1,7 @@
 # Cora Platform — Comprehensive Platform & Onboarding Strategic Brief
 > **Target Audience for this Document**: AI Product & Growth Strategist Agent  
 > **Objective**: Comprehensive platform architectural overview, feature breakdown, and onboarding evaluation brief to formulate optimal user onboarding, product activation, and launch strategies for Cora.  
-> **Platform Version**: `v4.9.384` | **Date**: October 2026
+> **Platform Version**: `v4.9.389` | **Date**: October 2026
 
 ---
 
@@ -74,6 +74,11 @@ Cora consolidates the entire agency lifecycle into a single, unified, white-labe
 51. **Shopify-Inspired Main-Area Docked View Panel Architecture (v4.9.382 / SOP Rule 15)**: Workspace editing drawers, creators, and case study builders slide up smoothly from the bottom into a clean, docked main-area view panel below the global top header (`top: 52px; height: calc(100vh - 52px)`). Panels dynamically scale to available canvas width based on sidebar status, enforce zero dimming backdrops to preserve full underlying context, and lock scrolling strictly to `main.cora-main` without freezing the body or sidebar.
 52. **Shopify-Inspired Canvas Maximize / Restore Toggle (⤢ Fullscreen Mode) (v4.9.382)**: Dedicated maximize trigger (`#cora-proj-maximize-btn`) expanding docked panels across the entire viewport width (`100vw`) for distraction-free case study composing, narrative drafting, and metric calculation, with 1-click restoration back to docked canvas mode.
 53. **Global Sticky Workspace Header & Mobile Expandable Sub-Tabs Search (v4.9.383 - v4.9.384)**: Global sticky header pinning (`top: 0; z-index: 100020;`) paired with pixel-perfect sub-tabs vertical alignment, Level 01 Segmented view switchers (Table vs Grid), and 1-tap expandable search inputs (< 640px) that prevent horizontal mobile overflow.
+54. **Google Business Profile & Google Maps AI Autopilot (v4.9.388 - v4.9.389)**: Unified local presence autopilot suite (`/workspace/google-profile`, `view-google-profile.php`) featuring a multi-state reactive hub (Disconnected, Pending OAuth, Connected), 5-tab segmented control (Overview & Performance, Reviews AI Copilot, Google Posts Publisher, Business Hours, Local SEO & Keywords), 4 AI review reply tones (Professional, Empathetic, Promotional, Brief), 7-day operating hours editor with 1-click 'Apply Mon-Fri', Local SEO 3-Pack rank tracker, API credentials drawer (`#cora-gbp-credentials-drawer`), and proactive Google Cloud 0-quota advisory warning card (`#cora-gbp-quota-advisory`) with instant 1-click sandbox simulation fallback (`window.coraGbpAuthorizeDemoAccount`) preventing onboarding and testing blockages.
+55. **Dynamic Plugins, Modules & AI Skills Extensibility Engine (v4.9.387)**: Full modular extensibility runtime (`class-cora-plugins-skills-engine.php`) supporting dynamic plugin registration, AI skill manifests, execution hooks, and external API key governance across 4 dedicated tables (`wp_cora_workspace_plugins`, `wp_cora_workspace_skills`, `wp_cora_workspace_api_keys`, `wp_cora_workspace_plugin_logs`). Bridges dynamic custom skills directly into the Universal Remote MCP Tool Registry (`cora_mcp_tools`) and OpenAPI 3.0.1 gateway for external AI assistants (ChatGPT, Claude, Gemini).
+56. **Enterprise Client Onboarding Studio & Strict Role Isolation (v4.9.386 - v4.9.387)**: Multi-step client onboarding wizard (`views/view-clients.php`) with step-by-step progress tracking, dedicated WordPress client role provisioning (`cora_client`), tokenized portal access (`public-client-portal.php`), and strict route interception in `cora-workspace.php` automatically redirecting `cora_client` users away from admin workspace screens directly to their client portal.
+57. **Interactive Workspace Scheduling Calendar & Two-Way Google Meet Engine (v4.9.386 - v4.9.387)**: Full-featured visual calendar scheduling suite (`views/view-calendar.php`) with Month, Week, and Day views, drag-and-drop event creation, client association, automated Google Meet video conference link generation, multi-crew scheduling, and real-time appointment booking synchronization into the CRM pipeline.
+58. **Collapsible Sidebar Navigation Groups & Memory State Persistence (v4.9.385 - v4.9.386)**: Accordion-collapsible navigation group categories across the workspace sidebar (`admin-dashboard.php`), persistent collapsed/expanded state management via localStorage and AJAX user options (`cora_sidebar_group_*`), and mobile sticky sub-tabs navigation ensuring clean one-handed navigation without visual clutter.
 
 ---
 
@@ -201,4 +206,4 @@ Cora consolidates the entire agency lifecycle into a single, unified, white-labe
 
 ---
 
-*Cora Strategic Onboarding Brief v4.9.384 — Architecture & Growth Team. Last updated: October 2026.*
+*Cora Strategic Onboarding Brief v4.9.389 — Architecture & Growth Team. Last updated: October 2026.*

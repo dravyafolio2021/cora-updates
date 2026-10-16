@@ -249,6 +249,12 @@ self.addEventListener('notificationclick', event => {
   
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
+      // If external link (such as WhatsApp deep link https://wa.me/...), open directly
+      if (urlToOpen.startsWith('http') && !urlToOpen.startsWith(self.location.origin)) {
+        if (clients.openWindow) {
+          return clients.openWindow(urlToOpen);
+        }
+      }
       for (let i = 0; i < windowClients.length; i++) {
         const client = windowClients[i];
         if (client.url && client.url.startsWith(self.location.origin) && 'focus' in client) {

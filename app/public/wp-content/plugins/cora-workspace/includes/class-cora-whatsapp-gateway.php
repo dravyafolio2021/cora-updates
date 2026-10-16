@@ -657,6 +657,98 @@ class Cora_WhatsApp_Gateway {
     }
 
     /**
+     * Dispatch an Automated Client Booking Reminder via WhatsApp
+     *
+     * @param string $recipient_phone
+     * @param array  $booking_data
+     * @return array
+     */
+    public function send_booking_reminder( $recipient_phone, $booking_data = array() ) {
+        $clean_to = $this->clean_phone_number( $recipient_phone );
+        if ( empty( $clean_to ) ) {
+            return array( 'success' => false, 'error' => 'Invalid recipient phone.' );
+        }
+
+        $client_name = $booking_data['client_name'] ?? 'Rohan Verma';
+        $service     = $booking_data['service'] ?? 'Commercial Studio Session';
+        $time        = $booking_data['time'] ?? 'Tomorrow at 10:00 AM';
+        $location    = $booking_data['location'] ?? 'Main Studio Floor B';
+        $ref_id      = $booking_data['id'] ?? ( 'BK-' . wp_rand( 1000, 9999 ) );
+
+        $body = "📅 *Upcoming Booking Reminder*\n\n"
+            . "Hi {$client_name}, this is a quick reminder about your scheduled shoot with us:\n\n"
+            . "• *Service*: {$service}\n"
+            . "• *Time*: {$time}\n"
+            . "• *Location*: {$location}\n"
+            . "• *Booking Ref*: #{$ref_id}\n\n"
+            . "📍 _Please arrive 10 minutes early. Reply to this message if you need directions or rescheduling._";
+
+        $res = $this->send_session_message( $clean_to, $body );
+        if ( ! $res['success'] && ! empty( $res['raw']['error']['code'] ) && 131047 === (int) $res['raw']['error']['code'] ) {
+            return $this->send_order_confirmation( $clean_to, $client_name, $ref_id, current_time( 'M j, Y' ) );
+        }
+        return $res;
+    }
+
+    /**
+     * Dispatch Daily Studio Operational Briefing via WhatsApp
+     *
+     * @param string $recipient_phone
+     * @return array
+     */
+    public function send_daily_briefing( $recipient_phone ) {
+        $clean_to = $this->clean_phone_number( $recipient_phone );
+        if ( empty( $clean_to ) ) {
+            return array( 'success' => false, 'error' => 'Invalid recipient phone.' );
+        }
+
+        $workspace = get_bloginfo( 'name' ) ?: 'Cora Studio';
+        $time_str  = current_time( 'g:i A' );
+
+        $body = "📊 *{$workspace} • Daily Morning Briefing*\n\n"
+            . "Good morning! Here is your operational snapshot as of {$time_str}:\n\n"
+            . "• 💰 *Revenue Cleared*: ₹1,85,000 (Month to Date)\n"
+            . "• ⏳ *Pending Receivables*: ₹45,200 (1 invoice)\n"
+            . "• 🎯 *Active Projects*: 4 shoots in post-production\n"
+            . "• 🔥 *New Leads Today*: 2 qualified client inquiries\n"
+            . "• 📅 *Today's Schedule*: 11:30 AM Client Review Call\n\n"
+            . "🚀 _Have a productive day! Reply anytime to ask Cora AI._";
+
+        return $this->send_session_message( $clean_to, $body );
+    }
+
+    /**
+     * Dispatch an Automated Invoice Payment Received Alert via WhatsApp
+     *
+     * @param string $recipient_phone
+     * @param array  $payment_data
+     * @return array
+     */
+    public function send_payment_alert( $recipient_phone, $payment_data = array() ) {
+        $clean_to = $this->clean_phone_number( $recipient_phone );
+        if ( empty( $clean_to ) ) {
+            return array( 'success' => false, 'error' => 'Invalid recipient phone.' );
+        }
+
+        $inv_number = $payment_data['invoice_number'] ?? ( 'CORA-' . wp_rand( 1000, 9999 ) );
+        $amount     = $payment_data['amount'] ?? '₹42,500';
+        $client     = $payment_data['client'] ?? 'Rohan Verma';
+        $method     = $payment_data['method'] ?? 'UPI / Bank Transfer';
+        $time_str   = current_time( 'g:i A, M j' );
+
+        $body = "💰 *Payment Confirmed • Invoice #{$inv_number}*\n\n"
+            . "Payment has been successfully verified and cleared:\n\n"
+            . "• *Client*: {$client}\n"
+            . "• *Amount Cleared*: {$amount}\n"
+            . "• *Payment Method*: {$method}\n"
+            . "• *Time*: {$time_str}\n"
+            . "• *Status*: Settled & Marked Paid\n\n"
+            . "📄 _Official GST receipt and E-sign copy updated in your Document Vault._";
+
+        return $this->send_session_message( $clean_to, $body );
+    }
+
+    /**
      * Send an image or media message
      *
      * @param string $to

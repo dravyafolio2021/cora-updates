@@ -597,7 +597,13 @@ class Cora_OAuth_Server {
     public static function authenticate_token( $request = null ) {
         $token = '';
 
-        if ( $request instanceof WP_REST_Request ) {
+        if ( is_string( $request ) && ! empty( $request ) ) {
+            if ( preg_match( '/Bearer\s+(.+)$/i', $request, $matches ) ) {
+                $token = trim( $matches[1] );
+            } else {
+                $token = trim( $request );
+            }
+        } elseif ( $request instanceof WP_REST_Request ) {
             $auth_header = $request->get_header( 'authorization' );
             if ( $auth_header ) {
                 if ( preg_match( '/Bearer\s+(.+)$/i', $auth_header, $matches ) ) {
@@ -720,6 +726,28 @@ class Cora_OAuth_Server {
                     'client_name'  => $token_row->client_name,
                     'client_id'    => $token_row->client_id,
                     'auth_type'    => 'oauth2',
+                );
+            }
+        }
+
+        // Check Workspace API Keys (cora_ws_live_...)
+        $table_api_keys = $wpdb->prefix . 'cora_workspace_api_keys';
+        if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $table_api_keys ) ) {
+            $key_row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table_api_keys} WHERE key_hash = %s AND status = 'active'", $token_hash ) );
+            if ( $key_row ) {
+                $wpdb->update( $table_api_keys, array( 'last_used_at' => current_time( 'mysql' ) ), array( 'id' => $key_row->id ) );
+                $scopes = array_filter( array_map( 'trim', explode( ' ', $key_row->scopes ?: 'workspace:read workspace:write content:read content:write mcp:all' ) ) );
+                $owner_ids = function_exists( 'cora_get_workspace_owner_user_ids' ) ? cora_get_workspace_owner_user_ids( $key_row->agency_id ) : array( 1 );
+                $owner_id = ! empty( $owner_ids ) ? $owner_ids[0] : 1;
+                return array(
+                    'valid'        => true,
+                    'token_id'     => $key_row->id,
+                    'user_id'      => intval( $owner_id ),
+                    'workspace_id' => (string) $key_row->agency_id,
+                    'scopes'       => $scopes,
+                    'client_name'  => $key_row->key_name ?: 'Workspace API Key',
+                    'client_id'    => 'workspace_api_key_' . $key_row->id,
+                    'auth_type'    => 'workspace_api_key',
                 );
             }
         }

@@ -165,12 +165,12 @@
 ## 3. Branch Activity & Progress Log
 
 ### `main` (Production Base)
-- **Platform Version**: `4.9.387`
-- **Health**: 100% Operational & Clean Slate Base (HEAD commit `ec3b28cc6` on `main`). Google Business Profile & Google Maps AI Autopilot (`views/view-google-profile.php`, `tests/e2e/test-gbp-management.spec.ts`), Dynamic Plugins & Skills Engine (`class-cora-plugins-skills-engine.php`), Enterprise Client Onboarding Suite (`views/view-clients.php`), Interactive Workspace Calendar (`views/view-calendar.php`), Collapsible Sidebar Navigation Groups (`admin-dashboard.php`), and Mobile Sticky Sub-tabs verified ✅.
+- **Platform Version**: `4.9.389`
+- **Health**: 100% Operational & Clean Slate Base (HEAD commit `8b1cf4891` on `main`). Google Business Profile & Google Maps AI Autopilot (`views/view-google-profile.php`, `tests/e2e/test-gbp-management.spec.ts`), Google 0-quota proactive advisory card and 1-click sandbox simulation fallback (`assets/js/admin-script.js`), Dynamic Plugins & Skills Engine (`class-cora-plugins-skills-engine.php`), Enterprise Client Onboarding Suite (`views/view-clients.php`), Interactive Workspace Calendar (`views/view-calendar.php`), Collapsible Sidebar Navigation Groups (`admin-dashboard.php`), and Mobile Sticky Sub-tabs verified ✅.
 
 <!-- BRANCH_LOGS_START -->
 ### `feat/google-business-profile-autopilot` (Merged to Main)
-- **Status**: 🟢 Complete & Active (v4.9.387) — Google Business Profile & Google Maps AI Autopilot:
+- **Status**: 🟢 Complete & Active (v4.9.388 - v4.9.389) — Google Business Profile & Google Maps AI Autopilot:
   - Overhauled `views/view-google-profile.php` from waitlist placeholder into production multi-state hub (State A: Unconnected Hero with OAuth & Places text search, State B: Multi-Branch Location Picker, State C: Connected Hub with 4 live KPI metrics).
   - Built 5-Tab Segmented Control architecture:
     1. *Reviews & AI Autopilot*: Filter pills (`All`, `Needs Reply`, `Replied`, `5 Stars`, `Critical`), tone selector (`warm`, `professional`, `concise`, `apology`), AI review response generation, and 1-click posting to Google Maps.
@@ -179,6 +179,7 @@
     4. *Local SEO & Map-Pack Ranks*: Keyword ranking table, #1 in 3-Pack badges, 94% visibility score, and local optimization checklist.
     5. *Multi-Branch Locations*: Location switcher between Cyber City Hub and South Delhi branch.
   - Added right-sliding API Credentials Drawer (`#cora-gbp-keys-panel`) with masked OAuth Client ID/Secret, Google Maps API key, copyable OAuth redirect URI, and Escape-key dismissal.
+  - Injected proactive monochromatic advisory card (`#cora-gbp-quota-advisory`) upon detecting Google Cloud 0-QPM default API quota restrictions, with a 1-click sandbox simulation fallback (`window.coraGbpAuthorizeDemoAccount('studio.director@elitestudio.local')`) enabling complete end-to-end testing without blocking agency evaluation (v4.9.389).
   - Comprehensive automated E2E Playwright test suite `tests/e2e/test-gbp-management.spec.ts` (4/4 tests passing: TC-GBP-01, TC-GBP-02, TC-GBP-03, TC-GBP-04).
 - **Main Touchpoint**: `views/view-google-profile.php`, `cora-workspace.php`, `assets/js/admin-script.js`, `tests/e2e/test-gbp-management.spec.ts`.
 

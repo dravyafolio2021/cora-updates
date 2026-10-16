@@ -65,6 +65,9 @@ class Cora_Plugins_Skills_Engine {
 
         // WordPress filter hook for dynamic MCP tool registration
         add_filter( 'cora_mcp_tools', array( __CLASS__, 'filter_mcp_tools' ), 10, 1 );
+
+        // Universal REST API authentication middleware via Workspace API Key
+        add_filter( 'determine_current_user', array( __CLASS__, 'determine_user_from_api_key' ), 20 );
     }
 
     /**
@@ -1332,6 +1335,8 @@ Return ONLY raw JSON with keys:
             $raw_key = trim( $_SERVER['HTTP_X_CORA_API_KEY'] );
         } elseif ( ! empty( $_SERVER['HTTP_AUTHORIZATION'] ) && preg_match( '/Bearer\s+(cora_ws_live_[a-zA-Z0-9]+)/i', $_SERVER['HTTP_AUTHORIZATION'], $m ) ) {
             $raw_key = $m[1];
+        } elseif ( ! empty( $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ) && preg_match( '/Bearer\s+(cora_ws_live_[a-zA-Z0-9]+)/i', $_SERVER['REDIRECT_HTTP_AUTHORIZATION'], $m ) ) {
+            $raw_key = $m[1];
         }
 
         if ( empty( $raw_key ) ) {
@@ -1350,6 +1355,30 @@ Return ONLY raw JSON with keys:
         }
 
         return false;
+    }
+
+    /**
+     * Determine current user from Workspace API Key for REST requests
+     */
+    public static function determine_user_from_api_key( $user_id ) {
+        if ( ! empty( $user_id ) ) {
+            return $user_id;
+        }
+
+        $api_key = self::authenticate_api_key( null );
+        if ( ! empty( $api_key ) ) {
+            $agency_id = intval( $api_key['agency_id'] );
+            if ( function_exists( 'cora_set_current_tenant_agency_id' ) ) {
+                cora_set_current_tenant_agency_id( $agency_id );
+            }
+            $_REQUEST['cora_agency_id'] = $agency_id;
+            $_REQUEST['workspace_id']   = $agency_id;
+
+            $owner_ids = function_exists( 'cora_get_workspace_owner_user_ids' ) ? cora_get_workspace_owner_user_ids( $agency_id ) : array( 1 );
+            return ! empty( $owner_ids ) ? $owner_ids[0] : 1;
+        }
+
+        return $user_id;
     }
 
     /**

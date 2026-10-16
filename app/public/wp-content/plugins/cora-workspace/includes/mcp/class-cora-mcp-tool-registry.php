@@ -516,10 +516,10 @@ class Cora_MCP_Tool_Registry {
                 'handler'       => array( __CLASS__, 'handle_record_financial_transaction' ),
             ),
 
-            // ── 8. Growth & Content Studio ────────────────────────────────────
-            'cora_search_content' => array(
-                'name'          => 'cora_search_content',
-                'description'   => 'Search articles and guides across the Growth CMS repository by title, keyword, status, category, or ICP.',
+            // ── 8. Content Suite & Editorial Operations ───────────────────────
+            'cora_list_articles' => array(
+                'name'          => 'cora_list_articles',
+                'description'   => 'List, filter, search, and paginate articles in the workspace Content Library with SEO/GEO metadata, publishing status, and author details.',
                 'readOnly'      => true,
                 'destructive'   => false,
                 'openWorld'     => false,
@@ -527,19 +527,22 @@ class Cora_MCP_Tool_Registry {
                 'inputSchema'   => array(
                     'type'       => 'object',
                     'properties' => array(
-                        'type'     => array( 'type' => 'string', 'description' => 'Content type: article, guide, or all.' ),
-                        'status'   => array( 'type' => 'string', 'description' => 'Status: draft, review, published, or all.' ),
-                        'search'   => array( 'type' => 'string', 'description' => 'Search term.' ),
-                        'category' => array( 'type' => 'string', 'description' => 'Canonical category (operations, client-management, sales-proposals, growth, finance, ai-automation).' ),
-                        'limit'    => array( 'type' => 'integer', 'description' => 'Max records (default: 20).' ),
+                        'search'    => array( 'type' => 'string', 'description' => 'Search term across title and content.' ),
+                        'status'    => array( 'type' => 'string', 'description' => 'Status filter: all, published, draft, in_review, scheduled, needs_update.' ),
+                        'category'  => array( 'type' => 'string', 'description' => 'Filter by category slug or name.' ),
+                        'limit'     => array( 'type' => 'integer', 'description' => 'Number of articles to return (default: 20, max: 100).' ),
+                        'page'      => array( 'type' => 'integer', 'description' => 'Page number (default: 1).' ),
+                        'orderby'   => array( 'type' => 'string', 'description' => 'Sort field: date, modified, title, ID.' ),
+                        'order'     => array( 'type' => 'string', 'description' => 'Sort direction: ASC, DESC.' ),
+                        'source'    => array( 'type' => 'string', 'description' => 'Data source: workspace (default) or growth (headless CMS).' ),
                     ),
                 ),
-                'handler'       => array( __CLASS__, 'handle_growth_tool' ),
+                'handler'       => array( __CLASS__, 'handle_list_articles' ),
             ),
 
-            'cora_get_content' => array(
-                'name'          => 'cora_get_content',
-                'description'   => 'Retrieve a complete article or guide entry by ID or slug including all structured blocks, sources, and SEO metadata.',
+            'cora_get_article' => array(
+                'name'          => 'cora_get_article',
+                'description'   => 'Retrieve full article details by ID or slug, including complete body, categories, tags, SEO analysis, and GEO engine signals.',
                 'readOnly'      => true,
                 'destructive'   => false,
                 'openWorld'     => false,
@@ -547,16 +550,18 @@ class Cora_MCP_Tool_Registry {
                 'inputSchema'   => array(
                     'type'       => 'object',
                     'properties' => array(
-                        'id'   => array( 'type' => 'string', 'description' => 'Content ID or slug.' ),
-                        'slug' => array( 'type' => 'string', 'description' => 'Content slug (alternative to id).' ),
+                        'id'     => array( 'type' => 'string', 'description' => 'Article ID or slug.' ),
+                        'slug'   => array( 'type' => 'string', 'description' => 'Article slug (alternative to id).' ),
+                        'source' => array( 'type' => 'string', 'description' => 'Data source: workspace (default) or growth.' ),
                     ),
+                    'required'   => array( 'id' ),
                 ),
-                'handler'       => array( __CLASS__, 'handle_growth_tool' ),
+                'handler'       => array( __CLASS__, 'handle_get_article' ),
             ),
 
             'cora_create_article' => array(
                 'name'          => 'cora_create_article',
-                'description'   => 'Create or draft a new structured editorial article with quick_answer, key takeaways, content blocks, sources, and SEO metadata.',
+                'description'   => 'Create a new editorial article in the workspace with content, SEO metadata (meta_title, meta_description, focus_keyword), and GEO engine signals.',
                 'readOnly'      => false,
                 'destructive'   => false,
                 'openWorld'     => false,
@@ -564,24 +569,28 @@ class Cora_MCP_Tool_Registry {
                 'inputSchema'   => array(
                     'type'       => 'object',
                     'properties' => array(
-                        'title'            => array( 'type' => 'string', 'description' => 'Article title.' ),
-                        'slug'             => array( 'type' => 'string', 'description' => 'URL slug.' ),
-                        'primary_category' => array( 'type' => 'string', 'description' => 'Canonical category (e.g. operations, client-management, sales-proposals, growth, finance, ai-automation).' ),
-                        'excerpt'          => array( 'type' => 'string', 'description' => 'Meta description / summary.' ),
-                        'quick_answer'     => array( 'type' => 'string', 'description' => '45-second direct answer.' ),
-                        'key_takeaways'    => array( 'type' => 'array', 'items' => array( 'type' => 'string' ), 'description' => 'List of 3-5 core takeaways.' ),
-                        'content_blocks'   => array( 'type' => 'array', 'description' => 'Structured block objects.' ),
-                        'sources'          => array( 'type' => 'array', 'description' => 'Structured source references.' ),
-                        'seo'              => array( 'type' => 'object', 'description' => 'SEO metadata (canonical, keywords, search intent).' ),
+                        'title'          => array( 'type' => 'string', 'description' => 'Article title.' ),
+                        'content'        => array( 'type' => 'string', 'description' => 'Main content body (Markdown or HTML).' ),
+                        'excerpt'        => array( 'type' => 'string', 'description' => 'Article summary / meta description.' ),
+                        'status'         => array( 'type' => 'string', 'description' => 'Publication status: draft, publish, review.' ),
+                        'slug'           => array( 'type' => 'string', 'description' => 'URL slug.' ),
+                        'focus_keyword'  => array( 'type' => 'string', 'description' => 'Primary SEO focus keyword.' ),
+                        'meta_title'     => array( 'type' => 'string', 'description' => 'Custom search engine meta title.' ),
+                        'meta_desc'      => array( 'type' => 'string', 'description' => 'Custom search engine meta description.' ),
+                        'category'       => array( 'type' => 'string', 'description' => 'Primary category name or slug.' ),
+                        'categories'     => array( 'type' => 'array', 'items' => array( 'type' => 'integer' ), 'description' => 'Array of category IDs.' ),
+                        'tags'           => array( 'type' => 'array', 'items' => array( 'type' => 'string' ), 'description' => 'Array of tag names.' ),
+                        'scheduled_date' => array( 'type' => 'string', 'description' => 'Scheduled publish date (Y-m-d H:i:s).' ),
+                        'source'         => array( 'type' => 'string', 'description' => 'workspace (default) or growth.' ),
                     ),
                     'required'   => array( 'title' ),
                 ),
-                'handler'       => array( __CLASS__, 'handle_growth_tool' ),
+                'handler'       => array( __CLASS__, 'handle_create_article' ),
             ),
 
             'cora_update_article' => array(
                 'name'          => 'cora_update_article',
-                'description'   => 'Update an existing editorial article by ID or slug.',
+                'description'   => 'Update an existing article by ID or slug, updating its title, content, SEO metadata, GEO signals, category, or status.',
                 'readOnly'      => false,
                 'destructive'   => false,
                 'openWorld'     => false,
@@ -589,17 +598,173 @@ class Cora_MCP_Tool_Registry {
                 'inputSchema'   => array(
                     'type'       => 'object',
                     'properties' => array(
-                        'id'               => array( 'type' => 'string', 'description' => 'ID of the article.' ),
-                        'title'            => array( 'type' => 'string', 'description' => 'Updated title.' ),
-                        'quick_answer'     => array( 'type' => 'string', 'description' => 'Updated quick answer.' ),
-                        'primary_category' => array( 'type' => 'string', 'description' => 'Category.' ),
-                        'content_blocks'   => array( 'type' => 'array', 'description' => 'Structured blocks.' ),
+                        'id'             => array( 'type' => 'string', 'description' => 'Article ID or slug.' ),
+                        'title'          => array( 'type' => 'string', 'description' => 'Updated title.' ),
+                        'content'        => array( 'type' => 'string', 'description' => 'Updated content body.' ),
+                        'excerpt'        => array( 'type' => 'string', 'description' => 'Updated excerpt.' ),
+                        'status'         => array( 'type' => 'string', 'description' => 'Updated status: draft, publish, review, trash.' ),
+                        'slug'           => array( 'type' => 'string', 'description' => 'Updated URL slug.' ),
+                        'focus_keyword'  => array( 'type' => 'string', 'description' => 'Updated primary SEO focus keyword.' ),
+                        'meta_title'     => array( 'type' => 'string', 'description' => 'Updated search engine meta title.' ),
+                        'meta_desc'      => array( 'type' => 'string', 'description' => 'Updated search engine meta description.' ),
+                        'categories'     => array( 'type' => 'array', 'items' => array( 'type' => 'integer' ), 'description' => 'Category IDs.' ),
+                        'tags'           => array( 'type' => 'array', 'items' => array( 'type' => 'string' ), 'description' => 'Tags.' ),
+                        'scheduled_date' => array( 'type' => 'string', 'description' => 'Scheduled publish date.' ),
+                        'source'         => array( 'type' => 'string', 'description' => 'workspace (default) or growth.' ),
                     ),
                     'required'   => array( 'id' ),
                 ),
-                'handler'       => array( __CLASS__, 'handle_growth_tool' ),
+                'handler'       => array( __CLASS__, 'handle_update_article' ),
             ),
 
+            'cora_delete_article' => array(
+                'name'          => 'cora_delete_article',
+                'description'   => 'Trash or permanently delete an article from the workspace Content Library.',
+                'readOnly'      => false,
+                'destructive'   => true,
+                'openWorld'     => false,
+                'requiredScope' => 'content:write',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'id'    => array( 'type' => 'string', 'description' => 'Article ID or slug to delete.' ),
+                        'force' => array( 'type' => 'boolean', 'description' => 'Set true to permanently delete instead of trashing.' ),
+                    ),
+                    'required'   => array( 'id' ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_delete_article' ),
+            ),
+
+            'cora_publish_article' => array(
+                'name'          => 'cora_publish_article',
+                'description'   => 'Publish an article immediately, updating post status to published and syncing workspace workflow tables.',
+                'readOnly'      => false,
+                'destructive'   => true,
+                'openWorld'     => true,
+                'requiredScope' => 'content:write',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'id'     => array( 'type' => 'string', 'description' => 'Article ID or slug to publish.' ),
+                        'source' => array( 'type' => 'string', 'description' => 'workspace (default) or growth.' ),
+                    ),
+                    'required'   => array( 'id' ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_publish_article' ),
+            ),
+
+            'cora_unpublish_article' => array(
+                'name'          => 'cora_unpublish_article',
+                'description'   => 'Revert a published article back to draft status.',
+                'readOnly'      => false,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'content:write',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'id' => array( 'type' => 'string', 'description' => 'Article ID or slug to unpublish.' ),
+                    ),
+                    'required'   => array( 'id' ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_unpublish_article' ),
+            ),
+
+            'cora_bulk_update_articles' => array(
+                'name'          => 'cora_bulk_update_articles',
+                'description'   => 'Batch update multiple articles at once: publish, draft, trash, update_category, or update_status.',
+                'readOnly'      => false,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'content:write',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'article_ids' => array( 'type' => 'array', 'items' => array( 'type' => 'integer' ), 'description' => 'List of article IDs.' ),
+                        'action'      => array( 'type' => 'string', 'description' => 'Action to perform: publish, draft, trash, review, update_category, update_status.' ),
+                        'category'    => array( 'type' => 'string', 'description' => 'Target category (for update_category action).' ),
+                        'status'      => array( 'type' => 'string', 'description' => 'Target status (for update_status action).' ),
+                    ),
+                    'required'   => array( 'article_ids', 'action' ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_bulk_update_articles' ),
+            ),
+
+            'cora_audit_article_seo' => array(
+                'name'          => 'cora_audit_article_seo',
+                'description'   => 'Run an algorithmic 11-point SEO & GEO engine audit on an article, returning readability, heading distribution, keyword density, GEO schema status, and actionable recommendations.',
+                'readOnly'      => true,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'content:read',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'id'            => array( 'type' => 'string', 'description' => 'Article ID or slug.' ),
+                        'focus_keyword' => array( 'type' => 'string', 'description' => 'Optional focus keyword override to test.' ),
+                        'save_score'    => array( 'type' => 'boolean', 'description' => 'Whether to persist recalculated score to article metadata (default true).' ),
+                    ),
+                    'required'   => array( 'id' ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_audit_article_seo' ),
+            ),
+
+            'cora_list_content_opportunities' => array(
+                'name'          => 'cora_list_content_opportunities',
+                'description'   => 'Retrieve keyword, topic cluster, and competitive content gap opportunities for the workspace.',
+                'readOnly'      => true,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'content:read',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'status'   => array( 'type' => 'string', 'description' => 'Filter by status: all, open, in_progress, completed, dismissed.' ),
+                        'category' => array( 'type' => 'string', 'description' => 'Filter by topic category.' ),
+                        'limit'    => array( 'type' => 'integer', 'description' => 'Number of opportunities to return (default: 20).' ),
+                    ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_list_content_opportunities' ),
+            ),
+
+            'cora_generate_content_opportunities' => array(
+                'name'          => 'cora_generate_content_opportunities',
+                'description'   => 'Generate fresh AI-driven content and keyword opportunities tailored to the workspace industry and search trends.',
+                'readOnly'      => false,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'content:write',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'topic' => array( 'type' => 'string', 'description' => 'Seed topic or niche domain.' ),
+                        'count' => array( 'type' => 'integer', 'description' => 'Number of opportunities to generate (default 5, max 10).' ),
+                    ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_generate_content_opportunities' ),
+            ),
+
+            'cora_generate_article_outline' => array(
+                'name'          => 'cora_generate_article_outline',
+                'description'   => 'Generate a structured editorial outline or initial draft with H2/H3 headings, key takeaways, FAQ schema, and GEO optimization signals.',
+                'readOnly'      => false,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'content:write',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'title'           => array( 'type' => 'string', 'description' => 'Target article title or topic.' ),
+                        'target_keyword'  => array( 'type' => 'string', 'description' => 'Primary SEO focus keyword.' ),
+                        'target_audience' => array( 'type' => 'string', 'description' => 'Ideal customer persona or audience description.' ),
+                        'location'        => array( 'type' => 'string', 'description' => 'Target geographic area for GEO optimization.' ),
+                    ),
+                    'required'   => array( 'title' ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_generate_article_outline' ),
+            ),
+
+            // Headless Growth CMS Tools
             'cora_create_guide' => array(
                 'name'          => 'cora_create_guide',
                 'description'   => 'Create or draft a flagship multi-chapter guide with modular chapters, deliverables, and lead magnet attachments.',
@@ -632,23 +797,6 @@ class Cora_MCP_Tool_Registry {
                     'type'       => 'object',
                     'properties' => array(
                         'id' => array( 'type' => 'string', 'description' => 'ID of existing content to validate.' ),
-                    ),
-                    'required'   => array( 'id' ),
-                ),
-                'handler'       => array( __CLASS__, 'handle_growth_tool' ),
-            ),
-
-            'cora_publish_content' => array(
-                'name'          => 'cora_publish_content',
-                'description'   => 'Validate and publish a content entry live, trigger Next.js ISR cache revalidation, and verify the live public URL.',
-                'readOnly'      => false,
-                'destructive'   => true,
-                'openWorld'     => true,
-                'requiredScope' => 'content:write',
-                'inputSchema'   => array(
-                    'type'       => 'object',
-                    'properties' => array(
-                        'id' => array( 'type' => 'string', 'description' => 'ID or slug of the content entry to publish.' ),
                     ),
                     'required'   => array( 'id' ),
                 ),
@@ -1043,13 +1191,18 @@ class Cora_MCP_Tool_Registry {
             'create_payment'                    => 'cora_record_financial_transaction',
             'add_transaction'                   => 'cora_record_financial_transaction',
 
-            'cora_search_content'               => 'cora_search_content',
-            'growth_search_content'             => 'cora_search_content',
-            'search_content'                    => 'cora_search_content',
+            'cora_list_articles'                => 'cora_list_articles',
+            'list_articles'                     => 'cora_list_articles',
+            'cora_search_content'               => 'cora_list_articles',
+            'growth_search_content'             => 'cora_list_articles',
+            'search_content'                    => 'cora_list_articles',
+            'get_articles'                      => 'cora_list_articles',
 
-            'cora_get_content'                  => 'cora_get_content',
-            'growth_get_content'                => 'cora_get_content',
-            'get_content'                       => 'cora_get_content',
+            'cora_get_article'                  => 'cora_get_article',
+            'get_article'                       => 'cora_get_article',
+            'cora_get_content'                  => 'cora_get_article',
+            'growth_get_content'                => 'cora_get_article',
+            'get_content'                       => 'cora_get_article',
 
             'cora_create_article'               => 'cora_create_article',
             'growth_create_article'             => 'cora_create_article',
@@ -1059,6 +1212,43 @@ class Cora_MCP_Tool_Registry {
             'growth_update_article'             => 'cora_update_article',
             'update_article'                    => 'cora_update_article',
 
+            'cora_delete_article'               => 'cora_delete_article',
+            'delete_article'                    => 'cora_delete_article',
+            'trash_article'                     => 'cora_delete_article',
+
+            'cora_publish_article'              => 'cora_publish_article',
+            'publish_article'                   => 'cora_publish_article',
+            'cora_publish_content'              => 'cora_publish_article',
+            'growth_publish'                    => 'cora_publish_article',
+            'growth_publish_content'            => 'cora_publish_article',
+            'publish_content'                   => 'cora_publish_article',
+
+            'cora_unpublish_article'            => 'cora_unpublish_article',
+            'unpublish_article'                 => 'cora_unpublish_article',
+
+            'cora_bulk_update_articles'         => 'cora_bulk_update_articles',
+            'bulk_update_articles'              => 'cora_bulk_update_articles',
+            'batch_update_articles'             => 'cora_bulk_update_articles',
+
+            'cora_audit_article_seo'            => 'cora_audit_article_seo',
+            'audit_article_seo'                 => 'cora_audit_article_seo',
+            'cora_run_seo_analysis'             => 'cora_audit_article_seo',
+            'run_seo_analysis'                  => 'cora_audit_article_seo',
+            'cora_seo_audit'                    => 'cora_audit_article_seo',
+
+            'cora_list_content_opportunities'   => 'cora_list_content_opportunities',
+            'list_content_opportunities'        => 'cora_list_content_opportunities',
+            'cora_opportunities'                => 'cora_list_content_opportunities',
+            'cora_get_content_opportunities'    => 'cora_list_content_opportunities',
+
+            'cora_generate_content_opportunities' => 'cora_generate_content_opportunities',
+            'generate_content_opportunities'      => 'cora_generate_content_opportunities',
+            'generate_opportunities'              => 'cora_generate_content_opportunities',
+
+            'cora_generate_article_outline'     => 'cora_generate_article_outline',
+            'generate_article_outline'          => 'cora_generate_article_outline',
+            'generate_outline'                  => 'cora_generate_article_outline',
+
             'cora_create_guide'                 => 'cora_create_guide',
             'growth_create_guide'               => 'cora_create_guide',
             'create_guide'                      => 'cora_create_guide',
@@ -1066,11 +1256,6 @@ class Cora_MCP_Tool_Registry {
             'cora_validate_content'             => 'cora_validate_content',
             'growth_validate_content'           => 'cora_validate_content',
             'validate_content'                  => 'cora_validate_content',
-
-            'cora_publish_content'              => 'cora_publish_content',
-            'growth_publish'                    => 'cora_publish_content',
-            'growth_publish_content'            => 'cora_publish_content',
-            'publish_content'                   => 'cora_publish_content',
 
             'cora_rollback_content'             => 'cora_rollback_content',
             'growth_rollback'                   => 'cora_rollback_content',
@@ -2450,8 +2635,148 @@ class Cora_MCP_Tool_Registry {
         return array( 'success' => true, 'transaction_id' => 501, 'amount' => $amount, 'type' => $type );
     }
 
+    // ── Helper: Dispatch to Workspace Content REST Controller ─────────────────
+    private static function dispatch_content_rest( $method, $route, $args, $auth ) {
+        $agency_id = self::get_agency_id( $auth, $args );
+        if ( function_exists( 'cora_set_current_tenant_agency_id' ) ) {
+            cora_set_current_tenant_agency_id( $agency_id );
+        }
+        if ( ! empty( $auth['user_id'] ) && function_exists( 'wp_set_current_user' ) ) {
+            wp_set_current_user( intval( $auth['user_id'] ) );
+        }
+
+        if ( ! class_exists( 'Cora_Workspace_Content_REST_Controller' ) ) {
+            require_once dirname( __DIR__ ) . '/class-cora-workspace-content-rest-controller.php';
+        }
+
+        $request = new WP_REST_Request( $method, $route );
+        if ( is_array( $args ) ) {
+            foreach ( $args as $k => $v ) {
+                $request->set_param( $k, $v );
+            }
+        }
+        if ( ! empty( $auth['user_id'] ) ) {
+            $request->set_param( '_auth_user_id', $auth['user_id'] );
+        }
+        $request->set_param( '_tenant_agency_id', $agency_id );
+
+        return $request;
+    }
+
+    private static function unwrap_rest_response( $response ) {
+        if ( is_wp_error( $response ) ) {
+            return $response;
+        }
+        if ( $response instanceof WP_REST_Response ) {
+            $status = $response->get_status();
+            $data   = $response->get_data();
+            if ( $status >= 400 ) {
+                $msg = is_array( $data ) && ! empty( $data['message'] ) ? $data['message'] : 'Content REST error';
+                return new WP_Error( 'rest_error_' . $status, $msg, $data );
+            }
+            return $data;
+        }
+        return $response;
+    }
+
     /**
-     * 8. Growth CMS Tools Handler
+     * 8. Content Suite Tool Handlers
+     */
+    public static function handle_list_articles( $args, $auth ) {
+        if ( isset( $args['source'] ) && $args['source'] === 'growth' ) {
+            return self::handle_growth_tool( $args, $auth, 'cora_search_content' );
+        }
+        $req = self::dispatch_content_rest( 'GET', '/cora/v1/content', $args, $auth );
+        $res = Cora_Workspace_Content_REST_Controller::get_articles( $req );
+        return self::unwrap_rest_response( $res );
+    }
+
+    public static function handle_get_article( $args, $auth ) {
+        if ( isset( $args['source'] ) && $args['source'] === 'growth' ) {
+            return self::handle_growth_tool( $args, $auth, 'cora_get_content' );
+        }
+        $id  = $args['id'] ?? $args['slug'] ?? 0;
+        $req = self::dispatch_content_rest( 'GET', '/cora/v1/content/' . $id, $args, $auth );
+        $res = Cora_Workspace_Content_REST_Controller::get_single_article( $req );
+        return self::unwrap_rest_response( $res );
+    }
+
+    public static function handle_create_article( $args, $auth ) {
+        if ( isset( $args['source'] ) && $args['source'] === 'growth' ) {
+            return self::handle_growth_tool( $args, $auth, 'cora_create_article' );
+        }
+        $req = self::dispatch_content_rest( 'POST', '/cora/v1/content', $args, $auth );
+        $res = Cora_Workspace_Content_REST_Controller::create_article( $req );
+        return self::unwrap_rest_response( $res );
+    }
+
+    public static function handle_update_article( $args, $auth ) {
+        if ( isset( $args['source'] ) && $args['source'] === 'growth' ) {
+            return self::handle_growth_tool( $args, $auth, 'cora_update_article' );
+        }
+        $id  = $args['id'] ?? $args['slug'] ?? 0;
+        $req = self::dispatch_content_rest( 'POST', '/cora/v1/content/' . $id, $args, $auth );
+        $res = Cora_Workspace_Content_REST_Controller::update_article( $req );
+        return self::unwrap_rest_response( $res );
+    }
+
+    public static function handle_delete_article( $args, $auth ) {
+        $id  = $args['id'] ?? 0;
+        $req = self::dispatch_content_rest( 'DELETE', '/cora/v1/content/' . $id, $args, $auth );
+        $res = Cora_Workspace_Content_REST_Controller::delete_article( $req );
+        return self::unwrap_rest_response( $res );
+    }
+
+    public static function handle_publish_article( $args, $auth ) {
+        if ( isset( $args['source'] ) && $args['source'] === 'growth' ) {
+            return self::handle_growth_tool( $args, $auth, 'cora_publish_content' );
+        }
+        $id  = $args['id'] ?? $args['slug'] ?? 0;
+        $req = self::dispatch_content_rest( 'POST', '/cora/v1/content/' . $id . '/publish', $args, $auth );
+        $res = Cora_Workspace_Content_REST_Controller::publish_article( $req );
+        return self::unwrap_rest_response( $res );
+    }
+
+    public static function handle_unpublish_article( $args, $auth ) {
+        $id  = $args['id'] ?? $args['slug'] ?? 0;
+        $req = self::dispatch_content_rest( 'POST', '/cora/v1/content/' . $id . '/unpublish', $args, $auth );
+        $res = Cora_Workspace_Content_REST_Controller::unpublish_article( $req );
+        return self::unwrap_rest_response( $res );
+    }
+
+    public static function handle_bulk_update_articles( $args, $auth ) {
+        $req = self::dispatch_content_rest( 'POST', '/cora/v1/content/batch', $args, $auth );
+        $res = Cora_Workspace_Content_REST_Controller::batch_update_articles( $req );
+        return self::unwrap_rest_response( $res );
+    }
+
+    public static function handle_audit_article_seo( $args, $auth ) {
+        $id  = $args['id'] ?? $args['slug'] ?? 0;
+        $req = self::dispatch_content_rest( 'POST', '/cora/v1/content/' . $id . '/seo-audit', $args, $auth );
+        $res = Cora_Workspace_Content_REST_Controller::run_seo_audit( $req );
+        return self::unwrap_rest_response( $res );
+    }
+
+    public static function handle_list_content_opportunities( $args, $auth ) {
+        $req = self::dispatch_content_rest( 'GET', '/cora/v1/content/opportunities', $args, $auth );
+        $res = Cora_Workspace_Content_REST_Controller::get_opportunities( $req );
+        return self::unwrap_rest_response( $res );
+    }
+
+    public static function handle_generate_content_opportunities( $args, $auth ) {
+        $req = self::dispatch_content_rest( 'POST', '/cora/v1/content/generate-opportunities', $args, $auth );
+        $res = Cora_Workspace_Content_REST_Controller::generate_opportunities( $req );
+        return self::unwrap_rest_response( $res );
+    }
+
+    public static function handle_generate_article_outline( $args, $auth ) {
+        $req = self::dispatch_content_rest( 'POST', '/cora/v1/content/generate', $args, $auth );
+        $res = Cora_Workspace_Content_REST_Controller::generate_article_outline( $req );
+        return self::unwrap_rest_response( $res );
+    }
+
+    /**
+     * Growth CMS Tools Handler
      */
     public static function handle_growth_tool( $args, $auth, $tool_name ) {
         if ( class_exists( 'Cora_Growth_API' ) ) {
