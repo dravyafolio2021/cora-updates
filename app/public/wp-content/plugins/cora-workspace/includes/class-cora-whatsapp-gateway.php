@@ -64,7 +64,7 @@ class Cora_WhatsApp_Gateway {
         $app_secret   = get_option( 'cora_wa_app_secret', '' );
         $enabled      = get_option( 'cora_wa_enabled', '1' ) === '1';
         $admin_phone  = get_option( 'cora_wa_admin_phone', '' );
-        $default_tpl  = get_option( 'cora_wa_default_template', 'jaspers_market_order_confirmation_v1' );
+        $default_tpl  = get_option( 'cora_wa_default_template', 'hello_world' );
         $auto_leads   = get_option( 'cora_wa_auto_leads_enabled', '1' ) === '1';
         $auto_client  = get_option( 'cora_wa_auto_client_confirmation', '1' ) === '1';
 
@@ -596,8 +596,14 @@ class Cora_WhatsApp_Gateway {
     public function send_order_confirmation( $to, $customer_name, $reference_id = '', $date = '', $template_name = '', $language_code = 'en_US' ) {
         if ( empty( $template_name ) ) {
             $settings      = $this->get_settings();
-            $template_name = ! empty( $settings['default_template'] ) ? $settings['default_template'] : 'jaspers_market_order_confirmation_v1';
+            $template_name = ! empty( $settings['default_template'] ) ? $settings['default_template'] : 'hello_world';
         }
+
+        // If template is hello_world, it is parameterless
+        if ( 'hello_world' === $template_name ) {
+            return $this->send_template_message( $to, 'hello_world', array(), $language_code );
+        }
+
         if ( empty( $date ) ) {
             $date = current_time( 'M j, Y' );
         }

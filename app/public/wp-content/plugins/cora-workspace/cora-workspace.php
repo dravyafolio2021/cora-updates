@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.393
+ * Version:           4.9.394
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.393' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.394' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -5745,6 +5745,20 @@ function cora_rest_whatsapp_webhook_receive( $request ) {
         $body = json_decode( $raw_body, true );
     }
 
+    // Persist raw webhook log for diagnostics
+    if ( ! empty( $raw_body ) ) {
+        update_option( 'cora_wa_last_raw_webhook', $raw_body, false );
+        $wh_log = get_option( 'cora_wa_webhook_history', array() );
+        if ( ! is_array( $wh_log ) ) {
+            $wh_log = array();
+        }
+        array_unshift( $wh_log, array(
+            'time' => current_time( 'mysql' ),
+            'body' => $body,
+        ) );
+        update_option( 'cora_wa_webhook_history', array_slice( $wh_log, 0, 25 ), false );
+    }
+
     if ( ! empty( $body['entry'] ) && is_array( $body['entry'] ) && class_exists( 'Cora_WhatsApp_Gateway' ) ) {
         $gateway = Cora_WhatsApp_Gateway::instance();
 
@@ -5783,6 +5797,24 @@ function cora_rest_whatsapp_webhook_receive( $request ) {
                             }
                         }
                     }
+                }
+
+                // Process Delivery & Error Statuses (e.g. sent, delivered, failed)
+                if ( ! empty( $val['statuses'] ) && is_array( $val['statuses'] ) ) {
+                    $status_history = get_option( 'cora_wa_status_history', array() );
+                    if ( ! is_array( $status_history ) ) {
+                        $status_history = array();
+                    }
+                    foreach ( $val['statuses'] as $st ) {
+                        array_unshift( $status_history, array(
+                            'time'         => current_time( 'mysql' ),
+                            'status'       => $st['status'] ?? '',
+                            'id'           => $st['id'] ?? '',
+                            'recipient_id' => $st['recipient_id'] ?? '',
+                            'errors'       => $st['errors'] ?? array(),
+                        ) );
+                    }
+                    update_option( 'cora_wa_status_history', array_slice( $status_history, 0, 30 ), false );
                 }
             }
         }
