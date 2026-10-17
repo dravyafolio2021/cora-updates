@@ -816,6 +816,158 @@ class Cora_WhatsApp_Gateway {
     }
 
     /**
+     * Send an Interactive Quick-Reply Button Message ($0 Free inside 24h CSW)
+     *
+     * @param string $to Recipient phone number
+     * @param string $body_text Main message body text
+     * @param array  $buttons Array of buttons (e.g. ['Interested', 'Next Property'] or [['id'=>'b1', 'title'=>'Interested']])
+     * @param string $header_text Optional text header
+     * @param string $footer_text Optional footer text
+     * @return array
+     */
+    public function send_interactive_buttons( $to, $body_text, $buttons = array(), $header_text = '', $footer_text = '' ) {
+        $settings = $this->get_settings();
+        if ( empty( $settings['phone_number_id'] ) || empty( $settings['access_token'] ) ) {
+            return array( 'success' => false, 'error' => 'WhatsApp API credentials not configured.' );
+        }
+
+        $clean_to = $this->clean_phone_number( $to );
+        if ( empty( $clean_to ) ) {
+            return array( 'success' => false, 'error' => 'Invalid recipient phone number.' );
+        }
+
+        // Format buttons (up to 3 allowed by Meta)
+        $action_buttons = array();
+        $btn_list = array_slice( (array) $buttons, 0, 3 );
+        foreach ( $btn_list as $idx => $b ) {
+            $id    = is_array( $b ) && ! empty( $b['id'] ) ? $b['id'] : 'btn_' . ( $idx + 1 );
+            $title = is_array( $b ) && ! empty( $b['title'] ) ? $b['title'] : (string) $b;
+            $title = mb_substr( trim( $title ), 0, 20 );
+            $action_buttons[] = array(
+                'type'  => 'reply',
+                'reply' => array(
+                    'id'    => $id,
+                    'title' => $title,
+                ),
+            );
+        }
+
+        if ( empty( $action_buttons ) ) {
+            $action_buttons[] = array(
+                'type'  => 'reply',
+                'reply' => array( 'id' => 'btn_view', 'title' => 'View Details' ),
+            );
+        }
+
+        $interactive = array(
+            'type'   => 'button',
+            'body'   => array( 'text' => $body_text ),
+            'action' => array( 'buttons' => $action_buttons ),
+        );
+
+        if ( ! empty( $header_text ) ) {
+            $interactive['header'] = array(
+                'type' => 'text',
+                'text' => mb_substr( $header_text, 0, 60 ),
+            );
+        }
+
+        if ( ! empty( $footer_text ) ) {
+            $interactive['footer'] = array(
+                'text' => mb_substr( $footer_text, 0, 60 ),
+            );
+        }
+
+        $payload = array(
+            'messaging_product' => 'whatsapp',
+            'recipient_type'    => 'individual',
+            'to'                => $clean_to,
+            'type'              => 'interactive',
+            'interactive'       => $interactive,
+        );
+
+        return $this->execute_post_request( $payload );
+    }
+
+    /**
+     * Send an Image Card with Optional Buttons & Caption ($0 Free inside 24h CSW)
+     *
+     * @param string $to Recipient phone number
+     * @param string $image_url Public image URL (JPG/PNG)
+     * @param string $body_text Caption/Body text
+     * @param array  $buttons Optional quick-reply buttons
+     * @param string $footer_text Optional footer text
+     * @return array
+     */
+    public function send_image_card( $to, $image_url, $body_text, $buttons = array(), $footer_text = '' ) {
+        $settings = $this->get_settings();
+        if ( empty( $settings['phone_number_id'] ) || empty( $settings['access_token'] ) ) {
+            return array( 'success' => false, 'error' => 'WhatsApp API credentials not configured.' );
+        }
+
+        $clean_to = $this->clean_phone_number( $to );
+        if ( empty( $clean_to ) ) {
+            return array( 'success' => false, 'error' => 'Invalid recipient phone number.' );
+        }
+
+        // If buttons provided, send as interactive card with image header
+        if ( ! empty( $buttons ) ) {
+            $action_buttons = array();
+            $btn_list = array_slice( (array) $buttons, 0, 3 );
+            foreach ( $btn_list as $idx => $b ) {
+                $id    = is_array( $b ) && ! empty( $b['id'] ) ? $b['id'] : 'btn_' . ( $idx + 1 );
+                $title = is_array( $b ) && ! empty( $b['title'] ) ? $b['title'] : (string) $b;
+                $title = mb_substr( trim( $title ), 0, 20 );
+                $action_buttons[] = array(
+                    'type'  => 'reply',
+                    'reply' => array(
+                        'id'    => $id,
+                        'title' => $title,
+                    ),
+                );
+            }
+
+            $interactive = array(
+                'type'   => 'button',
+                'header' => array(
+                    'type'  => 'image',
+                    'image' => array( 'link' => esc_url_raw( $image_url ) ),
+                ),
+                'body'   => array( 'text' => $body_text ),
+                'action' => array( 'buttons' => $action_buttons ),
+            );
+
+            if ( ! empty( $footer_text ) ) {
+                $interactive['footer'] = array( 'text' => mb_substr( $footer_text, 0, 60 ) );
+            }
+
+            $payload = array(
+                'messaging_product' => 'whatsapp',
+                'recipient_type'    => 'individual',
+                'to'                => $clean_to,
+                'type'              => 'interactive',
+                'interactive'       => $interactive,
+            );
+
+            return $this->execute_post_request( $payload );
+        }
+
+        // Otherwise send as standard media image with caption
+        $payload = array(
+            'messaging_product' => 'whatsapp',
+            'recipient_type'    => 'individual',
+            'to'                => $clean_to,
+            'type'              => 'image',
+            'image'             => array(
+                'link'    => esc_url_raw( $image_url ),
+                'caption' => $body_text,
+            ),
+        );
+
+        return $this->execute_post_request( $payload );
+    }
+
+    /**
      * Send a Template Message (Used outside 24h window or for initial outreach)
      *
      * @param string $to

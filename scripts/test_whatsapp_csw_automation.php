@@ -325,6 +325,34 @@ assert_test(
     "Message ID: " . ( $cmd_menu_res['message_id'] ?? 'N/A' )
 );
 
+// Test Interactive Button Card ($0 Free Tier)
+$btn_res = $gateway->send_interactive_buttons(
+    $clean_phone,
+    "🏢 *Commercial Studio Inquiry Match*\n\n• Date: " . current_time( 'M j, Y' ) . "\n• Client: Aarav Mehta\n• Budget: ₹45,000\n\nChoose an action:",
+    array( "Accept Booking", "Reschedule", "Call Client" ),
+    "🎬 Cora Studio AI",
+    "24h Free Customer Service Window"
+);
+assert_test(
+    "Interactive Quick-Reply Button Card delivers inside CSW ($0 Free Tier)",
+    ! empty( $btn_res['success'] ),
+    "Message ID: " . ( $btn_res['message_id'] ?? 'N/A' )
+);
+
+// Test Image Card with Buttons ($0 Free Tier)
+$img_res = $gateway->send_image_card(
+    $clean_phone,
+    "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80",
+    "🏡 *Luxury Penthouse • Bandra West*\n\n• Price: ₹12.5 Cr\n• 4 BHK • 3,200 sq.ft.\n• Private Terrace & Sea View",
+    array( "Interested", "Next Property" ),
+    "Cora Real Estate AI • $0 Free Session"
+);
+assert_test(
+    "Image Card with Interactive Buttons delivers inside CSW ($0 Free Tier)",
+    ! empty( $img_res['success'] ),
+    "Message ID: " . ( $img_res['message_id'] ?? 'N/A' )
+);
+
 echo "\n";
 
 // -------------------------------------------------------------
