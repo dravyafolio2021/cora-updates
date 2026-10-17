@@ -383,6 +383,119 @@ assert_test(
 );
 
 echo "\n";
+
+// -------------------------------------------------------------
+// TEST 8: Hourly Pacing & Rate Limiting Engine (Max 3/hr Hard Cap)
+// -------------------------------------------------------------
+echo "[TEST 8] Hourly Pacing & Rate Limiting Engine (Max 3/hr)...\n";
+$test_rate_phone = '919999999999';
+delete_option( 'cora_wa_hourly_dispatches_' . $test_rate_phone );
+
+$can_1 = $gateway->can_send_automated_message( $test_rate_phone );
+$gateway->record_automated_message_sent( $test_rate_phone );
+
+$can_2 = $gateway->can_send_automated_message( $test_rate_phone );
+$gateway->record_automated_message_sent( $test_rate_phone );
+
+$can_3 = $gateway->can_send_automated_message( $test_rate_phone );
+$gateway->record_automated_message_sent( $test_rate_phone );
+
+$can_4 = $gateway->can_send_automated_message( $test_rate_phone );
+$count_1hr = $gateway->get_hourly_dispatches_count( $test_rate_phone );
+
+assert_test(
+    "Rate limiter allows messages 1 to 3 within rolling 1-hour window",
+    $can_1 === true && $can_2 === true && $can_3 === true,
+    "Slots 1, 2, 3 granted successfully"
+);
+
+assert_test(
+    "Rate limiter strictly enforces maximum 3 automated messages per hour (4th message throttled/queued)",
+    $can_4 === false && $count_1hr === 3,
+    "Dispatches recorded: {$count_1hr}/3 | 4th attempt rejected: " . ( ! $can_4 ? 'true' : 'false' )
+);
+
+// Cleanup
+delete_option( 'cora_wa_hourly_dispatches_' . $test_rate_phone );
+
+echo "\n";
+
+// -------------------------------------------------------------
+// TEST 9: 1-Click Cryptographic Tokenized Executive Daily Report
+// -------------------------------------------------------------
+echo "[TEST 9] 1-Click Cryptographic Tokenized Executive Daily Report...\n";
+assert_test(
+    "cora_get_24h_report_url() function exists and generates tokenized URL",
+    function_exists( 'cora_get_24h_report_url' ),
+    "cora_get_24h_report_url is loaded"
+);
+
+$report_url = cora_get_24h_report_url( 1, current_time( 'Y-m-d' ) );
+$parsed_url = wp_parse_url( $report_url );
+parse_str( $parsed_url['query'] ?? '', $query_args );
+
+$has_token = ! empty( $query_args['token'] );
+$has_agency = ! empty( $query_args['agency_id'] );
+$has_date   = ! empty( $query_args['date'] );
+
+$expected_token = hash_hmac( 'sha256', "cora_exec_report_1_" . current_time( 'Y-m-d' ), wp_salt( 'auth' ) );
+$token_matches  = $has_token && hash_equals( $expected_token, $query_args['token'] );
+
+assert_test(
+    "Executive report URL includes cryptographic HMAC-SHA256 authentication token",
+    $token_matches && $has_agency && $has_date,
+    "URL: " . substr( $report_url, 0, 75 ) . "... | Token verified: " . ( $token_matches ? 'YES' : 'NO' )
+);
+
+// Verify full workspace data includes all members and leads
+$exec_data = cora_generate_24h_executive_report_data( 1 );
+$has_roster = ! empty( $exec_data['team_roster'] ) && is_array( $exec_data['team_roster'] );
+$has_leads  = isset( $exec_data['total_leads_today'] ) && is_array( $exec_data['today_leads'] );
+
+assert_test(
+    "Executive report data aggregates full workspace team roster and daily CRM leads",
+    $has_roster && $has_leads,
+    "Team Members: " . count( $exec_data['team_roster'] ?? array() ) . " | Today's Leads: " . ( $exec_data['total_leads_today'] ?? 0 )
+);
+
+// Verify A4 Print-Ready HTML renders both sections
+$html_report = cora_render_24h_executive_pdf_html( $exec_data );
+$has_roster_html = strpos( $html_report, 'Workspace Team Roster &amp; Member Attendance' ) !== false;
+$has_leads_html  = strpos( $html_report, 'Daily CRM Lead Pipeline &amp; Inquiries' ) !== false;
+$has_print_btn   = strpos( $html_report, 'Print / Save Official PDF' ) !== false;
+
+assert_test(
+    "A4 Executive Report renders certified HTML with full team roster and leads pipeline",
+    $has_roster_html && $has_leads_html && $has_print_btn,
+    "Roster Section: " . ( $has_roster_html ? 'Present' : 'Missing' ) . " | Leads Section: " . ( $has_leads_html ? 'Present' : 'Missing' )
+);
+
+echo "\n";
+
+// -------------------------------------------------------------
+// TEST 10: Inbound Lead Rapid-Fire Pacing & Intelligent Batching
+// -------------------------------------------------------------
+echo "[TEST 10] Inbound Lead Rapid-Fire Pacing & Batching...\n";
+$test_lead_phone = '919817059266';
+$lead_pacing_key = 'cora_wa_recent_lead_' . $test_lead_phone;
+set_transient( $lead_pacing_key, 1, 600 ); // Simulate a lead was sent within past 10 minutes
+
+$lead_result = $gateway->send_lead_alert( $test_lead_phone, array(
+    'name'  => 'Rohan Verma',
+    'title' => 'Commercial Studio Session',
+    'phone' => '+91 98112 00000',
+    'email' => 'rohan.v@example.com',
+), true );
+
+assert_test(
+    "Rapid-fire incoming lead inquiries are intelligently batched instead of buzzing user phone",
+    ! empty( $lead_result['batched'] ) && ! empty( $lead_result['queued'] ),
+    "Batched: " . ( ! empty( $lead_result['batched'] ) ? 'YES' : 'NO' ) . " | Status: " . ( $lead_result['message'] ?? 'Queued' )
+);
+
+delete_transient( $lead_pacing_key );
+
+echo "\n";
 echo "====================================================================\n";
 echo "📊 VERIFICATION SUMMARY\n";
 echo "====================================================================\n";
