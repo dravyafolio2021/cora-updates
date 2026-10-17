@@ -1822,14 +1822,17 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         <!-- WhatsApp Cloud Alerts -->
                         <div class="p-4 rounded-xl border border-zinc-200 bg-zinc-50/60 flex flex-col justify-between space-y-3">
                             <div class="flex items-start justify-between gap-2">
-                                <div>
-                                    <div class="flex items-center gap-1.5 flex-wrap">
-                                        <span class="text-xs font-bold text-zinc-900 block">WhatsApp Alerts</span>
-                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold <?php echo $wa_configured ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'; ?>">
-                                            <?php echo $wa_configured ? 'Meta Connected' : 'Setup API'; ?>
-                                        </span>
+                                <div class="flex items-center gap-2.5">
+                                    <img src="<?php echo esc_url( plugins_url( 'assets/images/cora-ai-whatsapp-dp.jpg', dirname( __FILE__ ) ) ); ?>" alt="Cora AI" class="w-7 h-7 rounded-full border border-zinc-200/80 object-cover shrink-0 shadow-3xs" />
+                                    <div>
+                                        <div class="flex items-center gap-1.5 flex-wrap">
+                                            <span class="text-xs font-bold text-zinc-900 block">WhatsApp Alerts</span>
+                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold <?php echo $wa_configured ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'; ?>">
+                                                <?php echo $wa_configured ? 'Meta Connected' : 'Setup API'; ?>
+                                            </span>
+                                        </div>
+                                        <span class="text-[11px] text-zinc-500 block leading-tight mt-0.5">Official Meta Cloud API utility alerts &amp; briefs.</span>
                                     </div>
-                                    <span class="text-[11px] text-zinc-500 block leading-tight mt-1">Official Meta Cloud API utility alerts &amp; briefs.</span>
                                 </div>
                                 <span class="w-2.5 h-2.5 rounded-full <?php echo ( $global_whatsapp && $wa_configured ) ? 'bg-emerald-500' : 'bg-zinc-300'; ?> shrink-0 mt-0.5"></span>
                             </div>

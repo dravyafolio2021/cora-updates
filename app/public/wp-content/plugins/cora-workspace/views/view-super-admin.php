@@ -1240,12 +1240,15 @@ $current_header = isset( $page_headers[$active_sub_page] ) ? $page_headers[$acti
                     <span class="text-[10px] uppercase font-bold tracking-wider text-zinc-400 block mb-0.5">Phone Number ID</span>
                     <span class="font-mono font-bold text-zinc-900" id="wa-info-phone-id">613919938474268</span>
                 </div>
-                <div>
-                    <span class="text-[10px] uppercase font-bold tracking-wider text-zinc-400 block mb-0.5">Verified Profile</span>
-                    <span class="font-medium text-zinc-900 flex items-center gap-1.5" id="wa-info-profile">
-                        <span id="wa-info-display-name">Cora Workspace</span>
-                        <svg viewBox="0 0 24 24" width="12" height="12" class="text-emerald-600 inline" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-                    </span>
+                <div class="flex items-center gap-2">
+                    <img id="wa-info-dp-img" src="<?php echo esc_url( plugins_url( 'assets/images/cora-ai-whatsapp-dp.jpg', dirname( __FILE__ ) ) ); ?>" alt="Cora AI" class="w-8 h-8 rounded-full border border-zinc-200/80 object-cover shrink-0 shadow-3xs" />
+                    <div>
+                        <span class="text-[10px] uppercase font-bold tracking-wider text-zinc-400 block mb-0.5">Verified Profile</span>
+                        <span class="font-medium text-zinc-900 flex items-center gap-1.5" id="wa-info-profile">
+                            <span id="wa-info-display-name">Cora AI</span>
+                            <svg viewBox="0 0 24 24" width="12" height="12" class="text-emerald-600 inline" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                        </span>
+                    </div>
                 </div>
                 <div>
                     <span class="text-[10px] uppercase font-bold tracking-wider text-zinc-400 block mb-0.5">Quality Rating & Tier</span>
@@ -5191,6 +5194,7 @@ window.confirmDeleteWorkspace = function() {
                     if (d.whatsapp.waba_id) $('#wa-info-waba').text(d.whatsapp.waba_id);
                     if (d.whatsapp.phone_number_id) $('#wa-info-phone-id').text(d.whatsapp.phone_number_id);
                     if (d.whatsapp.verified_name) $('#wa-info-display-name').text(d.whatsapp.verified_name);
+                    if (d.whatsapp.profile_picture_url) $('#wa-info-dp-img').attr('src', d.whatsapp.profile_picture_url);
                     if (d.whatsapp.quality_rating) $('#wa-info-quality').text(d.whatsapp.quality_rating + ' (High Quality)');
 
                     // 2. Metrics Deck

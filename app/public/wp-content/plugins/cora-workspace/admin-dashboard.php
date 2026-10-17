@@ -661,7 +661,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         window.coraOpenWhatsAppActivation = function(customText) {
             var activationUrl = '<?php echo esc_js( $cora_wa_activation_url ); ?>';
             if (customText) {
-                var phoneDigits = '<?php echo esc_js( preg_replace( '/[^\d]/', '', ! empty( $cora_wa_settings['admin_phone'] ) ? $cora_wa_settings['admin_phone'] : '917015317965' ) ); ?>';
+                var phoneDigits = '<?php echo esc_js( class_exists( "Cora_WhatsApp_Gateway" ) ? Cora_WhatsApp_Gateway::instance()->get_business_phone_digits() : "917015317965" ); ?>';
                 activationUrl = 'https://wa.me/' + phoneDigits + '?text=' + encodeURIComponent(customText);
             }
             if (window.coraShowToast) {
@@ -10385,8 +10385,8 @@ textarea,
                         <div class="p-4 bg-zinc-50 border border-zinc-200/80 rounded-xl space-y-3" id="cora-wa-activator-card">
                             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
                                 <div class="flex items-start sm:items-center gap-2.5">
-                                    <div class="w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0 mt-0.5 sm:mt-0">
-                                        <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" class="text-emerald-600"><path d="M17.472 14.382c-.301-.15-1.78-.878-2.056-.979-.275-.1-.475-.15-.675.15-.2.3-.775.979-.95 1.18-.175.2-.35.225-.65.075-.3-.15-1.267-.467-2.414-1.489-.893-.796-1.496-1.78-1.671-2.08-.175-.3-.019-.462.131-.611.135-.134.3-.35.45-.525.15-.175.2-.3.3-.5.1-.2.05-.375-.025-.525-.075-.15-.675-1.625-.925-2.225-.244-.584-.492-.505-.675-.514-.175-.009-.375-.01-.575-.01s-.525.075-.8.375c-.275.3-1.05 1.025-1.05 2.5s1.075 2.898 1.225 3.1c.15.2 2.115 3.23 5.125 4.53.716.31 1.275.495 1.71.633.72.228 1.375.196 1.893.118.577-.087 1.78-.727 2.03-1.428.25-.7.25-1.3.175-1.428-.075-.128-.275-.203-.575-.353zM12.04 2C6.516 2 2.022 6.49 2.022 12c0 1.954.563 3.78 1.541 5.334L2 22l4.81-1.523A9.972 9.972 0 0 0 12.04 22c5.523 0 10.018-4.49 10.018-10S17.563 2 12.04 2zm0 18.232c-1.62 0-3.13-.48-4.404-1.312l-.316-.208-2.854.903.92-2.78-.205-.327A8.212 8.212 0 0 1 3.822 12c0-4.53 3.687-8.216 8.218-8.216 4.53 0 8.218 3.686 8.218 8.216 0 4.53-3.688 8.232-8.218 8.232z"/></svg>
+                                    <div class="w-9 h-9 rounded-full border border-zinc-200/80 overflow-hidden shrink-0 mt-0.5 sm:mt-0 shadow-3xs">
+                                        <img src="<?php echo esc_url( plugins_url( 'assets/images/cora-ai-whatsapp-dp.jpg', __FILE__ ) ); ?>" alt="Cora AI" class="w-full h-full object-cover" />
                                     </div>
                                     <div>
                                         <div class="flex items-center gap-2">

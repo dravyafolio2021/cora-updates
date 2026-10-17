@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.397
+ * Version:           4.9.399
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.397' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.399' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -5791,8 +5791,10 @@ function cora_rest_whatsapp_webhook_receive( $request ) {
                                 'id'   => $msg['id'] ?? '',
                             ) );
 
-                            // Auto-respond with activation confirmation to greet the user and confirm active 24h window
-                            if ( method_exists( $gateway, 'send_daily_activation_reply' ) ) {
+                            // Intelligently process inbound query: automatically flushes queued alerts or serves interactive bot commands
+                            if ( method_exists( $gateway, 'handle_inbound_query' ) ) {
+                                $gateway->handle_inbound_query( $from, $msg_body );
+                            } elseif ( method_exists( $gateway, 'send_daily_activation_reply' ) ) {
                                 $gateway->send_daily_activation_reply( $from );
                             }
                         }
@@ -19569,6 +19571,26 @@ if ( ! wp_next_scheduled( 'cora_cron_daily_whatsapp_activation' ) ) {
     wp_schedule_event( $time_9am, 'daily', 'cora_cron_daily_whatsapp_activation' );
 }
 add_action( 'cora_cron_daily_whatsapp_activation', 'cora_dispatch_daily_whatsapp_activation_push' );
+
+// Morning Cron Alias for backward compatibility & diagnostic checks
+if ( ! wp_next_scheduled( 'cora_cron_morning_whatsapp_activation' ) ) {
+    $time_9am = strtotime( '09:00:00' );
+    if ( $time_9am < time() ) {
+        $time_9am += 86400;
+    }
+    wp_schedule_event( $time_9am, 'daily', 'cora_cron_morning_whatsapp_activation' );
+}
+add_action( 'cora_cron_morning_whatsapp_activation', 'cora_dispatch_daily_whatsapp_activation_push' );
+
+// Register Evening 24-Hour WhatsApp Session Maintenance Cron Schedule (Daily 05:30 PM)
+if ( ! wp_next_scheduled( 'cora_cron_evening_whatsapp_activation' ) ) {
+    $time_5pm = strtotime( '17:30:00' );
+    if ( $time_5pm < time() ) {
+        $time_5pm += 86400;
+    }
+    wp_schedule_event( $time_5pm, 'daily', 'cora_cron_evening_whatsapp_activation' );
+}
+add_action( 'cora_cron_evening_whatsapp_activation', 'cora_dispatch_daily_whatsapp_activation_push' );
 
 if ( ! function_exists( 'cora_dispatch_daily_whatsapp_activation_push' ) ) {
 function cora_dispatch_daily_whatsapp_activation_push() {
@@ -38511,8 +38533,13 @@ function cora_dispatch_whatsapp_to_user( $user_id, $title, $body, $url = '', $ca
         return array( 'success' => false, 'error' => 'WhatsApp API not configured or disabled.' );
     }
 
-    $target_uids = array();
-    if ( is_numeric( $user_id ) && intval( $user_id ) > 0 ) {
+    $target_uids   = array();
+    $direct_phones = array();
+
+    $clean_digits = ( is_string( $user_id ) || ( is_numeric( $user_id ) && $user_id > 1000000 ) ) ? preg_replace( '/[^\d]/', '', (string) $user_id ) : '';
+    if ( ! empty( $clean_digits ) && strlen( $clean_digits ) >= 10 && ! in_array( $user_id, array( 'agency_owners', 'all_admins', 'super_admins' ), true ) ) {
+        $direct_phones[] = $gateway->clean_phone_number( $clean_digits );
+    } elseif ( is_numeric( $user_id ) && intval( $user_id ) > 0 ) {
         $target_uids[] = intval( $user_id );
     } elseif ( is_array( $user_id ) ) {
         $target_uids = array_map( 'intval', $user_id );
@@ -38524,7 +38551,7 @@ function cora_dispatch_whatsapp_to_user( $user_id, $title, $body, $url = '', $ca
     }
 
     $target_uids = array_unique( array_filter( $target_uids ) );
-    if ( empty( $target_uids ) ) {
+    if ( empty( $target_uids ) && empty( $direct_phones ) ) {
         $cur_uid = get_current_user_id();
         if ( $cur_uid ) {
             $target_uids[] = $cur_uid;
@@ -38543,6 +38570,41 @@ function cora_dispatch_whatsapp_to_user( $user_id, $title, $body, $url = '', $ca
 
     $results = array();
 
+    // 1. Process direct phone number dispatches
+    foreach ( $direct_phones as $d_phone ) {
+        $clean_phone = $gateway->clean_phone_number( $d_phone );
+        if ( empty( $clean_phone ) ) {
+            continue;
+        }
+
+        $session = $gateway->get_session_window( $clean_phone );
+        if ( $session['active'] ) {
+            $wa_body = "🔔 *[{$cat_label}] {$clean_title}*\n\n"
+                . "{$clean_body}\n\n"
+                . "🔗 *Open Workspace*: {$action_url}\n\n"
+                . "_Cora Workspace AI • 24h Free Alerts_";
+
+            $res = $gateway->send_session_message( $clean_phone, $wa_body );
+            if ( ! $res['success'] && ! empty( $res['raw']['error']['code'] ) && 131047 === (int) $res['raw']['error']['code'] ) {
+                if ( method_exists( $gateway, 'queue_pending_update' ) ) {
+                    $gateway->queue_pending_update( $clean_phone, $clean_title, $clean_body, $action_url, $cat_label );
+                }
+                $res = array( 'success' => true, 'queued' => true, 'session_active' => false );
+            }
+            $results[ $clean_phone ] = $res;
+        } else {
+            if ( method_exists( $gateway, 'queue_pending_update' ) ) {
+                $gateway->queue_pending_update( $clean_phone, $clean_title, $clean_body, $action_url, $cat_label );
+            }
+            $results[ $clean_phone ] = array(
+                'success'        => true,
+                'queued'         => true,
+                'session_active' => false,
+            );
+        }
+    }
+
+    // 2. Process user ID dispatches
     foreach ( $target_uids as $uid ) {
         $prefs = cora_get_user_notification_prefs( $uid );
 
@@ -38587,38 +38649,64 @@ function cora_dispatch_whatsapp_to_user( $user_id, $title, $body, $url = '', $ca
 
             $res = $gateway->send_session_message( $clean_phone, $wa_body );
 
-            // If Meta returns session expired (code 131047), fall back to approved template
+            // If Meta returns session expired (code 131047), queue update and send push nudge
             if ( ! $res['success'] && ! empty( $res['raw']['error']['code'] ) && 131047 === (int) $res['raw']['error']['code'] ) {
+                if ( method_exists( $gateway, 'queue_pending_update' ) ) {
+                    $gateway->queue_pending_update( $clean_phone, $clean_title, $clean_body, $action_url, $cat_label );
+                }
+                $act_url = $gateway->get_activation_url( 'View Updates ⚡' );
+                if ( function_exists( 'cora_pwa_send_push_notification' ) ) {
+                    cora_pwa_send_push_notification( $uid, "⚡ {$cat_label}: {$clean_title}", "Queued for WhatsApp. Tap to open and view for free.", $act_url, true );
+                }
+                $res = array( 'success' => true, 'queued' => true, 'session_active' => false );
+            }
+            $results[ $uid ] = $res;
+        } else {
+            // Outside 24h Window: Enqueue update into $0 Smart Queue
+            if ( method_exists( $gateway, 'queue_pending_update' ) ) {
+                $gateway->queue_pending_update( $clean_phone, $clean_title, $clean_body, $action_url, $cat_label );
+            }
+
+            // Dispatch instant Free Web Push / PWA Notification to phone/desktop
+            $act_url = $gateway->get_activation_url( 'View Updates ⚡' );
+            if ( function_exists( 'cora_pwa_send_push_notification' ) ) {
+                cora_pwa_send_push_notification(
+                    $uid,
+                    "⚡ {$cat_label}: {$clean_title}",
+                    "Queued for WhatsApp. Tap to open and receive full update at ₹0.",
+                    $act_url,
+                    true
+                );
+            }
+
+            // Also register in user's in-app notification center
+            if ( function_exists( 'cora_add_notification' ) ) {
+                cora_add_notification(
+                    $uid,
+                    "⚡ {$cat_label}: {$clean_title}",
+                    "Queued for WhatsApp. Click to activate free 24h WhatsApp delivery.",
+                    $act_url
+                );
+            }
+
+            // Rate-limited 1-time daily utility template nudge (at most 1 per 24 hours per phone)
+            $nudge_transient = 'cora_wa_daily_nudge_' . $clean_phone;
+            if ( ! get_transient( $nudge_transient ) && get_option( 'cora_wa_allow_template_nudge', '1' ) === '1' ) {
                 $user_obj = get_userdata( $uid );
-                $uname = $user_obj ? $user_obj->display_name : 'Valued Client';
-                $tpl_res = $gateway->send_order_confirmation(
+                $uname = $user_obj ? $user_obj->display_name : 'Studio Admin';
+                $gateway->send_order_confirmation(
                     $clean_phone,
                     $uname,
                     'ACT-' . wp_rand( 1000, 9999 ),
                     current_time( 'M j, Y' )
                 );
-                $res = array(
-                    'success'           => ! empty( $tpl_res['success'] ),
-                    'template_fallback' => true,
-                    'raw'               => $tpl_res,
-                );
+                set_transient( $nudge_transient, 1, 24 * HOUR_IN_SECONDS );
             }
-            $results[ $uid ] = $res;
-        } else {
-            // Outside 24h Window: dispatch template so handset receives ping
-            $user_obj = get_userdata( $uid );
-            $uname = $user_obj ? $user_obj->display_name : 'Valued Client';
-            $tpl_res = $gateway->send_order_confirmation(
-                $clean_phone,
-                $uname,
-                'ACT-' . wp_rand( 1000, 9999 ),
-                current_time( 'M j, Y' )
-            );
+
             $results[ $uid ] = array(
-                'success'           => ! empty( $tpl_res['success'] ),
-                'template_fallback' => true,
-                'session_active'    => false,
-                'raw'               => $tpl_res,
+                'success'        => true,
+                'queued'         => true,
+                'session_active' => false,
             );
         }
     }
@@ -56794,8 +56882,9 @@ function cora_ajax_super_get_integrations_telemetry() {
             'waba_id'               => $wa_settings['waba_id'] ?: '1735159218190730',
             'phone_number_id'       => $wa_settings['phone_number_id'] ?: '',
             'admin_phone'           => $wa_settings['admin_phone'] ?: '',
-            'display_phone'         => $wa_status['display_phone_number'] ?? ( ! empty( $wa_settings['admin_phone'] ) ? $wa_settings['admin_phone'] : '+91 98170 59266' ),
-            'verified_name'         => $wa_status['verified_name'] ?? 'Cora Workspace',
+            'display_phone'         => method_exists( $gw, 'get_display_phone_number' ) ? $gw->get_display_phone_number() : ( $wa_status['display_phone_number'] ?? '+91 70153 17965' ),
+            'verified_name'         => $wa_status['verified_name'] ?? 'Cora AI',
+            'profile_picture_url'   => plugins_url( 'assets/images/cora-ai-whatsapp-dp.jpg', __FILE__ ),
             'quality_rating'        => $wa_status['quality_rating'] ?? 'GREEN',
             'free_quota_service'    => 1000,
             'used_quota_service'    => count( $active_sessions ),
@@ -56804,6 +56893,7 @@ function cora_ajax_super_get_integrations_telemetry() {
             'billed_charges'        => '₹0.00',
             'cost_status'           => '100% Free Tier ($0 Cost Active)',
             'active_sessions_count' => count( $active_sessions ),
+            'pending_queue_count'   => ( ! empty( $wa_settings['admin_phone'] ) && method_exists( $gw, 'get_pending_updates' ) ) ? count( $gw->get_pending_updates( $wa_settings['admin_phone'] ) ) : 0,
             'expired_sessions_count'=> $expired_sessions_count,
             'active_sessions'       => $active_sessions,
         ),

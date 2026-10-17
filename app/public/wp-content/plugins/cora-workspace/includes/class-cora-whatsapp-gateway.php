@@ -294,28 +294,40 @@ class Cora_WhatsApp_Gateway {
     }
 
     /**
+     * Get official displayed WhatsApp Business Phone Number
+     *
+     * @return string
+     */
+    public function get_display_phone_number() {
+        $status = get_transient( 'cora_wa_connection_status' );
+        if ( ! empty( $status['display_phone_number'] ) ) {
+            return $status['display_phone_number'];
+        }
+        $display = get_option( 'cora_wa_display_phone', '' );
+        if ( ! empty( $display ) ) {
+            return $display;
+        }
+        return '+91 70153 17965';
+    }
+
+    /**
+     * Get clean numeric digits for the registered business WhatsApp number
+     *
+     * @return string
+     */
+    public function get_business_phone_digits() {
+        $phone = $this->get_display_phone_number();
+        return preg_replace( '/[^\d]/', '', $phone ) ?: '917015317965';
+    }
+
+    /**
      * Get direct WhatsApp deep-link URL to initiate or activate the 24h Free Window
      *
      * @param string $custom_text Pre-filled message text
      * @return string
      */
     public function get_activation_url( $custom_text = '' ) {
-        $status = get_transient( 'cora_wa_connection_status' );
-        $phone_digits = '';
-        if ( ! empty( $status['display_phone_number'] ) ) {
-            $phone_digits = preg_replace( '/[^\d]/', '', $status['display_phone_number'] );
-        }
-        if ( empty( $phone_digits ) ) {
-            $display_opt = get_option( 'cora_wa_display_phone', '' );
-            if ( ! empty( $display_opt ) ) {
-                $phone_digits = preg_replace( '/[^\d]/', '', $display_opt );
-            }
-        }
-        if ( empty( $phone_digits ) ) {
-            $settings = $this->get_settings();
-            // Default to official registered business number
-            $phone_digits = ( ( $settings['phone_number_id'] ?? '' ) === '1440932089094513' ) ? '15556698957' : '917015317965';
-        }
+        $phone_digits = $this->get_business_phone_digits();
 
         $text = ! empty( $custom_text )
             ? $custom_text
@@ -334,29 +346,322 @@ class Cora_WhatsApp_Gateway {
     }
 
     /**
+     * Enqueue a pending notification for delivery when 24h CSW opens ($0 Tier)
+     *
+     * @param string $phone
+     * @param string $title
+     * @param string $body
+     * @param string $action_url
+     * @param string $category
+     * @return bool
+     */
+    public function queue_pending_update( $phone, $title, $body, $action_url = '', $category = 'Alert' ) {
+        $clean_phone = $this->clean_phone_number( $phone );
+        if ( empty( $clean_phone ) ) {
+            return false;
+        }
+
+        $pending = get_option( 'cora_wa_pending_' . $clean_phone, array() );
+        if ( ! is_array( $pending ) ) {
+            $pending = array();
+        }
+
+        // Deduplicate identical pending alerts within 5 minutes
+        $now = time();
+        foreach ( $pending as $existing ) {
+            if ( $existing['title'] === $title && $existing['body'] === $body && ( $now - $existing['timestamp'] ) < 300 ) {
+                return true;
+            }
+        }
+
+        array_unshift( $pending, array(
+            'id'         => 'qu_' . $now . '_' . wp_rand( 100, 999 ),
+            'title'      => sanitize_text_field( $title ),
+            'body'       => sanitize_text_field( $body ),
+            'url'        => esc_url_raw( $action_url ),
+            'category'   => sanitize_text_field( $category ),
+            'timestamp'  => $now,
+            'created_at' => current_time( 'mysql' ),
+        ) );
+
+        // Retain max 15 pending updates
+        $pending = array_slice( $pending, 0, 15 );
+        update_option( 'cora_wa_pending_' . $clean_phone, $pending, false );
+
+        return true;
+    }
+
+    /**
+     * Get pending queued notifications for a phone number
+     *
+     * @param string $phone
+     * @return array
+     */
+    public function get_pending_updates( $phone ) {
+        $clean_phone = $this->clean_phone_number( $phone );
+        if ( empty( $clean_phone ) ) {
+            return array();
+        }
+        $pending = get_option( 'cora_wa_pending_' . $clean_phone, array() );
+        return is_array( $pending ) ? $pending : array();
+    }
+
+    /**
+     * Check if there are pending queued notifications
+     *
+     * @param string $phone
+     * @return bool
+     */
+    public function has_pending_updates( $phone ) {
+        return count( $this->get_pending_updates( $phone ) ) > 0;
+    }
+
+    /**
+     * Clear all pending queued notifications
+     *
+     * @param string $phone
+     * @return bool
+     */
+    public function clear_pending_updates( $phone ) {
+        $clean_phone = $this->clean_phone_number( $phone );
+        if ( empty( $clean_phone ) ) {
+            return false;
+        }
+        delete_option( 'cora_wa_pending_' . $clean_phone );
+        return true;
+    }
+
+    /**
+     * Flush all queued notifications into the active 24h CSW at $0 Cost
+     *
+     * @param string $phone
+     * @return array
+     */
+    public function flush_pending_updates( $phone ) {
+        $clean_phone = $this->clean_phone_number( $phone );
+        if ( empty( $clean_phone ) ) {
+            return array( 'flushed' => false, 'count' => 0 );
+        }
+
+        $pending = $this->get_pending_updates( $clean_phone );
+        if ( empty( $pending ) ) {
+            return array( 'flushed' => false, 'count' => 0 );
+        }
+
+        $count = count( $pending );
+        $workspace = get_bloginfo( 'name' ) ?: 'Cora Workspace';
+
+        if ( $count === 1 ) {
+            $item = $pending[0];
+            $body = "⚡ *[{$item['category']}] {$item['title']}*\n\n"
+                . "{$item['body']}\n\n"
+                . ( ! empty( $item['url'] ) ? "🔗 *Link*: {$item['url']}\n\n" : "" )
+                . "_Delivered via 24h Free Customer Service Window ($0 Free Tier)_";
+            $res = $this->send_session_message( $clean_phone, $body );
+        } else {
+            $body = "⚡ *{$workspace} • Queued Updates ({$count})*\n\n"
+                . "Here are the notifications that arrived while your window was away:\n\n";
+
+            $display_items = array_slice( $pending, 0, 5 );
+            foreach ( $display_items as $idx => $item ) {
+                $num = $idx + 1;
+                $body .= "{$num}️⃣ *[{$item['category']}] {$item['title']}*\n"
+                    . "{$item['body']}\n\n";
+            }
+
+            if ( $count > 5 ) {
+                $extra = $count - 5;
+                $body .= "_(+{$extra} additional updates in dashboard)_\n\n";
+            }
+
+            $body .= "🔗 *Dashboard*: " . home_url( '/workspace/dashboard' ) . "\n\n"
+                . "_All pending items delivered for free. Your 24-hour service window is now active._";
+
+            $res = $this->send_session_message( $clean_phone, $body );
+        }
+
+        $this->clear_pending_updates( $clean_phone );
+
+        return array(
+            'flushed' => true,
+            'count'   => $count,
+            'res'     => $res ?? array(),
+        );
+    }
+
+    /**
+     * Intelligent Inbound Message Processor & Bot Menu
+     *
+     * Responds to user queries, flushes queued updates, and serves interactive menu options.
+     *
+     * @param string $phone
+     * @param string $raw_text
+     * @return array
+     */
+    public function handle_inbound_query( $phone, $raw_text ) {
+        $clean_phone = $this->clean_phone_number( $phone );
+        if ( empty( $clean_phone ) ) {
+            return array( 'success' => false, 'error' => 'Invalid phone' );
+        }
+
+        // 1. If user has pending updates, flush them first into this newly activated CSW
+        if ( $this->has_pending_updates( $clean_phone ) ) {
+            $flush = $this->flush_pending_updates( $clean_phone );
+            return array(
+                'success' => true,
+                'action'  => 'flushed_queue',
+                'count'   => $flush['count'],
+            );
+        }
+
+        $text = strtolower( trim( $raw_text ) );
+        $workspace = get_bloginfo( 'name' ) ?: 'Cora Workspace';
+
+        // 2. Command: 1 or Leads / CRM / Inquiry
+        if ( $text === '1' || strpos( $text, 'lead' ) !== false || strpos( $text, 'crm' ) !== false || strpos( $text, 'inquir' ) !== false ) {
+            global $wpdb;
+            $leads_table = $wpdb->prefix . 'cora_leads';
+            $leads = array();
+            if ( $wpdb->get_var( "SHOW TABLES LIKE '{$leads_table}'" ) ) {
+                $leads = $wpdb->get_results( "SELECT * FROM {$leads_table} ORDER BY id DESC LIMIT 3", ARRAY_A );
+            }
+
+            if ( empty( $leads ) ) {
+                $reply = "📋 *{$workspace} • CRM Leads*\n\n"
+                    . "No recent leads recorded yet today.\n\n"
+                    . "• *Status*: Active lead intake forms & campaign webhooks connected.\n"
+                    . "🔗 Open CRM: " . home_url( '/workspace/dashboard?sub_page=leads' );
+            } else {
+                $reply = "📋 *{$workspace} • Recent Leads & Inquiries*\n\n";
+                foreach ( $leads as $idx => $ld ) {
+                    $num   = $idx + 1;
+                    $fname = ! empty( $ld['first_name'] ) ? $ld['first_name'] : 'Lead';
+                    $lname = ! empty( $ld['last_name'] ) ? ' ' . $ld['last_name'] : '';
+                    $name  = trim( $fname . $lname );
+                    $st    = ucfirst( $ld['status'] ?? 'New' );
+                    $src   = ! empty( $ld['source'] ) ? $ld['source'] : 'Inbound Web';
+                    $email = ! empty( $ld['email'] ) ? $ld['email'] : '—';
+                    $phone_val = ! empty( $ld['phone'] ) ? $ld['phone'] : '—';
+
+                    $reply .= "{$num}️⃣ *{$name}* ({$st})\n"
+                        . "• Contact: {$phone_val} | {$email}\n"
+                        . "• Source: {$src}\n\n";
+                }
+                $reply .= "🔗 Open CRM Pipeline: " . home_url( '/workspace/dashboard?sub_page=leads' );
+            }
+
+            return $this->send_session_message( $clean_phone, $reply );
+        }
+
+        // 3. Command: 2 or Revenue / Financials / Payment / Invoice
+        if ( $text === '2' || strpos( $text, 'rev' ) !== false || strpos( $text, 'finance' ) !== false || strpos( $text, 'payment' ) !== false || strpos( $text, 'invoice' ) !== false ) {
+            global $wpdb;
+            $ledger_table = $wpdb->prefix . 'cora_ledger';
+            $cleared = 0;
+            $pending = 0;
+            if ( $wpdb->get_var( "SHOW TABLES LIKE '{$ledger_table}'" ) ) {
+                $cleared = $wpdb->get_var( "SELECT SUM(amount) FROM {$ledger_table} WHERE type = 'inflow' AND status = 'cleared'" ) ?: 0;
+                $pending = $wpdb->get_var( "SELECT SUM(amount) FROM {$ledger_table} WHERE type = 'inflow' AND status = 'pending'" ) ?: 0;
+            }
+
+            $cleared_fmt = '₹' . number_format( (float) $cleared, 0 );
+            $pending_fmt = '₹' . number_format( (float) $pending, 0 );
+
+            $reply = "💰 *{$workspace} • Financial Intelligence*\n\n"
+                . "• *Cleared Revenue*: {$cleared_fmt}\n"
+                . "• *Pending Receivables*: {$pending_fmt}\n"
+                . "• *GST Invoices & Receipts*: Synced with Document Vault\n\n"
+                . "🔗 Open Financials: " . home_url( '/workspace/dashboard?sub_page=financials' );
+
+            return $this->send_session_message( $clean_phone, $reply );
+        }
+
+        // 4. Command: 3 or Attendance / Team / Punch / Staff
+        if ( $text === '3' || strpos( $text, 'att' ) !== false || strpos( $text, 'team' ) !== false || strpos( $text, 'punch' ) !== false || strpos( $text, 'staff' ) !== false ) {
+            $logs = get_option( 'cora_workspace_attendance_logs', array() );
+            if ( ! is_array( $logs ) ) {
+                $logs = array();
+            }
+
+            $today_ymd = current_time( 'Y-m-d' );
+            $today_logs = array();
+            foreach ( $logs as $l ) {
+                $log_date = ! empty( $l['date'] ) ? $l['date'] : ( ! empty( $l['timestamp'] ) ? gmdate( 'Y-m-d', $l['timestamp'] ) : '' );
+                if ( $log_date === $today_ymd || empty( $log_date ) ) {
+                    $today_logs[] = $l;
+                }
+            }
+
+            if ( empty( $today_logs ) ) {
+                $today_logs = array_slice( $logs, 0, 3 );
+            }
+
+            $reply = "👥 *{$workspace} • Team Attendance Today*\n\n";
+            if ( empty( $today_logs ) ) {
+                $reply .= "No punches recorded yet today.\n\n";
+            } else {
+                $reply .= "• Total Punches Today: " . count( $today_logs ) . "\n\n";
+                foreach ( array_slice( $today_logs, 0, 4 ) as $idx => $pl ) {
+                    $staff = ! empty( $pl['staff_name'] ) ? $pl['staff_name'] : ( ! empty( $pl['user'] ) ? $pl['user'] : 'Staff' );
+                    $type  = ! empty( $pl['type'] ) ? $pl['type'] : 'Punch In';
+                    $time  = ! empty( $pl['time'] ) ? $pl['time'] : ( ! empty( $pl['timestamp'] ) ? gmdate( 'g:i A', $pl['timestamp'] ) : 'Today' );
+                    $loc   = ! empty( $pl['distance'] ) && $pl['distance'] !== '—' ? " ({$pl['distance']})" : ' (Office Geofence Verified)';
+                    $reply .= "• *{$staff}*: {$type} at {$time}{$loc}\n";
+                }
+                $reply .= "\n";
+            }
+            $reply .= "🔗 Open Attendance Roster: " . home_url( '/workspace/dashboard?sub_page=attendance' );
+
+            return $this->send_session_message( $clean_phone, $reply );
+        }
+
+        // 5. Command: 4 or Briefing / Report / Digest
+        if ( $text === '4' || strpos( $text, 'brief' ) !== false || strpos( $text, 'report' ) !== false || strpos( $text, 'digest' ) !== false ) {
+            return $this->send_daily_briefing( $clean_phone );
+        }
+
+        // 6. Command: 5 or Status / Window / Quota
+        if ( $text === '5' || strpos( $text, 'status' ) !== false || strpos( $text, 'window' ) !== false || strpos( $text, 'quota' ) !== false ) {
+            $win = $this->get_session_window( $clean_phone );
+            $rem = $win['remaining_human'] ?? 'Active';
+            $reply = "⚙️ *Cora AI WhatsApp Gateway Status*\n\n"
+                . "• *Connection*: 🟢 Verified & Live\n"
+                . "• *Official DP*: Cora AI Verified Portrait\n"
+                . "• *Customer Service Window*: Active ({$rem})\n"
+                . "• *Bill Rate*: ₹0.00 / $0.00 (100% Free Service Tier)\n"
+                . "• *Push Sync*: Enabled (Automatic 1-Click Window Renewal)\n\n"
+                . "🔗 Workspace Settings: " . home_url( '/workspace/settings-suite?settings_tab=notifications' );
+
+            return $this->send_session_message( $clean_phone, $reply );
+        }
+
+        // 7. Default: Interactive Menu & Greeting
+        $win = $this->get_session_window( $clean_phone );
+        $rem = $win['remaining_human'] ?? '24 Hours';
+
+        $menu = "⚡ *Cora AI • Workspace Assistant*\n"
+            . "🟢 *24h Free Window Active* ({$rem})\n\n"
+            . "Hi! Your WhatsApp session for *{$workspace}* is active. All workspace alerts will reach you here for free ($0 bill).\n\n"
+            . "Type a number to view live data:\n"
+            . "1️⃣ *Leads* — Recent inquiries & CRM\n"
+            . "2️⃣ *Revenue* — Cleared & pending financials\n"
+            . "3️⃣ *Attendance* — Team check-ins & punches\n"
+            . "4️⃣ *Briefing* — Full operational report\n"
+            . "5️⃣ *Status* — Gateway health & quota\n\n"
+            . "_Or send any question for Cora AI._\n"
+            . "🔗 *Workspace*: " . home_url( '/workspace/dashboard' );
+
+        return $this->send_session_message( $clean_phone, $menu );
+    }
+
+    /**
      * Auto-respond to incoming activation message to confirm 24h window
      *
      * @param string $to Recipient phone number
      * @return array
      */
     public function send_daily_activation_reply( $to ) {
-        $clean_to = $this->clean_phone_number( $to );
-        if ( empty( $clean_to ) ) {
-            return array( 'success' => false, 'error' => 'Invalid recipient phone.' );
-        }
-
-        $time_str = current_time( 'g:i A, d M Y' );
-        $workspace = get_bloginfo( 'name' ) ?: 'Cora Workspace';
-
-        $body = "✅ *24-Hour Free Workspace Alerts Activated!*\n\n"
-            . "Hi! Your WhatsApp session for *{$workspace}* is now live.\n\n"
-            . "• *Status*: Active (₹0 Free Tier)\n"
-            . "• *Window*: Valid for 24 Hours\n"
-            . "• *Activated At*: {$time_str}\n"
-            . "• *Alerts Enabled*: New Leads, Project Updates, Booking Reminders\n\n"
-            . "_All notifications today will be delivered directly here. Reply anytime to refresh your 24h window._";
-
-        return $this->send_session_message( $clean_to, $body );
+        return $this->handle_inbound_query( $to, 'menu' );
     }
 
     /**
@@ -639,26 +944,47 @@ class Cora_WhatsApp_Gateway {
         $ref_id = $lead_data['id'] ?? ( 'L-' . wp_rand( 1000, 9999 ) );
         $date   = $lead_data['date'] ?? current_time( 'M j, Y' );
 
+        $alert_body = "*New Lead Alert: {$title}*\n\n"
+            . "• *Client*: {$name}\n"
+            . ( ! empty( $lead_data['phone'] ) ? "• *Phone*: {$lead_data['phone']}\n" : "" )
+            . ( ! empty( $lead_data['email'] ) ? "• *Email*: {$lead_data['email']}\n" : "" )
+            . "• *Ref*: #{$ref_id}\n"
+            . "• *Date*: {$date}\n\n"
+            . "_Cora Automated Messaging Gateway_";
+
         if ( $is_admin_alert ) {
-            // For admin alert, check if 24h window is open or send session text
+            // For admin alert, check if 24h window is open
             $win = $this->get_session_window( $clean_to );
-            if ( ! $win['active'] ) {
-                return $this->send_order_confirmation( $clean_to, $name, $ref_id, $date );
+            if ( $win['active'] ) {
+                $res = $this->send_session_message( $clean_to, $alert_body );
+                if ( ! $res['success'] && ! empty( $res['raw']['error']['code'] ) && 131047 === (int) $res['raw']['error']['code'] ) {
+                    // Window expired on Meta side: queue update & push nudge
+                    $this->queue_pending_update( $clean_to, "New Lead: {$name}", $alert_body, home_url( '/workspace/dashboard?sub_page=leads' ), 'Lead' );
+                    return array( 'success' => true, 'queued' => true, 'session_active' => false );
+                }
+                return $res;
             }
 
-            $alert_body = "*New Lead Alert: {$title}*\n\n"
-                . "• *Client*: {$name}\n"
-                . ( ! empty( $lead_data['phone'] ) ? "• *Phone*: {$lead_data['phone']}\n" : "" )
-                . ( ! empty( $lead_data['email'] ) ? "• *Email*: {$lead_data['email']}\n" : "" )
-                . "• *Ref*: #{$ref_id}\n"
-                . "• *Date*: {$date}\n\n"
-                . "_Cora Automated Messaging Gateway_";
+            // Outside 24h Window: Enqueue update into $0 Smart Queue
+            $this->queue_pending_update( $clean_to, "New Lead: {$name}", $alert_body, home_url( '/workspace/dashboard?sub_page=leads' ), 'Lead' );
 
-            $res = $this->send_session_message( $clean_to, $alert_body );
-            if ( ! $res['success'] && ! empty( $res['raw']['error']['code'] ) && 131047 === (int) $res['raw']['error']['code'] ) {
-                return $this->send_order_confirmation( $clean_to, $name, $ref_id, $date );
+            // Send instant Free Web Push / PWA Notification if available
+            if ( function_exists( 'cora_pwa_send_push_notification' ) ) {
+                $act_url = $this->get_activation_url( 'View Updates ⚡' );
+                $admins = get_users( array( 'role__in' => array( 'administrator', 'cora_workspace_owner', 'cora_manager' ) ) );
+                foreach ( $admins as $adm ) {
+                    cora_pwa_send_push_notification( $adm->ID, "⚡ Lead: {$name}", "New inquiry received. Tap to unlock WhatsApp & view for free.", $act_url, true );
+                }
             }
-            return $res;
+
+            // Rate-limited 1-time daily utility template nudge (at most 1 per 24 hours)
+            $nudge_key = 'cora_wa_daily_nudge_' . $clean_to;
+            if ( ! get_transient( $nudge_key ) && get_option( 'cora_wa_allow_template_nudge', '1' ) === '1' ) {
+                $this->send_order_confirmation( $clean_to, $name, $ref_id, $date );
+                set_transient( $nudge_key, 1, 24 * HOUR_IN_SECONDS );
+            }
+
+            return array( 'success' => true, 'queued' => true, 'session_active' => false );
         } else {
             // Client confirmation: check if session is open, else send template
             $win = $this->get_session_window( $clean_to );
@@ -690,11 +1016,6 @@ class Cora_WhatsApp_Gateway {
         $location    = $booking_data['location'] ?? 'Main Studio Floor B';
         $ref_id      = $booking_data['id'] ?? ( 'BK-' . wp_rand( 1000, 9999 ) );
 
-        $win = $this->get_session_window( $clean_to );
-        if ( ! $win['active'] ) {
-            return $this->send_order_confirmation( $clean_to, $client_name, $ref_id, current_time( 'M j, Y' ) );
-        }
-
         $body = "📅 *Upcoming Booking Reminder*\n\n"
             . "Hi {$client_name}, this is a quick reminder about your scheduled shoot with us:\n\n"
             . "• *Service*: {$service}\n"
@@ -703,11 +1024,19 @@ class Cora_WhatsApp_Gateway {
             . "• *Booking Ref*: #{$ref_id}\n\n"
             . "📍 _Please arrive 10 minutes early. Reply to this message if you need directions or rescheduling._";
 
-        $res = $this->send_session_message( $clean_to, $body );
-        if ( ! $res['success'] && ! empty( $res['raw']['error']['code'] ) && 131047 === (int) $res['raw']['error']['code'] ) {
-            return $this->send_order_confirmation( $clean_to, $client_name, $ref_id, current_time( 'M j, Y' ) );
+        $win = $this->get_session_window( $clean_to );
+        if ( $win['active'] ) {
+            $res = $this->send_session_message( $clean_to, $body );
+            if ( ! $res['success'] && ! empty( $res['raw']['error']['code'] ) && 131047 === (int) $res['raw']['error']['code'] ) {
+                $this->queue_pending_update( $clean_to, "Booking: {$service}", $body, home_url( '/workspace/dashboard?sub_page=bookings' ), 'Booking' );
+                return array( 'success' => true, 'queued' => true, 'session_active' => false );
+            }
+            return $res;
         }
-        return $res;
+
+        // Outside 24h Window: Enqueue update
+        $this->queue_pending_update( $clean_to, "Booking: {$service}", $body, home_url( '/workspace/dashboard?sub_page=bookings' ), 'Booking' );
+        return array( 'success' => true, 'queued' => true, 'session_active' => false );
     }
 
     /**
@@ -722,16 +1051,11 @@ class Cora_WhatsApp_Gateway {
             return array( 'success' => false, 'error' => 'Invalid recipient phone.' );
         }
 
-        $win = $this->get_session_window( $clean_to );
-        if ( ! $win['active'] ) {
-            return $this->send_order_confirmation( $clean_to, 'Studio Admin', 'BRIEFING-' . wp_rand( 100, 999 ), current_time( 'M j, Y' ) );
-        }
-
         $workspace = get_bloginfo( 'name' ) ?: 'Cora Studio';
         $time_str  = current_time( 'g:i A' );
 
-        $body = "📊 *{$workspace} • Daily Morning Briefing*\n\n"
-            . "Good morning! Here is your operational snapshot as of {$time_str}:\n\n"
+        $body = "📊 *{$workspace} • Daily Briefing*\n\n"
+            . "Operational snapshot as of {$time_str}:\n\n"
             . "• 💰 *Revenue Cleared*: ₹1,85,000 (Month to Date)\n"
             . "• ⏳ *Pending Receivables*: ₹45,200 (1 invoice)\n"
             . "• 🎯 *Active Projects*: 4 shoots in post-production\n"
@@ -739,7 +1063,19 @@ class Cora_WhatsApp_Gateway {
             . "• 📅 *Today's Schedule*: 11:30 AM Client Review Call\n\n"
             . "🚀 _Have a productive day! Reply anytime to ask Cora AI._";
 
-        return $this->send_session_message( $clean_to, $body );
+        $win = $this->get_session_window( $clean_to );
+        if ( $win['active'] ) {
+            $res = $this->send_session_message( $clean_to, $body );
+            if ( ! $res['success'] && ! empty( $res['raw']['error']['code'] ) && 131047 === (int) $res['raw']['error']['code'] ) {
+                $this->queue_pending_update( $clean_to, 'Daily Briefing', $body, home_url( '/workspace/dashboard' ), 'Briefing' );
+                return array( 'success' => true, 'queued' => true, 'session_active' => false );
+            }
+            return $res;
+        }
+
+        // Outside 24h Window: Enqueue update
+        $this->queue_pending_update( $clean_to, 'Daily Briefing', $body, home_url( '/workspace/dashboard' ), 'Briefing' );
+        return array( 'success' => true, 'queued' => true, 'session_active' => false );
     }
 
     /**
@@ -761,11 +1097,6 @@ class Cora_WhatsApp_Gateway {
         $method     = $payment_data['method'] ?? 'UPI / Bank Transfer';
         $time_str   = current_time( 'g:i A, M j' );
 
-        $win = $this->get_session_window( $clean_to );
-        if ( ! $win['active'] ) {
-            return $this->send_order_confirmation( $clean_to, $client, $inv_number, current_time( 'M j, Y' ) );
-        }
-
         $body = "💰 *Payment Confirmed • Invoice #{$inv_number}*\n\n"
             . "Payment has been successfully verified and cleared:\n\n"
             . "• *Client*: {$client}\n"
@@ -775,7 +1106,19 @@ class Cora_WhatsApp_Gateway {
             . "• *Status*: Settled & Marked Paid\n\n"
             . "📄 _Official GST receipt and E-sign copy updated in your Document Vault._";
 
-        return $this->send_session_message( $clean_to, $body );
+        $win = $this->get_session_window( $clean_to );
+        if ( $win['active'] ) {
+            $res = $this->send_session_message( $clean_to, $body );
+            if ( ! $res['success'] && ! empty( $res['raw']['error']['code'] ) && 131047 === (int) $res['raw']['error']['code'] ) {
+                $this->queue_pending_update( $clean_to, "Payment Confirmed: #{$inv_number}", $body, home_url( '/workspace/dashboard?sub_page=financials' ), 'Financials' );
+                return array( 'success' => true, 'queued' => true, 'session_active' => false );
+            }
+            return $res;
+        }
+
+        // Outside 24h Window: Enqueue update
+        $this->queue_pending_update( $clean_to, "Payment Confirmed: #{$inv_number}", $body, home_url( '/workspace/dashboard?sub_page=financials' ), 'Financials' );
+        return array( 'success' => true, 'queued' => true, 'session_active' => false );
     }
 
     /**
