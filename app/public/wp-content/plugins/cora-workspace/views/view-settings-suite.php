@@ -1947,6 +1947,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                     'icon'  => '<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>',
                     'items' => array(
                         'lead_created'           => array( 'label' => 'New Lead Captured', 'desc' => 'Instant alert when a lead submits inquiry, form, or WhatsApp message.', 'default_email' => 'instant' ),
+                        'form_submitted'         => array( 'label' => 'Inbound Form Response', 'desc' => 'Instant alert when a client or lead completes an online form.', 'default_email' => 'instant' ),
                         'lead_status_changed'    => array( 'label' => 'Lead Pipeline Stage Changed', 'desc' => 'Status transitions (Negotiating, Contract Sent, Closed Won).', 'default_email' => 'daily' ),
                         'lead_reassigned'        => array( 'label' => 'Lead Assigned to Agent/User', 'desc' => 'Notification sent when a lead is delegated to you.', 'default_email' => 'instant' ),
                         'lead_followup_reminder' => array( 'label' => 'Follow-up Call / Task Reminder', 'desc' => 'Reminder when scheduled follow-up or viewing time is due.', 'default_email' => 'instant' ),
@@ -1989,6 +1990,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         'team_member_joined'     => array( 'label' => 'New Team Member Joined', 'desc' => 'Invited user accepts email invite and completes workspace onboarding.', 'default_email' => 'daily' ),
                         'shift_assigned'         => array( 'label' => 'Roster / Shift Assigned', 'desc' => 'New studio or field shift added to your schedule.', 'default_email' => 'instant' ),
                         'attendance_reminder'    => array( 'label' => 'Punch-in & Punch-out Reminder', 'desc' => 'Daily prompt to log attendance and session hours.', 'default_email' => 'never' ),
+                        'report_generated'       => array( 'label' => 'Daily Attendance & Executive Report', 'desc' => 'Automated daily attendance logs and 24h executive digest summaries.', 'default_email' => 'instant' ),
                         'role_changed'           => array( 'label' => 'Role / Permission Level Updated', 'desc' => 'Your workspace permission capabilities have been modified.', 'default_email' => 'instant' ),
                     )
                 ),

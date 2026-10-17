@@ -661,7 +661,8 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         window.coraOpenWhatsAppActivation = function(customText) {
             var activationUrl = '<?php echo esc_js( $cora_wa_activation_url ); ?>';
             if (customText) {
-                activationUrl = 'https://wa.me/15556698957?text=' + encodeURIComponent(customText);
+                var phoneDigits = '<?php echo esc_js( preg_replace( '/[^\d]/', '', ! empty( $cora_wa_settings['admin_phone'] ) ? $cora_wa_settings['admin_phone'] : '917015317965' ) ); ?>';
+                activationUrl = 'https://wa.me/' + phoneDigits + '?text=' + encodeURIComponent(customText);
             }
             if (window.coraShowToast) {
                 window.coraShowToast('Opening WhatsApp... Send the pre-filled message to activate your 24-hour free window.', 'info');
@@ -5805,6 +5806,10 @@ textarea,
                                 'title' => 'System Health',
                                 'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>'
                             ),
+                            'super-integrations' => array(
+                                'title' => 'Integrations & WhatsApp',
+                                'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>'
+                            ),
                             'super-ai-tokens' => array(
                                 'title' => 'AI Master Tokens',
                                 'icon'  => '<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm1 14.93V17a1 1 0 0 1-2 0v-.07A7 7 0 0 1 5.07 11H5a1 1 0 0 1 0-2h.07A7 7 0 0 1 11 5.07V5a1 1 0 0 1 2 0v.07A7 7 0 0 1 18.93 11H19a1 1 0 0 1 0 2h-.07A7 7 0 0 1 13 16.93zM12 8a4 4 0 1 0 4 4 4 4 0 0 0-4-4z"></path></svg>'
@@ -5886,7 +5891,7 @@ textarea,
                     $visible_items = array();
                     $group_has_active = false;
                     foreach ( $group['items'] as $target => $item ) {
-                        $super_pages = array( 'super-admin', 'super-users', 'super-finances', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-docs', 'super-ai-tokens', 'super-feature-flags', 'super-emergency', 'super-audit' );
+                        $super_pages = array( 'super-admin', 'super-users', 'super-finances', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-integrations', 'super-docs', 'super-ai-tokens', 'super-feature-flags', 'super-emergency', 'super-audit' );
                         if ( ! in_array( $target, $super_pages ) && function_exists( 'cora_user_has_feature_access' ) && ! cora_user_has_feature_access( $target ) ) {
                             continue;
                         }
@@ -7237,7 +7242,7 @@ textarea,
                                 foreach ( $nav_groups as $g ) {
                                     if ( empty( $g['items'] ) || ! is_array( $g['items'] ) ) continue;
                                     foreach ( $g['items'] as $target => $item ) {
-                                        if ( in_array( $target, array( 'super-admin', 'super-users', 'super-finances', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-docs', 'super-ai-tokens', 'super-feature-flags', 'super-emergency', 'super-audit' ), true ) ) {
+                                        if ( in_array( $target, array( 'super-admin', 'super-users', 'super-finances', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-integrations', 'super-docs', 'super-ai-tokens', 'super-feature-flags', 'super-emergency', 'super-audit' ), true ) ) {
                                             continue;
                                         }
                                         if ( ! empty( $qa_enabled_features ) && ! in_array( $target, $qa_enabled_features, true ) && ! in_array( $target, array( 'dashboard', 'feature-hub', 'settings-suite', 'settings' ), true ) ) {
@@ -10870,11 +10875,13 @@ textarea,
                     });
                 };
 
-                window.coraOpenWhatsAppActivation = function() {
+                window.coraOpenWhatsAppActivation = function(customText) {
                     var hiddenInput = document.getElementById('cora-wa-activation-link-hidden');
                     var activationUrl = hiddenInput ? hiddenInput.value : '';
-                    if (!activationUrl) {
-                        activationUrl = 'https://wa.me/15556698957?text=' + encodeURIComponent('Activate Daily Briefing & Workspace Alerts 🚀');
+                    if (!activationUrl || customText) {
+                        var phoneDigits = '<?php echo esc_js( preg_replace( '/[^\d]/', '', ! empty( $cora_wa_settings['admin_phone'] ) ? $cora_wa_settings['admin_phone'] : '917015317965' ) ); ?>';
+                        var text = customText || 'Activate Daily Briefing & Workspace Alerts 🚀';
+                        activationUrl = 'https://wa.me/' + phoneDigits + '?text=' + encodeURIComponent(text);
                     }
                     if (window.coraShowToast) {
                         window.coraShowToast('Opening WhatsApp... Send the pre-filled message to activate your 24-hour free window.', 'info');
@@ -11763,7 +11770,7 @@ textarea,
 
             <!-- SECTION: SUPER ADMIN PANEL -->
             <?php 
-            $super_pages = array( 'super-admin', 'super-users', 'super-finances', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-ai-tokens', 'super-feature-flags', 'super-emergency', 'super-audit' );
+            $super_pages = array( 'super-admin', 'super-users', 'super-finances', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-integrations', 'super-ai-tokens', 'super-feature-flags', 'super-emergency', 'super-audit' );
             if ( in_array( $sub_page, $super_pages ) && cora_is_super_owner() ) : ?>
             <section id="cora-page-super-admin" class="cora-page-section cora-active space-y-6">
                 <?php include CORA_WORKSPACE_PATH . 'views/view-super-admin.php'; ?>
@@ -16530,14 +16537,14 @@ Output ONLY the rewritten text to replace the selection. Do NOT include markdown
             <!-- STATE 3: Navigation Tabs Bar (Default Visible Nav Mode) -->
             <?php
             $cora_active_sub = empty($sub_page) ? 'dashboard' : str_replace('_', '-', $sub_page);
-            $super_pages = array( 'super-admin', 'super-users', 'super-finances', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-docs', 'super-ai-tokens', 'super-feature-flags', 'super-emergency', 'super-audit' );
+            $super_pages = array( 'super-admin', 'super-users', 'super-finances', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-integrations', 'super-docs', 'super-ai-tokens', 'super-feature-flags', 'super-emergency', 'super-audit' );
             $is_super_mode = ( cora_is_super_owner() && ! $is_impersonating ) || in_array( $cora_active_sub, $super_pages, true );
 
             if ( $is_super_mode ) {
                 $is_ws_act    = ( $cora_active_sub === 'super-admin' || $cora_active_sub === 'dashboard' || $cora_active_sub === 'home' );
                 $is_fin_act   = ( $cora_active_sub === 'super-finances' );
                 $is_users_act = ( $cora_active_sub === 'super-users' );
-                $is_ai_act    = ( $cora_active_sub === 'super-ai-tokens' || $cora_active_sub === 'super-health' );
+                $is_ai_act    = ( $cora_active_sub === 'super-ai-tokens' || $cora_active_sub === 'super-health' || $cora_active_sub === 'super-integrations' );
                 $is_more_act  = ( ! $is_ws_act && ! $is_fin_act && ! $is_users_act && ! $is_ai_act );
             } else {
                 $is_home_act    = ( $cora_active_sub === 'dashboard' || $cora_active_sub === 'home' );
@@ -16703,6 +16710,11 @@ if ( $is_super_mode ) {
             'title' => 'System Health & Specs',
             'desc'  => 'Live user presence, MySQL footprint & media uploads',
             'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>'
+        ),
+        'super-integrations' => array(
+            'title' => 'Integrations & WhatsApp',
+            'desc'  => 'WhatsApp Cloud API 24h free windows, Web Push, SMTP & AI webhooks',
+            'icon'  => '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>'
         ),
         'super-feature-flags' => array(
             'title' => 'Feature Flags Matrix',

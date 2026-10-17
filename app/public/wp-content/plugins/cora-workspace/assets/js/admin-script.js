@@ -6045,7 +6045,7 @@ jQuery(document).ready(function($) {
             });
         });
 
-        const superPages = ['super-admin', 'super-users', 'super-finances', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-docs', 'super-ai-tokens', 'super-feature-flags', 'super-emergency', 'super-audit'];
+        const superPages = ['super-admin', 'super-users', 'super-finances', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-integrations', 'super-docs', 'super-ai-tokens', 'super-feature-flags', 'super-emergency', 'super-audit'];
         const enterpriseNewModules = ['event_timeline', 'event-timeline', 'multi-day-timeline', 'review_acquisition', 'smart-reviews', 'crew_scheduler', 'crew-scheduler', 'team_scheduler', 'team-scheduler', 'shifts', 'vault', 'emails', 'calendar', 'activity-timeline', 'automations', 'inbox', 'analytics', 'social-meta', 'plant_inventory', 'plant-inventory', 'stationery_inventory', 'stationery-inventory', 'inventory', 'inventory_management', 'affiliates', 'referrals', 'projects', 'portfolio', 'case-studies', 'case_studies', ...superPages];
         permissions['administrator'] = ['dashboard', 'bookings', 'feature-hub', 'team-roles', 'equipment', 'financials', 'settings', 'vault', 'portfolio', 'projects', 'leads', 'clients', 'attendance', 'tasks', 'blogs', 'gbp', 'plugins', 'pages', 'comments', 'appearance', 'tools', 'media-editor', 'settings-suite', 'canvas', 'audit-panel', 'media', 'forms', 'emails', 'ecosystem', 'mcp', 'affiliates', 'referrals', ...superPages, ...enterpriseNewModules];
         permissions['cora_super_admin'] = permissions['administrator'];
@@ -7133,7 +7133,7 @@ jQuery(document).ready(function($) {
 
     // Role Enforcement capability controller
     window.coraEnforcePermissions = function(role) {
-        const superPages = ['super-admin', 'super-users', 'super-finances', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-docs', 'super-ai-tokens', 'super-feature-flags', 'super-emergency', 'super-audit'];
+        const superPages = ['super-admin', 'super-users', 'super-finances', 'super-appeals', 'super-governance', 'super-announcements', 'super-health', 'super-integrations', 'super-docs', 'super-ai-tokens', 'super-feature-flags', 'super-emergency', 'super-audit'];
         const enterpriseNewModules = ['event_timeline', 'event-timeline', 'multi-day-timeline', 'review_acquisition', 'smart-reviews', 'crew_scheduler', 'crew-scheduler', 'team_scheduler', 'team-scheduler', 'shifts', 'vault', 'emails', 'calendar', 'activity-timeline', 'automations', 'inbox', 'analytics', 'social-meta', 'plant_inventory', 'plant-inventory', 'stationery_inventory', 'stationery-inventory', 'inventory', 'inventory_management', 'affiliates', 'referrals', 'projects', 'portfolio', 'case-studies', 'case_studies', ...superPages];
         let allowed = (coraREData.userPermissions && coraREData.userPermissions[role]) ? coraREData.userPermissions[role] : [];
         
