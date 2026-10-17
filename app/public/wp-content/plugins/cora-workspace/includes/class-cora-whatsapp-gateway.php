@@ -306,9 +306,15 @@ class Cora_WhatsApp_Gateway {
             $phone_digits = preg_replace( '/[^\d]/', '', $status['display_phone_number'] );
         }
         if ( empty( $phone_digits ) ) {
+            $display_opt = get_option( 'cora_wa_display_phone', '' );
+            if ( ! empty( $display_opt ) ) {
+                $phone_digits = preg_replace( '/[^\d]/', '', $display_opt );
+            }
+        }
+        if ( empty( $phone_digits ) ) {
             $settings = $this->get_settings();
-            // Default to test number digits if available
-            $phone_digits = ! empty( $settings['phone_number_id'] ) ? '15556698957' : '15556698957';
+            // Default to official registered business number
+            $phone_digits = ( ( $settings['phone_number_id'] ?? '' ) === '1440932089094513' ) ? '15556698957' : '917015317965';
         }
 
         $text = ! empty( $custom_text )

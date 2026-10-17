@@ -286,7 +286,7 @@ $cora_wa_default_tpl       = $cora_wa_settings['default_template'] ?? 'jaspers_m
 $cora_wa_auto_leads        = ! empty( $cora_wa_settings['auto_leads_enabled'] );
 $cora_wa_auto_client       = ! empty( $cora_wa_settings['auto_client_confirmation'] );
 $cora_wa_webhook_url       = home_url( '/wp-json/cora-workspace/v1/whatsapp-webhook' );
-$cora_wa_activation_url    = class_exists( 'Cora_WhatsApp_Gateway' ) ? Cora_WhatsApp_Gateway::instance()->get_activation_url() : 'https://wa.me/15556698957?text=Activate%20Daily%20Briefing%20%26%20Workspace%20Alerts%20%F0%9F%9A%80';
+$cora_wa_activation_url    = class_exists( 'Cora_WhatsApp_Gateway' ) ? Cora_WhatsApp_Gateway::instance()->get_activation_url() : 'https://wa.me/917015317965?text=Activate%20Daily%20Briefing%20%26%20Workspace%20Alerts%20%F0%9F%9A%80';
 $cora_wa_activation_redirect = class_exists( 'Cora_WhatsApp_Gateway' ) ? Cora_WhatsApp_Gateway::instance()->get_activation_redirect_url() : home_url( '/workspace/wa-activate' );
 $cora_wa_session_window    = ( class_exists( 'Cora_WhatsApp_Gateway' ) && ! empty( $cora_wa_admin_phone ) ) ? Cora_WhatsApp_Gateway::instance()->get_session_window( $cora_wa_admin_phone ) : array( 'active' => false, 'remaining_seconds' => 0, 'remaining_human' => 'Outside 24h Window' );
 
@@ -6003,6 +6003,15 @@ textarea,
                             <span>Workspace Settings</span>
                         </div>
                         <span class="text-[10px] text-zinc-400 font-mono px-1 py-0.2 rounded bg-zinc-100 dark:bg-zinc-800">⌘.</span>
+                    </button>
+
+                    <!-- Workspace API & MCP Gateway (Rule 15 Docked Panel) -->
+                    <button type="button" class="w-full text-left px-2.5 py-1.5 text-xs text-zinc-700 dark:text-zinc-300 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100 font-medium flex items-center justify-between cursor-pointer transition-colors" onclick="$('#cora-profile-popover').addClass('hidden'); if(typeof coraOpenWorkspaceDeveloperGateway === 'function') coraOpenWorkspaceDeveloperGateway();">
+                        <div class="flex items-center gap-2.5">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none" class="text-zinc-400 shrink-0"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                            <span>Workspace API &amp; MCP</span>
+                        </div>
+                        <span class="text-[9px] font-semibold text-emerald-600 dark:text-emerald-400 px-1.5 py-0.2 bg-emerald-50 dark:bg-emerald-950/40 rounded border border-emerald-200/50 dark:border-emerald-800/50">MCP 2.0</span>
                     </button>
 
                     <!-- Activate WhatsApp Alerts (24h Free Window) -->
@@ -22206,6 +22215,9 @@ jQuery(document).ready(function($) {
 });
 </script>
 <?php endif; ?>
+
+<!-- Unified Workspace Developer Gateway Docked Panel (Rule 15 Compliant) -->
+<?php include CORA_WORKSPACE_PATH . 'includes/partials/workspace-developer-gateway-drawer.php'; ?>
 
 <!-- Modern Cora PWA Install Bottom Sheet Modal -->
 <?php
