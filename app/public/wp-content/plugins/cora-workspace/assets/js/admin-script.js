@@ -19305,6 +19305,13 @@ jQuery(document).ready(function($) {
         };
         const alertLabel = alertType ? (labelMap[alertType] || alertType) : channel;
 
+        if (channel === 'whatsapp' && !customPhone) {
+            const phoneInput = document.querySelector('input[name="cora_notif_custom_whatsapp"]');
+            if (phoneInput && phoneInput.value && phoneInput.value.trim()) {
+                customPhone = phoneInput.value.trim();
+            }
+        }
+
         if (window.coraShowToast) {
             window.coraShowToast(`Dispatching ${alertLabel} to your WhatsApp...`, 'info');
         }

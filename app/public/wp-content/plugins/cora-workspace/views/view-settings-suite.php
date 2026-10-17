@@ -1705,6 +1705,37 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 
                 </div> <!-- close cora-shopify-card-body -->
             </div> <!-- close cora-shopify-card -->
+
+            <!-- Card 3: Workspace API & MCP Gateway (Universal Account Integration) -->
+            <div class="cora-shopify-card">
+                <div class="cora-shopify-card-header border-b border-zinc-100 dark:border-zinc-800 pb-3 flex items-center justify-between cursor-pointer select-none">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
+                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-semibold text-zinc-900 dark:text-white m-0">Workspace API &amp; MCP Gateway</h3>
+                            <p class="text-xs text-zinc-500 dark:text-zinc-400 m-0">Connect external AI agents (Claude Desktop, Cursor) or custom scripts across all modules.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> MCP 2.0 Live
+                        </span>
+                    </div>
+                </div>
+                <div class="cora-shopify-card-body pt-4 space-y-3">
+                    <p class="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed m-0">
+                        Instead of connecting each workspace module separately, your Workspace Account Key grants unified access across the Content Suite, CRM Leads, Clients, Media Vault, and Analytics.
+                    </p>
+                    <div class="pt-1 flex items-center gap-3">
+                        <button type="button" onclick="if(typeof coraOpenWorkspaceDeveloperGateway === 'function') coraOpenWorkspaceDeveloperGateway();" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-850 text-white dark:bg-white dark:text-zinc-950 text-xs font-bold rounded-xl transition-all shadow-2xs cursor-pointer border-0 flex items-center gap-2">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 2l-2 2m-2-2l2 2m-2 2l2-2m-7 7l7-7-3-3-7 7v3h3z"></path><circle cx="7.5" cy="16.5" r="4.5"></circle></svg>
+                            <span>Open Developer Gateway &amp; Keys</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div> <!-- close cora-settings-panel-brand -->
 
         <!-- TAB: NOTIFICATION MANAGEMENT & EVENT TRIGGERS -->

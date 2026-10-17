@@ -5855,31 +5855,50 @@ window.coraCreateInvoiceForClient = function() {
 };
 
 window.coraDraftProposalForClient = function() {
-    if (!window.coraActiveDrawerClient) return;
-    var client = window.coraActiveDrawerClient;
-    var wsSlug = window.coraActiveWorkspaceSlug || 'studio';
-    window.location.href = '/' + wsSlug + '/vault?create=proposal&client_id=' + encodeURIComponent(client.id) + '&client_name=' + encodeURIComponent(client.name || 'Valued Client');
+    var client = window.coraActiveDrawerClient || {};
+    var clientName = client.name || 'Valued Client';
+    var clientId = client.id || '0';
+    var target = 'vault?create=proposal&client_id=' + encodeURIComponent(clientId) + '&client_name=' + encodeURIComponent(clientName);
+    if (typeof window.coraNavigateTo === 'function') {
+        window.coraNavigateTo(target);
+    } else {
+        window.location.href = '/workspace/' + target;
+    }
 };
 
 window.coraDraftContractForClient = function() {
-    if (!window.coraActiveDrawerClient) return;
-    var client = window.coraActiveDrawerClient;
-    var wsSlug = window.coraActiveWorkspaceSlug || 'studio';
-    window.location.href = '/' + wsSlug + '/vault?create=contract&client_id=' + encodeURIComponent(client.id) + '&client_name=' + encodeURIComponent(client.name || 'Valued Client');
+    var client = window.coraActiveDrawerClient || {};
+    var clientName = client.name || 'Valued Client';
+    var clientId = client.id || '0';
+    var target = 'vault?create=contract&client_id=' + encodeURIComponent(clientId) + '&client_name=' + encodeURIComponent(clientName);
+    if (typeof window.coraNavigateTo === 'function') {
+        window.coraNavigateTo(target);
+    } else {
+        window.location.href = '/workspace/' + target;
+    }
 };
 
 window.coraUploadDeliverablesForClient = function() {
-    if (!window.coraActiveDrawerClient) return;
-    var client = window.coraActiveDrawerClient;
-    var wsSlug = window.coraActiveWorkspaceSlug || 'studio';
-    window.location.href = '/' + wsSlug + '/media?client_id=' + encodeURIComponent(client.id);
+    var client = window.coraActiveDrawerClient || {};
+    var clientId = client.id || '0';
+    var target = 'media?client_id=' + encodeURIComponent(clientId);
+    if (typeof window.coraNavigateTo === 'function') {
+        window.coraNavigateTo(target);
+    } else {
+        window.location.href = '/workspace/' + target;
+    }
 };
 
 window.coraScheduleCalendarForClient = function() {
-    if (!window.coraActiveDrawerClient) return;
-    var client = window.coraActiveDrawerClient;
-    var wsSlug = window.coraActiveWorkspaceSlug || 'studio';
-    window.location.href = '/' + wsSlug + '/calendar?client_id=' + encodeURIComponent(client.id) + '&client_name=' + encodeURIComponent(client.name || 'Valued Client');
+    var client = window.coraActiveDrawerClient || {};
+    var clientName = client.name || 'Valued Client';
+    var clientId = client.id || '0';
+    var target = 'calendar?client_id=' + encodeURIComponent(clientId) + '&client_name=' + encodeURIComponent(clientName);
+    if (typeof window.coraNavigateTo === 'function') {
+        window.coraNavigateTo(target);
+    } else {
+        window.location.href = '/workspace/' + target;
+    }
 };
 
 window.coraNavigateToVault = function() {

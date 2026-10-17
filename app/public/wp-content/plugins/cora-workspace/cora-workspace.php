@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.395
+ * Version:           4.9.396
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.395' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.396' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -19407,7 +19407,7 @@ function cora_ajax_whatsapp_save_settings() {
     $verify_token    = sanitize_text_field( $_POST['verify_token'] ?? '' );
     $enabled         = isset( $_POST['enabled'] ) ? ( $_POST['enabled'] === '1' || $_POST['enabled'] === 'true' ) : true;
     $admin_phone     = sanitize_text_field( $_POST['admin_phone'] ?? '' );
-    $default_tpl     = sanitize_text_field( $_POST['default_template'] ?? 'jaspers_market_order_confirmation_v1' );
+    $default_tpl     = sanitize_text_field( $_POST['default_template'] ?? 'hello_world' );
     $auto_leads      = isset( $_POST['auto_leads_enabled'] ) ? ( $_POST['auto_leads_enabled'] === '1' || $_POST['auto_leads_enabled'] === 'true' ) : true;
     $auto_client     = isset( $_POST['auto_client_confirmation'] ) ? ( $_POST['auto_client_confirmation'] === '1' || $_POST['auto_client_confirmation'] === 'true' ) : true;
 
@@ -19466,7 +19466,7 @@ function cora_ajax_whatsapp_send_test() {
     $recipient_phone = sanitize_text_field( $_POST['recipient_phone'] ?? '' );
     $message_type    = sanitize_text_field( $_POST['message_type'] ?? 'template' );
     $custom_message  = sanitize_textarea_field( $_POST['custom_message'] ?? '' );
-    $template_name   = sanitize_text_field( $_POST['template_name'] ?? 'jaspers_market_order_confirmation_v1' );
+    $template_name   = sanitize_text_field( $_POST['template_name'] ?? 'hello_world' );
     $param_name      = sanitize_text_field( $_POST['param_name'] ?? 'Rohan Verma' );
     $param_order_id  = sanitize_text_field( $_POST['param_order_id'] ?? '123456' );
     $param_date      = sanitize_text_field( $_POST['param_date'] ?? current_time( 'M j, Y' ) );
@@ -19479,10 +19479,11 @@ function cora_ajax_whatsapp_send_test() {
         $gateway = Cora_WhatsApp_Gateway::instance();
 
         if ( 'template' === $message_type ) {
+            $params = ( 'hello_world' === $template_name ) ? array() : array( $param_name, $param_order_id, $param_date );
             $res = $gateway->send_template_message(
                 $recipient_phone,
                 $template_name,
-                array( $param_name, $param_order_id, $param_date ),
+                $params,
                 'en_US'
             );
         } else {

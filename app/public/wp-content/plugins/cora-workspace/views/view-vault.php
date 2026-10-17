@@ -4205,7 +4205,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
     var docId = urlParams.get('doc_id') || localStorage.getItem('cora_vault_doc_id');
 
-    if (coraView === 'editor' || urlStep || (savedTab === 'editor' && localStep)) {
+    var createType = urlParams.get('create');
+    if (createType) {
+        coraCreateNewDocInStudio();
+        var cName = urlParams.get('client_name');
+        if (cName) {
+            var el = document.getElementById('studio-client-name');
+            if (el) el.value = cName;
+        }
+        var typeEl = document.getElementById('studio-doc-type');
+        if (typeEl && (createType === 'proposal' || createType === 'quote')) typeEl.value = 'Proposal';
+        if (typeEl && createType === 'contract') typeEl.value = 'Contract';
+    } else if (coraView === 'editor' || urlStep || (savedTab === 'editor' && localStep)) {
         if (docId && coraView === 'editor') {
             coraOpenDocInStudio(docId);
         } else {

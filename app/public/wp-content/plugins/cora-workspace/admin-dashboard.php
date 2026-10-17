@@ -282,7 +282,7 @@ $cora_wa_access_token   = $cora_wa_settings['access_token'] ?? '';
 $cora_wa_verify_token   = $cora_wa_settings['verify_token'] ?? '';
 $cora_wa_cached_status     = get_transient( 'cora_wa_connection_status' );
 $cora_wa_admin_phone       = $cora_wa_settings['admin_phone'] ?? '';
-$cora_wa_default_tpl       = $cora_wa_settings['default_template'] ?? 'jaspers_market_order_confirmation_v1';
+$cora_wa_default_tpl       = $cora_wa_settings['default_template'] ?? 'hello_world';
 $cora_wa_auto_leads        = ! empty( $cora_wa_settings['auto_leads_enabled'] );
 $cora_wa_auto_client       = ! empty( $cora_wa_settings['auto_client_confirmation'] );
 $cora_wa_webhook_url       = home_url( '/wp-json/cora-workspace/v1/whatsapp-webhook' );
@@ -707,6 +707,13 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             var ajaxUrl = (typeof coraREData !== 'undefined' && coraREData.ajaxUrl) ? coraREData.ajaxUrl : (window.ajaxurl || '/wp-admin/admin-ajax.php');
             var nonce = (typeof coraREData !== 'undefined' && coraREData.ajaxNonce) ? coraREData.ajaxNonce : '';
             var type = alertType || 'lead';
+
+            if (!customPhone) {
+                var phoneInput = document.querySelector('input[name="cora_notif_custom_whatsapp"]');
+                if (phoneInput && phoneInput.value && phoneInput.value.trim()) {
+                    customPhone = phoneInput.value.trim();
+                }
+            }
 
             var labelMap = {
                 'activation': '24-Hour Free Session Confirmation',
@@ -10460,7 +10467,7 @@ textarea,
                                     <span>Default Meta Template Name</span>
                                     <span class="text-[9.5px] font-normal lowercase text-zinc-400">for automated outreach</span>
                                 </label>
-                                <input type="text" id="cora-wa-default-template" class="w-full border border-zinc-200 rounded-lg px-3 py-2 text-sm bg-white focus:border-zinc-400 focus:outline-none font-mono text-zinc-800 placeholder:font-sans placeholder:text-zinc-300 transition-all" value="<?php echo esc_attr( $cora_wa_default_tpl ); ?>" placeholder="jaspers_market_order_confirmation_v1">
+                                <input type="text" id="cora-wa-default-template" class="w-full border border-zinc-200 rounded-lg px-3 py-2 text-sm bg-white focus:border-zinc-400 focus:outline-none font-mono text-zinc-800 placeholder:font-sans placeholder:text-zinc-300 transition-all" value="<?php echo esc_attr( $cora_wa_default_tpl ); ?>" placeholder="hello_world">
                             </div>
                         </div>
 
@@ -10582,7 +10589,7 @@ textarea,
                             <div id="cora-wa-test-template-fields" class="space-y-3">
                                 <div>
                                     <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-1">Template Name</label>
-                                    <input type="text" id="cora-wa-test-template-name" class="w-full border border-zinc-200 rounded-lg px-3 py-1.5 text-xs font-mono bg-white text-zinc-800" value="<?php echo esc_attr( $cora_wa_default_tpl ?: 'jaspers_market_order_confirmation_v1' ); ?>">
+                                    <input type="text" id="cora-wa-test-template-name" class="w-full border border-zinc-200 rounded-lg px-3 py-1.5 text-xs font-mono bg-white text-zinc-800" value="<?php echo esc_attr( $cora_wa_default_tpl ?: 'hello_world' ); ?>">
                                 </div>
                                 <div class="grid grid-cols-3 gap-2">
                                     <div>
@@ -10832,7 +10839,7 @@ textarea,
                     };
 
                     if (mode === 'template') {
-                        postData.template_name  = (document.getElementById('cora-wa-test-template-name') || {}).value || 'jaspers_market_order_confirmation_v1';
+                        postData.template_name  = (document.getElementById('cora-wa-test-template-name') || {}).value || 'hello_world';
                         postData.param_name     = (document.getElementById('cora-wa-test-param-name') || {}).value || 'Rohan Verma';
                         postData.param_order_id = (document.getElementById('cora-wa-test-param-order') || {}).value || '123456';
                         postData.param_date     = (document.getElementById('cora-wa-test-param-date') || {}).value || 'Oct 17, 2026';
