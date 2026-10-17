@@ -738,8 +738,22 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                             window.coraShowToast(r.data.message || 'WhatsApp alert delivered! Check your phone.', 'success');
                         }
                     } else {
-                        if (window.coraShowToast) {
-                            window.coraShowToast((r && r.data && r.data.message) ? r.data.message : 'Error sending WhatsApp alert.', 'error');
+                        var msg = (r && r.data && r.data.message) ? r.data.message : 'Error sending WhatsApp alert.';
+                        if (r && r.data && r.data.needs_profile_phone) {
+                            if (window.coraShowToast) {
+                                window.coraShowToast(msg, 'warning');
+                            }
+                        } else if (r && r.data && r.data.code === 'window_not_active') {
+                            if (window.coraShowToast) {
+                                window.coraShowToast(msg, 'info');
+                            }
+                            if (r.data.activation_url) {
+                                window.open(r.data.activation_url, '_blank');
+                            }
+                        } else {
+                            if (window.coraShowToast) {
+                                window.coraShowToast(msg, 'error');
+                            }
                         }
                     }
                 },

@@ -642,6 +642,10 @@ class Cora_WhatsApp_Gateway {
         if ( $is_admin_alert ) {
             // For admin alert, check if 24h window is open or send session text
             $win = $this->get_session_window( $clean_to );
+            if ( ! $win['active'] ) {
+                return $this->send_order_confirmation( $clean_to, $name, $ref_id, $date );
+            }
+
             $alert_body = "*New Lead Alert: {$title}*\n\n"
                 . "• *Client*: {$name}\n"
                 . ( ! empty( $lead_data['phone'] ) ? "• *Phone*: {$lead_data['phone']}\n" : "" )
@@ -651,7 +655,6 @@ class Cora_WhatsApp_Gateway {
                 . "_Cora Automated Messaging Gateway_";
 
             $res = $this->send_session_message( $clean_to, $alert_body );
-            // If window expired, fall back to template
             if ( ! $res['success'] && ! empty( $res['raw']['error']['code'] ) && 131047 === (int) $res['raw']['error']['code'] ) {
                 return $this->send_order_confirmation( $clean_to, $name, $ref_id, $date );
             }
@@ -687,6 +690,11 @@ class Cora_WhatsApp_Gateway {
         $location    = $booking_data['location'] ?? 'Main Studio Floor B';
         $ref_id      = $booking_data['id'] ?? ( 'BK-' . wp_rand( 1000, 9999 ) );
 
+        $win = $this->get_session_window( $clean_to );
+        if ( ! $win['active'] ) {
+            return $this->send_order_confirmation( $clean_to, $client_name, $ref_id, current_time( 'M j, Y' ) );
+        }
+
         $body = "📅 *Upcoming Booking Reminder*\n\n"
             . "Hi {$client_name}, this is a quick reminder about your scheduled shoot with us:\n\n"
             . "• *Service*: {$service}\n"
@@ -712,6 +720,11 @@ class Cora_WhatsApp_Gateway {
         $clean_to = $this->clean_phone_number( $recipient_phone );
         if ( empty( $clean_to ) ) {
             return array( 'success' => false, 'error' => 'Invalid recipient phone.' );
+        }
+
+        $win = $this->get_session_window( $clean_to );
+        if ( ! $win['active'] ) {
+            return $this->send_order_confirmation( $clean_to, 'Studio Admin', 'BRIEFING-' . wp_rand( 100, 999 ), current_time( 'M j, Y' ) );
         }
 
         $workspace = get_bloginfo( 'name' ) ?: 'Cora Studio';
@@ -747,6 +760,11 @@ class Cora_WhatsApp_Gateway {
         $client     = $payment_data['client'] ?? 'Rohan Verma';
         $method     = $payment_data['method'] ?? 'UPI / Bank Transfer';
         $time_str   = current_time( 'g:i A, M j' );
+
+        $win = $this->get_session_window( $clean_to );
+        if ( ! $win['active'] ) {
+            return $this->send_order_confirmation( $clean_to, $client, $inv_number, current_time( 'M j, Y' ) );
+        }
 
         $body = "💰 *Payment Confirmed • Invoice #{$inv_number}*\n\n"
             . "Payment has been successfully verified and cleared:\n\n"

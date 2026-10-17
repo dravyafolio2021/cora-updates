@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.394
+ * Version:           4.9.395
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.394' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.395' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -38902,22 +38902,34 @@ function cora_ajax_send_test_notification_channel() {
         if ( empty( $target_phone ) ) {
             $target_phone = get_user_meta( $user_id, 'cora_user_whatsapp', true ) ?: get_user_meta( $user_id, 'billing_phone', true );
         }
+
+        // Strictly enforce user profile WhatsApp number (Never fall back to hardcoded admin number)
         if ( empty( $target_phone ) ) {
-            $target_phone = get_option( 'cora_wa_admin_phone', '' ) ?: get_option( 'cora_whatsapp_admin_phone', '' );
-        }
-        if ( empty( $target_phone ) ) {
-            $target_phone = '919817059266'; // Default admin fallback
+            wp_send_json_error( array(
+                'code'                => 'no_profile_phone',
+                'needs_profile_phone' => true,
+                'message'             => __( 'No WhatsApp number found in your profile. Please add your WhatsApp number in Settings → Notifications first to receive alerts.', 'cora-workspace' ),
+                'action_url'          => home_url( '/workspace/settings-suite?settings_tab=notifications' ),
+            ) );
         }
 
         $alert_type = sanitize_text_field( $_POST['alert_type'] ?? 'lead' );
         
         if ( class_exists( 'Cora_WhatsApp_Gateway' ) ) {
             $gateway = Cora_WhatsApp_Gateway::instance();
-            $wa_res = array( 'success' => false, 'error' => 'Unknown alert type.' );
-            $label  = 'Test message';
+            $session = $gateway->get_session_window( $target_phone );
+            $wa_res  = array( 'success' => false, 'error' => 'Unknown alert type.' );
+            $label   = 'Test message';
 
             switch ( $alert_type ) {
                 case 'activation':
+                    if ( ! $session['active'] ) {
+                        wp_send_json_error( array(
+                            'code'           => 'window_not_active',
+                            'message'        => sprintf( __( 'To activate 24h WhatsApp alerts on %s, send "Hi" from your WhatsApp to %s first (Meta policy requirement).', 'cora-workspace' ), $target_phone, $gateway->get_display_phone_number() ),
+                            'activation_url' => $gateway->get_activation_redirect_url(),
+                        ) );
+                    }
                     $wa_res = $gateway->send_daily_activation_reply( $target_phone );
                     $label  = '24h Activation confirmation';
                     break;
@@ -38959,11 +38971,13 @@ function cora_ajax_send_test_notification_channel() {
             }
 
             if ( ! empty( $wa_res['success'] ) ) {
+                $status_note = ! $session['active'] ? ' (Delivered via approved template - send "Hi" to unlock custom format)' : '';
                 wp_send_json_success( array(
-                    'message'    => "{$label} dispatched successfully to {$target_phone} via WhatsApp!",
+                    'message'    => "{$label} dispatched successfully to {$target_phone} via WhatsApp!{$status_note}",
                     'message_id' => $wa_res['message_id'] ?? '',
                     'phone'      => $target_phone,
                     'type'       => $alert_type,
+                    'is_session' => $session['active'],
                 ) );
             } else {
                 $err = $wa_res['error'] ?? 'Unknown WhatsApp API error';
