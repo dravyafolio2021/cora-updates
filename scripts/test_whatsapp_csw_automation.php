@@ -22,7 +22,15 @@
  * Usage: php scripts/test_whatsapp_csw_automation.php [optional_test_phone]
  */
 
-require_once __DIR__ . '/../app/public/wp-load.php';
+if ( ! defined( 'ABSPATH' ) ) {
+    if ( file_exists( __DIR__ . '/../app/public/wp-load.php' ) ) {
+        require_once __DIR__ . '/../app/public/wp-load.php';
+    } elseif ( file_exists( dirname( __DIR__ ) . '/public_html/demo/wp-load.php' ) ) {
+        require_once dirname( __DIR__ ) . '/public_html/demo/wp-load.php';
+    } elseif ( file_exists( '/home/u484406462/domains/heycora.in/public_html/demo/wp-load.php' ) ) {
+        require_once '/home/u484406462/domains/heycora.in/public_html/demo/wp-load.php';
+    }
+}
 
 if ( ! class_exists( 'Cora_WhatsApp_Gateway' ) ) {
     echo "❌ Error: Cora_WhatsApp_Gateway class not found.\n";
@@ -493,7 +501,147 @@ assert_test(
     "Batched: " . ( ! empty( $lead_result['batched'] ) ? 'YES' : 'NO' ) . " | Status: " . ( $lead_result['message'] ?? 'Queued' )
 );
 
-delete_transient( $lead_pacing_key );
+// -------------------------------------------------------------
+// TEST 11: Webhook Interactive Button Click Simulation: View Full Report
+// -------------------------------------------------------------
+echo "[TEST 11] Interactive Button Reply Simulation: View Full Report...\n";
+$btn_report_payload = array(
+    'object' => 'whatsapp_business_account',
+    'entry'  => array(
+        array(
+            'id'      => $settings['waba_id'],
+            'changes' => array(
+                array(
+                    'value' => array(
+                        'messaging_product' => 'whatsapp',
+                        'metadata'          => array(
+                            'display_phone_number' => '7015317965',
+                            'phone_number_id'      => $settings['phone_number_id'],
+                        ),
+                        'contacts'          => array(
+                            array(
+                                'profile' => array( 'name' => 'Studio Admin' ),
+                                'wa_id'   => $clean_phone,
+                            ),
+                        ),
+                        'messages'          => array(
+                            array(
+                                'from'        => $clean_phone,
+                                'id'          => 'wamid.TEST_BTN_REPORT_' . time(),
+                                'timestamp'   => (string) time(),
+                                'type'        => 'interactive',
+                                'interactive' => array(
+                                    'type'         => 'button_reply',
+                                    'button_reply' => array(
+                                        'id'    => 'btn_view_full_report',
+                                        'title' => 'View Full Report',
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                    'field' => 'messages',
+                ),
+            ),
+        ),
+    ),
+);
+
+$req_btn_report = new WP_REST_Request( 'POST', '/cora/v1/whatsapp/webhook' );
+$req_btn_report->set_header( 'content-type', 'application/json' );
+$req_btn_report->set_body( wp_json_encode( $btn_report_payload ) );
+
+$res_btn_report = cora_rest_whatsapp_webhook_receive( $req_btn_report );
+$status_btn_report = is_object( $res_btn_report ) && method_exists( $res_btn_report, 'get_status' ) ? $res_btn_report->get_status() : 200;
+
+assert_test(
+    "Webhook successfully receives and responds to 'View Full Report' interactive button click",
+    $status_btn_report === 200,
+    "HTTP Status: {$status_btn_report}"
+);
+
+// -------------------------------------------------------------
+// TEST 12: Webhook Interactive Button Click Simulation: Open Dashboard
+// -------------------------------------------------------------
+echo "[TEST 12] Interactive Button Reply Simulation: Open Dashboard...\n";
+$btn_dash_payload = array(
+    'object' => 'whatsapp_business_account',
+    'entry'  => array(
+        array(
+            'id'      => $settings['waba_id'],
+            'changes' => array(
+                array(
+                    'value' => array(
+                        'messaging_product' => 'whatsapp',
+                        'metadata'          => array(
+                            'display_phone_number' => '7015317965',
+                            'phone_number_id'      => $settings['phone_number_id'],
+                        ),
+                        'contacts'          => array(
+                            array(
+                                'profile' => array( 'name' => 'Studio Admin' ),
+                                'wa_id'   => $clean_phone,
+                            ),
+                        ),
+                        'messages'          => array(
+                            array(
+                                'from'        => $clean_phone,
+                                'id'          => 'wamid.TEST_BTN_DASH_' . time(),
+                                'timestamp'   => (string) time(),
+                                'type'        => 'interactive',
+                                'interactive' => array(
+                                    'type'         => 'button_reply',
+                                    'button_reply' => array(
+                                        'id'    => 'btn_open_dashboard',
+                                        'title' => 'Open Dashboard',
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                    'field' => 'messages',
+                ),
+            ),
+        ),
+    ),
+);
+
+$req_btn_dash = new WP_REST_Request( 'POST', '/cora/v1/whatsapp/webhook' );
+$req_btn_dash->set_header( 'content-type', 'application/json' );
+$req_btn_dash->set_body( wp_json_encode( $btn_dash_payload ) );
+
+$res_btn_dash = cora_rest_whatsapp_webhook_receive( $req_btn_dash );
+$status_btn_dash = is_object( $res_btn_dash ) && method_exists( $res_btn_dash, 'get_status' ) ? $res_btn_dash->get_status() : 200;
+
+assert_test(
+    "Webhook successfully receives and responds to 'Open Dashboard' interactive button click",
+    $status_btn_dash === 200,
+    "HTTP Status: {$status_btn_dash}"
+);
+
+// -------------------------------------------------------------
+// TEST 13: Direct Access & Route Protection for Executive Report
+// -------------------------------------------------------------
+echo "[TEST 13] Executive Report Route Routing & Verification Bypass Protection...\n";
+$report_url = cora_get_24h_report_url( 1, current_time( 'Y-m-d' ) );
+$parsed_report = wp_parse_url( $report_url );
+parse_str( $parsed_report['query'] ?? '', $query_parts );
+
+$test_token = $query_parts['token'] ?? '';
+$expected_hash = hash_hmac( 'sha256', "cora_exec_report_1_" . current_time( 'Y-m-d' ), wp_salt( 'auth' ) );
+
+assert_test(
+    "HMAC-SHA256 signature verification protects executive report against tampering",
+    hash_equals( $expected_hash, $test_token ),
+    "Cryptographic token matches expected auth salt hash"
+);
+
+// Verify ensure_waba_webhook_subscribed method exists and can be executed safely
+assert_test(
+    "ensure_waba_webhook_subscribed() method exists on gateway instance",
+    method_exists( $gateway, 'ensure_waba_webhook_subscribed' ),
+    "Method confirmed present"
+);
 
 echo "\n";
 echo "====================================================================\n";

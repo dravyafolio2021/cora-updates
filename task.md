@@ -1,54 +1,61 @@
-# Platform Task Tracker: Complete Content Suite Audit & Full MCP/API Workspace Compatibility
+# Task Tracker: Standardize & Update Official AI Tool Logos Globally
 
 ## Task Overview
-Execute a comprehensive audit and implementation of the AI Content Suite across Cora Platform (`http://cora.local/workspace/blogs?ct=ct-library`), dispatching multiple specialized subagents in parallel to inspect and bridge:
-1. Direct User Operations in Workspace UI (`views/view-content-suite.php`)
-2. Model Context Protocol (MCP) Tools compatibility (`includes/mcp/class-cora-mcp-tool-registry.php`, `class-cora-universal-mcp-server.php`)
-3. Open Workspace REST API (`/wp-json/cora/v1/content/*`)
-Ensure complete parity so that whatever a user wants to do with their content, they can do:
-- Directly inside the Workspace UI
-- By connecting external preferred/referred AI agents (Claude Desktop, Cursor, ChatGPT, etc.) via MCP
-- Programmatically via the fully opened Workspace-Level REST API.
+The user requested:
+> "Make it standard and update globally on all teh Commponent, 
+> I want to have Official logo instead of this customSVG icon of these AI tools"
+(Referencing the overlapping 5-icon stack showing ChatGPT/OpenAI, Claude, Gemini, Perplexity, YouTube).
+
+Replace all custom, inaccurate, and monochromatic placeholder SVGs across the platform with authentic, official vector brand logos and official brand colors (OpenAI green `#10A37F`, Claude terracotta/amber `#D97706`, Gemini Google gradient sparkle `#4E82EE`→`#9B72CB`→`#D96570`, Perplexity teal `#20808D`, and YouTube red `#FF0000` + `#FFFFFF` play button).
 
 ---
 
-## Real-Time Subtask Tracker
+## Subtasks & Execution Status
 
-### Phase 1: Parallel Subagent Audit & Discovery
-- [x] **Subagent 1: Content Suite UI & Data Layer Auditor** (Completed by `Content UI Auditor`)
-  - [x] Audited Content Library UI table, filters, bulk actions, search, and DOM pagination.
-  - [x] Audited Article Drawers (Create / Edit), AI Content Generators, and metadata mapping (`_cora_seo_score`, `_cora_focus_keyword`, `_cora_editorial_status`, `_cora_geo_score`).
-  - [x] Audited Opportunities tab, SEO & AI Visibility tab, and unlocked Calendar, Performance, Automations, Brain tabs.
-  - [x] Identified missing AJAX handlers (`cora_update_article_date`, 4 GEO handlers, and brief-to-post creation).
-- [x] **Subagent 2: MCP Tool Registry & Execution Compatibility Auditor** (Completed by `MCP Tools Auditor`)
-  - [x] Analyzed `Cora_MCP_Tool_Registry`, `Cora_Universal_MCP_Server`, and `cora_execute_ai_action`.
-  - [x] Identified critical gap: MCP was routing all content tools to `wp_cora_content_entries` (`growth_cora_main_01`), completely disconnected from the 45 library articles in `wp_posts`.
-  - [x] Formulated 9-tool canonical MCP Content Suite blueprint with dual `source: 'workspace' | 'growth'` support.
-- [x] **Subagent 3: Workspace REST API & Auth Openness Auditor** (Completed by `Workspace API Auditor`)
-  - [x] Analyzed REST namespaces (`/cora/v1`, `/cora-growth/v1`) and auth tables (`wp_cora_workspace_api_keys`).
-  - [x] Identified gap: No `/wp-json/cora/v1/content` REST controller existed for workspace articles, and API keys (`cora_ws_live_...`) lacked universal REST middleware.
-  - [x] Formulated blueprint for universal REST auth filter, full Content REST controller, and Developer Gateway UI drawer.
+- [x] **Subtask 1: Universal Official Brand Logos Engine (Frontend & TypeScript)**
+  - Status: Completed
+  - Target: `cora-frontend/components/features/OfficialBrandLogos.tsx`, `cora-frontend/components/features/CapabilityVisualCard.tsx`, `cora-frontend/components/showcase/ProductShowcase.tsx`
+  - Checklist:
+    - [x] `OpenAILogo` / `ChatGPTLogo`: Official OpenAI rosette in `#10A37F`
+    - [x] `ClaudeLogo`: Authentic Anthropic Claude asterisk burst in `#D97706` (replacing custom polygon)
+    - [x] `GeminiLogo`: Authentic Google Gemini 4-point sparkle with official multi-stop gradient
+    - [x] `PerplexityLogo`: Official Simple Icons Perplexity geometric knot in `#20808D` (replacing custom isometric cube)
+    - [x] `YouTubeLogo`: Official YouTube `#FF0000` rounded container with crisp `#FFFFFF` play triangle
+    - [x] Clean re-exports and import in `CapabilityVisualCard.tsx` and `ProductShowcase.tsx`
+    - [x] TypeScript compilation check passed (`npx tsc --noEmit` code 0)
+    - [x] Next.js production build check passed (`npm run build` code 0, 338 routes compiled)
 
-### Phase 2: Architectural Delivery & Integration
-- [/] **Step 1: Universal REST & MCP Workspace Authentication Bridge**:
-  - [ ] Add `cora_rest_api_key_determine_user` filter in `class-cora-plugins-skills-engine.php` recognizing `X-Cora-API-Key` and `Authorization: Bearer cora_ws_live_...`.
-  - [ ] Update `Cora_OAuth_Server::authenticate_token` to accept `cora_ws_live_...` API keys directly for unified REST and MCP authentication.
-- [ ] **Step 2: Workspace Content REST Controller (`/wp-json/cora/v1/content`)**:
-  - [ ] Create `class-cora-workspace-content-rest-controller.php` in `includes/`.
-  - [ ] Implement `GET /content` (list with filters, search, pagination), `GET /content/{id}`, `POST /content` (create), `PATCH /content/{id}` (update), `DELETE /content/{id}` (delete/trash).
-  - [ ] Implement `POST /content/{id}/publish`, `POST /content/{id}/unpublish`, `POST /content/batch` (bulk actions).
-  - [ ] Implement `POST /content/{id}/seo-audit` (11-point algorithmic audit) and `GET /content/opportunities`.
-- [ ] **Step 3: Unified MCP Content Tools Suite**:
-  - [ ] In `class-cora-mcp-tool-registry.php`, implement the 9 canonical tools: `cora_list_articles`, `cora_get_article`, `cora_create_article`, `cora_update_article`, `cora_delete_article`, `cora_publish_article`, `cora_unpublish_article`, `cora_bulk_update_articles`, `cora_audit_article_seo`, `cora_list_content_opportunities`, `cora_generate_article_outline`.
-  - [ ] Support dual source: workspace `wp_posts` and headless growth `wp_cora_content_entries`.
-  - [ ] Update curated 28-tool priority list in `Cora_Universal_MCP_Server::handle_list_tools()`.
-- [ ] **Step 4: Content Suite UI Enhancements & Missing Handlers**:
-  - [ ] Implement missing AJAX handlers in `cora-workspace.php`: `cora_ajax_update_article_date`, 4 GEO handlers, and link `cora_create_brief_from_opportunity` to `wp_posts`.
-  - [ ] Unlock Calendar, Performance, Automations, and Business Brain tabs in `views/view-content-suite.php`.
-  - [ ] Add "Developer API & MCP Gateway" button in Content Suite header.
-  - [ ] Embed Shopify-inspired docked Developer Gateway drawer (`#cora-developer-gateway-drawer`) per Rule 15 with API key generation, REST endpoint reference, and MCP client config snippets.
+- [x] **Subtask 2: Workspace PHP Universal Brand Logo Engine**
+  - Status: Completed
+  - Target: `app/public/wp-content/plugins/cora-workspace/includes/workspace-header.php`
+  - Checklist:
+    - [x] Define standard reusable function `cora_get_ai_platform_official_logo($platform, $class, $size, $monochrome)`
+    - [x] Support `'openai'`, `'chatgpt'`, `'claude'`, `'anthropic'`, `'gemini'`, `'google'`, `'perplexity'`, `'youtube'`
+    - [x] PHP syntax lint check passed (0 syntax errors)
 
-### Phase 3: Verification & Regression Testing
-- [ ] Run automated PHP test suite (`scripts/test_content_mcp_api_full.php`) validating REST CRUD, MCP tools, and AJAX actions.
-- [ ] Strict Rule 3 Privacy verification (zero owner name).
-- [ ] Monochrome Design System & Shopify Docked Panel standard compliance.
+- [x] **Subtask 3: Update `.cora-platform-stack` in Workspace Header (Desktop & Mobile)**
+  - Status: Completed
+  - Target: `app/public/wp-content/plugins/cora-workspace/includes/workspace-header.php`, `assets/css/admin-style.css`
+  - Checklist:
+    - [x] Replace custom SVGs in desktop `.cora-platform-stack` (lines 460-504) with official brand logos
+    - [x] Replace custom SVGs in mobile `.cora-platform-stack` (lines 540-562) with official brand logos
+    - [x] Standardize circular button containers (`bg-white dark:bg-zinc-800`, subtle border `border-zinc-200/90 dark:border-zinc-700/80`, smooth hover scale, and z-index elevation)
+
+- [x] **Subtask 4: Update Global Components Across Workspace**
+  - Status: Completed
+  - Target: `views/view-mcp.php`, `views/view-canvas.php`, `views/view-settings-suite.php`, `admin-dashboard.php`
+  - Checklist:
+    - [x] `view-mcp.php`: Update Model Selector dropdown (Gemini, Claude, OpenAI) with official logos
+    - [x] `view-mcp.php`: Update "Connect AI Assistant" cards and modal JS (ChatGPT, Claude, Gemini) with official logos
+    - [x] `view-canvas.php`: Update MCP client connection cards and connect modal JS with official logos
+    - [x] `view-settings-suite.php`: Update Model Cards Grid (Gemini, Claude, ChatGPT 4o) with official logos
+    - [x] `admin-dashboard.php`: Replace emojis (`⚡`, `✦`, `⚙️`) in sidebar popover active AI model selector with official SVG logos
+    - [x] `admin-dashboard.php`: Add official SVG logos to Settings drawer active model radios
+
+- [x] **Subtask 5: Verification & Quality Assurance**
+  - Status: Completed
+  - Checklist:
+    - [x] PHP syntax check on all modified PHP files (`php -l` on all files: 0 errors)
+    - [x] TypeScript & Next.js production build verification (0 errors)
+    - [x] Rule 3 privacy compliance audit (zero owner name occurrences)
+    - [x] Rule 8 zero-regression verification across neighboring modules

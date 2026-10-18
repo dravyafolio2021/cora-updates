@@ -44,7 +44,10 @@ class Cora_MCP_Loader {
 
         // 1. Universal MCP endpoints
         register_rest_route( 'cora/v1', '/mcp', $mcp_args );
+        register_rest_route( 'cora/v1', '/mcp/sse', $mcp_args );
+        register_rest_route( 'cora-mcp/v1', '', $mcp_args );
         register_rest_route( 'cora-mcp/v1', '/endpoint', $mcp_args );
+        register_rest_route( 'cora-mcp/v1', '/sse', $mcp_args );
 
         // 2. OAuth 2.1 endpoints
         register_rest_route( 'cora/v1', '/oauth/authorize', array(

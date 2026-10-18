@@ -9,8 +9,12 @@
 
 | Module Name | Branch Name | Status | Main Touchpoint Files | Assigned Agent / Chat |
 |---|---|---|---|---|
-| **Core Platform** | `main` | 🟢 Stable (v4.9.389) | `cora-workspace.php`, `admin-dashboard.php` | Main Orchestrator |
+| **Core Platform** | `main` | 🟢 Stable (v4.9.401) | `cora-workspace.php`, `admin-dashboard.php` | Main Orchestrator |
 <!-- MODULE_ROWS_START -->
+| **WhatsApp Cloud API Zero-Cost CSW Queue & Inbound Bot Engine** | `main` | 🟢 100% Production Ready (v4.9.401) | `includes/class-cora-whatsapp-gateway.php`, `cora-workspace.php`, `scripts/test_whatsapp_csw_automation.php` | WhatsApp & Messaging Agent |
+| **Super Admin Integrations & WhatsApp Telemetry Hub** | `main` | 🟢 100% Production Ready (v4.9.397) | `views/view-super-admin.php`, `cora-workspace.php` | Super Admin & Telemetry Agent |
+| **Workspace Content REST API & Canonical 9-Tool MCP Suite** | `main` | 🟢 100% Production Ready (v4.9.391) | `includes/class-cora-workspace-content-rest-controller.php`, `includes/mcp/class-cora-mcp-tool-registry.php`, `scripts/test_content_suite_e2e.php` | Content & API Architecture Agent |
+| **Workspace Developer API & MCP Gateway Docked Drawer** | `main` | 🟢 100% Production Ready (v4.9.391) | `includes/partials/workspace-developer-gateway-drawer.php`, `includes/workspace-header.php` | Developer Experience & UI Agent |
 | **Google Business Profile & Google Maps AI Autopilot** | `main` | 🟢 100% Production Ready (v4.9.389) | `views/view-google-profile.php`, `cora-workspace.php`, `assets/js/admin-script.js`, `tests/e2e/test-gbp-management.spec.ts` | Local SEO & Integrations Agent |
 | **Plugins in App Module & Open API / Dynamic MCP Architecture** | `main` | 🟢 100% Production Ready (v4.9.387) | `includes/class-cora-plugins-skills-engine.php`, `views/view-feature-hub.php`, `includes/mcp/class-cora-mcp-tool-registry.php`, `admin-dashboard.php`, `cora-workspace.php` | AI & Extensibility Architect |
 | **Enterprise Client Onboarding Suite & Portal Role Isolation** | `main` | 🟢 100% Production Ready (v4.9.387) | `views/view-clients.php`, `public-client-portal.php`, `cora-workspace.php`, `scripts/verify_client_onboarding_features.php` | Client Operations & Security Agent |
@@ -159,16 +163,63 @@
 - `app/public/wp-content/plugins/cora-workspace/includes/class-cora-plugins-skills-engine.php` (Dynamic Plugins, Modules & AI Skills Runtime Engine, Isolated Custom DB Schemas, REST Endpoints, API Keys, Dynamic MCP 2.0 Integration)
 - `app/public/wp-content/plugins/cora-workspace/views/view-calendar.php` (Interactive Workspace Scheduling Calendar, Month/Week/Day Views, Google Calendar Two-Way Sync, Google Meet 3-4-3 Format Standardization)
 - `app/public/wp-content/plugins/cora-workspace/views/view-google-profile.php` (Google Business Profile & Google Maps AI Autopilot Hub, Multi-Branch Locations, Live Sync, AI Review Replies, 7-Day Hours, Maps Post Publisher, Local SEO 3-Pack Rank Tracker)
+- `app/public/wp-content/plugins/cora-workspace/includes/class-cora-whatsapp-gateway.php` (WhatsApp Cloud API Gateway v22.0, Zero-Cost 24h CSW Queue, Inbound Bot Router, 3/hr Rate Limiter, Executive PDF Report Delivery)
+- `app/public/wp-content/plugins/cora-workspace/includes/class-cora-workspace-content-rest-controller.php` (Workspace Content REST API, 11-Point Algorithmic SEO & GEO Audit Engine, Full CRUD, Batch Publishing, Keyword Opportunity Engine)
+- `app/public/wp-content/plugins/cora-workspace/includes/partials/workspace-developer-gateway-drawer.php` (Workspace Developer API & MCP Gateway Docked Drawer, Rule 15 SOP Compliant, API Key Generation, Claude/Cursor Config, Live Sandbox)
 
 ---
 
 ## 3. Branch Activity & Progress Log
 
 ### `main` (Production Base)
-- **Platform Version**: `4.9.389`
-- **Health**: 100% Operational & Clean Slate Base (HEAD commit `8b1cf4891` on `main`). Google Business Profile & Google Maps AI Autopilot (`views/view-google-profile.php`, `tests/e2e/test-gbp-management.spec.ts`), Google 0-quota proactive advisory card and 1-click sandbox simulation fallback (`assets/js/admin-script.js`), Dynamic Plugins & Skills Engine (`class-cora-plugins-skills-engine.php`), Enterprise Client Onboarding Suite (`views/view-clients.php`), Interactive Workspace Calendar (`views/view-calendar.php`), Collapsible Sidebar Navigation Groups (`admin-dashboard.php`), and Mobile Sticky Sub-tabs verified ✅.
+- **Platform Version**: `4.9.401`
+- **Health**: 100% Operational & Clean Slate Base (HEAD commit `846f8d0b9` on `main`). WhatsApp Cloud API Zero-Cost CSW Queue & Inbound Bot Engine (`includes/class-cora-whatsapp-gateway.php`, `scripts/test_whatsapp_csw_automation.php`), Super Admin Integrations & WhatsApp Telemetry Hub (`views/view-super-admin.php`), Workspace Content REST API & Canonical 9-Tool MCP Suite (`includes/class-cora-workspace-content-rest-controller.php`, `scripts/test_content_suite_e2e.php`), Workspace Developer API & MCP Gateway Docked Drawer (`includes/partials/workspace-developer-gateway-drawer.php`), Google Business Profile & Google Maps AI Autopilot (`views/view-google-profile.php`), and Enterprise Client Onboarding Suite verified ✅.
 
 <!-- BRANCH_LOGS_START -->
+### `feat/whatsapp-cloud-api-csw-engine` (Merged to Main)
+- **Status**: 🟢 Complete & Active (v4.9.398 - v4.9.401) — WhatsApp Cloud API Zero-Cost CSW Queue, Inbound Bot Engine, Rate Limiting & Executive PDF Report Delivery:
+  - Implemented 24-Hour Customer Service Window (CSW) lifecycle management inside `includes/class-cora-whatsapp-gateway.php` utilizing Meta Graph API v22.0.
+  - Zero-Cost Smart Queueing: When outside the 24-hour window, outgoing notifications are automatically queued instead of triggering paid utility templates, preserving $0.00 billed Meta tier charges.
+  - Inbound Bot Engine: Interactive webhook router listening for incoming user messages (`[1] Leads`, `[2] Financials`, `[3] Staff Attendance`, `[4] Daily Briefing`, `[5] Gateway Health`, `[Menu]`) automatically refreshing the 24-hour CSW session window and immediately flushing pending queued updates.
+  - Automated 3/hr Rolling Rate Limiter (`can_send_automated_notification`, `record_automated_dispatch`) preventing alert fatigue.
+  - Smart Lead Batching: Groups high-velocity inbound form leads into scheduled digests.
+  - 1-Click Cryptographic Tokenized Executive PDF Report Delivery (`cora_get_24h_report_url`) delivering secure financial and operational daily reports via WhatsApp document messages without raw long links.
+  - Official Registered Business Phone Number (`+91 70153 17965`) synchronization, WhatsApp Business Profile DP verification, and deep-link activation URLs.
+  - Automated test suite `scripts/test_whatsapp_csw_automation.php` covering profile verification, CSW window calculations, outbound session messages, zero-cost queueing, inbound bot commands, and cron maintenance.
+- **Main Touchpoint**: `includes/class-cora-whatsapp-gateway.php`, `cora-workspace.php`, `scripts/test_whatsapp_csw_automation.php`.
+
+### `feat/super-admin-whatsapp-telemetry` (Merged to Main)
+- **Status**: 🟢 Complete & Active (v4.9.397) — Super Admin Integrations & WhatsApp Telemetry Hub:
+  - Built dedicated `#tab-super-integrations` within `views/view-super-admin.php` offering complete governance over Meta Cloud API connectivity.
+  - Real-Time 24-Hour CSW Window Monitor: Live visual countdown timers showing time remaining per active workspace recipient with color-coded status badges.
+  - Zero Billed Charges Verification: Real-time cost meter tracking $0.00 Meta free tier service conversations and alert counts.
+  - Verified Meta Graph API connectivity indicators (WABA ID `1735159218190730`, Phone Number ID `613919938474268`, Verified Profile badge, and High Quality Green tier rating).
+  - Manual Simulation Test Suite: Integrated controls for manual test push triggers, 24h session renewal simulations, sync with Meta Graph API (`syncMetaGraphApi`), and delivery webhook status logs.
+- **Main Touchpoint**: `views/view-super-admin.php`, `cora-workspace.php`.
+
+### `feat/workspace-content-rest-api-mcp` (Merged to Main)
+- **Status**: 🟢 Complete & Active (v4.9.391) — Workspace Content REST API & Canonical 9-Tool MCP Suite:
+  - Engineered standalone REST controller `includes/class-cora-workspace-content-rest-controller.php` mounted under `/wp-json/cora/v1/content` with strict tenant isolation (`cora_assert_agency_context`).
+  - Full CRUD & Batch Lifecycle: Endpoints for listing, single article inspection with block metadata, creation, updates, trashing, single publish/unpublish, and batch status transitions (`/content/batch`).
+  - 11-Point Algorithmic SEO & GEO Audit Engine (`/content/{id}/seo-audit`): Automated evaluation checking title length, meta description, heading structure (H1/H2/H3), keyword density, GEO semantic entities, answer-first paragraphs, image alt text, reading ease, schema tags, URL slug structure, and link architecture.
+  - Strategic Opportunity Engine (`/content/opportunities` and `/content/opportunities/seed`): Discovers and seeds high-impact topic clusters and keywords for organic growth.
+  - Canonical 9-Tool MCP Suite in `includes/mcp/class-cora-mcp-tool-registry.php`: `cora_list_articles`, `cora_get_article`, `cora_create_article`, `cora_update_article`, `cora_delete_article`, `cora_publish_article`, `cora_unpublish_article`, `cora_bulk_update_articles`, `cora_audit_article_seo` (plus opportunity discovery and outline generator).
+  - Dual Authentication Support: Seamless authorization via Workspace API Keys (`cora_ws_live_...`) or WordPress session nonces.
+  - Comprehensive end-to-end test runner `scripts/test_content_suite_e2e.php` validating API key auth, REST CRUD, 11-point audit, and MCP execution.
+- **Main Touchpoint**: `includes/class-cora-workspace-content-rest-controller.php`, `includes/mcp/class-cora-mcp-tool-registry.php`, `scripts/test_content_suite_e2e.php`.
+
+### `feat/workspace-developer-gateway-drawer` (Merged to Main)
+- **Status**: 🟢 Complete & Active (v4.9.391) — Workspace Developer API & MCP Gateway Docked Drawer:
+  - Implemented docked drawer panel in `includes/partials/workspace-developer-gateway-drawer.php` accessible across workspace views via global header trigger (`#cora-open-dev-gateway-btn`).
+  - Strict Rule 15 SOP Compliance: Universal bottom-slide motion (`translateY(100%)` to `translateY(0)`), docked directly beneath global header (`top: 52px; height: calc(100vh - 52px)`), responsive available space sizing, zero backdrop / zero dimming overlay, and Escape key dismissal.
+  - 5-Tab Level 01 Segmented Pill Control:
+    1. *Workspace Keys*: Multi-scope key generation (`content:read`, `content:write`, `crm:read`, `crm:write`, `media:read`, `workspace:read`) with one-time copyable secret disclosure.
+    2. *Connect AI Agent*: 1-click configuration snippets for Claude Desktop (`claude_desktop_config.json`) and Cursor IDE (`cursor-mcp.json`).
+    3. *Universal Tools*: Interactive registry matrix detailing all available MCP tools, parameter schemas, and scope requirements.
+    4. *REST Endpoints*: Interactive OpenAPI / REST route reference with curl and fetch command generators.
+    5. *Live Sandbox*: In-browser execution runner for issuing test requests and inspecting JSON-RPC responses.
+  - Dedicated maximize/restore toggle button (`#cora-ws-dev-maximize-btn`) expanding panel to full viewport for deep developer workflows.
+- **Main Touchpoint**: `includes/partials/workspace-developer-gateway-drawer.php`, `includes/workspace-header.php`, `cora-workspace.php`.
 ### `feat/google-business-profile-autopilot` (Merged to Main)
 - **Status**: 🟢 Complete & Active (v4.9.388 - v4.9.389) — Google Business Profile & Google Maps AI Autopilot:
   - Overhauled `views/view-google-profile.php` from waitlist placeholder into production multi-state hub (State A: Unconnected Hero with OAuth & Places text search, State B: Multi-Branch Location Picker, State C: Connected Hub with 4 live KPI metrics).
@@ -374,6 +425,13 @@
 
 | Version | Date | Key Changes |
 | :--- | :--- | :--- |
+| **v4.9.401**<br>`CORA-1250` | Oct 2026 | **WhatsApp Rate Limiting, Lead Batching & Tokenized Executive PDF Report**: Enforced 3/hr rolling rate limit per recipient (`can_send_automated_notification`), smart lead batching for inbound form submissions, elimination of raw links, and 1-click cryptographic tokenized 24h Executive PDF reports via WhatsApp document delivery (`class-cora-whatsapp-gateway.php`, `cora_get_24h_report_url`). |
+| **v4.9.400**<br>`CORA-1249` | Oct 2026 | **Interactive WhatsApp Quick-Reply & Media Cards**: Added structured quick-reply buttons and image card helpers for rich inbound bot interactions. |
+| **v4.9.399**<br>`CORA-1248` | Oct 2026 | **WhatsApp Zero-Cost CSW Queue & Inbound Bot Engine**: Meta Graph API v22.0 integration, zero-cost 24h Customer Service Window queueing, inbound bot menu router (`[1]` to `[5]`), official DP synchronization, and automated session renewal. |
+| **v4.9.397**<br>`CORA-1246` | Oct 2026 | **Super Admin Integrations & WhatsApp Telemetry Hub**: Dedicated Super Admin subtab (`#tab-super-integrations`) featuring real-time 24h window countdown timers, $0.00 Meta billed charges monitor, WABA connection health, and manual simulation test suite. |
+| **v4.9.395**<br>`CORA-1244` | Oct 2026 | **WhatsApp User Mobile Routing & CSW Window Checks**: Strict routing of notifications to recipient profile mobile number and pre-send 24h session window assertions. |
+| **v4.9.393**<br>`CORA-1243` | Oct 2026 | **WhatsApp Official Business Number Synchronization**: Synchronized registered business line (`+91 70153 17965`) and updated deep-link activation routes. |
+| **v4.9.391**<br>`CORA-1242` | Oct 2026 | **Workspace Content REST API & Developer Gateway Docked Drawer**: Complete REST controller `/wp-json/cora/v1/content`, 11-point algorithmic SEO/GEO audit engine, canonical 9-tool MCP suite, and Rule 15 SOP compliant docked Developer API drawer with API key management and AI agent connectors. |
 | **v4.9.389**<br>`CORA-1241` | Oct 2026 | **Google Business Profile Quota Error Advisory & Sandbox Fallback**: Enhanced `coraGbpLoadAccounts` in `admin-script.js` to proactively detect Google's 0-QPM default quota limit (HTTP 429 `RESOURCE_EXHAUSTED` for `mybusinessaccountmanagement.googleapis.com`), rendering a high-clarity monochromatic callout card with Google access form link and 1-click "Test in Sandbox Mode Now" fallback. |
 | **v4.9.388**<br>`CORA-1240` | Oct 2026 | **Google Business Profile & Google Maps AI Autopilot**: Complete Google Business Profile integration (`/workspace/gbp`, `views/view-google-profile.php`) featuring 3 reactive states (OAuth connect hero, multi-location selector, connected management hub), Places API search, tone-driven AI review reply copilot (warm, professional, concise, apology), Maps announcement & update post publisher, 7-day business operating hours manager, Local SEO 3-Pack rank inspector, and right-sliding credentials drawer sheet. |
 | **v4.9.387**<br>`CORA-1239` | Oct 2026 | **Dynamic Plugins & AI Skills Runtime Engine**: Self-contained extensibility framework (`includes/class-cora-plugins-skills-engine.php`) with isolated schema tables, dynamic MCP 2.0 tool registry, REST gateway (`/wp-json/cora-plugins/v1/`), 3-tab segmented Feature Hub view (`views/view-feature-hub.php`), and enterprise API key generation. |
@@ -501,4 +559,4 @@
 
 ---
 
-*Cora Platform Release Manifest v4.9.389 — Architecture & Engineering Team.*
+*Cora Platform Release Manifest v4.9.401 — Architecture & Engineering Team.*

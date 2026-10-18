@@ -216,6 +216,7 @@ class Cora_WhatsApp_Gateway {
                 'verified_at'            => current_time( 'mysql' ),
             );
             set_transient( 'cora_wa_connection_status', $data, 300 );
+            $this->ensure_waba_webhook_subscribed();
             return array(
                 'success' => true,
                 'data'    => $data,
@@ -228,6 +229,34 @@ class Cora_WhatsApp_Gateway {
             'error'   => $error_msg,
             'raw'     => $json,
         );
+    }
+
+    /**
+     * Ensure WhatsApp Business Account is subscribed to this App's Webhooks
+     *
+     * @return bool
+     */
+    public function ensure_waba_webhook_subscribed() {
+        $settings = $this->get_settings();
+        if ( empty( $settings['waba_id'] ) || empty( $settings['access_token'] ) ) {
+            return false;
+        }
+
+        $endpoint = self::GRAPH_API_BASE . '/' . self::GRAPH_API_VERSION . '/' . rawurlencode( $settings['waba_id'] ) . '/subscribed_apps';
+        $response = wp_remote_post( $endpoint, array(
+            'headers' => array(
+                'Authorization' => 'Bearer ' . $settings['access_token'],
+                'Content-Type'  => 'application/json',
+            ),
+            'timeout' => 15,
+        ) );
+
+        if ( is_wp_error( $response ) ) {
+            return false;
+        }
+
+        $code = wp_remote_retrieve_response_code( $response );
+        return ( $code >= 200 && $code < 300 );
     }
 
     /**
@@ -621,16 +650,37 @@ class Cora_WhatsApp_Gateway {
      *
      * @param string $phone
      * @param string $raw_text
+     * @param string $button_id Optional interactive button id from webhook
      * @return array
      */
-    public function handle_inbound_query( $phone, $raw_text ) {
+    public function handle_inbound_query( $phone, $raw_text, $button_id = '' ) {
         $clean_phone = $this->clean_phone_number( $phone );
         if ( empty( $clean_phone ) ) {
             return array( 'success' => false, 'error' => 'Invalid phone' );
         }
 
-        // 1. If user has pending updates, flush them first into this newly activated CSW
-        if ( $this->has_pending_updates( $clean_phone ) ) {
+        $text = strtolower( trim( (string) $raw_text ) );
+        $btn  = strtolower( trim( (string) $button_id ) );
+        $workspace = get_bloginfo( 'name' ) ?: 'Cora Workspace';
+
+        // Check if this is an explicit command or button action
+        $is_report_cmd     = ( $text === '4' || strpos( $text, 'report' ) !== false || strpos( $text, 'brief' ) !== false || strpos( $text, 'digest' ) !== false || strpos( $text, 'full report' ) !== false || strpos( $btn, 'report' ) !== false );
+        $is_dashboard_cmd  = ( strpos( $text, 'dash' ) !== false || strpos( $text, 'open dashboard' ) !== false || strpos( $text, 'workspace' ) !== false || strpos( $text, 'open workspace' ) !== false || strpos( $text, 'portal' ) !== false || strpos( $btn, 'dash' ) !== false || strpos( $btn, 'workspace' ) !== false );
+        $is_leads_cmd      = ( $text === '1' || strpos( $text, 'lead' ) !== false || strpos( $text, 'crm' ) !== false || strpos( $text, 'inquir' ) !== false || strpos( $btn, 'lead' ) !== false || strpos( $text, 'client' ) !== false );
+        $is_revenue_cmd    = ( $text === '2' || strpos( $text, 'rev' ) !== false || strpos( $text, 'finance' ) !== false || strpos( $text, 'payment' ) !== false || strpos( $text, 'invoice' ) !== false || strpos( $text, 'receipt' ) !== false || strpos( $btn, 'rev' ) !== false || strpos( $btn, 'receipt' ) !== false );
+        $is_attendance_cmd = ( $text === '3' || strpos( $text, 'att' ) !== false || strpos( $text, 'team' ) !== false || strpos( $text, 'punch' ) !== false || strpos( $text, 'staff' ) !== false || strpos( $text, 'roster' ) !== false || strpos( $btn, 'att' ) !== false );
+        $is_status_cmd     = ( $text === '5' || strpos( $text, 'status' ) !== false || strpos( $text, 'window' ) !== false || strpos( $text, 'quota' ) !== false || strpos( $btn, 'status' ) !== false );
+        $is_booking_cmd    = ( strpos( $text, 'book' ) !== false || strpos( $text, 'accept' ) !== false || strpos( $btn, 'book' ) !== false );
+        $is_details_cmd    = ( strpos( $text, 'detail' ) !== false || strpos( $btn, 'detail' ) !== false );
+
+        $is_explicit_action = $is_report_cmd || $is_dashboard_cmd || $is_leads_cmd || $is_revenue_cmd || $is_attendance_cmd || $is_status_cmd || $is_booking_cmd || $is_details_cmd;
+
+        // If the user triggered an explicit command or tapped an interactive button:
+        // Clear any stale pending queue silently so backlog digests NEVER hijack or block their immediate command!
+        if ( $is_explicit_action ) {
+            $this->clear_pending_updates( $clean_phone );
+        } elseif ( $this->has_pending_updates( $clean_phone ) ) {
+            // Only flush queued backlog if it was a generic wakeup message (e.g. "Hi", "Hello", "Activate")
             $flush = $this->flush_pending_updates( $clean_phone );
             return array(
                 'success' => true,
@@ -639,11 +689,39 @@ class Cora_WhatsApp_Gateway {
             );
         }
 
-        $text = strtolower( trim( $raw_text ) );
-        $workspace = get_bloginfo( 'name' ) ?: 'Cora Workspace';
+        // 1. Report / Briefing / View Full Report Command
+        if ( $is_report_cmd ) {
+            return $this->send_daily_briefing( $clean_phone, false );
+        }
 
-        // 2. Command: 1 or Leads / CRM / Inquiry
-        if ( $text === '1' || strpos( $text, 'lead' ) !== false || strpos( $text, 'crm' ) !== false || strpos( $text, 'inquir' ) !== false ) {
+        // 2. Dashboard / Open Workspace Command
+        if ( $is_dashboard_cmd ) {
+            $dash_url = home_url( '/workspace/dashboard' );
+            $reply = "*Workspace Dashboard Access*\n\n"
+                . "Tap below to launch your centralized workspace operations:\n\n"
+                . "👉 {$dash_url}\n\n"
+                . "• Team Attendance & Punch Roster\n"
+                . "• CRM Inquiries & Pipeline Tracking\n"
+                . "• Revenue Ledger & Document Vault\n\n"
+                . "Tap below to view full certified report or inspect leads.";
+
+            $res = $this->send_interactive_buttons(
+                $clean_phone,
+                $reply,
+                array( 'View Full Report', 'Recent Leads', 'Team Attendance' ),
+                "⚡ Cora AI • Workspace Console",
+                "Direct Mobile Access"
+            );
+
+            if ( empty( $res['success'] ) ) {
+                $res = $this->send_session_message( $clean_phone, "⚡ *{$workspace} • Dashboard*\n\n{$reply}" );
+            }
+
+            return $res;
+        }
+
+        // 3. Command: 1 or Leads / CRM / Inquiry
+        if ( $is_leads_cmd ) {
             global $wpdb;
             $leads_table = $wpdb->prefix . 'cora_leads';
             $leads = array();
@@ -690,8 +768,8 @@ class Cora_WhatsApp_Gateway {
             return $res;
         }
 
-        // 3. Command: 2 or Revenue / Financials / Payment / Invoice
-        if ( $text === '2' || strpos( $text, 'rev' ) !== false || strpos( $text, 'finance' ) !== false || strpos( $text, 'payment' ) !== false || strpos( $text, 'invoice' ) !== false ) {
+        // 4. Command: 2 or Revenue / Financials / Payment / Invoice
+        if ( $is_revenue_cmd ) {
             global $wpdb;
             $ledger_table = $wpdb->prefix . 'cora_ledger';
             $cleared = 0;
@@ -725,8 +803,8 @@ class Cora_WhatsApp_Gateway {
             return $res;
         }
 
-        // 4. Command: 3 or Attendance / Team / Punch / Staff
-        if ( $text === '3' || strpos( $text, 'att' ) !== false || strpos( $text, 'team' ) !== false || strpos( $text, 'punch' ) !== false || strpos( $text, 'staff' ) !== false ) {
+        // 5. Command: 3 or Attendance / Team / Punch / Staff
+        if ( $is_attendance_cmd ) {
             $logs = get_option( 'cora_workspace_attendance_logs', array() );
             if ( ! is_array( $logs ) ) {
                 $logs = array();
@@ -775,13 +853,51 @@ class Cora_WhatsApp_Gateway {
             return $res;
         }
 
-        // 5. Command: 4 or Briefing / Report / Digest / View Full Report
-        if ( $text === '4' || strpos( $text, 'brief' ) !== false || strpos( $text, 'report' ) !== false || strpos( $text, 'digest' ) !== false || strpos( $text, 'full report' ) !== false ) {
-            return $this->send_daily_briefing( $clean_phone );
+        // 6. Command: Booking Confirmed / Action
+        if ( $is_booking_cmd ) {
+            $reply = "*Booking & Inquiry Status*\n\n"
+                . "Client booking has been confirmed and verified in your workspace CRM.\n\n"
+                . "Tap below to inspect dashboard or view full operations report.";
+
+            $res = $this->send_interactive_buttons(
+                $clean_phone,
+                $reply,
+                array( 'View Full Report', 'Open Dashboard', 'Recent Leads' ),
+                "📅 Cora AI • Booking",
+                "Cora Workspace AI"
+            );
+
+            if ( empty( $res['success'] ) ) {
+                $res = $this->send_session_message( $clean_phone, "📅 *{$workspace} • Booking*\n\n{$reply}" );
+            }
+
+            return $res;
         }
 
-        // 6. Command: 5 or Status / Window / Quota
-        if ( $text === '5' || strpos( $text, 'status' ) !== false || strpos( $text, 'window' ) !== false || strpos( $text, 'quota' ) !== false ) {
+        // 7. Command: View Details
+        if ( $is_details_cmd ) {
+            $dash_url = home_url( '/workspace/dashboard' );
+            $reply = "*Workspace Detailed Operations*\n\n"
+                . "Full itemized details are accessible in your live workspace:\n👉 {$dash_url}\n\n"
+                . "Tap below to view full executive PDF report.";
+
+            $res = $this->send_interactive_buttons(
+                $clean_phone,
+                $reply,
+                array( 'View Full Report', 'Open Dashboard', 'Recent Leads' ),
+                "🔍 Cora AI • Operations",
+                "Cora Workspace AI"
+            );
+
+            if ( empty( $res['success'] ) ) {
+                $res = $this->send_session_message( $clean_phone, "🔍 *{$workspace}*\n\n{$reply}" );
+            }
+
+            return $res;
+        }
+
+        // 8. Command: 5 or Status / Window / Quota
+        if ( $is_status_cmd ) {
             $win = $this->get_session_window( $clean_phone );
             $rem = $win['remaining_human'] ?? 'Active';
             $hourly_sent = $this->get_hourly_dispatches_count( $clean_phone );
@@ -797,7 +913,7 @@ class Cora_WhatsApp_Gateway {
             $res = $this->send_interactive_buttons(
                 $clean_phone,
                 $reply,
-                array( 'Daily Report', 'Recent Leads', 'Main Menu' ),
+                array( 'View Full Report', 'Open Dashboard', 'Main Menu' ),
                 "⚙️ Cora AI • System Status",
                 "Cora Workspace AI"
             );
@@ -809,7 +925,7 @@ class Cora_WhatsApp_Gateway {
             return $res;
         }
 
-        // 7. Default: Interactive Menu & Greeting
+        // 9. Default: Interactive Menu & Greeting
         $win = $this->get_session_window( $clean_phone );
         $rem = $win['remaining_human'] ?? '24 Hours';
 
@@ -821,12 +937,13 @@ class Cora_WhatsApp_Gateway {
             . "2️⃣ *Revenue* — Financial overview\n"
             . "3️⃣ *Attendance* — Team check-ins & roster\n"
             . "4️⃣ *Report* — Certified daily operations PDF\n"
-            . "5️⃣ *Status* — Gateway health & quota";
+            . "5️⃣ *Dashboard* — Direct workspace access\n"
+            . "6️⃣ *Status* — Gateway health & quota";
 
         $res = $this->send_interactive_buttons(
             $clean_phone,
             $menu,
-            array( 'Recent Leads', 'Today Revenue', 'Daily Report' ),
+            array( 'View Full Report', 'Open Dashboard', 'Recent Leads' ),
             "⚡ Cora AI • Assistant",
             "Type a number or tap an action"
         );
@@ -1024,7 +1141,15 @@ class Cora_WhatsApp_Gateway {
         $action_buttons = array();
         $btn_list = array_slice( (array) $buttons, 0, 3 );
         foreach ( $btn_list as $idx => $b ) {
-            $id    = is_array( $b ) && ! empty( $b['id'] ) ? $b['id'] : 'btn_' . ( $idx + 1 );
+            if ( is_array( $b ) && ! empty( $b['id'] ) ) {
+                $id = sanitize_key( $b['id'] );
+            } else {
+                $slug = sanitize_title( (string) $b );
+                $id   = 'btn_' . substr( str_replace( '-', '_', $slug ), 0, 20 );
+            }
+            if ( empty( $id ) ) {
+                $id = 'btn_' . ( $idx + 1 );
+            }
             $title = is_array( $b ) && ! empty( $b['title'] ) ? $b['title'] : (string) $b;
             $title = mb_substr( trim( $title ), 0, 20 );
             $action_buttons[] = array(
@@ -1039,7 +1164,7 @@ class Cora_WhatsApp_Gateway {
         if ( empty( $action_buttons ) ) {
             $action_buttons[] = array(
                 'type'  => 'reply',
-                'reply' => array( 'id' => 'btn_view', 'title' => 'View Details' ),
+                'reply' => array( 'id' => 'btn_view_details', 'title' => 'View Details' ),
             );
         }
 
@@ -1435,12 +1560,19 @@ class Cora_WhatsApp_Gateway {
      * Dispatch Daily Studio Operational Briefing via WhatsApp
      *
      * @param string $recipient_phone
+     * @param bool   $is_automated True if unsolicited broadcast, False if user query/button click
      * @return array
      */
-    public function send_daily_briefing( $recipient_phone ) {
+    public function send_daily_briefing( $recipient_phone, $is_automated = true ) {
         $clean_to = $this->clean_phone_number( $recipient_phone );
         if ( empty( $clean_to ) ) {
             return array( 'success' => false, 'error' => 'Invalid recipient phone.' );
+        }
+
+        // Strict rate limit applies ONLY to unsolicited background automated pushes, NEVER user queries!
+        if ( $is_automated && ! $this->can_send_automated_message( $clean_to ) ) {
+            $this->queue_pending_update( $clean_to, 'Daily Briefing', '24h operations briefing', home_url( '/workspace/dashboard' ), 'Executive Briefing' );
+            return array( 'success' => true, 'rate_limited' => true, 'queued' => true );
         }
 
         $workspace = get_bloginfo( 'name' ) ?: 'Cora Workspace';
@@ -1486,7 +1618,7 @@ class Cora_WhatsApp_Gateway {
             $res = $this->send_interactive_buttons(
                 $clean_to,
                 $body,
-                array( 'Recent Leads', 'Today Revenue', 'Team Attendance' ),
+                array( 'Open Dashboard', 'Recent Leads', 'Today Revenue' ),
                 "📊 Cora AI • Executive Briefing",
                 "Certified A4 PDF Report Available"
             );
@@ -1495,7 +1627,7 @@ class Cora_WhatsApp_Gateway {
                 $res = $this->send_session_message( $clean_to, "📊 *{$workspace} • Executive Briefing*\n\n{$body}" );
             }
 
-            if ( ! empty( $res['success'] ) ) {
+            if ( ! empty( $res['success'] ) && $is_automated ) {
                 $this->record_automated_message_sent( $clean_to );
             } elseif ( ! empty( $res['raw']['error']['code'] ) && 131047 === (int) $res['raw']['error']['code'] ) {
                 $this->queue_pending_update( $clean_to, 'Daily Briefing', $body, $report_url, 'Briefing' );

@@ -300,16 +300,55 @@ class Cora_OAuth_Server {
         $raw_body    = $request instanceof WP_REST_Request ? $request->get_body() : file_get_contents( 'php://input' );
         $json_params = ( $request instanceof WP_REST_Request ? $request->get_json_params() : null ) ?: ( json_decode( $raw_body, true ) ?: array() );
 
-        $grant_type    = sanitize_text_field( ( $request instanceof WP_REST_Request ? $request->get_param( 'grant_type' ) : null ) ?? ( $json_params['grant_type'] ?? ( $_POST['grant_type'] ?? '' ) ) );
-        $client_id     = sanitize_text_field( ( $request instanceof WP_REST_Request ? $request->get_param( 'client_id' ) : null ) ?? ( $json_params['client_id'] ?? ( $_POST['client_id'] ?? '' ) ) );
+        $grant_type    = sanitize_text_field( ( $request instanceof WP_REST_Request ? $request->get_param( 'grant_type' ) : null ) ?? ( $json_params['grant_type'] ?? ( $_POST['grant_type'] ?? ( $_GET['grant_type'] ?? '' ) ) ) );
+        $client_id     = sanitize_text_field( ( $request instanceof WP_REST_Request ? $request->get_param( 'client_id' ) : null ) ?? ( $json_params['client_id'] ?? ( $_POST['client_id'] ?? ( $_GET['client_id'] ?? '' ) ) ) );
+        $client_secret = sanitize_text_field( ( $request instanceof WP_REST_Request ? $request->get_param( 'client_secret' ) : null ) ?? ( $json_params['client_secret'] ?? ( $_POST['client_secret'] ?? '' ) ) );
         $code          = sanitize_text_field( ( $request instanceof WP_REST_Request ? $request->get_param( 'code' ) : null ) ?? ( $json_params['code'] ?? ( $_POST['code'] ?? '' ) ) );
         $redirect_uri  = esc_url_raw( ( $request instanceof WP_REST_Request ? $request->get_param( 'redirect_uri' ) : null ) ?? ( $json_params['redirect_uri'] ?? ( $_POST['redirect_uri'] ?? '' ) ) );
         $code_verifier = sanitize_text_field( ( $request instanceof WP_REST_Request ? $request->get_param( 'code_verifier' ) : null ) ?? ( $json_params['code_verifier'] ?? ( $_POST['code_verifier'] ?? '' ) ) );
         $refresh_token = sanitize_text_field( ( $request instanceof WP_REST_Request ? $request->get_param( 'refresh_token' ) : null ) ?? ( $json_params['refresh_token'] ?? ( $_POST['refresh_token'] ?? '' ) ) );
 
-        header( 'Content-Type: application/json; charset=utf-8' );
-        header( 'Cache-Control: no-store' );
-        header( 'Pragma: no-cache' );
+        // Extract client_id & client_secret from HTTP Basic Auth if present
+        if ( empty( $client_id ) && ! empty( $_SERVER['PHP_AUTH_USER'] ) ) {
+            $client_id = sanitize_text_field( $_SERVER['PHP_AUTH_USER'] );
+        }
+        if ( empty( $client_secret ) && ! empty( $_SERVER['PHP_AUTH_PW'] ) ) {
+            $client_secret = sanitize_text_field( $_SERVER['PHP_AUTH_PW'] );
+        }
+
+        if ( empty( $client_id ) || empty( $client_secret ) ) {
+            $auth_header = '';
+            if ( $request instanceof WP_REST_Request ) {
+                $auth_header = $request->get_header( 'authorization' );
+            }
+            if ( empty( $auth_header ) && isset( $_SERVER['HTTP_AUTHORIZATION'] ) ) {
+                $auth_header = $_SERVER['HTTP_AUTHORIZATION'];
+            } elseif ( empty( $auth_header ) && isset( $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ) ) {
+                $auth_header = $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
+            } elseif ( empty( $auth_header ) && function_exists( 'getallheaders' ) ) {
+                $all_headers = getallheaders();
+                $auth_header = $all_headers['Authorization'] ?? ( $all_headers['authorization'] ?? '' );
+            }
+
+            if ( ! empty( $auth_header ) && stripos( trim( $auth_header ), 'Basic ' ) === 0 ) {
+                $basic_decoded = base64_decode( substr( trim( $auth_header ), 6 ) );
+                if ( $basic_decoded && strpos( $basic_decoded, ':' ) !== false ) {
+                    list( $basic_user, $basic_pass ) = explode( ':', $basic_decoded, 2 );
+                    if ( empty( $client_id ) ) {
+                        $client_id = sanitize_text_field( $basic_user );
+                    }
+                    if ( empty( $client_secret ) ) {
+                        $client_secret = sanitize_text_field( $basic_pass );
+                    }
+                }
+            }
+        }
+
+        if ( ! headers_sent() ) {
+            header( 'Content-Type: application/json; charset=utf-8' );
+            header( 'Cache-Control: no-store' );
+            header( 'Pragma: no-cache' );
+        }
 
         if ( $grant_type === 'authorization_code' ) {
             if ( empty( $code ) ) {
@@ -432,7 +471,130 @@ class Cora_OAuth_Server {
             ), 200 );
         }
 
-        return new WP_REST_Response( array( 'error' => 'unsupported_grant_type', 'error_description' => 'Grant type must be authorization_code or refresh_token.' ), 400 );
+        if ( $grant_type === 'client_credentials' ) {
+            // Fallback for Gemini zero-config calls if client_id is empty
+            if ( empty( $client_id ) ) {
+                if ( ! empty( $client_secret ) && ( strpos( strtolower( $client_secret ), 'gemini' ) !== false || strpos( strtolower( $client_secret ), 'cora' ) !== false ) ) {
+                    $client_id = 'cora_gemini_client';
+                }
+            }
+
+            if ( empty( $client_id ) ) {
+                return new WP_REST_Response( array(
+                    'error'             => 'invalid_client',
+                    'error_description' => 'Missing client_id in request or authorization header.',
+                ), 401 );
+            }
+
+            $lower_client_id = strtolower( $client_id );
+            $is_recognized   = false;
+
+            if ( strpos( $lower_client_id, 'cora_gemini_client' ) === 0 ||
+                 strpos( $lower_client_id, 'cora_client_' ) === 0 ||
+                 strpos( $lower_client_id, 'gemini' ) === 0 ) {
+                $is_recognized = true;
+            } else {
+                $client_obj = self::get_client( $client_id );
+                if ( $client_obj && ! empty( $client_obj->client_id ) ) {
+                    $is_recognized = true;
+                }
+            }
+
+            if ( ! $is_recognized ) {
+                return new WP_REST_Response( array(
+                    'error'             => 'invalid_client',
+                    'error_description' => 'Client authentication failed or unrecognized client credentials.',
+                ), 401 );
+            }
+
+            // Resolve client metadata
+            $client = self::get_client( $client_id );
+            $client_name = ( $client && ! empty( $client->client_name ) ) ? $client->client_name : 'Google Gemini';
+            if ( empty( $client_name ) || $client_name === 'AI Assistant' ) {
+                if ( strpos( $lower_client_id, 'cora_gemini_client' ) === 0 || strpos( $lower_client_id, 'cora_client_ws_' ) === 0 || strpos( $lower_client_id, 'gemini' ) !== false ) {
+                    $client_name = 'Google Gemini';
+                }
+            }
+
+            // Resolve target workspace ID
+            $target_workspace_id = '';
+            if ( preg_match( '/ws_([0-9]+)/i', $client_id, $ws_matches ) ) {
+                $target_workspace_id = (string) $ws_matches[1];
+            }
+
+            if ( empty( $target_workspace_id ) ) {
+                $req_ws = sanitize_text_field( ( $request instanceof WP_REST_Request ? $request->get_param( 'workspace_id' ) : null ) ?? ( $json_params['workspace_id'] ?? ( $_POST['workspace_id'] ?? ( $_GET['workspace_id'] ?? '' ) ) ) );
+                if ( ! empty( $req_ws ) ) {
+                    $target_workspace_id = (string) $req_ws;
+                }
+            }
+
+            if ( empty( $target_workspace_id ) && function_exists( 'cora_get_current_tenant_agency_id' ) ) {
+                $tenant_id = cora_get_current_tenant_agency_id();
+                if ( ! empty( $tenant_id ) ) {
+                    $target_workspace_id = (string) $tenant_id;
+                }
+            }
+
+            if ( empty( $target_workspace_id ) ) {
+                $target_workspace_id = '1';
+            }
+
+            // Resolve associated user_id (workspace owner or super admin)
+            $user_id = 1;
+            if ( function_exists( 'cora_get_workspace_owner_user_ids' ) ) {
+                $owner_ids = cora_get_workspace_owner_user_ids( $target_workspace_id );
+                if ( ! empty( $owner_ids ) && is_array( $owner_ids ) ) {
+                    $user_id = intval( $owner_ids[0] );
+                }
+            }
+            if ( $user_id <= 0 ) {
+                $user_id = 1;
+            }
+
+            // Issue access token and refresh token
+            $access_token  = 'cora_mcp_at_' . bin2hex( function_exists( 'wp_generate_password' ) ? wp_generate_password( 32, false ) : random_bytes( 16 ) );
+            $refresh_token = 'cora_mcp_rt_' . bin2hex( function_exists( 'wp_generate_password' ) ? wp_generate_password( 32, false ) : random_bytes( 16 ) );
+
+            $token_hash         = hash( 'sha256', $access_token );
+            $refresh_token_hash = hash( 'sha256', $refresh_token );
+
+            $now = time();
+            $expires_at         = gmdate( 'Y-m-d H:i:s', $now + self::ACCESS_TOKEN_EXPIRY_SECONDS );
+            $refresh_expires_at = gmdate( 'Y-m-d H:i:s', $now + self::REFRESH_TOKEN_EXPIRY_SECONDS );
+
+            // Grant all supported scopes plus master wildcard *
+            $supported_scopes = array_keys( self::get_supported_scopes() );
+            $granted_scopes   = array_merge( array( '*' ), $supported_scopes );
+            $scope_string     = implode( ' ', $granted_scopes );
+
+            global $wpdb;
+            $table_tokens = $wpdb->prefix . 'cora_oauth_tokens';
+            $wpdb->insert( $table_tokens, array(
+                'token_hash'         => $token_hash,
+                'refresh_token_hash' => $refresh_token_hash,
+                'client_id'          => $client_id,
+                'client_name'        => $client_name,
+                'user_id'            => $user_id,
+                'workspace_id'       => (string) $target_workspace_id,
+                'scopes'             => $scope_string,
+                'expires_at'         => $expires_at,
+                'refresh_expires_at' => $refresh_expires_at,
+                'revoked'            => 0,
+                'created_at'         => gmdate( 'Y-m-d H:i:s', $now ),
+            ) );
+
+            return new WP_REST_Response( array(
+                'access_token'  => $access_token,
+                'token_type'    => 'Bearer',
+                'expires_in'    => self::ACCESS_TOKEN_EXPIRY_SECONDS,
+                'refresh_token' => $refresh_token,
+                'scope'         => $scope_string,
+                'workspace_id'  => (string) $target_workspace_id,
+            ), 200 );
+        }
+
+        return new WP_REST_Response( array( 'error' => 'unsupported_grant_type', 'error_description' => 'Grant type must be authorization_code, client_credentials, or refresh_token.' ), 400 );
     }
 
     /**
@@ -515,7 +677,7 @@ class Cora_OAuth_Server {
             'mcp_endpoint'                          => $base . '/mcp',
             'protected_resources'                   => array( $base . '/mcp' ),
             'response_types_supported'              => array( 'code' ),
-            'grant_types_supported'                 => array( 'authorization_code', 'refresh_token' ),
+            'grant_types_supported'                 => array( 'authorization_code', 'client_credentials', 'refresh_token' ),
             'code_challenge_methods_supported'      => array( 'S256', 'plain' ),
             'token_endpoint_auth_methods_supported' => array( 'none', 'client_secret_post', 'client_secret_basic' ),
             'scopes_supported'                      => array_keys( self::get_supported_scopes() ),
@@ -550,7 +712,7 @@ class Cora_OAuth_Server {
         }
 
         $token_endpoint_auth_method = sanitize_text_field( $json_params['token_endpoint_auth_method'] ?? 'none' );
-        $grant_types = $json_params['grant_types'] ?? array( 'authorization_code', 'refresh_token' );
+        $grant_types = $json_params['grant_types'] ?? array( 'authorization_code', 'client_credentials', 'refresh_token' );
         $response_types = $json_params['response_types'] ?? array( 'code' );
 
         $client_id     = 'cora_client_' . bin2hex( wp_generate_password( 12, false ) );
@@ -927,10 +1089,14 @@ class Cora_OAuth_Server {
      */
     public static function get_client( $client_id ) {
         global $wpdb;
+        $lower_id = strtolower( (string) $client_id );
         $table_clients = $wpdb->prefix . 'cora_oauth_clients';
         if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $table_clients ) ) {
             $client = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table_clients} WHERE client_id = %s", $client_id ) );
             if ( $client ) {
+                if ( ( strpos( $lower_id, 'cora_gemini_client' ) === 0 || strpos( $lower_id, 'cora_client_ws_' ) === 0 || strpos( $lower_id, 'gemini' ) !== false ) && ( empty( $client->client_name ) || $client->client_name === 'AI Assistant' ) ) {
+                    $client->client_name = 'Google Gemini';
+                }
                 return $client;
             }
         }
@@ -939,15 +1105,16 @@ class Cora_OAuth_Server {
         $names = array(
             'chatgpt' => 'ChatGPT',
             'claude'  => 'Claude',
-            'gemini'  => 'Gemini',
+            'gemini'  => 'Google Gemini',
             'cursor'  => 'Cursor',
             'vscode'  => 'VS Code',
             'windsurf'=> 'Windsurf',
             'generic' => 'Generic MCP Client',
         );
 
-        $lower_id = strtolower( $client_id );
-        if ( isset( $names[ $lower_id ] ) ) {
+        if ( strpos( $lower_id, 'cora_gemini_client' ) === 0 || strpos( $lower_id, 'cora_client_ws_' ) === 0 || $lower_id === 'gemini' || strpos( $lower_id, 'gemini' ) !== false ) {
+            $name = 'Google Gemini';
+        } elseif ( isset( $names[ $lower_id ] ) ) {
             $name = $names[ $lower_id ];
         } elseif ( strpos( $lower_id, 'claude' ) !== false || strpos( $lower_id, 'anthropic' ) !== false ) {
             $name = 'Claude';

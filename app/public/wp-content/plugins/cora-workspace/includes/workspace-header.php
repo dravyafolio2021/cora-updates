@@ -11,6 +11,94 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
+if ( ! function_exists( 'cora_get_mcp_button_html' ) ) {
+    /**
+     * Standard Workspace Model Context Protocol (MCP) Living Button
+     * 
+     * Luminous frosted peach-to-lavender glassmorphism with warm orange typography
+     * and plug vector icon, matching platform design system benchmark.
+     */
+    function cora_get_mcp_button_html( $extra_class = '', $id = 'cora-btn-ai-mcp-gateway' ) {
+        $btn_id = ! empty( $id ) ? ' id="' . esc_attr( $id ) . '"' : '';
+        $classes = 'cora-ai-alive-btn select-none' . ( ! empty( $extra_class ) ? ' ' . esc_attr( $extra_class ) : '' );
+        
+        return '<button type="button"' . $btn_id . ' class="' . $classes . '" onclick="if(typeof coraOpenWorkspaceDeveloperGateway === \'function\') coraOpenWorkspaceDeveloperGateway();" title="Workspace Model Context Protocol (MCP) &amp; Developer Gateway">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="cora-ai-plug-icon shrink-0">
+                <path d="M12 22v-5"></path>
+                <path d="M9 8V2"></path>
+                <path d="M15 8V2"></path>
+                <path d="M18 8v5a6 6 0 0 1-12 0V8z"></path>
+            </svg>
+            <span class="whitespace-nowrap font-semibold">MCP</span>
+        </button>';
+    }
+}
+
+if ( ! function_exists( 'cora_get_ai_platform_official_logo' ) ) {
+    /**
+     * Return authentic, official brand vector SVG logo for top AI platforms.
+     *
+     * @param string $platform Platform slug: 'openai'|'chatgpt'|'claude'|'gemini'|'perplexity'|'youtube'
+     * @param string $class Extra CSS classes
+     * @param int $size Width and height in px
+     * @param bool $monochrome If true, render in currentColor instead of official brand color
+     * @return string Valid SVG markup
+     */
+    function cora_get_ai_platform_official_logo( $platform, $class = '', $size = 15, $monochrome = false ) {
+        $platform = strtolower( trim( $platform ) );
+        $w = intval( $size );
+        $h = intval( $size );
+        $cls = ! empty( $class ) ? ' ' . esc_attr( $class ) : '';
+
+        switch ( $platform ) {
+            case 'openai':
+            case 'chatgpt':
+                $color = $monochrome ? 'currentColor' : '#10A37F';
+                return '<svg viewBox="0 0 24 24" width="' . $w . '" height="' . $h . '" fill="none" class="shrink-0' . $cls . '">
+                    <path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1683a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4945 4.4947zm-9.6607-4.1254a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1408-1.6464zM2.3408 7.8956a4.485 4.485 0 0 1 2.3655-1.9728V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.0201 1.1683a.0757.0757 0 0 1-.071 0l-4.8303-2.7866A4.4992 4.4992 0 0 1 2.3408 7.872zm16.5963 3.8558L13.1038 8.364 15.1239 7.2a.0757.0757 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6772a.79.79 0 0 0-.4076-.6667zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.7759.7759 0 0 0-.7854 0L9.409 9.2297V6.8974a.0662.0662 0 0 1 .0284-.0615l4.8303-2.7866a4.4992 4.4992 0 0 1 6.6802 4.6608zm-12.6401 4.135l2.4633-1.4208 2.4633 1.4208v2.8417l-2.4633 1.4208-2.4633-1.4208zM7.65 1.761a4.4992 4.4992 0 0 1 5.371 1.055l-.142.0804-4.783 2.763a.79.79 0 0 0-.3927.6812v6.7417L5.683 11.914a.0757.0757 0 0 1-.038-.052V6.2794a4.4944 4.4944 0 0 1 2.005-4.5184z" fill="' . esc_attr( $color ) . '"/>
+                </svg>';
+
+            case 'claude':
+            case 'anthropic':
+                $color = $monochrome ? 'currentColor' : '#D97706';
+                return '<svg viewBox="0 0 24 24" width="' . $w . '" height="' . $h . '" fill="none" class="shrink-0' . $cls . '">
+                    <path d="m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z" fill="' . esc_attr( $color ) . '"/>
+                </svg>';
+
+            case 'gemini':
+            case 'google':
+                static $grad_idx = 0;
+                $grad_idx++;
+                $gid = 'cora-gemini-hdr-grad-' . $grad_idx;
+                return '<svg viewBox="0 0 24 24" width="' . $w . '" height="' . $h . '" fill="none" class="shrink-0' . $cls . '">
+                    <defs>
+                        <linearGradient id="' . $gid . '" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#4E82EE"/>
+                            <stop offset="50%" stop-color="#9B72CB"/>
+                            <stop offset="100%" stop-color="#D96570"/>
+                        </linearGradient>
+                    </defs>
+                    <path d="M12 0C12 6.627 6.627 12 0 12c6.627 0 12 5.373 12 12 0-6.627 5.373-12 12-12-6.627 0-12-5.373-12-12z" fill="' . ( $monochrome ? 'currentColor' : 'url(#' . $gid . ')' ) . '"/>
+                </svg>';
+
+            case 'perplexity':
+                $color = $monochrome ? 'currentColor' : '#20808D';
+                return '<svg viewBox="0 0 24 24" width="' . $w . '" height="' . $h . '" fill="none" class="shrink-0' . $cls . '">
+                    <path d="M22.3977 7.0896h-2.3106V.0676l-7.5094 6.3542V.1577h-1.1554v6.1966L4.4904 0v7.0896H1.6023v10.3976h2.8882V24l6.932-6.3591v6.2005h1.1554v-6.0469l6.9318 6.1807v-6.4879h2.8882V7.0896zm-3.4657-4.531v4.531h-5.355l5.355-4.531zm-13.2862.0676 4.8691 4.4634H5.6458V2.6262zM2.7576 16.332V8.245h7.8476l-6.1149 6.1147v1.9723H2.7576zm2.8882 5.0404v-3.8852h.0001v-2.6488l5.7763-5.7764v7.0111l-5.7764 5.2993zm12.7086.0248-5.7766-5.1509V9.0618l5.7766 5.7766v6.5588zm2.8882-5.0652h-1.733v-1.9723L13.3948 8.245h7.8478v8.087z" fill="' . esc_attr( $color ) . '"/>
+                </svg>';
+
+            case 'youtube':
+                return '<svg viewBox="0 0 24 24" width="' . $w . '" height="' . $h . '" fill="none" class="shrink-0' . $cls . '">
+                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z" fill="' . ( $monochrome ? 'currentColor' : '#FF0000' ) . '"/>
+                    <path d="M9.545 15.568V8.432L15.818 12l-6.273 3.568z" fill="' . ( $monochrome ? '#18181B' : '#FFFFFF' ) . '"/>
+                </svg>';
+
+            default:
+                return '<svg viewBox="0 0 24 24" width="' . $w . '" height="' . $h . '" fill="currentColor" class="shrink-0' . $cls . '"><circle cx="12" cy="12" r="10"/></svg>';
+        }
+    }
+}
+
 if ( ! function_exists( 'cora_render_workspace_header' ) ) {
 function cora_render_workspace_header( $args = array() ) {
     $defaults = array(
@@ -24,6 +112,7 @@ function cora_render_workspace_header( $args = array() ) {
         'tutorial_onclick'   => 'openPermissionsVideoDrawer()',
         'cta'                => array(),
         'tabs'               => array(),
+        'show_mcp_button'    => true,
         'container_class'    => '',
     );
     
@@ -308,12 +397,13 @@ function cora_render_workspace_header( $args = array() ) {
                     }
                 });
 
-                // Stuck state handler for subtle elevation shadow
+                // Stuck state handler for subtle elevation shadow and white frosted surface
                 var checkStuck = function() {
-                    var topbarH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cora-topbar-height')) || 48;
                     var rect = container.getBoundingClientRect();
-                    var threshold = (window.innerWidth >= 1024) ? 2 : (topbarH + 2);
-                    if (rect.top <= threshold) {
+                    var topbarEl = document.getElementById('cora-global-topbar');
+                    var topbarH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cora-topbar-height')) || 48;
+                    var topbarBottom = topbarEl ? topbarEl.getBoundingClientRect().bottom : topbarH;
+                    if (rect.top <= topbarBottom + 3) {
                         container.classList.add('cora-tabs-stuck');
                     } else {
                         container.classList.remove('cora-tabs-stuck');
@@ -368,8 +458,8 @@ function cora_render_workspace_header( $args = array() ) {
                 <?php if ( $args['ai_stack'] ) : ?>
                 <div class="cora-platform-stack flex items-center select-none mr-1" style="display: flex; align-items: center;">
                     <!-- ChatGPT Button -->
-                    <button type="button" onclick="coraAskExternalPlatform('openai', event); event.stopPropagation(); return false;" class="group relative w-8 h-8 rounded-full border border-zinc-200/80 dark:border-zinc-700/80 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200/80 dark:hover:bg-zinc-700/80 flex items-center justify-center text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 shadow-3xs cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 dark:focus-visible:ring-white">
-                        <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" class="w-3.5 h-3.5"><path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1683a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4945 4.4947zm-9.6607-4.1254a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1408-1.6464zM2.3408 7.8956a4.485 4.485 0 0 1 2.3655-1.9728V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.0201 1.1683a.0757.0757 0 0 1-.071 0l-4.8303-2.7866A4.4992 4.4992 0 0 1 2.3408 7.872zm16.5963 3.8558L13.1038 8.364 15.1239 7.2a.0757.0757 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6772a.79.79 0 0 0-.4076-.6667zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.7759.7759 0 0 0-.7854 0L9.409 9.2297V6.8974a.0662.0662 0 0 1 .0284-.0615l4.8303-2.7866a4.4992 4.4992 0 0 1 6.6802 4.6608zm-12.6401 4.135l2.4633-1.4208 2.4633 1.4208v2.8417l-2.4633 1.4208-2.4633-1.4208zM7.65 1.761a4.4992 4.4992 0 0 1 5.371 1.055l-.142.0804-4.783 2.763a.79.79 0 0 0-.3927.6812v6.7417L5.683 11.914a.0757.0757 0 0 1-.038-.052V6.2794a4.4944 4.4944 0 0 1 2.005-4.5184z"/></svg>
+                    <button type="button" onclick="coraAskExternalPlatform('openai', event); event.stopPropagation(); return false;" class="group relative w-8 h-8 rounded-full border border-zinc-200/90 dark:border-zinc-700/80 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-750 flex items-center justify-center transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 shadow-3xs cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 dark:focus-visible:ring-white">
+                        <?php echo cora_get_ai_platform_official_logo( 'openai', '', 16 ); ?>
                         <span class="absolute top-full left-1/2 -translate-x-1/2 mt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-visible:opacity-100 group-focus-visible:visible transition-all duration-150 bg-zinc-950 dark:bg-zinc-900 text-white text-[10px] font-semibold py-1.5 px-2.5 rounded-lg shadow-md whitespace-nowrap pointer-events-none z-50">
                             Ask ChatGPT
                             <span class="absolute bottom-full left-1/2 -translate-x-1/2 border-[4px] border-transparent border-b-zinc-950 dark:border-b-zinc-900"></span>
@@ -377,8 +467,8 @@ function cora_render_workspace_header( $args = array() ) {
                     </button>
                     
                     <!-- Claude Button -->
-                    <button type="button" onclick="coraAskExternalPlatform('claude', event); event.stopPropagation(); return false;" class="group relative w-8 h-8 rounded-full border border-zinc-200/80 dark:border-zinc-700/80 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200/80 dark:hover:bg-zinc-700/80 flex items-center justify-center text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 shadow-3xs cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 dark:focus-visible:ring-white">
-                        <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" class="w-3.5 h-3.5"><path d="m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z"/></svg>
+                    <button type="button" onclick="coraAskExternalPlatform('claude', event); event.stopPropagation(); return false;" class="group relative w-8 h-8 rounded-full border border-zinc-200/90 dark:border-zinc-700/80 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-750 flex items-center justify-center transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 shadow-3xs cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 dark:focus-visible:ring-white">
+                        <?php echo cora_get_ai_platform_official_logo( 'claude', '', 16 ); ?>
                         <span class="absolute top-full left-1/2 -translate-x-1/2 mt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-visible:opacity-100 group-focus-visible:visible transition-all duration-150 bg-zinc-950 dark:bg-zinc-900 text-white text-[10px] font-semibold py-1.5 px-2.5 rounded-lg shadow-md whitespace-nowrap pointer-events-none z-50">
                             Ask Claude
                             <span class="absolute bottom-full left-1/2 -translate-x-1/2 border-[4px] border-transparent border-b-zinc-950 dark:border-b-zinc-900"></span>
@@ -386,8 +476,8 @@ function cora_render_workspace_header( $args = array() ) {
                     </button>
                     
                     <!-- Gemini Button -->
-                    <button type="button" onclick="coraAskExternalPlatform('gemini', event); event.stopPropagation(); return false;" class="group relative w-8 h-8 rounded-full border border-zinc-200/80 dark:border-zinc-700/80 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200/80 dark:hover:bg-zinc-700/80 flex items-center justify-center text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 shadow-3xs cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 dark:focus-visible:ring-white">
-                        <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" class="w-3.5 h-3.5"><path d="M12 24C12 17.373 6.627 12 0 12C6.627 12 12 6.627 12 0C12 6.627 17.373 12 24 12C17.373 12 12 17.373 12 24Z"/></svg>
+                    <button type="button" onclick="coraAskExternalPlatform('gemini', event); event.stopPropagation(); return false;" class="group relative w-8 h-8 rounded-full border border-zinc-200/90 dark:border-zinc-700/80 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-750 flex items-center justify-center transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 shadow-3xs cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 dark:focus-visible:ring-white">
+                        <?php echo cora_get_ai_platform_official_logo( 'gemini', '', 16 ); ?>
                         <span class="absolute top-full left-1/2 -translate-x-1/2 mt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-visible:opacity-100 group-focus-visible:visible transition-all duration-150 bg-zinc-950 dark:bg-zinc-900 text-white text-[10px] font-semibold py-1.5 px-2.5 rounded-lg shadow-md whitespace-nowrap pointer-events-none z-50">
                             Ask Gemini
                             <span class="absolute bottom-full left-1/2 -translate-x-1/2 border-[4px] border-transparent border-b-zinc-950 dark:border-b-zinc-900"></span>
@@ -395,8 +485,8 @@ function cora_render_workspace_header( $args = array() ) {
                     </button>
 
                     <!-- Perplexity Button -->
-                    <button type="button" onclick="coraAskExternalPlatform('perplexity', event); event.stopPropagation(); return false;" class="group relative w-8 h-8 rounded-full border border-zinc-200/80 dark:border-zinc-700/80 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200/80 dark:hover:bg-zinc-700/80 flex items-center justify-center text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 shadow-3xs cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 dark:focus-visible:ring-white">
-                        <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" class="w-3.5 h-3.5"><path d="M12 0c-.23 0-.45.06-.64.18L3.62 5.02A1.25 1.25 0 0 0 3 6.09v11.82c0 .44.23.84.62 1.07l7.74 4.84c.19.12.41.18.64.18s.45-.06.64-.18l7.74-4.84c.39-.23.62-.63.62-1.07V6.09c0-.44-.23-.84-.62-1.07L12.64.18A1.25 1.25 0 0 0 12 0zm-1.25 3.03v4.61L5.5 10.9V7.12l5.25-4.09zm2.5 0l5.25 4.09v3.78l-5.25-3.26V3.03zM5.5 13.1l5.25 3.26v4.61L5.5 16.88V13.1zm13 0v3.78l-5.25 4.09v-4.61l5.25-3.26zM12 9.27l3.75 2.33L12 13.93l-3.75-2.33L12 9.27z"/></svg>
+                    <button type="button" onclick="coraAskExternalPlatform('perplexity', event); event.stopPropagation(); return false;" class="group relative w-8 h-8 rounded-full border border-zinc-200/90 dark:border-zinc-700/80 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-750 flex items-center justify-center transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 shadow-3xs cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 dark:focus-visible:ring-white">
+                        <?php echo cora_get_ai_platform_official_logo( 'perplexity', '', 16 ); ?>
                         <span class="absolute top-full left-1/2 -translate-x-1/2 mt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-visible:opacity-100 group-focus-visible:visible transition-all duration-150 bg-zinc-950 dark:bg-zinc-900 text-white text-[10px] font-semibold py-1.5 px-2.5 rounded-lg shadow-md whitespace-nowrap pointer-events-none z-50">
                             Ask Perplexity
                             <span class="absolute bottom-full left-1/2 -translate-x-1/2 border-[4px] border-transparent border-b-zinc-950 dark:border-b-zinc-900"></span>
@@ -404,8 +494,8 @@ function cora_render_workspace_header( $args = array() ) {
                     </button>
 
                     <!-- YouTube Button -->
-                    <button type="button" onclick="coraAskExternalPlatform('youtube', event); event.stopPropagation(); return false;" class="group relative w-8 h-8 rounded-full border border-zinc-200/80 dark:border-zinc-700/80 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200/80 dark:hover:bg-zinc-700/80 flex items-center justify-center text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 shadow-3xs cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 dark:focus-visible:ring-white">
-                        <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" class="w-3.5 h-3.5"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                    <button type="button" onclick="coraAskExternalPlatform('youtube', event); event.stopPropagation(); return false;" class="group relative w-8 h-8 rounded-full border border-zinc-200/90 dark:border-zinc-700/80 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-750 flex items-center justify-center transition-all duration-200 hover:-translate-y-0.5 hover:scale-110 shadow-3xs cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 dark:focus-visible:ring-white">
+                        <?php echo cora_get_ai_platform_official_logo( 'youtube', '', 16 ); ?>
                         <span class="absolute top-full left-1/2 -translate-x-1/2 mt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-visible:opacity-100 group-focus-visible:visible transition-all duration-150 bg-zinc-950 dark:bg-zinc-900 text-white text-[10px] font-semibold py-1.5 px-2.5 rounded-lg shadow-md whitespace-nowrap pointer-events-none z-50">
                             Search YouTube
                             <span class="absolute bottom-full left-1/2 -translate-x-1/2 border-[4px] border-transparent border-b-zinc-950 dark:border-b-zinc-900"></span>
@@ -449,24 +539,24 @@ function cora_render_workspace_header( $args = array() ) {
                 <?php if ( $args['ai_stack'] ) : ?>
                 <div class="cora-platform-stack flex items-center select-none mr-0.5" style="display: flex; align-items: center;">
                     <!-- ChatGPT Button -->
-                    <button type="button" onclick="coraAskExternalPlatform('openai', event); event.stopPropagation(); return false;" class="group relative rounded-full border border-zinc-200/80 dark:border-zinc-700/80 bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-700 dark:text-zinc-300 transition-all duration-200 hover:-translate-y-0.5 shadow-3xs cursor-pointer focus:outline-none" style="width: 24px; height: 24px; min-width: 24px; min-height: 24px; padding: 0 !important;">
-                        <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1683a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4945 4.4947zm-9.6607-4.1254a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1408-1.6464zM2.3408 7.8956a4.485 4.485 0 0 1 2.3655-1.9728V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.0201 1.1683a.0757.0757 0 0 1-.071 0l-4.8303-2.7866A4.4992 4.4992 0 0 1 2.3408 7.872zm16.5963 3.8558L13.1038 8.364 15.1239 7.2a.0757.0757 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6772a.79.79 0 0 0-.4076-.6667zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.7759.7759 0 0 0-.7854 0L9.409 9.2297V6.8974a.0662.0662 0 0 1 .0284-.0615l4.8303-2.7866a4.4992 4.4992 0 0 1 6.6802 4.6608zm-12.6401 4.135l2.4633-1.4208 2.4633 1.4208v2.8417l-2.4633 1.4208-2.4633-1.4208zM7.65 1.761a4.4992 4.4992 0 0 1 5.371 1.055l-.142.0804-4.783 2.763a.79.79 0 0 0-.3927.6812v6.7417L5.683 11.914a.0757.0757 0 0 1-.038-.052V6.2794a4.4944 4.4944 0 0 1 2.005-4.5184z"/></svg>
+                    <button type="button" onclick="coraAskExternalPlatform('openai', event); event.stopPropagation(); return false;" class="group relative rounded-full border border-zinc-200/90 dark:border-zinc-700/80 bg-white dark:bg-zinc-800 flex items-center justify-center transition-all duration-200 hover:-translate-y-0.5 shadow-3xs cursor-pointer focus:outline-none" style="width: 24px; height: 24px; min-width: 24px; min-height: 24px; padding: 0 !important;">
+                        <?php echo cora_get_ai_platform_official_logo( 'openai', '', 13 ); ?>
                     </button>
                     <!-- Claude Button -->
-                    <button type="button" onclick="coraAskExternalPlatform('claude', event); event.stopPropagation(); return false;" class="group relative rounded-full border border-zinc-200/80 dark:border-zinc-700/80 bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-700 dark:text-zinc-300 transition-all duration-200 hover:-translate-y-0.5 shadow-3xs cursor-pointer focus:outline-none" style="width: 24px; height: 24px; min-width: 24px; min-height: 24px; padding: 0 !important;">
-                        <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z"/></svg>
+                    <button type="button" onclick="coraAskExternalPlatform('claude', event); event.stopPropagation(); return false;" class="group relative rounded-full border border-zinc-200/90 dark:border-zinc-700/80 bg-white dark:bg-zinc-800 flex items-center justify-center transition-all duration-200 hover:-translate-y-0.5 shadow-3xs cursor-pointer focus:outline-none" style="width: 24px; height: 24px; min-width: 24px; min-height: 24px; padding: 0 !important;">
+                        <?php echo cora_get_ai_platform_official_logo( 'claude', '', 13 ); ?>
                     </button>
                     <!-- Gemini Button -->
-                    <button type="button" onclick="coraAskExternalPlatform('gemini', event); event.stopPropagation(); return false;" class="group relative rounded-full border border-zinc-200/80 dark:border-zinc-700/80 bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-700 dark:text-zinc-300 transition-all duration-200 hover:-translate-y-0.5 shadow-3xs cursor-pointer focus:outline-none" style="width: 24px; height: 24px; min-width: 24px; min-height: 24px; padding: 0 !important;">
-                        <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M12 24C12 17.373 6.627 12 0 12C6.627 12 12 6.627 12 0C12 6.627 17.373 12 24 12C17.373 12 12 17.373 12 24Z"/></svg>
+                    <button type="button" onclick="coraAskExternalPlatform('gemini', event); event.stopPropagation(); return false;" class="group relative rounded-full border border-zinc-200/90 dark:border-zinc-700/80 bg-white dark:bg-zinc-800 flex items-center justify-center transition-all duration-200 hover:-translate-y-0.5 shadow-3xs cursor-pointer focus:outline-none" style="width: 24px; height: 24px; min-width: 24px; min-height: 24px; padding: 0 !important;">
+                        <?php echo cora_get_ai_platform_official_logo( 'gemini', '', 13 ); ?>
                     </button>
                     <!-- Perplexity Button -->
-                    <button type="button" onclick="coraAskExternalPlatform('perplexity', event); event.stopPropagation(); return false;" class="group relative rounded-full border border-zinc-200/80 dark:border-zinc-700/80 bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-700 dark:text-zinc-300 transition-all duration-200 hover:-translate-y-0.5 shadow-3xs cursor-pointer focus:outline-none" style="width: 24px; height: 24px; min-width: 24px; min-height: 24px; padding: 0 !important;">
-                        <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M12 0c-.23 0-.45.06-.64.18L3.62 5.02A1.25 1.25 0 0 0 3 6.09v11.82c0 .44.23.84.62 1.07l7.74 4.84c.19.12.41.18.64.18s.45-.06.64-.18l7.74-4.84c.39-.23.62-.63.62-1.07V6.09c0-.44-.23-.84-.62-1.07L12.64.18A1.25 1.25 0 0 0 12 0zm-1.25 3.03v4.61L5.5 10.9V7.12l5.25-4.09zm2.5 0l5.25 4.09v3.78l-5.25-3.26V3.03zM5.5 13.1l5.25 3.26v4.61L5.5 16.88V13.1zm13 0v3.78l-5.25 4.09v-4.61l5.25-3.26zM12 9.27l3.75 2.33L12 13.93l-3.75-2.33L12 9.27z"/></svg>
+                    <button type="button" onclick="coraAskExternalPlatform('perplexity', event); event.stopPropagation(); return false;" class="group relative rounded-full border border-zinc-200/90 dark:border-zinc-700/80 bg-white dark:bg-zinc-800 flex items-center justify-center transition-all duration-200 hover:-translate-y-0.5 shadow-3xs cursor-pointer focus:outline-none" style="width: 24px; height: 24px; min-width: 24px; min-height: 24px; padding: 0 !important;">
+                        <?php echo cora_get_ai_platform_official_logo( 'perplexity', '', 13 ); ?>
                     </button>
                     <!-- YouTube Button -->
-                    <button type="button" onclick="coraAskExternalPlatform('youtube', event); event.stopPropagation(); return false;" class="group relative rounded-full border border-zinc-200/80 dark:border-zinc-700/80 bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-700 dark:text-zinc-300 transition-all duration-200 hover:-translate-y-0.5 shadow-3xs cursor-pointer focus:outline-none" style="width: 24px; height: 24px; min-width: 24px; min-height: 24px; padding: 0 !important;">
-                        <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                    <button type="button" onclick="coraAskExternalPlatform('youtube', event); event.stopPropagation(); return false;" class="group relative rounded-full border border-zinc-200/90 dark:border-zinc-700/80 bg-white dark:bg-zinc-800 flex items-center justify-center transition-all duration-200 hover:-translate-y-0.5 shadow-3xs cursor-pointer focus:outline-none" style="width: 24px; height: 24px; min-width: 24px; min-height: 24px; padding: 0 !important;">
+                        <?php echo cora_get_ai_platform_official_logo( 'youtube', '', 13 ); ?>
                     </button>
                 </div>
                 <?php endif; ?>
@@ -501,17 +591,18 @@ function cora_render_workspace_header( $args = array() ) {
 
     <!-- Sub Navigation Tabs (Sticky Bar) -->
     <?php if ( ! empty( $visible_tabs ) ) : 
-        $has_extra = ! empty( $args['tabs_extra_html'] );
+        $show_mcp = ! isset( $args['show_mcp_button'] ) || ! empty( $args['show_mcp_button'] );
+        $has_extra = ! empty( $args['tabs_extra_html'] ) || $show_mcp;
         $container_extra_class = $has_extra ? ' has-extra-actions' : '';
         $container_overflow = $has_extra ? 'overflow: hidden;' : 'overflow-x: auto; overflow-y: hidden;';
     ?>
-        <div class="cora-sub-tabs-container cora-sticky-sub-tabs<?php echo $container_extra_class; ?> relative flex items-center justify-between border-b border-zinc-200/80 dark:border-zinc-800 bg-[#FBFaf7] dark:bg-[#0c0c0e] -mx-3 sm:-mx-4 md:-mx-5 px-3 sm:px-4 md:px-5 w-[calc(100%+1.5rem)] sm:w-[calc(100%+2rem)] md:w-[calc(100%+2.5rem)] max-w-[calc(100%+1.5rem)] sm:max-w-[calc(100%+2rem)] md:max-w-[calc(100%+2.5rem)]" id="<?php echo esc_attr( $args['tabs_dom_id'] ?? 'cora-sub-navigation-tabs' ); ?>" style="position: -webkit-sticky; position: sticky; top: var(--cora-sticky-tabs-top, 0px); left: 0; right: 0; z-index: 40; display: flex; flex-wrap: nowrap; <?php echo $container_overflow; ?> -webkit-overflow-scrolling: touch; touch-action: pan-x pan-y; overscroll-behavior-x: contain; scrollbar-width: none; min-height: 40px; height: 40px; padding-top: 0; padding-bottom: 0;">
+        <div class="cora-sub-tabs-container cora-sticky-sub-tabs<?php echo $container_extra_class; ?> relative flex items-center justify-between border-b border-zinc-200/80 dark:border-zinc-800 bg-transparent -mx-3 sm:-mx-4 md:-mx-5 px-3 sm:px-4 md:px-5 w-[calc(100%+1.5rem)] sm:w-[calc(100%+2rem)] md:w-[calc(100%+2.5rem)] max-w-[calc(100%+1.5rem)] sm:max-w-[calc(100%+2rem)] md:max-w-[calc(100%+2.5rem)]" id="<?php echo esc_attr( $args['tabs_dom_id'] ?? 'cora-sub-navigation-tabs' ); ?>" style="position: -webkit-sticky; position: sticky; top: var(--cora-sticky-tabs-top, 0px); left: 0; right: 0; z-index: 45; display: flex; flex-wrap: nowrap; background-color: transparent; <?php echo $container_overflow; ?> -webkit-overflow-scrolling: touch; touch-action: pan-x pan-y; overscroll-behavior-x: contain; scrollbar-width: none; min-height: 44px; height: 44px; padding-top: 0; padding-bottom: 0;">
             <div class="cora-sub-tabs-nav flex items-center gap-1 <?php echo $has_extra ? 'min-w-0 flex-1' : 'shrink-0'; ?> overflow-x-auto scrollbar-hide" style="touch-action: pan-x pan-y; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; scrollbar-width: none;">
             <?php foreach ( $visible_tabs as $tab ) : 
-                $active_class = ! empty( $tab['active'] ) ? 'active border-zinc-950 text-zinc-900 dark:border-white dark:text-white font-semibold' : 'border-transparent text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 font-semibold';
+                $active_class = ! empty( $tab['active'] ) ? 'active border-zinc-950 text-zinc-900 dark:border-white dark:text-white font-bold' : 'border-transparent text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 font-semibold';
                 $onclick_attr = ! empty( $tab['onclick'] ) ? 'onclick="' . esc_attr( $tab['onclick'] ) . '"' : '';
             ?>
-                <button <?php if ( ! empty( $tab['dom_id'] ) ) : ?>id="<?php echo esc_attr( $tab['dom_id'] ); ?>"<?php endif; ?> class="cora-sub-tab cora-tab-btn px-2.5 sm:px-3.5 h-[40px] py-0 -mb-px border-b-2 text-xs font-semibold cursor-pointer transition-all inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 outline-none focus:outline-none focus-visible:outline-none select-none <?php echo $active_class; ?>" data-target="<?php echo esc_attr( $tab['id'] ); ?>" <?php echo $onclick_attr; ?> style="touch-action: pan-x pan-y; -webkit-tap-highlight-color: transparent;">
+                <button <?php if ( ! empty( $tab['dom_id'] ) ) : ?>id="<?php echo esc_attr( $tab['dom_id'] ); ?>"<?php endif; ?> class="cora-sub-tab cora-tab-btn px-2.5 sm:px-3.5 h-[40px] py-0 -mb-px border-b-2 text-xs cursor-pointer transition-all inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 outline-none focus:outline-none focus-visible:outline-none select-none <?php echo $active_class; ?>" data-target="<?php echo esc_attr( $tab['id'] ); ?>" <?php echo $onclick_attr; ?> style="touch-action: pan-x pan-y; -webkit-tap-highlight-color: transparent;">
                     <?php if ( ! empty( $tab['icon'] ) ) : ?>
                         <span class="pointer-events-none flex items-center shrink-0"><?php echo $tab['icon']; ?></span>
                     <?php endif; ?>
@@ -525,9 +616,16 @@ function cora_render_workspace_header( $args = array() ) {
                 </button>
             <?php endforeach; ?>
             </div>
-            <?php if ( ! empty( $args['tabs_extra_html'] ) ) : ?>
+            <?php if ( $has_extra ) : ?>
                 <div class="cora-sub-tabs-extra h-full flex items-center gap-1.5 sm:gap-2 pl-2 sm:pl-3 ml-auto shrink-0 select-none">
-                    <?php echo $args['tabs_extra_html']; ?>
+                    <?php 
+                    if ( ! empty( $args['tabs_extra_html'] ) ) {
+                        echo $args['tabs_extra_html'];
+                    }
+                    if ( $show_mcp && ( empty( $args['tabs_extra_html'] ) || strpos( $args['tabs_extra_html'], 'coraOpenWorkspaceDeveloperGateway' ) === false ) ) {
+                        echo cora_get_mcp_button_html();
+                    }
+                    ?>
                 </div>
             <?php endif; ?>
         </div>

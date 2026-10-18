@@ -27,28 +27,33 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
 }
 ?>
 
-    <!-- Sticky Sub-Navigation Tabs SOP (~40px Sleek Height - Edge-to-Edge - Just After Header) -->
-    <div id="cora-emails-subtabs" class="cora-sub-tabs-container cora-sticky-sub-tabs flex items-center gap-1 border-b border-zinc-200/80 dark:border-zinc-800 bg-[#FBFaf7] dark:bg-[#0c0c0e] -mx-3 sm:-mx-4 md:-mx-5 px-3 sm:px-4 md:px-5 shrink-0 overflow-x-auto scrollbar-hide w-[calc(100%+1.5rem)] sm:w-[calc(100%+2rem)] md:w-[calc(100%+2.5rem)] max-w-[calc(100%+1.5rem)] sm:max-w-[calc(100%+2rem)] md:max-w-[calc(100%+2.5rem)] mb-4" style="position: -webkit-sticky; position: sticky; top: var(--cora-sticky-tabs-top, 0px); left: 0; right: 0; z-index: 40; touch-action: pan-x pan-y; -webkit-overflow-scrolling: touch; scrollbar-width: none; min-height: 40px; height: 40px; padding-top: 0; padding-bottom: 0; margin-top: 0;">
-        <button id="tab-btn-email-tab-compose" onclick="coraSwitchEmailSubTab('email-tab-compose')"
-                class="cora-email-sub-tab px-3.5 h-[40px] py-0 -mb-px text-xs font-bold text-zinc-900 border-b-2 border-zinc-950 transition-all whitespace-nowrap cursor-pointer shrink-0 inline-flex items-center">
-            Compose & Send
-        </button>
-        <button id="tab-btn-email-tab-templates" onclick="coraSwitchEmailSubTab('email-tab-templates')"
-                class="cora-email-sub-tab px-3.5 h-[40px] py-0 -mb-px text-xs font-semibold text-zinc-500 hover:text-zinc-900 border-b-2 border-transparent transition-all whitespace-nowrap cursor-pointer shrink-0 inline-flex items-center">
-            Email Templates
-        </button>
-        <button id="tab-btn-email-tab-sequences" onclick="coraSwitchEmailSubTab('email-tab-sequences')"
-                class="cora-email-sub-tab px-3.5 h-[40px] py-0 -mb-px text-xs font-semibold text-zinc-500 hover:text-zinc-900 border-b-2 border-transparent transition-all whitespace-nowrap cursor-pointer shrink-0 inline-flex items-center">
-            Automated Drip Sequences
-        </button>
-        <button id="tab-btn-email-tab-outbox" onclick="coraSwitchEmailSubTab('email-tab-outbox')"
-                class="cora-email-sub-tab px-3.5 h-[40px] py-0 -mb-px text-xs font-semibold text-zinc-500 hover:text-zinc-900 border-b-2 border-transparent transition-all whitespace-nowrap cursor-pointer shrink-0 inline-flex items-center">
-            Outbox & Sent Logs
-        </button>
-        <button id="tab-btn-email-tab-settings" onclick="coraSwitchEmailSubTab('email-tab-settings')"
-                class="cora-email-sub-tab px-3.5 h-[40px] py-0 -mb-px text-xs font-semibold text-zinc-500 hover:text-zinc-900 border-b-2 border-transparent transition-all whitespace-nowrap cursor-pointer shrink-0 inline-flex items-center">
-            SMTP & Provider Settings
-        </button>
+    <!-- Sticky Sub-Navigation Tabs SOP (~44px Sleek Height - Edge-to-Edge - Just After Header) -->
+    <div id="cora-emails-subtabs" class="cora-sub-tabs-container cora-sticky-sub-tabs flex items-center justify-between border-b border-zinc-200/80 dark:border-zinc-800 bg-transparent -mx-3 sm:-mx-4 md:-mx-5 px-3 sm:px-4 md:px-5 shrink-0 overflow-x-auto scrollbar-hide w-[calc(100%+1.5rem)] sm:w-[calc(100%+2rem)] md:w-[calc(100%+2.5rem)] max-w-[calc(100%+1.5rem)] sm:max-w-[calc(100%+2rem)] md:max-w-[calc(100%+2.5rem)] mb-4" style="position: -webkit-sticky; position: sticky; top: var(--cora-sticky-tabs-top, 0px); left: 0; right: 0; z-index: 45; touch-action: pan-x pan-y; -webkit-overflow-scrolling: touch; scrollbar-width: none; min-height: 44px; height: 44px; padding-top: 0; padding-bottom: 0; margin-top: 0; background-color: transparent;">
+        <div class="flex items-center gap-1 overflow-x-auto scrollbar-hide">
+            <button id="tab-btn-email-tab-compose" onclick="coraSwitchEmailSubTab('email-tab-compose')"
+                    class="cora-email-sub-tab px-3.5 h-[40px] py-0 -mb-px text-xs font-bold text-zinc-900 border-b-2 border-zinc-950 transition-all whitespace-nowrap cursor-pointer shrink-0 inline-flex items-center">
+                Compose & Send
+            </button>
+            <button id="tab-btn-email-tab-templates" onclick="coraSwitchEmailSubTab('email-tab-templates')"
+                    class="cora-email-sub-tab px-3.5 h-[40px] py-0 -mb-px text-xs font-semibold text-zinc-500 hover:text-zinc-900 border-b-2 border-transparent transition-all whitespace-nowrap cursor-pointer shrink-0 inline-flex items-center">
+                Email Templates
+            </button>
+            <button id="tab-btn-email-tab-sequences" onclick="coraSwitchEmailSubTab('email-tab-sequences')"
+                    class="cora-email-sub-tab px-3.5 h-[40px] py-0 -mb-px text-xs font-semibold text-zinc-500 hover:text-zinc-900 border-b-2 border-transparent transition-all whitespace-nowrap cursor-pointer shrink-0 inline-flex items-center">
+                Automated Drip Sequences
+            </button>
+            <button id="tab-btn-email-tab-outbox" onclick="coraSwitchEmailSubTab('email-tab-outbox')"
+                    class="cora-email-sub-tab px-3.5 h-[40px] py-0 -mb-px text-xs font-semibold text-zinc-500 hover:text-zinc-900 border-b-2 border-transparent transition-all whitespace-nowrap cursor-pointer shrink-0 inline-flex items-center">
+                Outbox & Sent Logs
+            </button>
+            <button id="tab-btn-email-tab-settings" onclick="coraSwitchEmailSubTab('email-tab-settings')"
+                    class="cora-email-sub-tab px-3.5 h-[40px] py-0 -mb-px text-xs font-semibold text-zinc-500 hover:text-zinc-900 border-b-2 border-transparent transition-all whitespace-nowrap cursor-pointer shrink-0 inline-flex items-center">
+                SMTP & Provider Settings
+            </button>
+        </div>
+        <div class="cora-sub-tabs-extra ml-auto flex items-center pl-2 sm:pl-3 shrink-0">
+            <?php if ( function_exists( 'cora_get_mcp_button_html' ) ) { echo cora_get_mcp_button_html(); } ?>
+        </div>
     </div>
 
     <!-- MAIN SUB-TAB CONTENT PANELS CONTAINER -->

@@ -764,6 +764,163 @@ class Cora_MCP_Tool_Registry {
                 'handler'       => array( __CLASS__, 'handle_generate_article_outline' ),
             ),
 
+            // ── Autonomous Content Campaigns ─────────────────────────────────────
+            'cora_create_campaign' => array(
+                'name'          => 'cora_create_campaign',
+                'description'   => 'Create an autonomous content campaign with target topic keywords, cadence schedule, AI model selection, tone, and minimum SEO/GEO quality gating thresholds.',
+                'readOnly'      => false,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'content:write',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'name'           => array( 'type' => 'string', 'description' => 'Campaign title / name (e.g. Studio Architecture & Lighting Insights).' ),
+                        'topic_keywords' => array(
+                            'type'        => 'array',
+                            'items'       => array( 'type' => 'string' ),
+                            'description' => 'Target keywords or topic clusters for autonomous generation.',
+                        ),
+                        'cadence'        => array(
+                            'type'        => 'string',
+                            'enum'        => array( 'daily', '3x_week', 'weekly', 'bi_weekly' ),
+                            'description' => 'Autonomous publishing cadence (default: weekly).',
+                        ),
+                        'auto_publish'   => array( 'type' => 'boolean', 'description' => 'Auto-publish when quality threshold is met (true) or draft for review (false).' ),
+                        'min_seo_score'  => array( 'type' => 'integer', 'description' => 'Minimum 11-point algorithmic SEO score threshold (default: 80).' ),
+                        'min_geo_score'  => array( 'type' => 'integer', 'description' => 'Minimum GEO local intent engine score threshold (default: 85).' ),
+                        'tone'           => array(
+                            'type'        => 'string',
+                            'enum'        => array( 'editorial', 'executive', 'technical', 'conversational' ),
+                            'description' => 'Editorial tone and voice (default: editorial).',
+                        ),
+                        'assigned_ai'    => array(
+                            'type'        => 'string',
+                            'enum'        => array( 'claude', 'gemini', 'chatgpt', 'cora_ai' ),
+                            'description' => 'Generative AI model assigned to write articles (default: claude).',
+                        ),
+                        'status'         => array(
+                            'type'        => 'string',
+                            'enum'        => array( 'active', 'paused' ),
+                            'description' => 'Initial campaign status (default: active).',
+                        ),
+                    ),
+                    'required'   => array( 'name' ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_create_campaign' ),
+            ),
+
+            'cora_list_campaigns' => array(
+                'name'          => 'cora_list_campaigns',
+                'description'   => 'List all autonomous content campaigns in the workspace with active cadence, assigned AI models, quality gates, and generation counts.',
+                'readOnly'      => true,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'content:read',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'status' => array( 'type' => 'string', 'description' => 'Filter by status: active, paused, or all.' ),
+                    ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_list_campaigns' ),
+            ),
+
+            'cora_get_campaign' => array(
+                'name'          => 'cora_get_campaign',
+                'description'   => 'Retrieve full configuration details, next run schedule, and recent execution history logs for a specific autonomous content campaign.',
+                'readOnly'      => true,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'content:read',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'id' => array( 'type' => 'string', 'description' => 'Unique campaign ID (e.g. cmp_studio_lighting).' ),
+                    ),
+                    'required'   => array( 'id' ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_get_campaign' ),
+            ),
+
+            'cora_update_campaign' => array(
+                'name'          => 'cora_update_campaign',
+                'description'   => 'Update an existing autonomous content campaign: cadence, keywords, auto-publishing rules, quality thresholds, or AI model.',
+                'readOnly'      => false,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'content:write',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'id'             => array( 'type' => 'string', 'description' => 'Campaign ID to update.' ),
+                        'name'           => array( 'type' => 'string', 'description' => 'Updated campaign name.' ),
+                        'topic_keywords' => array( 'type' => 'array', 'items' => array( 'type' => 'string' ), 'description' => 'Updated keywords.' ),
+                        'cadence'        => array( 'type' => 'string', 'enum' => array( 'daily', '3x_week', 'weekly', 'bi_weekly' ) ),
+                        'auto_publish'   => array( 'type' => 'boolean', 'description' => 'Auto-publish toggle.' ),
+                        'min_seo_score'  => array( 'type' => 'integer', 'description' => 'Minimum SEO score threshold.' ),
+                        'min_geo_score'  => array( 'type' => 'integer', 'description' => 'Minimum GEO score threshold.' ),
+                        'tone'           => array( 'type' => 'string', 'enum' => array( 'editorial', 'executive', 'technical', 'conversational' ) ),
+                        'assigned_ai'    => array( 'type' => 'string', 'enum' => array( 'claude', 'gemini', 'chatgpt', 'cora_ai' ) ),
+                        'status'         => array( 'type' => 'string', 'enum' => array( 'active', 'paused' ) ),
+                    ),
+                    'required'   => array( 'id' ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_update_campaign' ),
+            ),
+
+            'cora_trigger_campaign_run' => array(
+                'name'          => 'cora_trigger_campaign_run',
+                'description'   => 'Trigger an immediate autonomous campaign run cycle: picks a high-intent opportunity, drafts a rich 600+ word article with FAQ schema, runs an 11-point SEO & GEO audit, enriches quality if below threshold, and publishes or drafts based on campaign rules.',
+                'readOnly'      => false,
+                'destructive'   => false,
+                'openWorld'     => true,
+                'requiredScope' => 'content:write',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'id'               => array( 'type' => 'string', 'description' => 'Campaign ID to trigger.' ),
+                        'keyword_override' => array( 'type' => 'string', 'description' => 'Optional specific keyword override to draft for this run.' ),
+                    ),
+                    'required'   => array( 'id' ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_trigger_campaign_run' ),
+            ),
+
+            'cora_improve_content' => array(
+                'name'          => 'cora_improve_content',
+                'description'   => 'Run autonomous content improvement on an existing article: enriches GEO entities, elevates search intent relevance, injects question headings and FAQ schema, and raises SEO score to 90+.',
+                'readOnly'      => false,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'content:write',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'id' => array( 'type' => 'integer', 'description' => 'Post ID of the article to enhance and improve.' ),
+                    ),
+                    'required'   => array( 'id' ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_improve_content' ),
+            ),
+
+            'cora_get_autonomous_activity_log' => array(
+                'name'          => 'cora_get_autonomous_activity_log',
+                'description'   => 'Retrieve aggregated autonomous campaign execution history logs, showing article generation runs, SEO/GEO audit scores, and publication outcomes.',
+                'readOnly'      => true,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'content:read',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'limit'       => array( 'type' => 'integer', 'description' => 'Maximum log entries to return (default: 20).' ),
+                        'campaign_id' => array( 'type' => 'string', 'description' => 'Optional campaign ID filter.' ),
+                    ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_get_autonomous_activity_log' ),
+            ),
+
             // Headless Growth CMS Tools
             'cora_create_guide' => array(
                 'name'          => 'cora_create_guide',
@@ -2773,6 +2930,97 @@ class Cora_MCP_Tool_Registry {
         $req = self::dispatch_content_rest( 'POST', '/cora/v1/content/generate', $args, $auth );
         $res = Cora_Workspace_Content_REST_Controller::generate_article_outline( $req );
         return self::unwrap_rest_response( $res );
+    }
+
+    /**
+     * Autonomous Campaigns Tool Handlers
+     */
+    public static function handle_create_campaign( $args, $auth ) {
+        if ( ! class_exists( 'Cora_Autonomous_Campaigns' ) ) {
+            require_once dirname( __DIR__ ) . '/class-cora-autonomous-campaigns.php';
+        }
+        $agency_id = self::get_agency_id( $auth, $args );
+        $camp = Cora_Autonomous_Campaigns::create_campaign( $args, $agency_id );
+        return array( 'success' => true, 'campaign' => $camp );
+    }
+
+    public static function handle_list_campaigns( $args, $auth ) {
+        if ( ! class_exists( 'Cora_Autonomous_Campaigns' ) ) {
+            require_once dirname( __DIR__ ) . '/class-cora-autonomous-campaigns.php';
+        }
+        $agency_id     = self::get_agency_id( $auth, $args );
+        $campaigns     = Cora_Autonomous_Campaigns::get_campaigns( $agency_id );
+        $status_filter = sanitize_text_field( $args['status'] ?? '' );
+        if ( ! empty( $status_filter ) && $status_filter !== 'all' ) {
+            $campaigns = array_values( array_filter( $campaigns, function( $c ) use ( $status_filter ) {
+                return ( $c['status'] ?? '' ) === $status_filter;
+            } ) );
+        }
+        return array( 'total' => count( $campaigns ), 'campaigns' => $campaigns );
+    }
+
+    public static function handle_get_campaign( $args, $auth ) {
+        if ( ! class_exists( 'Cora_Autonomous_Campaigns' ) ) {
+            require_once dirname( __DIR__ ) . '/class-cora-autonomous-campaigns.php';
+        }
+        $agency_id = self::get_agency_id( $auth, $args );
+        $id        = sanitize_text_field( $args['id'] ?? '' );
+        $camp      = Cora_Autonomous_Campaigns::get_campaign( $id, $agency_id );
+        if ( ! $camp ) {
+            return new WP_Error( 'not_found', "Campaign '{$id}' not found." );
+        }
+        return array( 'success' => true, 'campaign' => $camp );
+    }
+
+    public static function handle_update_campaign( $args, $auth ) {
+        if ( ! class_exists( 'Cora_Autonomous_Campaigns' ) ) {
+            require_once dirname( __DIR__ ) . '/class-cora-autonomous-campaigns.php';
+        }
+        $agency_id = self::get_agency_id( $auth, $args );
+        $id        = sanitize_text_field( $args['id'] ?? '' );
+        $res       = Cora_Autonomous_Campaigns::update_campaign( $id, $args, $agency_id );
+        if ( is_wp_error( $res ) ) {
+            return $res;
+        }
+        return array( 'success' => true, 'campaign' => $res );
+    }
+
+    public static function handle_trigger_campaign_run( $args, $auth ) {
+        if ( ! class_exists( 'Cora_Autonomous_Campaigns' ) ) {
+            require_once dirname( __DIR__ ) . '/class-cora-autonomous-campaigns.php';
+        }
+        $agency_id = self::get_agency_id( $auth, $args );
+        $id        = sanitize_text_field( $args['id'] ?? '' );
+        $kw        = sanitize_text_field( $args['keyword_override'] ?? '' );
+        $res       = Cora_Autonomous_Campaigns::trigger_campaign( $id, $agency_id, 'mcp', $kw );
+        if ( is_wp_error( $res ) ) {
+            return $res;
+        }
+        return $res;
+    }
+
+    public static function handle_improve_content( $args, $auth ) {
+        if ( ! class_exists( 'Cora_Autonomous_Campaigns' ) ) {
+            require_once dirname( __DIR__ ) . '/class-cora-autonomous-campaigns.php';
+        }
+        $agency_id = self::get_agency_id( $auth, $args );
+        $id        = intval( $args['id'] ?? 0 );
+        $res       = Cora_Autonomous_Campaigns::improve_content( $id, $agency_id );
+        if ( is_wp_error( $res ) ) {
+            return $res;
+        }
+        return $res;
+    }
+
+    public static function handle_get_autonomous_activity_log( $args, $auth ) {
+        if ( ! class_exists( 'Cora_Autonomous_Campaigns' ) ) {
+            require_once dirname( __DIR__ ) . '/class-cora-autonomous-campaigns.php';
+        }
+        $agency_id = self::get_agency_id( $auth, $args );
+        $limit     = isset( $args['limit'] ) ? intval( $args['limit'] ) : 20;
+        $cid       = ! empty( $args['campaign_id'] ) ? sanitize_text_field( $args['campaign_id'] ) : null;
+        $logs      = Cora_Autonomous_Campaigns::get_activity_log( $agency_id, $limit, $cid );
+        return array( 'total' => count( $logs ), 'activity_log' => $logs );
     }
 
     /**

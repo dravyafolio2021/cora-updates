@@ -130,7 +130,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
 ?>
 
 <!-- Tabs Navigation (Sticky Sub-Navigation Bar - SOP Flush After Header) -->
-<div class="cora-sticky-content-tabs cora-sub-tabs-container cora-sticky-sub-tabs flex items-center gap-1 border-b border-zinc-200/80 dark:border-zinc-800 select-none overflow-x-auto scrollbar-hide bg-[#FBFaf7] dark:bg-[#0c0c0e] -mx-3 sm:-mx-4 md:-mx-5 px-3 sm:px-4 md:px-5 w-[calc(100%+1.5rem)] sm:w-[calc(100%+2rem)] md:w-[calc(100%+2.5rem)] max-w-[calc(100%+1.5rem)] sm:max-w-[calc(100%+2rem)] md:max-w-[calc(100%+2.5rem)] mb-4" id="cora-content-tabs" style="position: -webkit-sticky; position: sticky; top: var(--cora-sticky-tabs-top, 0px); left: 0; right: 0; z-index: 40; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; scrollbar-width: none; min-height: 40px; height: 40px; padding-top: 0; padding-bottom: 0; margin-top: 0;">
+<div class="cora-sticky-content-tabs cora-sub-tabs-container cora-sticky-sub-tabs flex items-center gap-1 border-b border-zinc-200/80 dark:border-zinc-800 select-none overflow-x-auto scrollbar-hide bg-transparent -mx-3 sm:-mx-4 md:-mx-5 px-3 sm:px-4 md:px-5 w-[calc(100%+1.5rem)] sm:w-[calc(100%+2rem)] md:w-[calc(100%+2.5rem)] max-w-[calc(100%+1.5rem)] sm:max-w-[calc(100%+2rem)] md:max-w-[calc(100%+2.5rem)] mb-4" id="cora-content-tabs" style="position: -webkit-sticky; position: sticky; top: var(--cora-sticky-tabs-top, 0px); left: 0; right: 0; z-index: 45; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; scrollbar-width: none; min-height: 44px; height: 44px; padding-top: 0; padding-bottom: 0; margin-top: 0; background-color: transparent;">
     <button class="cora-tab-btn px-3.5 h-[40px] py-0 -mb-px border-b-2 text-xs font-bold cursor-pointer transition-all border-zinc-950 text-zinc-950 dark:border-white dark:text-white flex items-center gap-1.5 whitespace-nowrap shrink-0" data-tab="ct-overview" onclick="switchContentTab('ct-overview')">
         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none" class="shrink-0"><rect x="3" y="3" width="7" height="9" rx="1"></rect><rect x="14" y="3" width="7" height="5" rx="1"></rect><rect x="14" y="12" width="7" height="9" rx="1"></rect><rect x="3" y="16" width="7" height="5" rx="1"></rect></svg>
         <span>Overview</span>
@@ -152,11 +152,19 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
         <span>SEO & AI Visibility</span>
     </button>
 
-    <div class="ml-auto flex items-center pl-3">
-        <button type="button" class="px-3 py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-900 text-xs font-semibold flex items-center gap-1.5 shadow-2xs transition-all active:scale-97 cursor-pointer shrink-0 border-0" onclick="coraOpenWorkspaceDeveloperGateway()" title="Workspace REST API & Model Context Protocol Gateway">
-            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-            <span>API &amp; MCP Gateway</span>
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+    <div class="ml-auto flex items-center pl-2 sm:pl-3 shrink-0 cora-sub-tabs-extra">
+        <button type="button" 
+                id="cora-btn-ai-mcp-gateway"
+                class="cora-ai-alive-btn select-none" 
+                onclick="coraOpenWorkspaceDeveloperGateway()" 
+                title="Workspace Model Context Protocol (MCP) &amp; Developer Gateway">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="cora-ai-plug-icon shrink-0">
+                <path d="M12 22v-5"></path>
+                <path d="M9 8V2"></path>
+                <path d="M15 8V2"></path>
+                <path d="M18 8v5a6 6 0 0 1-12 0V8z"></path>
+            </svg>
+            <span class="whitespace-nowrap font-semibold">MCP</span>
         </button>
     </div>
 </div>
@@ -2061,12 +2069,13 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
 .cora-sticky-content-tabs {
     position: -webkit-sticky !important;
     position: sticky !important;
-    top: var(--cora-sticky-tabs-top, var(--cora-topbar-height, 48px)) !important;
-    z-index: 35 !important;
-    background-color: #FBFaf7 !important;
-    border-bottom: 1px solid rgba(228, 228, 231, 0.85) !important;
+    top: var(--cora-sticky-tabs-top, 0px) !important;
+    z-index: 45 !important;
+    background-color: transparent !important;
+    border-bottom: 1px solid rgba(228, 228, 231, 0.75) !important;
     box-sizing: border-box !important;
-    transition: background-color 0.15s ease, box-shadow 0.2s ease, border-color 0.15s ease;
+    box-shadow: none !important;
+    transition: background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease !important;
 }
 
 @media (min-width: 1024px) {
@@ -2076,20 +2085,36 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
     }
 }
 
+@media (max-width: 1023.98px) {
+    #cora-content-tabs,
+    .cora-sticky-content-tabs {
+        top: var(--cora-sticky-tabs-top, var(--cora-topbar-height, 48px)) !important;
+    }
+}
+
 .dark #cora-content-tabs,
 .dark .cora-sticky-content-tabs {
-    background-color: #0c0c0e !important;
-    border-bottom-color: #27272a !important;
+    background-color: transparent !important;
+    border-bottom-color: rgba(39, 39, 42, 0.75) !important;
+    box-shadow: none !important;
 }
 
 #cora-content-tabs.cora-tabs-stuck,
 .cora-sticky-content-tabs.cora-tabs-stuck {
-    box-shadow: 0 4px 12px -2px rgba(9, 9, 11, 0.05) !important;
+    background-color: rgba(255, 255, 255, 0.96) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border-bottom-color: rgba(228, 228, 231, 0.95) !important;
+    box-shadow: 0 4px 14px -2px rgba(0, 0, 0, 0.06), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
 }
 
 .dark #cora-content-tabs.cora-tabs-stuck,
 .dark .cora-sticky-content-tabs.cora-tabs-stuck {
-    box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.4) !important;
+    background-color: rgba(12, 12, 14, 0.96) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border-bottom-color: #27272a !important;
+    box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.5) !important;
 }
 
 .cora-skeleton {
@@ -2938,9 +2963,10 @@ if (file_exists(CORA_WORKSPACE_PATH . 'views/partials/content-approval-drawer.ph
         if (tabs) {
             var onScroll = function() {
                 var rect = tabs.getBoundingClientRect();
+                var topbarEl = document.getElementById('cora-global-topbar');
                 var topbarH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cora-topbar-height')) || 48;
-                var threshold = (window.innerWidth >= 1024) ? 5 : (topbarH + 2);
-                if (rect.top <= threshold) {
+                var topbarBottom = topbarEl ? topbarEl.getBoundingClientRect().bottom : topbarH;
+                if (rect.top <= topbarBottom + 3) {
                     tabs.classList.add('cora-tabs-stuck');
                 } else {
                     tabs.classList.remove('cora-tabs-stuck');

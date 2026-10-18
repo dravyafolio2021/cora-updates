@@ -803,7 +803,9 @@ body.cora-skeleton-active .cora-page-section {
         max-width: 100% !important;
         width: 100% !important;
         min-width: 0 !important;
-        overflow-x: hidden !important;
+        overflow: visible !important;
+        overflow-x: clip !important;
+        overflow-y: visible !important;
         box-sizing: border-box !important;
     }
     .cora-workspace-header {
@@ -995,7 +997,8 @@ body.cora-skeleton-active .cora-page-section {
                 width 0.2s cubic-bezier(0.4, 0, 0.2, 1),
                 max-width 0.2s cubic-bezier(0.4, 0, 0.2, 1),
                 transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
-                opacity 0.15s ease !important;
+                opacity 0.28s ease,
+                visibility 0.28s ease !important;
     display: none;
     flex-direction: column !important;
     overflow: hidden !important;
@@ -1056,10 +1059,10 @@ body.cora-skeleton-active .cora-page-section {
 .cora-docked-drawer.collapsed,
 .cora-docked-drawer:not(.open) {
     transform: translateY(100%) !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
+    visibility: hidden;
+    opacity: 0;
     pointer-events: none !important;
-    display: none !important;
+    display: none;
 }
 /* =============================================================================
    12. TOAST NOTIFICATION SYSTEM (Top-Center Floating, Priority-Aware)
@@ -1964,7 +1967,8 @@ body.cora-scroll-locked {
 #cora-forms-tabs a,
 #cora-settings-tabs a,
 #cora-settings-tabs button,
-#cora-content-tabs button,
+#cora-content-tabs .cora-tab-btn,
+#cora-content-tabs button:not(#cora-btn-ai-mcp-gateway),
 #cora-content-tabs a,
 #cora-emails-subtabs button,
 #cora-canvas-subtabs button {
@@ -2065,6 +2069,25 @@ body.cora-scroll-locked {
     }
 }
 
+#cora-content-tabs,
+.cora-sticky-content-tabs,
+#cora-forms-tabs,
+#cora-settings-tabs,
+#cora-emails-subtabs,
+#cora-canvas-subtabs,
+.cora-sticky-sub-tabs,
+.cora-sub-tabs-container {
+    min-height: 44px !important;
+    height: 44px !important;
+    background-color: transparent !important;
+    z-index: 45 !important;
+    border-bottom: 1px solid rgba(228, 228, 231, 0.75) !important;
+    box-shadow: none !important;
+    transition: background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                border-color 0.2s ease !important;
+}
+
 .dark #cora-content-tabs,
 .dark .cora-sticky-content-tabs,
 .dark #cora-forms-tabs,
@@ -2073,9 +2096,9 @@ body.cora-scroll-locked {
 .dark #cora-canvas-subtabs,
 .dark .cora-sticky-sub-tabs,
 .dark .cora-sub-tabs-container {
-    background-color: #0c0c0e !important;
-    border-bottom-color: #27272a !important;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3) !important;
+    background-color: transparent !important;
+    border-bottom-color: rgba(39, 39, 42, 0.75) !important;
+    box-shadow: none !important;
 }
 
 #cora-content-tabs.cora-tabs-stuck,
@@ -2086,11 +2109,11 @@ body.cora-scroll-locked {
 #cora-canvas-subtabs.cora-tabs-stuck,
 .cora-sticky-sub-tabs.cora-tabs-stuck,
 .cora-sub-tabs-container.cora-tabs-stuck {
-    background-color: rgba(251, 250, 247, 0.98) !important;
-    backdrop-filter: blur(8px) !important;
-    -webkit-backdrop-filter: blur(8px) !important;
+    background-color: rgba(255, 255, 255, 0.96) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
     border-bottom-color: rgba(228, 228, 231, 0.95) !important;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05) !important;
+    box-shadow: 0 4px 14px -2px rgba(0, 0, 0, 0.06), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
 }
 
 .dark #cora-content-tabs.cora-tabs-stuck,
@@ -2101,12 +2124,137 @@ body.cora-scroll-locked {
 .dark #cora-canvas-subtabs.cora-tabs-stuck,
 .dark .cora-sticky-sub-tabs.cora-tabs-stuck,
 .dark .cora-sub-tabs-container.cora-tabs-stuck {
-    background-color: rgba(12, 12, 14, 0.98) !important;
+    background-color: rgba(12, 12, 14, 0.96) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border-bottom-color: #27272a !important;
+    box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Platform-Wide MCP Button in Global Header: Hides automatically when subtabs bar with MCP exists */
+body:has(.cora-sticky-sub-tabs) #cora-header-mcp-btn,
+body.has-subtabs #cora-header-mcp-btn {
+    display: none !important;
+}
+
+/* =============================================================================
+   CORA LIVING AI MCP BUTTON (Luminous Frosted Peach-Lavender Aesthetic)
+   ============================================================================= */
+.cora-ai-alive-btn,
+#cora-btn-ai-mcp-gateway {
+    position: relative !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    height: 28px !important;
+    min-height: 28px !important;
+    max-height: 28px !important;
+    padding: 0 12px 0 10px !important;
+    border-radius: 10px !important;
+    border: 1.2px solid transparent !important;
+    color: #e78235 !important;
+    font-size: 11.5px !important;
+    font-weight: 600 !important;
+    letter-spacing: -0.01em !important;
+    line-height: 1 !important;
+    text-shadow: none !important;
+    cursor: pointer !important;
+    outline: none !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+    white-space: nowrap !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+    margin-bottom: 0 !important;
     backdrop-filter: blur(8px) !important;
     -webkit-backdrop-filter: blur(8px) !important;
-    border-bottom-color: #27272a !important;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.4) !important;
+    background: 
+        linear-gradient(105deg, rgba(255, 255, 255, 0.96) 0%, rgba(255, 247, 237, 0.92) 25%, rgba(255, 237, 213, 0.75) 45%, rgba(250, 245, 255, 0.85) 75%, rgba(238, 215, 255, 0.92) 100%) padding-box,
+        linear-gradient(105deg, rgba(251, 146, 60, 0.65) 0%, rgba(254, 215, 170, 0.45) 40%, rgba(216, 180, 254, 0.5) 70%, rgba(192, 132, 252, 0.75) 100%) border-box !important;
+    box-shadow: 
+        -14px 0 24px -2px rgba(251, 146, 60, 0.38),
+        -4px 0 10px rgba(249, 115, 22, 0.2),
+        0 2px 10px rgba(192, 132, 252, 0.16),
+        inset 0 1px 1px rgba(255, 255, 255, 0.95) !important;
+    transition: transform 0.16s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.22s ease,
+                filter 0.22s ease !important;
+    animation: cora-ai-living-pulse 3.8s ease-in-out infinite !important;
 }
+
+@keyframes cora-ai-living-pulse {
+    0%, 100% {
+        box-shadow: 
+            -14px 0 22px -2px rgba(251, 146, 60, 0.34),
+            -4px 0 10px rgba(249, 115, 22, 0.18),
+            0 2px 10px rgba(192, 132, 252, 0.15),
+            inset 0 1px 1.5px rgba(255, 255, 255, 0.95);
+        filter: brightness(1);
+    }
+    50% {
+        box-shadow: 
+            -18px 0 30px -1px rgba(251, 146, 60, 0.52),
+            -6px 0 14px rgba(249, 115, 22, 0.28),
+            0 2px 14px rgba(192, 132, 252, 0.28),
+            inset 0 1px 2px rgba(255, 255, 255, 1);
+        filter: brightness(1.03);
+    }
+}
+
+.cora-ai-alive-btn:hover,
+#cora-btn-ai-mcp-gateway:hover {
+    transform: translateY(-0.5px) scale(1.02) !important;
+    filter: brightness(1.06) !important;
+    box-shadow: 
+        -18px 0 30px -1px rgba(251, 146, 60, 0.55),
+        -6px 0 14px rgba(249, 115, 22, 0.32),
+        0 3px 14px rgba(192, 132, 252, 0.3),
+        inset 0 1px 2px rgba(255, 255, 255, 1) !important;
+}
+
+.cora-ai-alive-btn:active,
+#cora-btn-ai-mcp-gateway:active {
+    transform: translateY(0) scale(0.97) !important;
+    filter: brightness(0.97) !important;
+}
+
+.cora-ai-alive-btn .cora-ai-bolt-icon,
+#cora-btn-ai-mcp-gateway .cora-ai-bolt-icon,
+.cora-ai-alive-btn .cora-ai-plug-icon,
+#cora-btn-ai-mcp-gateway .cora-ai-plug-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #e78235 !important;
+    transition: transform 0.22s ease;
+}
+
+.cora-ai-alive-btn:hover .cora-ai-bolt-icon,
+#cora-btn-ai-mcp-gateway:hover .cora-ai-bolt-icon,
+.cora-ai-alive-btn:hover .cora-ai-plug-icon,
+#cora-btn-ai-mcp-gateway:hover .cora-ai-plug-icon {
+    transform: scale(1.1) rotate(-3deg);
+}
+
+.dark .cora-ai-alive-btn,
+.dark #cora-btn-ai-mcp-gateway {
+    background: 
+        linear-gradient(105deg, rgba(38, 26, 24, 0.95) 0%, rgba(45, 30, 28, 0.9) 25%, rgba(42, 26, 46, 0.88) 60%, rgba(38, 22, 54, 0.94) 100%) padding-box,
+        linear-gradient(105deg, rgba(251, 146, 60, 0.75) 0%, rgba(249, 115, 22, 0.55) 40%, rgba(192, 132, 252, 0.65) 100%) border-box !important;
+    color: #fb923c !important;
+    box-shadow: 
+        -14px 0 24px -2px rgba(251, 146, 60, 0.35),
+        0 2px 12px rgba(168, 85, 247, 0.22),
+        inset 0 1px 1px rgba(255, 255, 255, 0.12) !important;
+}
+
+.dark .cora-ai-alive-btn .cora-ai-plug-icon,
+.dark #cora-btn-ai-mcp-gateway .cora-ai-plug-icon {
+    color: #fb923c !important;
+}
+
 
 /* =============================================================================
    3. MOBILE PERFORMANCE & HARDWARE ACCELERATION OPTIMIZATIONS

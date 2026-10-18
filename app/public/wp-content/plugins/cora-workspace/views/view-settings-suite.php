@@ -585,7 +585,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
         #cora-settings-tabs { display: flex !important; }
     }
 </style>
-<div id="cora-settings-tabs" class="cora-sub-tabs-container cora-sticky-sub-tabs lg:hidden items-center gap-1 border-b border-zinc-200/80 dark:border-zinc-800 select-none overflow-x-auto scrollbar-hide bg-[#FBFaf7] dark:bg-[#0c0c0e] -mx-3 sm:-mx-4 md:-mx-5 px-3 sm:px-4 md:px-5 w-[calc(100%+1.5rem)] sm:w-[calc(100%+2rem)] md:w-[calc(100%+2.5rem)] max-w-[calc(100%+1.5rem)] sm:max-w-[calc(100%+2rem)] md:max-w-[calc(100%+2.5rem)] mb-4" style="position: -webkit-sticky; position: sticky; top: var(--cora-sticky-tabs-top, 0px); left: 0; right: 0; z-index: 40; flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; touch-action: pan-x pan-y; overscroll-behavior-x: contain; scrollbar-width: none; min-height: 40px; height: 40px; padding-top: 0; padding-bottom: 0; margin-top: 0;">
+<div id="cora-settings-tabs" class="cora-sub-tabs-container cora-sticky-sub-tabs lg:hidden items-center gap-1 border-b border-zinc-200/80 dark:border-zinc-800 select-none overflow-x-auto scrollbar-hide bg-transparent -mx-3 sm:-mx-4 md:-mx-5 px-3 sm:px-4 md:px-5 w-[calc(100%+1.5rem)] sm:w-[calc(100%+2rem)] md:w-[calc(100%+2.5rem)] max-w-[calc(100%+1.5rem)] sm:max-w-[calc(100%+2rem)] md:max-w-[calc(100%+2.5rem)] mb-4" style="position: -webkit-sticky; position: sticky; top: var(--cora-sticky-tabs-top, 0px); left: 0; right: 0; z-index: 45; flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; touch-action: pan-x pan-y; overscroll-behavior-x: contain; scrollbar-width: none; min-height: 44px; height: 44px; padding-top: 0; padding-bottom: 0; margin-top: 0; background-color: transparent;">
     <?php
     $tabs = $cora_settings_tabs;
     foreach ( $tabs as $tab_key => $tab ) :
@@ -1729,10 +1729,7 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         Instead of connecting each workspace module separately, your Workspace Account Key grants unified access across the Content Suite, CRM Leads, Clients, Media Vault, and Analytics.
                     </p>
                     <div class="pt-1 flex items-center gap-3">
-                        <button type="button" onclick="if(typeof coraOpenWorkspaceDeveloperGateway === 'function') coraOpenWorkspaceDeveloperGateway();" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-850 text-white dark:bg-white dark:text-zinc-950 text-xs font-bold rounded-xl transition-all shadow-2xs cursor-pointer border-0 flex items-center gap-2">
-                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 2l-2 2m-2-2l2 2m-2 2l2-2m-7 7l7-7-3-3-7 7v3h3z"></path><circle cx="7.5" cy="16.5" r="4.5"></circle></svg>
-                            <span>Open Developer Gateway &amp; Keys</span>
-                        </button>
+                        <?php if ( function_exists( 'cora_get_mcp_button_html' ) ) { echo cora_get_mcp_button_html(); } ?>
                     </div>
                 </div>
             </div>
@@ -4175,7 +4172,12 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         <!-- Gemini Flash -->
                         <div class="p-3.5 bg-white border border-zinc-200 rounded-2xl space-y-2 cursor-pointer hover:border-zinc-950 transition-all shadow-3xs" onclick="window.coraQuickSetModel('gemini', 'Gemini Flash'); if(window.coraShowToast) window.coraShowToast('Model set to Gemini Flash', 'success');">
                             <div class="flex items-center justify-between">
-                                <span class="text-xs font-bold text-zinc-900">Gemini 2.5 Flash</span>
+                                <div class="flex items-center gap-2">
+                                    <div class="w-6 h-6 rounded-lg bg-zinc-100 flex items-center justify-center shrink-0">
+                                        <?php echo cora_get_ai_platform_official_logo( 'gemini', '', 14 ); ?>
+                                    </div>
+                                    <span class="text-xs font-bold text-zinc-900">Gemini 2.5 Flash</span>
+                                </div>
                                 <span class="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-800">&lt;50ms</span>
                             </div>
                             <p class="text-[11px] text-zinc-500 m-0 leading-relaxed">Lightning fast RAG search, voice synthesis, and instant UI generation.</p>
@@ -4184,7 +4186,12 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         <!-- Claude Sonnet -->
                         <div class="p-3.5 bg-white border border-zinc-200 rounded-2xl space-y-2 cursor-pointer hover:border-zinc-950 transition-all shadow-3xs" onclick="window.coraQuickSetModel('claude-3-5-sonnet', 'Claude 3.5'); if(window.coraShowToast) window.coraShowToast('Model set to Claude 3.5 Sonnet', 'success');">
                             <div class="flex items-center justify-between">
-                                <span class="text-xs font-bold text-zinc-900">Claude 3.5 Sonnet</span>
+                                <div class="flex items-center gap-2">
+                                    <div class="w-6 h-6 rounded-lg bg-zinc-100 flex items-center justify-center shrink-0">
+                                        <?php echo cora_get_ai_platform_official_logo( 'claude', '', 14 ); ?>
+                                    </div>
+                                    <span class="text-xs font-bold text-zinc-900">Claude 3.5 Sonnet</span>
+                                </div>
                                 <span class="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-800">Pro</span>
                             </div>
                             <p class="text-[11px] text-zinc-500 m-0 leading-relaxed">Deep reasoning, complex contracts drafting, and creative marketing copy.</p>
@@ -4193,7 +4200,12 @@ if ( function_exists( 'cora_render_workspace_header' ) ) {
                         <!-- GPT-4o -->
                         <div class="p-3.5 bg-white border border-zinc-200 rounded-2xl space-y-2 cursor-pointer hover:border-zinc-950 transition-all shadow-3xs" onclick="window.coraQuickSetModel('gpt-4o', 'GPT-4o'); if(window.coraShowToast) window.coraShowToast('Model set to GPT-4o', 'success');">
                             <div class="flex items-center justify-between">
-                                <span class="text-xs font-bold text-zinc-900">ChatGPT 4o</span>
+                                <div class="flex items-center gap-2">
+                                    <div class="w-6 h-6 rounded-lg bg-zinc-100 flex items-center justify-center shrink-0">
+                                        <?php echo cora_get_ai_platform_official_logo( 'openai', '', 14 ); ?>
+                                    </div>
+                                    <span class="text-xs font-bold text-zinc-900">ChatGPT 4o</span>
+                                </div>
                                 <span class="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-800">Omni</span>
                             </div>
                             <p class="text-[11px] text-zinc-500 m-0 leading-relaxed">Multi-modal structured calculations, ledger balance, and spreadsheets.</p>

@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Bot, Layers, FileCheck, DollarSign, Sparkles, Check, ArrowUpRight, Zap, Shield } from 'lucide-react';
 import { trackEvent } from '../analytics/Analytics';
+import { ClaudeLogo, OpenAILogo, GeminiLogo } from '../features/OfficialBrandLogos';
 
 export function ProductShowcase() {
   const [activeTab, setActiveTab] = useState<'ai' | 'kanban' | 'vault' | 'gst'>('ai');
@@ -113,9 +114,18 @@ export function ProductShowcase() {
                   <p className="text-xs text-zinc-500">Route complex client drafts to Claude 3.5 Sonnet, speed queries to Gemini 2.0, and JSON extraction to GPT-4o.</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold px-2.5 py-1 bg-purple-50 text-purple-700 border border-purple-200 rounded-full">Claude 3.5 Active</span>
-                  <span className="text-xs font-semibold px-2.5 py-1 bg-zinc-100 text-zinc-600 rounded-full">GPT-4o Ready</span>
-                  <span className="text-xs font-semibold px-2.5 py-1 bg-zinc-100 text-zinc-600 rounded-full">Gemini 2.0 Ready</span>
+                  <span className="text-xs font-semibold px-2.5 py-1 bg-amber-50 text-amber-900 border border-amber-200/80 rounded-full inline-flex items-center gap-1.5 shadow-3xs">
+                    <ClaudeLogo size={13} />
+                    <span>Claude 3.5 Active</span>
+                  </span>
+                  <span className="text-xs font-semibold px-2.5 py-1 bg-zinc-50 text-zinc-700 border border-zinc-200/80 rounded-full inline-flex items-center gap-1.5 shadow-3xs">
+                    <OpenAILogo size={13} />
+                    <span>GPT-4o Ready</span>
+                  </span>
+                  <span className="text-xs font-semibold px-2.5 py-1 bg-zinc-50 text-zinc-700 border border-zinc-200/80 rounded-full inline-flex items-center gap-1.5 shadow-3xs">
+                    <GeminiLogo size={13} />
+                    <span>Gemini 2.0 Ready</span>
+                  </span>
                 </div>
               </div>
 
@@ -130,7 +140,7 @@ export function ProductShowcase() {
                 </div>
                 <div className="border-l-2 border-purple-500 pl-3 py-1 bg-purple-50/30 rounded-r-md">
                   <div className="text-[0.8125rem] font-medium text-zinc-900 mb-1 flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-purple-600" />
+                    <ClaudeLogo size={14} />
                     <span>Claude 3.5 Sonnet Response (Generated in 380ms):</span>
                   </div>
                   <p className="text-xs text-zinc-600 leading-relaxed font-sans">

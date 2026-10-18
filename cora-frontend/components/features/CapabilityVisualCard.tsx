@@ -19,62 +19,9 @@ import {
 } from 'lucide-react';
 import { FeatureModule } from '@/lib/features-data';
 
-// ── OFFICIAL BRAND LOGOS (VECTOR SVGS) ──
-
-export function ClaudeLogo({ className = "w-4 h-4" }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none">
-      <path
-        d="M17.472 2a.75.75 0 0 1 .71.512l1.642 5.053a.75.75 0 0 1-.22.788l-4.088 3.395 3.916 3.593a.75.75 0 0 1 .184.8l-1.854 4.978a.75.75 0 0 1-1.345.105l-3.415-4.07-3.415 4.07a.75.75 0 0 1-1.345-.105l-1.854-4.978a.75.75 0 0 1 .184-.8l3.916-3.593-4.088-3.395a.75.75 0 0 1-.22-.788L7.3 2.512A.75.75 0 0 1 8.01 2h9.462z"
-        fill="#D97706"
-      />
-    </svg>
-  );
-}
-
-export function GeminiLogo({ className = "w-4 h-4" }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none">
-      <path
-        d="M12 0C12 6.627 6.627 12 0 12C6.627 12 12 17.373 12 24C12 17.373 17.373 12 24 12C17.373 12 12 6.627 12 0Z"
-        fill="url(#gemini-grad-card)"
-      />
-      <defs>
-        <linearGradient id="gemini-grad-card" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#4E82EE" />
-          <stop offset="50%" stopColor="#9B72CB" />
-          <stop offset="100%" stopColor="#D96570" />
-        </linearGradient>
-      </defs>
-    </svg>
-  );
-}
-
-export function OpenAILogo({ className = "w-4 h-4" }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-      <path
-        d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.259 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7466-7.0729z"
-        fill="#10A37F"
-      />
-    </svg>
-  );
-}
-
-export function WhatsAppLogo({ className = "w-4 h-4" }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-      <path
-        d="M12.031 0C5.395 0 0 5.395 0 12.031c0 2.12.553 4.188 1.604 6.01L.062 24l6.143-1.61A12.03 12.03 0 0 0 12.03 24c6.637 0 12.031-5.395 12.031-12.031S18.668 0 12.031 0z"
-        fill="#25D366"
-      />
-      <path
-        d="M17.5 14.3c-.3-.15-1.78-.88-2.06-.98-.28-.1-.48-.15-.68.15-.2.3-.78.98-.95 1.18-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.68-1.64-.93-2.25-.24-.59-.49-.51-.68-.52h-.58c-.2 0-.52.07-.8.37-.27.3-1.05 1.03-1.05 2.51s1.08 2.91 1.23 3.11c.15.2 2.12 3.24 5.14 4.54.72.31 1.28.5 1.72.64.72.23 1.38.2 1.9.12.58-.09 1.78-.73 2.03-1.43.25-.7.25-1.3.18-1.43-.08-.13-.28-.2-.58-.35z"
-        fill="#FFFFFF"
-      />
-    </svg>
-  );
-}
+// ── OFFICIAL BRAND LOGOS (RE-EXPORTED FROM CANONICAL REGISTRY) ──
+import { ClaudeLogo, GeminiLogo, OpenAILogo, WhatsAppLogo } from './OfficialBrandLogos';
+export { ClaudeLogo, GeminiLogo, OpenAILogo, WhatsAppLogo };
 
 export function UPILogoBadge() {
   return (

@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.401
+ * Version:           4.9.406
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.401' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.406' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -459,6 +459,9 @@ require_once plugin_dir_path( __FILE__ ) . 'includes/class-cora-plugins-skills-e
 
 // ── Cora Workspace Content REST API Controller (Open Workspace API)
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-cora-workspace-content-rest-controller.php';
+
+// ── Cora Autonomous Content Campaigns Engine
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-cora-autonomous-campaigns.php';
 
 
 
@@ -1614,26 +1617,6 @@ function cora_workspace_handle_workspace_route() {
         }
     }
     
-    // Intercept Account Email Verification or Magic Link immediately before any routing or auth redirects
-    if ( isset( $_GET['cora_verify_token'] ) || isset( $_GET['verify_token'] ) || isset( $_GET['cora_magic_token'] ) || in_array( 'verify', $path_parts, true ) || ( isset( $_GET['token'] ) && ( isset( $_GET['uid'] ) || isset( $_GET['cora_user_id'] ) || in_array( 'workspace', $path_parts, true ) ) ) ) {
-        if ( function_exists( 'cora_workspace_handle_email_verification' ) ) {
-            cora_workspace_handle_email_verification();
-        }
-    }
-
-    // Intercept REST API v1 requests
-    if ( isset( $path_parts[0] ) && 'api' === $path_parts[0] && isset( $path_parts[1] ) && 'v1' === $path_parts[1] ) {
-        cora_handle_api_v1_request( $path_parts );
-        exit;
-    }
-    
-    // Intercept Public Documentation
-    if ( isset( $path_parts[0] ) && 'docs' === $path_parts[0] ) {
-        if ( function_exists( 'cora_docs_handle_public_route' ) ) {
-            cora_docs_handle_public_route();
-        }
-        exit;
-    }
     // Intercept WhatsApp 24h Activation Redirect
     if ( ( isset( $path_parts[0] ) && 'workspace' === $path_parts[0] && isset( $path_parts[1] ) && 'wa-activate' === $path_parts[1] ) || $path === 'wa-activate' ) {
         if ( class_exists( 'Cora_WhatsApp_Gateway' ) ) {
@@ -1676,6 +1659,28 @@ function cora_workspace_handle_workspace_route() {
             echo cora_render_24h_executive_pdf_html( $data );
             exit;
         }
+    }
+
+    // Intercept Account Email Verification or Magic Link immediately before any routing or auth redirects
+    $is_verify_candidate = isset( $_GET['cora_verify_token'] ) || isset( $_GET['verify_token'] ) || isset( $_GET['cora_magic_token'] ) || in_array( 'verify', $path_parts, true ) || ( isset( $_GET['token'] ) && ( isset( $_GET['uid'] ) || isset( $_GET['cora_user_id'] ) || in_array( 'verify', $path_parts, true ) ) );
+    if ( $is_verify_candidate && ! in_array( 'executive-report', $path_parts, true ) ) {
+        if ( function_exists( 'cora_workspace_handle_email_verification' ) ) {
+            cora_workspace_handle_email_verification();
+        }
+    }
+
+    // Intercept REST API v1 requests
+    if ( isset( $path_parts[0] ) && 'api' === $path_parts[0] && isset( $path_parts[1] ) && 'v1' === $path_parts[1] ) {
+        cora_handle_api_v1_request( $path_parts );
+        exit;
+    }
+    
+    // Intercept Public Documentation
+    if ( isset( $path_parts[0] ) && 'docs' === $path_parts[0] ) {
+        if ( function_exists( 'cora_docs_handle_public_route' ) ) {
+            cora_docs_handle_public_route();
+        }
+        exit;
     }
 
     // Intercept PWA Manifest and Service Worker to serve them from the root scope
@@ -5511,6 +5516,30 @@ add_action( 'rest_api_init', function () {
         'permission_callback' => '__return_true',
     ) );
 
+    register_rest_route( 'cora/v1', '/mcp/sse', array(
+        'methods'             => array( 'GET', 'POST' ),
+        'callback'            => 'cora_rest_mcp_handler',
+        'permission_callback' => '__return_true',
+    ) );
+
+    register_rest_route( 'cora-mcp/v1', '', array(
+        'methods'             => array( 'GET', 'POST' ),
+        'callback'            => 'cora_rest_mcp_handler',
+        'permission_callback' => '__return_true',
+    ) );
+
+    register_rest_route( 'cora-mcp/v1', '/sse', array(
+        'methods'             => array( 'GET', 'POST' ),
+        'callback'            => 'cora_rest_mcp_handler',
+        'permission_callback' => '__return_true',
+    ) );
+
+    register_rest_route( 'cora-mcp/v1', '/endpoint', array(
+        'methods'             => array( 'GET', 'POST' ),
+        'callback'            => 'cora_rest_mcp_handler',
+        'permission_callback' => '__return_true',
+    ) );
+
     register_rest_route( 'cora/v1', '/mcp/openapi.json', array(
         'methods'             => 'GET',
         'callback'            => 'cora_rest_mcp_openapi_handler',
@@ -5721,6 +5750,32 @@ add_action( 'rest_api_init', function () {
     );
     register_rest_route( 'cora/v1', '/whatsapp/webhook', $wa_webhook_args );
     register_rest_route( 'cora-workspace/v1', '/whatsapp-webhook', $wa_webhook_args );
+
+    // ── Autonomous Content Campaigns REST Endpoints ────────────────────────
+    register_rest_route( 'cora/v1', '/campaigns', array(
+        array(
+            'methods'             => 'GET',
+            'callback'            => array( 'Cora_Autonomous_Campaigns', 'rest_get_campaigns' ),
+            'permission_callback' => function( $req ) { return Cora_Autonomous_Campaigns::check_permission( $req, 'read' ); },
+        ),
+        array(
+            'methods'             => 'POST',
+            'callback'            => array( 'Cora_Autonomous_Campaigns', 'rest_create_campaign' ),
+            'permission_callback' => function( $req ) { return Cora_Autonomous_Campaigns::check_permission( $req, 'write' ); },
+        ),
+    ) );
+
+    register_rest_route( 'cora/v1', '/campaigns/(?P<id>[a-zA-Z0-9_\-]+)/trigger', array(
+        'methods'             => 'POST',
+        'callback'            => array( 'Cora_Autonomous_Campaigns', 'rest_trigger_campaign' ),
+        'permission_callback' => function( $req ) { return Cora_Autonomous_Campaigns::check_permission( $req, 'write' ); },
+    ) );
+
+    register_rest_route( 'cora/v1', '/content/(?P<id>\d+)/improve', array(
+        'methods'             => 'POST',
+        'callback'            => array( 'Cora_Autonomous_Campaigns', 'rest_improve_content' ),
+        'permission_callback' => function( $req ) { return Cora_Autonomous_Campaigns::check_permission( $req, 'write' ); },
+    ) );
 } );
 
 if ( ! function_exists( 'cora_rest_whatsapp_webhook_verify' ) ) {
@@ -5808,27 +5863,31 @@ function cora_rest_whatsapp_webhook_receive( $request ) {
                 // Process Inbound Messages (Resets 24-Hour Free Service Window!)
                 if ( ! empty( $val['messages'] ) && is_array( $val['messages'] ) ) {
                     foreach ( $val['messages'] as $msg ) {
-                        $from = $msg['from'] ?? '';
+                        $from     = $msg['from'] ?? '';
                         $msg_type = $msg['type'] ?? 'text';
                         $msg_body = '';
+                        $btn_id   = '';
                         if ( 'text' === $msg_type && isset( $msg['text']['body'] ) ) {
                             $msg_body = $msg['text']['body'];
                         } elseif ( 'interactive' === $msg_type ) {
                             $msg_body = $msg['interactive']['button_reply']['title'] ?? ( $msg['interactive']['list_reply']['title'] ?? 'Interactive reply' );
+                            $btn_id   = $msg['interactive']['button_reply']['id'] ?? ( $msg['interactive']['list_reply']['id'] ?? '' );
                         } elseif ( 'button' === $msg_type ) {
-                            $msg_body = $msg['button']['text'] ?? 'Button click';
+                            $msg_body = $msg['button']['text'] ?? ( $msg['button']['payload'] ?? 'Button click' );
+                            $btn_id   = $msg['button']['payload'] ?? '';
                         }
 
                         if ( ! empty( $from ) ) {
                             $gateway->record_inbound_message( $from, array(
-                                'body' => $msg_body,
-                                'type' => $msg_type,
-                                'id'   => $msg['id'] ?? '',
+                                'body'      => $msg_body,
+                                'type'      => $msg_type,
+                                'id'        => $msg['id'] ?? '',
+                                'button_id' => $btn_id,
                             ) );
 
                             // Intelligently process inbound query: automatically flushes queued alerts or serves interactive bot commands
                             if ( method_exists( $gateway, 'handle_inbound_query' ) ) {
-                                $gateway->handle_inbound_query( $from, $msg_body );
+                                $gateway->handle_inbound_query( $from, $msg_body, $btn_id );
                             } elseif ( method_exists( $gateway, 'send_daily_activation_reply' ) ) {
                                 $gateway->send_daily_activation_reply( $from );
                             }
@@ -7738,14 +7797,15 @@ function cora_rest_mcp_openapi_handler( $request = null ) {
     // Top 28 core high-priority operational actions for OpenAI Custom GPT 30-action limit compliance
     $curated_priority_names = array(
         'cora_get_workspace_overview',
-        'cora_canvas_get_active_theme',
-        'cora_canvas_list_themes',
-        'cora_canvas_get_page_html',
-        'cora_canvas_update_page_html',
-        'cora_canvas_create_theme',
-        'cora_canvas_activate_theme',
-        'cora_get_website_settings',
-        'cora_update_website_settings',
+        'cora_list_campaigns',
+        'cora_create_campaign',
+        'cora_trigger_campaign_run',
+        'cora_improve_content',
+        'cora_get_autonomous_activity_log',
+        'cora_list_articles',
+        'cora_create_article',
+        'cora_publish_article',
+        'cora_audit_article_seo',
         'cora_list_leads',
         'cora_get_lead',
         'cora_create_lead',
@@ -7758,13 +7818,12 @@ function cora_rest_mcp_openapi_handler( $request = null ) {
         'cora_create_task',
         'cora_update_task',
         'cora_query_financials',
-        'cora_record_financial_transaction',
-        'cora_search_content',
-        'cora_create_article',
-        'cora_publish_content',
+        'cora_canvas_get_active_theme',
+        'cora_canvas_list_themes',
+        'cora_canvas_get_page_html',
+        'cora_canvas_update_page_html',
         'cora_search_knowledge_base',
         'cora_add_knowledge_fragment',
-        'cora_list_forms',
     );
 
     $filtered_tools = array();
@@ -64584,7 +64643,7 @@ When the user asks you to perform an action, append one of the following tags at
     } elseif (strpos($normalized, 'index') !== false || strpos($normalized, 'check') !== false) {
         $reply = "I've scanned your public articles. Your Google Search Console health status is optimal. All 5 primary pages are crawlable and indexed successfully.\n\n[ACTION: SHOW_TOAST|text=\"GSC verification check complete: 100% crawl state\"]";
     } else {
-        $reply = "Hi Shruti! I'm your Cora AI Content Agent. I'm connected to your library and opportunities. Would you like me to draft a newborn photography tips guide, check your Google indexing status, or view the publishing calendar?";
+        $reply = "Hi Studio Director! I'm your Cora AI Content Agent. I'm connected to your library and opportunities. Would you like me to draft a newborn photography tips guide, check your Google indexing status, or view the publishing calendar?";
     }
 
     wp_send_json_success( array(
@@ -64604,6 +64663,43 @@ function preg_html_title_extract($prompt, &$title) {
     return false;
 }
 }
+
+// =========================================================================
+// CORA AUTONOMOUS CONTENT CAMPAIGNS — AJAX HANDLERS
+// =========================================================================
+
+add_action( 'wp_ajax_cora_ajax_get_campaigns', 'cora_ajax_get_campaigns' );
+add_action( 'wp_ajax_cora_get_campaigns', 'cora_ajax_get_campaigns' );
+if ( ! function_exists( 'cora_ajax_get_campaigns' ) ) {
+function cora_ajax_get_campaigns() {
+    Cora_Autonomous_Campaigns::ajax_get_campaigns();
+}
+}
+
+add_action( 'wp_ajax_cora_ajax_create_campaign', 'cora_ajax_create_campaign' );
+add_action( 'wp_ajax_cora_create_campaign', 'cora_ajax_create_campaign' );
+if ( ! function_exists( 'cora_ajax_create_campaign' ) ) {
+function cora_ajax_create_campaign() {
+    Cora_Autonomous_Campaigns::ajax_create_campaign();
+}
+}
+
+add_action( 'wp_ajax_cora_ajax_trigger_campaign', 'cora_ajax_trigger_campaign' );
+add_action( 'wp_ajax_cora_trigger_campaign', 'cora_ajax_trigger_campaign' );
+if ( ! function_exists( 'cora_ajax_trigger_campaign' ) ) {
+function cora_ajax_trigger_campaign() {
+    Cora_Autonomous_Campaigns::ajax_trigger_campaign();
+}
+}
+
+add_action( 'wp_ajax_cora_ajax_improve_article', 'cora_ajax_improve_article' );
+add_action( 'wp_ajax_cora_improve_article', 'cora_ajax_improve_article' );
+if ( ! function_exists( 'cora_ajax_improve_article' ) ) {
+function cora_ajax_improve_article() {
+    Cora_Autonomous_Campaigns::ajax_improve_article();
+}
+}
+
 
 // =========================================================================
 // CORA MEDIA MANAGER — EXTENDED V1 HANDLERS

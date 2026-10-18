@@ -1,4 +1,4 @@
-# Cora Platform — Developer Feature & Optimization Guide (v4.9.389)
+# Cora Platform — Developer Feature & Optimization Guide (v4.9.401)
 
 This guide defines the standardized architectural patterns, blueprints, and performance guidelines for engineering new modules and extending features across the Cora SaaS Workspace (`app/public/wp-content/plugins/cora-workspace`) and Marketing Frontend (`cora-frontend`).
 
@@ -122,8 +122,15 @@ This guide defines the standardized architectural patterns, blueprints, and perf
 111. **Dynamic Plugins, Modules & AI Skills Extensibility Engine (v4.9.387)**: Workspace modular engine delivers a 3-tab segmented control matrix: Plugins, Modules, and Skills (`/workspace/plugins`, `/workspace/modules`, `/workspace/skills`). Backed by dedicated isolated schema (`wp_cora_workspace_plugins`, `wp_cora_workspace_skills`, `wp_cora_workspace_api_keys`, `wp_cora_workspace_plugin_logs`) scoped by `agency_id`. Active plugins dynamically inject MCP tools via the `cora_mcp_tools` filter hook into `Cora_MCP_Tool_Registry`. Supports JSON Plugin Manifests and Antigravity `SKILL.md` format ingestion alongside autonomous AI generation. Dedicated API & MCP Gateway drawer manages tenant-scoped API keys (`cora_ws_live_...`), scopes, rate limits, and live OpenAPI discovery.
 112. **Enterprise Client Onboarding Suite & Strict Role Isolation (v4.9.386 - v4.9.387)**: 5-step guided onboarding studio in `views/view-clients.php` (Entity Profile, Multi-Currency / Tax Regimes, Production Service Matrix & Catalog, Initial Project Showcase, User Provisioning & Credentials). Strict WordPress role `cora_client` portal isolation prevents clients from accessing `/workspace` and redirects them to their personal portal. Automatic persistence of custom production services to `cora_workspace_services_{agency_id}` via `cora_ajax_save_workspace_custom_service`. Automatic lead conversion linking `wp_cora_leads` to `wp_cora_clients` with `won` status progression.
 113. **Two-Way Scheduling Calendar & Google Meet Standardization (v4.9.386 - v4.9.387)**: Full Month, Week, and Day calendar grids (`views/view-calendar.php`) with 2-way bidirectional Google Calendar sync. Enforces official 3-4-3 Google Meet syntax (`https://meet.google.com/xxx-yyyy-zzz`). Shareable public client booking flows with duration, buffers, pricing, and locations. Appointments automatically reflect into the CRM sales pipeline as qualified leads.
-114. **Google Business Profile & Google Maps AI Autopilot Suite (v4.9.388)**: Local reputation and Maps SEO hub in `views/view-google-profile.php` featuring a multi-state architecture (Unconnected Hero with OAuth & Places search, Multi-Branch Location Switcher, Connected Operations Hub with 4-KPI analytical scorecards: Total Impressions, Search Views, Directions Requests, Calls), 5-tab segmented control matrix (Reviews & AI Autopilot with 4 tones: Warm, Professional, Concise, Apology; Maps Post Publisher for Standard, Offer, and Event topics; Business Info & 7-Day Operating Hours editor with closed toggles; Local SEO & Map-Pack Ranks with #1 in 3-Pack badges and 94% visibility score; Multi-Branch Locations switcher), and a right-sliding API Credentials Drawer (`#cora-gbp-keys-panel`) with masked OAuth Client ID/Secret, Google Maps API key, copyable redirect URI, and Escape key dismissal.
+114. **Principle 90: Google Business Profile & Google Maps AI Autopilot Architecture (v4.9.388 - v4.9.389)**: Local reputation and Maps SEO hub in `views/view-google-profile.php` featuring a multi-state architecture (Unconnected Hero with Google OAuth 2.0 & Places search, Multi-Branch Location Switcher, Connected Operations Hub with 4-KPI analytical scorecards: Total Impressions, Search Views, Directions Requests, Calls), 5-tab segmented control matrix (Reviews & AI Autopilot with 4 tones: Warm, Professional, Concise, Apology; Maps Post Publisher for Standard, Offer, and Event topics; Business Info & 7-Day Operating Hours editor with closed toggles; Local SEO & Map-Pack Ranks with #1 in 3-Pack badges and 94% visibility score; Multi-Branch Locations switcher), and a right-sliding API Credentials Drawer (`#cora-gbp-keys-panel`) with masked OAuth Client ID/Secret, Google Maps API key, copyable redirect URI, and Escape key dismissal.
 115. **Google 0-Quota Proactive Advisory Card & 1-Click Sandbox Simulation Fallback (v4.9.389)**: Google Cloud imposes a strict default quota of 0 requests per minute (0 QPM) on the `mybusinessaccountmanagement` API for newly created projects until verified. When quota limit errors (429 or quota exceeded) are returned during account fetch, Cora presents a proactive monochromatic advisory card (`0 QPM Default`) explaining the review timeline, providing a direct link to the Google Access Request Form, and offering a 1-click **"Test in Sandbox Mode Now"** button (`window.coraGbpAuthorizeDemoAccount('studio.director@elitestudio.local')`). Sandbox mode simulates verified accounts, multi-branch listings, reviews, and post scheduling, enabling 100% test coverage without blocking agency onboarding.
+116. **Principle 91: Unified Workspace Content REST API & 11-Point Algorithmic SEO Audit Engine (`/wp-json/cora/v1/content`) (v4.9.391)**: The Content Suite provides a fully authenticated, tenant-isolated REST API (`Cora_Workspace_Content_REST_Controller`) under `/wp-json/cora/v1/content` supporting dual authentication via workspace API keys (`cora_ws_live_...`) or active session nonces. The controller provides complete CRUD parity with the workspace UI, including pagination, category filtering, keyword search, publish/unpublish state transitions, and batch operations. Embedded within the controller is an 11-point algorithmic SEO and GEO audit engine (`audit_article_seo` / `calculate_seo_scores`) that evaluates title length, meta description conciseness, primary keyword presence across H1/H2 tags and introductory copy, image alt-attribute coverage, outbound and internal reference density, content readability scores, and schema structured data readiness, returning actionable remediation items and numerical optimization scores (0–100) alongside automated strategic topic opportunities (`generate_content_opportunities`).
+117. **Principle 92: Canonical 9-Tool MCP Content Suite & Dual-Source Data Layer (v4.9.391)**: The universal Model Context Protocol registry (`Cora_MCP_Tool_Registry`) exposes a canonical 9-tool Content Suite (`cora_list_articles`, `cora_get_article`, `cora_create_article`, `cora_update_article`, `cora_delete_article`, `cora_publish_article`, `cora_unpublish_article`, `cora_bulk_update_articles`, and `cora_audit_article_seo`) enabling external AI coding agents (Claude Desktop, Cursor, ChatGPT, Antigravity) to manage agency content programmatically. The engine implements a resilient dual-source data abstraction layer: reading and writing seamlessly from both native WordPress posts (`wp_posts` with `post_type = 'post'`) and Cora's dedicated multi-tenant editorial table (`wp_cora_content_entries`), guaranteeing complete backward compatibility with existing blogs while enforcing strict workspace tenant isolation (`agency_id = %d`).
+118. **Principle 93: Shopify-Inspired Workspace Developer Gateway Docked Panel (Rule 15 SOP) (v4.9.391)**: Developer tooling and API credentials are encapsulated in a Shopify-inspired docked view panel (`workspace-developer-gateway-drawer.php`) adhering strictly to Design System Rule 15 SOP. The panel slides up smoothly from the bottom (`translateY(100%)` to `translateY(0)`) directly beneath the global top header (`top: 52px; height: calc(100vh - 52px)`), dynamically synchronizing its canvas bounds to sidebar status (`left: 16rem` expanded, `left: 4rem` collapsed, `left: 0` mobile) with zero backdrop/dimming overlay, zero floating box-shadow, and full ongoing accessibility of the sidebar. The gateway features a Level 01 Segmented Pill Control organizing 5 developer sub-tabs: Workspace Keys (generating and revoking scoped `cora_ws_live_...` tokens), Connect AI Agent (1-click copyable configuration snippets for Claude Desktop `claude_desktop_config.json`, Cursor, and ChatGPT Custom GPTs), Universal Tools Matrix (searchable directory of all registered MCP tools and schemas), REST Endpoints Reference (interactive endpoint documentation with parameter specifications), and Live Sandbox Execution (in-browser REST tester allowing developers to run live requests and inspect real-time responses).
+119. **Principle 94: WhatsApp Cloud API 24h Free Customer Service Window (CSW) & Zero-Cost Queue Architecture (v4.9.390 - v4.9.399)**: Under Meta's conversation-based pricing model, business-initiated template messages incur recurring per-conversation fees, whereas customer-initiated messages unlock a rolling 24-hour Customer Service Window (CSW) during which free-form session messages, media cards, and interactive buttons are delivered at zero cost. Cora's WhatsApp gateway (`Cora_WhatsApp_Gateway`) implements an intelligent zero-cost queue engine (`queue_pending_update`, `flush_pending_updates`). When automated alerts occur outside an active 24-hour window, the gateway stores updates in `cora_wa_pending_updates_{phone}` rather than triggering billable templates. Users can activate their 24h free session with a single click from the workspace header or navigation via a pre-populated direct link (`https://wa.me/917015317965?text=Hi%20Cora`), or by tapping daily Web Push notification prompts. The instant an inbound message or webhook arrives, the engine marks the window active (`cora_wa_session_window_{phone}`) with a 24-hour expiration timestamp and atomically flushes all queued updates into an elegant, formatted single digest or itemized interactive cards without incurring Meta template charges.
+120. **Principle 95: WhatsApp Inbound Bot Engine, DP Sync, Interactive Quick-Reply Buttons & Image Cards (v4.9.399 - v4.9.400)**: Inbound WhatsApp messages are routed to an autonomous natural-language command processor (`handle_inbound_query`) that recognizes conversational queries and numeric shortcuts: `1` / `leads` (real-time CRM inquiries with caller, contact, and source attribution), `2` / `revenue` (cleared revenue, pending receivables, and synced Document Vault invoices), `3` / `attendance` (today's team punches, geofence compliance, and staff timesheets), `4` / `report` (instant dispatch of the certified executive briefing), and `5` / `status` (gateway connectivity, verified profile DP, window countdown, and quota metrics). To eliminate noisy, untrusted raw URL links in chat, all bot responses utilize native WhatsApp Interactive Quick-Reply Buttons (`send_interactive_buttons`, up to 3 action pills such as "View Full Report", "Recent Leads", "Today Revenue") and rich Image Cards (`send_image_card`) featuring verified header context, body copy, and official footer metadata (`24h Free Customer Service Window`), preserving a clean, tactile executive user experience.
+121. **Principle 96: Super Admin Integrations & WhatsApp Telemetry Hub (Live 24h Windows, Real-Time Countdowns, Dispatch Savings) (v4.9.397)**: The Super Admin console (`views/view-super-admin.php`) features a dedicated Integrations & WhatsApp Telemetry Hub providing real-time visibility across Meta WhatsApp Cloud API v25.0 operations. The hub monitors active 24-hour customer service windows with live countdown timers, tracks service conversation quota consumption against Meta's 1,000 monthly free tier allowance, verifies billed charges in the Meta ledger (confirming zero fee operation), and computes cumulative rupee cost savings achieved by queueing messages inside customer service windows. Administrative tooling includes 1-click Web Push session activation prompts broadcast to all workspace owners, a live interactive test dispatch console measuring sub-second delivery latency (`cora_super_test_whatsapp_dispatch`), and a real-time event log streaming webhook payloads and delivery receipts.
+122. **Principle 97: WhatsApp Anti-Spam Rate Limiting (3/hr), Smart Lead Batching & 1-Click Tokenized PDF Report (v4.9.401)**: To protect agency directors and workspace owners from mobile notification fatigue, the WhatsApp gateway enforces a strict rolling 1-hour anti-spam rate limiter (`can_send_automated_message`, `record_automated_message_sent`) capping automated notifications to a maximum of 3 dispatches per rolling 60-minute window per recipient. Inbound inquiries arriving in rapid succession are intelligently batched into consolidated lead digests (`flush_pending_updates`) grouping notifications by operational category rather than firing repetitive micro-alerts. Daily executive reports generated by the platform are delivered with a single tap as certified, tokenized A4 PDF summaries (`cora_get_24h_report_url`) granting instant authenticated viewing without requiring tedious manual mobile logins, seamlessly bridging WhatsApp messaging directly into Cora's executive reporting pipeline.
 
 ---
 ---
@@ -1670,62 +1677,41 @@ In `includes/workspace-header.php`, pass `tabs_extra_html` wrapped in `h-full fl
 
 ---
 
-## 71. Google Business Profile & Google Maps AI Autopilot Engineering Blueprint (v4.9.388 - v4.9.389)
+## 71. Mobile Sticky Offsets, Sub-Tabs Stacking & 28px Touch Target Sizing Blueprint (v4.9.385)
 
-The Google Business Profile (GBP) & Google Maps AI Autopilot module (`views/view-google-profile.php`) provides full-lifecycle local SEO automation, automated customer review replies, and multi-branch management:
+Mobile viewport ergonomics, sticky offset calculation, and sub-tabs touch sizing in `assets/js/admin-script.js` and `assets/css/admin-style.css`:
 
-### 1. Multi-State Reactive Hub Architecture
-The view dynamically transitions across three states based on authentication and branch selection:
-- **State A (Unconnected Hero)**: Minimalist hero banner with 1-click Google OAuth 2.0 connection (`#cora-gbp-oauth-btn`), Places API text search lookup (`#cora-gbp-search-q`), and a 1-click sandbox demo shortcut (`coraGbpAuthorizeDemoAccount`).
-- **State B (Multi-Branch Location Picker)**: Interactive grid allowing agencies managing multiple studio branches or franchise locations to inspect and activate a specific target location.
-- **State C (Connected Hub)**: Live operational dashboard displaying 4 primary KPI scorecards:
-  - Total Impressions (Search + Maps views)
-  - Direct Search Views vs Discovery Searches
-  - Direction Requests on Google Maps
-  - Direct Phone Calls initiated from the Business Profile
-  All scorecards include 30-day percentage trajectory badges and sparkline indicators.
+### 1. Dynamic Sticky Offset Recalculation Engine
+On mobile viewports (< 768px), stacking navigation headers and sub-tabs frequently resulted in double-header visual gaps. The runtime calculation in `window.coraUpdateStickyOffsets` dynamically calculates available vertical space:
+- Sets `--cora-sticky-tabs-top` directly to the topbar height (`h + 'px'`).
+- Locks `--cora-mobile-header-height` to `0px` on mobile viewports to prevent redundant vertical offsets:
+  ```javascript
+  window.coraUpdateStickyOffsets = function() {
+      const topbar = document.getElementById('cora-workspace-header') || document.querySelector('.cora-topbar');
+      if (topbar) {
+          const h = topbar.offsetHeight;
+          document.documentElement.style.setProperty('--cora-sticky-tabs-top', h + 'px');
+          if (window.innerWidth < 768) {
+              document.documentElement.style.setProperty('--cora-mobile-header-height', '0px');
+          }
+      }
+  };
+  ```
+- Registers listeners across `resize` and `orientationchange` events to dynamically adjust values without page refresh.
 
-### 2. 5-Tab Segmented Control Matrix
-The connected interface enforces Level 01 Segmented Control navigation across 5 core workflows:
-1. **Reviews & AI Autopilot**:
-   - Filter pills: `All`, `Needs Reply`, `Replied`, `5 Stars`, `Critical (<=3 Stars)`.
-   - Tone Selector: `Warm`, `Professional`, `Concise`, `Apology`.
-   - 1-Click AI Generation (`coraGbpGenerateAiReply` via `cora_gbp_generate_ai_reply` AJAX endpoint) generating context-aware replies matching agency tone.
-   - 1-Click Instant Publishing (`coraGbpPostReply` via `cora_gbp_reply_review` AJAX endpoint) persisting the reply directly to Google Maps via API.
-2. **Maps Post Publisher**:
-   - Announcement composer supporting 3 topic types: `STANDARD`, `OFFER` (with coupon codes and terms), and `EVENT` (with start/end dates).
-   - Action CTA button selector: `LEARN_MORE`, `CALL_NOW`, `BOOK`, `SIGN_UP`.
-   - Media photo upload attachments and live preview card.
-   - Chronological post stream with instant revocation/deletion (`cora_gbp_delete_post`).
-3. **Business Info & 7-Day Operating Hours**:
-   - Primary business metadata editor (Name, Category, Primary Phone, Website URL, Address).
-   - 7-day schedule editor (Monday through Sunday) with open/close time pickers and dedicated "Closed" toggles.
-   - Single-click atomic persistence (`cora_gbp_update_business_info`).
-4. **Local SEO & Map-Pack Ranks**:
-   - Keyword ranking table tracking target search phrases (e.g. "Photography Studio Gurugram", "Portrait Studio Cyber City").
-   - #1 in 3-Pack badges, 94% local visibility scorecard, and automated local SEO optimization checklist.
-5. **Multi-Branch Locations**:
-   - Multi-branch switcher allowing agencies to toggle between studio locations (e.g. Cyber City Hub and South Delhi branch) with active status badges.
+### 2. Touch Target Sizing & Button Constraints Exemption
+To comply with WCAG 2.1 AAA touch target guidelines while maintaining a compact sub-tabs aesthetic:
+- Sub-tabs buttons are constrained to a compact 22px height on desktop for maximum content visibility.
+- Mobile search triggers (`#cora-proj-search-trigger-btn`) and close buttons (`#cora-proj-search-close-btn`) are explicitly exempted from global sub-tabs constraints:
+  ```css
+  .cora-sub-tabs button:not(#cora-proj-search-trigger-btn):not(#cora-proj-search-close-btn) {
+      height: 22px;
+  }
+  ```
+- This ensures mobile buttons maintain comfortable 28px tap targets (`w-7 h-7`), preventing missed taps on mobile touchscreens.
 
-### 3. Right-Sliding API Credentials Drawer (`#cora-gbp-keys-panel`)
-- Allows workspace owners to configure their custom Google Cloud Client ID, Client Secret, and Google Maps API Key.
-- Secure masked inputs with visibility toggle eye buttons.
-- Copyable OAuth redirect URI matching `/workspace/gbp`.
-- Full `Escape` key dismissal and backdrop click handling.
-
-### 4. Google 0-Quota Proactive Advisory Card & 1-Click Sandbox Fallback (v4.9.389)
-When Google Cloud returns 0 requests-per-minute (0 QPM default quota) on newly provisioned projects during account fetch (`cora_gbp_fetch_accounts`), Cora intercepts the error and displays a proactive monochromatic card (`#cora-gbp-quota-advisory`):
-- Explains Google's developer approval timeline (1–3 business days).
-- Provides a direct link to the Google Access Request Form (`https://support.google.com/business/contact/api_default`).
-- Exposes a 1-click **"Test in Sandbox Mode Now"** button (`window.coraGbpAuthorizeDemoAccount('studio.director@elitestudio.local')`).
-- Sandbox mode hydrates simulated verified accounts, multi-branch listings, reviews, and post streams, allowing complete verification of all agency features without waiting for Google Cloud quota approvals.
-
-### 5. Automated E2E Test Suite (`test-gbp-management.spec.ts`)
-Comprehensive 4-test Playwright suite covering:
-- `TC-GBP-01`: Unconnected state, Places search, credentials drawer open/close, and Escape key dismissal.
-- `TC-GBP-02`: Multi-branch location switcher and connected state activation.
-- `TC-GBP-03`: Reviews AI Copilot, 4-tone generation, and 1-click publishing.
-- `TC-GBP-04`: Maps Post Publisher, 7-day business hours editor, and Local SEO 3-Pack rank tracker.
+### 3. Root Module Mount Margins
+Standardizes module container mounting directly beneath the sticky workspace header using clean structural spacing (`mt-4`), eliminating overlapping borders and margin collapse.
 
 ---
 
@@ -1849,4 +1835,327 @@ Navigation items are structured into 4 logical accordion groups:
 
 ---
 
-*Cora Developer Feature Guide v4.9.389 — Last updated: October 2026.*
+## 76. Google Business Profile & Google Maps AI Autopilot Blueprint (v4.9.388 - v4.9.389)
+
+The Google Business Profile (GBP) & Google Maps AI Autopilot module (`views/view-google-profile.php`) provides full-lifecycle local SEO automation, automated customer review replies, and multi-branch management:
+
+### 1. Multi-State Reactive Hub Architecture
+The view dynamically transitions across three states based on authentication and branch selection:
+- **State A (Unconnected Hero)**: Minimalist hero banner with 1-click Google OAuth 2.0 connection (`#cora-gbp-oauth-btn`), Places API text search lookup (`#cora-gbp-search-q`), and a 1-click sandbox demo shortcut (`coraGbpAuthorizeDemoAccount`).
+- **State B (Multi-Branch Location Picker)**: Interactive grid allowing agencies managing multiple studio branches or franchise locations to inspect and activate a specific target location.
+- **State C (Connected Hub)**: Live operational dashboard displaying 4 primary KPI scorecards:
+  - Total Impressions (Search + Maps views)
+  - Direct Search Views vs Discovery Searches
+  - Direction Requests on Google Maps
+  - Direct Phone Calls initiated from the Business Profile
+  All scorecards include 30-day percentage trajectory badges and sparkline indicators.
+
+### 2. 5-Tab Segmented Control Matrix
+The connected interface enforces Level 01 Segmented Control navigation across 5 core workflows:
+1. **Reviews & AI Autopilot**:
+   - Filter pills: `All`, `Needs Reply`, `Replied`, `5 Stars`, `Critical (<=3 Stars)`.
+   - Tone Selector: `Warm`, `Professional`, `Concise`, `Apology`.
+   - 1-Click AI Generation (`coraGbpGenerateAiReply` via `cora_gbp_generate_ai_reply` AJAX endpoint) generating context-aware replies matching agency tone.
+   - 1-Click Instant Publishing (`coraGbpPostReply` via `cora_gbp_reply_review` AJAX endpoint) persisting the reply directly to Google Maps via API.
+2. **Maps Post Publisher**:
+   - Announcement composer supporting 3 topic types: `STANDARD`, `OFFER` (with coupon codes and terms), and `EVENT` (with start/end dates).
+   - Action CTA button selector: `LEARN_MORE`, `CALL_NOW`, `BOOK`, `SIGN_UP`.
+   - Media photo upload attachments and live preview card.
+   - Chronological post stream with instant revocation/deletion (`cora_gbp_delete_post`).
+3. **Business Info & 7-Day Operating Hours**:
+   - Primary business metadata editor (Name, Category, Primary Phone, Website URL, Address).
+   - 7-day schedule editor (Monday through Sunday) with open/close time pickers and dedicated "Closed" toggles.
+   - Single-click atomic persistence (`cora_gbp_update_business_info`).
+4. **Local SEO & Map-Pack Ranks**:
+   - Keyword ranking table tracking target search phrases (e.g. "Photography Studio Gurugram", "Portrait Studio Cyber City").
+   - #1 in 3-Pack badges, 94% local visibility scorecard, and automated local SEO optimization checklist.
+5. **Multi-Branch Locations**:
+   - Multi-branch switcher allowing agencies to toggle between studio locations (e.g. Cyber City Hub and South Delhi branch) with active status badges.
+
+### 3. Right-Sliding API Credentials Drawer (`#cora-gbp-keys-panel`)
+- Allows workspace owners to configure their custom Google Cloud Client ID, Client Secret, and Google Maps API Key.
+- Secure masked inputs with visibility toggle eye buttons.
+- Copyable OAuth redirect URI matching `/workspace/gbp`.
+- Full `Escape` key dismissal and backdrop click handling.
+
+### 4. Google 0-Quota Proactive Advisory Card & 1-Click Sandbox Fallback (v4.9.389)
+When Google Cloud returns 0 requests-per-minute (0 QPM default quota) on newly provisioned projects during account fetch (`cora_gbp_fetch_accounts`), Cora intercepts the error and displays a proactive monochromatic card (`#cora-gbp-quota-advisory`):
+- Explains Google's developer approval timeline (1–3 business days).
+- Provides a direct link to the Google Access Request Form (`https://support.google.com/business/contact/api_default`).
+- Exposes a 1-click **"Test in Sandbox Mode Now"** button (`window.coraGbpAuthorizeDemoAccount('studio.director@elitestudio.local')`).
+- Sandbox mode hydrates simulated verified accounts, multi-branch listings, reviews, and post streams, allowing complete verification of all agency features without waiting for Google Cloud quota approvals.
+
+### 5. Automated E2E Test Suite (`test-gbp-management.spec.ts`)
+Comprehensive 4-test Playwright suite covering:
+- `TC-GBP-01`: Unconnected state, Places search, credentials drawer open/close, and Escape key dismissal.
+- `TC-GBP-02`: Multi-branch location switcher and connected state activation.
+- `TC-GBP-03`: Reviews AI Copilot, 4-tone generation, and 1-click publishing.
+- `TC-GBP-04`: Maps Post Publisher, 7-day business hours editor, and Local SEO 3-Pack rank tracker.
+
+---
+
+## 77. Unified Workspace Content REST API & 11-Point Algorithmic SEO Audit Blueprint (v4.9.391)
+
+The Workspace Content REST API (`includes/class-cora-workspace-content-rest-controller.php`) provides full programmatic editorial management under namespace `cora/v1` and base `content`:
+
+### 1. Dual Authentication & Scope Enforcement
+Endpoints support both session nonces for logged-in workspace staff and bearer API keys (`cora_ws_live_...`) for external developer agents:
+- Validated via `Cora_Plugins_Skills_Engine::authenticate_api_key( $request )`.
+- Scopes required: `content:read` (or `content:write`, `read`, `write`, `admin`).
+- Unauthenticated requests or mismatched tenant context (`agency_id`) are rejected with `401 Unauthorized` or `403 Forbidden`.
+
+### 2. Comprehensive Endpoint Matrix
+| Route | Method | Scope | Description |
+| :--- | :--- | :--- | :--- |
+| `/wp-json/cora/v1/content` | `GET` | `read` | List/search articles with pagination (`page`, `per_page`), category, search query, and status (`publish`, `draft`). |
+| `/wp-json/cora/v1/content` | `POST` | `write` | Create a new article with title, content, slug, category, tags, focus keyword, and meta description. Computes initial SEO audit automatically. |
+| `/wp-json/cora/v1/content/{id}` | `GET` | `read` | Retrieve full article details, rendered blocks, structured metadata, and calculated SEO scorecards. |
+| `/wp-json/cora/v1/content/{id}` | `PATCH` / `PUT` | `write` | Update article title, content, category, tags, or SEO metadata. Automatically recalculates SEO score. |
+| `/wp-json/cora/v1/content/{id}` | `DELETE` | `write` | Move article to trash or permanently remove (`force=true`). |
+| `/wp-json/cora/v1/content/{id}/publish` | `POST` | `write` | Immediately transition post status to `publish`. |
+| `/wp-json/cora/v1/content/{id}/unpublish` | `POST` | `write` | Immediately transition post status to `draft`. |
+| `/wp-json/cora/v1/content/batch` | `POST` | `write` | Batch update multiple articles (`ids: [...]`, `action: 'publish' \| 'draft' \| 'delete' \| 'category'`). |
+| `/wp-json/cora/v1/content/{id}/seo-audit` | `POST` | `read` | Execute on-demand 11-point algorithmic SEO audit and persist updated score. |
+| `/wp-json/cora/v1/content/opportunities` | `GET` | `read` | List high-potential content topics, keyword difficulty, and estimated search volume. |
+| `/wp-json/cora/v1/content/generate-opportunities` | `POST` | `write` | Seed/regenerate AI strategic content opportunities based on agency vertical. |
+| `/wp-json/cora/v1/content/generate` | `POST` | `write` | Generate full article outline and draft sections using workspace LLM copilot. |
+
+### 3. 11-Point Algorithmic SEO & GEO Audit Engine
+Implemented in `calculate_seo_scores( $post_id, $title, $content, $slug, $keyword, $meta_desc )`:
+1. **Keyword in Title (+15 pts)**: Focus keyword present in title.
+2. **Keyword in Meta Description (+10 pts)**: Keyword present in meta description.
+3. **Keyword in URL Slug (+10 pts)**: Sanitized focus keyword present in slug.
+4. **Keyword in First 100 Words (+10 pts)**: Keyword appears in introductory 600 characters.
+5. **Content Length (+15 pts)**: Minimum 600 words (`$words >= 600`).
+6. **Subheading Distribution (+10 pts)**: Contains H2/H3 tags (`/<h[23][^>]*>/i`).
+7. **Keyword Density (+10 pts)**: Density between 0.8% and 3.0% (`($kw_count / $words) * 100`).
+8. **Featured Image Asset (+10 pts)**: High-resolution thumbnail attached (`has_post_thumbnail`).
+9. **Internal / Authority Citations (+10 pts)**: Contains outbound/internal anchor links (`/<a\s+[^>]*href=/i`).
+10. **GEO Entity / Local Intent Signals (+10 pts)**: Contains verified geographic and studio terms.
+11. **AI Overview Question Headings (+10 pts)**: Contains question-formatted subheadings (`/<h[23][^>]*>[^<]*\?[^<]*<\/h[23]>/i`).
+
+Combined score is bounded `min( 100, max( 15, $score ) )`, persisted to `_cora_seo_score`, and returned with detailed pass/fail checks and actionable remediation recommendations.
+
+---
+
+## 78. Canonical 9-Tool MCP Content Suite & Dual-Source Data Layer Blueprint (v4.9.391)
+
+The Model Context Protocol tool registry (`includes/mcp/class-cora-mcp-tool-registry.php`) exposes a curated 9-tool Content Suite enabling autonomous AI agents (Claude Desktop, Cursor, ChatGPT, Antigravity) to manage agency blogs and headless articles:
+
+### 1. Dual-Source Data Layer Architecture
+The MCP Content Suite abstracts underlying database storage, supporting two distinct content models:
+1. **Native WordPress Posts (`wp_posts`)**: Standard workspace blogs with `post_type = 'post'`.
+2. **Headless Editorial Table (`wp_cora_content_entries`)**: Dedicated multi-tenant schema with `agency_id = %d` isolation.
+The tool layer automatically queries both sources and transparently delegates mutations to the appropriate storage backend.
+
+### 2. Canonical 9-Tool MCP Definitions
+1. `cora_list_articles`: Search and paginate articles with status, category, keyword, and per-page parameters.
+2. `cora_get_article`: Fetch complete article body, metadata, author attribution, and SEO scores by ID.
+3. `cora_create_article`: Create article with title, content, focus keyword, meta description, and category.
+4. `cora_update_article`: Modify content, title, tags, or SEO configuration with automatic re-auditing.
+5. `cora_delete_article`: Soft-delete or permanently purge article records.
+6. `cora_publish_article`: Transition draft or pending article directly into published state.
+7. `cora_unpublish_article`: Revert published article to draft mode.
+8. `cora_bulk_update_articles`: Batch update status, categories, or perform bulk deletion.
+9. `cora_audit_article_seo`: Run the 11-point SEO audit algorithm and return actionable recommendations.
+
+### 3. Automatic Alias Normalization
+The registry maps common external agent query phrases into canonical tools:
+- `search_content`, `list_articles`, `cora_search_content` -> `cora_list_articles`
+- `get_content`, `growth_get_content` -> `cora_get_article`
+- `create_article`, `growth_create_article` -> `cora_create_article`
+- `update_article`, `growth_update_article` -> `cora_update_article`
+- `publish_content`, `growth_publish` -> `cora_publish_article`
+- `run_seo_analysis`, `cora_seo_audit` -> `cora_audit_article_seo`
+
+---
+
+## 79. Shopify-Inspired Workspace Developer Gateway Docked Panel Blueprint (v4.9.391)
+
+Developer and AI agent configuration interface in `includes/partials/workspace-developer-gateway-drawer.php`, adhering strictly to Design System Rule 15 SOP:
+
+### 1. Architectural Rule 15 SOP Compliance
+- **Zero Overlay / Zero Backdrop**: Rendered with `backdrop: false`, leaving the workspace 100% visible and interactive.
+- **Header Docking**: Positioned directly beneath global topbar: `top: 52px; height: calc(100vh - 52px);`.
+- **Dynamic Canvas Sizing**: Sized to main content space based on sidebar state:
+  - Sidebar expanded (`w-64`): `left: 16rem; width: calc(100vw - 16rem);`
+  - Sidebar collapsed (`w-16`): `left: 4rem; width: calc(100vw - 4rem);`
+  - Mobile (< 1024px): `left: 0; width: 100vw;`
+- **Scoped Main Scroll Lock**: `main.cora-main.classList.add('overflow-hidden')`, body and sidebar scroll remain free.
+- **Escape Key Dismissal**: Dismisses immediately upon pressing `Escape`.
+
+### 2. 5-Tab Segmented Matrix
+1. **Workspace Keys (`#cora-ws-pane-keys`)**:
+   - Manage tenant-scoped API keys (`cora_ws_live_...`).
+   - Scope selection: `content:read`, `content:write`, `leads:read`, `leads:write`, `calendar:read`, `financials:read`.
+   - 1-click token generation, key revocation, and copy triggers.
+2. **Connect AI Agent (`#cora-ws-pane-connect`)**:
+   - 1-click configuration templates for Claude Desktop (`claude_desktop_config.json`), Cursor (`.cursorrules`), and ChatGPT Custom GPTs.
+   - Dynamic token placeholder replacement.
+3. **Universal Tools (`#cora-ws-pane-tools`)**:
+   - Searchable registry of registered MCP tools with JSON schema inspection.
+   - Direct link to OpenAPI 3.0.1 export specification.
+4. **REST Endpoints (`#cora-ws-pane-rest`)**:
+   - Interactive endpoint documentation for `/wp-json/cora/v1/content`, `/leads`, `/calendar`, `/vault`.
+   - Parameter descriptions, request body structures, and response schemas.
+5. **Live Sandbox (`#cora-ws-pane-sandbox`)**:
+   - In-browser REST execution tester with HTTP method selector, path builder, headers editor, and response inspector.
+   - Measures live API latency and formats JSON responses.
+
+---
+
+## 80. WhatsApp Cloud API 24-Hour Free Customer Service Window (CSW) & Zero-Cost Queue Blueprint (v4.9.390 - v4.9.399)
+
+The WhatsApp messaging gateway (`includes/class-cora-whatsapp-gateway.php`) implements Meta's rolling 24-hour Customer Service Window (CSW) architecture to deliver automated operational alerts at zero cost:
+
+### 1. Meta Conversation-Based Pricing & CSW Economics
+- Meta WhatsApp Cloud API charges per-conversation fees for business-initiated template messages.
+- When a user sends an inbound message to the business number, Meta unlocks a rolling 24-hour Customer Service Window (CSW).
+- During this 24-hour window, all business replies, free-form text messages, media cards, and interactive button messages are delivered at **₹0.00 cost** (100% free tier).
+- Cora provides 1,000 free service conversations per month under Meta's allowance.
+
+### 2. Zero-Cost Pending Update Queue
+When an automated event occurs (new CRM lead, payment received, schedule reminder) while the recipient's 24h CSW is closed:
+```php
+if ( ! $gateway->get_session_window( $recipient_phone )['active'] ) {
+    // Queue update at zero cost instead of sending expensive paid templates
+    $gateway->queue_pending_update( $recipient_phone, $title, $body, $action_url, $category );
+} else {
+    // Window is active - deliver immediately as free session message
+    $gateway->send_session_message( $recipient_phone, $message );
+}
+```
+- Stored in WordPress options: `cora_wa_pending_updates_{phone}`.
+- Prevents unnecessary paid template charges.
+
+### 3. 1-Click Customer Session Activation Triggers
+Users can open their 24h free customer service window through multiple seamless touchpoints:
+1. **Workspace Header Trigger**: Pre-populated click-to-chat link: `https://wa.me/917015317965?text=Hi%20Cora`.
+2. **Sidebar Admin Popover**: "Activate 24h Free WhatsApp Window" action pill with status indicator.
+3. **Daily Web Push Notification**: Automated morning push reminder: "Tap to activate your daily 24h WhatsApp briefing window".
+
+### 4. Atomic Queue Flushing (`flush_pending_updates`)
+The instant an inbound webhook message arrives from the user:
+- The phone's session window is marked active for 24 hours: `cora_wa_session_window_{phone} = time() + 86400`.
+- The gateway atomically retrieves and clears queued items:
+  ```php
+  $pending = $this->get_pending_updates( $phone );
+  $this->clear_pending_updates( $phone );
+  ```
+- All pending alerts are consolidated into a structured executive digest or dispatched as interactive cards.
+
+---
+
+## 81. Autonomous WhatsApp Inbound Bot Engine, DP Sync & Interactive Quick-Reply Actions (v4.9.399 - v4.9.400)
+
+Inbound conversational query parser and interactive card dispatching in `includes/class-cora-whatsapp-gateway.php`:
+
+### 1. Autonomous Natural-Language & Numeric Command Parser
+Inbound messages received via webhook (`handle_inbound_query( $phone, $raw_text )`) are evaluated against operational keyword patterns:
+- `1` / `leads`: Queries `wp_cora_leads` for inquiries in the last 24–48 hours, returning caller name, budget, and source.
+- `2` / `revenue`: Queries `wp_cora_vault_documents` and invoices, returning cleared revenue and pending receivables.
+- `3` / `attendance`: Queries staff roster and field logs, returning team clock-ins and geofence compliance.
+- `4` / `report`: Generates the daily executive summary and sends it as a tokenized PDF attachment (`send_document`).
+- `5` / `status`: Checks Meta API connection quality, active 24h session window remaining time, and monthly quota.
+- `help` / `menu` / `hi`: Dispatches a formatted command directory with interactive quick-reply buttons.
+
+### 2. Official WhatsApp Profile Picture (DP) Synchronization
+- Automatically uploads and synchronizes the official high-resolution Cora wordmark avatar (`assets/images/cora-ai-whatsapp-dp.jpg`) with Meta Graph API (`v25.0/{phone_number_id}/whatsapp_business_profile`).
+- Ensures verified brand presentation in recipient chat threads.
+
+### 3. Interactive Quick-Reply Buttons (`send_interactive_buttons`)
+Replaces ugly raw URL strings with native WhatsApp interactive button elements:
+```php
+$gateway->send_interactive_buttons(
+    $recipient_phone,
+    "Here is your real-time operational summary for today.",
+    array(
+        array( 'id' => 'btn_leads',  'title' => 'Recent Leads' ),
+        array( 'id' => 'btn_revenue', 'title' => 'Today Revenue' ),
+        array( 'id' => 'btn_report',  'title' => 'View Full Report' )
+    ),
+    "Cora Studio AI",
+    "24h Free Customer Service Window"
+);
+```
+
+### 4. Rich Media Image Cards (`send_image_card`)
+Sends promotional announcements, case study highlights, or report previews with a header image container, formatted body text, and up to 3 interactive button pills.
+
+---
+
+## 82. Super Admin Integrations & WhatsApp Telemetry Hub Blueprint (v4.9.397)
+
+Command center for monitoring Meta WhatsApp Cloud API v25.0 operations in `views/view-super-admin.php`:
+
+### 1. Live 24h Active Windows Telemetry Monitor
+- Displays all currently active 24-hour customer service sessions across tenant phone numbers.
+- Real-time countdown timers (`wa-metric-active-sessions`) tracking remaining minutes until window closure.
+- Green status indicators for verified active windows.
+
+### 2. Free Tier Quota & Financial Verification Deck
+- **Monthly Free Quota**: Tracks conversation usage against Meta's 1,000 monthly free tier allowance (`wa-metric-free-quota`).
+- **Billed Charges Ledger**: Verifies that total Meta billing remains strictly **₹0.00 (Zero Fee Guarantee)** (`wa-metric-billed-cost`).
+- **Cumulative Rupee Savings**: Calculates total cost savings achieved vs standard commercial SMS gateways (baseline: ₹0.85 per message) (`wa-metric-rupees-saved`).
+
+### 3. Interactive Administrative Actions
+- **1-Click Web Push Session Activation**: Broadcasts a silent push prompt to all workspace owners inviting them to tap and open their 24h free WhatsApp session.
+- **Live Interactive Simulation Dispatches**: Administrative test panel (`cora_super_test_whatsapp_dispatch`) allowing real-time test messages to verify Meta Graph API latency (~180ms).
+- **Delivery Webhook Event Stream**: Live audit log showing webhook delivery receipts, read statuses, and error codes.
+
+---
+
+## 83. Anti-Spam Rate Limiting (3/hr), Smart Lead Batching & 1-Click Tokenized PDF Delivery (v4.9.401)
+
+Enterprise-grade notification protection and reporting bridge in `includes/class-cora-whatsapp-gateway.php`:
+
+### 1. Rolling 1-Hour Anti-Spam Rate Limiting
+To prevent notification fatigue and comply with Meta's messaging quality guidelines:
+- The gateway enforces a strict ceiling of **3 automated messages per rolling 60-minute window** per recipient:
+  ```php
+  public function can_send_automated_message( $phone ) {
+      $clean_phone = $this->clean_phone_number( $phone );
+      $transient_key = 'cora_wa_hourly_dispatches_' . $clean_phone;
+      $dispatches = get_transient( $transient_key );
+      if ( ! is_array( $dispatches ) ) {
+          return true;
+      }
+      // Filter timestamps within last 3600 seconds
+      $now = time();
+      $recent = array_filter( $dispatches, function( $ts ) use ( $now ) {
+          return ( $now - $ts ) < 3600;
+      } );
+      return count( $recent ) < 3;
+  }
+  ```
+- Automated dispatches exceeding the rate limit are automatically redirected into the pending update queue (`queue_pending_update`).
+
+### 2. Smart Inbound Lead Batching
+- High-velocity lead acquisition campaigns often trigger multiple form submissions within minutes.
+- Instead of firing individual alerts for every submission, the gateway batches consecutive submissions within a 5-minute debounce window.
+- Inquiries are consolidated into a single structured digest:
+  ```
+  [Cora CRM Alert] 3 New Leads Received:
+  1. Rohan Verma - Commercial Video Shoot (₹75,000)
+  2. Kavya Patel - Brand Identity Package (₹45,000)
+  3. Aarav Mehta - Studio Bay Rental (₹20,000)
+  ```
+- Actionable buttons attached: "View CRM Pipeline", "Acknowledge All".
+
+### 3. 1-Click Tokenized Executive PDF Report Delivery
+- Generates a certified 24-hour business summary compiled from Finance, Leads, Attendance, and Tasks.
+- Sends the report directly to WhatsApp as a native document attachment using `send_document`:
+  ```php
+  $pdf_url = cora_get_24h_report_url( $agency_id, 'tokenized' );
+  $gateway->send_document(
+      $phone,
+      $pdf_url,
+      "Daily Executive Briefing for " . date('d M Y'),
+      "Cora-Executive-Briefing-" . date('Y-m-d') . ".pdf"
+  );
+  ```
+- Includes a 32-byte CSPRNG token (`?token=cora_rep_...`) granting immediate authenticated viewing on mobile devices without requiring manual password entry.
+
+---
+
+*Cora Developer Feature Guide v4.9.401 — Last updated: October 2026.*

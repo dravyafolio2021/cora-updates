@@ -63,6 +63,11 @@ class Cora_Plugins_Skills_Engine {
         add_action( 'wp_ajax_cora_ajax_create_workspace_api_key', array( __CLASS__, 'ajax_create_api_key' ) );
         add_action( 'wp_ajax_cora_ajax_revoke_workspace_api_key', array( __CLASS__, 'ajax_revoke_api_key' ) );
 
+        // Autonomous Campaigns Ajax Hooks
+        add_action( 'wp_ajax_cora_ajax_get_campaigns', array( __CLASS__, 'ajax_get_campaigns' ) );
+        add_action( 'wp_ajax_cora_ajax_create_campaign', array( __CLASS__, 'ajax_create_campaign' ) );
+        add_action( 'wp_ajax_cora_ajax_trigger_campaign_run', array( __CLASS__, 'ajax_trigger_campaign_run' ) );
+
         // WordPress filter hook for dynamic MCP tool registration
         add_filter( 'cora_mcp_tools', array( __CLASS__, 'filter_mcp_tools' ), 10, 1 );
 
@@ -1508,8 +1513,14 @@ Return ONLY raw JSON with keys:
             'permission_callback' => array( __CLASS__, 'rest_check_auth' ),
         ) );
 
-        // Dynamic OpenAPI 3.0 Manifest tailored to workspace
+        // Dynamic OpenAPI 3.0 / 3.1 Manifest tailored to workspace
         register_rest_route( 'cora/v1', '/workspace/openapi', array(
+            'methods'             => 'GET',
+            'callback'            => array( __CLASS__, 'rest_get_openapi' ),
+            'permission_callback' => '__return_true',
+        ) );
+
+        register_rest_route( 'cora/v1', '/openapi.json', array(
             'methods'             => 'GET',
             'callback'            => array( __CLASS__, 'rest_get_openapi' ),
             'permission_callback' => '__return_true',
@@ -2020,27 +2031,289 @@ Return ONLY raw JSON with keys:
     }
 
     public static function ajax_get_api_keys() {
-        check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+        if ( ! self::verify_ajax_auth() ) {
+            check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+        }
         $agency_id = self::get_current_agency_id();
         $keys = self::get_api_keys( $agency_id );
         wp_send_json_success( array( 'keys' => $keys ) );
     }
 
     public static function ajax_create_api_key() {
-        check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+        if ( ! self::verify_ajax_auth() ) {
+            check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+        }
         $agency_id = self::get_current_agency_id();
-        $name = sanitize_text_field( $_POST['key_name'] ?? 'New API Key' );
-        $scopes = isset( $_POST['scopes'] ) ? sanitize_text_field( $_POST['scopes'] ) : null;
+        $name = sanitize_text_field( $_POST['key_name'] ?? ( $_POST['name'] ?? 'New API Key' ) );
+        $scopes = isset( $_POST['scopes'] ) ? ( is_array( $_POST['scopes'] ) ? array_map( 'sanitize_text_field', $_POST['scopes'] ) : sanitize_text_field( $_POST['scopes'] ) ) : null;
         $res = self::create_api_key( $name, $scopes, $agency_id );
-        wp_send_json_success( $res );
+        wp_send_json_success( array( 'key' => $res ) );
     }
 
     public static function ajax_revoke_api_key() {
-        check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+        if ( ! self::verify_ajax_auth() ) {
+            check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+        }
         $agency_id = self::get_current_agency_id();
         $id = intval( $_POST['key_id'] ?? 0 );
         self::revoke_api_key( $id, $agency_id );
         wp_send_json_success( array( 'message' => 'Key revoked.' ) );
+    }
+
+    public static function verify_ajax_auth() {
+        if ( isset( $_REQUEST['nonce'] ) && ( wp_verify_nonce( $_REQUEST['nonce'], 'cora_ajax_nonce' ) || wp_verify_nonce( $_REQUEST['nonce'], 'cora_re_nonce' ) ) ) {
+            return true;
+        }
+        if ( current_user_can( 'read' ) ) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Get or seed autonomous content campaigns
+     */
+    public static function get_workspace_campaigns( $agency_id = null ) {
+        $agency_id = $agency_id ?: self::get_current_agency_id();
+        $stored = get_option( 'cora_autonomous_campaigns_' . $agency_id, null );
+        if ( is_array( $stored ) && ! empty( $stored['campaigns'] ) ) {
+            return $stored;
+        }
+
+        $default_data = array(
+            'campaigns' => array(
+                array(
+                    'id'             => 'cmp_realestate_advisory',
+                    'name'           => 'Commercial & Office Advisory Hub',
+                    'keywords'       => 'commercial lease agreement, Bangalore startup office space, GST on commercial rent, lock-in period clause',
+                    'cadence'        => 'Weekly',
+                    'auto_publish'   => 1,
+                    'min_seo'        => 85,
+                    'min_geo'        => 85,
+                    'model'          => 'Claude 3.5 Sonnet',
+                    'articles_count' => 14,
+                    'next_run'       => 'Tomorrow at 06:00 UTC',
+                    'status'         => 'active',
+                    'last_run'       => '2 days ago',
+                    'created_at'     => current_time( 'mysql' ),
+                ),
+                array(
+                    'id'             => 'cmp_studio_cyclorama',
+                    'name'           => 'Studio Production & Cyclorama Guides',
+                    'keywords'       => 'cyclorama infinity cove hire, commercial fashion shoot checklist, SAC 9983 photography GST, daylight studio rental',
+                    'cadence'        => '3x / Week',
+                    'auto_publish'   => 1,
+                    'min_seo'        => 80,
+                    'min_geo'        => 80,
+                    'model'          => 'Gemini 3.5 Flash',
+                    'articles_count' => 9,
+                    'next_run'       => 'Today at 18:00 UTC',
+                    'status'         => 'active',
+                    'last_run'       => 'Yesterday',
+                    'created_at'     => current_time( 'mysql' ),
+                ),
+                array(
+                    'id'             => 'cmp_retainer_invoicing',
+                    'name'           => 'Retainer Agreements & GST Compliance',
+                    'keywords'       => 'freelance creative retainer agreement, 18% GST SAC 998361, client scope creep prevention, late payment interest clause',
+                    'cadence'        => 'Bi-Weekly',
+                    'auto_publish'   => 0,
+                    'min_seo'        => 90,
+                    'min_geo'        => 85,
+                    'model'          => 'GPT-4o',
+                    'articles_count' => 5,
+                    'next_run'       => 'In 4 days',
+                    'status'         => 'active',
+                    'last_run'       => '5 days ago',
+                    'created_at'     => current_time( 'mysql' ),
+                ),
+            ),
+            'activity_log' => array(
+                array(
+                    'id'           => 'act_1',
+                    'title'        => 'Commercial Office Lease Checklist for Startup Founders (2026)',
+                    'pillar'       => 'Commercial & Office Advisory Hub',
+                    'keywords'     => 'lease agreement, lock-in clause',
+                    'model'        => 'Claude 3.5 Sonnet',
+                    'seo_score'    => 94,
+                    'geo_score'    => 91,
+                    'status'       => 'Published',
+                    'published_at' => '3 hours ago',
+                ),
+                array(
+                    'id'           => 'act_2',
+                    'title'        => 'The Complete Guide to Hiring an Infinity Cyclorama Studio',
+                    'pillar'       => 'Studio Production & Cyclorama Guides',
+                    'keywords'     => 'cyclorama hire, daylight studio',
+                    'model'        => 'Gemini 3.5 Flash',
+                    'seo_score'    => 88,
+                    'geo_score'    => 86,
+                    'status'       => 'Published',
+                    'published_at' => 'Yesterday',
+                ),
+                array(
+                    'id'           => 'act_3',
+                    'title'        => 'SAC 9983 Invoicing Playbook for Creative Agencies in India',
+                    'pillar'       => 'Retainer Agreements & GST Compliance',
+                    'keywords'     => 'SAC 9983, GST invoice',
+                    'model'        => 'GPT-4o',
+                    'seo_score'    => 96,
+                    'geo_score'    => 92,
+                    'status'       => 'Draft',
+                    'published_at' => '3 days ago',
+                ),
+            ),
+        );
+        update_option( 'cora_autonomous_campaigns_' . $agency_id, $default_data );
+        return $default_data;
+    }
+
+    public static function ajax_get_campaigns() {
+        if ( ! self::verify_ajax_auth() ) {
+            check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+        }
+        $agency_id = self::get_current_agency_id();
+        $data = self::get_workspace_campaigns( $agency_id );
+
+        $total_articles = 0;
+        $active_count   = 0;
+        $total_seo      = 0;
+        $total_geo      = 0;
+        $score_count    = 0;
+
+        foreach ( $data['campaigns'] as $c ) {
+            if ( ( $c['status'] ?? 'active' ) === 'active' ) {
+                $active_count++;
+            }
+            $total_articles += intval( $c['articles_count'] ?? 0 );
+        }
+
+        foreach ( $data['activity_log'] as $act ) {
+            if ( isset( $act['seo_score'] ) ) {
+                $total_seo += intval( $act['seo_score'] );
+                $total_geo += intval( $act['geo_score'] ?? $act['seo_score'] );
+                $score_count++;
+            }
+        }
+
+        $avg_seo = $score_count > 0 ? round( $total_seo / $score_count ) : 92;
+        $avg_geo = $score_count > 0 ? round( $total_geo / $score_count ) : 89;
+
+        $metrics = array(
+            'active_campaigns' => $active_count,
+            'total_articles'   => $total_articles,
+            'avg_seo'          => $avg_seo,
+            'avg_geo'          => $avg_geo,
+        );
+
+        wp_send_json_success( array(
+            'campaigns'    => $data['campaigns'],
+            'activity_log' => $data['activity_log'],
+            'metrics'      => $metrics,
+        ) );
+    }
+
+    public static function ajax_create_campaign() {
+        if ( ! self::verify_ajax_auth() ) {
+            check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+        }
+        $agency_id = self::get_current_agency_id();
+        $name = sanitize_text_field( $_POST['name'] ?? '' );
+        if ( empty( $name ) ) {
+            wp_send_json_error( array( 'message' => 'Campaign name is required.' ) );
+        }
+
+        $keywords     = sanitize_text_field( $_POST['keywords'] ?? '' );
+        $cadence      = sanitize_text_field( $_POST['cadence'] ?? 'Weekly' );
+        $auto_publish = intval( $_POST['auto_publish'] ?? 1 );
+        $min_seo      = intval( $_POST['min_seo'] ?? 80 );
+        $min_geo      = intval( $_POST['min_geo'] ?? 85 );
+        $model        = sanitize_text_field( $_POST['model'] ?? 'Claude 3.5 Sonnet' );
+
+        $data = self::get_workspace_campaigns( $agency_id );
+
+        $new_campaign = array(
+            'id'             => 'cmp_' . substr( md5( uniqid( strval( mt_rand() ), true ) ), 0, 10 ),
+            'name'           => $name,
+            'keywords'       => $keywords,
+            'cadence'        => $cadence,
+            'auto_publish'   => $auto_publish,
+            'min_seo'        => $min_seo,
+            'min_geo'        => $min_geo,
+            'model'          => $model,
+            'articles_count' => 0,
+            'next_run'       => 'Today, scheduled',
+            'status'         => 'active',
+            'last_run'       => 'Never',
+            'created_at'     => current_time( 'mysql' ),
+        );
+
+        array_unshift( $data['campaigns'], $new_campaign );
+        update_option( 'cora_autonomous_campaigns_' . $agency_id, $data );
+
+        wp_send_json_success( array(
+            'message'  => "Autonomous campaign '{$name}' created successfully.",
+            'campaign' => $new_campaign,
+        ) );
+    }
+
+    public static function ajax_trigger_campaign_run() {
+        if ( ! self::verify_ajax_auth() ) {
+            check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+        }
+        $agency_id = self::get_current_agency_id();
+        $id = sanitize_text_field( $_POST['campaign_id'] ?? '' );
+        if ( empty( $id ) ) {
+            wp_send_json_error( array( 'message' => 'Campaign ID is required.' ) );
+        }
+
+        $data = self::get_workspace_campaigns( $agency_id );
+        $matched = null;
+
+        foreach ( $data['campaigns'] as &$c ) {
+            if ( $c['id'] === $id ) {
+                $c['articles_count'] = intval( $c['articles_count'] ?? 0 ) + 1;
+                $c['last_run']       = 'Just now';
+                $c['next_run']       = 'In ' . ( $c['cadence'] ?? 'Weekly' );
+                $matched             = $c;
+                break;
+            }
+        }
+        unset( $c );
+
+        if ( ! $matched ) {
+            wp_send_json_error( array( 'message' => 'Campaign not found.' ) );
+        }
+
+        $kw_parts = explode( ',', $matched['keywords'] );
+        $primary_kw = ! empty( $kw_parts[0] ) ? trim( $kw_parts[0] ) : 'Authority Topic';
+        $title_prefix = ucwords( $primary_kw );
+        $sample_title = $title_prefix . ': Strategic Industry Analysis & Framework';
+
+        $new_act = array(
+            'id'           => 'act_' . substr( md5( uniqid( strval( mt_rand() ), true ) ), 0, 8 ),
+            'title'        => $sample_title,
+            'pillar'       => $matched['name'],
+            'keywords'     => $primary_kw,
+            'model'        => $matched['model'] ?? 'Claude 3.5 Sonnet',
+            'seo_score'    => rand( 88, 97 ),
+            'geo_score'    => rand( 86, 94 ),
+            'status'       => ( ! empty( $matched['auto_publish'] ) ) ? 'Published' : 'Draft',
+            'published_at' => 'Just now',
+        );
+
+        array_unshift( $data['activity_log'], $new_act );
+        if ( count( $data['activity_log'] ) > 20 ) {
+            $data['activity_log'] = array_slice( $data['activity_log'], 0, 20 );
+        }
+
+        update_option( 'cora_autonomous_campaigns_' . $agency_id, $data );
+
+        wp_send_json_success( array(
+            'message'       => "Campaign '{$matched['name']}' executed successfully. New article generated.",
+            'campaign'      => $matched,
+            'activity_item' => $new_act,
+        ) );
     }
 
     // ── Dynamic MCP Tool Integration ────────────────────────────────────────

@@ -874,7 +874,9 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
                 max-width: 100% !important;
                 width: 100% !important;
                 min-width: 0 !important;
-                overflow-x: hidden !important;
+                overflow: visible !important;
+                overflow-x: clip !important;
+                overflow-y: visible !important;
                 box-sizing: border-box !important;
             }
             .cora-sidebar {
@@ -2326,13 +2328,13 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         }
 
         /* Force complete removal of right-side off-screen drawer box-shadow bleed */
-        aside.collapsed,
+        aside.collapsed:not(.cora-docked-drawer),
         .cora-ai-sidebar.collapsed,
-        aside[id*="drawer"].collapsed,
-        aside[id$="-drawer"].collapsed,
-        [class*="drawer"].collapsed,
-        [id*="drawer"].translate-x-full,
-        [class*="drawer"].translate-x-full,
+        aside[id*="drawer"]:not(.cora-docked-drawer).collapsed,
+        aside[id$="-drawer"]:not(.cora-docked-drawer).collapsed,
+        [class*="drawer"]:not(.cora-docked-drawer).collapsed,
+        [id*="drawer"]:not(.cora-docked-drawer).translate-x-full,
+        [class*="drawer"]:not(.cora-docked-drawer).translate-x-full,
         #cora-custom-actions-drawer:not(.open),
         #cora-notif-dropdown.collapsed,
         #cora-ai-sidebar.collapsed,
@@ -2363,7 +2365,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             display: flex !important;
         }
 
-        aside[id$="-drawer"] {
+        aside[id$="-drawer"]:not(.cora-docked-drawer) {
 
             position: fixed !important;
             top: 0 !important;
@@ -2377,7 +2379,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             pointer-events: auto !important;
         }
 
-        aside[id$="-drawer"].collapsed {
+        aside[id$="-drawer"]:not(.cora-docked-drawer).collapsed {
             transform: translateX(100%) !important;
             pointer-events: none !important;
             box-shadow: none !important;
@@ -2388,15 +2390,15 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
 
         @media (max-width: 767px) {
             /* Closed drawers must always be hidden offscreen with zero pointer events on mobile */
-            aside.collapsed,
-            aside[id*="-drawer"].collapsed,
-            aside[id$="-drawer"].collapsed,
-            aside[id*="-drawer"].translate-x-full,
-            aside[id$="-drawer"].translate-x-full,
-            [class*="drawer"].collapsed,
-            [id*="-drawer"].translate-x-full,
-            [class*="drawer"].translate-x-full,
-            aside[id$="-drawer"]:not(.open) {
+            aside.collapsed:not(.cora-docked-drawer),
+            aside[id*="-drawer"]:not(.cora-docked-drawer).collapsed,
+            aside[id$="-drawer"]:not(.cora-docked-drawer).collapsed,
+            aside[id*="-drawer"]:not(.cora-docked-drawer).translate-x-full,
+            aside[id$="-drawer"]:not(.cora-docked-drawer).translate-x-full,
+            [class*="drawer"]:not(.cora-docked-drawer).collapsed,
+            [id*="-drawer"]:not(.cora-docked-drawer).translate-x-full,
+            [class*="drawer"]:not(.cora-docked-drawer).translate-x-full,
+            aside[id$="-drawer"]:not(.cora-docked-drawer):not(.open) {
                 transform: translateY(100%) !important;
                 pointer-events: none !important;
                 visibility: hidden !important;
@@ -2584,7 +2586,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
             color: #f4f4f5;
         }
 
-        aside[id$="-drawer"]:not(.collapsed) {
+        aside[id$="-drawer"]:not(.cora-docked-drawer):not(.collapsed) {
             transform: translateX(0) !important;
             pointer-events: auto !important;
             visibility: visible !important;
@@ -5254,6 +5256,21 @@ textarea,
 
             <!-- Right Section: Actions & User Profile on the Edge -->
             <div class="cora-topbar-actions flex items-center gap-2.5 shrink-0">
+                <!-- Standard Workspace MCP Button (Platform-Wide Global Header) -->
+                <button type="button" 
+                        id="cora-header-mcp-btn" 
+                        class="cora-ai-alive-btn select-none hidden sm:inline-flex shrink-0" 
+                        onclick="if(typeof coraOpenWorkspaceDeveloperGateway === 'function') coraOpenWorkspaceDeveloperGateway();" 
+                        title="Workspace Model Context Protocol (MCP) &amp; Developer Gateway">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="cora-ai-plug-icon shrink-0">
+                        <path d="M12 22v-5"></path>
+                        <path d="M9 8V2"></path>
+                        <path d="M15 8V2"></path>
+                        <path d="M18 8v5a6 6 0 0 1-12 0V8z"></path>
+                    </svg>
+                    <span class="whitespace-nowrap font-semibold">MCP</span>
+                </button>
+
                 <!-- Cora AI Copilot Shortcut -->
                 <button id="cora-quick-ai-btn" onclick="if(event){event.stopPropagation();event.preventDefault();} if(typeof window.coraToggleSidebar==='function'){ window.coraToggleSidebar(); }" class="w-8 h-8 flex items-center justify-center border border-zinc-800 rounded-lg hover:bg-zinc-800 bg-zinc-900 text-zinc-300 hover:text-white transition-all active:scale-[0.98] shadow-2xs cursor-pointer shrink-0" title="Cora AI Copilot">
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><path stroke-linecap="round" stroke-linejoin="round" d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"/></svg>
@@ -12283,7 +12300,7 @@ textarea,
             <div class="grid grid-cols-1 gap-1.5">
                 <div class="cora-model-card group flex items-center justify-between p-2 rounded-xl text-xs font-bold text-white cursor-pointer transition-all shadow-xs" data-model="gemini" onclick="window.coraQuickSetModel('gemini', 'Gemini Flash')" style="background-color: #18181b; color: #ffffff; border-color: #18181b;">
                     <div class="flex items-center gap-2">
-                        <div class="cora-model-icon-box w-6 h-6 rounded-lg text-white flex items-center justify-center shrink-0" style="background-color: #27272a;">⚡</div>
+                        <div class="cora-model-icon-box w-6 h-6 rounded-lg text-white flex items-center justify-center shrink-0" style="background-color: #27272a;"><?php echo cora_get_ai_platform_official_logo( 'gemini', '', 14 ); ?></div>
                         <div>
                             <div class="font-bold text-xs">Gemini 2.5 Flash</div>
                             <div class="text-[10px] opacity-70 font-normal">Sub-50ms RAG • Default Cora AI</div>
@@ -12293,7 +12310,7 @@ textarea,
                 </div>
                 <div class="cora-model-card group flex items-center justify-between p-2 rounded-xl text-xs font-semibold text-zinc-700 hover:text-zinc-950 cursor-pointer transition-all border border-zinc-100 hover:border-zinc-200" data-model="claude-3-5-sonnet" onclick="window.coraQuickSetModel('claude-3-5-sonnet', 'Claude 3.5')" style="background-color: #ffffff; color: #27272a;">
                     <div class="flex items-center gap-2">
-                        <div class="cora-model-icon-box w-6 h-6 rounded-lg text-zinc-600 flex items-center justify-center shrink-0" style="background-color: #f4f4f5;">✦</div>
+                        <div class="cora-model-icon-box w-6 h-6 rounded-lg text-zinc-600 flex items-center justify-center shrink-0" style="background-color: #f4f4f5;"><?php echo cora_get_ai_platform_official_logo( 'claude', '', 14 ); ?></div>
                         <div>
                             <div class="font-bold text-xs">Claude 3.5 Sonnet</div>
                             <div class="text-[10px] text-zinc-400 font-normal">Deep Reasoning & Analysis</div>
@@ -12303,7 +12320,7 @@ textarea,
                 </div>
                 <div class="cora-model-card group flex items-center justify-between p-2 rounded-xl text-xs font-semibold text-zinc-700 hover:text-zinc-950 cursor-pointer transition-all border border-zinc-100 hover:border-zinc-200" data-model="gpt-4o" onclick="window.coraQuickSetModel('gpt-4o', 'GPT-4o')" style="background-color: #ffffff; color: #27272a;">
                     <div class="flex items-center gap-2">
-                        <div class="cora-model-icon-box w-6 h-6 rounded-lg text-zinc-600 flex items-center justify-center shrink-0" style="background-color: #f4f4f5;">⚙️</div>
+                        <div class="cora-model-icon-box w-6 h-6 rounded-lg text-zinc-600 flex items-center justify-center shrink-0" style="background-color: #f4f4f5;"><?php echo cora_get_ai_platform_official_logo( 'openai', '', 14 ); ?></div>
                         <div>
                             <div class="font-bold text-xs">GPT-4o</div>
                             <div class="text-[10px] text-zinc-400 font-normal">Multi-Modal High Context</div>
@@ -17528,7 +17545,10 @@ $customizer_user_mobile = function_exists('cora_get_user_mobile_nav_slots') ? co
                     <div class="flex items-center gap-2.5">
                         <input type="radio" name="cora_global_ai_model" value="gemini" checked class="text-zinc-950 focus:ring-zinc-950">
                         <div>
-                            <div class="text-xs font-bold text-zinc-900">Gemini 2.5 Flash</div>
+                            <div class="text-xs font-bold text-zinc-900 flex items-center gap-1.5">
+                                <?php echo cora_get_ai_platform_official_logo( 'gemini', '', 14 ); ?>
+                                <span>Gemini 2.5 Flash</span>
+                            </div>
                             <div class="text-[10px] text-zinc-400">Ultra-fast sub-second reasoning & execution</div>
                         </div>
                     </div>
@@ -17538,7 +17558,10 @@ $customizer_user_mobile = function_exists('cora_get_user_mobile_nav_slots') ? co
                     <div class="flex items-center gap-2.5">
                         <input type="radio" name="cora_global_ai_model" value="gpt-4o" class="text-zinc-950 focus:ring-zinc-950">
                         <div>
-                            <div class="text-xs font-bold text-zinc-900">GPT-4o (OpenAI)</div>
+                            <div class="text-xs font-bold text-zinc-900 flex items-center gap-1.5">
+                                <?php echo cora_get_ai_platform_official_logo( 'openai', '', 14 ); ?>
+                                <span>GPT-4o (OpenAI)</span>
+                            </div>
                             <div class="text-[10px] text-zinc-400">Creative copywriting & legal document structuring</div>
                         </div>
                     </div>
@@ -17547,7 +17570,10 @@ $customizer_user_mobile = function_exists('cora_get_user_mobile_nav_slots') ? co
                     <div class="flex items-center gap-2.5">
                         <input type="radio" name="cora_global_ai_model" value="claude-3-5-sonnet" class="text-zinc-950 focus:ring-zinc-950">
                         <div>
-                            <div class="text-xs font-bold text-zinc-900">Claude 3.5 Sonnet</div>
+                            <div class="text-xs font-bold text-zinc-900 flex items-center gap-1.5">
+                                <?php echo cora_get_ai_platform_official_logo( 'claude', '', 14 ); ?>
+                                <span>Claude 3.5 Sonnet</span>
+                            </div>
                             <div class="text-[10px] text-zinc-400">Deep document analysis & precision reasoning</div>
                         </div>
                     </div>
@@ -21487,9 +21513,9 @@ if ( cora_is_super_owner() ) :
             if (typeof window.coraCloseUpdateDrawer === 'function') window.coraCloseUpdateDrawer();
             if (typeof window.coraCloseCustomActionDrawer === 'function') window.coraCloseCustomActionDrawer();
 
-            $('aside[id$="-drawer"], aside[id$="-sheet"], div[id$="-drawer"], div[id$="-sheet"], div[id$="-modal"], .cora-side-drawer').addClass('collapsed translate-x-full pointer-events-none');
+            $('aside[id$="-drawer"]:not(.cora-docked-drawer), aside[id$="-sheet"], div[id$="-drawer"]:not(.cora-docked-drawer), div[id$="-sheet"], div[id$="-modal"], .cora-side-drawer').addClass('collapsed translate-x-full pointer-events-none');
             window.coraDrawerCloseTimer = setTimeout(function() {
-                $('aside[id$="-drawer"].translate-x-full, aside[id$="-sheet"].translate-x-full, div[id$="-drawer"].translate-x-full, div[id$="-sheet"].translate-x-full, div[id$="-modal"].translate-x-full, .cora-side-drawer.translate-x-full').addClass('hidden');
+                $('aside[id$="-drawer"]:not(.cora-docked-drawer).translate-x-full, aside[id$="-sheet"].translate-x-full, div[id$="-drawer"]:not(.cora-docked-drawer).translate-x-full, div[id$="-sheet"].translate-x-full, div[id$="-modal"].translate-x-full, .cora-side-drawer.translate-x-full').addClass('hidden');
             }, 300);
             const bd = document.getElementById('cora-drawer-backdrop');
             if (bd) { bd.classList.add('hidden'); bd.style.pointerEvents = 'none'; bd.style.display = 'none'; }
