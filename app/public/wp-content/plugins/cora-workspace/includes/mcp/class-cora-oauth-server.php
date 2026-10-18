@@ -472,10 +472,17 @@ class Cora_OAuth_Server {
         }
 
         if ( $grant_type === 'client_credentials' ) {
-            // Fallback for Gemini zero-config calls if client_id is empty
+            // Fallback for zero-config calls if client_id is empty
             if ( empty( $client_id ) ) {
-                if ( ! empty( $client_secret ) && ( strpos( strtolower( $client_secret ), 'gemini' ) !== false || strpos( strtolower( $client_secret ), 'cora' ) !== false ) ) {
-                    $client_id = 'cora_gemini_client';
+                if ( ! empty( $client_secret ) ) {
+                    $lower_secret = strtolower( $client_secret );
+                    if ( strpos( $lower_secret, 'claude' ) !== false || strpos( $lower_secret, 'anthropic' ) !== false ) {
+                        $client_id = 'cora_claude_client';
+                    } elseif ( strpos( $lower_secret, 'chatgpt' ) !== false || strpos( $lower_secret, 'openai' ) !== false ) {
+                        $client_id = 'cora_chatgpt_client';
+                    } elseif ( strpos( $lower_secret, 'gemini' ) !== false || strpos( $lower_secret, 'cora' ) !== false ) {
+                        $client_id = 'cora_gemini_client';
+                    }
                 }
             }
 
@@ -490,8 +497,14 @@ class Cora_OAuth_Server {
             $is_recognized   = false;
 
             if ( strpos( $lower_client_id, 'cora_gemini_client' ) === 0 ||
+                 strpos( $lower_client_id, 'cora_claude_client' ) === 0 ||
+                 strpos( $lower_client_id, 'cora_chatgpt_client' ) === 0 ||
                  strpos( $lower_client_id, 'cora_client_' ) === 0 ||
-                 strpos( $lower_client_id, 'gemini' ) === 0 ) {
+                 strpos( $lower_client_id, 'gemini' ) === 0 ||
+                 strpos( $lower_client_id, 'claude' ) === 0 ||
+                 strpos( $lower_client_id, 'anthropic' ) === 0 ||
+                 strpos( $lower_client_id, 'chatgpt' ) === 0 ||
+                 strpos( $lower_client_id, 'openai' ) === 0 ) {
                 $is_recognized = true;
             } else {
                 $client_obj = self::get_client( $client_id );
@@ -509,17 +522,24 @@ class Cora_OAuth_Server {
 
             // Resolve client metadata
             $client = self::get_client( $client_id );
-            $client_name = ( $client && ! empty( $client->client_name ) ) ? $client->client_name : 'Google Gemini';
-            if ( empty( $client_name ) || $client_name === 'AI Assistant' ) {
-                if ( strpos( $lower_client_id, 'cora_gemini_client' ) === 0 || strpos( $lower_client_id, 'cora_client_ws_' ) === 0 || strpos( $lower_client_id, 'gemini' ) !== false ) {
+            $client_name = ( $client && ! empty( $client->client_name ) ) ? $client->client_name : 'AI Client';
+            if ( empty( $client_name ) || $client_name === 'AI Assistant' || $client_name === 'AI Client' ) {
+                if ( strpos( $lower_client_id, 'cora_claude_client' ) === 0 || strpos( $lower_client_id, 'claude' ) !== false || strpos( $lower_client_id, 'anthropic' ) !== false ) {
+                    $client_name = 'Claude';
+                } elseif ( strpos( $lower_client_id, 'cora_chatgpt_client' ) === 0 || strpos( $lower_client_id, 'chatgpt' ) !== false || strpos( $lower_client_id, 'openai' ) !== false ) {
+                    $client_name = 'ChatGPT';
+                } elseif ( strpos( $lower_client_id, 'cora_gemini_client' ) === 0 || strpos( $lower_client_id, 'cora_client_ws_' ) === 0 || strpos( $lower_client_id, 'gemini' ) !== false ) {
                     $client_name = 'Google Gemini';
                 }
             }
 
             // Resolve target workspace ID
             $target_workspace_id = '';
-            if ( preg_match( '/ws_([0-9]+)/i', $client_id, $ws_matches ) ) {
+            if ( preg_match( '/(?:ws|sec)_([0-9]+)/i', $client_id, $ws_matches ) ) {
                 $target_workspace_id = (string) $ws_matches[1];
+            }
+            if ( empty( $target_workspace_id ) && ! empty( $client_secret ) && preg_match( '/(?:ws|sec)_([0-9]+)/i', $client_secret, $sec_matches ) ) {
+                $target_workspace_id = (string) $sec_matches[1];
             }
 
             if ( empty( $target_workspace_id ) ) {
@@ -1058,6 +1078,115 @@ class Cora_OAuth_Server {
     }
 
     /**
+     * Get Ecosystem Connection & Request Status for Gemini, Claude, and ChatGPT
+     *
+     * @param int|string $agency_id
+     * @return array
+     */
+    public static function get_ecosystems_status( $agency_id ) {
+        global $wpdb;
+
+        $status = array(
+            'gemini'  => array( 'connected' => false, 'last_active' => null, 'requests_count' => 0, 'token_id' => 0 ),
+            'claude'  => array( 'connected' => false, 'last_active' => null, 'requests_count' => 0, 'token_id' => 0 ),
+            'chatgpt' => array( 'connected' => false, 'last_active' => null, 'requests_count' => 0, 'token_id' => 0 ),
+        );
+
+        $table_tokens = $wpdb->prefix . 'cora_oauth_tokens';
+        $table_audit  = $wpdb->prefix . 'cora_mcp_audit_log';
+        $agency_str   = ! empty( $agency_id ) ? (string) $agency_id : '1';
+
+        $has_tokens_table = function_exists( 'cora_table_exists' )
+            ? cora_table_exists( $table_tokens )
+            : ! empty( $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $table_tokens ) ) );
+
+        if ( $has_tokens_table ) {
+            $tokens = $wpdb->get_results(
+                $wpdb->prepare(
+                    "SELECT id, client_id, client_name, last_used_at, created_at, expires_at 
+                     FROM {$table_tokens} 
+                     WHERE (workspace_id = %s OR workspace_id = '1')
+                       AND revoked = 0 
+                       AND (expires_at > NOW() OR expires_at > UTC_TIMESTAMP())
+                     ORDER BY id DESC",
+                    $agency_str
+                )
+            );
+
+            if ( ! empty( $tokens ) ) {
+                foreach ( $tokens as $tok ) {
+                    $haystack = strtolower( (string) $tok->client_id . ' ' . (string) $tok->client_name );
+                    $eco = null;
+                    if ( strpos( $haystack, 'gemini' ) !== false ) {
+                        $eco = 'gemini';
+                    } elseif ( strpos( $haystack, 'claude' ) !== false || strpos( $haystack, 'anthropic' ) !== false ) {
+                        $eco = 'claude';
+                    } elseif ( strpos( $haystack, 'chatgpt' ) !== false || strpos( $haystack, 'openai' ) !== false ) {
+                        $eco = 'chatgpt';
+                    }
+
+                    if ( $eco && ! $status[ $eco ]['connected'] ) {
+                        $status[ $eco ]['connected']  = true;
+                        $status[ $eco ]['token_id']    = intval( $tok->id );
+                        $status[ $eco ]['last_active'] = ! empty( $tok->last_used_at ) ? (string) $tok->last_used_at : (string) $tok->created_at;
+                    }
+                }
+            }
+        }
+
+        $has_audit_table = function_exists( 'cora_table_exists' )
+            ? cora_table_exists( $table_audit )
+            : ! empty( $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $table_audit ) ) );
+
+        if ( $has_audit_table ) {
+            $audit_rows = $wpdb->get_results(
+                $wpdb->prepare(
+                    "SELECT client_name, token_id, COUNT(*) as cnt, MAX(created_at) as last_seen 
+                     FROM {$table_audit} 
+                     WHERE (workspace_id = %s OR workspace_id = '1')
+                     GROUP BY client_name, token_id",
+                    $agency_str
+                )
+            );
+
+            if ( ! empty( $audit_rows ) ) {
+                foreach ( $audit_rows as $row ) {
+                    $matched_eco = null;
+                    if ( ! empty( $row->token_id ) ) {
+                        foreach ( array( 'gemini', 'claude', 'chatgpt' ) as $ek ) {
+                            if ( $status[ $ek ]['token_id'] > 0 && intval( $status[ $ek ]['token_id'] ) === intval( $row->token_id ) ) {
+                                $matched_eco = $ek;
+                                break;
+                            }
+                        }
+                    }
+                    if ( ! $matched_eco ) {
+                        $haystack = strtolower( (string) $row->client_name );
+                        if ( strpos( $haystack, 'gemini' ) !== false ) {
+                            $matched_eco = 'gemini';
+                        } elseif ( strpos( $haystack, 'claude' ) !== false || strpos( $haystack, 'anthropic' ) !== false ) {
+                            $matched_eco = 'claude';
+                        } elseif ( strpos( $haystack, 'chatgpt' ) !== false || strpos( $haystack, 'openai' ) !== false ) {
+                            $matched_eco = 'chatgpt';
+                        }
+                    }
+
+                    if ( $matched_eco ) {
+                        $status[ $matched_eco ]['requests_count'] += intval( $row->cnt );
+                        if ( ! empty( $row->last_seen ) ) {
+                            if ( empty( $status[ $matched_eco ]['last_active'] ) || strtotime( $row->last_seen ) > strtotime( $status[ $matched_eco ]['last_active'] ) ) {
+                                $status[ $matched_eco ]['last_active'] = (string) $row->last_seen;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return $status;
+    }
+
+    /**
      * Generate an authorization code
      */
     public static function generate_auth_code( $client_id, $user_id, $workspace_id, $redirect_uri, $code_challenge, $code_challenge_method, $scopes ) {
@@ -1096,6 +1225,10 @@ class Cora_OAuth_Server {
             if ( $client ) {
                 if ( ( strpos( $lower_id, 'cora_gemini_client' ) === 0 || strpos( $lower_id, 'cora_client_ws_' ) === 0 || strpos( $lower_id, 'gemini' ) !== false ) && ( empty( $client->client_name ) || $client->client_name === 'AI Assistant' ) ) {
                     $client->client_name = 'Google Gemini';
+                } elseif ( ( strpos( $lower_id, 'cora_claude_client' ) === 0 || strpos( $lower_id, 'claude' ) !== false || strpos( $lower_id, 'anthropic' ) !== false ) && ( empty( $client->client_name ) || $client->client_name === 'AI Assistant' ) ) {
+                    $client->client_name = 'Claude';
+                } elseif ( ( strpos( $lower_id, 'cora_chatgpt_client' ) === 0 || strpos( $lower_id, 'chatgpt' ) !== false || strpos( $lower_id, 'openai' ) !== false ) && ( empty( $client->client_name ) || $client->client_name === 'AI Assistant' ) ) {
+                    $client->client_name = 'ChatGPT';
                 }
                 return $client;
             }
@@ -1112,14 +1245,14 @@ class Cora_OAuth_Server {
             'generic' => 'Generic MCP Client',
         );
 
-        if ( strpos( $lower_id, 'cora_gemini_client' ) === 0 || strpos( $lower_id, 'cora_client_ws_' ) === 0 || $lower_id === 'gemini' || strpos( $lower_id, 'gemini' ) !== false ) {
+        if ( strpos( $lower_id, 'cora_claude_client' ) === 0 || strpos( $lower_id, 'claude' ) !== false || strpos( $lower_id, 'anthropic' ) !== false ) {
+            $name = 'Claude';
+        } elseif ( strpos( $lower_id, 'cora_chatgpt_client' ) === 0 || strpos( $lower_id, 'chatgpt' ) !== false || strpos( $lower_id, 'openai' ) !== false ) {
+            $name = 'ChatGPT';
+        } elseif ( strpos( $lower_id, 'cora_gemini_client' ) === 0 || strpos( $lower_id, 'cora_client_ws_' ) === 0 || $lower_id === 'gemini' || strpos( $lower_id, 'gemini' ) !== false ) {
             $name = 'Google Gemini';
         } elseif ( isset( $names[ $lower_id ] ) ) {
             $name = $names[ $lower_id ];
-        } elseif ( strpos( $lower_id, 'claude' ) !== false || strpos( $lower_id, 'anthropic' ) !== false ) {
-            $name = 'Claude';
-        } elseif ( strpos( $lower_id, 'openai' ) !== false || strpos( $lower_id, 'chatgpt' ) !== false ) {
-            $name = 'ChatGPT';
         } elseif ( strpos( $lower_id, 'cursor' ) !== false ) {
             $name = 'Cursor';
         } else {
@@ -1278,38 +1411,15 @@ class Cora_OAuth_Server {
         nocache_headers();
 
         $supported_scopes = self::get_supported_scopes();
-        $requested_scopes = array_filter( array_map( 'trim', explode( ' ', $scope_param ) ) );
-        $has_broad_scope  = false;
-        $broad_keywords   = array( 'mcp', 'all', '*', 'tools', 'workspace', 'default', 'openid', 'profile', 'email', 'api', 'full_access' );
-        foreach ( $broad_keywords as $bk ) {
-            if ( in_array( $bk, $requested_scopes, true ) ) {
-                $has_broad_scope = true;
-                break;
-            }
-        }
-        if ( empty( $requested_scopes ) || $has_broad_scope ) {
-            $requested_scopes = array_keys( $supported_scopes );
-        }
+        $selected_workspace_name = ! empty( $workspaces ) ? $workspaces[0]['name'] : 'Workspace';
+        $selected_workspace_id   = ! empty( $workspaces ) ? $workspaces[0]['id'] : '1';
 
-        // Group scopes by category for intuitive UX
-        $categories = array(
-            'canvas'       => array( 'title' => 'Website, Themes & Canvas', 'icon' => 'globe', 'scopes' => array() ),
-            'crm'          => array( 'title' => 'CRM, Leads & Clients', 'icon' => 'users', 'scopes' => array() ),
-            'operations'   => array( 'title' => 'Projects, Bookings & Tasks', 'icon' => 'clipboard', 'scopes' => array() ),
-            'finance'      => array( 'title' => 'Financials, Invoices & Ledger', 'icon' => 'credit-card', 'scopes' => array() ),
-            'growth'       => array( 'title' => 'Content Engine & SEO', 'icon' => 'file-text', 'scopes' => array() ),
-            'intelligence' => array( 'title' => 'Living RAG Knowledge Base', 'icon' => 'cpu', 'scopes' => array() ),
-            'core'         => array( 'title' => 'Workspace & Settings', 'icon' => 'settings', 'scopes' => array() ),
-            'automation'   => array( 'title' => 'Automated Workflows', 'icon' => 'zap', 'scopes' => array() ),
-        );
+        $client_name = ! empty( $client->client_name ) ? $client->client_name : 'AI Client';
+        $lower_ident = strtolower( (string) $client->client_id . ' ' . $client_name );
 
-        foreach ( $supported_scopes as $key => $meta ) {
-            $cat = $meta['category'] ?? 'core';
-            if ( ! isset( $categories[ $cat ] ) ) {
-                $categories[ $cat ] = array( 'title' => ucfirst( $cat ), 'icon' => 'check', 'scopes' => array() );
-            }
-            $categories[ $cat ]['scopes'][ $key ] = $meta;
-        }
+        $is_gemini  = ( strpos( $lower_ident, 'gemini' ) !== false );
+        $is_claude  = ( strpos( $lower_ident, 'claude' ) !== false || strpos( $lower_ident, 'anthropic' ) !== false );
+        $is_chatgpt = ( strpos( $lower_ident, 'chatgpt' ) !== false || strpos( $lower_ident, 'openai' ) !== false || strpos( $lower_ident, 'gpt' ) !== false );
 
         $nonce = wp_create_nonce( 'cora_oauth_authorize_action' );
         ?>
@@ -1318,7 +1428,7 @@ class Cora_OAuth_Server {
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Authorize <?php echo esc_html( $client->client_name ); ?> — Cora Universal MCP</title>
+            <title>Connect <?php echo esc_html( $client_name ); ?> — Cora</title>
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
             <script src="https://cdn.tailwindcss.com"></script>
             <style>
@@ -1326,38 +1436,73 @@ class Cora_OAuth_Server {
                 .font-mono { font-family: 'JetBrains Mono', monospace; }
                 .custom-scrollbar::-webkit-scrollbar { width: 4px; }
                 .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-                .custom-scrollbar::-webkit-scrollbar-thumb { background: #d4d4d8; border-radius: 4px; }
+                .custom-scrollbar::-webkit-scrollbar-thumb { background: #e4e4e7; border-radius: 4px; }
             </style>
         </head>
-        <body class="bg-zinc-50 text-zinc-900 flex items-center justify-center min-h-screen p-3 sm:p-6 antialiased selection:bg-zinc-900 selection:text-white">
-            <div class="bg-white border border-zinc-200/90 rounded-3xl p-6 sm:p-8 max-w-xl w-full shadow-sm">
-                <!-- Header Badge -->
-                <div class="flex items-center justify-between pb-5 border-b border-zinc-100">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-2xl bg-zinc-900 text-white flex items-center justify-center font-bold text-sm tracking-tight shadow-sm">
-                            C
-                        </div>
-                        <div>
-                            <div class="text-xs font-semibold text-zinc-900 tracking-tight flex items-center gap-1.5">
-                                Cora Universal MCP
-                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-zinc-100 text-zinc-700">OAuth 2.1</span>
-                            </div>
-                            <div class="text-[11px] text-zinc-500">Autonomous AI Integration Gateway</div>
-                        </div>
+        <body class="bg-zinc-50 text-zinc-900 flex flex-col items-center justify-center min-h-screen p-4 sm:p-6 antialiased selection:bg-zinc-950 selection:text-white">
+            <div class="bg-white border border-zinc-200/90 rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-sm">
+                <!-- Linked App Avatars -->
+                <div class="flex items-center justify-center pt-2 pb-1">
+                    <div class="w-14 h-14 rounded-2xl bg-zinc-950 text-white flex items-center justify-center font-bold text-xl tracking-tight shadow-sm border border-zinc-900 shrink-0 select-none">
+                        C
                     </div>
-                    <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200/60 text-emerald-700 text-[11px] font-medium">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                        Ready to Connect
+                    <div class="w-8 h-8 rounded-full bg-zinc-100 border border-zinc-200/90 flex items-center justify-center text-zinc-400 shrink-0 -mx-1.5 z-10 shadow-2xs">
+                        <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                        </svg>
                     </div>
+                    <?php if ( $is_gemini ) : ?>
+                        <div class="w-14 h-14 rounded-2xl bg-cyan-50/80 border border-cyan-200/80 flex items-center justify-center text-cyan-600 shadow-sm shrink-0">
+                            <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+                                <path d="M5 3v4"/>
+                                <path d="M19 17v4"/>
+                                <path d="M3 5h4"/>
+                                <path d="M17 19h4"/>
+                            </svg>
+                        </div>
+                    <?php elseif ( $is_claude ) : ?>
+                        <div class="w-14 h-14 rounded-2xl bg-amber-50/80 border border-amber-200/80 flex items-center justify-center text-amber-600 shadow-sm shrink-0">
+                            <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="4"/>
+                                <path d="M12 2v2.5"/>
+                                <path d="M12 19.5v2.5"/>
+                                <path d="m4.93 4.93 1.77 1.77"/>
+                                <path d="m17.3 17.3 1.77 1.77"/>
+                                <path d="M2 12h2.5"/>
+                                <path d="M19.5 12H22"/>
+                                <path d="m6.7 17.3-1.77 1.77"/>
+                                <path d="m19.07 4.93-1.77 1.77"/>
+                            </svg>
+                        </div>
+                    <?php elseif ( $is_chatgpt ) : ?>
+                        <div class="w-14 h-14 rounded-2xl bg-emerald-50/80 border border-emerald-200/80 flex items-center justify-center text-emerald-600 shadow-sm shrink-0">
+                            <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10S2 17.523 2 12"/>
+                                <path d="M12 6a6 6 0 0 1 6 6c0 3.314-2.686 6-6 6"/>
+                                <circle cx="12" cy="12" r="2.2"/>
+                            </svg>
+                        </div>
+                    <?php else : ?>
+                        <div class="w-14 h-14 rounded-2xl bg-zinc-100 border border-zinc-200/80 flex items-center justify-center text-zinc-700 shadow-sm shrink-0">
+                            <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <rect width="18" height="14" x="3" y="6" rx="3"/>
+                                <path d="m9 13 2 2 4-4"/>
+                                <path d="M12 2v4"/>
+                            </svg>
+                        </div>
+                    <?php endif; ?>
                 </div>
 
-                <!-- Connection Hero -->
-                <div class="my-5">
-                    <h1 class="text-base sm:text-lg font-semibold text-zinc-900 tracking-tight flex items-center gap-2">
-                        Authorize <span class="underline decoration-zinc-300 underline-offset-4"><?php echo esc_html( $client->client_name ); ?></span>
+                <!-- Headline & Subtitle -->
+                <div class="text-center mt-4 mb-6">
+                    <h1 class="text-xl font-bold text-zinc-950 tracking-tight">
+                        Connect <?php echo esc_html( $client_name ); ?> to Cora
                     </h1>
-                    <p class="text-xs text-zinc-600 mt-1.5 leading-relaxed">
-                        Grant <span class="font-medium text-zinc-900"><?php echo esc_html( $client->client_name ); ?></span> secure Model Context Protocol access to your workspace tools, live website themes, CRM leads, and operations.
+                    <p class="text-xs text-zinc-500 mt-1.5 leading-relaxed">
+                        <?php echo esc_html( $client_name ); ?> is requesting access to your workspace:<br>
+                        <span id="display-workspace-name" class="font-bold text-zinc-900"><?php echo esc_html( $selected_workspace_name ); ?></span>
                     </p>
                 </div>
 
@@ -1368,157 +1513,165 @@ class Cora_OAuth_Server {
                     <input type="hidden" name="state" value="<?php echo esc_attr( $state ); ?>">
                     <input type="hidden" name="code_challenge" value="<?php echo esc_attr( $challenge ); ?>">
                     <input type="hidden" name="code_challenge_method" value="<?php echo esc_attr( $challenge_method ); ?>">
+                    <input type="hidden" name="full_access" value="1">
+                    <input type="hidden" name="scopes[]" value="*">
+                    <?php foreach ( array_keys( $supported_scopes ) as $scope_key ) : ?>
+                        <input type="hidden" name="scopes[]" value="<?php echo esc_attr( $scope_key ); ?>">
+                    <?php endforeach; ?>
 
                     <!-- Workspace Selector -->
-                    <div>
-                        <label class="block text-xs font-semibold text-zinc-800 mb-1.5">Target Workspace</label>
-                        <select name="workspace_id" class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3.5 py-2.5 text-xs text-zinc-900 focus:bg-white focus:outline-none focus:border-zinc-400 transition-colors font-medium">
-                            <?php foreach ( $workspaces as $ws ) : ?>
-                                <option value="<?php echo esc_attr( $ws['id'] ); ?>"><?php echo esc_html( $ws['name'] ); ?> (<?php echo esc_html( $ws['slug'] ); ?>)</option>
-                            <?php endforeach; ?>
-                        </select>
-                        <p class="text-[11px] text-zinc-500 mt-1">AI tool calls and data mutations strictly bind to this workspace context.</p>
-                    </div>
+                    <?php if ( count( $workspaces ) > 1 ) : ?>
+                        <div class="pb-1">
+                            <label class="block text-xs font-semibold text-zinc-700 mb-1.5">Workspace</label>
+                            <select name="workspace_id" id="cora-workspace-select" onchange="onWorkspaceChanged(this)" class="w-full bg-zinc-50 hover:bg-zinc-100/70 border border-zinc-200 rounded-xl px-3.5 py-2.5 text-xs text-zinc-900 font-medium focus:bg-white focus:outline-none focus:border-zinc-400 transition-colors cursor-pointer">
+                                <?php foreach ( $workspaces as $ws ) : ?>
+                                    <option value="<?php echo esc_attr( $ws['id'] ); ?>"><?php echo esc_html( $ws['name'] ); ?> (<?php echo esc_html( $ws['slug'] ); ?>)</option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    <?php else : ?>
+                        <input type="hidden" name="workspace_id" value="<?php echo esc_attr( $selected_workspace_id ); ?>">
+                    <?php endif; ?>
 
-                    <!-- Master Full Access Card -->
-                    <div class="p-3.5 rounded-2xl bg-zinc-900 text-white border border-zinc-800 flex items-start justify-between gap-3 cursor-pointer shadow-sm" onclick="toggleMasterSwitch(event)">
-                        <div class="flex-1">
-                            <div class="flex items-center gap-2">
-                                <span class="text-xs font-semibold text-white tracking-tight">Grant Full Access (Read & Write)</span>
-                                <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Recommended</span>
+                    <!-- Clean 4-Item Permission Overview -->
+                    <div class="space-y-2.5">
+                        <div class="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider px-0.5">
+                            This will allow <?php echo esc_html( $client_name ); ?> to:
+                        </div>
+
+                        <!-- Card 1: Autonomous Campaigns & Content Engine -->
+                        <div class="p-3.5 rounded-2xl bg-zinc-50/70 border border-zinc-200/80 flex items-start gap-3 transition-colors hover:bg-zinc-50">
+                            <div class="w-8 h-8 rounded-xl bg-white border border-zinc-200/80 flex items-center justify-center shrink-0 text-zinc-800 shadow-2xs">
+                                <svg class="w-4 h-4 text-zinc-700" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"/>
+                                </svg>
                             </div>
-                            <p class="text-[11px] text-zinc-300 mt-0.5 leading-snug">
-                                Exposes all tools: Read/Edit Website Themes, Manage Leads & CRM, Schedule Bookings, Record Invoices, and Publish Content.
-                            </p>
+                            <div class="flex-1 min-w-0">
+                                <div class="text-xs font-semibold text-zinc-900 leading-snug">Autonomous Campaigns & Content Engine</div>
+                                <div class="text-[11px] text-zinc-500 mt-0.5 leading-snug">Discover topic opportunities, generate outlines, and auto-publish content.</div>
+                            </div>
+                            <svg class="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/>
+                            </svg>
                         </div>
-                        <input type="checkbox" id="cora-master-full-access" name="full_access" value="1" checked class="w-4 h-4 rounded text-zinc-900 accent-white cursor-pointer mt-0.5">
+
+                        <!-- Card 2: Website, Themes & Canvas -->
+                        <div class="p-3.5 rounded-2xl bg-zinc-50/70 border border-zinc-200/80 flex items-start gap-3 transition-colors hover:bg-zinc-50">
+                            <div class="w-8 h-8 rounded-xl bg-white border border-zinc-200/80 flex items-center justify-center shrink-0 text-zinc-800 shadow-2xs">
+                                <svg class="w-4 h-4 text-zinc-700" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                                    <circle cx="12" cy="12" r="9"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.6 9h16.8M3.6 15h16.8M12 3a14 14 0 0 0 0 18M12 3a14 14 0 0 1 0 18"/>
+                                </svg>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="text-xs font-semibold text-zinc-900 leading-snug">Website, Themes & Canvas</div>
+                                <div class="text-[11px] text-zinc-500 mt-0.5 leading-snug">Inspect live site themes, review landing pages, and deploy HTML updates.</div>
+                            </div>
+                            <svg class="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/>
+                            </svg>
+                        </div>
+
+                        <!-- Card 3: CRM Leads & Client Pipelines -->
+                        <div class="p-3.5 rounded-2xl bg-zinc-50/70 border border-zinc-200/80 flex items-start gap-3 transition-colors hover:bg-zinc-50">
+                            <div class="w-8 h-8 rounded-xl bg-white border border-zinc-200/80 flex items-center justify-center shrink-0 text-zinc-800 shadow-2xs">
+                                <svg class="w-4 h-4 text-zinc-700" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/>
+                                </svg>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="text-xs font-semibold text-zinc-900 leading-snug">CRM Leads & Client Pipelines</div>
+                                <div class="text-[11px] text-zinc-500 mt-0.5 leading-snug">Manage lead funnels, client records, and stage transitions.</div>
+                            </div>
+                            <svg class="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/>
+                            </svg>
+                        </div>
+
+                        <!-- Card 4: Studio Operations & MCP Tools -->
+                        <div class="p-3.5 rounded-2xl bg-zinc-50/70 border border-zinc-200/80 flex items-start gap-3 transition-colors hover:bg-zinc-50">
+                            <div class="w-8 h-8 rounded-xl bg-white border border-zinc-200/80 flex items-center justify-center shrink-0 text-zinc-800 shadow-2xs">
+                                <svg class="w-4 h-4 text-zinc-700" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"/>
+                                </svg>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="text-xs font-semibold text-zinc-900 leading-snug">Studio Operations & MCP Tools</div>
+                                <div class="text-[11px] text-zinc-500 mt-0.5 leading-snug">Execute bookings, invoices, and run authorized workspace actions.</div>
+                            </div>
+                            <svg class="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/>
+                            </svg>
+                        </div>
                     </div>
 
-                    <!-- Preset Pills -->
-                    <div class="flex items-center justify-between pt-1">
-                        <span class="text-[11px] font-medium text-zinc-500">Quick Presets:</span>
-                        <div class="flex items-center gap-1.5">
-                            <button type="button" onclick="applyPreset('all')" class="px-2.5 py-1 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-800 text-[10px] font-semibold transition-colors flex items-center gap-1">
-                                <svg class="w-3 h-3 text-zinc-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                                <span>All (Read & Write)</span>
-                            </button>
-                            <button type="button" onclick="applyPreset('readonly')" class="px-2.5 py-1 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[10px] font-medium transition-colors flex items-center gap-1">
-                                <svg class="w-3 h-3 text-zinc-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                <span>Read-Only</span>
-                            </button>
-                            <button type="button" onclick="applyPreset('website')" class="px-2.5 py-1 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[10px] font-medium transition-colors flex items-center gap-1">
-                                <svg class="w-3 h-3 text-zinc-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
-                                <span>Website Only</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Granular Permission Matrix -->
-                    <div>
-                        <div class="flex items-center justify-between mb-1.5">
-                            <label class="block text-xs font-semibold text-zinc-800">Permissions by Area</label>
-                            <span class="text-[11px] text-zinc-400" id="selected-scope-counter">20 of 20 granted</span>
-                        </div>
-
-                        <div class="max-h-60 overflow-y-auto space-y-2 pr-1 border border-zinc-200/80 bg-zinc-50/60 rounded-2xl p-2.5 custom-scrollbar">
-                            <?php foreach ( $categories as $cat_key => $cat_data ) :
-                                if ( empty( $cat_data['scopes'] ) ) continue;
-                            ?>
-                                <div class="bg-white border border-zinc-100 rounded-xl p-2.5 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
-                                    <div class="flex items-center justify-between pb-1.5 border-b border-zinc-50 mb-1.5">
-                                        <span class="text-[11px] font-semibold text-zinc-900 tracking-tight"><?php echo esc_html( $cat_data['title'] ); ?></span>
-                                        <span class="text-[10px] font-mono text-zinc-400 uppercase"><?php echo esc_html( $cat_key ); ?></span>
+                    <!-- Collapsible Detailed Permissions Accordion (for Auditors/Developers) -->
+                    <div class="border-t border-zinc-100 pt-3">
+                        <button type="button" onclick="toggleDetails()" class="w-full flex items-center justify-between py-1 text-xs font-medium text-zinc-500 hover:text-zinc-800 transition-colors cursor-pointer group">
+                            <span class="flex items-center gap-1.5">
+                                <svg class="w-3.5 h-3.5 text-zinc-400 group-hover:text-zinc-600 transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z"/>
+                                </svg>
+                                <span>View detailed permissions (28 tools)</span>
+                            </span>
+                            <svg id="details-chevron" class="w-4 h-4 text-zinc-400 transform transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
+                            </svg>
+                        </button>
+                        <div id="details-panel" class="hidden mt-2.5 max-h-48 overflow-y-auto space-y-1.5 p-3 rounded-2xl bg-zinc-50 border border-zinc-200/70 custom-scrollbar text-[11px]">
+                            <div class="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 mb-1.5">Universal MCP Tool Permissions</div>
+                            <?php foreach ( $supported_scopes as $s_key => $s_meta ) : ?>
+                                <div class="flex items-start justify-between gap-2 py-1 border-b border-zinc-100 last:border-b-0">
+                                    <div class="min-w-0">
+                                        <span class="font-medium text-zinc-800"><?php echo esc_html( $s_meta['label'] ); ?></span>
+                                        <p class="text-[10px] text-zinc-400 truncate"><?php echo esc_html( $s_meta['description'] ); ?></p>
                                     </div>
-                                    <div class="space-y-1.5">
-                                        <?php foreach ( $cat_data['scopes'] as $key => $meta ) :
-                                            $checked = true; // Default all checked
-                                            $is_write = ( $meta['level'] === 'write' );
-                                        ?>
-                                            <label class="flex items-start gap-2 p-1.5 rounded-lg hover:bg-zinc-50 cursor-pointer transition-colors">
-                                                <input type="checkbox" name="scopes[]" value="<?php echo esc_attr( $key ); ?>" data-level="<?php echo esc_attr( $meta['level'] ); ?>" data-category="<?php echo esc_attr( $cat_key ); ?>" checked onchange="handleScopeChange()" class="cora-scope-checkbox mt-0.5 rounded border-zinc-300 text-zinc-900 focus:ring-0">
-                                                <div class="flex-1 min-w-0">
-                                                    <div class="flex items-center justify-between gap-1">
-                                                        <span class="text-xs font-medium text-zinc-800 truncate"><?php echo esc_html( $meta['label'] ); ?></span>
-                                                        <span class="text-[9px] font-mono uppercase px-1.5 py-0.2 rounded flex-shrink-0 <?php echo $is_write ? 'bg-zinc-100 text-zinc-800 font-semibold' : 'bg-zinc-50 text-zinc-500'; ?>">
-                                                            <?php echo esc_html( $meta['level'] ); ?>
-                                                        </span>
-                                                    </div>
-                                                    <p class="text-[10px] text-zinc-500 leading-snug truncate"><?php echo esc_html( $meta['description'] ); ?></p>
-                                                </div>
-                                            </label>
-                                        <?php endforeach; ?>
-                                    </div>
+                                    <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-zinc-200/60 text-zinc-600 font-semibold uppercase shrink-0">
+                                        <?php echo esc_html( $s_key ); ?>
+                                    </span>
                                 </div>
                             <?php endforeach; ?>
                         </div>
                     </div>
 
-                    <!-- Security Affirmation -->
-                    <div class="p-3 rounded-2xl bg-zinc-50 border border-zinc-100 flex items-start gap-2.5">
-                        <svg class="w-4 h-4 text-zinc-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                        <div class="text-[11px] text-zinc-600 leading-tight">
-                            You can inspect or revoke tokens anytime from <span class="font-medium text-zinc-800">Admin Settings → AI Assistants</span>.
-                        </div>
+                    <!-- Actions -->
+                    <div class="space-y-2 pt-2">
+                        <button type="submit" name="cora_oauth_action" value="approve" class="w-full py-3 px-4 rounded-xl bg-zinc-950 text-white text-sm font-bold hover:bg-zinc-800 transition-all shadow-sm text-center cursor-pointer">
+                            Authorize <?php echo esc_html( $client_name ); ?>
+                        </button>
+                        <button type="submit" name="cora_oauth_action" value="deny" class="w-full py-2 px-4 rounded-xl text-zinc-500 hover:text-zinc-900 text-xs font-semibold text-center cursor-pointer transition-colors bg-transparent border-0">
+                            Cancel
+                        </button>
                     </div>
 
-                    <!-- Actions -->
-                    <div class="flex items-center gap-2.5 pt-1">
-                        <button type="submit" name="cora_oauth_action" value="approve" class="flex-1 py-2.5 px-4 rounded-xl bg-zinc-900 text-white text-xs font-semibold hover:bg-zinc-800 transition-colors shadow-sm text-center cursor-pointer">
-                            Authorize & Connect Now
-                        </button>
-                        <button type="submit" name="cora_oauth_action" value="deny" class="py-2.5 px-4 rounded-xl bg-zinc-100 text-zinc-700 text-xs font-medium hover:bg-zinc-200 transition-colors text-center cursor-pointer">
-                            Deny
-                        </button>
+                    <!-- Trust Footer -->
+                    <div class="text-center pt-1 text-[11px] text-zinc-400 leading-normal">
+                        Authorize only applications you trust. Permissions can be revoked anytime in Workspace Settings.
                     </div>
                 </form>
             </div>
 
             <script>
-                function updateCounter() {
-                    const checkboxes = document.querySelectorAll('.cora-scope-checkbox');
-                    const checked = document.querySelectorAll('.cora-scope-checkbox:checked');
-                    const counter = document.getElementById('selected-scope-counter');
-                    if (counter) {
-                        counter.textContent = `${checked.length} of ${checkboxes.length} granted`;
+                function toggleDetails() {
+                    const panel = document.getElementById('details-panel');
+                    const chevron = document.getElementById('details-chevron');
+                    if (panel.classList.contains('hidden')) {
+                        panel.classList.remove('hidden');
+                        chevron.classList.add('rotate-180');
+                    } else {
+                        panel.classList.add('hidden');
+                        chevron.classList.remove('rotate-180');
                     }
-                    const master = document.getElementById('cora-master-full-access');
-                    if (master) {
-                        master.checked = (checked.length === checkboxes.length);
+                }
+
+                function onWorkspaceChanged(selectEl) {
+                    const text = selectEl.options[selectEl.selectedIndex].text;
+                    const cleanName = text.replace(/\s*\([^)]*\)\s*$/, '').trim();
+                    const displayEl = document.getElementById('display-workspace-name');
+                    if (displayEl) {
+                        displayEl.textContent = cleanName;
                     }
                 }
-
-                function toggleMasterSwitch(e) {
-                    if (e.target.tagName !== 'INPUT') {
-                        const master = document.getElementById('cora-master-full-access');
-                        master.checked = !master.checked;
-                    }
-                    const isChecked = document.getElementById('cora-master-full-access').checked;
-                    document.querySelectorAll('.cora-scope-checkbox').forEach(cb => {
-                        cb.checked = isChecked;
-                    });
-                    updateCounter();
-                }
-
-                function handleScopeChange() {
-                    updateCounter();
-                }
-
-                function applyPreset(mode) {
-                    const checkboxes = document.querySelectorAll('.cora-scope-checkbox');
-                    checkboxes.forEach(cb => {
-                        if (mode === 'all') {
-                            cb.checked = true;
-                        } else if (mode === 'readonly') {
-                            cb.checked = (cb.getAttribute('data-level') === 'read');
-                        } else if (mode === 'website') {
-                            cb.checked = (cb.getAttribute('data-category') === 'canvas' || cb.getAttribute('data-category') === 'core');
-                        }
-                    });
-                    updateCounter();
-                }
-
-                // Initial run
-                updateCounter();
             </script>
         </body>
         </html>

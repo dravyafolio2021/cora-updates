@@ -39,29 +39,81 @@ test('Verify Multi-Model AI Connectors and Autonomous Campaigns in MCP Drawer', 
   const connectPane = page.locator('#cora-ws-pane-connect');
   await expect(connectPane).toBeVisible();
 
-  // Test Claude view
-  const claudeSubTab = page.locator('#cora-eco-btn-claude');
-  await expect(claudeSubTab).toBeVisible();
-  await claudeSubTab.click();
-  await page.waitForTimeout(300);
-  await expect(page.locator('#cora-ws-claude-cfg')).toBeVisible();
-  await page.screenshot({ path: path.join(artifactDir, 'mcp_connect_claude.png') });
+  const subagentArtifactDir = '/Users/shrutian/.gemini/antigravity/brain/a7e05cdb-6c68-4e2c-99f0-28e37435f155';
 
-  // Test Gemini view
+  // 1. Verify Gemini Tab: Cloud MCP app link visible (#cora-gemini-app-link)
   const geminiSubTab = page.locator('#cora-eco-btn-gemini');
   await expect(geminiSubTab).toBeVisible();
   await geminiSubTab.click();
-  await page.waitForTimeout(300);
-  await expect(page.locator('#cora-ws-gemini-code')).toBeVisible();
-  await page.screenshot({ path: path.join(artifactDir, 'mcp_connect_gemini.png') });
+  await page.waitForTimeout(400);
 
-  // Test ChatGPT view
+  const geminiAppLink = page.locator('#cora-gemini-app-link');
+  await expect(geminiAppLink).toBeVisible();
+  const geminiUrl = await geminiAppLink.inputValue();
+  console.log('Gemini Cloud App Link:', geminiUrl);
+  expect(geminiUrl).toContain('/mcp');
+  await page.screenshot({ path: path.join(artifactDir, 'mcp_connect_gemini.png') });
+  try { await page.screenshot({ path: path.join(subagentArtifactDir, 'mcp_connect_gemini.png') }); } catch (e) {}
+
+  // 2. Verify Claude Tab: #cora-eco-btn-claude clicks and shows #cora-claude-cloud-view with app link input (#cora-claude-app-link) and name input (#cora-claude-name)
+  const claudeSubTab = page.locator('#cora-eco-btn-claude');
+  await expect(claudeSubTab).toBeVisible();
+  await claudeSubTab.click();
+  await page.waitForTimeout(400);
+
+  const claudeCloudTab = page.locator('#cora-claude-tab-cloud');
+  if (await claudeCloudTab.isVisible()) {
+    await claudeCloudTab.click();
+    await page.waitForTimeout(200);
+  }
+
+  const claudeCloudView = page.locator('#cora-claude-cloud-view');
+  await expect(claudeCloudView).toBeVisible();
+
+  const claudeAppLink = page.locator('#cora-claude-app-link');
+  await expect(claudeAppLink).toBeVisible();
+  const claudeUrl = await claudeAppLink.inputValue();
+  console.log('Claude Cloud App Link:', claudeUrl);
+  expect(claudeUrl).toContain('/mcp');
+
+  const claudeNameInput = page.locator('#cora-claude-name');
+  await expect(claudeNameInput).toBeVisible();
+  const claudeNameVal = await claudeNameInput.inputValue();
+  console.log('Claude Connector Name:', claudeNameVal);
+  expect(claudeNameVal).toBeTruthy();
+
+  await page.screenshot({ path: path.join(artifactDir, 'mcp_connect_claude.png') });
+  try { await page.screenshot({ path: path.join(subagentArtifactDir, 'mcp_connect_claude.png') }); } catch (e) {}
+
+  // 3. Verify ChatGPT Tab: #cora-eco-btn-chatgpt clicks and shows #cora-chatgpt-mcp-view with server URL input (#cora-chatgpt-app-link) and name input (#cora-chatgpt-name)
   const chatgptSubTab = page.locator('#cora-eco-btn-chatgpt');
   await expect(chatgptSubTab).toBeVisible();
   await chatgptSubTab.click();
-  await page.waitForTimeout(300);
-  await expect(page.locator('#cora-ws-openapi-url')).toBeVisible();
+  await page.waitForTimeout(400);
+
+  const chatgptMcpTab = page.locator('#cora-chatgpt-tab-mcp');
+  if (await chatgptMcpTab.isVisible()) {
+    await chatgptMcpTab.click();
+    await page.waitForTimeout(200);
+  }
+
+  const chatgptMcpView = page.locator('#cora-chatgpt-mcp-view');
+  await expect(chatgptMcpView).toBeVisible();
+
+  const chatgptAppLink = page.locator('#cora-chatgpt-app-link');
+  await expect(chatgptAppLink).toBeVisible();
+  const chatgptUrl = await chatgptAppLink.inputValue();
+  console.log('ChatGPT Server URL:', chatgptUrl);
+  expect(chatgptUrl).toContain('/mcp');
+
+  const chatgptNameInput = page.locator('#cora-chatgpt-name');
+  await expect(chatgptNameInput).toBeVisible();
+  const chatgptNameVal = await chatgptNameInput.inputValue();
+  console.log('ChatGPT Connector Name:', chatgptNameVal);
+  expect(chatgptNameVal).toBeTruthy();
+
   await page.screenshot({ path: path.join(artifactDir, 'mcp_connect_chatgpt.png') });
+  try { await page.screenshot({ path: path.join(subagentArtifactDir, 'mcp_connect_chatgpt.png') }); } catch (e) {}
 
   // 4. Tab 3: Autonomous Campaigns Command Center
   const campaignsTabBtn = page.locator('#cora-ws-gw-btn-campaigns');
@@ -98,4 +150,26 @@ test('Verify Multi-Model AI Connectors and Autonomous Campaigns in MCP Drawer', 
   await page.keyboard.press('Escape');
   await page.waitForTimeout(400);
   await expect(drawer).toHaveClass(/collapsed/);
+});
+
+test('Verify Redesigned Minimal OAuth 2.1 Consent Screen', async ({ page }) => {
+  const artifactDir = '/Users/shrutian/.gemini/antigravity/brain/58e87118-a119-4a20-9906-b30972fba7f6';
+  await page.setViewportSize({ width: 1200, height: 900 });
+  await login(page, 'owner.studio@cora.local', 'cora_secure_pass_123');
+
+  // Navigate to OAuth Authorize endpoint for Google Gemini
+  await page.goto('/oauth/authorize?response_type=code&client_id=cora_gemini_client&redirect_uri=https://gemini.google.com/apps/callback&scope=*&state=xyz123');
+  await page.waitForLoadState('domcontentloaded');
+  await page.waitForTimeout(1000);
+
+  // Assert clean high-trust elements
+  await expect(page.locator('text=Connect Google Gemini to Cora').first()).toBeVisible();
+  await expect(page.locator('text=Autonomous Campaigns & Content Engine').first()).toBeVisible();
+  await expect(page.locator('text=Website, Themes & Canvas').first()).toBeVisible();
+  await expect(page.locator('text=CRM Leads & Client Pipelines').first()).toBeVisible();
+  await expect(page.locator('text=Studio Operations & MCP Tools').first()).toBeVisible();
+  await expect(page.locator('button:has-text("Authorize Google Gemini")').first()).toBeVisible();
+
+  // Capture screenshot
+  await page.screenshot({ path: path.join(artifactDir, 'mcp_oauth_consent_screen_new.png') });
 });
