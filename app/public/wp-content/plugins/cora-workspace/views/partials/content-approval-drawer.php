@@ -93,6 +93,12 @@
                 </select>
             </div>
             <div>
+                <label class="block text-xs font-bold text-zinc-700 mb-1">Canvas Dynamic Template</label>
+                <select id="wp-cora-template-slug" class="w-full border border-zinc-200 rounded-lg px-3 py-2 text-sm bg-white">
+                    <option value="default">Default Blueprint (article.default)</option>
+                </select>
+            </div>
+            <div>
                 <label class="block text-xs font-bold text-zinc-700 mb-1">Publish Status</label>
                 <select id="wp-publish-status" class="w-full border border-zinc-200 rounded-lg px-3 py-2 text-sm">
                     <option value="draft">Save as Draft</option>
@@ -144,6 +150,25 @@
         
         document.getElementById('approval-item-id').value = itemId;
         document.getElementById('approval-item-title').textContent = 'Loading...';
+        
+        const tplSelect = document.getElementById('wp-cora-template-slug');
+        if (tplSelect) {
+            tplSelect.innerHTML = '<option value="default">Default Blueprint (article.default)</option>';
+            fetch('/wp-json/cora-canvas/v1/templates?theme_id=1&archetype=article')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && Array.isArray(data.templates)) {
+                        data.templates.forEach(t => {
+                            if (t.slug !== 'default') {
+                                const opt = document.createElement('option');
+                                opt.value = t.slug;
+                                opt.textContent = `${t.name} (${t.slug})`;
+                                tplSelect.appendChild(opt);
+                            }
+                        });
+                    }
+                }).catch(() => {});
+        }
         
         // Load item
         $.post(coraREWPData.ajaxUrl, {
@@ -251,13 +276,15 @@
         const postType = document.getElementById('wp-post-type').value;
         const status = document.getElementById('wp-publish-status').value;
         const schedDate = document.getElementById('wp-schedule-date').value;
+        const templateSlug = document.getElementById('wp-cora-template-slug') ? document.getElementById('wp-cora-template-slug').value : 'default';
         
-        window.coraShowToast('Syncing to WordPress...', 'info');
+        window.coraShowToast('Syncing to WordPress with dynamic template...', 'info');
         $.post(coraREWPData.ajaxUrl, {
             action: 'cora_sync_to_wordpress',
             nonce: coraREWPData.ajaxNonce,
             item_id: itemId,
             wp_post_type: postType,
+            template_slug: templateSlug,
             publish_status: status,
             publish_timestamp: schedDate
         }, function(r) {

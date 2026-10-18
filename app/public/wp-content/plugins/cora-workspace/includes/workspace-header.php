@@ -19,6 +19,9 @@ if ( ! function_exists( 'cora_get_mcp_button_html' ) ) {
      * and plug vector icon, matching platform design system benchmark.
      */
     function cora_get_mcp_button_html( $extra_class = '', $id = 'cora-btn-ai-mcp-gateway' ) {
+        if ( function_exists( 'cora_is_workspace_mcp_eligible' ) && ! cora_is_workspace_mcp_eligible() ) {
+            return '';
+        }
         $btn_id = ! empty( $id ) ? ' id="' . esc_attr( $id ) . '"' : '';
         $classes = 'cora-ai-alive-btn select-none' . ( ! empty( $extra_class ) ? ' ' . esc_attr( $extra_class ) : '' );
         

@@ -22,11 +22,13 @@ class Cora_MCP_Loader {
 
         Cora_MCP_DB::init();
 
+        add_action( 'init', array( __CLASS__, 'handle_cors_preflight' ), 0 );
         add_action( 'rest_api_init', array( __CLASS__, 'register_rest_routes' ) );
         add_action( 'init', array( __CLASS__, 'add_rewrite_rules' ) );
         add_filter( 'query_vars', array( __CLASS__, 'add_query_vars' ) );
         add_action( 'wp_loaded', array( __CLASS__, 'handle_pretty_endpoints' ), 1 );
         add_action( 'template_redirect', array( __CLASS__, 'handle_pretty_endpoints' ), 0 );
+        add_filter( 'rest_pre_serve_request', array( __CLASS__, 'filter_rest_cors' ), 10, 4 );
         add_action( 'wp_ajax_cora_get_active_mcp_connections', array( __CLASS__, 'ajax_get_connections' ) );
         add_action( 'wp_ajax_cora_get_mcp_connections', array( __CLASS__, 'ajax_get_connections' ) );
         add_action( 'wp_ajax_cora_revoke_mcp_connection', array( __CLASS__, 'ajax_revoke_connection' ) );
@@ -174,6 +176,67 @@ class Cora_MCP_Loader {
     }
 
     /**
+     * Send CORS headers for cross-origin MCP clients (ChatGPT, Gemini, Claude, etc.)
+     */
+    public static function send_cors_headers() {
+        if ( headers_sent() ) {
+            return;
+        }
+
+        $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+        if ( ! empty( $origin ) ) {
+            header( "Access-Control-Allow-Origin: {$origin}" );
+            header( 'Access-Control-Allow-Credentials: true' );
+            header( 'Vary: Origin' );
+        } else {
+            header( 'Access-Control-Allow-Origin: *' );
+        }
+
+        header( 'Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE' );
+        header( 'Access-Control-Allow-Headers: Authorization, Content-Type, X-Requested-With, Accept, Origin, Cache-Control, X-Accel-Buffering, Mcp-Session-Id' );
+        header( 'Access-Control-Expose-Headers: WWW-Authenticate, Content-Length, Content-Type, Mcp-Session-Id' );
+        header( 'Access-Control-Max-Age: 86400' );
+    }
+
+    /**
+     * Intercept early OPTIONS CORS preflights on init
+     */
+    public static function handle_cors_preflight() {
+        if ( ( $_SERVER['REQUEST_METHOD'] ?? 'GET' ) !== 'OPTIONS' ) {
+            return;
+        }
+
+        $request_uri = parse_url( $_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH ) ?: '';
+        $home_path   = parse_url( home_url(), PHP_URL_PATH ) ?: '';
+        if ( ! empty( $home_path ) && 0 === strpos( $request_uri, $home_path ) ) {
+            $path = substr( $request_uri, strlen( $home_path ) );
+        } else {
+            $path = $request_uri;
+        }
+        $path = trim( $path, '/' );
+        $parts = array_values( array_filter( explode( '/', $path ) ) );
+        $first = $parts[0] ?? '';
+
+        if ( $first === 'mcp' || $first === 'oauth' || $first === '.well-known' || ( $first === 'wp-json' && ( strpos( $path, 'cora' ) !== false || strpos( $path, 'mcp' ) !== false ) ) ) {
+            self::send_cors_headers();
+            status_header( 204 );
+            header( 'Content-Length: 0' );
+            exit;
+        }
+    }
+
+    /**
+     * Filter REST API responses to ensure CORS headers are added to MCP/OAuth REST routes
+     */
+    public static function filter_rest_cors( $served, $result, $request, $server ) {
+        $route = $request->get_route();
+        if ( strpos( $route, '/cora/' ) !== false || strpos( $route, '/cora-mcp' ) !== false ) {
+            self::send_cors_headers();
+        }
+        return $served;
+    }
+
+    /**
      * Handle pretty endpoints on template redirect or early init
      */
     public static function handle_pretty_endpoints() {
@@ -200,6 +263,20 @@ class Cora_MCP_Loader {
         $is_oauth_discovery = get_query_var( 'cora_oauth_discovery' ) || ( $first_seg === '.well-known' && ( $second_seg === 'oauth-authorization-server' || $second_seg === 'openid-configuration' ) );
         $is_oauth_protected_resource = get_query_var( 'cora_oauth_protected_resource' ) || ( $first_seg === '.well-known' && $second_seg === 'oauth-protected-resource' );
 
+        $is_any_mcp = $is_mcp || $is_openapi || $is_ai_plugin || $is_oauth_auth || $is_oauth_token || $is_oauth_register || $is_oauth_revoke || $is_oauth_userinfo || $is_oauth_protected_resource || $is_oauth_discovery;
+
+        if ( ! $is_any_mcp ) {
+            return;
+        }
+
+        self::send_cors_headers();
+
+        if ( ( $_SERVER['REQUEST_METHOD'] ?? 'GET' ) === 'OPTIONS' ) {
+            status_header( 204 );
+            header( 'Content-Length: 0' );
+            exit;
+        }
+
         if ( $is_mcp ) {
             $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
             $request = self::create_request_from_globals( $method, '/cora/v1/mcp' );
@@ -218,15 +295,16 @@ class Cora_MCP_Loader {
 
         if ( $is_ai_plugin ) {
             header( 'Content-Type: application/json; charset=utf-8' );
-            header( 'Access-Control-Allow-Origin: *' );
             header( 'Cache-Control: public, max-age=3600' );
             $base = home_url();
+            $requested_model = sanitize_key( $_GET['model'] ?? ( $_GET['name'] ?? 'cla' ) );
+            $name_for_model  = in_array( $requested_model, array( 'cora', 'cla' ), true ) ? $requested_model : 'cla';
             $manifest = array(
                 'schema_version'        => 'v1',
-                'name_for_human'        => 'Cora Studio OS',
-                'name_for_model'        => 'cora',
-                'description_for_human' => 'Universal workspace operations, CRM pipeline, tasks, bookings, ledger, and autonomous publishing.',
-                'description_for_model' => 'Cora Studio OS provides universal MCP tools and REST actions to query workspace metrics, manage CRM leads, clients, tasks, projects, bookings, invoices, and author/publish content.',
+                'name_for_human'        => 'CLA (Cora Workspace OS)',
+                'name_for_model'        => $name_for_model,
+                'description_for_human' => 'CLA Workspace AI Operator for CORA. Manage CRM leads, tasks, media library, CMS articles, financial records, and operational analytics.',
+                'description_for_model' => 'CLA (Cora Living Agent) connects directly to the authenticated workspace. Allows reading and managing CRM leads, tasks, projects, media vault assets, CMS articles, landing pages, financial invoices, and analytics.',
                 'auth'                  => array(
                     'type'                       => 'oauth',
                     'client_url'                 => $base . '/oauth/authorize',
@@ -308,6 +386,9 @@ class Cora_MCP_Loader {
         if ( ! ( $response instanceof WP_REST_Response ) ) {
             return;
         }
+
+        self::send_cors_headers();
+
         $status = $response->get_status();
         $data   = $response->get_data();
 
@@ -327,6 +408,7 @@ class Cora_MCP_Loader {
         }
 
         if ( $status === 204 ) {
+            header( 'Content-Length: 0' );
             exit;
         }
 

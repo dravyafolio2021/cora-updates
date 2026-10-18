@@ -28,6 +28,11 @@ class Cora_Universal_MCP_Server {
      * @return WP_REST_Response
      */
     public static function handle_request( $request ) {
+        // 0. Handle OPTIONS Preflight
+        if ( $request->get_method() === 'OPTIONS' || ( isset( $_SERVER['REQUEST_METHOD'] ) && $_SERVER['REQUEST_METHOD'] === 'OPTIONS' ) ) {
+            return new WP_REST_Response( null, 204 );
+        }
+
         // 1. Authenticate Token (OAuth 2.1 or Direct API Token)
         $auth = Cora_OAuth_Server::authenticate_token( $request );
 
@@ -42,6 +47,18 @@ class Cora_Universal_MCP_Server {
             }
             $_REQUEST['cora_agency_id'] = $agency_id;
             $_REQUEST['workspace_id']   = $agency_id;
+
+            // Enforce Plan Eligibility Check (Paid Workspaces Only)
+            if ( function_exists( 'cora_is_workspace_mcp_eligible' ) && ! cora_is_workspace_mcp_eligible( $agency_id ) ) {
+                return new WP_REST_Response( array(
+                    'jsonrpc' => '2.0',
+                    'error'   => array(
+                        'code'    => -32001,
+                        'message' => 'Plan Upgrade Required: The Model Context Protocol (MCP) and Developer Gateway is restricted to Professional and Scale workspaces.',
+                    ),
+                    'id'      => null,
+                ), 403 );
+            }
 
             // Enforce Rate Limiting
             if ( ! self::check_rate_limit( $auth ) ) {
@@ -58,10 +75,13 @@ class Cora_Universal_MCP_Server {
 
         // 2. Handle GET / SSE Streaming Transport or Discovery
         if ( $request->get_method() === 'GET' ) {
-            if ( ! empty( $auth['valid'] ) ) {
+            $accept = $request->get_header( 'accept' ) ?? '';
+            $is_sse = ( strpos( $accept, 'text/event-stream' ) !== false ) || ( isset( $_GET['transport'] ) && $_GET['transport'] === 'sse' ) || ( isset( $_SERVER['REQUEST_URI'] ) && strpos( $_SERVER['REQUEST_URI'], '/sse' ) !== false );
+
+            if ( $is_sse && ! empty( $auth['valid'] ) ) {
                 return self::handle_sse_stream( $request, $auth );
             }
-            // Return public MCP Discovery for HTTP GET
+            // Return public or authenticated MCP Discovery for HTTP GET
             return self::handle_discover( array(), 1, $auth );
         }
 
@@ -115,7 +135,7 @@ class Cora_Universal_MCP_Server {
         switch ( $method ) {
             // ── Protocol Negotiation, Discovery & Lifecycle ─────────────────
             case 'initialize':
-                return self::handle_initialize( $params, $id );
+                return self::handle_initialize( $params, $id, $auth );
 
             case 'server/discover':
             case 'server/info':
@@ -153,7 +173,26 @@ class Cora_Universal_MCP_Server {
      * Handle modern MCP 2026-07-28 server discovery
      */
     private static function handle_discover( $params, $id, $auth ) {
+        global $wpdb;
         $meta_url = home_url( '/.well-known/oauth-protected-resource' );
+
+        $agency_id = intval( $auth['workspace_id'] ?? 1 ) ?: 1;
+        $host = wp_parse_url( home_url(), PHP_URL_HOST );
+        $clean_host = sanitize_key( str_replace( array( '.', '-' ), '_', $host ) );
+
+        $workspace_name = 'Cora Workspace';
+        if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $wpdb->prefix . 'cora_agencies' ) ) {
+            $db_name = $wpdb->get_var( $wpdb->prepare( "SELECT name FROM {$wpdb->prefix}cora_agencies WHERE id = %d", $agency_id ) );
+            if ( ! empty( $db_name ) ) {
+                $workspace_name = $db_name;
+            }
+        } else {
+            $db_name = $wpdb->get_var( $wpdb->prepare( "SELECT name FROM {$wpdb->prefix}cora_agencies WHERE id = %d", $agency_id ) );
+            if ( ! empty( $db_name ) ) {
+                $workspace_name = $db_name;
+            }
+        }
+
         return self::success_response( array(
             'protocolVersion'           => self::PROTOCOL_VERSION,
             'supportedProtocolVersions' => self::SUPPORTED_PROTOCOL_VERSIONS,
@@ -164,43 +203,60 @@ class Cora_Universal_MCP_Server {
                 'prompts'   => (object) array(),
             ),
             'serverInfo'                => array(
-                'name'        => self::SERVER_NAME,
+                'name'        => 'cla-workspace-' . $clean_host . ( $agency_id > 1 ? '-ws' . $agency_id : '' ),
                 'version'     => self::SERVER_VERSION,
-                'title'       => 'Cora Universal MCP Server',
-                'description' => 'Standards-compliant remote MCP server for autonomous workspace operations and growth publishing.',
+                'title'       => 'CLA Workspace - ' . $workspace_name . ' (' . $host . ')',
+                'description' => 'Standards-compliant remote MCP server for CLA autonomous workspace operations and growth publishing.',
             ),
             'auth'                      => array(
                 'type'             => 'oauth2',
                 'resourceMetadata' => $meta_url,
                 'scopes'           => array_keys( Cora_OAuth_Server::get_supported_scopes() ),
             ),
-            'instructions'              => 'You are connected to Cora Studio OS via the Universal Model Context Protocol (MCP). Use the provided tools to inspect and operate the user\'s workspace, manage CRM leads, execute projects, track tasks, query financial ledgers, and author/publish content.',
+            'instructions'              => "You are CLA (Cora Living Agent), the authorized AI operator for the '{$workspace_name}' workspace on {$host} (Workspace ID: {$agency_id}). You have full read and write operational access across CRM leads, tasks, media vault, CMS articles, invoices, and analytics. All operations you execute MUST and CAN ONLY be performed within this specific workspace ({$workspace_name}).",
         ), $id );
     }
 
     /**
      * Handle initialize method (MCP handshake)
      */
-    private static function handle_initialize( $params, $id ) {
+    private static function handle_initialize( $params, $id, $auth = array() ) {
+        global $wpdb;
         $client_proto = isset( $params['protocolVersion'] ) ? sanitize_text_field( $params['protocolVersion'] ) : self::PROTOCOL_VERSION;
         $negotiated = in_array( $client_proto, self::SUPPORTED_PROTOCOL_VERSIONS, true ) ? $client_proto : self::PROTOCOL_VERSION;
 
+        $agency_id = intval( $auth['workspace_id'] ?? 1 ) ?: 1;
+        $host = wp_parse_url( home_url(), PHP_URL_HOST );
+        $clean_host = sanitize_key( str_replace( array( '.', '-' ), '_', $host ) );
+
+        $workspace_name = 'Cora Workspace';
+        if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $wpdb->prefix . 'cora_agencies' ) ) {
+            $db_name = $wpdb->get_var( $wpdb->prepare( "SELECT name FROM {$wpdb->prefix}cora_agencies WHERE id = %d", $agency_id ) );
+            if ( ! empty( $db_name ) ) {
+                $workspace_name = $db_name;
+            }
+        } else {
+            $db_name = $wpdb->get_var( $wpdb->prepare( "SELECT name FROM {$wpdb->prefix}cora_agencies WHERE id = %d", $agency_id ) );
+            if ( ! empty( $db_name ) ) {
+                $workspace_name = $db_name;
+            }
+        }
+
         return self::success_response( array(
-            'protocolVersion'           => $negotiated,
-            'supportedProtocolVersions' => self::SUPPORTED_PROTOCOL_VERSIONS,
-            'capabilities'              => array(
+            'protocolVersion' => $negotiated,
+            'capabilities'    => array(
                 'tools'     => array( 'listChanged' => false ),
                 'logging'   => (object) array(),
                 'resources' => (object) array(),
                 'prompts'   => (object) array(),
             ),
-            'serverInfo'                => array(
-                'name'        => self::SERVER_NAME,
+            'serverInfo'      => array(
+                'name'        => 'cla-workspace-' . $clean_host . ( $agency_id > 1 ? '-ws' . $agency_id : '' ),
                 'version'     => self::SERVER_VERSION,
-                'title'       => 'Cora Universal MCP Server',
-                'description' => 'Standards-compliant remote MCP server for autonomous workspace operations and growth publishing.',
+                'title'       => 'CLA Workspace - ' . $workspace_name . ' (' . $host . ')',
+                'description' => 'Standards-compliant remote MCP server for CLA autonomous workspace operations and growth publishing.',
             ),
-            'instructions'              => 'You are connected to Cora Studio OS via the Universal Model Context Protocol (MCP). Use the provided tools to inspect and operate the user\'s workspace, manage CRM leads, execute projects, track tasks, query financial ledgers, and author/publish content.',
+            'instructions'    => "You are CLA (Cora Living Agent), the authorized AI operator for the '{$workspace_name}' workspace on {$host} (Workspace ID: {$agency_id}). You have full read and write operational access across CRM leads, tasks, media vault, CMS articles, invoices, and analytics. All operations you execute MUST and CAN ONLY be performed within this specific workspace ({$workspace_name}).",
         ), $id );
     }
 
@@ -210,74 +266,14 @@ class Cora_Universal_MCP_Server {
     private static function handle_list_tools( $params, $id, $auth ) {
         $all_tools = Cora_MCP_Tool_Registry::get_tools();
 
-        $all_requested = false;
-        if ( ! empty( $params['all'] ) || ( isset( $params['limit'] ) && $params['limit'] === 'all' ) || ( isset( $_GET['all'] ) && $_GET['all'] == '1' ) ) {
-            $all_requested = true;
-        }
-
-        // Top 28 core high-priority operational actions to stay within ChatGPT 30-tools ceiling
-        $curated_priority_names = array(
-            'cora_get_workspace_overview',
-            'cora_list_campaigns',
-            'cora_create_campaign',
-            'cora_trigger_campaign_run',
-            'cora_improve_content',
-            'cora_get_autonomous_activity_log',
-            'cora_list_articles',
-            'cora_create_article',
-            'cora_publish_article',
-            'cora_audit_article_seo',
-            'cora_list_leads',
-            'cora_get_lead',
-            'cora_create_lead',
-            'cora_update_lead',
-            'cora_list_clients',
-            'cora_create_client',
-            'cora_list_projects',
-            'cora_create_project',
-            'cora_list_tasks',
-            'cora_create_task',
-            'cora_update_task',
-            'cora_query_financials',
-            'cora_canvas_get_active_theme',
-            'cora_canvas_list_themes',
-            'cora_canvas_get_page_html',
-            'cora_canvas_update_page_html',
-            'cora_search_knowledge_base',
-            'cora_add_knowledge_fragment',
-        );
-
-        $selected_tools = array();
-        if ( ! $all_requested ) {
-            foreach ( $curated_priority_names as $pname ) {
-                if ( isset( $all_tools[ $pname ] ) ) {
-                    $selected_tools[ $pname ] = $all_tools[ $pname ];
-                }
-            }
-            if ( count( $selected_tools ) < 28 ) {
-                foreach ( $all_tools as $tk => $tv ) {
-                    if ( ! isset( $selected_tools[ $tk ] ) && count( $selected_tools ) < 28 ) {
-                        $selected_tools[ $tk ] = $tv;
-                    }
-                }
-            }
-        } else {
-            $selected_tools = $all_tools;
-        }
-
         $formatted_tools = array();
-        foreach ( $selected_tools as $tool_key => $tool ) {
-            $read_only   = ! empty( $tool['readOnlyHint'] ) || ! empty( $tool['readOnly'] );
-            $destructive = ! empty( $tool['destructiveHint'] ) || ! empty( $tool['destructive'] );
-            $open_world  = ! empty( $tool['openWorldHint'] ) || ! empty( $tool['openWorld'] );
-            $idempotent  = ! empty( $tool['idempotentHint'] ) || ! empty( $tool['idempotent'] ) || $read_only;
-
+        foreach ( $all_tools as $tool_key => $tool ) {
             $tool_name = str_replace( '.', '_', $tool['name'] );
             $schema    = $tool['inputSchema'] ?? array( 'type' => 'object', 'properties' => (object) array() );
             if ( ! isset( $schema['type'] ) ) {
                 $schema['type'] = 'object';
             }
-            if ( ! isset( $schema['properties'] ) || empty( $schema['properties'] ) ) {
+            if ( ! isset( $schema['properties'] ) || empty( $schema['properties'] ) || ( is_array( $schema['properties'] ) && empty( $schema['properties'] ) ) ) {
                 $schema['properties'] = (object) array();
             }
             if ( isset( $schema['required'] ) && empty( $schema['required'] ) ) {
@@ -286,14 +282,8 @@ class Cora_Universal_MCP_Server {
 
             $formatted_tools[] = array(
                 'name'        => $tool_name,
-                'description' => $tool['description'],
+                'description' => $tool['description'] ?? '',
                 'inputSchema' => $schema,
-                'annotations' => array(
-                    'readOnlyHint'    => (bool) $read_only,
-                    'destructiveHint' => (bool) $destructive,
-                    'openWorldHint'   => (bool) $open_world,
-                    'idempotentHint'  => (bool) $idempotent,
-                ),
             );
         }
 
@@ -311,6 +301,12 @@ class Cora_Universal_MCP_Server {
             $response = self::error_response( -32001, 'Unauthorized: ' . ( $auth['error'] ?? 'Missing or invalid Bearer token.' ), $id, 401 );
             $response->header( 'WWW-Authenticate', 'Bearer resource_metadata="' . $meta_url . '", realm="cora-mcp", error="invalid_token", error_description="Missing or invalid bearer token"' );
             return $response;
+        }
+
+        // Enforce Plan Eligibility Check (Paid Workspaces Only)
+        $target_workspace_id = ! empty( $auth['workspace_id'] ) ? $auth['workspace_id'] : ( $_REQUEST['cora_agency_id'] ?? 1 );
+        if ( function_exists( 'cora_is_workspace_mcp_eligible' ) && ! cora_is_workspace_mcp_eligible( $target_workspace_id ) ) {
+            return self::error_response( -32001, 'Plan Upgrade Required: The Model Context Protocol (MCP) and Developer Gateway is restricted to Professional and Scale workspaces.', $id, 403 );
         }
 
         $tool_name = isset( $params['name'] ) ? sanitize_text_field( $params['name'] ) : '';
@@ -478,10 +474,10 @@ class Cora_Universal_MCP_Server {
         elseif ( isset( $arguments['project_id'] ) ) $target_id = (string) $arguments['project_id'];
 
         $wpdb->insert( $table, array(
-            'user_id'            => $auth['user_id'],
-            'workspace_id'       => (string) $auth['workspace_id'],
+            'user_id'            => $auth['user_id'] ?? 0,
+            'workspace_id'       => (string) ( $auth['workspace_id'] ?? 1 ),
             'client_name'        => $auth['client_name'] ?? 'unknown',
-            'token_id'           => $auth['token_id'] ?: null,
+            'token_id'           => ! empty( $auth['token_id'] ) ? $auth['token_id'] : null,
             'tool_name'          => $tool_name,
             'action_type'        => $action_type,
             'target_id'          => $target_id,

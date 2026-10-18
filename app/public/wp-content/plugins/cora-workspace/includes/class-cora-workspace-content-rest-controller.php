@@ -174,6 +174,15 @@ class Cora_Workspace_Content_REST_Controller {
      * Resolve Tenant Agency ID from Request
      */
     public static function resolve_agency_id( $request ) {
+        // 1. Direct tenant parameter from MCP dispatcher
+        if ( $request->get_param( '_tenant_agency_id' ) ) {
+            $tid = $request->get_param( '_tenant_agency_id' );
+            if ( is_numeric( $tid ) && intval( $tid ) > 0 ) {
+                return intval( $tid );
+            }
+        }
+
+        // 2. Workspace API Key
         if ( class_exists( 'Cora_Plugins_Skills_Engine' ) ) {
             $api_key = Cora_Plugins_Skills_Engine::authenticate_api_key( $request );
             if ( ! empty( $api_key ) && ! empty( $api_key['agency_id'] ) ) {
@@ -181,25 +190,60 @@ class Cora_Workspace_Content_REST_Controller {
             }
         }
 
+        // 3. Header parameter
         if ( $request->get_header( 'x-cora-agency-id' ) ) {
             return intval( $request->get_header( 'x-cora-agency-id' ) );
         }
 
+        // 4. Request parameters (agency_id or workspace_id)
         if ( $request->get_param( 'agency_id' ) ) {
-            return intval( $request->get_param( 'agency_id' ) );
+            $aid = $request->get_param( 'agency_id' );
+            if ( is_numeric( $aid ) && intval( $aid ) > 0 ) {
+                return intval( $aid );
+            } elseif ( is_string( $aid ) && function_exists( 'cora_db_get_agency_id_by_slug' ) ) {
+                $slug_id = cora_db_get_agency_id_by_slug( $aid );
+                if ( $slug_id > 0 ) return intval( $slug_id );
+            }
         }
 
+        if ( $request->get_param( 'workspace_id' ) ) {
+            $wid = $request->get_param( 'workspace_id' );
+            if ( is_numeric( $wid ) && intval( $wid ) > 0 ) {
+                return intval( $wid );
+            } elseif ( is_string( $wid ) && function_exists( 'cora_db_get_agency_id_by_slug' ) ) {
+                $slug_id = cora_db_get_agency_id_by_slug( $wid );
+                if ( $slug_id > 0 ) return intval( $slug_id );
+            }
+        }
+
+        // 5. Current tenant context
         if ( function_exists( 'cora_get_current_tenant_agency_id' ) ) {
             $tid = cora_get_current_tenant_agency_id();
             if ( $tid > 0 ) return intval( $tid );
         }
 
+        // 6. User Meta (handle string slugs via cora_db_get_agency_id_by_slug)
         if ( is_user_logged_in() ) {
             $user_id = get_current_user_id();
             $meta_agency = get_user_meta( $user_id, 'cora_agency_id', true );
-            if ( ! empty( $meta_agency ) ) {
-                return intval( is_array( $meta_agency ) ? $meta_agency[0] : $meta_agency );
+            if ( is_array( $meta_agency ) ) {
+                $meta_agency = reset( $meta_agency );
             }
+            if ( ! empty( $meta_agency ) ) {
+                if ( is_numeric( $meta_agency ) && intval( $meta_agency ) > 0 ) {
+                    return intval( $meta_agency );
+                } elseif ( is_string( $meta_agency ) && function_exists( 'cora_db_get_agency_id_by_slug' ) ) {
+                    $slug_id = cora_db_get_agency_id_by_slug( $meta_agency );
+                    if ( $slug_id > 0 ) {
+                        return intval( $slug_id );
+                    }
+                }
+            }
+        }
+
+        if ( function_exists( 'cora_get_current_agency_id' ) ) {
+            $cid = cora_get_current_agency_id();
+            if ( $cid > 0 ) return intval( $cid );
         }
 
         return 1;
@@ -263,19 +307,12 @@ class Cora_Workspace_Content_REST_Controller {
             }
         }
 
-        // Scoping by Agency
+        // Scoping by Agency - Strict Zero-Bleed Isolation
         if ( $agency_id > 0 ) {
             $args['meta_query'][] = array(
-                'relation' => 'OR',
-                array(
-                    'key'     => 'cora_agency_id',
-                    'value'   => (string) $agency_id,
-                    'compare' => '=',
-                ),
-                array(
-                    'key'     => 'cora_agency_id',
-                    'compare' => 'NOT EXISTS',
-                ),
+                'key'     => 'cora_agency_id',
+                'value'   => (string) $agency_id,
+                'compare' => '=',
             );
         }
 
@@ -330,7 +367,20 @@ class Cora_Workspace_Content_REST_Controller {
             }
         }
 
-        return ( $post && $post->post_type === 'post' ) ? $post : null;
+        if ( ! ( $post && $post->post_type === 'post' ) ) {
+            return null;
+        }
+
+        // Strict multi-tenant isolation check
+        $agency_id = self::resolve_agency_id( $request );
+        if ( $agency_id > 0 ) {
+            $post_agency = get_post_meta( $post->ID, 'cora_agency_id', true );
+            if ( ! empty( $post_agency ) && (string) $post_agency !== (string) $agency_id ) {
+                return null;
+            }
+        }
+
+        return $post;
     }
 
     /**
@@ -359,12 +409,19 @@ class Cora_Workspace_Content_REST_Controller {
         $title      = sanitize_text_field( $request->get_param( 'title' ) ?? 'Untitled Article' );
         $content    = wp_kses_post( $request->get_param( 'content' ) ?? '' );
         $req_status = sanitize_text_field( $request->get_param( 'status' ) ?? 'draft' );
-        $keyword    = sanitize_text_field( $request->get_param( 'focus_keyword' ) ?? $request->get_param( 'keyword' ) ?? '' );
-        $meta_desc  = sanitize_text_field( $request->get_param( 'meta_desc' ) ?? $request->get_param( 'excerpt' ) ?? '' );
-        $meta_title = sanitize_text_field( $request->get_param( 'meta_title' ) ?? '' );
+        $keyword    = sanitize_text_field( $request->get_param( 'focus_keyword' ) ?? $request->get_param( 'keyword' ) ?? $request->get_param( 'target_keywords' ) ?? '' );
+        $meta_desc  = sanitize_text_field( $request->get_param( 'meta_desc' ) ?? $request->get_param( 'meta_description' ) ?? $request->get_param( 'excerpt' ) ?? '' );
+        $meta_title = sanitize_text_field( $request->get_param( 'meta_title' ) ?? $request->get_param( 'seo_title' ) ?? '' );
         $slug       = sanitize_title( $request->get_param( 'slug' ) ?? $title );
         $author_id  = intval( $request->get_param( 'author_id' ) ?? ( get_current_user_id() ?: 1 ) );
         $thumb_id   = intval( $request->get_param( 'thumbnail_id' ) ?? 0 );
+        $thumb_url  = esc_url_raw( $request->get_param( 'thumbnail_url' ) ?? '' );
+        if ( empty( $thumb_id ) && ! empty( $thumb_url ) ) {
+            $found_thumb = attachment_url_to_postid( $thumb_url );
+            if ( $found_thumb > 0 ) {
+                $thumb_id = $found_thumb;
+            }
+        }
         $categories = (array) ( $request->get_param( 'categories' ) ?? array() );
         $tags       = (array) ( $request->get_param( 'tags' ) ?? array() );
 
@@ -395,6 +452,7 @@ class Cora_Workspace_Content_REST_Controller {
         if ( ! empty( $keyword ) ) {
             update_post_meta( $new_id, '_cora_focus_keyword', $keyword );
             update_post_meta( $new_id, '_cora_seo_keyword', $keyword );
+            update_post_meta( $new_id, '_cora_target_keywords', $keyword );
         }
         if ( ! empty( $meta_desc ) ) {
             update_post_meta( $new_id, '_cora_meta_desc', $meta_desc );
@@ -402,6 +460,10 @@ class Cora_Workspace_Content_REST_Controller {
         }
         if ( ! empty( $meta_title ) ) {
             update_post_meta( $new_id, '_cora_meta_title', $meta_title );
+            update_post_meta( $new_id, '_cora_seo_title', $meta_title );
+        }
+        if ( ! empty( $thumb_url ) ) {
+            update_post_meta( $new_id, '_cora_thumbnail_url', $thumb_url );
         }
 
         // Taxonomies
@@ -417,8 +479,13 @@ class Cora_Workspace_Content_REST_Controller {
 
         // Calculate initial algorithmic SEO score
         $audit = self::calculate_seo_scores( $new_id, $title, $content, $slug, $keyword, $meta_desc );
-        update_post_meta( $new_id, '_cora_seo_score', $audit['seo_score'] );
-        update_post_meta( $new_id, '_cora_geo_score', $audit['geo_score'] );
+        $final_seo = $request->has_param( 'seo_score' ) ? intval( $request->get_param( 'seo_score' ) ) : $audit['seo_score'];
+        $final_geo = $request->has_param( 'geo_score' ) ? intval( $request->get_param( 'geo_score' ) ) : $audit['geo_score'];
+        update_post_meta( $new_id, '_cora_seo_score', $final_seo );
+        update_post_meta( $new_id, '_cora_geo_score', $final_geo );
+        if ( $request->has_param( 'faq_schema' ) ) {
+            update_post_meta( $new_id, '_cora_faq_schema', $request->get_param( 'faq_schema' ) );
+        }
 
         // Sync to workflow table if exists
         global $wpdb;
@@ -510,6 +577,10 @@ class Cora_Workspace_Content_REST_Controller {
             wp_set_post_tags( $post_id, (array) $request->get_param( 'tags' ) );
         }
 
+        if ( $request->has_param( 'faq_schema' ) ) {
+            update_post_meta( $post_id, '_cora_faq_schema', $request->get_param( 'faq_schema' ) );
+        }
+
         // Recalculate SEO & GEO
         $updated_post = get_post( $post_id );
         $audit = self::calculate_seo_scores(
@@ -520,8 +591,10 @@ class Cora_Workspace_Content_REST_Controller {
             get_post_meta( $post_id, '_cora_focus_keyword', true ),
             $updated_post->post_excerpt
         );
-        update_post_meta( $post_id, '_cora_seo_score', $audit['seo_score'] );
-        update_post_meta( $post_id, '_cora_geo_score', $audit['geo_score'] );
+        $final_seo = $request->has_param( 'seo_score' ) ? intval( $request->get_param( 'seo_score' ) ) : $audit['seo_score'];
+        $final_geo = $request->has_param( 'geo_score' ) ? intval( $request->get_param( 'geo_score' ) ) : $audit['geo_score'];
+        update_post_meta( $post_id, '_cora_seo_score', $final_seo );
+        update_post_meta( $post_id, '_cora_geo_score', $final_geo );
 
         return new WP_REST_Response( array(
             'success' => true,
@@ -594,6 +667,8 @@ class Cora_Workspace_Content_REST_Controller {
             'post_id'    => $post_id,
             'status'     => 'published',
             'public_url' => $pub_url,
+            'live_url'   => $pub_url,
+            'url'        => $pub_url,
         ), 200 );
     }
 
@@ -893,7 +968,7 @@ class Cora_Workspace_Content_REST_Controller {
         $reading_time = max( 1, ceil( $word_count / 200 ) );
 
         $author = get_userdata( $post->post_author );
-        $author_name = $author ? $author->display_name : 'Studio Author';
+        $author_name = ( $author && stripos( $author->display_name, 'shrut' ) === false ) ? $author->display_name : 'Studio Director';
 
         $cats = wp_get_post_categories( $post_id, array( 'fields' => 'all' ) );
         $cat_list = array();
@@ -926,13 +1001,17 @@ class Cora_Workspace_Content_REST_Controller {
                 'meta_desc'     => $meta_desc,
             ),
             'geo'              => array(
-                'geo_score' => $geo_score,
-                'signals'   => get_post_meta( $post_id, '_cora_geo_signals', true ) ?: array(),
+                'geo_score'  => $geo_score,
+                'signals'    => get_post_meta( $post_id, '_cora_geo_signals', true ) ?: array(),
+                'faq_schema' => get_post_meta( $post_id, '_cora_faq_schema', true ) ?: '',
             ),
+            'faq_schema'       => get_post_meta( $post_id, '_cora_faq_schema', true ) ?: '',
             'word_count'       => $word_count,
             'reading_time'     => $reading_time,
             'thumbnail_url'    => $thumb_url,
             'public_url'       => $public_url,
+            'live_url'         => $public_url,
+            'url'              => $public_url,
             'edit_url'         => $edit_url,
             'author_id'        => intval( $post->post_author ),
             'author_name'      => $author_name,

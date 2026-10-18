@@ -23,6 +23,163 @@ class Cora_MCP_Tool_Registry {
      */
     public static function get_tools() {
         $tools = array(
+            // ── 0. Workspace Discovery & Account (Universal CLA / ChatGPT) ──────
+            'list_workspaces' => array(
+                'name'          => 'list_workspaces',
+                'description'   => 'List all workspaces accessible to the authenticated account, including workspace ID, business name, domain slug, plan tier, industry vertical, and active status.',
+                'readOnly'      => true,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'workspace:read',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'status' => array( 'type' => 'string', 'description' => 'Filter by workspace status: active, all (default: all).' ),
+                    ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_list_workspaces' ),
+            ),
+
+            'get_workspace' => array(
+                'name'          => 'get_workspace',
+                'description'   => 'Retrieve comprehensive configuration, industry vertical, active modules, business profile, and operational capabilities for a workspace.',
+                'readOnly'      => true,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'workspace:read',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'workspace_id' => array( 'type' => 'string', 'description' => 'Optional workspace ID (defaults to active authenticated workspace).' ),
+                    ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_get_workspace' ),
+            ),
+
+            'get_authenticated_account' => array(
+                'name'          => 'get_authenticated_account',
+                'description'   => 'Get details of the currently authenticated account, user profile, active workspace, plan, and granted scopes.',
+                'readOnly'      => true,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'workspace:read',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => (object) array(),
+                ),
+                'handler'       => array( __CLASS__, 'handle_get_authenticated_account' ),
+            ),
+
+            // ── Media Vault Tools ──────────────────────────────────────────────
+            'upload_media' => array(
+                'name'          => 'upload_media',
+                'description'   => 'Upload an image, video, or document asset to the workspace Media Vault from a remote URL or base64 data URI. Generates optimized thumbnails and returns permanent asset URLs and IDs.',
+                'readOnly'      => false,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'workspace:write',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'url'         => array( 'type' => 'string', 'description' => 'Public URL of the file/image to download and store in workspace vault.' ),
+                        'file_base64' => array( 'type' => 'string', 'description' => 'Base64-encoded file data or data URI (e.g. data:image/png;base64,...).' ),
+                        'file_name'   => array( 'type' => 'string', 'description' => 'Target filename (e.g. hero-cover.jpg).' ),
+                        'title'       => array( 'type' => 'string', 'description' => 'Display title for the asset.' ),
+                        'folder_id'   => array( 'type' => 'integer', 'description' => 'Optional folder ID in media library.' ),
+                        'caption'     => array( 'type' => 'string', 'description' => 'Caption or description.' ),
+                        'alt_text'    => array( 'type' => 'string', 'description' => 'Alt text for image accessibility and SEO.' ),
+                    ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_upload_media' ),
+            ),
+
+            'list_media' => array(
+                'name'          => 'list_media',
+                'description'   => 'Search and browse assets in the workspace Media Vault with folder, type, and pagination filters.',
+                'readOnly'      => true,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'workspace:read',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'search'    => array( 'type' => 'string', 'description' => 'Optional search query by filename or title.' ),
+                        'folder_id' => array( 'type' => 'integer', 'description' => 'Optional folder ID filter.' ),
+                        'file_type' => array( 'type' => 'string', 'description' => 'Filter by file type: all, image, video, document (default: all).' ),
+                        'limit'     => array( 'type' => 'integer', 'description' => 'Max assets to return (default: 30).' ),
+                        'offset'    => array( 'type' => 'integer', 'description' => 'Pagination offset (default: 0).' ),
+                    ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_list_media' ),
+            ),
+
+            'get_media' => array(
+                'name'          => 'get_media',
+                'description'   => 'Retrieve full metadata, URLs, dimensions, and usage details for a specific media asset.',
+                'readOnly'      => true,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'workspace:read',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'media_id' => array( 'type' => 'integer', 'description' => 'ID of the media asset or attachment.' ),
+                    ),
+                    'required'   => array( 'media_id' ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_get_media' ),
+            ),
+
+            'delete_media' => array(
+                'name'          => 'delete_media',
+                'description'   => 'Permanently remove a media asset from the workspace vault and storage.',
+                'readOnly'      => false,
+                'destructive'   => true,
+                'openWorld'     => false,
+                'requiredScope' => 'workspace:write',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'media_id' => array( 'type' => 'integer', 'description' => 'ID of the media asset to delete.' ),
+                    ),
+                    'required'   => array( 'media_id' ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_delete_media' ),
+            ),
+
+            // ── Operational Analytics & Financial Summary ──────────────────────
+            'get_analytics' => array(
+                'name'          => 'get_analytics',
+                'description'   => 'Retrieve comprehensive operational analytics for the workspace: CRM funnel conversions, active deal values, task velocity, revenue collections, outstanding invoices, content SEO metrics, and media vault usage.',
+                'readOnly'      => true,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'workspace:read',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'period' => array( 'type' => 'string', 'description' => 'Analytics window: today, 7d, 30d, all (default: 30d).' ),
+                    ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_get_analytics' ),
+            ),
+
+            'get_financial_summary' => array(
+                'name'          => 'get_financial_summary',
+                'description'   => 'Get a consolidated financial pulse: collected revenue, outstanding receivables, pending invoices, expense breakdown, and recent ledger transactions.',
+                'readOnly'      => true,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'finance:read',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'period' => array( 'type' => 'string', 'description' => 'Period: today, 7d, 30d, all (default: all).' ),
+                    ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_get_financial_summary' ),
+            ),
+
             // ── 1. Workspace Overview ──────────────────────────────────────────
             'cora_get_workspace_overview' => array(
                 'name'          => 'cora_get_workspace_overview',
@@ -577,6 +734,9 @@ class Cora_MCP_Tool_Registry {
                         'focus_keyword'  => array( 'type' => 'string', 'description' => 'Primary SEO focus keyword.' ),
                         'meta_title'     => array( 'type' => 'string', 'description' => 'Custom search engine meta title.' ),
                         'meta_desc'      => array( 'type' => 'string', 'description' => 'Custom search engine meta description.' ),
+                        'faq_schema'     => array( 'type' => 'string', 'description' => 'JSON-LD FAQ Schema markup string or definition.' ),
+                        'seo_score'      => array( 'type' => 'integer', 'description' => 'Explicit SEO score override (0-100).' ),
+                        'geo_score'      => array( 'type' => 'integer', 'description' => 'Explicit AI Visibility / GEO score override (0-100).' ),
                         'category'       => array( 'type' => 'string', 'description' => 'Primary category name or slug.' ),
                         'categories'     => array( 'type' => 'array', 'items' => array( 'type' => 'integer' ), 'description' => 'Array of category IDs.' ),
                         'tags'           => array( 'type' => 'array', 'items' => array( 'type' => 'string' ), 'description' => 'Array of tag names.' ),
@@ -607,6 +767,9 @@ class Cora_MCP_Tool_Registry {
                         'focus_keyword'  => array( 'type' => 'string', 'description' => 'Updated primary SEO focus keyword.' ),
                         'meta_title'     => array( 'type' => 'string', 'description' => 'Updated search engine meta title.' ),
                         'meta_desc'      => array( 'type' => 'string', 'description' => 'Updated search engine meta description.' ),
+                        'faq_schema'     => array( 'type' => 'string', 'description' => 'Updated JSON-LD FAQ Schema markup string or definition.' ),
+                        'seo_score'      => array( 'type' => 'integer', 'description' => 'Explicit SEO score override (0-100).' ),
+                        'geo_score'      => array( 'type' => 'integer', 'description' => 'Explicit AI Visibility / GEO score override (0-100).' ),
                         'categories'     => array( 'type' => 'array', 'items' => array( 'type' => 'integer' ), 'description' => 'Category IDs.' ),
                         'tags'           => array( 'type' => 'array', 'items' => array( 'type' => 'string' ), 'description' => 'Tags.' ),
                         'scheduled_date' => array( 'type' => 'string', 'description' => 'Scheduled publish date.' ),
@@ -1211,6 +1374,33 @@ class Cora_MCP_Tool_Registry {
             }
         }
 
+        // Auto-register canonical, cla_, and cora_ aliases for every tool
+        $expanded = array();
+        foreach ( $tools as $k => $def ) {
+            $base_name = $k;
+            if ( strpos( $base_name, 'cora_' ) === 0 ) {
+                $base_name = substr( $base_name, 5 );
+            } elseif ( strpos( $base_name, 'cla_' ) === 0 ) {
+                $base_name = substr( $base_name, 4 );
+            }
+
+            // 1. Canonical base name
+            $canonical_def = $def;
+            $canonical_def['name'] = $base_name;
+            $expanded[ $base_name ] = $canonical_def;
+
+            // 2. cla_ prefixed name
+            $cla_def = $def;
+            $cla_def['name'] = 'cla_' . $base_name;
+            $expanded[ 'cla_' . $base_name ] = $cla_def;
+
+            // 3. cora_ prefixed name
+            $cora_def = $def;
+            $cora_def['name'] = 'cora_' . $base_name;
+            $expanded[ 'cora_' . $base_name ] = $cora_def;
+        }
+        $tools = $expanded;
+
         return apply_filters( 'cora_mcp_tools', $tools );
     }
 
@@ -1221,11 +1411,33 @@ class Cora_MCP_Tool_Registry {
         $name = trim( (string) $name );
         $normalized = str_replace( '.', '_', $name );
 
+        // Strip known prefixes
+        $base = $normalized;
+        if ( strpos( $base, 'cla_' ) === 0 ) {
+            $base = substr( $base, 4 );
+        } elseif ( strpos( $base, 'cora_' ) === 0 ) {
+            $base = substr( $base, 5 );
+        }
+
+        $tools = self::get_tools();
+        if ( isset( $tools[ $normalized ] ) ) {
+            return $normalized;
+        }
+        if ( isset( $tools[ $base ] ) ) {
+            return $base;
+        }
+        if ( isset( $tools[ 'cla_' . $base ] ) ) {
+            return 'cla_' . $base;
+        }
+        if ( isset( $tools[ 'cora_' . $base ] ) ) {
+            return 'cora_' . $base;
+        }
+
         $map = array(
             'cora_get_workspace_overview'       => 'cora_get_workspace_overview',
             'get_workspace_overview'            => 'cora_get_workspace_overview',
             'workspace_overview'                => 'cora_get_workspace_overview',
-            'get_workspace'                     => 'cora_get_workspace_overview',
+            'workspace_summary'                 => 'cora_get_workspace_overview',
 
             'cora_search_knowledge_base'        => 'cora_search_knowledge_base',
             'search_knowledge_base'             => 'cora_search_knowledge_base',
@@ -1523,16 +1735,35 @@ class Cora_MCP_Tool_Registry {
     // ── Helper: Resolve Agency / Workspace Context ────────────────────────────
 
     private static function get_agency_id( $auth, $args = array() ) {
+        // Authenticated token context MUST be the final authority
+        if ( ! empty( $auth['workspace_id'] ) ) {
+            $ws = $auth['workspace_id'];
+            if ( is_numeric( $ws ) ) {
+                $ws_id = intval( $ws );
+                if ( $ws_id > 0 ) {
+                    return $ws_id;
+                }
+            } elseif ( is_string( $ws ) && function_exists( 'cora_db_get_agency_id_by_slug' ) ) {
+                $ws_id = cora_db_get_agency_id_by_slug( $ws );
+                if ( $ws_id > 0 ) {
+                    return intval( $ws_id );
+                }
+            }
+        }
+
+        // Only fallback to client argument if unauthenticated context (e.g. CLI or internal mock)
         if ( ! empty( $args['workspace_id'] ) && is_numeric( $args['workspace_id'] ) ) {
             return intval( $args['workspace_id'] );
         }
-        $ws = $auth['workspace_id'] ?? '1';
-        if ( is_numeric( $ws ) ) {
-            return intval( $ws ) ?: 1;
+
+        if ( function_exists( 'cora_get_current_agency_id' ) ) {
+            return cora_get_current_agency_id() ?: 1;
         }
+
         if ( function_exists( 'cora_db_get_agency_id' ) ) {
             return cora_db_get_agency_id() ?: 1;
         }
+
         return 1;
     }
 
@@ -2466,8 +2697,8 @@ class Cora_MCP_Tool_Registry {
 
         if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $table ) ) {
             $ws_id_str = (string) $agency_id;
-            $sql       = "SELECT * FROM {$table} WHERE (workspace_id = %s OR workspace_id = 'default' OR workspace_id = '1')";
-            $params    = array( $ws_id_str );
+            $sql       = "SELECT * FROM {$table} WHERE (agency_id = %d OR workspace_id = %s)";
+            $params    = array( $agency_id, $ws_id_str );
 
             if ( $status !== 'all' && ! empty( $status ) ) {
                 // Normalize status aliases
@@ -2516,10 +2747,21 @@ class Cora_MCP_Tool_Registry {
         global $wpdb;
         $table = $wpdb->prefix . 'cora_workspace_tasks';
         if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $table ) ) {
+            $ws_id_str = (string) $agency_id;
             if ( is_numeric( $task_id ) ) {
-                $task = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", intval( $task_id ) ) );
+                $task = $wpdb->get_row( $wpdb->prepare(
+                    "SELECT * FROM {$table} WHERE id = %d AND (agency_id = %d OR workspace_id = %s)",
+                    intval( $task_id ),
+                    $agency_id,
+                    $ws_id_str
+                ) );
             } else {
-                $task = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE task_uid = %s", $task_id ) );
+                $task = $wpdb->get_row( $wpdb->prepare(
+                    "SELECT * FROM {$table} WHERE task_uid = %s AND (agency_id = %d OR workspace_id = %s)",
+                    $task_id,
+                    $agency_id,
+                    $ws_id_str
+                ) );
             }
 
             if ( $task ) {
@@ -2566,6 +2808,7 @@ class Cora_MCP_Tool_Registry {
         if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $table ) ) {
             $wpdb->insert( $table, array(
                 'task_uid'     => $task_uid,
+                'agency_id'    => $agency_id,
                 'workspace_id' => (string) $agency_id,
                 'user_id'      => $assignee,
                 'created_by'   => $user_id,
@@ -2617,11 +2860,12 @@ class Cora_MCP_Tool_Registry {
         $table = $wpdb->prefix . 'cora_workspace_tasks';
         if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $table ) ) {
             $is_numeric = is_numeric( $task_id );
-            $exists = $is_numeric
-                ? $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$table} WHERE id = %d", intval( $task_id ) ) )
-                : $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$table} WHERE task_uid = %s", $task_id ) );
+            $ws_id_str  = (string) $agency_id;
+            $task_row   = $is_numeric
+                ? $wpdb->get_row( $wpdb->prepare( "SELECT id FROM {$table} WHERE id = %d AND (agency_id = %d OR workspace_id = %s)", intval( $task_id ), $agency_id, $ws_id_str ) )
+                : $wpdb->get_row( $wpdb->prepare( "SELECT id FROM {$table} WHERE task_uid = %s AND (agency_id = %d OR workspace_id = %s)", $task_id, $agency_id, $ws_id_str ) );
 
-            if ( ! $exists ) {
+            if ( ! $task_row ) {
                 return new WP_Error( 'not_found', "Task '{$task_id}' not found in this workspace." );
             }
 
@@ -2636,8 +2880,7 @@ class Cora_MCP_Tool_Registry {
             }
 
             if ( ! empty( $update_data ) ) {
-                $where = $is_numeric ? array( 'id' => intval( $task_id ) ) : array( 'task_uid' => $task_id );
-                $wpdb->update( $table, $update_data, $where );
+                $wpdb->update( $table, $update_data, array( 'id' => intval( $task_row->id ) ) );
             }
         }
 
@@ -2654,8 +2897,17 @@ class Cora_MCP_Tool_Registry {
         global $wpdb;
         $table = $wpdb->prefix . 'cora_workspace_tasks';
         if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $table ) ) {
-            $where = is_numeric( $task_id ) ? array( 'id' => intval( $task_id ) ) : array( 'task_uid' => $task_id );
-            $wpdb->delete( $table, $where );
+            $is_numeric = is_numeric( $task_id );
+            $ws_id_str  = (string) $agency_id;
+            $task_row   = $is_numeric
+                ? $wpdb->get_row( $wpdb->prepare( "SELECT id FROM {$table} WHERE id = %d AND (agency_id = %d OR workspace_id = %s)", intval( $task_id ), $agency_id, $ws_id_str ) )
+                : $wpdb->get_row( $wpdb->prepare( "SELECT id FROM {$table} WHERE task_uid = %s AND (agency_id = %d OR workspace_id = %s)", $task_id, $agency_id, $ws_id_str ) );
+
+            if ( ! $task_row ) {
+                return new WP_Error( 'not_found', "Task '{$task_id}' not found in this workspace." );
+            }
+
+            $wpdb->delete( $table, array( 'id' => intval( $task_row->id ) ) );
         }
 
         return array( 'success' => true, 'task_id' => $task_id, 'deleted' => true );
@@ -2815,7 +3067,9 @@ class Cora_MCP_Tool_Registry {
         if ( ! empty( $auth['user_id'] ) ) {
             $request->set_param( '_auth_user_id', $auth['user_id'] );
         }
+        $request->set_param( 'agency_id', $agency_id );
         $request->set_param( '_tenant_agency_id', $agency_id );
+        $request->set_param( 'workspace_id', $agency_id );
 
         return $request;
     }
@@ -3607,6 +3861,696 @@ class Cora_MCP_Tool_Registry {
             'message'       => 'Website settings updated successfully.',
             'business_name' => get_bloginfo( 'name' ),
             'tagline'       => get_bloginfo( 'description' ),
+        );
+    }
+
+    /**
+     * List all workspaces accessible to the authenticated account
+     */
+    public static function handle_list_workspaces( $args, $auth ) {
+        $user_id = intval( $auth['user_id'] ?? 1 ) ?: 1;
+        $status_filter = sanitize_text_field( $args['status'] ?? 'all' );
+
+        $raw_workspaces = class_exists( 'Cora_OAuth_Server' )
+            ? Cora_OAuth_Server::get_user_workspaces( $user_id )
+            : array();
+
+        global $wpdb;
+        $table_agencies = $wpdb->prefix . 'cora_agencies';
+        $active_ws_id   = self::get_agency_id( $auth, $args );
+
+        $workspaces = array();
+        foreach ( $raw_workspaces as $ws ) {
+            $ws_id = intval( $ws['id'] );
+            $agency = null;
+            if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $table_agencies ) ) {
+                $agency = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table_agencies} WHERE id = %d", $ws_id ) );
+            }
+
+            $status = $agency ? ( $agency->status ?? 'active' ) : 'active';
+            if ( $status_filter !== 'all' && $status !== $status_filter ) {
+                continue;
+            }
+
+            $industry = $agency->industry ?? 'photography_studio';
+
+            $workspaces[] = array(
+                'id'          => (string) $ws_id,
+                'name'        => $ws['name'],
+                'slug'        => $ws['slug'],
+                'plan'        => $ws['plan'],
+                'industry'    => $industry,
+                'status'      => $status,
+                'is_active'   => ( $ws_id === $active_ws_id ),
+                'capabilities'=> array(
+                    'cms'       => true,
+                    'media'     => true,
+                    'crm'       => true,
+                    'tasks'     => true,
+                    'finance'   => true,
+                    'analytics' => true,
+                ),
+            );
+        }
+
+        return array(
+            'total'               => count( $workspaces ),
+            'active_workspace_id' => (string) $active_ws_id,
+            'workspaces'          => $workspaces,
+        );
+    }
+
+    /**
+     * Get single workspace details and capabilities
+     */
+    public static function handle_get_workspace( $args, $auth ) {
+        $active_ws_id = self::get_agency_id( $auth, $args );
+        $requested_id = ! empty( $args['workspace_id'] ) ? intval( $args['workspace_id'] ) : $active_ws_id;
+
+        // Security check: If auth token is locked to a workspace, prevent cross-workspace access
+        if ( ! empty( $auth['workspace_id'] ) && intval( $auth['workspace_id'] ) !== $requested_id ) {
+            $user_id = intval( $auth['user_id'] ?? 1 ) ?: 1;
+            $is_admin = user_can( $user_id, 'manage_options' );
+            if ( ! $is_admin ) {
+                return new WP_Error( 'forbidden', "Cross-workspace access denied. Your active authorization is scoped to workspace #{$auth['workspace_id']}." );
+            }
+        }
+
+        global $wpdb;
+        $table_agencies = $wpdb->prefix . 'cora_agencies';
+        $agency = null;
+        if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $table_agencies ) ) {
+            $agency = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table_agencies} WHERE id = %d", $requested_id ) );
+        }
+
+        $workspace_name = $agency ? ( $agency->name ?? '' ) : '';
+        if ( empty( $workspace_name ) && function_exists( 'cora_get_agency_title' ) ) {
+            $workspace_name = cora_get_agency_title( $requested_id );
+        }
+        if ( empty( $workspace_name ) ) {
+            $workspace_name = 'Workspace #' . $requested_id;
+        }
+
+        $host = wp_parse_url( home_url(), PHP_URL_HOST );
+
+        return array(
+            'workspace_id'   => (string) $requested_id,
+            'name'           => $workspace_name,
+            'slug'           => $agency ? ( $agency->slug ?? ( 'ws-' . $requested_id ) ) : ( 'ws-' . $requested_id ),
+            'plan'           => $agency ? ( $agency->plan ?? 'pro' ) : 'pro',
+            'industry'       => $agency ? ( $agency->industry ?? 'photography_studio' ) : 'photography_studio',
+            'status'         => $agency ? ( $agency->status ?? 'active' ) : 'active',
+            'host'           => $host,
+            'modules'        => array(
+                'websites_cms'        => array( 'status' => 'active', 'operations' => array( 'read', 'create', 'update', 'publish', 'seo_audit' ) ),
+                'media_vault'         => array( 'status' => 'active', 'operations' => array( 'upload', 'list', 'get', 'delete' ) ),
+                'crm_leads'           => array( 'status' => 'active', 'operations' => array( 'list', 'get', 'create', 'update' ) ),
+                'tasks_projects'      => array( 'status' => 'active', 'operations' => array( 'list', 'get', 'create', 'update', 'delete' ) ),
+                'financial_ledger'    => array( 'status' => 'active', 'operations' => array( 'summary', 'query', 'record_transaction' ) ),
+                'forms_funnels'       => array( 'status' => 'active', 'operations' => array( 'list', 'submissions' ) ),
+                'operational_metrics' => array( 'status' => 'active', 'operations' => array( 'analytics', 'activity_log' ) ),
+                'autonomous_campaigns'=> array( 'status' => 'active', 'operations' => array( 'list', 'create', 'trigger', 'improve' ) ),
+            ),
+        );
+    }
+
+    /**
+     * Get authenticated account and session details
+     */
+    public static function handle_get_authenticated_account( $args, $auth ) {
+        $agency_id = self::get_agency_id( $auth, $args );
+        $user_id   = intval( $auth['user_id'] ?? 1 ) ?: 1;
+        $user      = get_userdata( $user_id );
+
+        $workspace_name = function_exists( 'cora_get_agency_title' )
+            ? cora_get_agency_title( $agency_id )
+            : ( 'Workspace #' . $agency_id );
+
+        $client_name = $auth['client_name'] ?? 'CLA';
+        $client_id   = $auth['client_id'] ?? 'cla';
+
+        return array(
+            'authenticated'         => true,
+            'installed'             => true,
+            'status'                => 'active',
+            'app_id'                => 'cla',
+            'user_id'               => $user_id,
+            'email'                 => $user ? $user->user_email : get_option( 'admin_email' ),
+            'display_name'          => ( $user && stripos( $user->display_name, 'shrut' ) === false ) ? $user->display_name : 'Studio Admin',
+            'roles'                 => $user ? (array) $user->roles : array( 'administrator' ),
+            'active_workspace_id'   => (string) $agency_id,
+            'active_workspace_name' => $workspace_name,
+            'client_id'             => $client_id,
+            'client_name'           => $client_name,
+            'scopes'                => ! empty( $auth['scopes'] ) ? ( is_array( $auth['scopes'] ) ? $auth['scopes'] : explode( ' ', $auth['scopes'] ) ) : array( '*' ),
+            'server_version'        => '4.9.412',
+        );
+    }
+
+    /**
+     * Upload asset to workspace Media Vault from URL or Base64
+     */
+    public static function handle_upload_media( $args, $auth ) {
+        $agency_id = self::get_agency_id( $auth, $args );
+        $user_id   = intval( $auth['user_id'] ?? 1 ) ?: 1;
+
+        $url         = ! empty( $args['url'] ) ? esc_url_raw( trim( $args['url'] ) ) : '';
+        $file_base64 = ! empty( $args['file_base64'] ) ? trim( $args['file_base64'] ) : '';
+        $title       = sanitize_text_field( $args['title'] ?? ( $args['file_name'] ?? 'Uploaded Asset' ) );
+        $alt_text    = sanitize_text_field( $args['alt_text'] ?? $title );
+        $caption     = sanitize_text_field( $args['caption'] ?? '' );
+        $folder_id   = ! empty( $args['folder_id'] ) ? intval( $args['folder_id'] ) : null;
+
+        if ( empty( $url ) && empty( $file_base64 ) ) {
+            return new WP_Error( 'missing_param', 'Either "url" or "file_base64" must be provided for media upload.' );
+        }
+
+        require_once ABSPATH . 'wp-admin/includes/file.php';
+        require_once ABSPATH . 'wp-admin/includes/image.php';
+        require_once ABSPATH . 'wp-admin/includes/media.php';
+
+        $filename = ! empty( $args['file_name'] ) ? sanitize_file_name( $args['file_name'] ) : '';
+        $file_content = '';
+
+        if ( ! empty( $file_base64 ) ) {
+            // Strip data:image/...;base64, header if present
+            if ( preg_match( '/^data:([a-zA-Z0-9_\-\/]+);base64,(.+)$/', $file_base64, $m ) ) {
+                $mime_detected = $m[1];
+                $file_content  = base64_decode( $m[2] );
+                if ( empty( $filename ) ) {
+                    $ext = ( $mime_detected === 'image/png' ) ? 'png' : ( ( $mime_detected === 'image/webp' ) ? 'webp' : 'jpg' );
+                    $filename = 'media-' . bin2hex( wp_generate_password( 6, false ) ) . '.' . $ext;
+                }
+            } else {
+                $file_content = base64_decode( $file_base64 );
+                if ( empty( $filename ) ) {
+                    $filename = 'media-' . bin2hex( wp_generate_password( 6, false ) ) . '.jpg';
+                }
+            }
+        } elseif ( ! empty( $url ) ) {
+            if ( empty( $filename ) ) {
+                $path = wp_parse_url( $url, PHP_URL_PATH );
+                $filename = $path ? basename( $path ) : '';
+                if ( empty( $filename ) || strpos( $filename, '.' ) === false ) {
+                    $filename = 'media-' . bin2hex( wp_generate_password( 6, false ) ) . '.jpg';
+                }
+            }
+            $filename = sanitize_file_name( $filename );
+
+            $response = wp_safe_remote_get( $url, array(
+                'timeout'     => 30,
+                'redirection' => 5,
+                'sslverify'   => false,
+            ) );
+
+            if ( is_wp_error( $response ) ) {
+                return new WP_Error( 'download_failed', 'Failed to download media from URL: ' . $response->get_error_message() );
+            }
+
+            $status = wp_remote_retrieve_response_code( $response );
+            if ( $status !== 200 ) {
+                return new WP_Error( 'download_failed', "Failed to download media from URL. HTTP status: {$status}" );
+            }
+
+            $file_content = wp_remote_retrieve_body( $response );
+        }
+
+        if ( empty( $file_content ) ) {
+            return new WP_Error( 'empty_content', 'Media payload is empty or invalid.' );
+        }
+
+        // Upload bits to WordPress upload directory
+        $upload = wp_upload_bits( $filename, null, $file_content );
+        if ( ! empty( $upload['error'] ) ) {
+            return new WP_Error( 'upload_error', $upload['error'] );
+        }
+
+        $file_path = $upload['file'];
+        $file_url  = $upload['url'];
+        $wp_filetype = wp_check_filetype( $filename, null );
+
+        $attachment = array(
+            'post_mime_type' => $wp_filetype['type'] ?: 'image/jpeg',
+            'post_title'     => $title,
+            'post_content'   => '',
+            'post_excerpt'   => $caption,
+            'post_status'    => 'inherit',
+            'post_author'    => $user_id,
+        );
+
+        $attachment_id = wp_insert_attachment( $attachment, $file_path );
+        if ( is_wp_error( $attachment_id ) || ! $attachment_id ) {
+            return new WP_Error( 'attachment_failed', 'Could not register attachment in media library.' );
+        }
+
+        // Generate metadata & intermediate thumbnail sizes
+        $attach_data = wp_generate_attachment_metadata( $attachment_id, $file_path );
+        wp_update_attachment_metadata( $attachment_id, $attach_data );
+
+        // Associate with active workspace
+        update_post_meta( $attachment_id, '_cora_agency_id', (string) $agency_id );
+        if ( ! empty( $alt_text ) ) {
+            update_post_meta( $attachment_id, '_wp_attachment_image_alt', $alt_text );
+        }
+
+        // Taxonomy folder assignment if available
+        if ( $folder_id && taxonomy_exists( 'cora_media_folder' ) ) {
+            wp_set_object_terms( $attachment_id, $folder_id, 'cora_media_folder' );
+        }
+
+        // Insert into wp_cora_media table for unified vault records
+        global $wpdb;
+        $cora_media_id = 0;
+        $table_media = $wpdb->prefix . 'cora_media';
+        if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $table_media ) ) {
+            $wpdb->insert(
+                $table_media,
+                array(
+                    'agency_id'   => $agency_id,
+                    'uploaded_by' => $user_id,
+                    'folder_id'   => $folder_id,
+                    'linked_type' => 'attachment',
+                    'linked_id'   => $attachment_id,
+                    'file_name'   => basename( $file_path ),
+                    'file_path'   => $file_path,
+                    'file_type'   => $wp_filetype['ext'] ?: 'jpg',
+                    'file_size'   => filesize( $file_path ),
+                    'mime_type'   => $wp_filetype['type'] ?: 'image/jpeg',
+                    'width'       => $attach_data['width'] ?? null,
+                    'height'      => $attach_data['height'] ?? null,
+                    'alt_text'    => $alt_text,
+                    'title'       => $title,
+                    'caption'     => $caption,
+                    'created_at'  => current_time( 'mysql' ),
+                    'updated_at'  => current_time( 'mysql' ),
+                )
+            );
+            $cora_media_id = $wpdb->insert_id;
+        }
+
+        $thumb = wp_get_attachment_image_src( $attachment_id, 'medium' );
+        $thumbnail_url = $thumb ? $thumb[0] : $file_url;
+
+        return array(
+            'success'        => true,
+            'media_id'       => $attachment_id,
+            'cora_media_id'  => $cora_media_id ?: $attachment_id,
+            'title'          => $title,
+            'file_name'      => basename( $file_path ),
+            'url'            => $file_url,
+            'thumbnail_url'  => $thumbnail_url,
+            'file_size'      => filesize( $file_path ),
+            'mime_type'      => $wp_filetype['type'] ?: 'image/jpeg',
+            'width'          => $attach_data['width'] ?? null,
+            'height'         => $attach_data['height'] ?? null,
+            'alt_text'       => $alt_text,
+            'workspace_id'   => (string) $agency_id,
+        );
+    }
+
+    /**
+     * List and search media assets in workspace vault
+     */
+    public static function handle_list_media( $args, $auth ) {
+        $agency_id = self::get_agency_id( $auth, $args );
+        $search    = sanitize_text_field( $args['search'] ?? '' );
+        $file_type = sanitize_text_field( $args['file_type'] ?? 'all' );
+        $folder_id = ! empty( $args['folder_id'] ) ? intval( $args['folder_id'] ) : 0;
+        $limit     = min( 100, max( 1, intval( $args['limit'] ?? 30 ) ) );
+        $offset    = max( 0, intval( $args['offset'] ?? 0 ) );
+
+        global $wpdb;
+        $table_media = $wpdb->prefix . 'cora_media';
+        $assets = array();
+        $total  = 0;
+
+        if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $table_media ) ) {
+            $sql = "SELECT * FROM {$table_media} WHERE agency_id = %d";
+            $params = array( $agency_id );
+
+            if ( ! empty( $search ) ) {
+                $sql .= " AND (title LIKE %s OR file_name LIKE %s OR alt_text LIKE %s)";
+                $like = '%' . $wpdb->esc_like( $search ) . '%';
+                $params[] = $like;
+                $params[] = $like;
+                $params[] = $like;
+            }
+
+            if ( ! empty( $folder_id ) ) {
+                $sql .= " AND folder_id = %d";
+                $params[] = $folder_id;
+            }
+
+            if ( $file_type !== 'all' && ! empty( $file_type ) ) {
+                $sql .= " AND (file_type = %s OR mime_type LIKE %s)";
+                $params[] = $file_type;
+                $params[] = '%' . $file_type . '%';
+            }
+
+            $count_sql = str_replace( 'SELECT *', 'SELECT COUNT(*)', $sql );
+            $total = intval( $wpdb->get_var( $wpdb->prepare( $count_sql, $params ) ) ) ?: 0;
+
+            $sql .= " ORDER BY id DESC LIMIT %d OFFSET %d";
+            $params[] = $limit;
+            $params[] = $offset;
+
+            $rows = $wpdb->get_results( $wpdb->prepare( $sql, $params ) );
+            if ( ! empty( $rows ) ) {
+                foreach ( $rows as $r ) {
+                    $att_id = intval( $r->linked_id ?: $r->id );
+                    $url = wp_get_attachment_url( $att_id );
+                    if ( empty( $url ) && ! empty( $r->file_path ) ) {
+                        $url = content_url( '/uploads/' . basename( $r->file_path ) );
+                    }
+                    $thumb = wp_get_attachment_image_src( $att_id, 'medium' );
+
+                    $assets[] = array(
+                        'id'            => intval( $r->id ),
+                        'media_id'      => $att_id,
+                        'title'         => $r->title,
+                        'file_name'     => $r->file_name,
+                        'url'           => $url,
+                        'thumbnail_url' => $thumb ? $thumb[0] : $url,
+                        'mime_type'     => $r->mime_type,
+                        'file_type'     => $r->file_type,
+                        'file_size'     => intval( $r->file_size ),
+                        'width'         => intval( $r->width ),
+                        'height'        => intval( $r->height ),
+                        'alt_text'      => $r->alt_text ?? '',
+                        'created_at'    => $r->created_at,
+                    );
+                }
+            }
+        } else {
+            // Fallback to wp_posts attachments
+            $query_args = array(
+                'post_type'      => 'attachment',
+                'post_status'    => 'inherit',
+                'posts_per_page' => $limit,
+                'offset'         => $offset,
+                'meta_query'     => array(
+                    array(
+                        'key'     => '_cora_agency_id',
+                        'value'   => (string) $agency_id,
+                        'compare' => '=',
+                    ),
+                ),
+            );
+            if ( ! empty( $search ) ) {
+                $query_args['s'] = $search;
+            }
+            $q = new WP_Query( $query_args );
+            $total = $q->found_posts;
+            foreach ( $q->posts as $p ) {
+                $thumb = wp_get_attachment_image_src( $p->ID, 'medium' );
+                $assets[] = array(
+                    'id'            => $p->ID,
+                    'media_id'      => $p->ID,
+                    'title'         => $p->post_title,
+                    'file_name'     => basename( get_attached_file( $p->ID ) ),
+                    'url'           => wp_get_attachment_url( $p->ID ),
+                    'thumbnail_url' => $thumb ? $thumb[0] : wp_get_attachment_url( $p->ID ),
+                    'mime_type'     => $p->post_mime_type,
+                    'alt_text'      => get_post_meta( $p->ID, '_wp_attachment_image_alt', true ),
+                    'created_at'    => $p->post_date,
+                );
+            }
+        }
+
+        return array(
+            'total'     => $total,
+            'limit'     => $limit,
+            'offset'    => $offset,
+            'assets'    => $assets,
+        );
+    }
+
+    /**
+     * Get specific media asset details
+     */
+    public static function handle_get_media( $args, $auth ) {
+        $agency_id = self::get_agency_id( $auth, $args );
+        $media_id  = intval( $args['media_id'] ?? 0 );
+        if ( ! $media_id ) {
+            return new WP_Error( 'missing_param', 'Parameter "media_id" is required.' );
+        }
+
+        global $wpdb;
+        $table_media = $wpdb->prefix . 'cora_media';
+        $row = null;
+        if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $table_media ) ) {
+            $row = $wpdb->get_row( $wpdb->prepare(
+                "SELECT * FROM {$table_media} WHERE (id = %d OR linked_id = %d) AND agency_id = %d",
+                $media_id,
+                $media_id,
+                $agency_id
+            ) );
+        }
+
+        $att_id = $row ? intval( $row->linked_id ?: $row->id ) : $media_id;
+        $post   = get_post( $att_id );
+
+        if ( ! $post && ! $row ) {
+            return new WP_Error( 'not_found', "Media asset #{$media_id} not found in this workspace." );
+        }
+
+        // Verify agency ownership on post meta if row wasn't found
+        if ( ! $row && $post ) {
+            $post_agency = get_post_meta( $att_id, '_cora_agency_id', true );
+            if ( $post_agency && (string) $post_agency !== (string) $agency_id ) {
+                return new WP_Error( 'forbidden', "Access denied. Asset #{$media_id} does not belong to active workspace." );
+            }
+        }
+
+        $url   = wp_get_attachment_url( $att_id ) ?: ( $row ? content_url( '/uploads/' . basename( $row->file_path ) ) : '' );
+        $thumb = wp_get_attachment_image_src( $att_id, 'medium' );
+        $meta  = wp_get_attachment_metadata( $att_id );
+
+        return array(
+            'id'            => $row ? intval( $row->id ) : $att_id,
+            'media_id'      => $att_id,
+            'title'         => $post ? $post->post_title : ( $row->title ?? '' ),
+            'file_name'     => $row ? $row->file_name : basename( get_attached_file( $att_id ) ),
+            'url'           => $url,
+            'thumbnail_url' => $thumb ? $thumb[0] : $url,
+            'mime_type'     => $post ? $post->post_mime_type : ( $row->mime_type ?? 'image/jpeg' ),
+            'file_size'     => $row ? intval( $row->file_size ) : ( file_exists( get_attached_file( $att_id ) ) ? filesize( get_attached_file( $att_id ) ) : 0 ),
+            'width'         => $meta['width'] ?? ( $row->width ?? null ),
+            'height'        => $meta['height'] ?? ( $row->height ?? null ),
+            'alt_text'      => get_post_meta( $att_id, '_wp_attachment_image_alt', true ) ?: ( $row->alt_text ?? '' ),
+            'caption'       => $post ? $post->post_excerpt : ( $row->caption ?? '' ),
+            'workspace_id'  => (string) $agency_id,
+            'created_at'    => $post ? $post->post_date : ( $row->created_at ?? '' ),
+        );
+    }
+
+    /**
+     * Delete a media asset from workspace vault
+     */
+    public static function handle_delete_media( $args, $auth ) {
+        $agency_id = self::get_agency_id( $auth, $args );
+        $media_id  = intval( $args['media_id'] ?? 0 );
+        if ( ! $media_id ) {
+            return new WP_Error( 'missing_param', 'Parameter "media_id" is required.' );
+        }
+
+        global $wpdb;
+        $table_media = $wpdb->prefix . 'cora_media';
+        $row = null;
+        if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $table_media ) ) {
+            $row = $wpdb->get_row( $wpdb->prepare(
+                "SELECT * FROM {$table_media} WHERE (id = %d OR linked_id = %d) AND agency_id = %d",
+                $media_id,
+                $media_id,
+                $agency_id
+            ) );
+        }
+
+        $att_id = $row ? intval( $row->linked_id ?: $row->id ) : $media_id;
+
+        // Verify agency ownership on post meta if row wasn't found
+        if ( ! $row ) {
+            $post = get_post( $att_id );
+            if ( ! $post ) {
+                return new WP_Error( 'not_found', "Media asset #{$media_id} not found." );
+            }
+            $post_agency = get_post_meta( $att_id, '_cora_agency_id', true );
+            if ( $post_agency && (string) $post_agency !== (string) $agency_id ) {
+                return new WP_Error( 'forbidden', "Access denied. Asset #{$media_id} does not belong to active workspace." );
+            }
+        }
+
+        // Delete from WordPress attachments
+        wp_delete_attachment( $att_id, true );
+
+        // Delete from cora_media table
+        if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $table_media ) ) {
+            $wpdb->query( $wpdb->prepare(
+                "DELETE FROM {$table_media} WHERE (id = %d OR linked_id = %d) AND agency_id = %d",
+                $media_id,
+                $media_id,
+                $agency_id
+            ) );
+        }
+
+        return array(
+            'success'   => true,
+            'deleted'   => true,
+            'media_id'  => $media_id,
+            'message'   => "Media asset #{$media_id} deleted successfully.",
+        );
+    }
+
+    /**
+     * Get workspace operational analytics and metrics
+     */
+    public static function handle_get_analytics( $args, $auth ) {
+        $agency_id = self::get_agency_id( $auth, $args );
+        $period    = sanitize_text_field( $args['period'] ?? '30d' );
+
+        global $wpdb;
+        $leads_table    = $wpdb->prefix . 'cora_leads';
+        $tasks_table    = $wpdb->prefix . 'cora_workspace_tasks';
+        $ledger_table   = $wpdb->prefix . 'cora_ledger';
+        $media_table    = $wpdb->prefix . 'cora_media';
+
+        // CRM Leads stats
+        $total_leads = 0;
+        $converted_leads = 0;
+        $pipeline_value = 0;
+        if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $leads_table ) ) {
+            $total_leads = intval( $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$leads_table} WHERE agency_id = %d", $agency_id ) ) ) ?: 0;
+            $converted_leads = intval( $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$leads_table} WHERE agency_id = %d AND status = 'converted'", $agency_id ) ) ) ?: 0;
+            $pipeline_value = floatval( $wpdb->get_var( $wpdb->prepare( "SELECT SUM(COALESCE(budget_max, budget_min, 0)) FROM {$leads_table} WHERE agency_id = %d AND status NOT IN ('lost', 'converted')", $agency_id ) ) ) ?: 0;
+        }
+
+        // Tasks stats
+        $total_tasks = 0;
+        $completed_tasks = 0;
+        $pending_tasks = 0;
+        if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $tasks_table ) ) {
+            $ws_id_str = (string) $agency_id;
+            $total_tasks = intval( $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$tasks_table} WHERE (agency_id = %d OR workspace_id = %s)", $agency_id, $ws_id_str ) ) ) ?: 0;
+            $completed_tasks = intval( $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$tasks_table} WHERE (agency_id = %d OR workspace_id = %s) AND status IN ('done', 'completed')", $agency_id, $ws_id_str ) ) ) ?: 0;
+            $pending_tasks = $total_tasks - $completed_tasks;
+        }
+
+        // Financial stats
+        $collected_revenue = 0;
+        $pending_receivables = 0;
+        if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $ledger_table ) ) {
+            $collected_revenue = floatval( $wpdb->get_var( $wpdb->prepare( "SELECT SUM(amount) FROM {$ledger_table} WHERE agency_id = %d AND type IN ('payment', 'income', 'retainer') AND status = 'paid'", $agency_id ) ) ) ?: 0;
+            $pending_receivables = floatval( $wpdb->get_var( $wpdb->prepare( "SELECT SUM(amount) FROM {$ledger_table} WHERE agency_id = %d AND type IN ('invoice', 'receivable') AND status IN ('unpaid', 'overdue', 'pending')", $agency_id ) ) ) ?: 0;
+        }
+
+        // Content & CMS stats
+        $published_articles = intval( $wpdb->get_var( $wpdb->prepare(
+            "SELECT COUNT(p.ID) FROM {$wpdb->posts} p 
+             INNER JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id 
+             WHERE p.post_status = 'publish' AND pm.meta_key = 'cora_agency_id' AND pm.meta_value = %s",
+            (string) $agency_id
+        ) ) ) ?: 0;
+
+        // Media Vault stats
+        $media_count = 0;
+        $media_bytes = 0;
+        if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $media_table ) ) {
+            $media_count = intval( $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$media_table} WHERE agency_id = %d", $agency_id ) ) ) ?: 0;
+            $media_bytes = floatval( $wpdb->get_var( $wpdb->prepare( "SELECT SUM(file_size) FROM {$media_table} WHERE agency_id = %d", $agency_id ) ) ) ?: 0;
+        }
+
+        $conversion_rate = $total_leads > 0 ? round( ( $converted_leads / $total_leads ) * 100, 1 ) : 0;
+        $task_velocity   = $total_tasks > 0 ? round( ( $completed_tasks / $total_tasks ) * 100, 1 ) : 0;
+
+        return array(
+            'workspace_id'         => (string) $agency_id,
+            'period'               => $period,
+            'crm'                  => array(
+                'total_leads'         => $total_leads,
+                'converted_leads'     => $converted_leads,
+                'conversion_rate_pct' => $conversion_rate,
+                'pipeline_value_inr'  => $pipeline_value,
+            ),
+            'tasks'                => array(
+                'total_tasks'         => $total_tasks,
+                'completed_tasks'     => $completed_tasks,
+                'pending_tasks'       => $pending_tasks,
+                'completion_rate_pct' => $task_velocity,
+            ),
+            'financials'           => array(
+                'collected_revenue_inr'   => $collected_revenue,
+                'pending_receivables_inr' => $pending_receivables,
+                'net_operating_balance'   => $collected_revenue - $pending_receivables,
+            ),
+            'content_and_publishing' => array(
+                'published_articles' => $published_articles,
+            ),
+            'media_vault'          => array(
+                'total_assets'      => $media_count,
+                'storage_used_bytes'=> $media_bytes,
+                'storage_used_mb'   => round( $media_bytes / ( 1024 * 1024 ), 2 ),
+            ),
+        );
+    }
+
+    /**
+     * Get consolidated financial pulse and recent transactions
+     */
+    public static function handle_get_financial_summary( $args, $auth ) {
+        $agency_id = self::get_agency_id( $auth, $args );
+        $period    = sanitize_text_field( $args['period'] ?? 'all' );
+
+        global $wpdb;
+        $ledger_table = $wpdb->prefix . 'cora_ledger';
+
+        $collected_revenue    = 0;
+        $outstanding_invoices = 0;
+        $total_expenses       = 0;
+        $recent_entries       = array();
+
+        if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $ledger_table ) ) {
+            $collected_revenue = floatval( $wpdb->get_var( $wpdb->prepare(
+                "SELECT SUM(amount) FROM {$ledger_table} WHERE agency_id = %d AND type IN ('payment', 'income', 'retainer') AND status = 'paid'",
+                $agency_id
+            ) ) ) ?: 0;
+
+            $outstanding_invoices = floatval( $wpdb->get_var( $wpdb->prepare(
+                "SELECT SUM(amount) FROM {$ledger_table} WHERE agency_id = %d AND type IN ('invoice', 'receivable') AND status IN ('unpaid', 'overdue', 'pending')",
+                $agency_id
+            ) ) ) ?: 0;
+
+            $total_expenses = floatval( $wpdb->get_var( $wpdb->prepare(
+                "SELECT SUM(amount) FROM {$ledger_table} WHERE agency_id = %d AND type IN ('expense', 'payout')",
+                $agency_id
+            ) ) ) ?: 0;
+
+            $rows = $wpdb->get_results( $wpdb->prepare(
+                "SELECT * FROM {$ledger_table} WHERE agency_id = %d ORDER BY id DESC LIMIT 15",
+                $agency_id
+            ) );
+
+            if ( ! empty( $rows ) ) {
+                foreach ( $rows as $r ) {
+                    $recent_entries[] = array(
+                        'id'          => intval( $r->id ),
+                        'type'        => $r->type,
+                        'description' => $r->description ?? '',
+                        'amount'      => floatval( $r->amount ),
+                        'status'      => $r->status,
+                        'date'        => $r->created_at ?? ( $r->transaction_date ?? '' ),
+                    );
+                }
+            }
+        }
+
+        return array(
+            'workspace_id'            => (string) $agency_id,
+            'period'                  => $period,
+            'collected_revenue_inr'   => $collected_revenue,
+            'outstanding_invoices_inr'=> $outstanding_invoices,
+            'total_expenses_inr'      => $total_expenses,
+            'net_operating_profit_inr'=> $collected_revenue - $total_expenses,
+            'recent_transactions'     => $recent_entries,
         );
     }
 }

@@ -3,7 +3,7 @@
  * Plugin Name:       Cora Workspace
  * Plugin URI:        https://heycora.in
  * Description:       Multi-industry business workspace management platform for WordPress. Supports real estate, photography studios, and multiple commercial verticals.
- * Version:           4.9.407
+ * Version:           4.9.412
  * Author:            Cora
  * Author URI:        https://heycora.in
  * Text Domain:       cora-workspace
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Plugin Constants
 if ( ! defined( 'CORA_WORKSPACE_VERSION' ) ) {
-    define( 'CORA_WORKSPACE_VERSION', '4.9.407' );
+    define( 'CORA_WORKSPACE_VERSION', '4.9.412' );
 }
 define( 'CORA_WORKSPACE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CORA_WORKSPACE_URL', str_replace( '/wp-content/', '/assets/', plugin_dir_url( __FILE__ ) ) );
@@ -462,6 +462,9 @@ require_once plugin_dir_path( __FILE__ ) . 'includes/class-cora-workspace-conten
 
 // ── Cora Autonomous Content Campaigns Engine
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-cora-autonomous-campaigns.php';
+
+// ── Cora Dynamic Multi-Engine Template System (Shopify-Style Archetype Decoupling)
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-cora-template-engine.php';
 
 
 
@@ -1272,6 +1275,126 @@ function cora_workspace_has_plan_access( $required_plan = 'starter', $user_id = 
 
     return $current_level >= $required_level;
 }
+}
+
+/**
+ * Check if a workspace is eligible for Model Context Protocol (MCP) & Developer Gateway.
+ * MCP is restricted to paid workspaces (Starter, Pro, Professional, Scale, Enterprise, Beta)
+ * and super administrators, and blocked on Free / Sandbox tiers.
+ *
+ * @param int|string|null $agency_id_or_user_id Target agency/workspace ID or user ID.
+ * @return bool True if workspace is eligible for MCP, false otherwise.
+ */
+if ( ! function_exists( 'cora_is_workspace_mcp_eligible' ) ) {
+function cora_is_workspace_mcp_eligible( $agency_id_or_user_id = null ) {
+    global $wpdb;
+
+    $current_user = is_user_logged_in() ? wp_get_current_user() : null;
+
+    // Super Admin privilege check
+    if ( $current_user ) {
+        if ( function_exists( 'cora_is_super_owner' ) && cora_is_super_owner( $current_user ) ) {
+            return true;
+        }
+        $roles = (array) ( $current_user->roles ?? array() );
+        if ( in_array( 'cora_super_admin', $roles, true ) || ( in_array( 'administrator', $roles, true ) && current_user_can( 'manage_options' ) ) ) {
+            return true;
+        }
+    }
+
+    // Resolve target workspace ID
+    $agency_id = 0;
+    if ( null !== $agency_id_or_user_id && is_numeric( $agency_id_or_user_id ) ) {
+        $candidate_id = intval( $agency_id_or_user_id );
+        if ( $wpdb ) {
+            $table = $wpdb->prefix . 'cora_agencies';
+            $exists = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$table} WHERE id = %d", $candidate_id ) );
+            if ( $exists ) {
+                $agency_id = $candidate_id;
+            } else {
+                // If not an agency ID, check if it is a user ID
+                $user_agency = intval( get_user_meta( $candidate_id, 'cora_agency_id', true ) );
+                if ( $user_agency ) {
+                    $agency_id = $user_agency;
+                } elseif ( function_exists( 'cora_get_active_workspace_plan' ) ) {
+                    $plan = strtolower( trim( (string) cora_get_active_workspace_plan( $candidate_id ) ) );
+                    if ( in_array( $plan, array( 'starter', 'pro', 'professional', 'scale', 'enterprise', 'beta' ), true ) ) {
+                        return true;
+                    }
+                    return false;
+                }
+            }
+        }
+    } elseif ( is_string( $agency_id_or_user_id ) && ! empty( $agency_id_or_user_id ) && $wpdb ) {
+        $table = $wpdb->prefix . 'cora_agencies';
+        $agency_id = intval( $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$table} WHERE slug = %s", $agency_id_or_user_id ) ) );
+    }
+
+    if ( ! $agency_id ) {
+        if ( class_exists( 'Cora_Plugins_Skills_Engine' ) && method_exists( 'Cora_Plugins_Skills_Engine', 'get_current_agency_id' ) ) {
+            $agency_id = intval( Cora_Plugins_Skills_Engine::get_current_agency_id() );
+        } elseif ( function_exists( 'cora_get_current_agency_id' ) ) {
+            $agency_id = intval( cora_get_current_agency_id() );
+        } elseif ( function_exists( 'cora_db_get_agency_id' ) ) {
+            $agency_id = intval( cora_db_get_agency_id() );
+        } elseif ( function_exists( 'cora_get_current_tenant_agency_id' ) ) {
+            $agency_id = intval( cora_get_current_tenant_agency_id() );
+        }
+    }
+
+    $plan = '';
+    if ( ! empty( $agency_id ) && $agency_id > 0 && $wpdb ) {
+        $table = $wpdb->prefix . 'cora_agencies';
+        $plan = (string) $wpdb->get_var( $wpdb->prepare( "SELECT plan FROM {$table} WHERE id = %d LIMIT 1", $agency_id ) );
+    }
+
+    if ( empty( $plan ) && function_exists( 'cora_get_active_workspace_plan' ) ) {
+        $plan = cora_get_active_workspace_plan( $current_user ? $current_user->ID : 0 );
+    }
+
+    $clean_plan = strtolower( trim( (string) $plan ) );
+
+    // Free tier, empty, or sandbox are blocked
+    if ( empty( $clean_plan ) || in_array( $clean_plan, array( 'free', 'free_tier', 'trial', 'sandbox', 'none' ), true ) ) {
+        return false;
+    }
+
+    // Eligible paid tiers
+    if ( in_array( $clean_plan, array( 'starter', 'pro', 'professional', 'scale', 'enterprise', 'beta' ), true ) ) {
+        return true;
+    }
+
+    return false;
+}
+}
+
+/**
+ * AJAX Handler: Generate/create workspace API key with MCP plan gating.
+ */
+if ( ! function_exists( 'cora_ajax_generate_workspace_api_key' ) ) {
+function cora_ajax_generate_workspace_api_key() {
+    if ( ! is_user_logged_in() ) {
+        wp_send_json_error( array( 'message' => 'Unauthorized' ), 401 );
+    }
+
+    $agency_id = 0;
+    if ( class_exists( 'Cora_Plugins_Skills_Engine' ) && method_exists( 'Cora_Plugins_Skills_Engine', 'get_current_agency_id' ) ) {
+        $agency_id = Cora_Plugins_Skills_Engine::get_current_agency_id();
+    } elseif ( function_exists( 'cora_get_current_agency_id' ) ) {
+        $agency_id = cora_get_current_agency_id();
+    }
+
+    if ( function_exists( 'cora_is_workspace_mcp_eligible' ) && ! cora_is_workspace_mcp_eligible( $agency_id ) ) {
+        wp_send_json_error( array( 'message' => 'Developer API & MCP Gateway is an exclusive feature for Professional and Scale workspaces. Please upgrade your plan.' ) );
+    }
+
+    if ( class_exists( 'Cora_Plugins_Skills_Engine' ) && method_exists( 'Cora_Plugins_Skills_Engine', 'ajax_create_api_key' ) ) {
+        Cora_Plugins_Skills_Engine::ajax_create_api_key();
+    } else {
+        wp_send_json_error( array( 'message' => 'Skills engine not available.' ) );
+    }
+}
+add_action( 'wp_ajax_cora_ajax_generate_workspace_api_key', 'cora_ajax_generate_workspace_api_key' );
 }
 
 /**
@@ -9305,9 +9428,20 @@ function cora_render_nextjs_static_build( $static_dir, $route_path = '/', $activ
             $html_file = $real_static_dir . '/' . $clean_route . '.html';
         } elseif ( file_exists( $real_static_dir . '/' . $clean_route . '/index.html' ) ) {
             $html_file = $real_static_dir . '/' . $clean_route . '/index.html';
-        } elseif ( file_exists( $real_static_dir . '/index.html' ) ) {
-            // SPA fallback
-            $html_file = $real_static_dir . '/index.html';
+        } else {
+            // Check if route matches a published WordPress post / Content Suite article before SPA fallback
+            $article_post = get_page_by_path( $clean_route, OBJECT, array( 'post', 'cora_content_article' ) );
+            if ( $article_post && ( 'publish' === $article_post->post_status || is_user_logged_in() ) && defined( 'CORA_WORKSPACE_PATH' ) && file_exists( CORA_WORKSPACE_PATH . 'public-preview-view.php' ) ) {
+                $preview_post = $article_post;
+                $preview_post_id = $article_post->ID;
+                nocache_headers();
+                include CORA_WORKSPACE_PATH . 'public-preview-view.php';
+                exit;
+            }
+            if ( file_exists( $real_static_dir . '/index.html' ) ) {
+                // SPA fallback
+                $html_file = $real_static_dir . '/index.html';
+            }
         }
     }
 
@@ -10740,11 +10874,126 @@ HTML;
                     return;
                 }
 
+                // ── Cora Dynamic Template Engine Resolution ──
+                if ( class_exists( 'Cora_Template_Engine' ) ) {
+                    $engine = Cora_Template_Engine::instance();
+                    $dyn_theme_id = $active_theme_id ?: 0;
+
+                    // A. Single Article / Blog Post
+                    if ( $post && 'post' === $post->post_type ) {
+                        $tpl_slug = get_post_meta( $post->ID, '_cora_template_slug', true ) ?: 'default';
+                        $entity_data = $engine->format_article_entity( $post );
+                        $compiled_html = $engine->render_entity_template( $dyn_theme_id, Cora_Template_Engine::ARCHETYPE_ARTICLE, $entity_data, $tpl_slug );
+                        if ( ! empty( $compiled_html ) ) {
+                            if ( $is_preview && ! empty( $preview_bar_script ) ) {
+                                $compiled_html = str_replace( '</body>', $preview_bar_script . '</body>', $compiled_html );
+                            }
+                            while ( ob_get_level() > 0 ) ob_end_clean();
+                            status_header( 200 );
+                            nocache_headers();
+                            echo $compiled_html;
+                            exit;
+                        }
+                    }
+
+                    // B. Standard Dynamic Page
+                    if ( $canvas_page || ( $post && 'page' === $post->post_type ) ) {
+                        $tpl_slug = ! empty( $canvas_page['template'] ) ? $canvas_page['template'] : ( get_post_meta( $page_id, '_cora_template_slug', true ) ?: 'default' );
+                        if ( $tpl_slug !== 'canvas' ) {
+                            $page_item = $canvas_page ?: array( 'id' => $post->ID, 'title' => $post->post_title, 'slug' => $post->post_name, 'wp_post_id' => $post->ID );
+                            $entity_data = $engine->format_page_entity( $page_item );
+                            $compiled_html = $engine->render_entity_template( $dyn_theme_id, Cora_Template_Engine::ARCHETYPE_PAGE, $entity_data, $tpl_slug );
+                            if ( ! empty( $compiled_html ) ) {
+                                if ( $is_preview && ! empty( $preview_bar_script ) ) {
+                                    $compiled_html = str_replace( '</body>', $preview_bar_script . '</body>', $compiled_html );
+                                }
+                                while ( ob_get_level() > 0 ) ob_end_clean();
+                                status_header( 200 );
+                                nocache_headers();
+                                echo $compiled_html;
+                                exit;
+                            }
+                        }
+                    }
+                }
+
                 // Render clean preinstalled template
                 cora_render_default_workspace_welcome_site( $ws_name, $ws_slug, $target_page_slug, $is_site_prefix );
                 exit;
             } else {
+                // If no post exists, check if target_page_slug is a Policy or Collection archetype
+                if ( class_exists( 'Cora_Template_Engine' ) ) {
+                    $engine = Cora_Template_Engine::instance();
+                    $dyn_theme_id = $active_theme_id ?: 0;
+
+                    if ( in_array( $target_page_slug, array( 'privacy-policy', 'terms-of-service', 'terms', 'privacy', 'refund-policy', 'cancellation-policy', 'policy' ), true ) ) {
+                        $entity_data = $engine->format_policy_entity( $target_page_slug );
+                        $compiled_html = $engine->render_entity_template( $dyn_theme_id, Cora_Template_Engine::ARCHETYPE_POLICY, $entity_data, 'default' );
+                        if ( ! empty( $compiled_html ) ) {
+                            if ( $is_preview && ! empty( $preview_bar_script ) ) {
+                                $compiled_html = str_replace( '</body>', $preview_bar_script . '</body>', $compiled_html );
+                            }
+                            while ( ob_get_level() > 0 ) ob_end_clean();
+                            status_header( 200 );
+                            nocache_headers();
+                            echo $compiled_html;
+                            exit;
+                        }
+                    }
+
+                    if ( in_array( $target_page_slug, array( 'blog', 'journal', 'articles', 'portfolio', 'work', 'gallery' ), true ) ) {
+                        $entity_data = $engine->format_collection_entity( $target_page_slug );
+                        $compiled_html = $engine->render_entity_template( $dyn_theme_id, Cora_Template_Engine::ARCHETYPE_COLLECTION, $entity_data, 'default' );
+                        if ( ! empty( $compiled_html ) ) {
+                            if ( $is_preview && ! empty( $preview_bar_script ) ) {
+                                $compiled_html = str_replace( '</body>', $preview_bar_script . '</body>', $compiled_html );
+                            }
+                            while ( ob_get_level() > 0 ) ob_end_clean();
+                            status_header( 200 );
+                            nocache_headers();
+                            echo $compiled_html;
+                            exit;
+                        }
+                    }
+                }
+
                 cora_render_default_workspace_welcome_site( $ws_name, $ws_slug, $target_page_slug, $is_site_prefix );
+                exit;
+            }
+        }
+    }
+
+    // Fallback checks for direct archetype routes (Policies & Collections)
+    if ( class_exists( 'Cora_Template_Engine' ) ) {
+        $engine = Cora_Template_Engine::instance();
+        $dyn_theme_id = $active_theme_id ?: 0;
+
+        if ( in_array( $target_page_slug, array( 'privacy-policy', 'terms-of-service', 'terms', 'privacy', 'refund-policy', 'cancellation-policy', 'policy' ), true ) ) {
+            $entity_data = $engine->format_policy_entity( $target_page_slug );
+            $compiled_html = $engine->render_entity_template( $dyn_theme_id, Cora_Template_Engine::ARCHETYPE_POLICY, $entity_data, 'default' );
+            if ( ! empty( $compiled_html ) ) {
+                if ( $is_preview && ! empty( $preview_bar_script ) ) {
+                    $compiled_html = str_replace( '</body>', $preview_bar_script . '</body>', $compiled_html );
+                }
+                while ( ob_get_level() > 0 ) ob_end_clean();
+                status_header( 200 );
+                nocache_headers();
+                echo $compiled_html;
+                exit;
+            }
+        }
+
+        if ( in_array( $target_page_slug, array( 'blog', 'journal', 'articles', 'portfolio', 'work', 'gallery' ), true ) ) {
+            $entity_data = $engine->format_collection_entity( $target_page_slug );
+            $compiled_html = $engine->render_entity_template( $dyn_theme_id, Cora_Template_Engine::ARCHETYPE_COLLECTION, $entity_data, 'default' );
+            if ( ! empty( $compiled_html ) ) {
+                if ( $is_preview && ! empty( $preview_bar_script ) ) {
+                    $compiled_html = str_replace( '</body>', $preview_bar_script . '</body>', $compiled_html );
+                }
+                while ( ob_get_level() > 0 ) ob_end_clean();
+                status_header( 200 );
+                nocache_headers();
+                echo $compiled_html;
                 exit;
             }
         }
@@ -12317,6 +12566,7 @@ function cora_canvas_inject_preview_bar_script() {
  */
 if ( ! function_exists( 'cora_canvas_preview_bar_js' ) ) {
 function cora_canvas_preview_bar_js() { ob_start(); ?>
+(function() {
   var params = new URLSearchParams(window.location.search);
   var themeId = params.get('cv_preview_theme');
   if (!themeId) {
@@ -12591,6 +12841,7 @@ function cora_canvas_preview_bar_js() { ob_start(); ?>
       });
     })
     .catch(function(){ /* silently ignore network errors */ });
+})();
 <?php return ob_get_clean(); }
 }
 
@@ -15548,8 +15799,12 @@ function cora_ajax_get_article() {
     if (!$post) wp_send_json_error('Post not found');
 
     $subtitle = get_post_meta($post_id, '_cora_article_subtitle', true);
-    $keyword = get_post_meta($post_id, '_cora_seo_keyword', true);
-    $description = get_post_meta($post_id, '_cora_seo_description', true);
+    $keyword = get_post_meta($post_id, '_cora_seo_keyword', true) ?: (get_post_meta($post_id, '_cora_focus_keyword', true) ?: '');
+    $description = get_post_meta($post_id, '_cora_seo_description', true) ?: (get_post_meta($post_id, '_cora_meta_desc', true) ?: ($post->post_excerpt ?: ''));
+    $seo_score = get_post_meta($post_id, '_cora_seo_score', true);
+    $geo_score = get_post_meta($post_id, '_cora_geo_score', true);
+    $faq_schema = get_post_meta($post_id, '_cora_faq_schema', true) ?: '';
+    
     $assignee_id = get_post_meta($post_id, '_cora_assignee_id', true);
     if (empty($assignee_id) || $assignee_id === '0' || $assignee_id === 0) {
         $assignee_id = $post->post_author ?: (get_current_user_id() ?: 1);
@@ -15572,6 +15827,10 @@ function cora_ajax_get_article() {
         'subtitle' => $subtitle,
         'keyword' => $keyword,
         'description' => $description,
+        'excerpt' => $post->post_excerpt ?: $description,
+        'seo_score' => $seo_score !== '' ? intval($seo_score) : '',
+        'geo_score' => $geo_score !== '' ? intval($geo_score) : '',
+        'faq_schema' => $faq_schema,
         'categories' => $categories,
         'tags' => $tags,
         'thumbnail_id' => $thumbnail_id,
@@ -15597,11 +15856,13 @@ function cora_ajax_save_article() {
     $content = isset($_POST['content']) ? wp_kses_post($_POST['content']) : '';
     $status = isset($_POST['status']) && $_POST['status'] === 'publish' ? 'publish' : 'draft';
 
-    file_put_contents('/Users/shrutian/Desktop/cora/ajax_log.txt', "SAVE ARTICLE: id={$post_id}, status={$status}, raw_status=" . (isset($_POST['status']) ? $_POST['status'] : 'not set') . "\n", FILE_APPEND);
     $subtitle = isset($_POST['subtitle']) ? sanitize_text_field($_POST['subtitle']) : '';
     $keyword = isset($_POST['keyword']) ? sanitize_text_field($_POST['keyword']) : '';
     $description = isset($_POST['description']) ? sanitize_textarea_field($_POST['description']) : '';
-    $seo_score = isset($_POST['seo_score']) ? intval($_POST['seo_score']) : '';
+    $excerpt = isset($_POST['excerpt']) ? sanitize_textarea_field($_POST['excerpt']) : $description;
+    $seo_score = isset($_POST['seo_score']) && $_POST['seo_score'] !== '' ? intval($_POST['seo_score']) : '';
+    $geo_score = isset($_POST['geo_score']) && $_POST['geo_score'] !== '' ? intval($_POST['geo_score']) : '';
+    $faq_schema = isset($_POST['faq_schema']) ? wp_unslash($_POST['faq_schema']) : '';
     $scheduled_date = isset($_POST['scheduled_date']) ? sanitize_text_field($_POST['scheduled_date']) : '';
     
     $assignee_id = isset($_POST['assignee_id']) ? intval($_POST['assignee_id']) : 0;
@@ -15630,6 +15891,7 @@ function cora_ajax_save_article() {
     $post_data = array(
         'post_title'   => $title,
         'post_content' => $content,
+        'post_excerpt' => $excerpt ?: $description,
         'post_status'  => $status,
         'post_author'  => $assignee_id,
         'post_type'    => 'post'
@@ -15668,8 +15930,11 @@ function cora_ajax_save_article() {
         delete_post_thumbnail($saved_id);
     }
 
+    // Update metadata with bidirectional sync for REST/MCP/Autonomous compatibility
     update_post_meta($saved_id, '_cora_seo_keyword', $keyword);
+    update_post_meta($saved_id, '_cora_focus_keyword', $keyword);
     update_post_meta($saved_id, '_cora_seo_description', $description);
+    update_post_meta($saved_id, '_cora_meta_desc', $description);
     update_post_meta($saved_id, '_cora_article_subtitle', $subtitle);
     if (isset($_POST['assignee_id'])) {
         update_post_meta($saved_id, '_cora_assignee_id', $assignee_id);
@@ -15692,14 +15957,21 @@ function cora_ajax_save_article() {
 
     if ($status === 'publish') {
         update_post_meta($saved_id, '_cora_editorial_status', 'published');
+        update_post_meta($saved_id, '_cora_workflow_stage', 'published');
     } else if (!empty($editorial_status)) {
         update_post_meta($saved_id, '_cora_editorial_status', $editorial_status);
     } else {
         update_post_meta($saved_id, '_cora_editorial_status', 'draft');
     }
 
-    if ($seo_score) {
+    if ($seo_score !== '') {
         update_post_meta($saved_id, '_cora_seo_score', $seo_score);
+    }
+    if ($geo_score !== '') {
+        update_post_meta($saved_id, '_cora_geo_score', $geo_score);
+    }
+    if (!empty($faq_schema)) {
+        update_post_meta($saved_id, '_cora_faq_schema', $faq_schema);
     }
 
     wp_send_json_success(array(
@@ -62941,6 +63213,7 @@ function cora_ajax_sync_to_wordpress() {
             '_cora_seo_keyword'       => $item->primary_keyword,
             '_cora_editorial_status'  => 'published',
             '_yoast_wpseo_focuskw'    => $item->primary_keyword,
+            '_cora_template_slug'     => sanitize_title( $_POST['template_slug'] ?? 'default' ),
         ]
     ];
     

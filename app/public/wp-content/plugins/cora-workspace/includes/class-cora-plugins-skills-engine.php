@@ -2049,6 +2049,9 @@ Return ONLY raw JSON with keys:
             check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
         }
         $agency_id = self::get_current_agency_id();
+        if ( function_exists( 'cora_is_workspace_mcp_eligible' ) && ! cora_is_workspace_mcp_eligible( $agency_id ) ) {
+            wp_send_json_error( array( 'message' => 'Developer API & MCP Gateway is an exclusive feature for Professional and Scale workspaces. Please upgrade your plan.' ) );
+        }
         $name = sanitize_text_field( $_POST['key_name'] ?? ( $_POST['name'] ?? 'New API Key' ) );
         $scopes = isset( $_POST['scopes'] ) ? ( is_array( $_POST['scopes'] ) ? array_map( 'sanitize_text_field', $_POST['scopes'] ) : sanitize_text_field( $_POST['scopes'] ) ) : null;
         $res = self::create_api_key( $name, $scopes, $agency_id );

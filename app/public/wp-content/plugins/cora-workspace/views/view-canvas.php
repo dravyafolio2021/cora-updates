@@ -289,6 +289,197 @@ function cora_get_sparkline_points( $history, $type ) {
         padding-left: 12px;
     }
 
+    /* =========================================================================
+       MAIN-AREA DOCKED VIEW PANEL (Shopify-Inspired Docked Drawer SOP)
+       Referenced from Portfolio Module (#cora-project-drawer)
+       ========================================================================= */
+    .cora-docked-drawer {
+        position: fixed !important;
+        top: var(--cora-main-top, 52px) !important;
+        bottom: 0 !important;
+        left: var(--cora-main-left, 16rem) !important;
+        right: 0 !important;
+        width: var(--cora-main-width, calc(100vw - 16rem)) !important;
+        max-width: var(--cora-main-width, calc(100vw - 16rem)) !important;
+        height: var(--cora-main-height, calc(100vh - 52px)) !important;
+        max-height: var(--cora-main-height, calc(100vh - 52px)) !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border-radius: 0 !important;
+        border-top: 1px solid #e4e4e7 !important;
+        border-left: 1px solid #e4e4e7 !important;
+        border-right: none !important;
+        border-bottom: none !important;
+        background-color: #ffffff !important;
+        z-index: 40 !important; /* Kept strictly below sidebar (z-index: 60) and topbar (z-index: 9999) */
+        box-shadow: none !important;
+        -webkit-box-shadow: none !important;
+        transition: left 0.2s cubic-bezier(0.4, 0, 0.2, 1), width 0.2s cubic-bezier(0.4, 0, 0.2, 1), max-width 0.2s cubic-bezier(0.4, 0, 0.2, 1), transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.15s ease !important;
+        display: flex !important;
+        flex-direction: column !important;
+        overflow: hidden !important;
+    }
+
+    .dark .cora-docked-drawer {
+        background-color: #18181b !important;
+        border-top: 1px solid #27272a !important;
+        border-left: 1px solid #27272a !important;
+    }
+
+    @media (min-width: 1024px) {
+        body:has(.cora-sidebar.collapsed-sidebar) .cora-docked-drawer:not(.maximized),
+        body.cora-sidebar-collapsed .cora-docked-drawer:not(.maximized),
+        .cora-sidebar.collapsed-sidebar ~ .cora-main .cora-docked-drawer:not(.maximized),
+        .cora-docked-drawer.sidebar-collapsed:not(.maximized) {
+            left: 4rem !important;
+            width: calc(100vw - 4rem) !important;
+            max-width: calc(100vw - 4rem) !important;
+        }
+    }
+
+    .cora-docked-drawer.maximized {
+        left: 0 !important;
+        width: 100vw !important;
+        max-width: 100vw !important;
+        border-left: none !important;
+        z-index: 70 !important;
+    }
+
+    @media (max-width: 1023px) {
+        .cora-docked-drawer,
+        body:has(.cora-sidebar.collapsed-sidebar) .cora-docked-drawer,
+        body.cora-sidebar-collapsed .cora-docked-drawer,
+        .cora-docked-drawer.sidebar-collapsed {
+            left: 0 !important;
+            right: 0 !important;
+            width: 100vw !important;
+            max-width: 100vw !important;
+            border-left: none !important;
+            z-index: 10000 !important;
+        }
+        body:has(.cora-docked-drawer.open) #cora-mobile-floating-island,
+        body:has(.cora-docked-drawer:not(.collapsed)) #cora-mobile-floating-island {
+            transform: translateY(150%) !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+            display: none !important;
+        }
+    }
+
+    .cora-docked-drawer.open:not(.collapsed) {
+        transform: translateY(0) !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+    }
+
+    .cora-docked-drawer.collapsed,
+    .cora-docked-drawer:not(.open) {
+        transform: translateY(100%) !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        display: none !important;
+    }
+
+    /* Header 3-Part Alignment: Left Title, Center Stepper, Extreme Right Buttons */
+    @media (max-width: 1023px) {
+        .cora-drawer-header-left {
+            order: 1 !important;
+            flex: 1 1 auto !important;
+            min-width: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+        }
+        .cora-drawer-header-right {
+            order: 2 !important;
+            margin-left: auto !important;
+            flex-shrink: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+        }
+        .cora-drawer-header-center {
+            order: 3 !important;
+            width: 100% !important;
+            flex: 0 0 100% !important;
+        }
+    }
+    @media (min-width: 1024px) {
+        .cora-drawer-header-left {
+            order: 1 !important;
+            flex: 1 1 0% !important;
+            min-width: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: flex-start !important;
+        }
+        .cora-drawer-header-center {
+            order: 2 !important;
+            flex: 0 0 auto !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            margin: 0 auto !important;
+        }
+        .cora-drawer-header-right {
+            order: 3 !important;
+            flex: 1 1 0% !important;
+            min-width: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: flex-end !important;
+            margin-left: auto !important;
+        }
+    }
+
+    .cora-docked-drawer-body {
+        flex: 1 1 0% !important;
+        width: 100% !important;
+        overflow-y: auto !important;
+        padding: 1.5rem !important;
+        box-sizing: border-box !important;
+    }
+    @media (min-width: 768px) {
+        .cora-docked-drawer-body {
+            padding: 1.75rem 2.25rem !important;
+        }
+    }
+
+    .cora-drawer-container {
+        width: 100% !important;
+        max-width: 1200px !important;
+        margin: 0 auto !important;
+        box-sizing: border-box !important;
+    }
+
+    .cora-grid-7-5 {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 1.5rem !important;
+        width: 100% !important;
+        align-items: start !important;
+        box-sizing: border-box !important;
+    }
+    @media (min-width: 1024px) {
+        .cora-grid-7-5 {
+            grid-template-columns: 7fr 5fr !important;
+            gap: 1.75rem !important;
+        }
+    }
+
+    .cora-grid-1-1 {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 1rem !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    @media (max-width: 640px) {
+        .cora-grid-1-1 {
+            grid-template-columns: 1fr !important;
+        }
+    }
+
     /* ── Canvas Level-3 Editor Layout (Strictly isolated overlay) ────── */
     #canvas-level-3:not(.hidden) {
         position: fixed !important;
@@ -719,7 +910,7 @@ function cora_get_sparkline_points( $history, $type ) {
                             <div class="inline-flex items-center gap-2 pt-0.5">
                                 <button onclick="toggleThemeVersionDrawer(event)" class="inline-flex items-center gap-1 text-[10px] text-zinc-700 hover:text-zinc-950 font-semibold cursor-pointer border-none bg-transparent p-0">
                                     <span class="w-1.5 h-1.5 rounded-full bg-zinc-900 shrink-0"></span>
-                                    Version <?php echo esc_html( $live_theme['version'] ); ?>
+                                    Version <?php echo esc_html( ! empty( $live_theme['version'] ) ? $live_theme['version'] : '1.0.0' ); ?>
                                     <svg id="version-chevron-icon" viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none" class="transition-transform duration-200 text-zinc-400"><polyline points="6 9 12 15 18 9"></polyline></svg>
                                 </button>
                                 <span class="text-[10px] text-zinc-400">· Active Release</span>
@@ -1755,6 +1946,7 @@ function cora_get_sparkline_points( $history, $type ) {
                 </div>
             </div>
         </div>
+    </div> <!-- /#canvas-level-1 -->
 
     <!-- LEVEL 2 — THEME DASHBOARD -->
     <div id="canvas-level-2" class="space-y-4 hidden">
@@ -1787,6 +1979,10 @@ function cora_get_sparkline_points( $history, $type ) {
         <div class="border-b border-zinc-200 flex items-center justify-between pb-1">
             <div class="flex gap-6 text-xs font-semibold">
                 <button onclick="switchTab('pages')" id="tab-btn-pages" class="canvas-tab-btn pb-3 border-b-2 border-transparent text-zinc-400 hover:text-zinc-900 cursor-pointer transition-colors active">Pages</button>
+                <button onclick="switchTab('templates')" id="tab-btn-templates" class="canvas-tab-btn pb-3 border-b-2 border-transparent text-zinc-400 hover:text-zinc-900 cursor-pointer transition-colors flex items-center gap-1.5" title="Shopify-Style Dynamic Archetype Templates">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                    <span>Templates</span>
+                </button>
                 <button onclick="switchTab('nextjs-sdk')" id="tab-btn-nextjs-sdk" class="canvas-tab-btn pb-3 border-b-2 border-transparent text-zinc-400 hover:text-zinc-900 cursor-pointer transition-colors flex items-center gap-1.5" title="Next.js Headless SDK & Ops" style="display: none;">
                     <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12 2L2 19.7778H22L12 2Z"/></svg>
                     <span>Next.js SDK</span>
@@ -1821,6 +2017,14 @@ function cora_get_sparkline_points( $history, $type ) {
                     <button onclick="openNewPageDrawer()" id="tab-btn-add-page" class="px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-[11px] font-bold shadow-xs cursor-pointer transition-all active:scale-95 flex items-center gap-1.5 border-none">
                         <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                         <span>Add page</span>
+                    </button>
+                </div>
+
+                <!-- Action button for Templates tab -->
+                <div id="tab-action-templates" class="tab-action-btn hidden flex items-center gap-2">
+                    <button onclick="openNewTemplateDrawer()" id="tab-btn-add-template" class="px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-[11px] font-bold shadow-xs cursor-pointer transition-all active:scale-95 flex items-center gap-1.5 border-none">
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        <span>Add template</span>
                     </button>
                 </div>
                 <?php endif; ?>
@@ -2044,6 +2248,97 @@ function cora_get_sparkline_points( $history, $type ) {
                 </select>
                 <button onclick="applyBulkPagesAction()" class="px-3 py-1 bg-white hover:bg-zinc-100 text-zinc-900 font-bold rounded-lg text-[10px] cursor-pointer transition-colors shadow-sm">Apply</button>
                 <button onclick="deselectAllPages()" class="text-[10px] font-semibold text-zinc-400 hover:text-white transition-colors cursor-pointer">Deselect All</button>
+            </div>
+        </div>
+
+        <!-- TAB CONTENT: DYNAMIC TEMPLATES -->
+        <div id="tab-content-templates" class="space-y-4 hidden">
+            <!-- ── Templates Stats Bar ── -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 divide-x divide-zinc-100 border border-zinc-200 rounded-xl bg-white shadow-sm overflow-hidden text-left">
+                <div class="px-4 py-2.5">
+                    <div class="flex items-center gap-1.5 mb-1">
+                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="#71717a" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+                        <span class="text-[10px] text-zinc-500 font-medium">All Templates</span>
+                    </div>
+                    <div class="text-[18px] font-bold text-zinc-900 leading-none" id="stat-total-templates">--</div>
+                </div>
+                <div class="px-4 py-2.5">
+                    <div class="flex items-center gap-1.5 mb-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-blue-500 flex-shrink-0"></span>
+                        <span class="text-[10px] text-zinc-500 font-medium">Articles</span>
+                    </div>
+                    <div class="text-[18px] font-bold text-zinc-900 leading-none" id="stat-article-templates">--</div>
+                </div>
+                <div class="px-4 py-2.5">
+                    <div class="flex items-center gap-1.5 mb-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 flex-shrink-0"></span>
+                        <span class="text-[10px] text-zinc-500 font-medium">Pages</span>
+                    </div>
+                    <div class="text-[18px] font-bold text-zinc-900 leading-none" id="stat-page-templates">--</div>
+                </div>
+                <div class="px-4 py-2.5">
+                    <div class="flex items-center gap-1.5 mb-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-purple-500 flex-shrink-0"></span>
+                        <span class="text-[10px] text-zinc-500 font-medium">Policies</span>
+                    </div>
+                    <div class="text-[18px] font-bold text-zinc-900 leading-none" id="stat-policy-templates">--</div>
+                </div>
+                <div class="px-4 py-2.5">
+                    <div class="flex items-center gap-1.5 mb-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500 flex-shrink-0"></span>
+                        <span class="text-[10px] text-zinc-500 font-medium">Products</span>
+                    </div>
+                    <div class="text-[18px] font-bold text-zinc-900 leading-none" id="stat-product-templates">--</div>
+                </div>
+                <div class="px-4 py-2.5">
+                    <div class="flex items-center gap-1.5 mb-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-zinc-400 flex-shrink-0"></span>
+                        <span class="text-[10px] text-zinc-500 font-medium">Collections</span>
+                    </div>
+                    <div class="text-[18px] font-bold text-zinc-900 leading-none" id="stat-collection-templates">--</div>
+                </div>
+            </div>
+
+            <!-- ── Filter & Search Toolbar ── -->
+            <div class="bg-white border border-zinc-200 rounded-xl overflow-hidden shadow-sm">
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between px-4 py-2.5 border-b border-zinc-100 gap-2">
+                    <!-- Archetype Pills -->
+                    <div class="flex items-center gap-1 overflow-x-auto pb-1 sm:pb-0" id="templates-archetype-pills">
+                        <button onclick="setTemplateFilter('all')" data-archetype="all" class="tpl-filter-btn px-3 py-1.5 rounded-md text-[11px] font-semibold bg-zinc-900 text-white cursor-pointer transition-all">All Archetypes</button>
+                        <button onclick="setTemplateFilter('article')" data-archetype="article" class="tpl-filter-btn px-3 py-1.5 rounded-md text-[11px] font-semibold text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 cursor-pointer transition-all">Articles &amp; Blog</button>
+                        <button onclick="setTemplateFilter('page')" data-archetype="page" class="tpl-filter-btn px-3 py-1.5 rounded-md text-[11px] font-semibold text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 cursor-pointer transition-all">Standard Pages</button>
+                        <button onclick="setTemplateFilter('policy')" data-archetype="policy" class="tpl-filter-btn px-3 py-1.5 rounded-md text-[11px] font-semibold text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 cursor-pointer transition-all">Policies</button>
+                        <button onclick="setTemplateFilter('product')" data-archetype="product" class="tpl-filter-btn px-3 py-1.5 rounded-md text-[11px] font-semibold text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 cursor-pointer transition-all">Products &amp; Packages</button>
+                        <button onclick="setTemplateFilter('collection')" data-archetype="collection" class="tpl-filter-btn px-3 py-1.5 rounded-md text-[11px] font-semibold text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 cursor-pointer transition-all">Collections</button>
+                    </div>
+
+                    <!-- Search Input -->
+                    <div class="relative w-full sm:w-56 shrink-0">
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <input type="text" id="templates-search-input" onkeyup="filterTemplatesGrid()" placeholder="Filter templates..." class="w-full pl-8 pr-3 py-1.5 bg-zinc-50 border border-zinc-200 rounded-lg text-xs outline-none focus:border-zinc-900 focus:bg-white transition-all">
+                    </div>
+                </div>
+
+                <!-- Template Items Table -->
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-zinc-100 bg-zinc-50/50 text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                                <th class="py-2.5 px-4">Archetype</th>
+                                <th class="py-2.5 px-4">Template Name &amp; Slug</th>
+                                <th class="py-2.5 px-4">Presentation Engine</th>
+                                <th class="py-2.5 px-4">Role / Scope</th>
+                                <th class="py-2.5 px-4">Dynamic Slots</th>
+                                <th class="py-2.5 px-4 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="theme-templates-tbody" class="divide-y divide-zinc-100 text-xs">
+                            <tr>
+                                <td colspan="6" class="py-12 text-center text-zinc-400">Loading theme templates...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -4108,6 +4403,360 @@ function cora_get_sparkline_points( $history, $type ) {
     </div>
 </div>
 
+<!-- =========================================================================
+     DYNAMIC TEMPLATE CREATION DOCKED VIEW PANEL (Portfolio Module SOP)
+     ========================================================================= -->
+<aside id="drawer-new-template" class="cora-docked-drawer collapsed">
+    <!-- 1. Unified Ultra-Compact Docked Header (52px Desktop / Responsive Mobile) -->
+    <div class="cora-drawer-header px-4 sm:px-6 py-2.5 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shrink-0 sticky top-0 z-30">
+        <div class="flex items-center justify-between min-h-[42px] w-full gap-2 sm:gap-4">
+            
+            <!-- Left: Category Pill & Title & Archetype Pill -->
+            <div class="flex items-center gap-2 sm:gap-2.5 cora-drawer-header-left">
+                <span class="hidden sm:inline-block px-2 py-0.5 rounded text-[9.5px] font-mono font-bold tracking-wider uppercase bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 shrink-0">Template Blueprint</span>
+                <h2 class="text-sm font-bold text-zinc-950 dark:text-zinc-50 truncate tracking-tight">Create Archetype Template</h2>
+                <span id="cora-new-template-badge" class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shrink-0 uppercase">ARTICLE</span>
+            </div>
+
+            <!-- Center: Level 01 Segmented Control (Archetype Switcher) -->
+            <div class="hidden md:flex items-center justify-center overflow-x-auto cora-no-scrollbar py-0.5 cora-drawer-header-center">
+                <div class="p-1 bg-zinc-100/90 dark:bg-zinc-800/80 rounded-xl border border-zinc-200/70 dark:border-zinc-800/80 flex items-center gap-1 select-none shrink-0" id="new-template-archetype-selector">
+                    <button type="button" onclick="switchNewTemplateArchetype('article')" data-arch="article" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white shadow-2xs border-0 cursor-pointer whitespace-nowrap flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                        <span>Article</span>
+                    </button>
+                    <button type="button" onclick="switchNewTemplateArchetype('page')" data-arch="page" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50 bg-transparent border-0 cursor-pointer whitespace-nowrap flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                        <span>Page</span>
+                    </button>
+                    <button type="button" onclick="switchNewTemplateArchetype('policy')" data-arch="policy" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50 bg-transparent border-0 cursor-pointer whitespace-nowrap flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
+                        <span>Policy</span>
+                    </button>
+                    <button type="button" onclick="switchNewTemplateArchetype('product')" data-arch="product" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50 bg-transparent border-0 cursor-pointer whitespace-nowrap flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                        <span>Product</span>
+                    </button>
+                    <button type="button" onclick="switchNewTemplateArchetype('collection')" data-arch="collection" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50 bg-transparent border-0 cursor-pointer whitespace-nowrap flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-zinc-500"></span>
+                        <span>Catalog</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right: Actions (Maximize + Close) -->
+            <div class="flex items-center gap-1.5 shrink-0 cora-drawer-header-right">
+                <button 
+                    type="button" 
+                    onclick="coraToggleDockedDrawerMaximize('drawer-new-template')"
+                    id="drawer-new-template-max-btn"
+                    class="w-8 h-8 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 flex items-center justify-center text-zinc-500 hover:text-zinc-950 dark:hover:text-white transition-all cursor-pointer border border-zinc-200/80 dark:border-zinc-700 shadow-2xs active:scale-95 shrink-0"
+                    title="Expand / Restore Canvas"
+                >
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"></path><path d="M9 21H3v-6"></path><path d="M21 3l-7 7"></path><path d="M3 21l7-7"></path></svg>
+                </button>
+                <button 
+                    type="button" 
+                    onclick="closeNewTemplateDrawer()"
+                    class="h-8 px-2.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 flex items-center gap-1.5 text-zinc-500 hover:text-zinc-950 dark:hover:text-white transition-all cursor-pointer border border-zinc-200/80 dark:border-zinc-700 shadow-2xs active:scale-95 shrink-0"
+                    title="Close Drawer (Esc)"
+                >
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    <kbd class="hidden sm:inline-block px-1 py-0.2 rounded bg-zinc-200 dark:bg-zinc-700 text-[9px] font-mono font-medium text-zinc-500 dark:text-zinc-400">Esc</kbd>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Form Body (Scrollable, Decoupled SaaS Grid) -->
+    <div class="cora-docked-drawer-body" id="drawer-new-template-card">
+        <div class="cora-drawer-container space-y-5">
+            
+            <!-- Mobile Archetype Switcher -->
+            <div class="block md:hidden space-y-1.5">
+                <label class="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider font-sans">Archetype</label>
+                <div class="grid grid-cols-5 gap-1 p-1 bg-zinc-100 dark:bg-zinc-800 rounded-xl border border-zinc-200/80 dark:border-zinc-700/80 text-[10px] font-semibold">
+                    <button type="button" onclick="switchNewTemplateArchetype('article')" class="py-1.5 rounded-lg text-center font-bold bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white shadow-2xs">Article</button>
+                    <button type="button" onclick="switchNewTemplateArchetype('page')" class="py-1.5 rounded-lg text-center text-zinc-600 dark:text-zinc-400">Page</button>
+                    <button type="button" onclick="switchNewTemplateArchetype('policy')" class="py-1.5 rounded-lg text-center text-zinc-600 dark:text-zinc-400">Policy</button>
+                    <button type="button" onclick="switchNewTemplateArchetype('product')" class="py-1.5 rounded-lg text-center text-zinc-600 dark:text-zinc-400">Product</button>
+                    <button type="button" onclick="switchNewTemplateArchetype('collection')" class="py-1.5 rounded-lg text-center text-zinc-600 dark:text-zinc-400">Catalog</button>
+                </div>
+            </div>
+
+            <!-- 2-Column Responsive Layout Grid -->
+            <div class="cora-grid-7-5">
+                
+                <!-- Left Column (7 cols): Metadata & Blueprint Editor -->
+                <div class="space-y-5 w-full">
+                    
+                    <!-- Metadata Section Card -->
+                    <div class="p-4 sm:p-5 bg-zinc-50/70 dark:bg-zinc-900/40 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 space-y-4">
+                        <div class="cora-grid-1-1">
+                            <div class="space-y-1.5">
+                                <label class="block text-[10px] font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider font-sans">Template Name *</label>
+                                <input type="text" id="new-template-name-input" onkeyup="autoGenerateTemplateSlug(this)" placeholder="e.g. Minimalist Editorial Case Study" class="w-full px-3.5 py-2.5 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs focus:outline-none focus:border-zinc-400 font-medium font-sans bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 transition-colors shadow-2xs">
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="block text-[10px] font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider font-sans">Identifier Slug *</label>
+                                <input type="text" id="new-template-slug-input" placeholder="e.g. minimalist-editorial" class="w-full px-3.5 py-2.5 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs focus:outline-none focus:border-zinc-400 font-mono font-medium bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 transition-colors shadow-2xs">
+                            </div>
+                        </div>
+
+                        <!-- Presentation Engine Segmented Control -->
+                        <div class="space-y-1.5">
+                            <div class="flex items-center justify-between">
+                                <label class="block text-[10px] font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider font-sans">Presentation Engine</label>
+                                <span class="text-[10px] text-zinc-400 font-mono">Render Target</span>
+                            </div>
+                            <div class="inline-flex flex-wrap items-center p-1 bg-zinc-100 dark:bg-zinc-800/80 rounded-xl border border-zinc-200/80 dark:border-zinc-700/80 text-xs font-semibold gap-1 select-none" id="new-template-engine-pills">
+                                <button type="button" onclick="setTemplateEngine('new', 'html')" data-engine="html" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white shadow-2xs border-0 cursor-pointer whitespace-nowrap">
+                                    Smart Canvas HTML
+                                </button>
+                                <button type="button" onclick="setTemplateEngine('new', 'nextjs')" data-engine="nextjs" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white bg-transparent border-0 cursor-pointer whitespace-nowrap">
+                                    Next.js App Router
+                                </button>
+                                <button type="button" onclick="setTemplateEngine('new', 'elementor')" data-engine="elementor" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white bg-transparent border-0 cursor-pointer whitespace-nowrap">
+                                    Elementor Dynamic
+                                </button>
+                            </div>
+                            <input type="hidden" id="new-template-engine-input" value="html">
+                        </div>
+                    </div>
+
+                    <!-- Blueprint Layout Markup Editor (Terminal Style) -->
+                    <div class="bg-zinc-950 rounded-2xl border border-zinc-800 overflow-hidden shadow-sm flex flex-col">
+                        <div class="flex items-center justify-between px-4 py-2.5 bg-zinc-900/90 border-b border-zinc-800/80 text-zinc-400 shrink-0">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-zinc-700 inline-block"></span>
+                                <span class="text-[11px] font-mono font-medium text-zinc-300">blueprint.layout.html</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-[10px] font-mono text-zinc-500">Supports HTML5 • Tailwind • {{ slots }}</span>
+                            </div>
+                        </div>
+                        <textarea id="new-template-layout-input" rows="18" class="w-full p-4 font-mono text-[11.5px] leading-relaxed bg-zinc-950 text-zinc-100 border-0 focus:outline-none focus:ring-0 selection:bg-zinc-800 resize-y" placeholder="<!DOCTYPE html>..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Right Column (5 cols): Dynamic Slots Helper & Default Switch -->
+                <div class="space-y-5 w-full">
+                    
+                    <!-- Dynamic Slot Tokens Helper Card -->
+                    <div class="p-4 sm:p-5 bg-zinc-50/70 dark:bg-zinc-900/40 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider font-mono flex items-center gap-1.5">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                                Dynamic Slot Tokens
+                            </span>
+                            <span class="text-[9px] text-zinc-400 font-mono">Click to insert</span>
+                        </div>
+                        <p class="text-[11px] text-zinc-500 dark:text-zinc-400">Tokens are dynamically compiled with live entity data at render time.</p>
+                        <div class="flex flex-wrap gap-1.5 max-h-[380px] overflow-y-auto cora-no-scrollbar py-1" id="new-template-slot-chips">
+                            <!-- Dynamic chips injected here -->
+                        </div>
+                    </div>
+
+                    <!-- Primary Default Switch Card -->
+                    <div class="p-4 sm:p-5 bg-zinc-50/70 dark:bg-zinc-900/40 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 space-y-3">
+                        <div class="flex items-center justify-between gap-3">
+                            <div>
+                                <span class="block text-xs font-bold text-zinc-900 dark:text-zinc-100">Primary Default Blueprint</span>
+                                <span class="block text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 leading-snug">Entities without an explicit template will automatically compile this layout.</span>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer shrink-0">
+                                <input type="checkbox" id="new-template-default-input" class="sr-only peer">
+                                <div class="w-10 h-5 bg-zinc-200 peer-focus:outline-none rounded-full peer dark:bg-zinc-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-zinc-600 peer-checked:bg-zinc-900 dark:peer-checked:bg-white dark:peer-checked:after:bg-zinc-900"></div>
+                            </label>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 3. Sticky Stepper Drawer Footer (Edge-to-Edge Flush at Bottom) -->
+    <div class="px-4 sm:px-6 lg:px-8 py-3 border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-between shrink-0 sticky bottom-0 z-30">
+        <div class="flex items-center gap-2">
+            <button type="button" onclick="closeNewTemplateDrawer()" class="px-3.5 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold transition cursor-pointer">
+                Cancel
+            </button>
+        </div>
+        <div class="flex items-center gap-3">
+            <span class="hidden md:inline-flex items-center gap-1 text-[11px] text-zinc-400 font-mono">
+                Press <kbd class="px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 rounded border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 text-[10px]">⌘S</kbd> to save
+            </span>
+            <button type="button" onclick="saveNewTemplate()" class="px-4 py-2 bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-bold rounded-xl text-xs hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-all cursor-pointer shadow-2xs active:scale-95 flex items-center gap-1.5">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                <span>Create Template</span>
+            </button>
+        </div>
+    </div>
+</aside>
+
+<!-- =========================================================================
+     DYNAMIC TEMPLATE EDIT DOCKED VIEW PANEL (Portfolio Module SOP)
+     ========================================================================= -->
+<aside id="drawer-edit-template" class="cora-docked-drawer collapsed">
+    <input type="hidden" id="edit-template-id" value="">
+    <input type="hidden" id="edit-template-archetype" value="">
+
+    <!-- 1. Unified Ultra-Compact Docked Header -->
+    <div class="cora-drawer-header px-4 sm:px-6 py-2.5 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shrink-0 sticky top-0 z-30">
+        <div class="flex items-center justify-between min-h-[42px] w-full gap-2 sm:gap-4">
+            
+            <!-- Left: Title & Status Pill -->
+            <div class="flex items-center gap-2 sm:gap-2.5 cora-drawer-header-left">
+                <span class="hidden sm:inline-block px-2 py-0.5 rounded text-[9.5px] font-mono font-bold tracking-wider uppercase bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 shrink-0">Template Blueprint</span>
+                <h2 class="text-sm font-bold text-zinc-950 dark:text-zinc-50 truncate tracking-tight" id="edit-template-header-title">Edit Template Blueprint</h2>
+                <span id="edit-template-archetype-badge" class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shrink-0 uppercase">ARTICLE</span>
+                <span id="edit-template-header-slug" class="hidden sm:inline-block text-[11px] font-mono text-zinc-400 truncate max-w-[220px]">template.slug</span>
+            </div>
+
+            <!-- Right: Actions (Maximize + Close) -->
+            <div class="flex items-center gap-1.5 shrink-0 cora-drawer-header-right">
+                <button 
+                    type="button" 
+                    onclick="coraToggleDockedDrawerMaximize('drawer-edit-template')"
+                    id="drawer-edit-template-max-btn"
+                    class="w-8 h-8 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 flex items-center justify-center text-zinc-500 hover:text-zinc-950 dark:hover:text-white transition-all cursor-pointer border border-zinc-200/80 dark:border-zinc-700 shadow-2xs active:scale-95 shrink-0"
+                    title="Expand / Restore Canvas"
+                >
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"></path><path d="M9 21H3v-6"></path><path d="M21 3l-7 7"></path><path d="M3 21l7-7"></path></svg>
+                </button>
+                <button 
+                    type="button" 
+                    onclick="closeEditTemplateDrawer()"
+                    class="h-8 px-2.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 flex items-center gap-1.5 text-zinc-500 hover:text-zinc-950 dark:hover:text-white transition-all cursor-pointer border border-zinc-200/80 dark:border-zinc-700 shadow-2xs active:scale-95 shrink-0"
+                    title="Close Drawer (Esc)"
+                >
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    <kbd class="hidden sm:inline-block px-1 py-0.2 rounded bg-zinc-200 dark:bg-zinc-700 text-[9px] font-mono font-medium text-zinc-500 dark:text-zinc-400">Esc</kbd>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Form Body (Scrollable, Decoupled SaaS Grid) -->
+    <div class="cora-docked-drawer-body" id="drawer-edit-template-card">
+        <div class="cora-drawer-container space-y-5">
+            
+            <div class="cora-grid-7-5">
+                
+                <!-- Left Column (7 cols): Metadata & Blueprint Editor -->
+                <div class="space-y-5 w-full">
+                    
+                    <!-- Metadata Section Card -->
+                    <div class="p-4 sm:p-5 bg-zinc-50/70 dark:bg-zinc-900/40 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 space-y-4">
+                        <div class="cora-grid-1-1">
+                            <div class="space-y-1.5">
+                                <label class="block text-[10px] font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider font-sans">Template Name</label>
+                                <input type="text" id="edit-template-name-input" class="w-full px-3.5 py-2.5 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs focus:outline-none focus:border-zinc-400 font-medium font-sans bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 transition-colors shadow-2xs">
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="block text-[10px] font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider font-sans">Identifier Slug</label>
+                                <input type="text" id="edit-template-slug-input" class="w-full px-3.5 py-2.5 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs focus:outline-none focus:border-zinc-400 font-mono font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 shadow-2xs" readonly>
+                            </div>
+                        </div>
+
+                        <!-- Presentation Engine Segmented Control -->
+                        <div class="space-y-1.5">
+                            <div class="flex items-center justify-between">
+                                <label class="block text-[10px] font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider font-sans">Presentation Engine</label>
+                                <span class="text-[10px] text-zinc-400 font-mono">Render Target</span>
+                            </div>
+                            <div class="inline-flex flex-wrap items-center p-1 bg-zinc-100 dark:bg-zinc-800/80 rounded-xl border border-zinc-200/80 dark:border-zinc-700/80 text-xs font-semibold gap-1 select-none" id="edit-template-engine-pills">
+                                <button type="button" onclick="setTemplateEngine('edit', 'html')" data-engine="html" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white shadow-2xs border-0 cursor-pointer whitespace-nowrap">
+                                    Smart Canvas HTML
+                                </button>
+                                <button type="button" onclick="setTemplateEngine('edit', 'nextjs')" data-engine="nextjs" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white bg-transparent border-0 cursor-pointer whitespace-nowrap">
+                                    Next.js App Router
+                                </button>
+                                <button type="button" onclick="setTemplateEngine('edit', 'elementor')" data-engine="elementor" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white bg-transparent border-0 cursor-pointer whitespace-nowrap">
+                                    Elementor Dynamic
+                                </button>
+                            </div>
+                            <input type="hidden" id="edit-template-engine-input" value="html">
+                        </div>
+                    </div>
+
+                    <!-- Blueprint Layout Markup Editor (Terminal Style) -->
+                    <div class="bg-zinc-950 rounded-2xl border border-zinc-800 overflow-hidden shadow-sm flex flex-col">
+                        <div class="flex items-center justify-between px-4 py-2.5 bg-zinc-900/90 border-b border-zinc-800/80 text-zinc-400 shrink-0">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-zinc-700 inline-block"></span>
+                                <span class="text-[11px] font-mono font-medium text-zinc-300">blueprint.layout.html</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-[10px] font-mono text-zinc-500">Supports HTML5 • Tailwind • {{ slots }}</span>
+                            </div>
+                        </div>
+                        <textarea id="edit-template-layout-input" rows="18" class="w-full p-4 font-mono text-[11.5px] leading-relaxed bg-zinc-950 text-zinc-100 border-0 focus:outline-none focus:ring-0 selection:bg-zinc-800 resize-y"></textarea>
+                    </div>
+                </div>
+
+                <!-- Right Column (5 cols): Dynamic Slots Helper & Default Switch -->
+                <div class="space-y-5 w-full">
+                    
+                    <!-- Dynamic Slot Tokens Helper Card -->
+                    <div class="p-4 sm:p-5 bg-zinc-50/70 dark:bg-zinc-900/40 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider font-mono flex items-center gap-1.5">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                                Available Slot Tokens
+                            </span>
+                            <span class="text-[9px] text-zinc-400 font-mono">Click to insert</span>
+                        </div>
+                        <p class="text-[11px] text-zinc-500 dark:text-zinc-400">Tokens are dynamically compiled with live entity data at render time.</p>
+                        <div class="flex flex-wrap gap-1.5 max-h-[380px] overflow-y-auto cora-no-scrollbar py-1" id="edit-template-slot-chips">
+                            <!-- Dynamic chips injected here -->
+                        </div>
+                    </div>
+
+                    <!-- Primary Default Switch Card -->
+                    <div class="p-4 sm:p-5 bg-zinc-50/70 dark:bg-zinc-900/40 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 space-y-3">
+                        <div class="flex items-center justify-between gap-3">
+                            <div>
+                                <span class="block text-xs font-bold text-zinc-900 dark:text-zinc-100">Set as Primary Default</span>
+                                <span class="block text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 leading-snug">Unassigned entities will automatically fall back to this blueprint.</span>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer shrink-0">
+                                <input type="checkbox" id="edit-template-default-input" class="sr-only peer">
+                                <div class="w-10 h-5 bg-zinc-200 peer-focus:outline-none rounded-full peer dark:bg-zinc-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-zinc-600 peer-checked:bg-zinc-900 dark:peer-checked:bg-white dark:peer-checked:after:bg-zinc-900"></div>
+                            </label>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 3. Sticky Stepper Drawer Footer (Edge-to-Edge Flush at Bottom) -->
+    <div class="px-4 sm:px-6 lg:px-8 py-3 border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-between shrink-0 sticky bottom-0 z-30">
+        <div class="flex items-center gap-2">
+            <button type="button" id="edit-template-delete-btn" onclick="deleteCurrentEditTemplate()" class="px-3.5 py-2 text-xs font-bold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-xl transition-colors cursor-pointer border border-red-200/80 dark:border-red-900/50">
+                Delete Template
+            </button>
+            <button type="button" onclick="closeEditTemplateDrawer()" class="px-3.5 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold transition cursor-pointer">
+                Cancel
+            </button>
+        </div>
+        <div class="flex items-center gap-3">
+            <span class="hidden md:inline-flex items-center gap-1 text-[11px] text-zinc-400 font-mono">
+                Press <kbd class="px-1.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 rounded border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 text-[10px]">⌘S</kbd> to save
+            </span>
+            <button type="button" onclick="saveEditTemplate()" class="px-4 py-2 bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 font-bold rounded-xl text-xs hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-all cursor-pointer shadow-2xs active:scale-95 flex items-center gap-1.5">
+                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                <span>Save Changes</span>
+            </button>
+        </div>
+    </div>
+</aside>
+
 <!-- 2. New Page Setup Drawer (Right-Sliding Sheet) -->
 <div id="drawer-new-page" class="fixed inset-0 z-[999999] bg-zinc-900/40 backdrop-blur-[1px] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300 hidden">
     <div class="bg-white border-l border-zinc-200 h-full w-full max-w-[500px] shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 pointer-events-auto" id="drawer-new-page-card">
@@ -4958,7 +5607,6 @@ function cora_get_sparkline_points( $history, $type ) {
 </div>
 
 <!-- 5. Activate theme confirmation modal removed (1-click toast activation) -->
-</div>
 
 <!-- 6. Theme Rename Drawer (Right-Sliding Sheet) -->
 <div id="drawer-rename-theme" class="fixed inset-0 z-[999999] bg-zinc-900/40 backdrop-blur-[1px] flex justify-end opacity-0 pointer-events-none transition-opacity duration-300 hidden">
@@ -7593,11 +8241,12 @@ echo esc_textarea( json_encode( array(
 <script>
     // --- Lovable Mappings Configuration ---
     <?php
-    $theme_settings_raw = $wpdb->get_var( $wpdb->prepare( "SELECT settings FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d", $current_theme_id ) );
-    $theme_settings = json_decode( $theme_settings_raw, true ) ?: array();
+    $current_theme_id = ! empty( $live_theme['id'] ) ? intval( $live_theme['id'] ) : 0;
+    $theme_settings_raw = $current_theme_id > 0 ? $wpdb->get_var( $wpdb->prepare( "SELECT settings FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d", $current_theme_id ) ) : null;
+    $theme_settings = $theme_settings_raw ? (json_decode( $theme_settings_raw, true ) ?: array()) : array();
     $active_theme_mappings = isset( $theme_settings['page_mappings'] ) ? $theme_settings['page_mappings'] : get_option( 'cora_git_sync_page_mappings', array() );
     ?>
-    window.CORA_LOVABLE_ROUTES = <?php echo json_encode( cora_git_sync_get_lovable_routes( $current_theme_id ) ); ?>;
+    window.CORA_LOVABLE_ROUTES = <?php echo json_encode( function_exists('cora_git_sync_get_lovable_routes') ? cora_git_sync_get_lovable_routes( $current_theme_id ) : array() ); ?>;
     window.CORA_PAGE_MAPPINGS = <?php echo json_encode( $active_theme_mappings ); ?>;
     window.CORA_GIT_CONFIG = <?php echo json_encode([
         'enabled'     => get_option('cora_git_sync_enabled') === '1',
@@ -7637,6 +8286,200 @@ echo esc_textarea( json_encode( array(
         get: function() { return this.activePageId; },
         set: function(val) { this.activePageId = val; }
     });
+
+    // =========================================================================
+    // DYNAMIC BOUNDS SYNCHRONIZER FOR DOCKED VIEW PANELS (Portfolio Drawer SOP)
+    // =========================================================================
+    function coraSyncDockedDrawerBounds() {
+        var drawers = document.querySelectorAll('.cora-docked-drawer');
+        if (!drawers.length) return;
+        var sidebarEl = document.querySelector('.cora-sidebar');
+        var isMobile = window.innerWidth < 1024;
+        var isSidebarCollapsed = sidebarEl && sidebarEl.classList.contains('collapsed-sidebar');
+
+        drawers.forEach(function(drawer) {
+            if (isSidebarCollapsed) {
+                drawer.classList.add('sidebar-collapsed');
+            } else {
+                drawer.classList.remove('sidebar-collapsed');
+            }
+
+            if (drawer.classList.contains('maximized')) {
+                drawer.style.left = '0px';
+                drawer.style.top = '52px';
+                drawer.style.width = '100vw';
+                drawer.style.maxWidth = '100vw';
+                drawer.style.height = (window.innerHeight - 52) + 'px';
+                drawer.style.maxHeight = (window.innerHeight - 52) + 'px';
+                return;
+            }
+
+            var topbarEl = document.getElementById('cora-global-topbar') || document.querySelector('.cora-header');
+            var actualTop = topbarEl ? Math.round(topbarEl.getBoundingClientRect().bottom) : 52;
+            if (actualTop < 0 || isNaN(actualTop)) actualTop = 52;
+
+            var targetLeft = 0;
+            if (!isMobile && sidebarEl) {
+                var sRect = sidebarEl.getBoundingClientRect();
+                targetLeft = Math.round(sRect.right);
+                if (targetLeft <= 0 || isNaN(targetLeft)) {
+                    targetLeft = isSidebarCollapsed ? 64 : 256;
+                }
+            }
+            var targetWidth = window.innerWidth - targetLeft;
+            var targetHeight = window.innerHeight - actualTop;
+
+            document.documentElement.style.setProperty('--cora-main-left', targetLeft + 'px');
+            document.documentElement.style.setProperty('--cora-main-top', actualTop + 'px');
+            document.documentElement.style.setProperty('--cora-main-width', targetWidth + 'px');
+            document.documentElement.style.setProperty('--cora-main-height', targetHeight + 'px');
+
+            drawer.style.left = targetLeft + 'px';
+            drawer.style.top = actualTop + 'px';
+            drawer.style.width = targetWidth + 'px';
+            drawer.style.maxWidth = targetWidth + 'px';
+            drawer.style.height = targetHeight + 'px';
+            drawer.style.maxHeight = targetHeight + 'px';
+        });
+    }
+    window.coraSyncDockedDrawerBounds = coraSyncDockedDrawerBounds;
+
+    function coraOpenDockedDrawer(drawerId) {
+        var drawer = typeof drawerId === 'string' ? document.getElementById(drawerId) : drawerId;
+        if (!drawer) return;
+        var mainEl = document.querySelector('main.cora-main') || document.querySelector('.cora-main');
+
+        // Body portaling: guarantee drawer sits at document.body level with no clipping
+        if (drawer.parentNode !== document.body) {
+            document.body.appendChild(drawer);
+        }
+
+        drawer.classList.remove('collapsed', 'hidden');
+        drawer.classList.add('open');
+
+        var island = document.getElementById('cora-mobile-floating-island');
+        if (island) {
+            island.classList.add('cora-island-hidden');
+        }
+
+        coraSyncDockedDrawerBounds();
+
+        if (mainEl) {
+            mainEl.classList.add('overflow-hidden');
+        }
+    }
+    window.coraOpenDockedDrawer = coraOpenDockedDrawer;
+
+    function coraCloseDockedDrawer(drawerId) {
+        var drawer = typeof drawerId === 'string' ? document.getElementById(drawerId) : drawerId;
+        if (!drawer) return;
+        var mainEl = document.querySelector('main.cora-main') || document.querySelector('.cora-main');
+
+        drawer.classList.remove('open', 'maximized');
+        drawer.classList.add('collapsed');
+
+        var island = document.getElementById('cora-mobile-floating-island');
+        if (island) {
+            island.classList.remove('cora-island-hidden');
+        }
+
+        if (mainEl) {
+            mainEl.classList.remove('overflow-hidden');
+        }
+    }
+    window.coraCloseDockedDrawer = coraCloseDockedDrawer;
+
+    function coraToggleDockedDrawerMaximize(drawerId) {
+        var drawer = typeof drawerId === 'string' ? document.getElementById(drawerId) : drawerId;
+        if (!drawer) return;
+        var isMax = drawer.classList.toggle('maximized');
+        var maxBtn = document.getElementById(drawer.id + '-max-btn');
+        if (maxBtn) {
+            if (isMax) {
+                maxBtn.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h6v6"></path><path d="M20 10h-6V4"></path><path d="M14 10l7-7"></path><path d="M3 21l7-7"></path></svg>';
+                maxBtn.title = 'Restore Docked Canvas';
+            } else {
+                maxBtn.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"></path><path d="M9 21H3v-6"></path><path d="M21 3l-7 7"></path><path d="M3 21l7-7"></path></svg>';
+                maxBtn.title = 'Expand / Restore Canvas';
+            }
+        }
+        coraSyncDockedDrawerBounds();
+    }
+    window.coraToggleDockedDrawerMaximize = coraToggleDockedDrawerMaximize;
+
+    window.addEventListener('resize', coraSyncDockedDrawerBounds);
+    window.addEventListener('cora:sidebar-toggle', coraSyncDockedDrawerBounds);
+    if (window.MutationObserver) {
+        var _coraCanvasSidebarObserver = new MutationObserver(function() {
+            coraSyncDockedDrawerBounds();
+        });
+        var _sEl = document.querySelector('.cora-sidebar');
+        if (_sEl) {
+            _coraCanvasSidebarObserver.observe(_sEl, { attributes: true, attributeFilter: ['class', 'style'] });
+        }
+        _coraCanvasSidebarObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+    }
+
+    // Global Key Listener for Docked Drawers (Escape + Cmd/Ctrl+S)
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            var openDocked = document.querySelector('.cora-docked-drawer.open');
+            if (openDocked) {
+                coraCloseDockedDrawer(openDocked.id);
+            }
+        }
+        if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+            var newDrawer = document.getElementById('drawer-new-template');
+            if (newDrawer && newDrawer.classList.contains('open')) {
+                e.preventDefault();
+                saveNewTemplate();
+            }
+            var editDrawer = document.getElementById('drawer-edit-template');
+            if (editDrawer && editDrawer.classList.contains('open')) {
+                e.preventDefault();
+                saveEditTemplate();
+            }
+        }
+    });
+
+    // Drawer Sheet open & close handlers (with automatic delegation to coraOpenDockedDrawer)
+    window.coraOpenDrawerSheet = function(containerId, cardId) {
+        var container = typeof containerId === 'string' ? document.getElementById(containerId) : containerId;
+        if (!container) return;
+        if (container.classList.contains('cora-docked-drawer')) {
+            coraOpenDockedDrawer(container);
+            return;
+        }
+        var card = cardId ? (typeof cardId === 'string' ? document.getElementById(cardId) : cardId) : container.firstElementChild;
+        container.classList.remove('hidden', 'pointer-events-none', 'opacity-0');
+        container.classList.add('opacity-100', 'pointer-events-auto');
+        if (card) {
+            void card.offsetWidth;
+            card.classList.remove('translate-x-full');
+            card.classList.add('translate-x-0');
+        }
+    };
+
+    window.coraCloseDrawerSheet = function(containerId, cardId) {
+        var container = typeof containerId === 'string' ? document.getElementById(containerId) : containerId;
+        if (!container) return;
+        if (container.classList.contains('cora-docked-drawer')) {
+            coraCloseDockedDrawer(container);
+            return;
+        }
+        var card = cardId ? (typeof cardId === 'string' ? document.getElementById(cardId) : cardId) : container.firstElementChild;
+        if (card) {
+            card.classList.remove('translate-x-0');
+            card.classList.add('translate-x-full');
+        }
+        container.classList.remove('opacity-100', 'pointer-events-auto');
+        container.classList.add('opacity-0', 'pointer-events-none');
+        setTimeout(function() {
+            if (container.classList.contains('opacity-0')) {
+                container.classList.add('hidden');
+            }
+        }, 300);
+    };
 
     // --- Global Creation & Migration State ---
     var _wizStep = 1;
@@ -8468,6 +9311,7 @@ echo esc_textarea( json_encode( array(
         }
 
         // Show settings, builder, custom code and menus tabs for all themes (dynamic capability)
+        jQuery('#tab-btn-templates').show();
         jQuery('#tab-btn-settings').show();
         jQuery('#tab-btn-code').show();
         jQuery('#tab-btn-menus').show();
@@ -8538,6 +9382,7 @@ echo esc_textarea( json_encode( array(
         jQuery('#tab-btn-' + tabId).addClass('active');
 
         jQuery('#tab-content-pages').addClass('hidden');
+        jQuery('#tab-content-templates').addClass('hidden');
         jQuery('#tab-content-menus').addClass('hidden');
         jQuery('#tab-content-settings').addClass('hidden');
         jQuery('#tab-content-code').addClass('hidden');
@@ -8553,7 +9398,9 @@ echo esc_textarea( json_encode( array(
             jQuery('#tab-action-' + tabId).removeClass('hidden');
         }
 
-        if (tabId === 'menus') {
+        if (tabId === 'templates') {
+            loadThemeTemplates();
+        } else if (tabId === 'menus') {
             showMenusTabContent();
         } else if (tabId === 'nextjs-sdk') {
             if (window.switchNextJSSnippet) {
@@ -9403,7 +10250,19 @@ echo esc_textarea( json_encode( array(
         // Reset inputs
         jQuery('#new-page-title-input').val('');
         jQuery('#new-page-slug-input').val('');
-        jQuery('#new-page-template-input').val('default');
+        
+        // Populate template options dynamically from theme templates
+        const tplSelect = jQuery('#new-page-template-input');
+        tplSelect.empty();
+        tplSelect.append('<option value="default">Default Page Template (Wrap Header &amp; Footer)</option>');
+        tplSelect.append('<option value="canvas">Canvas (Standalone Clean HTML)</option>');
+        if (canvasState.themeTemplates && Array.isArray(canvasState.themeTemplates)) {
+            const pageTpls = canvasState.themeTemplates.filter(t => t.archetype === 'page' && t.slug !== 'default');
+            pageTpls.forEach(t => {
+                tplSelect.append(`<option value="${t.slug}">${t.name} (${t.slug})</option>`);
+            });
+        }
+        tplSelect.val('default');
         jQuery('#new-page-status-input').val('draft');
 
         // Reset HTML file & paste state
@@ -10618,6 +11477,527 @@ echo esc_textarea( json_encode( array(
                 });
             }
         );
+    }
+
+    // ══════════════════════════════════════════════════════════════════════════
+    // SHOPIFY-STYLE DYNAMIC TEMPLATES ENGINE CONTROLLER
+    // ══════════════════════════════════════════════════════════════════════════
+
+    const CORA_ARCHETYPE_TOKENS = {
+        article: [
+            { token: 'article.title', label: 'Article Title' },
+            { token: 'article.content', label: 'Body Content' },
+            { token: 'article.excerpt', label: 'Short Excerpt' },
+            { token: 'article.featured_image', label: 'Featured Image' },
+            { token: 'article.author', label: 'Author Name' },
+            { token: 'article.published_date', label: 'Published Date' },
+            { token: 'article.read_time', label: 'Read Time' },
+            { token: 'cora_form_embed', label: 'Lead Form Embed' },
+            { token: 'current_year', label: 'Current Year' }
+        ],
+        page: [
+            { token: 'page.title', label: 'Page Title' },
+            { token: 'page.subtitle', label: 'Subtitle / SEO' },
+            { token: 'page.content', label: 'Page Content' },
+            { token: 'cora_form_embed', label: 'Lead Form Embed' },
+            { token: 'current_year', label: 'Current Year' }
+        ],
+        policy: [
+            { token: 'entity.title', label: 'Policy Title' },
+            { token: 'entity.content', label: 'Legal Terms Body' },
+            { token: 'entity.effective_date', label: 'Effective Date' },
+            { token: 'entity.version', label: 'Version Number' },
+            { token: 'entity.jurisdiction', label: 'Legal Jurisdiction' },
+            { token: 'current_year', label: 'Current Year' }
+        ],
+        product: [
+            { token: 'entity.title', label: 'Package Name' },
+            { token: 'entity.description', label: 'Package Description' },
+            { token: 'entity.price', label: 'Price Amount' },
+            { token: 'entity.gst_rate', label: 'GST Rate' },
+            { token: 'entity.content', label: 'Specs & Inclusions' },
+            { token: 'cora_form_embed', label: 'Booking Form Embed' }
+        ],
+        collection: [
+            { token: 'entity.title', label: 'Collection Name' },
+            { token: 'entity.content', label: 'Card Grid / Items Loop' },
+            { token: 'current_year', label: 'Current Year' }
+        ]
+    };
+
+    let activeTemplateFilter = 'all';
+
+    function setTemplateFilter(archetype) {
+        activeTemplateFilter = archetype;
+        jQuery('#templates-archetype-pills .tpl-filter-btn').removeClass('bg-zinc-900 text-white').addClass('text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100');
+        jQuery(`#templates-archetype-pills [data-archetype="${archetype}"]`).addClass('bg-zinc-900 text-white').removeClass('text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100');
+        renderThemeTemplatesGrid();
+    }
+    window.setTemplateFilter = setTemplateFilter;
+
+    function filterTemplatesGrid() {
+        renderThemeTemplatesGrid();
+    }
+    window.filterTemplatesGrid = filterTemplatesGrid;
+
+    function loadThemeTemplates() {
+        const themeId = canvasState.activeThemeId;
+        if (!themeId) return;
+
+        const tbody = jQuery('#theme-templates-tbody');
+        tbody.html('<tr><td colspan="6" class="py-12 text-center text-zinc-400">Loading theme templates...</td></tr>');
+
+        fetch(`/wp-json/cora-canvas/v1/templates?theme_id=${themeId}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.success && Array.isArray(data.templates)) {
+                    canvasState.themeTemplates = data.templates;
+                    updateTemplateStats(data.templates);
+                    renderThemeTemplatesGrid();
+                } else {
+                    tbody.html('<tr><td colspan="6" class="py-8 text-center text-zinc-400">Failed to load templates.</td></tr>');
+                }
+            })
+            .catch(err => {
+                tbody.html('<tr><td colspan="6" class="py-8 text-center text-red-500">Error connecting to template registry.</td></tr>');
+            });
+    }
+    window.loadThemeTemplates = loadThemeTemplates;
+
+    function updateTemplateStats(templates) {
+        const total = templates.length;
+        const articles = templates.filter(t => t.archetype === 'article').length;
+        const pages = templates.filter(t => t.archetype === 'page').length;
+        const policies = templates.filter(t => t.archetype === 'policy').length;
+        const products = templates.filter(t => t.archetype === 'product').length;
+        const collections = templates.filter(t => t.archetype === 'collection').length;
+
+        jQuery('#stat-total-templates').text(total);
+        jQuery('#stat-article-templates').text(articles);
+        jQuery('#stat-page-templates').text(pages);
+        jQuery('#stat-policy-templates').text(policies);
+        jQuery('#stat-product-templates').text(products);
+        jQuery('#stat-collection-templates').text(collections);
+    }
+
+    function renderThemeTemplatesGrid() {
+        const templates = canvasState.themeTemplates || [];
+        const tbody = jQuery('#theme-templates-tbody');
+        const query = (jQuery('#templates-search-input').val() || '').toLowerCase().trim();
+
+        let filtered = templates;
+        if (activeTemplateFilter !== 'all') {
+            filtered = filtered.filter(t => t.archetype === activeTemplateFilter);
+        }
+        if (query) {
+            filtered = filtered.filter(t => (t.name && t.name.toLowerCase().includes(query)) || (t.slug && t.slug.toLowerCase().includes(query)));
+        }
+
+        if (!filtered.length) {
+            tbody.html(`
+                <tr>
+                    <td colspan="6" class="py-12 text-center text-zinc-400 space-y-3">
+                        <p class="text-xs">No templates found matching current criteria.</p>
+                        ${!canvasState.isReadOnly ? `<button type="button" onclick="openNewTemplateDrawer('${activeTemplateFilter !== 'all' ? activeTemplateFilter : 'article'}')" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer"><svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg><span>Add Template</span></button>` : ''}
+                    </td>
+                </tr>
+            `);
+            return;
+        }
+
+        const archetypeLabels = {
+            article: { label: 'Article', bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200' },
+            page: { label: 'Page', bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200' },
+            policy: { label: 'Policy', bg: 'bg-purple-50', text: 'text-purple-700', border: 'border-purple-200' },
+            product: { label: 'Product', bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-200' },
+            collection: { label: 'Catalog', bg: 'bg-zinc-100', text: 'text-zinc-700', border: 'border-zinc-200' }
+        };
+
+        let html = '';
+        filtered.forEach(tpl => {
+            const meta = archetypeLabels[tpl.archetype] || { label: tpl.archetype, bg: 'bg-zinc-100', text: 'text-zinc-700', border: 'border-zinc-200' };
+            const isDefault = parseInt(tpl.is_default, 10) === 1 || tpl.slug === 'default';
+
+            // Detect slot tokens inside layout_data
+            const slotMatches = (tpl.layout_data || '').match(/\{\{\s*([a-zA-Z0-9_\.]+)\s*\}\}/g) || [];
+            const uniqueSlots = [...new Set(slotMatches.map(s => s.replace(/[\{\}\s]/g, '')))].filter(s => !s.startsWith('#') && !s.startsWith('/'));
+            const slotsPreview = uniqueSlots.slice(0, 3).map(s => `<span class="px-1.5 py-0.5 rounded text-[9px] font-mono bg-zinc-100 text-zinc-600 border border-zinc-200">{{ ${s} }}</span>`).join(' ');
+            const remainingCount = uniqueSlots.length > 3 ? `<span class="text-[9px] font-mono text-zinc-400">+${uniqueSlots.length - 3}</span>` : '';
+
+            html += `
+                <tr class="hover:bg-zinc-50/70 transition-colors">
+                    <td class="py-3 px-4">
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${meta.bg} ${meta.text} ${meta.border}">
+                            ${meta.label}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4">
+                        <div class="font-bold text-zinc-950 text-xs">${escapeHtml(tpl.name)}</div>
+                        <div class="font-mono text-[10px] text-zinc-400 mt-0.5">${escapeHtml(tpl.slug)}</div>
+                    </td>
+                    <td class="py-3 px-4">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-zinc-100 text-zinc-700 border border-zinc-200 uppercase">
+                            ${escapeHtml(tpl.engine || 'html')}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4">
+                        ${isDefault 
+                            ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-50 text-green-700 border border-green-200">
+                                 <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Primary Default
+                               </span>`
+                            : `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-zinc-100 text-zinc-600">
+                                 Custom Variation
+                               </span>`
+                        }
+                    </td>
+                    <td class="py-3 px-4">
+                        <div class="flex items-center gap-1 flex-wrap">
+                            ${slotsPreview || '<span class="text-[10px] text-zinc-400 italic">No slot tags</span>'}
+                            ${remainingCount}
+                        </div>
+                    </td>
+                    <td class="py-3 px-4 text-right">
+                        <div class="inline-flex items-center gap-1.5 justify-end">
+                            <button type="button" onclick="openEditTemplateDrawer(${tpl.id})" class="px-2.5 py-1 text-xs font-semibold text-zinc-700 hover:text-zinc-950 bg-zinc-100 hover:bg-zinc-200 rounded-lg transition-colors cursor-pointer border border-zinc-200">
+                                Edit Blueprint
+                            </button>
+                            <button type="button" onclick="duplicateThemeTemplate(${tpl.id})" class="px-2.5 py-1 text-xs font-semibold text-zinc-700 hover:text-zinc-950 bg-zinc-100 hover:bg-zinc-200 rounded-lg transition-colors cursor-pointer border border-zinc-200" title="Duplicate template">
+                                Duplicate
+                            </button>
+                            ${!isDefault && tpl.slug !== 'default' ? `
+                                <button type="button" onclick="deleteThemeTemplate(${tpl.id}, '${escapeQuotes(tpl.name)}')" class="px-2 py-1 text-xs font-semibold text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors cursor-pointer border border-red-200" title="Delete template">
+                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                </button>
+                            ` : ''}
+                        </div>
+                    </td>
+                </tr>
+            `;
+        });
+        tbody.html(html);
+    }
+
+    function renderSlotChips(archetype, containerId, targetInputId) {
+        const tokens = CORA_ARCHETYPE_TOKENS[archetype] || CORA_ARCHETYPE_TOKENS['article'];
+        const container = jQuery(containerId);
+        container.empty();
+
+        tokens.forEach(item => {
+            const chip = jQuery(`
+                <button type="button" class="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-mono bg-white hover:bg-zinc-100 text-zinc-800 border border-zinc-200 transition-all cursor-pointer shadow-3xs" title="${item.label}">
+                    <span>{{ ${item.token} }}</span>
+                    <span class="text-[8px] text-zinc-400 font-sans">(${item.label})</span>
+                </button>
+            `);
+            chip.on('click', function(e) {
+                e.preventDefault();
+                insertSlotTag(item.token, targetInputId);
+            });
+            container.append(chip);
+        });
+    }
+
+    function insertSlotTag(token, textareaId) {
+        const textarea = document.getElementById(textareaId);
+        if (!textarea) return;
+
+        const tag = token === 'cora_form_embed' ? '{{ cora_form_embed }}' : `{{ ${token} }}`;
+        const startPos = textarea.selectionStart;
+        const endPos = textarea.selectionEnd;
+        const val = textarea.value;
+
+        textarea.value = val.substring(0, startPos) + tag + val.substring(endPos, val.length);
+        textarea.focus();
+        textarea.selectionStart = startPos + tag.length;
+        textarea.selectionEnd = startPos + tag.length;
+
+        if (window.coraShowToast) {
+            window.coraShowToast(`Inserted tag: ${tag}`, 'info');
+        }
+    }
+    window.insertSlotTag = insertSlotTag;
+
+    function autoGenerateTemplateSlug(input) {
+        const val = input.value || '';
+        const slug = val.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+        jQuery('#new-template-slug-input').val(slug);
+    }
+    window.autoGenerateTemplateSlug = autoGenerateTemplateSlug;
+
+    function setTemplateEngine(mode, engine) {
+        const prefix = mode === 'new' ? 'new' : 'edit';
+        jQuery('#' + prefix + '-template-engine-input').val(engine);
+        jQuery('#' + prefix + '-template-engine-pills button').each(function() {
+            const btnEngine = jQuery(this).data('engine');
+            if (btnEngine === engine) {
+                jQuery(this)
+                    .removeClass('text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white bg-transparent font-medium')
+                    .addClass('bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white shadow-2xs font-bold');
+            } else {
+                jQuery(this)
+                    .removeClass('bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white shadow-2xs font-bold')
+                    .addClass('text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white bg-transparent font-medium');
+            }
+        });
+    }
+    window.setTemplateEngine = setTemplateEngine;
+
+    function switchNewTemplateArchetype(arch) {
+        jQuery('#new-template-archetype-selector button').each(function() {
+            const a = jQuery(this).data('arch');
+            if (a === arch) {
+                jQuery(this)
+                    .removeClass('text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white bg-transparent font-medium')
+                    .addClass('bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white shadow-2xs font-bold');
+            } else {
+                jQuery(this)
+                    .removeClass('bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white shadow-2xs font-bold')
+                    .addClass('text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white bg-transparent font-medium');
+            }
+        });
+        jQuery('#cora-new-template-badge').text(arch.toUpperCase());
+
+        // Update Slot Chips
+        renderSlotChips(arch, '#new-template-slot-chips', 'new-template-layout-input');
+
+        // Seed with default blueprint for this archetype if available
+        const defaultTpl = (canvasState.themeTemplates || []).find(t => t.archetype === arch && (parseInt(t.is_default, 10) === 1 || t.slug === 'default'));
+        if (defaultTpl && defaultTpl.layout_data) {
+            jQuery('#new-template-layout-input').val(defaultTpl.layout_data);
+        }
+    }
+    window.switchNewTemplateArchetype = switchNewTemplateArchetype;
+
+    function openNewTemplateDrawer(defaultArchetype) {
+        if (canvasState.isReadOnly) {
+            window.coraShowToast('Read-only mode. Workspace editing disabled.', 'error');
+            return;
+        }
+
+        defaultArchetype = defaultArchetype || 'article';
+        jQuery('#new-template-name-input').val('');
+        jQuery('#new-template-slug-input').val('');
+        jQuery('#new-template-default-input').prop('checked', false);
+        setTemplateEngine('new', 'html');
+
+        switchNewTemplateArchetype(defaultArchetype);
+        coraOpenDockedDrawer('drawer-new-template');
+    }
+    window.openNewTemplateDrawer = openNewTemplateDrawer;
+
+    function closeNewTemplateDrawer() {
+        coraCloseDockedDrawer('drawer-new-template');
+    }
+    window.closeNewTemplateDrawer = closeNewTemplateDrawer;
+
+    function saveNewTemplate() {
+        const themeId = canvasState.activeThemeId;
+        const archBtn = jQuery('#new-template-archetype-selector .bg-white, #new-template-archetype-selector .font-bold[data-arch]');
+        const archetype = archBtn.data('arch') || 'article';
+        const name = (jQuery('#new-template-name-input').val() || '').trim();
+        const slug = (jQuery('#new-template-slug-input').val() || '').trim();
+        const engine = jQuery('#new-template-engine-input').val() || 'html';
+        const layoutData = jQuery('#new-template-layout-input').val();
+        const isDefault = jQuery('#new-template-default-input').is(':checked') ? 1 : 0;
+
+        if (!name || !slug) {
+            window.coraShowToast('Template name and slug are required.', 'error');
+            return;
+        }
+
+        fetch('/wp-json/cora-canvas/v1/templates', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-WP-Nonce': coraREData.nonce
+            },
+            body: JSON.stringify({
+                theme_id: themeId,
+                archetype: archetype,
+                name: name,
+                slug: slug,
+                engine: engine,
+                layout_data: layoutData,
+                is_default: isDefault
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                closeNewTemplateDrawer();
+                window.coraShowToast('Template created successfully.', 'success');
+                loadThemeTemplates();
+            } else {
+                window.coraShowToast(data.message || 'Error creating template.', 'error');
+            }
+        })
+        .catch(err => {
+            window.coraShowToast('Network error saving template.', 'error');
+        });
+    }
+    window.saveNewTemplate = saveNewTemplate;
+
+    function openEditTemplateDrawer(templateId) {
+        if (canvasState.isReadOnly) {
+            window.coraShowToast('Read-only mode. Workspace editing disabled.', 'error');
+            return;
+        }
+
+        const tpl = (canvasState.themeTemplates || []).find(t => parseInt(t.id, 10) === parseInt(templateId, 10));
+        if (!tpl) {
+            window.coraShowToast('Template record not found.', 'error');
+            return;
+        }
+
+        jQuery('#edit-template-id').val(tpl.id);
+        jQuery('#edit-template-archetype').val(tpl.archetype);
+        jQuery('#edit-template-header-title').text(tpl.name);
+        jQuery('#edit-template-header-slug').text(`${tpl.archetype}.${tpl.slug}`);
+        jQuery('#edit-template-archetype-badge').text(tpl.archetype.toUpperCase());
+        jQuery('#edit-template-name-input').val(tpl.name);
+        jQuery('#edit-template-slug-input').val(tpl.slug);
+        setTemplateEngine('edit', tpl.engine || 'html');
+        jQuery('#edit-template-layout-input').val(tpl.layout_data || '');
+        jQuery('#edit-template-default-input').prop('checked', parseInt(tpl.is_default, 10) === 1 || tpl.slug === 'default');
+
+        // If system default template, hide delete button; otherwise show
+        if (parseInt(tpl.is_default, 10) === 1 || tpl.slug === 'default') {
+            jQuery('#edit-template-delete-btn').hide();
+        } else {
+            jQuery('#edit-template-delete-btn').show();
+        }
+
+        renderSlotChips(tpl.archetype, '#edit-template-slot-chips', 'edit-template-layout-input');
+        coraOpenDockedDrawer('drawer-edit-template');
+    }
+    window.openEditTemplateDrawer = openEditTemplateDrawer;
+
+    function closeEditTemplateDrawer() {
+        coraCloseDockedDrawer('drawer-edit-template');
+    }
+    window.closeEditTemplateDrawer = closeEditTemplateDrawer;
+
+    function saveEditTemplate() {
+        const themeId = canvasState.activeThemeId;
+        const templateId = jQuery('#edit-template-id').val();
+        const archetype = jQuery('#edit-template-archetype').val();
+        const name = (jQuery('#edit-template-name-input').val() || '').trim();
+        const slug = (jQuery('#edit-template-slug-input').val() || '').trim();
+        const engine = jQuery('#edit-template-engine-input').val() || 'html';
+        const layoutData = jQuery('#edit-template-layout-input').val();
+        const isDefault = jQuery('#edit-template-default-input').is(':checked') ? 1 : 0;
+
+        if (!name) {
+            window.coraShowToast('Template name cannot be empty.', 'error');
+            return;
+        }
+
+        fetch('/wp-json/cora-canvas/v1/templates', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-WP-Nonce': coraREData.nonce
+            },
+            body: JSON.stringify({
+                theme_id: themeId,
+                archetype: archetype,
+                name: name,
+                slug: slug,
+                engine: engine,
+                layout_data: layoutData,
+                is_default: isDefault
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                closeEditTemplateDrawer();
+                window.coraShowToast('Template updated successfully.', 'success');
+                loadThemeTemplates();
+            } else {
+                window.coraShowToast(data.message || 'Error updating template.', 'error');
+            }
+        })
+        .catch(err => {
+            window.coraShowToast('Network error saving template.', 'error');
+        });
+    }
+    window.saveEditTemplate = saveEditTemplate;
+
+    function deleteCurrentEditTemplate() {
+        const templateId = jQuery('#edit-template-id').val();
+        const name = jQuery('#edit-template-name-input').val();
+        closeEditTemplateDrawer();
+        deleteThemeTemplate(templateId, name);
+    }
+    window.deleteCurrentEditTemplate = deleteCurrentEditTemplate;
+
+    function deleteThemeTemplate(templateId, name) {
+        fetch(`/wp-json/cora-canvas/v1/templates?template_id=${templateId}`, {
+            method: 'DELETE',
+            headers: {
+                'X-WP-Nonce': coraREData.nonce
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                window.coraShowToast('Template deleted successfully.', 'success');
+                loadThemeTemplates();
+            } else {
+                window.coraShowToast(data.message || 'Could not delete template.', 'error');
+            }
+        })
+        .catch(err => {
+            window.coraShowToast('Error deleting template.', 'error');
+        });
+    }
+    window.deleteThemeTemplate = deleteThemeTemplate;
+
+    function duplicateThemeTemplate(templateId) {
+        const tpl = (canvasState.themeTemplates || []).find(t => parseInt(t.id, 10) === parseInt(templateId, 10));
+        if (!tpl) return;
+
+        const copyName = `${tpl.name} (Copy)`;
+        const copySlug = `${tpl.slug}-copy-${Math.floor(Math.random() * 900 + 100)}`;
+
+        fetch('/wp-json/cora-canvas/v1/templates', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-WP-Nonce': coraREData.nonce
+            },
+            body: JSON.stringify({
+                theme_id: tpl.theme_id,
+                archetype: tpl.archetype,
+                name: copyName,
+                slug: copySlug,
+                engine: tpl.engine || 'html',
+                layout_data: tpl.layout_data || '',
+                is_default: 0
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                window.coraShowToast('Template duplicated successfully.', 'success');
+                loadThemeTemplates();
+            } else {
+                window.coraShowToast(data.message || 'Error duplicating template.', 'error');
+            }
+        })
+        .catch(err => {
+            window.coraShowToast('Error duplicating template.', 'error');
+        });
+    }
+    window.duplicateThemeTemplate = duplicateThemeTemplate;
+
+    function escapeHtml(str) {
+        return (str || '').toString().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function escapeQuotes(str) {
+        return (str || '').toString().replace(/'/g, "\\'");
     }
 
     // --- Tab 2 Menus Functions ---

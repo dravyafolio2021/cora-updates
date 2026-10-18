@@ -36,6 +36,12 @@ class Cora_OAuth_Server {
                 'category'    => 'core',
                 'level'       => 'write',
             ),
+            'offline_access' => array(
+                'label'       => 'Offline Access',
+                'description' => 'Maintain access to workspace tools when the user is not actively present.',
+                'category'    => 'core',
+                'level'       => 'read',
+            ),
             'canvas:read' => array(
                 'label'       => 'Website, Themes & Templates',
                 'description' => 'Inspect active themes, landing page templates, route maps, and source HTML.',
@@ -219,6 +225,13 @@ class Cora_OAuth_Server {
 
         $current_user = wp_get_current_user();
         $accessible_workspaces = self::get_user_workspaces( $current_user->ID );
+        $default_ws = function_exists( 'cora_get_current_agency_id' ) ? (string) cora_get_current_agency_id() : '1';
+
+        // Plan eligibility check for current workspace
+        $primary_ws = ! empty( $accessible_workspaces ) ? $accessible_workspaces[0]['id'] : $default_ws;
+        if ( function_exists( 'cora_is_workspace_mcp_eligible' ) && ! cora_is_workspace_mcp_eligible( $primary_ws ) ) {
+            return self::render_upgrade_notice_screen( $client, $current_user, $accessible_workspaces );
+        }
 
         // Handle POST form submission (Approval or Denial)
         if ( $request->get_method() === 'POST' && isset( $_POST['cora_oauth_action'] ) ) {
@@ -233,7 +246,10 @@ class Cora_OAuth_Server {
             }
 
             if ( $action === 'approve' ) {
-                $selected_workspace = sanitize_text_field( $_POST['workspace_id'] ?? '1' );
+                $selected_workspace = sanitize_text_field( $_POST['workspace_id'] ?? $default_ws );
+                if ( function_exists( 'cora_is_workspace_mcp_eligible' ) && ! cora_is_workspace_mcp_eligible( $selected_workspace ) ) {
+                    return self::render_upgrade_notice_screen( $client, $current_user, $accessible_workspaces );
+                }
                 $full_access = ! empty( $_POST['full_access'] ) && (string) $_POST['full_access'] === '1';
 
                 $selected_scopes = ( isset( $_POST['scopes'] ) && is_array( $_POST['scopes'] ) && ! empty( $_POST['scopes'] ) )
@@ -256,7 +272,7 @@ class Cora_OAuth_Server {
                     }
                 }
                 if ( ! $workspace_valid ) {
-                    $selected_workspace = ! empty( $accessible_workspaces ) ? $accessible_workspaces[0]['id'] : '1';
+                    $selected_workspace = ! empty( $accessible_workspaces ) ? $accessible_workspaces[0]['id'] : $default_ws;
                 }
 
                 // Issue authorization code
@@ -363,6 +379,14 @@ class Cora_OAuth_Server {
                 return new WP_REST_Response( array( 'error' => 'invalid_grant', 'error_description' => 'Invalid or expired authorization code.' ), 400 );
             }
 
+            // Check plan eligibility (Paid Workspaces Only)
+            if ( function_exists( 'cora_is_workspace_mcp_eligible' ) && ! cora_is_workspace_mcp_eligible( $code_record->workspace_id ) ) {
+                return new WP_REST_Response( array(
+                    'error'             => 'insufficient_scope',
+                    'error_description' => 'Plan upgrade required: The Model Context Protocol (MCP) and Developer Gateway is restricted to Professional and Scale workspaces.',
+                ), 403 );
+            }
+
             if ( strtotime( $code_record->expires_at ) < time() ) {
                 $wpdb->update( $table_codes, array( 'used' => 1 ), array( 'code' => $code ) );
                 return new WP_REST_Response( array( 'error' => 'invalid_grant', 'error_description' => 'Authorization code has expired.' ), 400 );
@@ -421,12 +445,19 @@ class Cora_OAuth_Server {
                 'created_at'         => gmdate( 'Y-m-d H:i:s', $now ),
             ) );
 
+            $raw_scopes = $code_record->scopes ?? '';
+            $scopes_arr = array_filter( explode( ' ', str_replace( '*', '', $raw_scopes ) ) );
+            if ( empty( $scopes_arr ) ) {
+                $scopes_arr = array_keys( self::get_supported_scopes() );
+            }
+            $clean_scopes = implode( ' ', array_unique( $scopes_arr ) );
+
             return new WP_REST_Response( array(
                 'access_token'  => $access_token,
                 'token_type'    => 'Bearer',
                 'expires_in'    => self::ACCESS_TOKEN_EXPIRY_SECONDS,
                 'refresh_token' => $refresh_token,
-                'scope'         => $code_record->scopes,
+                'scope'         => $clean_scopes,
                 'workspace_id'  => $code_record->workspace_id,
             ), 200 );
         }
@@ -445,6 +476,14 @@ class Cora_OAuth_Server {
                 return new WP_REST_Response( array( 'error' => 'invalid_grant', 'error_description' => 'Refresh token is invalid or expired.' ), 400 );
             }
 
+            // Check plan eligibility (Paid Workspaces Only)
+            if ( function_exists( 'cora_is_workspace_mcp_eligible' ) && ! cora_is_workspace_mcp_eligible( $token_row->workspace_id ) ) {
+                return new WP_REST_Response( array(
+                    'error'             => 'insufficient_scope',
+                    'error_description' => 'Plan upgrade required: The Model Context Protocol (MCP) and Developer Gateway is restricted to Professional and Scale workspaces.',
+                ), 403 );
+            }
+
             // Rotate access and refresh tokens
             $new_access_token  = 'cora_mcp_at_' . bin2hex( wp_generate_password( 32, false ) );
             $new_refresh_token = 'cora_mcp_rt_' . bin2hex( wp_generate_password( 32, false ) );
@@ -461,12 +500,19 @@ class Cora_OAuth_Server {
                 'last_used_at'       => gmdate( 'Y-m-d H:i:s', $now ),
             ), array( 'id' => $token_row->id ) );
 
+            $raw_rt_scopes = $token_row->scopes ?? '';
+            $rt_scopes_arr = array_filter( explode( ' ', str_replace( '*', '', $raw_rt_scopes ) ) );
+            if ( empty( $rt_scopes_arr ) ) {
+                $rt_scopes_arr = array_keys( self::get_supported_scopes() );
+            }
+            $clean_rt_scopes = implode( ' ', array_unique( $rt_scopes_arr ) );
+
             return new WP_REST_Response( array(
                 'access_token'  => $new_access_token,
                 'token_type'    => 'Bearer',
                 'expires_in'    => self::ACCESS_TOKEN_EXPIRY_SECONDS,
                 'refresh_token' => $new_refresh_token,
-                'scope'         => $token_row->scopes,
+                'scope'         => $clean_rt_scopes,
                 'workspace_id'  => $token_row->workspace_id,
             ), 200 );
         }
@@ -560,6 +606,14 @@ class Cora_OAuth_Server {
                 $target_workspace_id = '1';
             }
 
+            // Check plan eligibility (Paid Workspaces Only)
+            if ( function_exists( 'cora_is_workspace_mcp_eligible' ) && ! cora_is_workspace_mcp_eligible( $target_workspace_id ) ) {
+                return new WP_REST_Response( array(
+                    'error'             => 'insufficient_scope',
+                    'error_description' => 'Plan upgrade required: The Model Context Protocol (MCP) and Developer Gateway is restricted to Professional and Scale workspaces.',
+                ), 403 );
+            }
+
             // Resolve associated user_id (workspace owner or super admin)
             $user_id = 1;
             if ( function_exists( 'cora_get_workspace_owner_user_ids' ) ) {
@@ -609,7 +663,7 @@ class Cora_OAuth_Server {
                 'token_type'    => 'Bearer',
                 'expires_in'    => self::ACCESS_TOKEN_EXPIRY_SECONDS,
                 'refresh_token' => $refresh_token,
-                'scope'         => $scope_string,
+                'scope'         => implode( ' ', $supported_scopes ),
                 'workspace_id'  => (string) $target_workspace_id,
             ), 200 );
         }
@@ -663,7 +717,10 @@ class Cora_OAuth_Server {
             'workspace_id'   => (string) $auth['workspace_id'],
             'workspace_name' => $workspace_name,
             'client_name'    => $auth['client_name'],
-            'scopes'         => $auth['scopes'],
+            'scopes'         => array_values( array_diff( (array) ( $auth['scopes'] ?? array() ), array( '*' ) ) ),
+            'installed'      => true,
+            'status'         => 'installed',
+            'app_id'         => 'cla',
         ), 200 );
     }
 
@@ -1223,11 +1280,14 @@ class Cora_OAuth_Server {
         if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $table_clients ) ) {
             $client = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table_clients} WHERE client_id = %s", $client_id ) );
             if ( $client ) {
-                if ( ( strpos( $lower_id, 'cora_gemini_client' ) === 0 || strpos( $lower_id, 'cora_client_ws_' ) === 0 || strpos( $lower_id, 'gemini' ) !== false ) && ( empty( $client->client_name ) || $client->client_name === 'AI Assistant' ) ) {
-                    $client->client_name = 'Google Gemini';
-                } elseif ( ( strpos( $lower_id, 'cora_claude_client' ) === 0 || strpos( $lower_id, 'claude' ) !== false || strpos( $lower_id, 'anthropic' ) !== false ) && ( empty( $client->client_name ) || $client->client_name === 'AI Assistant' ) ) {
+                $client_rec_name = strtolower( (string) ( $client->client_name ?? '' ) );
+                if ( ( strpos( $lower_id, 'claude' ) !== false || strpos( $lower_id, 'anthropic' ) !== false || strpos( $lower_id, 'cora_claude_client' ) === 0 || strpos( $client_rec_name, 'claude' ) !== false ) && ( empty( $client->client_name ) || $client->client_name === 'AI Assistant' ) ) {
                     $client->client_name = 'Claude';
-                } elseif ( ( strpos( $lower_id, 'cora_chatgpt_client' ) === 0 || strpos( $lower_id, 'chatgpt' ) !== false || strpos( $lower_id, 'openai' ) !== false ) && ( empty( $client->client_name ) || $client->client_name === 'AI Assistant' ) ) {
+                } elseif ( ( strpos( $lower_id, 'cora_cla_client' ) === 0 || strpos( $lower_id, 'cla' ) !== false || strpos( $client_rec_name, 'cla' ) !== false ) && ( empty( $client->client_name ) || $client->client_name === 'AI Assistant' || $client->client_name === 'cla' ) ) {
+                    $client->client_name = 'CLA';
+                } elseif ( ( strpos( $lower_id, 'cora_gemini_client' ) === 0 || strpos( $lower_id, 'cora_client_ws_' ) === 0 || strpos( $lower_id, 'gemini' ) !== false || strpos( $client_rec_name, 'gemini' ) !== false ) && ( empty( $client->client_name ) || $client->client_name === 'AI Assistant' ) ) {
+                    $client->client_name = 'Google Gemini';
+                } elseif ( ( strpos( $lower_id, 'cora_chatgpt_client' ) === 0 || strpos( $lower_id, 'chatgpt' ) !== false || strpos( $lower_id, 'openai' ) !== false || strpos( $client_rec_name, 'chatgpt' ) !== false ) && ( empty( $client->client_name ) || $client->client_name === 'AI Assistant' ) ) {
                     $client->client_name = 'ChatGPT';
                 }
                 return $client;
@@ -1236,6 +1296,7 @@ class Cora_OAuth_Server {
 
         // Dynamic fallback for recognized clients & CIMD URLs
         $names = array(
+            'cla'     => 'CLA',
             'chatgpt' => 'ChatGPT',
             'claude'  => 'Claude',
             'gemini'  => 'Google Gemini',
@@ -1245,8 +1306,10 @@ class Cora_OAuth_Server {
             'generic' => 'Generic MCP Client',
         );
 
-        if ( strpos( $lower_id, 'cora_claude_client' ) === 0 || strpos( $lower_id, 'claude' ) !== false || strpos( $lower_id, 'anthropic' ) !== false ) {
+        if ( strpos( $lower_id, 'claude' ) !== false || strpos( $lower_id, 'anthropic' ) !== false || strpos( $lower_id, 'cora_claude_client' ) === 0 ) {
             $name = 'Claude';
+        } elseif ( strpos( $lower_id, 'cora_cla_client' ) === 0 || strpos( $lower_id, 'cla_client' ) !== false || $lower_id === 'cla' || strpos( $lower_id, 'cla' ) !== false ) {
+            $name = 'CLA';
         } elseif ( strpos( $lower_id, 'cora_chatgpt_client' ) === 0 || strpos( $lower_id, 'chatgpt' ) !== false || strpos( $lower_id, 'openai' ) !== false ) {
             $name = 'ChatGPT';
         } elseif ( strpos( $lower_id, 'cora_gemini_client' ) === 0 || strpos( $lower_id, 'cora_client_ws_' ) === 0 || $lower_id === 'gemini' || strpos( $lower_id, 'gemini' ) !== false ) {
@@ -1310,17 +1373,77 @@ class Cora_OAuth_Server {
      * Get accessible workspaces for a user
      */
     public static function get_user_workspaces( $user_id ) {
+        global $wpdb;
         $workspaces = array();
+        $table_agencies = $wpdb->prefix . 'cora_agencies';
 
-        if ( function_exists( 'cora_get_user_accessible_agencies' ) ) {
-            $agencies = cora_get_user_accessible_agencies( $user_id );
-            if ( ! empty( $agencies ) ) {
-                foreach ( $agencies as $agency ) {
+        $user = get_userdata( $user_id );
+        $user_roles = $user ? (array) $user->roles : array();
+
+        $is_super_admin = user_can( $user_id, 'manage_options' ) ||
+            in_array( 'administrator', $user_roles, true ) ||
+            in_array( 'cora_super_admin', $user_roles, true ) ||
+            ( function_exists( 'cora_is_super_owner' ) && cora_is_super_owner( $user_id ) );
+
+        $rows = array();
+        if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $table_agencies ) ) {
+            if ( $is_super_admin ) {
+                $rows = $wpdb->get_results( "SELECT id, name, slug, plan FROM {$table_agencies} WHERE status = 'active' ORDER BY id ASC", ARRAY_A );
+                if ( empty( $rows ) ) {
+                    $rows = $wpdb->get_results( "SELECT id, name, slug, plan FROM {$table_agencies} ORDER BY id ASC", ARRAY_A );
+                }
+            } else {
+                $meta_agency = get_user_meta( $user_id, 'cora_agency_id', true );
+                if ( is_array( $meta_agency ) ) {
+                    $meta_agency = reset( $meta_agency );
+                }
+                $meta_slug = is_string( $meta_agency ) ? sanitize_text_field( $meta_agency ) : '';
+                $meta_id   = is_numeric( $meta_agency ) ? intval( $meta_agency ) : 0;
+                if ( empty( $meta_id ) && ! empty( $meta_slug ) && function_exists( 'cora_db_get_agency_id_by_slug' ) ) {
+                    $meta_id = intval( cora_db_get_agency_id_by_slug( $meta_slug ) );
+                }
+
+                $rows = $wpdb->get_results( $wpdb->prepare(
+                    "SELECT id, name, slug, plan FROM {$table_agencies} 
+                     WHERE (owner_user_id = %d OR slug = %s OR id = %d) 
+                       AND (status = 'active' OR status IS NULL OR status = '') 
+                     ORDER BY id ASC",
+                    $user_id,
+                    $meta_slug,
+                    $meta_id
+                ), ARRAY_A );
+            }
+        }
+
+        $seen_ids = array();
+        if ( ! empty( $rows ) && is_array( $rows ) ) {
+            foreach ( $rows as $row ) {
+                $row_id = (string) $row['id'];
+                if ( ! in_array( $row_id, $seen_ids, true ) ) {
+                    $seen_ids[] = $row_id;
                     $workspaces[] = array(
-                        'id'   => (string) $agency->id,
-                        'name' => $agency->name ?: ( 'Workspace #' . $agency->id ),
-                        'slug' => $agency->slug ?: ( 'ws-' . $agency->id ),
+                        'id'   => $row_id,
+                        'name' => ! empty( $row['name'] ) ? $row['name'] : ( 'Workspace #' . $row['id'] ),
+                        'slug' => ! empty( $row['slug'] ) ? $row['slug'] : ( 'ws-' . $row['id'] ),
+                        'plan' => ! empty( $row['plan'] ) ? $row['plan'] : 'growth',
                     );
+                }
+            }
+        }
+
+        // If the site is a custom domain, detect active agency via cora_get_current_agency_id() and ensure it is included
+        $current_agency_id = function_exists( 'cora_get_current_agency_id' ) ? cora_get_current_agency_id() : 1;
+        if ( ! empty( $current_agency_id ) && ! in_array( (string) $current_agency_id, $seen_ids, true ) ) {
+            if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $table_agencies ) ) {
+                $cur_agency = $wpdb->get_row( $wpdb->prepare( "SELECT id, name, slug, plan FROM {$table_agencies} WHERE id = %d", intval( $current_agency_id ) ), ARRAY_A );
+                if ( $cur_agency ) {
+                    $workspaces[] = array(
+                        'id'   => (string) $cur_agency['id'],
+                        'name' => ! empty( $cur_agency['name'] ) ? $cur_agency['name'] : ( 'Workspace #' . $cur_agency['id'] ),
+                        'slug' => ! empty( $cur_agency['slug'] ) ? $cur_agency['slug'] : ( 'ws-' . $cur_agency['id'] ),
+                        'plan' => ! empty( $cur_agency['plan'] ) ? $cur_agency['plan'] : 'growth',
+                    );
+                    $seen_ids[] = (string) $current_agency_id;
                 }
             }
         }
@@ -1330,11 +1453,7 @@ class Cora_OAuth_Server {
                 'id'   => '1',
                 'name' => 'Main Workspace',
                 'slug' => 'main-workspace',
-            );
-            $workspaces[] = array(
-                'id'   => 'growth_cora_main_01',
-                'name' => 'Growth & Marketing Studio',
-                'slug' => 'growth-studio',
+                'plan' => 'growth',
             );
         }
 
@@ -1403,6 +1522,91 @@ class Cora_OAuth_Server {
     }
 
     /**
+     * Render clean monochromatic upgrade notice screen for Free tier workspaces.
+     */
+    private static function render_upgrade_notice_screen( $client, $user, $workspaces ) {
+        status_header( 403 );
+        header( 'Content-Type: text/html; charset=UTF-8' );
+        nocache_headers();
+
+        $client_name = ! empty( $client->client_name ) ? $client->client_name : 'AI Client';
+        $workspace_name = ! empty( $workspaces ) ? $workspaces[0]['name'] : 'Your Workspace';
+        ?>
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Plan Upgrade Required — Cora MCP Gateway</title>
+            <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+            <script src="https://cdn.tailwindcss.com"></script>
+            <style>
+                body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+                .font-mono { font-family: 'JetBrains Mono', monospace; }
+            </style>
+        </head>
+        <body class="bg-zinc-50 text-zinc-900 flex flex-col items-center justify-center min-h-screen p-4 sm:p-6 antialiased selection:bg-zinc-950 selection:text-white">
+            <div class="bg-white border border-zinc-200/90 rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-sm text-center space-y-6">
+                <!-- Lock Icon Tile -->
+                <div class="w-14 h-14 rounded-2xl bg-zinc-100 text-zinc-900 flex items-center justify-center mx-auto shadow-2xs border border-zinc-200/60">
+                    <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                </div>
+
+                <!-- Headline & Subtitle -->
+                <div class="space-y-2">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-medium bg-zinc-100 text-zinc-600 border border-zinc-200/60">
+                        Pro Feature Gating
+                    </span>
+                    <h1 class="text-lg font-bold text-zinc-950 tracking-tight">
+                        Plan Upgrade Required
+                    </h1>
+                    <p class="text-xs text-zinc-500 leading-relaxed max-w-md mx-auto">
+                        Connecting <span class="font-semibold text-zinc-900"><?php echo esc_html( $client_name ); ?></span> to <span class="font-semibold text-zinc-900"><?php echo esc_html( $workspace_name ); ?></span> via Model Context Protocol (MCP) requires a Professional or Scale plan.
+                    </p>
+                </div>
+
+                <!-- Plan Highlights Card -->
+                <div class="p-4 rounded-2xl border border-zinc-200/80 bg-zinc-50/70 text-left space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-zinc-950 uppercase tracking-wider">Professional Plan</span>
+                        <span class="text-xs font-mono font-bold text-zinc-900 bg-zinc-200/80 px-2 py-0.5 rounded">&#8377;1,999/mo</span>
+                    </div>
+                    <ul class="text-xs text-zinc-600 space-y-1.5">
+                        <li class="flex items-center gap-2">
+                            <svg class="w-3.5 h-3.5 text-zinc-900 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            <span>Full MCP 2.0 Server &amp; Live API Gateway</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <svg class="w-3.5 h-3.5 text-zinc-900 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            <span>Google Gemini, Claude &amp; ChatGPT Direct Integration</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <svg class="w-3.5 h-3.5 text-zinc-900 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            <span>Unlimited Workspace API Keys &amp; OAuth 2.1 Tokens</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Actions -->
+                <div class="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+                    <a href="<?php echo esc_url( home_url( '/workspace/settings?tab=billing' ) ); ?>" class="w-full sm:w-auto px-6 py-2.5 bg-zinc-950 text-white rounded-xl text-xs font-bold hover:bg-zinc-850 transition-all text-center">
+                        Upgrade Workspace
+                    </a>
+                    <a href="<?php echo esc_url( home_url( '/workspace/dashboard' ) ); ?>" class="w-full sm:w-auto px-5 py-2.5 bg-zinc-100 text-zinc-700 rounded-xl text-xs font-semibold hover:bg-zinc-200 transition-colors border border-zinc-200/80 text-center">
+                        Return to Dashboard
+                    </a>
+                </div>
+            </div>
+        </body>
+        </html>
+        <?php
+        exit;
+    }
+
+    /**
      * Render Monochromatic Consent Screen
      */
     private static function render_consent_screen( $client, $user, $workspaces, $scope_param, $redirect_uri, $state, $challenge, $challenge_method ) {
@@ -1411,8 +1615,19 @@ class Cora_OAuth_Server {
         nocache_headers();
 
         $supported_scopes = self::get_supported_scopes();
+        $current_agency_id = function_exists( 'cora_get_current_agency_id' ) ? (string) cora_get_current_agency_id() : '1';
+
         $selected_workspace_name = ! empty( $workspaces ) ? $workspaces[0]['name'] : 'Workspace';
         $selected_workspace_id   = ! empty( $workspaces ) ? $workspaces[0]['id'] : '1';
+
+        // Pre-select current active workspace on current domain if available
+        foreach ( $workspaces as $ws ) {
+            if ( (string) $ws['id'] === (string) $current_agency_id ) {
+                $selected_workspace_id   = (string) $ws['id'];
+                $selected_workspace_name = $ws['name'];
+                break;
+            }
+        }
 
         $client_name = ! empty( $client->client_name ) ? $client->client_name : 'AI Client';
         $lower_ident = strtolower( (string) $client->client_id . ' ' . $client_name );
@@ -1525,7 +1740,7 @@ class Cora_OAuth_Server {
                             <label class="block text-xs font-semibold text-zinc-700 mb-1.5">Workspace</label>
                             <select name="workspace_id" id="cora-workspace-select" onchange="onWorkspaceChanged(this)" class="w-full bg-zinc-50 hover:bg-zinc-100/70 border border-zinc-200 rounded-xl px-3.5 py-2.5 text-xs text-zinc-900 font-medium focus:bg-white focus:outline-none focus:border-zinc-400 transition-colors cursor-pointer">
                                 <?php foreach ( $workspaces as $ws ) : ?>
-                                    <option value="<?php echo esc_attr( $ws['id'] ); ?>"><?php echo esc_html( $ws['name'] ); ?> (<?php echo esc_html( $ws['slug'] ); ?>)</option>
+                                    <option value="<?php echo esc_attr( $ws['id'] ); ?>" <?php selected( (string) $ws['id'], (string) $selected_workspace_id ); ?>><?php echo esc_html( $ws['name'] ); ?> (<?php echo esc_html( $ws['slug'] ); ?>)</option>
                                 <?php endforeach; ?>
                             </select>
                         </div>

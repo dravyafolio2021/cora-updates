@@ -153,8 +153,9 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
     </button>
 
     <div class="ml-auto flex items-center pl-2 sm:pl-3 shrink-0 cora-sub-tabs-extra">
+        <?php if ( function_exists('cora_is_workspace_mcp_eligible') && cora_is_workspace_mcp_eligible() ) : ?>
         <button type="button" 
-                id="cora-btn-ai-mcp-gateway"
+                id="cora-btn-ai-mcp-gateway" 
                 class="cora-ai-alive-btn select-none" 
                 onclick="coraOpenWorkspaceDeveloperGateway()" 
                 title="Workspace Model Context Protocol (MCP) &amp; Developer Gateway">
@@ -166,6 +167,7 @@ $avg_seo = $total_articles > 0 ? round($seo_sum / $total_articles) : 75;
             </svg>
             <span class="whitespace-nowrap font-semibold">MCP</span>
         </button>
+        <?php endif; ?>
     </div>
 </div>
 

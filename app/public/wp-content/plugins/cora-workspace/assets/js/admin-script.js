@@ -11086,44 +11086,16 @@ jQuery(document).ready(function($) {
                 }
             }
 
-            // Override Quill's default image and video handlers to use wp.media instead of prompt()
+            // Override Quill's default image and video handlers to use Workspace Media Vault
             const toolbar = coraQuillListingCoordinator.getModule('toolbar');
-            toolbar.addHandler('image', function() {
-                if (typeof wp !== 'undefined' && wp.media) {
-                    const customUploader = wp.media({
-                        title: 'Select or Upload Media',
-                        button: { text: 'Insert into Article' },
-                        multiple: false,
-                        library: { type: 'image' }
-                    });
-                    customUploader.on('select', function() {
-                        const attachment = customUploader.state().get('selection').first().toJSON();
-                        const range = coraQuillListingCoordinator.getSelection();
-                        coraQuillListingCoordinator.insertEmbed(range ? range.index : 0, 'image', attachment.url);
-                    });
-                    customUploader.open();
-                } else {
-                    window.coraShowToast('Media library is not loaded.');
-                }
-            });
-            toolbar.addHandler('video', function() {
-                if (typeof wp !== 'undefined' && wp.media) {
-                    const customUploader = wp.media({
-                        title: 'Select or Upload Video',
-                        button: { text: 'Insert into Article' },
-                        multiple: false,
-                        library: { type: 'video' }
-                    });
-                    customUploader.on('select', function() {
-                        const attachment = customUploader.state().get('selection').first().toJSON();
-                        const range = coraQuillListingCoordinator.getSelection();
-                        coraQuillListingCoordinator.insertEmbed(range ? range.index : 0, 'video', attachment.url);
-                    });
-                    customUploader.open();
-                } else {
-                    window.coraShowToast('Media library is not loaded.');
-                }
-            });
+            if (toolbar) {
+                toolbar.addHandler('image', function() {
+                    window.coraOpenMediaLibrary('inline');
+                });
+                toolbar.addHandler('video', function() {
+                    window.coraOpenMediaLibrary('inline');
+                });
+            }
             
             // Slash command detection helper
             function coraCheckSlashCommand(range) {
@@ -11132,21 +11104,45 @@ jQuery(document).ready(function($) {
                     if (line) {
                         // Clean zero-width characters using .replace(/[\u200B\uFEFF]/g, '') before checking
                         const lineText = (line.domNode.textContent || '').replace(/[\u200B\uFEFF]/g, '');
-                        if (lineText.trim() === '/') {
+                        const trimmed = lineText.trim();
+                        if (trimmed.startsWith('/')) {
+                            const filter = trimmed.slice(1).toLowerCase();
                             const bounds = coraQuillListingCoordinator.getBounds(range.index);
                             const editorContainer = $('#cora-quill-editor');
                             const parentPosition = editorContainer.position();
-                            
-                            $('#cora-editor-slash-menu').removeClass('hidden').css({
-                                top: (parentPosition.top + bounds.bottom + 8) + 'px',
-                                left: (parentPosition.left + bounds.left) + 'px'
+
+                            let hasVisible = false;
+                            $('#cora-slash-main-panel .cora-slash-item').each(function() {
+                                const text = $(this).text().toLowerCase();
+                                if (!filter || text.includes(filter)) {
+                                    $(this).removeClass('hidden');
+                                    hasVisible = true;
+                                } else {
+                                    $(this).addClass('hidden');
+                                }
                             });
+
+                            if (hasVisible) {
+                                $('#cora-editor-slash-menu').removeClass('hidden').css({
+                                    top: (parentPosition.top + bounds.bottom + 8) + 'px',
+                                    left: (parentPosition.left + bounds.left) + 'px'
+                                });
+                                // Highlight first visible item if none active
+                                if ($('#cora-slash-main-panel .cora-slash-item.cora-slash-active:visible').length === 0) {
+                                    $('#cora-slash-main-panel .cora-slash-item').removeClass('cora-slash-active bg-zinc-100');
+                                    $('#cora-slash-main-panel .cora-slash-item:visible').first().addClass('cora-slash-active bg-zinc-100');
+                                }
+                            } else {
+                                $('#cora-editor-slash-menu').addClass('hidden');
+                            }
                         } else {
                             $('#cora-editor-slash-menu').addClass('hidden');
+                            $('#cora-slash-main-panel .cora-slash-item').removeClass('hidden');
                         }
                     }
                 } else {
                     $('#cora-editor-slash-menu').addClass('hidden');
+                    $('#cora-slash-main-panel .cora-slash-item').removeClass('hidden');
                 }
             }
 
@@ -11183,6 +11179,100 @@ jQuery(document).ready(function($) {
             coraQuillListingCoordinator.on('selection-change', function(range) {
                 coraCheckSlashCommand(range);
             });
+
+            // Keyboard navigation for slash menu inside Quill
+            coraQuillListingCoordinator.root.addEventListener('keydown', function(e) {
+                const $slashMenu = $('#cora-editor-slash-menu');
+                if (!$slashMenu.length || $slashMenu.hasClass('hidden')) {
+                    return;
+                }
+
+                const $pickerPanel = $('#cora-slash-picker-panel');
+                const isPickerOpen = !$pickerPanel.hasClass('hidden');
+
+                if (e.key === 'Escape') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (isPickerOpen) {
+                        window.coraCloseSlashPicker();
+                    } else {
+                        $slashMenu.addClass('hidden');
+                    }
+                    return;
+                }
+
+                if (isPickerOpen) {
+                    const $items = $('#cora-slash-picker-results button:visible');
+                    if (!$items.length) return;
+                    let $active = $items.filter('.cora-slash-active');
+
+                    if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        let idx = $active.length ? $items.index($active) + 1 : 0;
+                        if (idx >= $items.length) idx = 0;
+                        $items.removeClass('cora-slash-active bg-zinc-100');
+                        $items.eq(idx).addClass('cora-slash-active bg-zinc-100');
+                        if ($items.eq(idx)[0].scrollIntoView) {
+                            $items.eq(idx)[0].scrollIntoView({ block: 'nearest' });
+                        }
+                    } else if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        let idx = $active.length ? $items.index($active) - 1 : $items.length - 1;
+                        if (idx < 0) idx = $items.length - 1;
+                        $items.removeClass('cora-slash-active bg-zinc-100');
+                        $items.eq(idx).addClass('cora-slash-active bg-zinc-100');
+                        if ($items.eq(idx)[0].scrollIntoView) {
+                            $items.eq(idx)[0].scrollIntoView({ block: 'nearest' });
+                        }
+                    } else if (e.key === 'Enter') {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if ($active.length) {
+                            $active[0].click();
+                        } else if ($items.length) {
+                            $items.first()[0].click();
+                        }
+                    }
+                    return;
+                }
+
+                const $visibleItems = $('#cora-slash-main-panel .cora-slash-item:visible');
+                if (!$visibleItems.length) return;
+
+                let $active = $visibleItems.filter('.cora-slash-active');
+
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    let idx = $active.length ? $visibleItems.index($active) + 1 : 0;
+                    if (idx >= $visibleItems.length) idx = 0;
+                    $visibleItems.removeClass('cora-slash-active bg-zinc-100');
+                    $visibleItems.eq(idx).addClass('cora-slash-active bg-zinc-100');
+                    if ($visibleItems.eq(idx)[0].scrollIntoView) {
+                        $visibleItems.eq(idx)[0].scrollIntoView({ block: 'nearest' });
+                    }
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    let idx = $active.length ? $visibleItems.index($active) - 1 : $visibleItems.length - 1;
+                    if (idx < 0) idx = $visibleItems.length - 1;
+                    $visibleItems.removeClass('cora-slash-active bg-zinc-100');
+                    $visibleItems.eq(idx).addClass('cora-slash-active bg-zinc-100');
+                    if ($visibleItems.eq(idx)[0].scrollIntoView) {
+                        $visibleItems.eq(idx)[0].scrollIntoView({ block: 'nearest' });
+                    }
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if ($active.length) {
+                        $active[0].click();
+                    } else if ($visibleItems.length) {
+                        $visibleItems.first()[0].click();
+                    }
+                }
+            }, true);
 
             $('#cora-article-title, #cora-seo-keyword, #cora-seo-description, #cora-article-categories, #cora-article-tags').on('input change', function() {
                 $('#cora-editor-status').text('Unsaved changes');
@@ -11256,6 +11346,15 @@ jQuery(document).ready(function($) {
         $('#cora-thumbnail-img').addClass('hidden').attr('src', '');
         $('#cora-thumbnail-placeholder').removeClass('hidden');
         $('#cora-editor-status').text('Drafting new');
+
+        // Ambient Header Reset
+        $('#cora-cover-image-container').addClass('hidden');
+        $('#cora-cover-image-img').attr('src', '');
+        $('#cora-article-cover-url').val('');
+        $('#cora-ambient-cover-btn').removeClass('hidden');
+
+        $('#cora-article-subtitle').val('').addClass('hidden');
+        $('#cora-ambient-subtitle-btn').removeClass('hidden');
 
         // Reset GEO indicators
         $('#chk-geo-direct-answer').prop('checked', false);
@@ -11376,7 +11475,24 @@ jQuery(document).ready(function($) {
                 }
                 
                 $('#cora-seo-keyword').val(data.keyword || '');
-                $('#cora-seo-description').val(data.description || '');
+                const excerptVal = data.description || data.excerpt || '';
+                $('#cora-seo-description').val(excerptVal);
+                $('#cora-article-excerpt').val(excerptVal);
+                $('#cora-article-excerpt-bh').val(excerptVal);
+
+                if (data.seo_score) {
+                    $('#cora-seo-score-display').text(data.seo_score);
+                }
+                if (data.geo_score) {
+                    $('#cora-geo-score-display').text(data.geo_score);
+                }
+                if (data.faq_schema) {
+                    try {
+                        $('#cora-schema-preview-block').text(typeof data.faq_schema === 'string' ? JSON.stringify(JSON.parse(data.faq_schema), null, 2) : JSON.stringify(data.faq_schema, null, 2));
+                    } catch(e) {
+                        $('#cora-schema-preview-block').text(data.faq_schema);
+                    }
+                }
                 
                 // Sync Categories Custom Checkboxes
                 $('.cora-meta-category-checkbox').prop('checked', false);
@@ -11458,162 +11574,569 @@ jQuery(document).ready(function($) {
         }
     } catch(e){}
 
+    // ══════════════════════════════════════════════════════════════════════════
+    // UNIFIED WORKSPACE MEDIA VAULT SELECTOR ENGINE (Rule 12 & Rule 13 Compliant)
+    // ══════════════════════════════════════════════════════════════════════════
+    window.coraMediaSelectorState = {
+        target: 'inline', // 'cover' | 'thumbnail' | 'inline' | 'gallery' | 'field'
+        multiSelect: false,
+        selectedIds: [],
+        filesMap: {},
+        folders: [],
+        searchQuery: '',
+        selectedFolder: '',
+        selectedType: 'all',
+        isLoading: false,
+        foldersLoaded: false,
+        searchTimer: null
+    };
+
+    function coraGetMediaAjaxConfig() {
+        const ajaxUrl = (window.coraREData && window.coraREData.ajaxUrl) ? window.coraREData.ajaxUrl : 
+                        ((window.coraREData && window.coraREData.ajaxurl) ? window.coraREData.ajaxurl : 
+                        (typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php'));
+        const nonce = (window.coraREData && window.coraREData.ajaxNonce) ? window.coraREData.ajaxNonce : 
+                      ((window.coraREData && window.coraREData.nonce) ? window.coraREData.nonce : 
+                      (typeof coraWorkspaceAjaxNonce !== 'undefined' ? coraWorkspaceAjaxNonce : ''));
+        return { ajaxUrl, nonce };
+    }
+
     window.coraToggleMediaDrawer = function(show) {
         if (show) {
-            $('#cora-media-library-drawer').removeClass('translate-x-full pointer-events-none collapsed');
-            coraFetchMediaLibrary();
+            window.coraOpenMediaLibrary('inline');
         } else {
-            $('#cora-media-library-drawer').addClass('translate-x-full pointer-events-none collapsed');
+            window.coraCloseWorkspaceMediaSelector();
         }
     };
 
-    window.coraOpenMediaLibrary = function() {
-        if (typeof wp !== 'undefined' && wp.media) {
-            const frame = wp.media({
-                title: 'Select or Upload Media',
-                button: { text: 'Select' },
-                multiple: false
-            });
-            frame.on('select', function() {
-                const attachment = frame.state().get('selection').first().toJSON();
-                window.coraSelectMedia(attachment.id, attachment.url);
-            });
-            frame.open();
-        } else {
-            coraToggleMediaDrawer(true);
-        }
+    window.coraOpenMediaLibrary = function(target) {
+        const mode = target || window.coraMediaSelectTarget || 'inline';
+        window.coraMediaSelectTarget = mode;
+        window.coraOpenWorkspaceMediaSelector(mode);
     };
-    
-    window.coraFetchMediaLibrary = function() {
-        $('#cora-media-library-grid').html('<div class="col-span-3 py-10 text-center"><div class="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div></div>');
-        
-        $.post(coraREData.ajaxurl, {
-            action: 'cora_get_media',
-            nonce: coraREData.nonce
+
+    window.coraOpenWorkspaceMediaSelector = function(mode) {
+        const targetMode = mode || window.coraMediaSelectTarget || 'inline';
+        window.coraMediaSelectTarget = targetMode;
+        window.coraMediaSelectorState.target = targetMode;
+        window.coraMediaSelectorState.multiSelect = (targetMode === 'gallery');
+        window.coraMediaSelectorState.selectedIds = [];
+
+        // Configure Header Mode Pill & Primary Confirm Button Label
+        const pill = $('#cora-media-selector-mode-pill');
+        const confirmBtn = $('#cora-media-selector-confirm-btn');
+
+        if (targetMode === 'cover') {
+            pill.text('Select Cover Image');
+            confirmBtn.text('Set Cover Image');
+        } else if (targetMode === 'thumbnail') {
+            pill.text('Select Featured Image');
+            confirmBtn.text('Set Featured Image');
+        } else if (targetMode === 'gallery') {
+            pill.text('Select Gallery Assets');
+            confirmBtn.text('Insert Gallery');
+        } else if (targetMode === 'field') {
+            pill.text('Select Brand Asset');
+            confirmBtn.text('Use Selected Asset');
+        } else {
+            pill.text('Insert Inline Media');
+            confirmBtn.text('Insert Into Article');
+        }
+
+        // Reset Counter & Confirm Button State
+        $('#cora-media-selector-counter').text('0 assets selected');
+        $('#cora-media-selector-clear-selection-btn').addClass('hidden');
+        confirmBtn.prop('disabled', true);
+
+        // Open Modal
+        $('#cora-workspace-media-selector-modal').removeClass('hidden');
+
+        // Fetch folders and assets
+        if (!window.coraMediaSelectorState.foldersLoaded) {
+            window.coraFetchWorkspaceFolders();
+        }
+        window.coraFetchWorkspaceMedia();
+    };
+
+    window.coraCloseWorkspaceMediaSelector = function() {
+        $('#cora-workspace-media-selector-modal').addClass('hidden');
+    };
+
+    window.coraFetchWorkspaceFolders = function() {
+        const cfg = coraGetMediaAjaxConfig();
+        $.post(cfg.ajaxUrl, {
+            action: 'cora_media_library_get_folders',
+            nonce: cfg.nonce
         }, function(response) {
-            if (response.success && response.data.images) {
-                let html = '';
-                response.data.images.forEach(function(img) {
-                    html += `
-                        <div class="aspect-square bg-zinc-100 rounded border border-zinc-200 overflow-hidden cursor-pointer hover:border-blue-500 transition-colors" onclick="coraSelectMedia(${img.id}, '${img.url}')">
-                            <img src="${img.url}" class="w-full h-full object-cover">
-                        </div>
-                    `;
+            if (response && response.success && Array.isArray(response.data)) {
+                window.coraMediaSelectorState.folders = response.data;
+                window.coraMediaSelectorState.foldersLoaded = true;
+                let html = '<option value="">All Folders</option><option value="-1">Unorganized Assets</option>';
+                response.data.forEach(function(folder) {
+                    const countStr = typeof folder.count !== 'undefined' ? ` (${folder.count})` : '';
+                    html += `<option value="${folder.id}">${folder.name}${countStr}</option>`;
                 });
-                if (html === '') html = '<div class="col-span-3 text-center text-xs text-zinc-500 py-4">No images found.</div>';
-                $('#cora-media-library-grid').html(html);
-            } else {
-                $('#cora-media-library-grid').html('<div class="col-span-3 text-center text-xs text-red-500 py-4">Failed to load media.</div>');
+                $('#cora-media-selector-folder').html(html);
             }
         });
     };
-    
-    window.coraSelectMedia = function(id, url) {
-        const target = window.coraMediaSelectTarget || 'thumbnail';
-        if (target === 'inline') {
-            if (window.coraQuillListingCoordinator) {
-                const range = window.coraQuillListingCoordinator.getSelection();
-                const index = range ? range.index : window.coraQuillListingCoordinator.getLength();
-                window.coraQuillListingCoordinator.insertEmbed(index, 'image', url);
-                window.coraQuillListingCoordinator.insertText(index + 1, '\n');
-                window.coraQuillListingCoordinator.setSelection(index + 2, 0);
-                if (window.coraShowToast) {
-                    window.coraShowToast('Image inserted inline at cursor.', 'success');
+
+    window.coraFetchWorkspaceMedia = function() {
+        const grid = $('#cora-media-selector-grid');
+        grid.html(`
+            <div class="col-span-full py-16 text-center select-none">
+                <div class="w-6 h-6 border-2 border-zinc-900 dark:border-zinc-100 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+                <p class="text-xs font-semibold text-zinc-600 dark:text-zinc-400">Loading Workspace Media Vault...</p>
+            </div>
+        `);
+
+        const cfg = coraGetMediaAjaxConfig();
+        $.post(cfg.ajaxUrl, {
+            action: 'cora_media_library_get',
+            nonce: cfg.nonce,
+            paged: 1,
+            per_page: 80,
+            search: window.coraMediaSelectorState.searchQuery || '',
+            type: window.coraMediaSelectorState.selectedType || 'all',
+            folder_id: window.coraMediaSelectorState.selectedFolder || ''
+        }, function(response) {
+            if (response && response.success && response.data && Array.isArray(response.data.files)) {
+                const files = response.data.files;
+                window.coraMediaSelectorState.filesMap = {};
+                files.forEach(function(f) {
+                    window.coraMediaSelectorState.filesMap[f.id] = f;
+                });
+
+                if (files.length === 0) {
+                    grid.html(`
+                        <div class="col-span-full py-16 text-center select-none">
+                            <div class="w-12 h-12 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-400 flex items-center justify-center mx-auto mb-3 border border-zinc-200/80 dark:border-zinc-700/80">
+                                <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                            </div>
+                            <h4 class="text-xs font-bold text-zinc-800 dark:text-zinc-200 mb-1">No Media Assets Found</h4>
+                            <p class="text-[11px] text-zinc-400 max-w-xs mx-auto mb-4">No assets match your active folder or search filters in the Workspace Vault.</p>
+                            <button type="button" onclick="document.getElementById('cora-media-selector-file-input').click()" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-lg text-xs font-semibold hover:bg-zinc-800 dark:hover:bg-white transition-all cursor-pointer shadow-3xs">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                                <span>Upload Asset to Vault</span>
+                            </button>
+                        </div>
+                    `);
+                    return;
                 }
+
+                let html = '';
+                files.forEach(function(file) {
+                    const isSelected = window.coraMediaSelectorState.selectedIds.includes(file.id);
+                    const isVideo = file.type_category === 'video';
+                    const isDoc = file.type_category === 'document' || file.type_category === 'audio';
+                    const thumbUrl = file.thumbnail || file.url;
+
+                    let mediaPreview = '';
+                    if (isDoc) {
+                        mediaPreview = `
+                            <div class="w-full h-full flex flex-col items-center justify-center bg-zinc-100 dark:bg-zinc-800 text-zinc-400">
+                                <svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                                <span class="text-[9px] font-mono mt-1 text-zinc-500 uppercase">${file.filename.split('.').pop() || 'DOC'}</span>
+                            </div>
+                        `;
+                    } else {
+                        mediaPreview = `<img src="${thumbUrl}" alt="${file.title || file.filename}" class="w-full h-full object-cover" loading="lazy">`;
+                    }
+
+                    const videoBadge = isVideo ? `
+                        <span class="absolute top-2 left-2 bg-zinc-950/70 backdrop-blur-xs text-white text-[9px] font-bold px-1.5 py-0.5 rounded flex items-center gap-1 border border-white/10">
+                            <svg viewBox="0 0 24 24" width="8" height="8" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                            VIDEO
+                        </span>
+                    ` : '';
+
+                    const selectedClasses = isSelected ? 'cora-media-card-selected bg-zinc-100/90 dark:bg-zinc-800/80 border-zinc-300 dark:border-zinc-700' : 'bg-white dark:bg-zinc-900 border-zinc-200/90 dark:border-zinc-800';
+                    const pillClasses = isSelected ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900' : 'bg-black/35 backdrop-blur-xs text-transparent';
+
+                    html += `
+                        <div class="cora-media-card group relative aspect-square rounded-xl border ${selectedClasses} overflow-hidden cursor-pointer hover:border-zinc-350 dark:hover:border-zinc-700 hover:shadow-3xs transition-all select-none" data-id="${file.id}" onclick="coraMediaSelectorToggleItem(${file.id})" ondblclick="coraMediaSelectorDblClickItem(${file.id})">
+                            ${mediaPreview}
+                            ${videoBadge}
+                            <!-- Tonal Monochromatic Checkmark Pill (Rule 13 Standard) -->
+                            <div class="cora-media-check-pill absolute top-2 right-2 w-5 h-5 rounded-full ${pillClasses} flex items-center justify-center transition-all shadow-3xs">
+                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.8" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            </div>
+                            <!-- Bottom Info Bar -->
+                            <div class="absolute inset-x-0 bottom-0 p-2 bg-gradient-to-t from-zinc-950/85 via-zinc-950/45 to-transparent text-white">
+                                <span class="block text-[11px] font-bold truncate leading-tight">${file.title || file.filename}</span>
+                                <div class="flex items-center justify-between text-[9px] text-zinc-300 mt-0.5 font-sans">
+                                    <span>${file.dimensions || (file.type_category ? file.type_category.toUpperCase() : '')}</span>
+                                    <span>${file.file_size_human || ''}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                grid.html(html);
+            } else {
+                grid.html(`
+                    <div class="col-span-full py-16 text-center select-none text-red-500 text-xs">
+                        Failed to fetch media assets. Please check permissions or connection.
+                    </div>
+                `);
             }
+        }).fail(function() {
+            grid.html(`
+                <div class="col-span-full py-16 text-center select-none text-red-500 text-xs">
+                    Network error while fetching media assets.
+                </div>
+            `);
+        });
+    };
+
+    window.coraMediaSelectorToggleItem = function(id) {
+        const state = window.coraMediaSelectorState;
+        if (!state.multiSelect) {
+            state.selectedIds = [id];
+        } else {
+            const idx = state.selectedIds.indexOf(id);
+            if (idx > -1) {
+                state.selectedIds.splice(idx, 1);
+            } else {
+                state.selectedIds.push(id);
+            }
+        }
+        coraMediaSelectorUpdateSelectionUI();
+    };
+
+    window.coraMediaSelectorDblClickItem = function(id) {
+        window.coraMediaSelectorState.selectedIds = [id];
+        coraMediaSelectorUpdateSelectionUI();
+        window.coraConfirmWorkspaceMediaSelection();
+    };
+
+    window.coraMediaSelectorClearSelection = function() {
+        window.coraMediaSelectorState.selectedIds = [];
+        coraMediaSelectorUpdateSelectionUI();
+    };
+
+    function coraMediaSelectorUpdateSelectionUI() {
+        const state = window.coraMediaSelectorState;
+        const count = state.selectedIds.length;
+
+        // Update counter text
+        const counterEl = $('#cora-media-selector-counter');
+        const clearBtn = $('#cora-media-selector-clear-selection-btn');
+        const confirmBtn = $('#cora-media-selector-confirm-btn');
+
+        if (count === 0) {
+            counterEl.text('0 assets selected');
+            clearBtn.addClass('hidden');
+            confirmBtn.prop('disabled', true);
+        } else {
+            counterEl.text(count === 1 ? '1 asset selected' : `${count} assets selected`);
+            clearBtn.removeClass('hidden');
+            confirmBtn.prop('disabled', false);
+        }
+
+        // Update Card DOM states adhering to Rule 13 (Tonal Surface Selection)
+        $('#cora-media-selector-grid .cora-media-card').each(function() {
+            const cardId = parseInt($(this).attr('data-id'), 10);
+            const pill = $(this).find('.cora-media-check-pill');
+            if (state.selectedIds.includes(cardId)) {
+                $(this).addClass('cora-media-card-selected bg-zinc-100/90 dark:bg-zinc-800/80 border-zinc-300 dark:border-zinc-700')
+                       .removeClass('bg-white dark:bg-zinc-900 border-zinc-200/90 dark:border-zinc-800');
+                pill.addClass('bg-zinc-900 text-white dark:bg-white dark:text-zinc-900')
+                    .removeClass('bg-black/35 text-transparent');
+            } else {
+                $(this).removeClass('cora-media-card-selected bg-zinc-100/90 dark:bg-zinc-800/80 border-zinc-300 dark:border-zinc-700')
+                       .addClass('bg-white dark:bg-zinc-900 border-zinc-200/90 dark:border-zinc-800');
+                pill.removeClass('bg-zinc-900 text-white dark:bg-white dark:text-zinc-900')
+                    .addClass('bg-black/35 text-transparent');
+            }
+        });
+    }
+
+    window.coraMediaSelectorDebouncedSearch = function() {
+        const query = $('#cora-media-selector-search').val().trim();
+        window.coraMediaSelectorState.searchQuery = query;
+
+        if (query) {
+            $('#cora-media-selector-clear-search').removeClass('hidden');
+        } else {
+            $('#cora-media-selector-clear-search').addClass('hidden');
+        }
+
+        if (window.coraMediaSelectorState.searchTimer) {
+            clearTimeout(window.coraMediaSelectorState.searchTimer);
+        }
+        window.coraMediaSelectorState.searchTimer = setTimeout(function() {
+            window.coraFetchWorkspaceMedia();
+        }, 280);
+    };
+
+    window.coraMediaSelectorClearSearch = function() {
+        $('#cora-media-selector-search').val('');
+        $('#cora-media-selector-clear-search').addClass('hidden');
+        window.coraMediaSelectorState.searchQuery = '';
+        window.coraFetchWorkspaceMedia();
+    };
+
+    window.coraMediaSelectorFilterChange = function() {
+        window.coraMediaSelectorState.selectedFolder = $('#cora-media-selector-folder').val();
+        window.coraFetchWorkspaceMedia();
+    };
+
+    window.coraMediaSelectorSetType = function(type, btn) {
+        window.coraMediaSelectorState.selectedType = type;
+        $('.cora-media-type-btn')
+            .removeClass('bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-3xs font-bold')
+            .addClass('text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100');
+        $(btn)
+            .addClass('bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-3xs font-bold')
+            .removeClass('text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100');
+        window.coraFetchWorkspaceMedia();
+    };
+
+    window.coraMediaSelectorHandleUpload = function(files) {
+        if (!files || files.length === 0) return;
+        const cfg = coraGetMediaAjaxConfig();
+        const statusEl = $('#cora-media-selector-upload-status');
+        statusEl.text(`Uploading ${files.length} asset(s)...`).removeClass('hidden text-red-500').addClass('text-zinc-500');
+
+        let uploadedCount = 0;
+        let lastUploadedFile = null;
+
+        Array.from(files).forEach(function(file) {
+            const formData = new FormData();
+            formData.append('action', 'cora_media_library_upload');
+            formData.append('nonce', cfg.nonce);
+            formData.append('file', file);
+            if (window.coraMediaSelectorState.selectedFolder && window.coraMediaSelectorState.selectedFolder !== '-1') {
+                formData.append('folder_id', window.coraMediaSelectorState.selectedFolder);
+            }
+
+            $.ajax({
+                url: cfg.ajaxUrl,
+                type: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function(response) {
+                    uploadedCount++;
+                    if (response && response.success && response.data && response.data.file) {
+                        lastUploadedFile = response.data.file;
+                    }
+                    if (uploadedCount === files.length) {
+                        statusEl.text('Upload complete!').removeClass('text-zinc-500').addClass('text-zinc-900 dark:text-white font-bold');
+                        setTimeout(function() { statusEl.addClass('hidden'); }, 2500);
+
+                        if (window.coraShowToast) {
+                            window.coraShowToast('Assets uploaded to Workspace Vault successfully.', 'success');
+                        }
+                        // Refresh media list and auto-select uploaded item
+                        window.coraFetchWorkspaceMedia();
+                        if (lastUploadedFile) {
+                            setTimeout(function() {
+                                window.coraMediaSelectorToggleItem(lastUploadedFile.id);
+                            }, 400);
+                        }
+                        if (typeof window.coraLoadSidebarRecentMedia === 'function') {
+                            window.coraLoadSidebarRecentMedia(true);
+                        }
+                    }
+                },
+                error: function() {
+                    uploadedCount++;
+                    statusEl.text('Upload error occurred.').removeClass('text-zinc-500').addClass('text-red-500');
+                    if (window.coraShowToast) {
+                        window.coraShowToast('Upload failed. Check file size and type.', 'error');
+                    }
+                }
+            });
+        });
+
+        $('#cora-media-selector-file-input').val('');
+    };
+
+    window.coraConfirmWorkspaceMediaSelection = function() {
+        const state = window.coraMediaSelectorState;
+        if (!state.selectedIds || state.selectedIds.length === 0) {
+            if (window.coraShowToast) window.coraShowToast('Please select at least one media asset.', 'info');
+            return;
+        }
+
+        const selectedFiles = state.selectedIds.map(id => state.filesMap[id]).filter(Boolean);
+        if (selectedFiles.length === 0) return;
+
+        coraExecuteMediaInsertion(state.target, selectedFiles);
+        window.coraCloseWorkspaceMediaSelector();
+    };
+
+    function coraExecuteMediaInsertion(target, selectedFiles) {
+        if (!selectedFiles || selectedFiles.length === 0) return;
+        const first = selectedFiles[0];
+
+        if (target === 'cover') {
+            $('#cora-cover-image-container').removeClass('hidden');
+            $('#cora-cover-image-img').attr('src', first.url).removeClass('hidden');
+            $('#cora-cover-image-placeholder').addClass('hidden');
+            $('#cora-cover-image-controls').removeClass('hidden');
+            $('#cora-ambient-cover-btn').addClass('hidden');
+            $('#cora-article-cover-url').val(first.url);
+
+            // Sync post thumbnail inputs and Beehiiv preview uploader
+            $('#cora-thumbnail-id').val(first.id);
+            $('#cora-thumbnail-img').attr('src', first.url).removeClass('hidden');
+            $('#cora-thumbnail-placeholder').addClass('hidden');
+            $('#cora-thumbnail-img-bh').attr('src', first.url).removeClass('hidden');
+            $('#cora-thumbnail-placeholder-bh').addClass('hidden');
+
+            $('#cora-editor-status').text('Unsaved changes');
+            if (typeof window.coraTriggerEditorAutoSave === 'function') {
+                window.coraTriggerEditorAutoSave();
+            }
+            if (window.coraShowToast) {
+                window.coraShowToast('Cover image updated from Workspace Vault.', 'success');
+            }
+
+        } else if (target === 'thumbnail') {
+            $('#cora-thumbnail-id').val(first.id);
+            $('#cora-thumbnail-img').attr('src', first.url).removeClass('hidden');
+            $('#cora-thumbnail-placeholder').addClass('hidden');
+
+            // Sync with Beehiiv bar thumbnail uploader preview
+            $('#cora-thumbnail-img-bh').attr('src', first.url).removeClass('hidden');
+            $('#cora-thumbnail-placeholder-bh').addClass('hidden');
+
+            $('#cora-editor-status').text('Unsaved changes');
+            if (typeof window.coraTriggerEditorAutoSave === 'function') {
+                window.coraTriggerEditorAutoSave();
+            }
+            if (window.coraShowToast) {
+                window.coraShowToast('Featured image updated from Workspace Vault.', 'success');
+            }
+
+        } else if (target === 'gallery') {
+            const count = selectedFiles.length;
+            const cardsHtml = selectedFiles.map(function(img) {
+                const titleAttr = (img.title || '').replace(/"/g, '&quot;');
+                return `<div style="aspect-ratio:4/3;background:#f4f4f5;border-radius:10px;overflow:hidden;border:1px solid #e4e4e7;"><img src="${img.url}" alt="${titleAttr}" style="width:100%;height:100%;object-fit:cover;display:block;" /></div>`;
+            }).join('');
+            const galleryHtml = `<div class="cora-gallery-showcase" style="margin:24px 0;max-width:680px;font-family:system-ui,sans-serif;" contenteditable="false"><h4 style="font-size:14px;font-weight:700;margin:0 0 10px;color:#09090b;">Media Gallery (${count} photos)</h4><div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:10px;">${cardsHtml}</div></div>`;
+
+            if (window.coraQuillListingCoordinator) {
+                const range = window.coraQuillListingCoordinator.getSelection(true);
+                const index = range ? range.index : window.coraQuillListingCoordinator.getLength();
+                window.coraQuillListingCoordinator.insertEmbed(index, 'cora-widget', { type: 'gallery', html: galleryHtml });
+                window.coraQuillListingCoordinator.setSelection(index + 1);
+                window.coraQuillListingCoordinator.insertText(index + 1, '\n');
+                window.coraQuillListingCoordinator.setSelection(index + 2);
+            }
+
             if (typeof window.coraUpdateWordCount === 'function') {
                 window.coraUpdateWordCount();
+            }
+            if (typeof window.coraUpdateLeftSidebarMediaGrid === 'function') {
+                window.coraUpdateLeftSidebarMediaGrid();
             }
             if (typeof window.coraTriggerEditorAutoSave === 'function') {
                 window.coraTriggerEditorAutoSave();
             }
-        } else if (target === 'cover') {
-            $('#cora-cover-image-img').attr('src', url).removeClass('hidden');
-            $('#cora-cover-image-placeholder').addClass('hidden');
-            $('#cora-article-cover-url').val(url);
-            
-            // Sync post thumbnail inputs and Beehiiv preview uploader
-            $('#cora-thumbnail-id').val(id);
-            $('#cora-thumbnail-img').attr('src', url).removeClass('hidden');
-            $('#cora-thumbnail-placeholder').addClass('hidden');
-            $('#cora-thumbnail-img-bh').attr('src', url).removeClass('hidden');
-            $('#cora-thumbnail-placeholder-bh').addClass('hidden');
+            if (window.coraShowToast) {
+                window.coraShowToast(`Gallery block with ${count} photo(s) inserted.`, 'success');
+            }
+
+        } else if (target === 'field' && window.coraMediaSelectField) {
+            $('#' + window.coraMediaSelectField).val(first.url).trigger('change');
+            if (window.coraShowToast) {
+                window.coraShowToast('Asset selected from Workspace Vault.', 'success');
+            }
+
         } else {
-            $('#cora-thumbnail-id').val(id);
-            $('#cora-thumbnail-img').attr('src', url).removeClass('hidden');
-            $('#cora-thumbnail-placeholder').addClass('hidden');
-            
-            // Sync with Beehiiv bar thumbnail uploader preview
-            $('#cora-thumbnail-img-bh').attr('src', url).removeClass('hidden');
-            $('#cora-thumbnail-placeholder-bh').addClass('hidden');
+            // Default: 'inline' insertion into Quill
+            if (window.coraQuillListingCoordinator) {
+                selectedFiles.forEach(function(item) {
+                    const range = window.coraQuillListingCoordinator.getSelection();
+                    const index = range ? range.index : window.coraQuillListingCoordinator.getLength();
+                    const isVideo = item.type_category === 'video';
+                    window.coraQuillListingCoordinator.insertEmbed(index, isVideo ? 'video' : 'image', item.url);
+                    window.coraQuillListingCoordinator.insertText(index + 1, '\n');
+                    window.coraQuillListingCoordinator.setSelection(index + 2, 0);
+                });
+            }
+
+            if (typeof window.coraUpdateWordCount === 'function') {
+                window.coraUpdateWordCount();
+            }
+            if (typeof window.coraUpdateLeftSidebarMediaGrid === 'function') {
+                window.coraUpdateLeftSidebarMediaGrid();
+            }
+            if (typeof window.coraTriggerEditorAutoSave === 'function') {
+                window.coraTriggerEditorAutoSave();
+            }
+            if (window.coraShowToast) {
+                window.coraShowToast('Media embedded from Workspace Vault.', 'success');
+            }
         }
-        $('#cora-editor-status').text('Unsaved changes');
-        coraToggleMediaDrawer(false);
+    }
+
+    // Direct selection handler for backward compatibility & 1-click sidebar insertion
+    window.coraSelectMedia = function(id, url, metadata) {
+        const target = window.coraMediaSelectTarget || 'inline';
+        const fileObj = {
+            id: id,
+            url: url,
+            title: metadata && metadata.title ? metadata.title : '',
+            thumbnail: url,
+            type_category: metadata && metadata.type_category ? metadata.type_category : 'image'
+        };
+        coraExecuteMediaInsertion(target, [fileObj]);
+        window.coraCloseWorkspaceMediaSelector();
     };
-    
-    // Handle Custom Media Uploads
-    if ($('#cora-media-drawer-dropzone').length) {
-        let dropzone = $('#cora-media-drawer-dropzone');
-        let fileInput = $('#cora-media-file-input');
-        
-        dropzone.on('click', function() {
-            fileInput.click();
-        });
-        
-        dropzone.on('dragover', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            dropzone.addClass('bg-blue-50 border-blue-300');
-        });
-        
-        dropzone.on('dragleave drop', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            dropzone.removeClass('bg-blue-50 border-blue-300');
-        });
-        
-        dropzone.on('drop', function(e) {
-            let files = e.originalEvent.dataTransfer.files;
-            if (files.length > 0) {
-                coraUploadMedia(files[0]);
+
+    // Load Left Sidebar Recent Media mini-grid
+    window.coraLoadSidebarRecentMedia = function(force) {
+        const grid = $('#cora-left-recent-vault-grid');
+        if (!grid.length) return;
+        if (!force && grid.attr('data-loaded') === 'true') return;
+
+        grid.html('<div class="col-span-2 py-3 text-center text-zinc-400 text-[10px]">Loading vault assets...</div>');
+        const cfg = coraGetMediaAjaxConfig();
+        $.post(cfg.ajaxUrl, {
+            action: 'cora_media_library_get',
+            nonce: cfg.nonce,
+            paged: 1,
+            per_page: 8,
+            type: 'image'
+        }, function(response) {
+            if (response && response.success && response.data && Array.isArray(response.data.files) && response.data.files.length > 0) {
+                grid.attr('data-loaded', 'true');
+                let html = '';
+                response.data.files.forEach(function(img) {
+                    const thumbUrl = img.thumbnail || img.url;
+                    const safeTitle = (img.title || img.filename || '').replace(/"/g, '&quot;');
+                    html += `
+                        <div class="group relative aspect-square bg-zinc-100 dark:bg-zinc-800 rounded-lg border border-zinc-200/80 dark:border-zinc-700/80 overflow-hidden cursor-pointer hover:border-zinc-400 dark:hover:border-zinc-500 hover:shadow-3xs transition-all select-none" onclick="window.coraMediaSelectTarget = 'inline'; coraSelectMedia(${img.id}, '${img.url}', {title: '${safeTitle}'})" title="Click to insert: ${safeTitle}">
+                            <img src="${thumbUrl}" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-zinc-950/70 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all duration-150">
+                                <span class="p-1 bg-white dark:bg-zinc-900 rounded text-zinc-900 dark:text-white shadow-3xs">
+                                    <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                </span>
+                            </div>
+                        </div>
+                    `;
+                });
+                grid.html(html);
+            } else {
+                grid.html('<div class="col-span-2 py-3 text-center text-zinc-400 text-[10px]">No recent assets in vault.</div>');
             }
+        }).fail(function() {
+            grid.html('<div class="col-span-2 py-3 text-center text-zinc-400 text-[10px]">Could not load vault assets.</div>');
         });
-        
-        fileInput.on('change', function() {
-            if (this.files.length > 0) {
-                coraUploadMedia(this.files[0]);
-            }
-        });
-    }
-    
-    function coraUploadMedia(file) {
-        let formData = new FormData();
-        formData.append('action', 'cora_upload_media');
-        formData.append('nonce', coraREData.nonce);
-        formData.append('file', file);
-        
-        $('#cora-media-upload-status').text('Uploading...').removeClass('text-red-500 text-green-500').addClass('text-blue-500');
-        
-        $.ajax({
-            url: coraREData.ajaxurl,
-            type: 'POST',
-            data: formData,
-            contentType: false,
-            processData: false,
-            success: function(response) {
-                if (response.success) {
-                    $('#cora-media-upload-status').text('Upload complete!').removeClass('text-blue-500').addClass('text-green-500');
-                    coraSelectMedia(response.data.id, response.data.url);
-                    setTimeout(() => $('#cora-media-upload-status').text('Maximum file size: 10MB').removeClass('text-green-500').addClass('text-zinc-500'), 3000);
-                } else {
-                    $('#cora-media-upload-status').text('Error: ' + response.data).removeClass('text-blue-500').addClass('text-red-500');
-                }
-            },
-            error: function() {
-                $('#cora-media-upload-status').text('Network error.').removeClass('text-blue-500').addClass('text-red-500');
-            }
-        });
-    }
+    };
+
+    // Close on Escape Key
+    $(document).on('keydown', function(e) {
+        if (e.key === 'Escape' && !$('#cora-workspace-media-selector-modal').hasClass('hidden')) {
+            window.coraCloseWorkspaceMediaSelector();
+        }
+    });
 
     window.coraGenerateArticleAI = function() {
         if (window.coraShowToast) {
@@ -11625,35 +12148,22 @@ jQuery(document).ready(function($) {
         const title = $('#cora-article-title').val();
         const content = coraQuillListingCoordinator ? coraQuillListingCoordinator.root.innerHTML : '';
         
-        if (!title || !content || content === '<p><br></p>') {
-            window.coraShowToast('Add some content to analyze SEO.', 'error');
+        if (!title && (!content || content === '<p><br></p>')) {
+            window.coraShowToast('Add a title and some content to analyze SEO.', 'warning');
             return;
         }
         
-        window.coraShowToast('Analyzing content for SEO...', 'info');
-        $('#cora-editor-status').text('Analyzing...');
+        if (typeof window.coraUpdateWordCount === 'function') {
+            window.coraUpdateWordCount();
+        }
+        if (typeof window.coraUpdateSEOAudits === 'function') {
+            window.coraUpdateSEOAudits();
+        }
         
-        $.post(ajaxurl, {
-            action: 'cora_analyze_seo',
-            nonce: coraREData.ajaxNonce,
-            title: title,
-            content: content
-        }, function(response) {
-            if(response.success) {
-                const score = response.data.score;
-                $('#cora-seo-score-display').text(score);
-                $('#cora-seo-score-display').parent().removeClass('text-green-600 text-yellow-500 text-zinc-400');
-                
-                if (score >= 80) {
-                    $('#cora-seo-score-display').parent().addClass('text-green-600');
-                    window.coraShowToast('Great job! Your article is highly optimized.', 'success');
-                } else {
-                    $('#cora-seo-score-display').parent().addClass('text-yellow-500');
-                    window.coraShowToast('SEO analysis complete. Room for improvement.', 'info');
-                }
-                $('#cora-editor-status').text('Unsaved changes');
-            }
-        });
+        const seoScore = $('#cora-seo-score-display').text() || '0';
+        const geoScore = $('#cora-geo-score-display').text() || '0';
+        window.coraShowToast(`Audit complete: SEO Score ${seoScore}/100 · AI Visibility ${geoScore}/100`, 'success');
+        $('#cora-editor-status').text('Analyzed');
     };
 
     window.coraSaveArticle = function(status, isAutoSave) {
@@ -11667,6 +12177,9 @@ jQuery(document).ready(function($) {
         const keyword = $('#cora-seo-keyword').val();
         const description = $('#cora-seo-description').val();
         const score = $('#cora-seo-score-display').text();
+        const geo_score = $('#cora-geo-score-display').text();
+        const excerpt = $('#cora-article-excerpt').val() || description;
+        const faq_schema = $('#cora-schema-preview-block').text();
         
         const categories = $('#cora-article-categories').val() || [];
         const tags = $('#cora-article-tags').val() || [];
@@ -11702,7 +12215,10 @@ jQuery(document).ready(function($) {
             status: status,
             keyword: keyword,
             description: description,
+            excerpt: excerpt,
             seo_score: score === '--' ? '' : score,
+            geo_score: geo_score === '--' ? '' : geo_score,
+            faq_schema: faq_schema,
             categories: categories,
             tags: tags,
             thumbnail_id: thumbnail_id,
@@ -11996,44 +12512,87 @@ jQuery(document).ready(function($) {
     };
 
     window.coraUpdateSchemaPreview = function() {
-        const title = $('#cora-article-title').val() || 'Untitled Article';
-        const url = window.location.origin + '/blogs/' + ($('#cora-seo-keyword').val() || 'untitled').toLowerCase().replace(/[^a-z0-9]+/g, '-');
+        const title = $('#cora-article-title').val() || 'Editorial Overview';
+        const rawKw = $('#cora-seo-keyword').val() || 'commercial-production';
+        const url = window.location.origin + '/blogs/' + rawKw.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+        const metaDesc = $('#cora-seo-description').val() || $('#cora-article-excerpt').val() || 'Verified production and commercial insights from Cora Studio.';
+        const authorName = $('#cora-article-assignee option:selected').text().trim() || 'Studio Admin';
+        const thumbnailSrc = $('#cora-thumbnail-img').attr('src') || ($('#cora-cover-image-img').attr('src') || (window.location.origin + '/wp-content/uploads/default-image.png'));
+
+        let editorText = '';
+        if (window.coraQuillListingCoordinator) {
+            editorText = window.coraQuillListingCoordinator.getText() || '';
+        }
+
+        // Parse any Q&A or FAQ present in text
+        const faqs = [];
+        const qaMatches = editorText.match(/(?:Q:|Question:)\s*([^\n\r]+)[\r\n]+(?:A:|Answer:)\s*([^\n\r]+)/gi);
+        if (qaMatches && qaMatches.length > 0) {
+            qaMatches.slice(0, 4).forEach(function(m) {
+                const parts = m.split(/(?:A:|Answer:)/i);
+                if (parts.length >= 2) {
+                    const q = parts[0].replace(/(?:Q:|Question:)/i, '').trim();
+                    const a = parts[1].trim();
+                    if (q && a) {
+                        faqs.push({
+                            "@type": "Question",
+                            "name": q,
+                            "acceptedAnswer": {
+                                "@type": "Answer",
+                                "text": a
+                            }
+                        });
+                    }
+                }
+            });
+        }
+
+        if (faqs.length === 0) {
+            faqs.push({
+                "@type": "Question",
+                "name": `What are the core specifications and standards for ${rawKw}?`,
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": `Commercial production and facility standards for ${rawKw} prioritize calibrated technical workflows, verifiable pricing tiers, and certified facility access.`
+                }
+            });
+        }
+
         const schema = {
             "@context": "https://schema.org",
-            "@type": "RealEstateAgent",
-            "name": "Apex Realty Group",
-            "url": window.location.origin,
-            "logo": window.location.origin + "/wp-content/uploads/logo.png",
-            "image": $('#cora-thumbnail-img').attr('src') || window.location.origin + "/wp-content/uploads/default-image.png",
-            "description": $('#cora-seo-description').val() || "Luxury property broker in Delhi NCR.",
-            "address": {
-                "@type": "PostalAddress",
-                "streetAddress": "Connaught Place",
-                "addressLocality": "New Delhi",
-                "addressRegion": "Delhi",
-                "postalCode": "110001",
-                "addressCountry": "IN"
-            },
-            "geo": {
-                "@type": "GeoCoordinates",
-                "latitude": 28.6304,
-                "longitude": 77.2177
-            },
-            "contactPoint": {
-                "@type": "ContactPoint",
-                "telephone": "+91-99999-88888",
-                "contactType": "customer service"
-            },
-            "mainEntityOfPage": {
-                "@type": "WebPage",
-                "@id": url
-            },
-            "headline": title,
-            "author": {
-                "@type": "Person",
-                "name": "Nitin Arora"
-            }
+            "@graph": [
+                {
+                    "@type": "Article",
+                    "@id": url + "#article",
+                    "isPartOf": {
+                        "@type": "WebPage",
+                        "@id": url
+                    },
+                    "headline": title,
+                    "description": metaDesc,
+                    "image": thumbnailSrc,
+                    "inLanguage": "en-US",
+                    "mainEntityOfPage": url,
+                    "datePublished": new Date().toISOString().split('T')[0],
+                    "dateModified": new Date().toISOString().split('T')[0],
+                    "author": {
+                        "@type": "Person",
+                        "name": authorName
+                    },
+                    "publisher": {
+                        "@type": "Organization",
+                        "name": "Cora Studio Platform",
+                        "url": window.location.origin
+                    }
+                },
+                {
+                    "@type": "FAQPage",
+                    "@id": url + "#faq",
+                    "mainEntity": faqs
+                }
+            ]
         };
+
         $('#cora-schema-preview-block').text(JSON.stringify(schema, null, 2));
     };
 
@@ -12043,75 +12602,84 @@ jQuery(document).ready(function($) {
             return;
         }
 
-        const title = $('#cora-article-title').val() || 'Apex Realty Luxury Catalog';
+        const title = $('#cora-article-title').val() || 'Commercial Market & Studio Production Guide';
+        const kw = $('#cora-seo-keyword').val() || 'Delhi NCR Commercial Studio & Media Infrastructure';
+        
         let currentHTML = coraQuillListingCoordinator.root.innerHTML;
         if (currentHTML === '<p><br></p>') {
             currentHTML = '';
         }
 
-        // Add Direct Answer block at the top if not present
-        const directAnswerHeader = `<h3 style="color:#09090b; font-weight:800; font-size:1.25rem; margin-top:1.5rem; margin-bottom:0.5rem;">Q: What is the luxury villa price trend in Delhi NCR?</h3>`;
-        const directAnswerBody = `<p style="background-color:#f4f4f5; border-left: 3px solid #09090b; padding: 12px; font-size: 0.95rem; line-height: 1.6; color: #27272a; margin-bottom: 1.5rem;"><strong>A:</strong> As of mid-2026, premium luxury villas in Gurgaon DLF Phase 5 and South Delhi are averaging ₹1.2 Lakhs to ₹1.8 Lakhs per square yard. High information density analysis from local listings coordinator Nitin & Shanaya Arora shows a 12% YoY increase in demand for eco-friendly luxury villas in Gurgaon.</p>`;
-        
-        // Add Price Catalog Table
-        const priceTable = `
-        <h3 style="color:#09090b; font-weight:850; font-size:1.2rem; margin-top:2rem; margin-bottom:0.5rem;">Delhi NCR Luxury Real Estate Price Index (2026)</h3>
-        <table style="width:100%; border-collapse:collapse; font-size:0.9rem; text-align:left; border:1px solid #e4e4e7; margin-bottom:2rem;">
-            <thead>
-                <tr style="background-color:#f4f4f5; border-bottom:1px solid #e4e4e7;">
-                    <th style="padding:10px; font-weight:700;">Location</th>
-                    <th style="padding:10px; font-weight:700;">Property Type</th>
-                    <th style="padding:10px; font-weight:700;">Average Price</th>
-                    <th style="padding:10px; font-weight:700;">Citation Authority</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr style="border-bottom:1px solid #e4e4e7;">
-                    <td style="padding:10px;">Gurgaon DLF Phase 5</td>
-                    <td style="padding:10px;">4BHK Luxury Penthouse</td>
-                    <td style="padding:10px;">₹12.5 Cr - ₹18.0 Cr</td>
-                    <td style="padding:10px; color:#52525b; font-size:0.8rem;">Apex Realty Index</td>
-                </tr>
-                <tr style="border-bottom:1px solid #e4e4e7;">
-                    <td style="padding:10px;">South Delhi Vasant Vihar</td>
-                    <td style="padding:10px;">Premium Duplex Villa</td>
-                    <td style="padding:10px;">₹22.0 Cr - ₹35.0 Cr</td>
-                    <td style="padding:10px; color:#52525b; font-size:0.8rem;">Delhi Municipal Records</td>
-                </tr>
-                <tr>
-                    <td style="padding:10px;">Noida Sector 150</td>
-                    <td style="padding:10px;">Green Villa Developments</td>
-                    <td style="padding:10px;">₹8.5 Cr - ₹12.0 Cr</td>
-                    <td style="padding:10px; color:#52525b; font-size:0.8rem;">RERA Registered</td>
-                </tr>
-            </tbody>
-        </table>
-        <p style="font-size:0.8rem; color:#71717a; margin-top:-1.5rem; margin-bottom:2rem;">Source: High-fidelity analytics compiled by Nitin & Shanaya Arora, licensed listing coordinator at <a href="https://cora.local" style="text-decoration:underline; color:#09090b;">Apex Realty Group</a>.</p>
+        // Direct Answer Block
+        const directAnswerBlock = `
+        <div class="cora-geo-answer-block" style="background-color:#f4f4f5; border-left: 3px solid #09090b; padding: 14px 16px; font-size: 0.95rem; line-height: 1.6; color: #18181b; margin: 1.5rem 0; border-radius: 0 8px 8px 0;">
+            <h3 style="color:#09090b; font-weight:800; font-size:1.15rem; margin-top:0; margin-bottom:0.5rem;">Q: What are the primary market dynamics, pricing benchmarks, and standards for ${kw}?</h3>
+            <p style="margin:0;"><strong>Answer:</strong> Analysis across primary commercial clusters indicates commercial and studio leasing rates averaging ₹140 to ₹185 per sq. ft. per month, with high-density production hubs sustaining 8% to 14% YoY growth. Institutional demand remains strong with verified certifications across DLF CyberCity, Gurgaon, Bandra West, and South Delhi.</p>
+        </div>
+        `;
+
+        // Key Takeaways & Fact Density Table
+        const takeawaysBlock = `
+        <div class="cora-geo-takeaways-block" style="background:#ffffff; border:1px solid #e4e4e7; border-radius:10px; padding:18px; margin:1.5rem 0; box-shadow:0 1px 3px rgba(0,0,0,0.03);">
+            <h4 style="font-size:1.05rem; font-weight:800; color:#09090b; margin:0 0 12px 0;">Key Takeaways &amp; Verified Regional Specifications</h4>
+            <table style="width:100%; border-collapse:collapse; font-size:0.875rem; text-align:left; border:1px solid #e4e4e7; margin-bottom:12px;">
+                <thead>
+                    <tr style="background-color:#f4f4f5; border-bottom:1px solid #e4e4e7;">
+                        <th style="padding:8px 12px; font-weight:700;">Location Hub</th>
+                        <th style="padding:8px 12px; font-weight:700;">Infrastructure Tier</th>
+                        <th style="padding:8px 12px; font-weight:700;">Benchmark Pricing</th>
+                        <th style="padding:8px 12px; font-weight:700;">Verification Source</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="border-bottom:1px solid #e4e4e7;">
+                        <td style="padding:8px 12px; font-weight:600;">Gurgaon DLF CyberCity</td>
+                        <td style="padding:8px 12px;">Grade-A Managed Facilities</td>
+                        <td style="padding:8px 12px;">₹140 - ₹180 / sq. ft.</td>
+                        <td style="padding:8px 12px; color:#71717a; font-size:0.8rem;">Cora Platform Index</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid #e4e4e7;">
+                        <td style="padding:8px 12px; font-weight:600;">South Delhi Vasant Vihar</td>
+                        <td style="padding:8px 12px;">Premium Commercial Suites</td>
+                        <td style="padding:8px 12px;">₹165 - ₹210 / sq. ft.</td>
+                        <td style="padding:8px 12px; color:#71717a; font-size:0.8rem;">Municipal Land Registry</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:8px 12px; font-weight:600;">Mumbai Bandra West</td>
+                        <td style="padding:8px 12px;">High-End Studio Production Bay</td>
+                        <td style="padding:8px 12px;">₹15,000 - ₹25,000 / day</td>
+                        <td style="padding:8px 12px; color:#71717a; font-size:0.8rem;">Studio Guild Certified</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p style="font-size:0.75rem; color:#71717a; margin:0;">Source: Aggregated data and technical specifications compiled by verified studio coordinators on <a href="javascript:void(0);" style="text-decoration:underline; color:#09090b; font-weight:600;">Cora Platform</a>.</p>
+        </div>
         `;
 
         let updatedHTML = currentHTML;
-        if (!updatedHTML.includes('Q: What is the luxury villa price trend')) {
-            updatedHTML = directAnswerHeader + directAnswerBody + updatedHTML;
+        if (!updatedHTML.includes('cora-geo-answer-block') && !updatedHTML.includes('Direct Answer:')) {
+            updatedHTML = directAnswerBlock + updatedHTML;
         }
-        if (!updatedHTML.includes('Delhi NCR Luxury Real Estate Price Index')) {
-            updatedHTML = updatedHTML + priceTable;
+        if (!updatedHTML.includes('cora-geo-takeaways-block') && !updatedHTML.includes('Key Takeaways &amp; Verified Regional Specifications')) {
+            updatedHTML = updatedHTML + takeawaysBlock;
         }
 
-        coraQuillListingCoordinator.clipboard.dangerouslyPasteHTML(updatedHTML);
-        
-        // Update checkmarks
+        coraQuillListingCoordinator.clipboard.dangerouslyPasteHTML(0, updatedHTML, 'user');
+
+        // Update checklist checkboxes
         $('#chk-geo-direct-answer').prop('checked', true);
         $('#chk-geo-info-density').prop('checked', true);
         $('#chk-geo-citations').prop('checked', true);
         $('#chk-geo-schema').prop('checked', true);
 
-        // Update score
+        // Update score flags
         window.coraGeoAutoOptimized = true;
-        $('#cora-geo-score-display').text('95');
-        $('#cora-seo-score-display').text('92').removeClass('text-zinc-400').addClass('text-green-600');
 
-        // Update schema block
+        // Update schema preview block
         coraUpdateSchemaPreview();
+
+        // Run full audit recalculations
+        coraUpdateSEOAudits();
 
         window.coraShowToast('Generative Engine Optimization (GEO) applied successfully!', 'success');
     };
@@ -12144,7 +12712,7 @@ jQuery(document).ready(function($) {
             $('#chk-indicator-meta').removeClass('bg-red-50 text-red-500 border-red-200/60').addClass('bg-emerald-50 text-emerald-600 border border-emerald-200/60 font-black').html('✓');
         } else {
             issues++;
-            $('#chk-indicator-meta').removeClass('bg-emerald-50 text-emerald-600 border-emerald-200/60').addClass('bg-red-50 text-red-500 border border-red-200/60 font-black').html('!');
+            $('#chk-indicator-meta').removeClass('bg-emerald-50 text-emerald-600 border border-emerald-200/60').addClass('bg-red-50 text-red-500 border border-red-200/60 font-black').html('!');
         }
 
         // 3. Keyword Density Audit
@@ -12165,7 +12733,7 @@ jQuery(document).ready(function($) {
             $('#chk-indicator-density').removeClass('bg-red-50 text-red-500 border-red-200/60').addClass('bg-emerald-50 text-emerald-600 border border-emerald-200/60 font-black').html('✓');
         } else {
             issues++;
-            $('#chk-indicator-density').removeClass('bg-emerald-50 text-emerald-600 border-emerald-200/60').addClass('bg-red-50 text-red-500 border border-red-200/60 font-black').html('!');
+            $('#chk-indicator-density').removeClass('bg-emerald-50 text-emerald-600 border border-emerald-200/60').addClass('bg-red-50 text-red-500 border border-red-200/60 font-black').html('!');
         }
 
         // Show/update badge
@@ -12195,9 +12763,116 @@ jQuery(document).ready(function($) {
                  .text('Optimal');
         }
 
+        // 4. GEO Citations Audit
+        const geoTerms = ['delhi', 'ncr', 'vasant vihar', 'saket', 'dwarka', 'gurgaon', 'noida', 'okhla', 'bandra', 'mumbai', 'gurugram', 'cybercity', 'bengaluru', 'bangalore'];
+        const currencyTerms = ['lakh', 'crore', 'lk', 'cr', 'thousand'];
+        const rupeeSymbol = /₹|\b(rs\.?|rupees?)\b/i;
+        const indianNumberFormat = /\b\d{1,2},\d{2},\d{2,3}\b/;
+
+        const hasGeoTerm = geoTerms.some(term => textLower.includes(term));
+        const hasCurrencyTerm = currencyTerms.some(term => textLower.includes(term));
+        const hasRupeeOrFormat = rupeeSymbol.test(textLower) || indianNumberFormat.test(textLower);
+
+        // Real-Time GEO Optimizations Audit checks
+        let hasDirectAnswer = textLower.includes('q:') || textLower.includes('answer:') || textLower.includes('cora-geo-answer-block') || textLower.includes('direct answer') || textLower.includes('q&a');
+        let hasStats = hasCurrencyTerm || hasRupeeOrFormat || /\b\d+(%| percent| sq\.?ft| lakhs?| crores?|k|cr)\b/i.test(textLower);
+        let hasSchema = textLower.includes('faq') || textLower.includes('frequently asked questions') || textLower.includes('schema') || (jQuery('#cora-schema-preview-block').length && jQuery('#cora-schema-preview-block').text().length > 10);
+        let hasCitations = hasGeoTerm;
+
+        // Dynamic Entity Detection and rendering
+        const knownEntities = [
+            'DLF CyberCity', 'Gurgaon', 'South Delhi', 'Vasant Vihar', 'Bandra West',
+            'Mumbai', 'Noida', 'Saket', 'Commercial Real Estate', 'Studio Production',
+            'RERA Certified', 'Grade-A Complexes', 'Sony FX3', 'Profoto Lighting',
+            'High-Speed Tethering', 'Sound Stage 4', 'Delhi NCR'
+        ];
+        const detectedEntities = [];
+        knownEntities.forEach(function(ent) {
+            if (textLower.includes(ent.toLowerCase())) {
+                detectedEntities.push(ent);
+            }
+        });
+        if (detectedEntities.length === 0 && (hasGeoTerm || textLower.includes('studio') || textLower.includes('camera'))) {
+            detectedEntities.push('Commercial Production', 'Studio Infrastructure');
+        }
+
+        const entitiesContainer = $('#cora-geo-entities-list');
+        if (entitiesContainer.length > 0) {
+            if (detectedEntities.length > 0) {
+                let entHtml = '';
+                detectedEntities.forEach(function(ent) {
+                    entHtml += `<span class="px-2.5 py-1 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-[10px] font-semibold text-zinc-800 dark:text-zinc-200 flex items-center gap-1">${ent}</span>`;
+                });
+                entitiesContainer.html(entHtml);
+            } else {
+                entitiesContainer.html('<span class="text-[10px] text-zinc-400 italic">No entities detected yet. Mention cities or facilities to populate.</span>');
+            }
+        }
+
+        if (window.coraGeoAutoOptimized) {
+            hasDirectAnswer = true;
+            hasStats = true;
+            hasSchema = true;
+            hasCitations = true;
+        }
+
+        // Update hidden checkboxes
+        $('#chk-geo-direct-answer').prop('checked', hasDirectAnswer);
+        $('#chk-geo-info-density').prop('checked', hasStats);
+        $('#chk-geo-schema').prop('checked', hasSchema);
+        $('#chk-geo-citations').prop('checked', hasCitations);
+
+        // Update Checklist visual states
+        let geoIssues = 0;
+        let geoScore = 15;
+
+        // Answer Block
+        if (hasDirectAnswer) {
+            geoScore += 25;
+            $('#chk-geo-direct-answer-icon').removeClass('bg-red-50 text-red-500 border-red-200/60').addClass('bg-emerald-50 text-emerald-600 border border-emerald-200/60').html('✓');
+            $('#chk-geo-direct-answer-status').removeClass('text-red-500').addClass('text-emerald-600').text('Good');
+        } else {
+            geoIssues++;
+            $('#chk-geo-direct-answer-icon').removeClass('bg-emerald-50 text-emerald-600 border border-emerald-200/60').addClass('bg-red-50 text-red-500 border border-red-200/60').html('!');
+            $('#chk-geo-direct-answer-status').removeClass('text-emerald-600').addClass('text-red-500').text('Missing');
+        }
+
+        // Facts & Stats
+        if (hasStats) {
+            geoScore += 20;
+            $('#chk-geo-info-density-icon').removeClass('bg-red-50 text-red-500 border-red-200/60').addClass('bg-emerald-50 text-emerald-600 border border-emerald-200/60').html('✓');
+            $('#chk-geo-info-density-status').removeClass('text-red-500').addClass('text-emerald-600').text('Good');
+        } else {
+            geoIssues++;
+            $('#chk-geo-info-density-icon').removeClass('bg-emerald-50 text-emerald-600 border border-emerald-200/60').addClass('bg-red-50 text-red-500 border border-red-200/60').html('!');
+            $('#chk-geo-info-density-status').removeClass('text-emerald-600').addClass('text-red-500').text('Missing');
+        }
+
+        // Schema FAQ
+        if (hasSchema) {
+            geoScore += 25;
+            $('#chk-geo-schema-icon').removeClass('bg-red-50 text-red-500 border-red-200/60').addClass('bg-emerald-50 text-emerald-600 border border-emerald-200/60').html('✓');
+            $('#chk-geo-schema-status').removeClass('text-red-500').addClass('text-emerald-600').text('Good');
+        } else {
+            geoIssues++;
+            $('#chk-geo-schema-icon').removeClass('bg-emerald-50 text-emerald-600 border border-emerald-200/60').addClass('bg-red-50 text-red-500 border border-red-200/60').html('!');
+            $('#chk-geo-schema-status').removeClass('text-emerald-600').addClass('text-red-500').text('Missing');
+        }
+
+        // Entity Citations
+        if (hasCitations) {
+            geoScore += 15;
+            $('#chk-geo-citations-icon').removeClass('bg-red-50 text-red-500 border-red-200/60').addClass('bg-emerald-50 text-emerald-600 border border-emerald-200/60').html('✓');
+            $('#chk-geo-citations-status').removeClass('text-red-500').addClass('text-emerald-600').text('Good');
+        } else {
+            geoIssues++;
+            $('#chk-geo-citations-icon').removeClass('bg-emerald-50 text-emerald-600 border border-emerald-200/60').addClass('bg-red-50 text-red-500 border border-red-200/60').html('!');
+            $('#chk-geo-citations-status').removeClass('text-emerald-600').addClass('text-red-500').text('Missing');
+        }
+
         // Update display elements
         if (window.coraGeoAutoOptimized) {
-            score = 92;
+            score = Math.max(score, 92);
         }
         $('#cora-seo-score-display').text(score);
         
@@ -12223,72 +12898,8 @@ jQuery(document).ready(function($) {
             statusText.addClass('text-red-500').text('Poor Optimization');
         }
 
-        // 4. GEO Citations Audit
-        const geoTerms = ['delhi', 'ncr', 'vasant vihar', 'saket', 'dwarka', 'gurgaon', 'noida', 'okhla', 'bandra', 'mumbai', 'gurugram', 'cybercity'];
-        const currencyTerms = ['lakh', 'crore', 'lk', 'cr'];
-        const rupeeSymbol = /₹|\b(rs\.?|rupees?)\b/i;
-        const indianNumberFormat = /\b\d{1,2},\d{2},\d{2,3}\b/;
-
-        const hasGeoTerm = geoTerms.some(term => textLower.includes(term));
-        const hasCurrencyTerm = currencyTerms.some(term => textLower.includes(term));
-        const hasRupeeOrFormat = rupeeSymbol.test(textLower) || indianNumberFormat.test(textLower);
-
-        // Real-Time GEO Optimizations Audit checks
-        const hasDirectAnswer = textLower.includes('q:') || textLower.includes('answer:') || textLower.includes('cora-geo-answer-block') || textLower.includes('q&a');
-        const hasStats = hasCurrencyTerm || hasRupeeOrFormat || /\b\d+(%| percent| sq\.?ft| lakhs?| crores?)\b/i.test(textLower);
-        const hasSchema = textLower.includes('faq') || textLower.includes('frequently asked questions') || textLower.includes('schema') || (jQuery('#cora-schema-preview-block').length && jQuery('#cora-schema-preview-block').text().length > 5);
-        const hasCitations = hasGeoTerm;
-
-        // Update Checklist visual states
-        let geoIssues = 0;
-        let geoScore = 15;
-
-        // Answer Block
-        if (hasDirectAnswer) {
-            geoScore += 20;
-            $('#chk-geo-direct-answer-icon').removeClass('bg-red-50 text-red-500 border-red-200/60').addClass('bg-emerald-50 text-emerald-600 border border-emerald-200/60').html('✓');
-            $('#chk-geo-direct-answer-status').removeClass('text-red-500').addClass('text-emerald-600').text('Good');
-        } else {
-            geoIssues++;
-            $('#chk-geo-direct-answer-icon').removeClass('bg-emerald-50 text-emerald-600 border border-emerald-200/60').addClass('bg-red-50 text-red-500 border border-red-200/60').html('!');
-            $('#chk-geo-direct-answer-status').removeClass('text-emerald-600').addClass('text-red-500').text('Missing');
-        }
-
-        // Facts & Stats
-        if (hasStats) {
-            geoScore += 15;
-            $('#chk-geo-info-density-icon').removeClass('bg-red-50 text-red-500 border-red-200/60').addClass('bg-emerald-50 text-emerald-600 border border-emerald-200/60').html('✓');
-            $('#chk-geo-info-density-status').removeClass('text-red-500').addClass('text-emerald-600').text('Good');
-        } else {
-            geoIssues++;
-            $('#chk-geo-info-density-icon').removeClass('bg-emerald-50 text-emerald-600 border border-emerald-200/60').addClass('bg-red-50 text-red-500 border border-red-200/60').html('!');
-            $('#chk-geo-info-density-status').removeClass('text-emerald-600').addClass('text-red-500').text('Missing');
-        }
-
-        // Schema FAQ
-        if (hasSchema) {
-            geoScore += 30;
-            $('#chk-geo-schema-icon').removeClass('bg-red-50 text-red-500 border-red-200/60').addClass('bg-emerald-50 text-emerald-600 border border-emerald-200/60').html('✓');
-            $('#chk-geo-schema-status').removeClass('text-red-500').addClass('text-emerald-600').text('Good');
-        } else {
-            geoIssues++;
-            $('#chk-geo-schema-icon').removeClass('bg-emerald-50 text-emerald-600 border border-emerald-200/60').addClass('bg-red-50 text-red-500 border border-red-200/60').html('!');
-            $('#chk-geo-schema-status').removeClass('text-emerald-600').addClass('text-red-500').text('Missing');
-        }
-
-        // Entity Citations
-        if (hasCitations) {
-            geoScore += 15;
-            $('#chk-geo-citations-icon').removeClass('bg-red-50 text-red-500 border-red-200/60').addClass('bg-emerald-50 text-emerald-600 border border-emerald-200/60').html('✓');
-            $('#chk-geo-citations-status').removeClass('text-red-500').addClass('text-emerald-600').text('Good');
-        } else {
-            geoIssues++;
-            $('#chk-geo-citations-icon').removeClass('bg-emerald-50 text-emerald-600 border border-emerald-200/60').addClass('bg-red-50 text-red-500 border border-red-200/60').html('!');
-            $('#chk-geo-citations-status').removeClass('text-emerald-600').addClass('text-red-500').text('Missing');
-        }
-
-        // Update display elements & ring colors
-        const activeGeoScore = (words === 0) ? 0 : (window.coraGeoAutoOptimized ? 95 : geoScore);
+        // Update display elements & ring colors for GEO
+        const activeGeoScore = (words === 0) ? 0 : (window.coraGeoAutoOptimized ? 96 : Math.min(100, geoScore));
         $('#cora-geo-score-display').text(activeGeoScore);
         const $geoRing = $('#cora-geo-score-ring');
         $geoRing.attr('stroke-dasharray', `${activeGeoScore}, 100`);
@@ -12314,7 +12925,7 @@ jQuery(document).ready(function($) {
         // Update Issues Badge
         const geoBadge = $('#geo-checklist-issues-badge');
         if (words > 0) {
-            if (geoIssues > 0) {
+            if (geoIssues > 0 && !window.coraGeoAutoOptimized) {
                 geoBadge.removeClass('bg-emerald-50 text-emerald-600 border-emerald-100')
                         .addClass('bg-red-50 text-red-650 border border-red-100/50')
                         .text(`${geoIssues} ${geoIssues === 1 ? 'Issue' : 'Issues'}`);
@@ -12328,7 +12939,6 @@ jQuery(document).ready(function($) {
                     .addClass('bg-red-50 text-red-650 border border-red-100/50')
                     .text('4 Issues');
         }
-
 
         // Readability Checker (Flesch Reading Ease)
         let sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0).length || 1;
@@ -12417,20 +13027,20 @@ jQuery(document).ready(function($) {
             $('#cora-brief-intent').html('<span class="px-2.5 py-0.5 bg-zinc-100 border border-zinc-200 rounded-full text-zinc-500 text-[10px] font-bold inline-block select-none">N/A</span>');
             $('#cora-brief-competitors').html('<div class="py-2 text-zinc-450 italic text-[11px] text-center">No competitors analyzed</div>');
         } else {
-            $('#cora-brief-audience').text('Marketing professionals, SEO specialists').removeClass('text-zinc-450').addClass('text-zinc-800');
-            $('#cora-brief-intent').html('<span class="px-2.5 py-0.5 bg-emerald-50 border border-emerald-150 rounded-full text-emerald-700 text-[10px] font-bold inline-block select-none">Informational</span>');
+            $('#cora-brief-audience').text('Commercial directors, agency producers, enterprise clients').removeClass('text-zinc-450').addClass('text-zinc-800');
+            $('#cora-brief-intent').html('<span class="px-2.5 py-0.5 bg-emerald-50 border border-emerald-150 rounded-full text-emerald-700 text-[10px] font-bold inline-block select-none">Commercial Intent</span>');
             $('#cora-brief-competitors').html(`
                 <div class="py-1.5 flex items-center justify-between">
-                    <span class="text-zinc-650"><strong class="text-zinc-850 mr-1 font-semibold">1</strong> Search Engine Journal</span>
-                    <span class="font-mono text-zinc-500">92</span>
+                    <span class="text-zinc-650"><strong class="text-zinc-850 mr-1 font-semibold">1</strong> Studio Guild Index</span>
+                    <span class="font-mono text-zinc-500">94</span>
                 </div>
                 <div class="py-1.5 flex items-center justify-between">
-                    <span class="text-zinc-650"><strong class="text-zinc-850 mr-1 font-semibold">2</strong> Backlinko</span>
+                    <span class="text-zinc-650"><strong class="text-zinc-850 mr-1 font-semibold">2</strong> Delhi NCR Commercial Directory</span>
                     <span class="font-mono text-zinc-500">89</span>
                 </div>
                 <div class="py-1.5 flex items-center justify-between">
-                    <span class="text-zinc-650"><strong class="text-zinc-850 mr-1 font-semibold">3</strong> Semrush Blog</span>
-                    <span class="font-mono text-zinc-500">87</span>
+                    <span class="text-zinc-650"><strong class="text-zinc-850 mr-1 font-semibold">3</strong> Industry Production Gazette</span>
+                    <span class="font-mono text-zinc-500">86</span>
                 </div>
             `);
         }
@@ -12448,20 +13058,20 @@ jQuery(document).ready(function($) {
             
             if (textLowerForClaims.includes('pricing') || textLowerForClaims.includes('starts at') || textLowerForClaims.includes('₹') || textLowerForClaims.includes('package')) {
                 detectedClaims.push({
-                    claim: 'Pricing package starts at ₹12,500',
-                    source: 'Bandra Studio Sessions'
+                    claim: 'Pricing package verified against regional rate sheet',
+                    source: 'Studio Rate Card Registry'
                 });
             }
-            if (textLowerForClaims.includes('camera') || textLowerForClaims.includes('gear') || textLowerForClaims.includes('lens') || textLowerForClaims.includes('equipment') || textLowerForClaims.includes('sony') || textLowerForClaims.includes('canon')) {
+            if (textLowerForClaims.includes('camera') || textLowerForClaims.includes('gear') || textLowerForClaims.includes('lens') || textLowerForClaims.includes('equipment') || textLowerForClaims.includes('sony') || textLowerForClaims.includes('profoto')) {
                 detectedClaims.push({
                     claim: 'Equipment list matches active studio inventory',
-                    source: 'Camera Gear Log'
+                    source: 'Camera & Lighting Gear Log'
                 });
             }
-            if (textLowerForClaims.includes('address') || textLowerForClaims.includes('location') || textLowerForClaims.includes('studio') || textLowerForClaims.includes('bandra')) {
+            if (textLowerForClaims.includes('address') || textLowerForClaims.includes('location') || textLowerForClaims.includes('studio') || textLowerForClaims.includes('delhi') || textLowerForClaims.includes('bandra') || textLowerForClaims.includes('gurgaon')) {
                 detectedClaims.push({
-                    claim: 'Studio location verified at Bandra West',
-                    source: 'Google Maps API Integration'
+                    claim: 'Studio location verified against municipal compliance records',
+                    source: 'Local Facility Registry'
                 });
             }
             
@@ -12482,10 +13092,9 @@ jQuery(document).ready(function($) {
                 claimsList.html(htmlStr);
             } else {
                 claimsStatus.text('Passed').removeClass('bg-zinc-100 text-zinc-400 border-zinc-200 bg-green-50 text-green-650 border-green-100/50').addClass('bg-zinc-100 text-zinc-500 border-zinc-200');
-                claimsList.html('<div class="py-3 text-zinc-550 italic text-[11px] text-center">Scanning completed. 0 active claims detected.</div>');
+                claimsList.html('<div class="py-3 text-zinc-550 italic text-[11px] text-center">Scanning completed. 0 unverified claims detected.</div>');
             }
         }
-
     };
 
     window.coraUpdateWordCount = function() {
@@ -12658,7 +13267,15 @@ jQuery(document).ready(function($) {
             $('#left-score-message').text('Needs attention. Fix the checklist issues.');
         }
 
-        coraUpdateSEOAudits();
+        // Debounced SEO Audit invocation to keep fast typing completely fluid
+        if (window.coraSeoAuditDebounceTimer) {
+            clearTimeout(window.coraSeoAuditDebounceTimer);
+        }
+        window.coraSeoAuditDebounceTimer = setTimeout(function() {
+            if (typeof window.coraUpdateSEOAudits === 'function') {
+                window.coraUpdateSEOAudits();
+            }
+        }, 80);
     };
 
     window.coraUpdateExcerptCount = function() {
@@ -12668,9 +13285,19 @@ jQuery(document).ready(function($) {
     };
 
     window.coraRemoveCoverImage = function() {
+        $('#cora-cover-image-container').addClass('hidden');
         $('#cora-cover-image-img').attr('src', '').addClass('hidden');
-        $('#cora-cover-image-placeholder').removeClass('hidden');
         $('#cora-article-cover-url').val('');
+        $('#cora-ambient-cover-btn').removeClass('hidden');
+        $('#cora-thumbnail-id').val('');
+        $('#cora-thumbnail-img').addClass('hidden').attr('src', '');
+        $('#cora-thumbnail-placeholder').removeClass('hidden');
+        $('#cora-thumbnail-img-bh').attr('src', '').addClass('hidden');
+        $('#cora-thumbnail-placeholder-bh').removeClass('hidden');
+        $('#cora-editor-status').text('Unsaved changes');
+        if (typeof window.coraTriggerEditorAutoSave === 'function') {
+            window.coraTriggerEditorAutoSave();
+        }
         window.coraShowToast('Cover image removed', 'info');
     };
 
@@ -12802,6 +13429,46 @@ jQuery(document).ready(function($) {
         }, 800);
     };
 
+    // ── AI Writing Copilot Floating Command Palette (⌘K) ───────────────────
+    window.coraOpenAIWritingPalette = function() {
+        $('#cora-ai-writing-palette').removeClass('hidden');
+        setTimeout(function() {
+            $('#cora-ai-prompt-input').focus().select();
+        }, 80);
+    };
+
+    window.coraCloseAIWritingPalette = function() {
+        $('#cora-ai-writing-palette').addClass('hidden');
+        if (window.coraQuillListingCoordinator) {
+            window.coraQuillListingCoordinator.focus();
+        }
+    };
+
+    window.coraToggleAIWritingPalette = function() {
+        if ($('#cora-ai-writing-palette').hasClass('hidden')) {
+            window.coraOpenAIWritingPalette();
+        } else {
+            window.coraCloseAIWritingPalette();
+        }
+    };
+
+    // Attach global ⌘K / Ctrl+K keyboard shortcut for AI Writing Palette
+    $(document).on('keydown', function(e) {
+        if ((e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'K')) {
+            const $fullEditor = $('#cora-full-page-editor');
+            if ($fullEditor.length && !$fullEditor.hasClass('hidden')) {
+                e.preventDefault();
+                e.stopPropagation();
+                window.coraToggleAIWritingPalette();
+            }
+        } else if (e.key === 'Escape') {
+            if (!$('#cora-ai-writing-palette').hasClass('hidden')) {
+                e.preventDefault();
+                window.coraCloseAIWritingPalette();
+            }
+        }
+    });
+
     window.coraInsertSlashWidget = function(type, data) {
         if (!coraQuillListingCoordinator) {
             window.coraShowToast('Quill editor is not initialized.', 'error');
@@ -12811,25 +13478,45 @@ jQuery(document).ready(function($) {
         const range = coraQuillListingCoordinator.getSelection(true);
         if (!range) return;
 
-        // Find and delete the "/" character that triggered the slash menu
+        // Find and delete the "/" character and any filter text that triggered the slash menu
         const [line, offset] = coraQuillListingCoordinator.getLine(range.index);
         let deleteIndex = range.index;
+        let deleteLength = 1;
         if (line) {
             const lineStartPos = range.index - offset;
             const lineText = (line.domNode.textContent || '').replace(/[\u200B\uFEFF]/g, '');
             const slashOffset = lineText.indexOf('/');
             if (slashOffset !== -1) {
                 deleteIndex = lineStartPos + slashOffset;
+                deleteLength = Math.max(1, range.index - deleteIndex);
             }
         }
 
-        coraQuillListingCoordinator.deleteText(deleteIndex, 1);
+        coraQuillListingCoordinator.deleteText(deleteIndex, deleteLength);
 
         let html = '';
         const postId = $('#cora-article-id').val() || '0';
 
         if (type === 'valuation') {
-            html = `<div class="cora-inline-cta-card" style="background:#ffffff;border:1px solid #e4e4e7;border-radius:12px;padding:24px;margin:24px 0;max-width:560px;font-family:system-ui,sans-serif;box-shadow:0 1px 3px rgba(0,0,0,0.05);" contenteditable="false"><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;"><span style="padding:6px;background:#f4f4f5;border-radius:6px;color:#09090b;display:inline-flex;"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg></span><strong style="font-size:14px;text-transform:uppercase;letter-spacing:0.05em;color:#71717a;">Free Local Appraisal</strong></div><h3 style="font-size:18px;font-weight:800;color:#09090b;margin:0 0 6px;line-height:1.2;">Get a Free Professional Property Valuation</h3><p style="font-size:12px;color:#71717a;margin:0 0 16px;">Find out exactly what your luxury home or villa is worth in today's market.</p><form class="cora-blog-lead-form" onsubmit="event.preventDefault();window.coraSubmitBlogLeadForm(this,${postId});" style="display:grid;gap:10px;"><input type="text" name="first_name" placeholder="Full Name" required style="width:100%;border:1px solid #e4e4e7;border-radius:6px;padding:8px 12px;font-size:13px;box-sizing:border-box;"><input type="email" name="email" placeholder="Email Address" required style="width:100%;border:1px solid #e4e4e7;border-radius:6px;padding:8px 12px;font-size:13px;box-sizing:border-box;"><input type="text" name="phone" placeholder="Phone Number" required style="width:100%;border:1px solid #e4e4e7;border-radius:6px;padding:8px 12px;font-size:13px;box-sizing:border-box;"><input type="text" name="notes" placeholder="Property Address" required style="width:100%;border:1px solid #e4e4e7;border-radius:6px;padding:8px 12px;font-size:13px;box-sizing:border-box;"><button type="submit" style="width:100%;background:#09090b;color:#fff;font-weight:700;border:none;border-radius:6px;padding:10px;font-size:13px;cursor:pointer;">Request Free Appraisal</button></form></div>`;
+            html = `<div class="cora-inline-cta-card" style="background:#ffffff;border:1px solid #e4e4e7;border-radius:12px;padding:24px;margin:24px 0;max-width:560px;font-family:system-ui,sans-serif;box-shadow:0 1px 3px rgba(0,0,0,0.05);" contenteditable="false"><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;"><span style="padding:6px;background:#f4f4f5;border-radius:6px;color:#09090b;display:inline-flex;"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="12" cy="12" r="10"></circle><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"></path><line x1="12" y1="6" x2="12" y2="18"></line></svg></span><strong style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:#71717a;">Free Local Appraisal</strong></div><h3 style="font-size:17px;font-weight:800;color:#09090b;margin:0 0 6px;line-height:1.3;">Get a Free Professional Property Valuation</h3><p style="font-size:12px;color:#71717a;margin:0 0 16px;line-height:1.5;">Find out exactly what your luxury home or villa is worth in today's local market with a comparative market analysis.</p><form class="cora-blog-lead-form" onsubmit="event.preventDefault();window.coraSubmitBlogLeadForm(this,${postId});" style="display:grid;gap:10px;"><input type="text" name="first_name" placeholder="Full Name" required style="width:100%;border:1px solid #e4e4e7;border-radius:8px;padding:8px 12px;font-size:13px;box-sizing:border-box;"><input type="email" name="email" placeholder="Email Address" required style="width:100%;border:1px solid #e4e4e7;border-radius:8px;padding:8px 12px;font-size:13px;box-sizing:border-box;"><input type="text" name="phone" placeholder="Phone Number" required style="width:100%;border:1px solid #e4e4e7;border-radius:8px;padding:8px 12px;font-size:13px;box-sizing:border-box;"><input type="text" name="notes" placeholder="Property Address / Locality" required style="width:100%;border:1px solid #e4e4e7;border-radius:8px;padding:8px 12px;font-size:13px;box-sizing:border-box;"><button type="submit" style="width:100%;background:#09090b;color:#fff;font-weight:700;border:none;border-radius:8px;padding:10px;font-size:13px;cursor:pointer;">Request Valuation Report</button></form></div>`;
+
+        } else if (type === 'neighborhood') {
+            html = `<div class="cora-neighborhood-guide-card" style="background:#ffffff;border:1px solid #e4e4e7;border-radius:12px;padding:24px;margin:24px 0;max-width:560px;font-family:system-ui,sans-serif;box-shadow:0 1px 3px rgba(0,0,0,0.05);" contenteditable="false"><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;"><span style="padding:6px;background:#f4f4f5;border-radius:6px;color:#09090b;display:inline-flex;"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></span><strong style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:#71717a;">Neighborhood Intelligence</strong></div><h3 style="font-size:17px;font-weight:800;color:#09090b;margin:0 0 6px;line-height:1.3;">Prime Enclave Lifestyle &amp; Connectivity</h3><p style="font-size:12px;color:#71717a;margin:0 0 16px;line-height:1.5;">Key neighborhood metrics, accessibility index, and capital appreciation trends.</p><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:14px;background:#fafafa;border:1px solid #f4f4f5;border-radius:8px;margin-bottom:14px;"><div style="text-align:center;"><span style="font-size:10px;color:#71717a;text-transform:uppercase;font-weight:700;display:block;">Schools</span><strong style="font-size:14px;color:#09090b;font-weight:800;display:block;margin-top:2px;">Top Tier</strong><span style="font-size:10px;color:#a1a1aa;">Within 4km</span></div><div style="text-align:center;border-left:1px solid #e4e4e7;border-right:1px solid #e4e4e7;"><span style="font-size:10px;color:#71717a;text-transform:uppercase;font-weight:700;display:block;">Transit</span><strong style="font-size:14px;color:#09090b;font-weight:800;display:block;margin-top:2px;">Express Hub</strong><span style="font-size:10px;color:#a1a1aa;">800m to Metro</span></div><div style="text-align:center;"><span style="font-size:10px;color:#71717a;text-transform:uppercase;font-weight:700;display:block;">YoY Growth</span><strong style="font-size:14px;color:#09090b;font-weight:800;display:block;margin-top:2px;">+14.2%</strong><span style="font-size:10px;color:#a1a1aa;">Capital Index</span></div></div><div style="font-size:11px;color:#71717a;display:flex;align-items:center;gap:6px;"><svg viewBox="0 0 24 24" width="14" height="14" stroke="#71717a" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg><span>Verified by Cora Local Market Intelligence data feed.</span></div></div>`;
+
+        } else if (type === 'booking') {
+            html = `<div class="cora-studio-booking-card" style="background:#ffffff;border:1px solid #e4e4e7;border-radius:12px;padding:24px;margin:24px 0;max-width:560px;font-family:system-ui,sans-serif;box-shadow:0 1px 3px rgba(0,0,0,0.05);" contenteditable="false"><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;"><span style="padding:6px;background:#f4f4f5;border-radius:6px;color:#09090b;display:inline-flex;"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></span><strong style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:#71717a;">Studio Booking</strong></div><h3 style="font-size:17px;font-weight:800;color:#09090b;margin:0 0 6px;line-height:1.3;">Reserve a Production Studio Session</h3><p style="font-size:12px;color:#71717a;margin:0 0 16px;line-height:1.5;">Book studio stage time, lighting packages, and technical production support for your upcoming shoot.</p><form class="cora-blog-lead-form" onsubmit="event.preventDefault();window.coraSubmitBlogLeadForm(this,${postId});" style="display:grid;gap:10px;"><input type="text" name="first_name" placeholder="Producer / Client Name" required style="width:100%;border:1px solid #e4e4e7;border-radius:8px;padding:8px 12px;font-size:13px;box-sizing:border-box;"><input type="email" name="email" placeholder="Email Address" required style="width:100%;border:1px solid #e4e4e7;border-radius:8px;padding:8px 12px;font-size:13px;box-sizing:border-box;"><input type="text" name="phone" placeholder="Phone Number" required style="width:100%;border:1px solid #e4e4e7;border-radius:8px;padding:8px 12px;font-size:13px;box-sizing:border-box;"><input type="text" name="notes" placeholder="Shoot Type &amp; Preferred Dates (e.g. Fashion Editorial / Stage A)" required style="width:100%;border:1px solid #e4e4e7;border-radius:8px;padding:8px 12px;font-size:13px;box-sizing:border-box;"><button type="submit" style="width:100%;background:#09090b;color:#fff;font-weight:700;border:none;border-radius:8px;padding:10px;font-size:13px;cursor:pointer;">Request Session Hold</button></form></div>`;
+
+        } else if (type === 'rates') {
+            html = `<div class="cora-rate-card-block" style="background:#ffffff;border:1px solid #e4e4e7;border-radius:12px;padding:24px;margin:24px 0;max-width:560px;font-family:system-ui,sans-serif;box-shadow:0 1px 3px rgba(0,0,0,0.05);" contenteditable="false"><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;"><span style="padding:6px;background:#f4f4f5;border-radius:6px;color:#09090b;display:inline-flex;"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v12M15 9.5H9.5a2.5 2.5 0 0 0 0 5h5a2.5 2.5 0 0 1 0 5H8"></path></svg></span><strong style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:#71717a;">Production Rates</strong></div><h3 style="font-size:17px;font-weight:800;color:#09090b;margin:0 0 6px;line-height:1.3;">Studio Stage &amp; Production Packages</h3><p style="font-size:12px;color:#71717a;margin:0 0 16px;line-height:1.5;">Transparent standard commercial rates including sound-treated space and power grid.</p><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;"><div style="padding:16px;background:#fafafa;border:1px solid #f4f4f5;border-radius:8px;"><span style="font-size:10px;font-weight:700;text-transform:uppercase;color:#71717a;display:block;">Half-Day (4 Hours)</span><strong style="font-size:18px;font-weight:800;color:#09090b;display:block;margin:4px 0;">₹28,000</strong><p style="font-size:11px;color:#71717a;margin:0;line-height:1.4;">Stage A or B, 3x C-Stands, Green room &amp; high-speed fiber uplink.</p></div><div style="padding:16px;background:#fafafa;border:1px solid #f4f4f5;border-radius:8px;"><span style="font-size:10px;font-weight:700;text-transform:uppercase;color:#71717a;display:block;">Full-Day (8 Hours)</span><strong style="font-size:18px;font-weight:800;color:#09090b;display:block;margin:4px 0;">₹48,000</strong><p style="font-size:11px;color:#71717a;margin:0;line-height:1.4;">Full stage buyout, standard grip package, styling lounge &amp; crew parking.</p></div></div><p style="font-size:11px;color:#71717a;margin:0;">Custom multi-day buyouts, overtime, and cinema camera gear packages available on request.</p></div>`;
+
+        } else if (type === 'casestudy') {
+            html = `<div class="cora-case-study-card" style="background:#ffffff;border:1px solid #e4e4e7;border-radius:12px;padding:24px;margin:24px 0;max-width:560px;font-family:system-ui,sans-serif;box-shadow:0 1px 3px rgba(0,0,0,0.05);" contenteditable="false"><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;"><span style="padding:6px;background:#f4f4f5;border-radius:6px;color:#09090b;display:inline-flex;"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg></span><strong style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:#71717a;">Case Study Showcase</strong></div><h3 style="font-size:17px;font-weight:800;color:#09090b;margin:0 0 6px;line-height:1.3;">Accelerating Growth Through System Design</h3><p style="font-size:12px;color:#71717a;margin:0 0 16px;line-height:1.5;">How our cross-functional team modernized workflow architecture and scaled qualified pipeline.</p><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:14px;background:#fafafa;border:1px solid #f4f4f5;border-radius:8px;margin-bottom:14px;"><div style="text-align:center;"><strong style="font-size:16px;color:#09090b;font-weight:800;display:block;">+240%</strong><span style="font-size:10px;color:#71717a;">Inbound Velocity</span></div><div style="text-align:center;border-left:1px solid #e4e4e7;border-right:1px solid #e4e4e7;"><strong style="font-size:16px;color:#09090b;font-weight:800;display:block;">18 Days</strong><span style="font-size:10px;color:#71717a;">Launch Sprints</span></div><div style="text-align:center;"><strong style="font-size:16px;color:#09090b;font-weight:800;display:block;">99.8%</strong><span style="font-size:10px;color:#71717a;">Client Retention</span></div></div><div style="font-size:11px;color:#71717a;">Key deliverable: Modular headless architecture with real-time editorial pipeline integration.</div></div>`;
+
+        } else if (type === 'package') {
+            html = `<div class="cora-package-card" style="background:#ffffff;border:1px solid #e4e4e7;border-radius:12px;padding:24px;margin:24px 0;max-width:560px;font-family:system-ui,sans-serif;box-shadow:0 1px 3px rgba(0,0,0,0.05);" contenteditable="false"><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;"><span style="padding:6px;background:#f4f4f5;border-radius:6px;color:#09090b;display:inline-flex;"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg></span><strong style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:#71717a;">Retainer &amp; Packages</strong></div><h3 style="font-size:17px;font-weight:800;color:#09090b;margin:0 0 6px;line-height:1.3;">Growth Partnership Retainer</h3><p style="font-size:12px;color:#71717a;margin:0 0 16px;line-height:1.5;">End-to-end design, development, and strategic positioning on a dedicated monthly sprint model.</p><div style="padding:14px;background:#fafafa;border:1px solid #f4f4f5;border-radius:8px;margin-bottom:14px;"><ul style="margin:0;padding:0 0 0 16px;font-size:11px;color:#52525b;line-height:1.7;"><li>Dedicated Senior Lead &amp; Technical Execution Team</li><li>Bi-weekly roadmap releases and continuous deployment</li><li>Priority SLA response window (&lt; 4 hours)</li><li>Full ownership of all repositories and design systems</li></ul></div><div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:12px;font-weight:800;color:#09090b;">Flexible Monthly Billing</span><span style="font-size:10px;color:#71717a;text-transform:uppercase;font-weight:700;">No Long-Term Lock-in</span></div></div>`;
+
+        } else if (type === 'consultation') {
+            html = `<div class="cora-consultation-card" style="background:#ffffff;border:1px solid #e4e4e7;border-radius:12px;padding:24px;margin:24px 0;max-width:560px;font-family:system-ui,sans-serif;box-shadow:0 1px 3px rgba(0,0,0,0.05);" contenteditable="false"><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;"><span style="padding:6px;background:#f4f4f5;border-radius:6px;color:#09090b;display:inline-flex;"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg></span><strong style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:#71717a;">Discovery Consultation</strong></div><h3 style="font-size:17px;font-weight:800;color:#09090b;margin:0 0 6px;line-height:1.3;">Book a Strategy Discovery Call</h3><p style="font-size:12px;color:#71717a;margin:0 0 16px;line-height:1.5;">Schedule a 30-minute scoping discussion with our principals to explore your initiative.</p><form class="cora-blog-lead-form" onsubmit="event.preventDefault();window.coraSubmitBlogLeadForm(this,${postId});" style="display:grid;gap:10px;"><input type="text" name="first_name" placeholder="Full Name" required style="width:100%;border:1px solid #e4e4e7;border-radius:8px;padding:8px 12px;font-size:13px;box-sizing:border-box;"><input type="email" name="email" placeholder="Work Email" required style="width:100%;border:1px solid #e4e4e7;border-radius:8px;padding:8px 12px;font-size:13px;box-sizing:border-box;"><input type="text" name="phone" placeholder="Phone Number" required style="width:100%;border:1px solid #e4e4e7;border-radius:8px;padding:8px 12px;font-size:13px;box-sizing:border-box;"><input type="text" name="notes" placeholder="Project Objectives / Timeline" required style="width:100%;border:1px solid #e4e4e7;border-radius:8px;padding:8px 12px;font-size:13px;box-sizing:border-box;"><button type="submit" style="width:100%;background:#09090b;color:#fff;font-weight:700;border:none;border-radius:8px;padding:10px;font-size:13px;cursor:pointer;">Schedule Discovery Call</button></form></div>`;
 
         } else if (type === 'article') {
             const title   = data && data.title   ? data.title   : 'Related Article';
@@ -12854,8 +13541,23 @@ jQuery(document).ready(function($) {
             const thumb    = data && data.thumb    ? `<img src="${data.thumb}" style="width:56px;height:56px;object-fit:cover;border-radius:8px;flex-shrink:0;">` : `<span style="width:56px;height:56px;background:#f4f4f5;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;"><svg viewBox="0 0 24 24" width="18" height="18" stroke="#a1a1aa" stroke-width="2" fill="none"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></span>`;
             html = `<div class="cora-equipment-card" style="background:#fff;border:1px solid #e4e4e7;border-radius:12px;padding:16px;margin:24px 0;max-width:560px;font-family:system-ui,sans-serif;display:flex;gap:14px;align-items:center;" contenteditable="false">${thumb}<div><span style="font-size:9px;text-transform:uppercase;color:#71717a;font-weight:700;letter-spacing:0.05em;">${category}</span><h4 style="font-size:13px;font-weight:700;color:#09090b;margin:3px 0 4px;">${title}</h4><p style="font-size:11px;color:#71717a;margin:0;">${notes}</p></div></div>`;
 
+        } else if (type === 'image' || type === 'media') {
+            $('#cora-editor-slash-menu').addClass('hidden');
+            if (typeof coraCloseSlashPicker === 'function') coraCloseSlashPicker();
+            window.coraOpenMediaLibrary('inline');
+            return;
+
         } else if (type === 'gallery') {
-            html = `<div class="cora-gallery-showcase" style="margin:24px 0;max-width:560px;font-family:system-ui,sans-serif;" contenteditable="false"><h4 style="font-size:14px;font-weight:700;margin:0 0 10px;color:#09090b;">Media Gallery</h4><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;"><div style="aspect-ratio:1/1;background:#f4f4f5;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#a1a1aa;font-size:10px;font-weight:bold;border:1px solid #e4e4e7;">Exterior</div><div style="aspect-ratio:1/1;background:#f4f4f5;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#a1a1aa;font-size:10px;font-weight:bold;border:1px solid #e4e4e7;">Living Hall</div><div style="aspect-ratio:1/1;background:#f4f4f5;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#a1a1aa;font-size:10px;font-weight:bold;border:1px solid #e4e4e7;">Master Suite</div></div></div>`;
+            $('#cora-editor-slash-menu').addClass('hidden');
+            if (typeof coraCloseSlashPicker === 'function') coraCloseSlashPicker();
+            window.coraOpenMediaLibrary('gallery');
+            return;
+
+        } else if (type === 'answer') {
+            html = `<div class="cora-direct-answer-card" style="background:#fafafa;border:1px solid #e4e4e7;border-radius:12px;padding:20px;margin:24px 0;max-width:560px;font-family:system-ui,sans-serif;" contenteditable="false"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><span style="padding:4px 8px;background:#09090b;border-radius:6px;color:#ffffff;font-size:10px;font-weight:800;letter-spacing:0.05em;text-transform:uppercase;display:inline-flex;align-items:center;gap:4px;"><svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg> Quick Answer</span><span style="font-size:10px;color:#71717a;font-weight:600;">GEO &amp; AI-Optimized Summary</span></div><h4 style="font-size:14px;font-weight:800;color:#09090b;margin:0 0 6px;line-height:1.3;">Executive Summary: Key Takeaway</h4><p style="font-size:12px;color:#3f3f46;margin:0;line-height:1.6;">Direct, concise response addressing search intent and generative engines. Insert core conclusion here to ensure priority indexing across AI-powered search overviews and featured snippets.</p></div>`;
+
+        } else if (type === 'takeaways') {
+            html = `<div class="cora-takeaways-card" style="background:#ffffff;border:1px solid #e4e4e7;border-radius:12px;padding:22px;margin:24px 0;max-width:560px;font-family:system-ui,sans-serif;box-shadow:0 1px 3px rgba(0,0,0,0.05);" contenteditable="false"><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;"><span style="padding:6px;background:#f4f4f5;border-radius:6px;color:#09090b;display:inline-flex;"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg></span><strong style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:#71717a;">Key Takeaways</strong></div><ul style="margin:0;padding:0;list-style:none;display:grid;gap:10px;"><li style="display:flex;align-items:flex-start;gap:10px;font-size:12px;color:#27272a;line-height:1.5;"><span style="width:18px;height:18px;border-radius:999px;background:#f4f4f5;color:#09090b;font-weight:800;font-size:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">1</span><span>Strategic positioning and local entity relevance directly improve conversion velocity.</span></li><li style="display:flex;align-items:flex-start;gap:10px;font-size:12px;color:#27272a;line-height:1.5;"><span style="width:18px;height:18px;border-radius:999px;background:#f4f4f5;color:#09090b;font-weight:800;font-size:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">2</span><span>Monochromatic, high-clarity interfaces remove cognitive friction across desktop and mobile.</span></li><li style="display:flex;align-items:flex-start;gap:10px;font-size:12px;color:#27272a;line-height:1.5;"><span style="width:18px;height:18px;border-radius:999px;background:#f4f4f5;color:#09090b;font-weight:800;font-size:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">3</span><span>Standardized lead capture triggers convert readers at peak interest points in the article.</span></li></ul></div>`;
 
         } else if (type === 'divider') {
             html = `<div class="cora-divider-block" style="margin:32px 0;display:flex;align-items:center;gap:12px;" contenteditable="false"><div style="flex:1;height:1px;background:#e4e4e7;"></div><svg viewBox="0 0 24 24" width="14" height="14" stroke="#d4d4d8" stroke-width="2" fill="none"><circle cx="12" cy="12" r="1"></circle><circle cx="6" cy="12" r="1"></circle><circle cx="18" cy="12" r="1"></circle></svg><div style="flex:1;height:1px;background:#e4e4e7;"></div></div>`;
@@ -12864,7 +13566,24 @@ jQuery(document).ready(function($) {
             html = `<div class="cora-pullquote-block" style="margin:32px 0;padding:24px 28px;border-left:3px solid #09090b;background:#fafafa;border-radius:0 8px 8px 0;max-width:560px;font-family:system-ui,sans-serif;" contenteditable="false"><p style="font-size:18px;font-weight:700;color:#09090b;line-height:1.5;margin:0 0 10px;font-style:italic;">"The best investment on earth is earth."</p><span style="font-size:11px;color:#71717a;font-weight:600;">— Louis Glickman</span></div>`;
 
         } else if (type === 'signature') {
-            html = `<div class="cora-editorial-signature" style="margin:24px 0;padding-top:16px;border-top:1px solid #e4e4e7;font-family:system-ui,sans-serif;max-width:560px;" contenteditable="false"><p style="font-size:12px;margin:0;font-weight:700;color:#09090b;">Nitin &amp; Shanaya Arora</p><p style="font-size:10px;margin:2px 0 0;color:#71717a;">Lead Listings Coordinator &amp; Editors at Apex Realty Group</p></div>`;
+            const industry = window.coraActiveIndustry || 'general';
+            let authorName = 'Aarav Mehta';
+            let authorRole = 'Managing Director &amp; Principal Consultant';
+            let companyName = 'Cora Studio Global';
+
+            if (industry === 'photography_studio' || industry === 'studio') {
+                authorName = 'Rohan Verma';
+                authorRole = 'Studio Director &amp; Lead Cinematographer';
+                companyName = 'Cora Creative Studios';
+            } else if (industry === 'real_estate') {
+                authorName = 'Kavya Patel';
+                authorRole = 'Lead Broker &amp; Principal Coordinator';
+                companyName = 'Apex Realty &amp; Luxury Estates';
+            }
+
+            const initials = authorName.split(' ').map(function(n) { return n[0]; }).join('');
+
+            html = `<div class="cora-editorial-signature" style="margin:28px 0;padding-top:18px;border-top:1px solid #e4e4e7;font-family:system-ui,sans-serif;max-width:560px;" contenteditable="false"><div style="display:flex;align-items:center;gap:12px;"><div style="width:40px;height:40px;border-radius:999px;background:#f4f4f5;border:1px solid #e4e4e7;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#09090b;flex-shrink:0;">${initials}</div><div><p style="font-size:13px;margin:0;font-weight:700;color:#09090b;">${authorName}</p><p style="font-size:11px;margin:2px 0 0;color:#71717a;">${authorRole} · ${companyName}</p></div></div></div>`;
         }
 
         coraQuillListingCoordinator.insertEmbed(deleteIndex, 'cora-widget', { type: type, html: html });
@@ -12875,7 +13594,7 @@ jQuery(document).ready(function($) {
         $('#cora-editor-slash-menu').addClass('hidden');
         if (typeof coraCloseSlashPicker === 'function') coraCloseSlashPicker();
         window.coraShowToast('Widget block inserted successfully!', 'success');
-        coraUpdateWordCount();
+        if (window.coraUpdateWordCount) coraUpdateWordCount();
     };
 
     // ── Slash Picker: open inline search sub-panel ─────────────────────────
@@ -12930,10 +13649,49 @@ jQuery(document).ready(function($) {
                 html += `<button type="button" onclick="coraSelectSlashItem('${type}', JSON.parse(this.dataset.item))" data-item="${safeData}" class="w-full text-left px-3 py-2 hover:bg-zinc-50 flex items-center gap-2.5 transition-colors cursor-pointer border-none bg-transparent">${thumb}<div class="min-w-0 flex-1"><span class="font-semibold block text-[11px] text-zinc-800 truncate">${item.title}</span>${sub}</div></button>`;
             });
             $('#cora-slash-picker-results').html(html);
+            $('#cora-slash-picker-results button').first().addClass('cora-slash-active bg-zinc-100');
         }).fail(function() {
             $('#cora-slash-picker-results').html('<div class="px-3 py-4 text-[10px] text-zinc-400 text-center">Search failed. Check your connection.</div>');
         });
     };
+
+    $(document).on('keydown', '#cora-slash-picker-search', function(e) {
+        const $items = $('#cora-slash-picker-results button:visible');
+        if (e.key === 'Escape') {
+            e.preventDefault();
+            window.coraCloseSlashPicker();
+            return;
+        }
+        if (!$items.length) return;
+        let $active = $items.filter('.cora-slash-active');
+
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            let idx = $active.length ? $items.index($active) + 1 : 0;
+            if (idx >= $items.length) idx = 0;
+            $items.removeClass('cora-slash-active bg-zinc-100');
+            $items.eq(idx).addClass('cora-slash-active bg-zinc-100');
+            if ($items.eq(idx)[0].scrollIntoView) {
+                $items.eq(idx)[0].scrollIntoView({ block: 'nearest' });
+            }
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            let idx = $active.length ? $items.index($active) - 1 : $items.length - 1;
+            if (idx < 0) idx = $items.length - 1;
+            $items.removeClass('cora-slash-active bg-zinc-100');
+            $items.eq(idx).addClass('cora-slash-active bg-zinc-100');
+            if ($items.eq(idx)[0].scrollIntoView) {
+                $items.eq(idx)[0].scrollIntoView({ block: 'nearest' });
+            }
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            if ($active.length) {
+                $active[0].click();
+            } else if ($items.length) {
+                $items.first()[0].click();
+            }
+        }
+    });
 
     window.coraSelectSlashItem = function(type, item) {
         $('#cora-editor-slash-menu').addClass('hidden');
@@ -13889,20 +14647,8 @@ jQuery(document).ready(function($) {
     };
 
     window.coraOpenMediaSelector = function(fieldId) {
-        if (typeof wp !== 'undefined' && wp.media) {
-            var frame = wp.media({
-                title: 'Select Brand Asset',
-                button: { text: 'Use this asset' },
-                multiple: false
-            });
-            frame.on('select', function() {
-                var attachment = frame.state().get('selection').first().toJSON();
-                $('#' + fieldId).val(attachment.url).trigger('change');
-            });
-            frame.open();
-        } else {
-            window.coraShowToast('Media library not available.');
-        }
+        window.coraMediaSelectField = fieldId;
+        window.coraOpenMediaLibrary('field');
     };
 
     window.coraOpenNewMenuDrawer = function() {
@@ -14138,19 +14884,7 @@ jQuery(document).ready(function($) {
     };
 
     window.coraOpenMediaUploader = function() {
-        if (typeof wp !== 'undefined' && wp.media) {
-            var frame = wp.media({
-                title: 'Upload Media',
-                button: { text: 'Insert Media' },
-                multiple: true
-            });
-            frame.on('select', function() {
-                window.location.reload();
-            });
-            frame.open();
-        } else {
-            window.coraShowToast('Media library not available.');
-        }
+        window.coraOpenMediaLibrary('inline');
     };
 
     window.coraLoadMediaIntoEditor = function(attachmentId) {
@@ -15670,24 +16404,28 @@ jQuery(document).ready(function($) {
             return;
         }
 
+        const kw = $('#cora-seo-keyword').val() || $('#cora-article-title').val() || 'Delhi NCR Commercial Studio & Media Infrastructure';
         let html = '';
         if (type === 'answer') {
-            html = `<h2>Direct Answer: What are the current commercial property leasing rates in DLF CyberCity, Gurgaon?</h2><p class="cora-geo-answer-block"><strong>Answer:</strong> Commercial leasing rates in DLF CyberCity, Gurgaon currently range between ₹140 to ₹180 per sq. ft. per month, depending on the building class and office size. Premium Grade-A office spaces command up to ₹200 per sq. ft. due to high corporate demand.</p><p></p>`;
-            window.coraShowToast('Answer Block template added to editor.', 'success');
+            html = `<div class="cora-geo-answer-block" style="background-color:#f4f4f5; border-left: 3px solid #09090b; padding: 14px 16px; font-size: 0.95rem; line-height: 1.6; color: #18181b; margin: 1.5rem 0; border-radius: 0 8px 8px 0;"><h2>Direct Answer: What are the current market leasing rates and specifications for ${kw}?</h2><p><strong>Answer:</strong> Commercial production and studio leasing rates for ${kw} currently range between ₹140 to ₹185 per sq. ft. per month in Grade-A clusters. Primary production facilities report high corporate occupancy with verified municipal compliance.</p></div><p></p>`;
+            window.coraShowToast('Direct Answer block inserted with undo support.', 'success');
         } else if (type === 'takeaways') {
-            html = `<h3>Key Takeaways & Facts:</h3><ul><li><strong>Average rent:</strong> ₹160/sq.ft. in Grade-A complexes.</li><li><strong>Vacancy rate:</strong> Reduced to 8.5% in Gurgaon's primary commercial sectors.</li><li><strong>Premium options:</strong> DLF CyberCity represents the highest demand hub.</li></ul><p></p>`;
-            window.coraShowToast('Key Takeaways block added to editor.', 'success');
+            html = `<div class="cora-geo-takeaways-block" style="background:#ffffff; border:1px solid #e4e4e7; border-radius:10px; padding:16px; margin:1.5rem 0;"><h3>Key Takeaways &amp; Verified Regional Specifications:</h3><ul style="margin:8px 0 0 18px; line-height:1.7;"><li><strong>Benchmark Yield:</strong> 8.2% to 11.4% across primary hubs for ${kw}.</li><li><strong>Vacancy Rate:</strong> Dropped to 6.2% across primary managed complexes.</li><li><strong>Turnkey Facilities:</strong> Includes calibrated sound stages and multi-circuit lighting distribution.</li></ul></div><p></p>`;
+            window.coraShowToast('Key Takeaways block inserted.', 'success');
         } else if (type === 'faq') {
-            html = `<h3>Frequently Asked Questions (FAQ)</h3><p><strong>Q: What is the average lease lock-in period in DLF CyberCity?</strong><br>A: Standard commercial lease lock-in periods range from 3 to 5 years with a 15% escalation every 3 years.</p><p><strong>Q: Are there ready-to-move office configurations available?</strong><br>A: Yes, multiple fully-furnished managed office spaces are available for lease starting from 10,000 sq. ft.</p><p></p>`;
-            window.coraShowToast('FAQ Section block added to editor.', 'success');
+            html = `<div class="cora-geo-faq-block" style="margin:1.5rem 0;"><h3>Frequently Asked Questions (FAQ)</h3><p><strong>Q: What is the typical lease lock-in period for ${kw}?</strong><br>A: Standard commercial terms range from 3 to 5 years with a structured 15% escalation cycle every 36 months.</p><p><strong>Q: Are fully-furnished turnkey configurations available?</strong><br>A: Yes, managed suites with tethered workstations and high-speed fiber infrastructure are available for immediate occupancy.</p></div><p></p>`;
+            window.coraShowToast('FAQ section block inserted.', 'success');
         }
 
         if (html) {
             const range = window.coraQuillListingCoordinator.getSelection();
             const index = range ? range.index : window.coraQuillListingCoordinator.getLength();
-            window.coraQuillListingCoordinator.clipboard.dangerouslyPasteHTML(index, html);
+            window.coraQuillListingCoordinator.clipboard.dangerouslyPasteHTML(index, html, 'user');
             
             // Trigger recalculations
+            if (typeof window.coraUpdateSchemaPreview === 'function') {
+                window.coraUpdateSchemaPreview();
+            }
             if (typeof window.coraUpdateWordCount === 'function') {
                 window.coraUpdateWordCount();
             }

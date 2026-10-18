@@ -550,8 +550,10 @@ class Cora_Autonomous_Campaigns {
         update_post_meta( $post_id, '_cora_editorial_status', 'draft' );
         update_post_meta( $post_id, '_cora_workflow_stage', 'drafting' );
         update_post_meta( $post_id, '_cora_focus_keyword', $keyword );
+        update_post_meta( $post_id, '_cora_seo_keyword', $keyword );
         update_post_meta( $post_id, '_cora_meta_title', $title );
         update_post_meta( $post_id, '_cora_meta_desc', $meta_desc );
+        update_post_meta( $post_id, '_cora_seo_description', $meta_desc );
         update_post_meta( $post_id, '_cora_assigned_ai', $campaign['assigned_ai'] );
 
         if ( $opp_id > 0 ) {
@@ -786,6 +788,22 @@ class Cora_Autonomous_Campaigns {
             'ai_overview' => true,
         );
         update_post_meta( $post_id, '_cora_geo_signals', $geo_signals );
+
+        $faq_schema = json_encode( array(
+            '@context'   => 'https://schema.org',
+            '@type'      => 'FAQPage',
+            'mainEntity' => array(
+                array(
+                    '@type'          => 'Question',
+                    'name'           => "What are the standard commercial rates for {$keyword}?",
+                    'acceptedAnswer' => array(
+                        '@type' => 'Answer',
+                        'text'  => "Commercial rates for {$keyword} across Delhi NCR and Mumbai average ₹12,500 to ₹18,500 depending on studio footprint and lighting package.",
+                    ),
+                ),
+            ),
+        ), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES );
+        update_post_meta( $post_id, '_cora_faq_schema', $faq_schema );
 
         // Recalculate 11-point SEO & GEO scores
         $audit = self::calculate_seo_scores( $post_id, $title, $improved_content, $slug, $keyword, $meta_desc );

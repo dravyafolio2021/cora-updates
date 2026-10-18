@@ -23,10 +23,49 @@ if ( empty( $agency_id ) || $agency_id === '0' || $agency_id === 0 ) {
     $agency_id = 1;
 }
 
+$is_mcp_eligible = function_exists( 'cora_is_workspace_mcp_eligible' ) ? cora_is_workspace_mcp_eligible( $agency_id ) : true;
+
+$workspace_name = 'Cora Workspace';
+$display_host   = wp_parse_url( home_url(), PHP_URL_HOST ) ?: ( $_SERVER['HTTP_HOST'] ?? 'cora.local' );
+
+global $wpdb;
+if ( ! empty( $agency_id ) && $wpdb ) {
+    $agencies_table = $wpdb->prefix . 'cora_agencies';
+    if ( function_exists( 'cora_table_exists' ) ? cora_table_exists( $agencies_table ) : true ) {
+        $agency_row = $wpdb->get_row( $wpdb->prepare( "SELECT name, slug, domain FROM {$agencies_table} WHERE id = %d LIMIT 1", intval( $agency_id ) ) );
+        if ( ! empty( $agency_row->name ) ) {
+            $workspace_name = $agency_row->name;
+        }
+        if ( ! empty( $agency_row->domain ) ) {
+            $clean_domain = preg_replace( '#^https?://#', '', rtrim( $agency_row->domain, '/' ) );
+            if ( ! empty( $clean_domain ) ) {
+                $display_host = $clean_domain;
+            }
+        }
+    }
+}
+if ( empty( $workspace_name ) || $workspace_name === 'Cora Workspace' ) {
+    $opt_name = get_option( 'cora_workspace_name', '' );
+    if ( ! empty( $opt_name ) ) {
+        $workspace_name = $opt_name;
+    } else {
+        $blog_name = get_bloginfo( 'name' );
+        if ( ! empty( $blog_name ) ) {
+            $workspace_name = $blog_name;
+        }
+    }
+}
+
+$mcp_target_name = "{$workspace_name} ({$display_host})";
+$mcp_target_desc = "Autonomous content campaigns and studio operations for {$workspace_name} on {$display_host}.";
+
 $mcp_server_url = home_url( '/wp-json/cora/v1/mcp' );
 $mcp_sse_url    = home_url( '/wp-json/cora-mcp/v1/sse' );
 $rest_base_url  = home_url( '/wp-json/cora/v1' );
 $openapi_url    = home_url( '/wp-json/cora/v1/mcp/openapi.json' );
+
+$workspace_skills  = class_exists( 'Cora_Plugins_Skills_Engine' ) ? Cora_Plugins_Skills_Engine::get_workspace_skills( $agency_id, 'active' ) : array();
+$workspace_plugins = class_exists( 'Cora_Plugins_Skills_Engine' ) ? Cora_Plugins_Skills_Engine::get_workspace_plugins( $agency_id, 'active' ) : array();
 ?>
 
 <div id="cora-workspace-developer-gateway-drawer" class="cora-docked-drawer collapsed" aria-label="Workspace Developer API and MCP Gateway">
@@ -42,14 +81,22 @@ $openapi_url    = home_url( '/wp-json/cora/v1/mcp/openapi.json' );
                 </div>
                 <div class="min-w-0 flex items-center gap-2">
                     <h2 class="text-sm font-bold text-zinc-950 dark:text-white truncate tracking-tight">Workspace API &amp; MCP Gateway</h2>
+                    <?php if ( $is_mcp_eligible ) : ?>
                     <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-medium bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60 shrink-0">
                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                         <span>Workspace Live</span>
                     </span>
+                    <?php else : ?>
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200/60 dark:border-zinc-700 shrink-0">
+                        <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                        <span>Pro Feature</span>
+                    </span>
+                    <?php endif; ?>
                 </div>
             </div>
 
             <!-- Center: Level 01 Segmented Pill Control -->
+            <?php if ( $is_mcp_eligible ) : ?>
             <div class="flex items-center justify-start lg:justify-center overflow-x-auto cora-no-scrollbar py-0.5 flex-1 min-w-0">
                 <div class="p-1 bg-zinc-100/90 dark:bg-zinc-800/80 rounded-xl border border-zinc-200/70 dark:border-zinc-800/80 flex items-center gap-1 select-none shrink-0" id="cora-ws-gw-tab-bar">
                     <button type="button" onclick="coraSwitchWorkspaceGwTab('keys')" id="cora-ws-gw-btn-keys" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-white dark:bg-zinc-900 text-zinc-950 dark:text-white shadow-2xs border-0 cursor-pointer whitespace-nowrap flex items-center gap-1.5">
@@ -66,7 +113,7 @@ $openapi_url    = home_url( '/wp-json/cora/v1/mcp/openapi.json' );
                     </button>
                     <button type="button" onclick="coraSwitchWorkspaceGwTab('tools')" id="cora-ws-gw-btn-tools" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white border-0 bg-transparent cursor-pointer whitespace-nowrap flex items-center gap-1.5">
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
-                        <span>Universal Tools</span>
+                        <span>Skills &amp; MCP Plugins</span>
                     </button>
                     <button type="button" onclick="coraSwitchWorkspaceGwTab('rest')" id="cora-ws-gw-btn-rest" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white border-0 bg-transparent cursor-pointer whitespace-nowrap flex items-center gap-1.5">
                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
@@ -78,6 +125,9 @@ $openapi_url    = home_url( '/wp-json/cora/v1/mcp/openapi.json' );
                     </button>
                 </div>
             </div>
+            <?php else : ?>
+            <div class="flex-1"></div>
+            <?php endif; ?>
 
             <!-- Right: Maximize & Close -->
             <div class="flex items-center gap-1.5 shrink-0 ml-auto">
@@ -94,6 +144,86 @@ $openapi_url    = home_url( '/wp-json/cora/v1/mcp/openapi.json' );
     <!-- Scrollable Body Canvas (Centered max-w-4xl) -->
     <div class="cora-drawer-body flex-1 overflow-y-auto px-4 sm:px-8 py-6 bg-zinc-50/50 dark:bg-zinc-950/50">
         <div class="max-w-4xl mx-auto space-y-6">
+        <?php if ( ! $is_mcp_eligible ) : ?>
+            <!-- UPGRADE PAYWALL CARD (Rule 1, 4, 13 Compliant) -->
+            <div class="p-8 sm:p-12 rounded-3xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xs text-center space-y-6 my-6">
+                <!-- Monochromatic Lock Icon Tile -->
+                <div class="w-14 h-14 rounded-2xl bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 flex items-center justify-center mx-auto shadow-2xs border border-zinc-200/60 dark:border-zinc-700/60">
+                    <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                </div>
+
+                <!-- Headline & Subtitle -->
+                <div class="space-y-2 max-w-lg mx-auto">
+                    <h3 class="text-lg font-bold text-zinc-950 dark:text-white tracking-tight">
+                        Model Context Protocol &amp; Developer Gateway (Pro Feature)
+                    </h3>
+                    <p class="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">
+                        Direct AI connections (Google Gemini, Claude, ChatGPT) and developer REST APIs are available exclusively on Professional and Scale workspaces.
+                    </p>
+                </div>
+
+                <!-- Plan Highlights Card: Pro & Scale -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left max-w-2xl mx-auto pt-2">
+                    <!-- Professional Plan -->
+                    <div class="p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-zinc-50/70 dark:bg-zinc-800/40 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-zinc-950 dark:text-white uppercase tracking-wider">Professional</span>
+                            <span class="text-xs font-mono font-bold text-zinc-900 dark:text-zinc-100 bg-zinc-200/70 dark:bg-zinc-700/60 px-2 py-0.5 rounded-lg">&#8377;1,999/mo</span>
+                        </div>
+                        <ul class="text-xs text-zinc-600 dark:text-zinc-400 space-y-2">
+                            <li class="flex items-start gap-2">
+                                <svg class="w-4 h-4 text-zinc-900 dark:text-zinc-100 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                <span>Full MCP 2.0 Server &amp; OpenAPI gateway</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <svg class="w-4 h-4 text-zinc-900 dark:text-zinc-100 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                <span>1-Click Google Gemini, Claude &amp; ChatGPT connect</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <svg class="w-4 h-4 text-zinc-900 dark:text-zinc-100 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                <span>Unlimited Workspace API live keys &amp; tokens</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Scale Plan -->
+                    <div class="p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-zinc-50/70 dark:bg-zinc-800/40 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-zinc-950 dark:text-white uppercase tracking-wider">Scale</span>
+                            <span class="text-xs font-mono font-bold text-zinc-900 dark:text-zinc-100 bg-zinc-200/70 dark:bg-zinc-700/60 px-2 py-0.5 rounded-lg">&#8377;2,999/mo</span>
+                        </div>
+                        <ul class="text-xs text-zinc-600 dark:text-zinc-400 space-y-2">
+                            <li class="flex items-start gap-2">
+                                <svg class="w-4 h-4 text-zinc-900 dark:text-zinc-100 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                <span>Everything in Professional</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <svg class="w-4 h-4 text-zinc-900 dark:text-zinc-100 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                <span>Multi-model autonomous agent campaigns</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <svg class="w-4 h-4 text-zinc-900 dark:text-zinc-100 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                <span>High-throughput webhooks &amp; dedicated SLA</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- CTA Button -->
+                <div class="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+                    <button type="button" onclick="if(typeof coraCloseWorkspaceDeveloperGateway==='function')coraCloseWorkspaceDeveloperGateway(); if(typeof coraNavigateTo==='function'){coraNavigateTo('settings?tab=billing');}else{window.location.href='/workspace/settings?tab=billing';}" class="px-6 py-3 rounded-xl bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:text-zinc-950 text-white text-xs font-bold transition-all shadow-2xs active:scale-97 cursor-pointer border-0 flex items-center gap-2">
+                        <span>Upgrade to Professional</span>
+                        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                    </button>
+                    <button type="button" onclick="coraCloseWorkspaceDeveloperGateway()" class="px-5 py-3 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs font-semibold transition-all cursor-pointer border border-zinc-200/80 dark:border-zinc-700">
+                        Dismiss
+                    </button>
+                </div>
+            </div>
+        <?php else : ?>
 
             <!-- ============================================================
                  TAB 1: WORKSPACE API KEYS
@@ -475,7 +605,7 @@ $openapi_url    = home_url( '/wp-json/cora/v1/mcp/openapi.json' );
                             <div class="space-y-1">
                                 <label for="cora-gemini-server-name" class="block text-xs font-semibold text-zinc-700 dark:text-zinc-300">Server name</label>
                                 <div class="flex items-center gap-2">
-                                    <input type="text" id="cora-gemini-server-name" readonly value="Cora Workspace" class="w-full font-mono text-xs px-3 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-semibold">
+                                    <input type="text" id="cora-gemini-server-name" readonly value="<?php echo esc_attr( $mcp_target_name ); ?>" class="w-full font-mono text-xs px-3 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-semibold">
                                     <button type="button" onclick="coraCopyInputValue('cora-gemini-server-name')" class="px-3 py-2 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 rounded-xl text-xs font-semibold shrink-0 cursor-pointer border border-zinc-200 dark:border-zinc-700 transition-colors">
                                         Copy
                                     </button>
@@ -486,7 +616,7 @@ $openapi_url    = home_url( '/wp-json/cora/v1/mcp/openapi.json' );
                             <div class="space-y-1">
                                 <label for="cora-gemini-server-desc" class="block text-xs font-semibold text-zinc-700 dark:text-zinc-300">Description</label>
                                 <div class="flex items-center gap-2">
-                                    <input type="text" id="cora-gemini-server-desc" readonly value="Autonomous content campaigns and studio operations." class="w-full text-xs px-3 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-medium">
+                                    <input type="text" id="cora-gemini-server-desc" readonly value="<?php echo esc_attr( $mcp_target_desc ); ?>" class="w-full text-xs px-3 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-medium">
                                     <button type="button" onclick="coraCopyInputValue('cora-gemini-server-desc')" class="px-3 py-2 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 rounded-xl text-xs font-semibold shrink-0 cursor-pointer border border-zinc-200 dark:border-zinc-700 transition-colors">
                                         Copy
                                     </button>
@@ -674,7 +804,7 @@ Security:  Multi-Tenant Scoped Isolation (Workspace ID #<?php echo esc_html( $ag
                                     <span class="text-[10px] text-zinc-400">Required</span>
                                 </div>
                                 <div class="flex items-center gap-2">
-                                    <input type="text" id="cora-claude-name" readonly value="Cora Workspace" class="w-full font-mono text-xs px-3.5 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 select-all font-semibold">
+                                    <input type="text" id="cora-claude-name" readonly value="<?php echo esc_attr( $mcp_target_name ); ?>" class="w-full font-mono text-xs px-3.5 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 select-all font-semibold">
                                     <button type="button" onclick="coraCopyInputValue('cora-claude-name')" class="px-3.5 py-2.5 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 rounded-xl text-xs font-semibold shrink-0 cursor-pointer border border-zinc-200 dark:border-zinc-700 transition-colors flex items-center gap-1.5">
                                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                                         <span>Copy</span>
@@ -854,9 +984,9 @@ Security:  Multi-Tenant Scoped Isolation (Workspace ID #<?php echo esc_html( $ag
                             <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="4" y="4" width="16" height="16" rx="2"></rect><rect x="9" y="9" width="6" height="6"></rect></svg>
                             <span>Custom MCP Server (Recommended &bull; 1-Click Setup)</span>
                         </button>
-                        <button type="button" onclick="coraSwitchChatGptSetupMethod('action')" id="cora-chatgpt-tab-action" class="cora-chatgpt-tab-btn flex-1 py-1.5 px-3 rounded-lg text-xs font-medium transition-all text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white border-0 bg-transparent cursor-pointer flex items-center justify-center gap-1.5">
-                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-                            <span>Custom GPT Action (OpenAPI 3.1)</span>
+                        <button type="button" onclick="coraSwitchChatGptSetupMethod('skills')" id="cora-chatgpt-tab-skills" class="cora-chatgpt-tab-btn flex-1 py-1.5 px-3 rounded-lg text-xs font-medium transition-all text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white border-0 bg-transparent cursor-pointer flex items-center justify-center gap-1.5">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                            <span>Agent Skills &amp; MCP Plugins</span>
                         </button>
                     </div>
 
@@ -905,7 +1035,7 @@ Security:  Multi-Tenant Scoped Isolation (Workspace ID #<?php echo esc_html( $ag
                             <div class="space-y-1.5">
                                 <label for="cora-chatgpt-name" class="block text-xs font-bold text-zinc-900 dark:text-zinc-100">Name</label>
                                 <div class="flex items-center gap-2">
-                                    <input type="text" id="cora-chatgpt-name" readonly value="Cora Workspace" class="w-full font-mono text-xs px-3.5 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 select-all font-semibold">
+                                    <input type="text" id="cora-chatgpt-name" readonly value="<?php echo esc_attr( $mcp_target_name ); ?>" class="w-full font-mono text-xs px-3.5 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 select-all font-semibold">
                                     <button type="button" onclick="coraCopyInputValue('cora-chatgpt-name')" class="px-3.5 py-2.5 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 rounded-xl text-xs font-semibold shrink-0 cursor-pointer border border-zinc-200 dark:border-zinc-700 transition-colors flex items-center gap-1.5">
                                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                                         <span>Copy</span>
@@ -917,7 +1047,7 @@ Security:  Multi-Tenant Scoped Isolation (Workspace ID #<?php echo esc_html( $ag
                             <div class="space-y-1.5">
                                 <label for="cora-chatgpt-desc" class="block text-xs font-bold text-zinc-900 dark:text-zinc-100">Description (optional)</label>
                                 <div class="flex items-center gap-2">
-                                    <input type="text" id="cora-chatgpt-desc" readonly value="Autonomous content campaigns and studio operations." class="w-full text-xs px-3.5 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 select-all font-medium">
+                                    <input type="text" id="cora-chatgpt-desc" readonly value="<?php echo esc_attr( $mcp_target_desc ); ?>" class="w-full text-xs px-3.5 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 select-all font-medium">
                                     <button type="button" onclick="coraCopyInputValue('cora-chatgpt-desc')" class="px-3.5 py-2.5 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 rounded-xl text-xs font-semibold shrink-0 cursor-pointer border border-zinc-200 dark:border-zinc-700 transition-colors flex items-center gap-1.5">
                                         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                                         <span>Copy</span>
@@ -1025,67 +1155,141 @@ Security:  Multi-Tenant Scoped Isolation (Workspace ID #<?php echo esc_html( $ag
                         </div>
                     </div>
 
-                    <!-- MODE 2: CUSTOM GPT ACTION VIEW (OpenAPI 3.1) -->
-                    <div id="cora-chatgpt-action-view" class="hidden space-y-4">
-                        <!-- Step-by-Step Custom GPT Guide -->
-                        <div class="p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xs space-y-3">
+                    <!-- MODE 2: AGENT SKILLS & MCP PLUGINS VIEW -->
+                    <div id="cora-chatgpt-skills-view" class="hidden space-y-4">
+                        <!-- Header Banner -->
+                        <div class="p-4 sm:p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xs space-y-2">
                             <div class="flex items-center gap-2">
-                                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-                                <h4 class="text-xs font-bold text-zinc-950 dark:text-white uppercase tracking-wider">Custom GPT 3-Step Setup Instructions</h4>
+                                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                <h4 class="text-xs font-bold text-zinc-950 dark:text-white uppercase tracking-wider">ChatGPT Agent Skills &amp; MCP Plugin Catalog</h4>
                             </div>
-                            <ol class="space-y-2 text-xs text-zinc-600 dark:text-zinc-400 list-decimal list-inside leading-relaxed">
-                                <li>In ChatGPT, open <span class="font-bold text-zinc-900 dark:text-zinc-100">Explore GPTs</span> &rarr; click <span class="font-bold text-zinc-900 dark:text-zinc-100">+ Create</span> &rarr; select the <span class="font-bold text-zinc-900 dark:text-zinc-100">Configure</span> tab.</li>
-                                <li>Scroll to <span class="font-bold text-zinc-900 dark:text-zinc-100">Actions</span> and click <span class="font-bold text-zinc-900 dark:text-zinc-100">Create new action</span>.</li>
-                                <li>In the Schema box, click <span class="font-bold text-zinc-900 dark:text-zinc-100">Import from URL</span> and paste the Direct Import URL below (or click "Copy OpenAPI 3.1 Schema").</li>
-                                <li>Under <span class="font-bold text-zinc-900 dark:text-zinc-100">Authentication</span>, select <span class="font-bold text-zinc-900 dark:text-zinc-100">API Key</span> &rarr; Auth Type: <span class="font-bold text-zinc-900 dark:text-zinc-100">Bearer</span> &rarr; enter your Workspace Live Key.</li>
-                            </ol>
+                            <p class="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
+                                Once connected via Custom MCP Server, ChatGPT inherits all active workspace skills, behavioral prompt directives, and dynamic MCP tools with real-time execution.
+                            </p>
                         </div>
 
-                        <!-- Direct Import URL Bar -->
-                        <div class="border border-zinc-200/80 dark:border-zinc-800 rounded-2xl p-4 bg-white dark:bg-zinc-900 shadow-2xs space-y-2">
-                            <label class="block text-xs font-semibold text-zinc-700 dark:text-zinc-300">Direct OpenAPI Import URL for ChatGPT Action:</label>
+                        <!-- 5 High-Impact Agent Skills & Plugins for ChatGPT -->
+                        <div class="space-y-3">
+                            <!-- Skill 1: SEO & GEO Content Architect -->
+                            <div class="p-4 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xs space-y-2.5">
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="flex items-center gap-2.5">
+                                        <div class="w-8 h-8 rounded-xl bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400 border border-purple-200/60 dark:border-purple-800/60 flex items-center justify-center shrink-0">
+                                            <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                                        </div>
+                                        <div>
+                                            <h5 class="text-xs font-bold text-zinc-900 dark:text-white">SEO &amp; GEO Content Architect Skill</h5>
+                                            <span class="text-[10px] font-mono text-zinc-400">Content Intelligence &bull; Active</span>
+                                        </div>
+                                    </div>
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60">🟢 Active</span>
+                                </div>
+                                <p class="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                                    Discovers high-intent keyword gaps, drafts structured authority guides, and executes algorithmic 11-point SEO &amp; GEO scoring to ensure content outranks competitors in search and AI citations.
+                                </p>
+                                <div class="flex flex-wrap items-center gap-1.5 pt-1">
+                                    <span class="text-[10px] font-mono font-semibold text-zinc-500">Bound Tools:</span>
+                                    <code class="text-[10px] font-mono px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">cora_create_article</code>
+                                    <code class="text-[10px] font-mono px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">cora_audit_article_seo</code>
+                                    <code class="text-[10px] font-mono px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">cora_improve_content</code>
+                                    <code class="text-[10px] font-mono px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">cora_list_content_opportunities</code>
+                                </div>
+                            </div>
+
+                            <!-- Skill 2: Client Intake & Lead Qualification -->
+                            <div class="p-4 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xs space-y-2.5">
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="flex items-center gap-2.5">
+                                        <div class="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 border border-blue-200/60 dark:border-blue-800/60 flex items-center justify-center shrink-0">
+                                            <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
+                                        </div>
+                                        <div>
+                                            <h5 class="text-xs font-bold text-zinc-900 dark:text-white">Client Intake &amp; CRM Lead Qualification Skill</h5>
+                                            <span class="text-[10px] font-mono text-zinc-400">Client Operations &bull; Active</span>
+                                        </div>
+                                    </div>
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60">🟢 Active</span>
+                                </div>
+                                <p class="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                                    Guides prospective inquiries through intake qualification, validates commercial project scope, and stages leads into the CRM pipeline with recommended next operational actions.
+                                </p>
+                                <div class="flex flex-wrap items-center gap-1.5 pt-1">
+                                    <span class="text-[10px] font-mono font-semibold text-zinc-500">Bound Tools:</span>
+                                    <code class="text-[10px] font-mono px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">cora_create_lead</code>
+                                    <code class="text-[10px] font-mono px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">cora_list_leads</code>
+                                    <code class="text-[10px] font-mono px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">cora_create_client</code>
+                                </div>
+                            </div>
+
+                            <!-- Plugin 1: Autonomous Campaigns Engine Plugin -->
+                            <div class="p-4 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xs space-y-2.5">
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="flex items-center gap-2.5">
+                                        <div class="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60 flex items-center justify-center shrink-0">
+                                            <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path></svg>
+                                        </div>
+                                        <div>
+                                            <h5 class="text-xs font-bold text-zinc-900 dark:text-white">Autonomous Campaigns Engine Plugin</h5>
+                                            <span class="text-[10px] font-mono text-zinc-400">Background Automation &bull; Active</span>
+                                        </div>
+                                    </div>
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60">🟢 Active</span>
+                                </div>
+                                <p class="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                                    Runs scheduled multi-article publishing pipelines, validating drafts against 11-point quality thresholds and auto-scheduling posts on the workspace editorial calendar.
+                                </p>
+                                <div class="flex flex-wrap items-center gap-1.5 pt-1">
+                                    <span class="text-[10px] font-mono font-semibold text-zinc-500">Bound Tools:</span>
+                                    <code class="text-[10px] font-mono px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">cora_create_campaign</code>
+                                    <code class="text-[10px] font-mono px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">cora_trigger_campaign_run</code>
+                                    <code class="text-[10px] font-mono px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">cora_list_campaigns</code>
+                                </div>
+                            </div>
+
+                            <!-- Skill 3: GST SAC 9983 Tax & Invoice Calculator -->
+                            <div class="p-4 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xs space-y-2.5">
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="flex items-center gap-2.5">
+                                        <div class="w-8 h-8 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 border border-amber-200/60 dark:border-amber-800/60 flex items-center justify-center shrink-0">
+                                            <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                                        </div>
+                                        <div>
+                                            <h5 class="text-xs font-bold text-zinc-900 dark:text-white">GST SAC 9983 Tax &amp; Spot Billing Skill</h5>
+                                            <span class="text-[10px] font-mono text-zinc-400">Financial Intelligence &bull; Active</span>
+                                        </div>
+                                    </div>
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60">🟢 Active</span>
+                                </div>
+                                <p class="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                                    Performs standard 18% GST SAC 9983 tax math, validates state codes for IGST vs CGST/SGST split, and reconciles spot billing receipts with real-time margin analytics.
+                                </p>
+                                <div class="flex flex-wrap items-center gap-1.5 pt-1">
+                                    <span class="text-[10px] font-mono font-semibold text-zinc-500">Bound Tools:</span>
+                                    <code class="text-[10px] font-mono px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">cora_get_workspace_metrics</code>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Natural Language Prompt Cheat Sheet for ChatGPT -->
+                        <div class="p-4 sm:p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xs space-y-3">
                             <div class="flex items-center gap-2">
-                                <input type="text" id="cora-ws-openapi-url" readonly value="<?php echo esc_url( $openapi_url ); ?>" class="w-full font-mono text-xs px-3 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 select-all font-semibold">
-                                <button type="button" onclick="coraCopyInputValue('cora-ws-openapi-url')" class="px-4 py-2.5 bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:text-zinc-950 text-white rounded-xl text-xs font-bold shrink-0 cursor-pointer border-0 transition-all shadow-2xs active:scale-97">
-                                    Copy URL
-                                </button>
+                                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-900 dark:text-white"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                                <h4 class="text-xs font-bold text-zinc-950 dark:text-white uppercase tracking-wider">Example Prompts to Give ChatGPT</h4>
                             </div>
-                        </div>
-
-                        <!-- Action Buttons: Download Schema & Copy Schema -->
-                        <div class="flex flex-wrap items-center gap-2.5">
-                            <button type="button" onclick="coraDownloadOpenAPISchema()" class="px-4 py-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-850 text-white dark:bg-white dark:text-zinc-950 text-xs font-bold cursor-pointer transition-all active:scale-97 border-0 shadow-2xs flex items-center gap-2">
-                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                                <span>Download OpenAPI 3.1 Schema</span>
-                            </button>
-                            <button type="button" onclick="coraCopyOpenAPISchema()" class="px-4 py-2.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 text-xs font-semibold cursor-pointer transition-all active:scale-97 border border-zinc-200/80 dark:border-zinc-700 flex items-center gap-2">
-                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                                <span>Copy Schema JSON</span>
-                            </button>
-                        </div>
-
-                        <!-- Schema Preview Card -->
-                        <div class="border border-zinc-200/80 dark:border-zinc-800 rounded-2xl overflow-hidden bg-white dark:bg-zinc-900 shadow-2xs">
-                            <div class="px-5 py-3 bg-zinc-50 dark:bg-zinc-800/60 border-b border-zinc-200/70 dark:border-zinc-800 flex items-center justify-between">
-                                <span class="text-xs font-bold text-zinc-900 dark:text-white">OpenAPI 3.1 Specification Preview</span>
-                                <span class="text-[10px] font-mono text-zinc-400">cora-openapi-3.1.json</span>
+                            <div class="space-y-2">
+                                <div class="p-3 rounded-xl border border-zinc-200/70 dark:border-zinc-800 bg-zinc-50/70 dark:bg-zinc-800/50 flex items-center justify-between gap-3">
+                                    <p class="text-xs font-medium text-zinc-800 dark:text-zinc-200 italic">&ldquo;Check our content opportunities and draft a 1,500-word authority guide on studio lighting with minimum 90+ SEO score.&rdquo;</p>
+                                    <button type="button" onclick="coraCopyAppText('Check our content opportunities and draft a 1,500-word authority guide on studio lighting with minimum 90+ SEO score.', 'Prompt')" class="px-2.5 py-1.5 rounded-lg text-[11px] font-bold bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 hover:opacity-90 transition-all shrink-0 cursor-pointer border-0">Copy</button>
+                                </div>
+                                <div class="p-3 rounded-xl border border-zinc-200/70 dark:border-zinc-800 bg-zinc-50/70 dark:bg-zinc-800/50 flex items-center justify-between gap-3">
+                                    <p class="text-xs font-medium text-zinc-800 dark:text-zinc-200 italic">&ldquo;List recent CRM leads, calculate their qualification score, and draft an intake summary for the top prospect.&rdquo;</p>
+                                    <button type="button" onclick="coraCopyAppText('List recent CRM leads, calculate their qualification score, and draft an intake summary for the top prospect.', 'Prompt')" class="px-2.5 py-1.5 rounded-lg text-[11px] font-bold bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 hover:opacity-90 transition-all shrink-0 cursor-pointer border-0">Copy</button>
+                                </div>
+                                <div class="p-3 rounded-xl border border-zinc-200/70 dark:border-zinc-800 bg-zinc-50/70 dark:bg-zinc-800/50 flex items-center justify-between gap-3">
+                                    <p class="text-xs font-medium text-zinc-800 dark:text-zinc-200 italic">&ldquo;Run the autonomous content campaign now and verify whether the generated article passed our SEO and GEO thresholds.&rdquo;</p>
+                                    <button type="button" onclick="coraCopyAppText('Run the autonomous content campaign now and verify whether the generated article passed our SEO and GEO thresholds.', 'Prompt')" class="px-2.5 py-1.5 rounded-lg text-[11px] font-bold bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 hover:opacity-90 transition-all shrink-0 cursor-pointer border-0">Copy</button>
+                                </div>
                             </div>
-                            <pre id="cora-ws-openapi-preview" class="p-5 text-xs font-mono text-zinc-300 bg-[#0c0c0e] overflow-x-auto max-h-60 select-all leading-relaxed">{
-  "openapi": "3.1.0",
-  "info": {
-    "title": "Cora Workspace Multi-Model Gateway API",
-    "version": "4.9.386",
-    "description": "Workspace-level actions for Content, SEO Audits, Leads, and CRM"
-  },
-  "servers": [
-    { "url": "<?php echo esc_url( home_url( '/wp-json' ) ); ?>" }
-  ],
-  "paths": {
-    "/cora/v1/content": { "get": { "operationId": "coraListArticles" } },
-    "/cora/v1/content/{id}/seo-audit": { "post": { "operationId": "coraAuditArticleSeo" } },
-    "/cora/v1/content/opportunities": { "get": { "operationId": "coraListContentOpportunities" } }
-  }
-}</pre>
                         </div>
                     </div>
                 </div>
@@ -1328,18 +1532,140 @@ Security:  Multi-Tenant Scoped Isolation (Workspace ID #<?php echo esc_html( $ag
             </div>
 
             <!-- ============================================================
-                 TAB 3: UNIVERSAL WORKSPACE MCP TOOLS
+                 TAB 3: WORKSPACE SKILLS & MCP PLUGINS
                  ============================================================ -->
-            <div id="cora-ws-pane-tools" class="cora-ws-pane hidden space-y-5">
+            <div id="cora-ws-pane-tools" class="cora-ws-pane hidden space-y-6">
+                <!-- Informational Header Card -->
                 <div class="p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xs space-y-2">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-sm font-bold text-zinc-950 dark:text-white">Universal Tools Exposed at Workspace Level</h3>
-                        <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">18 Canonical Tools</span>
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <h3 class="text-sm font-bold text-zinc-950 dark:text-white">Workspace AI Skills &amp; MCP Plugin Catalog</h3>
+                        </div>
+                        <span class="px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200/60 dark:border-zinc-700 self-start sm:self-auto">
+                            <?php echo count( $workspace_skills ); ?> Active Skills &bull; <?php echo count( $workspace_plugins ); ?> Plugins &bull; 28 MCP Tools
+                        </span>
                     </div>
-                    <p class="text-xs text-zinc-500 dark:text-zinc-400">
-                        Connecting your workspace provides your external AI with cross-module tools under a unified security perimeter:
+                    <p class="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
+                        Cora provides external AI models (Google Gemini, Claude, ChatGPT) with specialized behavioral skills, dynamic webhook plugins, and Model Context Protocol (MCP) tools under strict multi-tenant workspace isolation.
                     </p>
                 </div>
+
+                <!-- SECTION 1: ACTIVE AI AGENT SKILLS -->
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-900 dark:text-white"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                            <h4 class="text-xs font-bold text-zinc-900 dark:text-white uppercase tracking-wider">Active Workspace AI Skills (<?php echo count( $workspace_skills ); ?>)</h4>
+                        </div>
+                        <span class="text-[11px] text-zinc-400 font-mono">Prompt Directives + Bound Tools</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                    <?php if ( ! empty( $workspace_skills ) ) : ?>
+                        <?php foreach ( $workspace_skills as $skill ) : 
+                            $bound_tools = json_decode( $skill['bound_mcp_tools'] ?? '[]', true ) ?: array();
+                        ?>
+                        <div class="p-4 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xs space-y-2.5 flex flex-col justify-between">
+                            <div class="space-y-2">
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="flex items-center gap-2.5">
+                                        <div class="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white border border-zinc-200/60 dark:border-zinc-700/60 flex items-center justify-center shrink-0">
+                                            <?php echo ! empty( $skill['icon_svg'] ) ? $skill['icon_svg'] : '<svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2v20M2 12h20"></path></svg>'; ?>
+                                        </div>
+                                        <div>
+                                            <h5 class="text-xs font-bold text-zinc-900 dark:text-white"><?php echo esc_html( $skill['name'] ); ?></h5>
+                                            <span class="text-[10px] font-mono text-zinc-400"><?php echo esc_html( $skill['category'] ?? 'General' ); ?></span>
+                                        </div>
+                                    </div>
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60">🟢 Active</span>
+                                </div>
+                                <p class="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                                    <?php echo esc_html( $skill['description'] ); ?>
+                                </p>
+                            </div>
+
+                            <div class="space-y-1.5 pt-2 border-t border-zinc-100 dark:border-zinc-800/60">
+                                <?php if ( ! empty( $skill['trigger_phrases'] ) ) : ?>
+                                <div class="text-[10px] text-zinc-500 dark:text-zinc-400">
+                                    <span class="font-semibold text-zinc-700 dark:text-zinc-300">Triggers:</span> <em><?php echo esc_html( $skill['trigger_phrases'] ); ?></em>
+                                </div>
+                                <?php endif; ?>
+                                <?php if ( ! empty( $bound_tools ) ) : ?>
+                                <div class="flex flex-wrap items-center gap-1 pt-0.5">
+                                    <span class="text-[9px] font-mono font-semibold text-zinc-400">Tools:</span>
+                                    <?php foreach ( array_slice( $bound_tools, 0, 3 ) as $bt ) : ?>
+                                    <code class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300"><?php echo esc_html( $bt ); ?></code>
+                                    <?php endforeach; ?>
+                                    <?php if ( count( $bound_tools ) > 3 ) : ?>
+                                    <span class="text-[9px] font-mono text-zinc-400">+<?php echo count( $bound_tools ) - 3; ?> more</span>
+                                    <?php endif; ?>
+                                </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                    </div>
+                </div>
+
+                <!-- SECTION 2: DYNAMIC WORKSPACE PLUGINS -->
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-900 dark:text-white"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+                            <h4 class="text-xs font-bold text-zinc-900 dark:text-white uppercase tracking-wider">Dynamic Workspace Plugins (<?php echo count( $workspace_plugins ); ?>)</h4>
+                        </div>
+                        <span class="text-[11px] text-zinc-400 font-mono">Webhooks &bull; Bridges &bull; Listeners</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                    <?php if ( ! empty( $workspace_plugins ) ) : ?>
+                        <?php foreach ( $workspace_plugins as $plug ) : 
+                            $routes = json_decode( $plug['api_routes_json'] ?? '[]', true ) ?: array();
+                        ?>
+                        <div class="p-4 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xs space-y-2 flex flex-col justify-between">
+                            <div class="space-y-2">
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="flex items-center gap-2.5">
+                                        <div class="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white border border-zinc-200/60 dark:border-zinc-700/60 flex items-center justify-center shrink-0">
+                                            <?php echo ! empty( $plug['icon_svg'] ) ? $plug['icon_svg'] : '<svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="5" width="20" height="14" rx="2"></rect></svg>'; ?>
+                                        </div>
+                                        <div>
+                                            <h5 class="text-xs font-bold text-zinc-900 dark:text-white"><?php echo esc_html( $plug['name'] ); ?></h5>
+                                            <span class="text-[10px] font-mono text-zinc-400">v<?php echo esc_html( $plug['version'] ?? '1.0.0' ); ?> &bull; <?php echo esc_html( $plug['category'] ?? 'Plugin' ); ?></span>
+                                        </div>
+                                    </div>
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60">🟢 Active</span>
+                                </div>
+                                <p class="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                                    <?php echo esc_html( $plug['description'] ); ?>
+                                </p>
+                            </div>
+
+                            <?php if ( ! empty( $routes ) ) : ?>
+                            <div class="pt-2 border-t border-zinc-100 dark:border-zinc-800/60 flex flex-wrap items-center gap-1">
+                                <span class="text-[9px] font-mono font-semibold text-zinc-400">Routes:</span>
+                                <?php foreach ( $routes as $r ) : ?>
+                                <code class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300"><?php echo esc_html( $r ); ?></code>
+                                <?php endforeach; ?>
+                            </div>
+                            <?php endif; ?>
+                        </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                    </div>
+                </div>
+
+                <!-- SECTION 3: CANONICAL MCP TOOL REGISTRY -->
+                <div class="space-y-3 pt-2">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-900 dark:text-white"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                            <h4 class="text-xs font-bold text-zinc-900 dark:text-white uppercase tracking-wider">Universal Model Context Protocol (MCP) Tool Registry</h4>
+                        </div>
+                        <span class="text-[11px] text-zinc-400 font-mono">28 Core Tools</span>
+                    </div>
 
                 <!-- Section: Content Suite -->
                 <div class="border border-zinc-200/80 dark:border-zinc-800 rounded-2xl overflow-hidden bg-white dark:bg-zinc-900 shadow-2xs">
@@ -1532,6 +1858,7 @@ Security:  Multi-Tenant Scoped Isolation (Workspace ID #<?php echo esc_html( $ag
                     </div>
                 </div>
             </div>
+        <?php endif; ?>
 
         </div>
     </div>
@@ -1623,10 +1950,11 @@ Security:  Multi-Tenant Scoped Isolation (Workspace ID #<?php echo esc_html( $ag
         const mainEl = document.querySelector('main.cora-main');
         if (mainEl) mainEl.classList.add('overflow-hidden');
 
-        if (defaultTab) {
+        if (defaultTab && typeof coraSwitchWorkspaceGwTab === 'function') {
             coraSwitchWorkspaceGwTab(defaultTab);
         }
 
+        <?php if ( $is_mcp_eligible ) : ?>
         if (typeof coraRefreshWorkspaceKeys === 'function') coraRefreshWorkspaceKeys();
         if (typeof coraInterpolateActiveKey === 'function') coraInterpolateActiveKey(_currentKey);
         if (typeof coraLoadCampaigns === 'function') coraLoadCampaigns();
@@ -1635,6 +1963,7 @@ Security:  Multi-Tenant Scoped Isolation (Workspace ID #<?php echo esc_html( $ag
         } else if (typeof coraCheckEcosystemsStatus === 'function') {
             coraCheckEcosystemsStatus();
         }
+        <?php endif; ?>
     };
 
     // Alias for backward compatibility
@@ -2008,34 +2337,34 @@ Security:  Multi-Tenant Scoped Isolation (Workspace ID #<?php echo esc_html( $ag
     // Setup Method Switchers: ChatGPT
     window.coraSwitchChatGptSetupMethod = function(method) {
         const tabMcp = document.getElementById('cora-chatgpt-tab-mcp');
-        const tabAction = document.getElementById('cora-chatgpt-tab-action');
+        const tabSkills = document.getElementById('cora-chatgpt-tab-skills');
         const viewMcp = document.getElementById('cora-chatgpt-mcp-view');
-        const viewAction = document.getElementById('cora-chatgpt-action-view');
+        const viewSkills = document.getElementById('cora-chatgpt-skills-view');
 
         const activeClasses = ['bg-white', 'dark:bg-zinc-900', 'text-zinc-950', 'dark:text-white', 'shadow-2xs', 'font-bold'];
         const inactiveClasses = ['text-zinc-600', 'dark:text-zinc-400', 'font-medium', 'bg-transparent'];
 
-        if (method === 'action') {
+        if (method === 'skills') {
             if (tabMcp) {
                 tabMcp.classList.remove(...activeClasses);
                 tabMcp.classList.add(...inactiveClasses);
             }
-            if (tabAction) {
-                tabAction.classList.remove(...inactiveClasses);
-                tabAction.classList.add(...activeClasses);
+            if (tabSkills) {
+                tabSkills.classList.remove(...inactiveClasses);
+                tabSkills.classList.add(...activeClasses);
             }
             if (viewMcp) viewMcp.classList.add('hidden');
-            if (viewAction) viewAction.classList.remove('hidden');
+            if (viewSkills) viewSkills.classList.remove('hidden');
         } else {
-            if (tabAction) {
-                tabAction.classList.remove(...activeClasses);
-                tabAction.classList.add(...inactiveClasses);
+            if (tabSkills) {
+                tabSkills.classList.remove(...activeClasses);
+                tabSkills.classList.add(...inactiveClasses);
             }
             if (tabMcp) {
                 tabMcp.classList.remove(...inactiveClasses);
                 tabMcp.classList.add(...activeClasses);
             }
-            if (viewAction) viewAction.classList.add('hidden');
+            if (viewSkills) viewSkills.classList.add('hidden');
             if (viewMcp) viewMcp.classList.remove('hidden');
         }
     };
@@ -2162,134 +2491,6 @@ Security:  Multi-Tenant Scoped Isolation (Workspace ID #<?php echo esc_html( $ag
         if (window.coraShowToast) {
             window.coraShowToast((label || 'Text') + ' copied to clipboard.', 'success');
         }
-    };
-
-    // OpenAPI 3.1 Schema Spec for ChatGPT Action
-    const _openApiSchemaObj = {
-        openapi: "3.1.0",
-        info: {
-            title: "Cora Workspace Multi-Model Gateway API",
-            version: "<?php echo defined( 'CORA_WORKSPACE_VERSION' ) ? esc_js( CORA_WORKSPACE_VERSION ) : '4.9.386'; ?>",
-            description: "Unified AI MCP & REST Gateway for Workspace Content, Leads, SEO Audits, and CRM Actions."
-        },
-        servers: [
-            { url: "<?php echo esc_js( home_url( '/wp-json' ) ); ?>", description: "Cora Workspace Local Server" }
-        ],
-        paths: {
-            "/cora/v1/content": {
-                get: {
-                    operationId: "coraListArticles",
-                    summary: "Search and paginate workspace articles",
-                    parameters: [
-                        { name: "search", in: "query", schema: { type: "string" } },
-                        { name: "status", in: "query", schema: { type: "string", default: "publish" } },
-                        { name: "limit", in: "query", schema: { type: "integer", default: 10 } }
-                    ],
-                    responses: { "200": { description: "List of articles with SEO metrics" } }
-                },
-                post: {
-                    operationId: "coraCreateArticle",
-                    summary: "Draft or publish article with SEO/GEO metadata",
-                    requestBody: {
-                        required: true,
-                        content: {
-                            "application/json": {
-                                schema: {
-                                    type: "object",
-                                    properties: {
-                                        title: { type: "string" },
-                                        content: { type: "string" },
-                                        status: { type: "string", enum: ["draft", "publish"] },
-                                        target_keyword: { type: "string" }
-                                    },
-                                    required: ["title", "content"]
-                                }
-                            }
-                        }
-                    },
-                    responses: { "200": { description: "Article creation response" } }
-                }
-            },
-            "/cora/v1/content/{id}": {
-                get: {
-                    operationId: "coraGetArticle",
-                    summary: "Fetch article content with 11-point SEO & GEO scores",
-                    parameters: [{ name: "id", in: "path", required: true, schema: { type: "integer" } }],
-                    responses: { "200": { description: "Article details object" } }
-                }
-            },
-            "/cora/v1/content/{id}/seo-audit": {
-                post: {
-                    operationId: "coraAuditArticleSeo",
-                    summary: "Execute 11-point algorithmic SEO & GEO score audit",
-                    parameters: [{ name: "id", in: "path", required: true, schema: { type: "integer" } }],
-                    responses: { "200": { description: "Algorithmic audit breakdown" } }
-                }
-            },
-            "/cora/v1/content/opportunities": {
-                get: {
-                    operationId: "coraListContentOpportunities",
-                    summary: "Retrieve high-intent keyword gaps and search volumes",
-                    responses: { "200": { description: "List of keyword clusters" } }
-                }
-            },
-            "/cora/v1/leads": {
-                get: {
-                    operationId: "coraListLeads",
-                    summary: "List CRM leads and pipeline stages",
-                    responses: { "200": { description: "CRM leads array" } }
-                },
-                post: {
-                    operationId: "coraCreateLead",
-                    summary: "Ingest new CRM lead from external AI interactions",
-                    requestBody: {
-                        required: true,
-                        content: {
-                            "application/json": {
-                                schema: {
-                                    type: "object",
-                                    properties: {
-                                        name: { type: "string" },
-                                        email: { type: "string" },
-                                        phone: { type: "string" },
-                                        notes: { type: "string" }
-                                    },
-                                    required: ["name"]
-                                }
-                            }
-                        }
-                    },
-                    responses: { "200": { description: "Lead ingestion status" } }
-                }
-            }
-        },
-        components: {
-            securitySchemes: {
-                BearerAuth: {
-                    type: "http",
-                    scheme: "bearer",
-                    bearerFormat: "JWT/ApiKey",
-                    description: "Workspace Live API Key formatted as: Bearer cora_ws_live_..."
-                }
-            }
-        },
-        security: [{ BearerAuth: [] }]
-    };
-
-    window.coraDownloadOpenAPISchema = function() {
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(_openApiSchemaObj, null, 2));
-        const downloadAnchor = document.createElement('a');
-        downloadAnchor.setAttribute("href", dataStr);
-        downloadAnchor.setAttribute("download", "cora-openapi-3.1.json");
-        document.body.appendChild(downloadAnchor);
-        downloadAnchor.click();
-        downloadAnchor.remove();
-        if (window.coraShowToast) window.coraShowToast('OpenAPI 3.1 Schema downloaded.', 'success');
-    };
-
-    window.coraCopyOpenAPISchema = function() {
-        navigator.clipboard.writeText(JSON.stringify(_openApiSchemaObj, null, 2));
-        if (window.coraShowToast) window.coraShowToast('OpenAPI 3.1 Schema copied to clipboard.', 'success');
     };
 
     // Subtab Switcher

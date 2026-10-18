@@ -115,6 +115,20 @@ test('Verify Multi-Model AI Connectors and Autonomous Campaigns in MCP Drawer', 
   await page.screenshot({ path: path.join(artifactDir, 'mcp_connect_chatgpt.png') });
   try { await page.screenshot({ path: path.join(subagentArtifactDir, 'mcp_connect_chatgpt.png') }); } catch (e) {}
 
+  // 3b. Verify ChatGPT Agent Skills & MCP Plugins tab (and zero trace of legacy Custom GPT action)
+  await expect(page.locator('#cora-chatgpt-tab-action')).toHaveCount(0);
+  await expect(page.locator('#cora-chatgpt-action-view')).toHaveCount(0);
+
+  const chatgptSkillsTab = page.locator('#cora-chatgpt-tab-skills');
+  await expect(chatgptSkillsTab).toBeVisible();
+  await chatgptSkillsTab.click();
+  await page.waitForTimeout(300);
+
+  const chatgptSkillsView = page.locator('#cora-chatgpt-skills-view');
+  await expect(chatgptSkillsView).toBeVisible();
+  await expect(chatgptSkillsView.locator('text=SEO & GEO Content Architect').first()).toBeVisible();
+  await page.screenshot({ path: path.join(artifactDir, 'mcp_chatgpt_skills_plugins.png') });
+
   // 4. Tab 3: Autonomous Campaigns Command Center
   const campaignsTabBtn = page.locator('#cora-ws-gw-btn-campaigns');
   await expect(campaignsTabBtn).toBeVisible();
