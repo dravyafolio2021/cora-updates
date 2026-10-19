@@ -17,7 +17,7 @@ class Cora_Universal_MCP_Server {
 
     const PROTOCOL_VERSION = '2026-07-28';
     const SERVER_NAME      = 'cora-universal-mcp';
-    const SERVER_VERSION   = '4.1.0';
+    const SERVER_VERSION   = '4.9.417';
     const RATE_LIMIT_RPM   = 120; // 120 requests per minute
     const SUPPORTED_PROTOCOL_VERSIONS = array( '2026-07-28', '2025-11-25', '2024-11-05', '2024-10-07' );
 
@@ -157,16 +157,56 @@ class Cora_Universal_MCP_Server {
             case 'tools/call':
                 return self::handle_call_tool( $params, $id, $auth );
 
-            // ── Resources & Prompts (Standard Fallbacks) ─────────────────────
+            // ── Resources & Prompts ──────────────────────────────────────────
             case 'resources/list':
                 return self::success_response( array( 'resources' => array() ), $id );
 
             case 'prompts/list':
-                return self::success_response( array( 'prompts' => array() ), $id );
+                return self::handle_list_prompts( $params, $id, $auth );
+
+            case 'prompts/get':
+                return self::handle_get_prompt( $params, $id, $auth );
 
             default:
                 return self::error_response( -32601, "Method not found: {$method}", $id, 404 );
         }
+    }
+
+    /**
+     * Build rich, preference-driven Assistive Content Production Agent instructions
+     */
+    private static function get_agent_instructions( $workspace_name, $host, $agency_id ) {
+        return "You are CLA (Cora Living Agent), the autonomous Content Director & Workspace Operations Assistant for '{$workspace_name}' on {$host} (Workspace ID: {$agency_id}). All operations MUST and CAN ONLY be performed within this specific workspace ({$workspace_name}).
+
+### ASSISTIVE CONTENT PRODUCTION SUPERPOWER:
+You autonomously plan, produce, schedule, and optimize content for the user based entirely on their preferences. You make content creation effortless, consistent, and high-impact.
+
+### CORE OPERATING WORKFLOWS:
+1. UNDERSTAND USER PREFERENCES & INTENT:
+   - Topic/Pillars: What topics does the user want to dominate? (e.g., Studio Photography, Architectural Lighting, Real Estate Market Guides, Commercial Production, Tech Innovation).
+   - Cadence: How frequently should articles be published? (e.g., 'every_minute', 'hourly', 'every 2 hours', 'daily', '3x_week', 'weekly', 'monthly').
+   - Voice/Tone: What is their brand persona? ('editorial', 'executive', 'conversational', 'technical').
+   - Mode: Fully automated publication (`auto_publish: true` when score >= 80) or draft for human review (`auto_publish: false`).
+   - If the user does not specify preferences, proactively inspect current opportunities using `cora_list_keyword_opportunities` or `cora_list_articles`, propose a tailored strategy, and execute.
+
+2. AUTONOMOUS CAMPAIGNS & SCHEDULING:
+   - Create recurring campaigns with `cora_create_campaign`. Set `run_now: true` to publish or draft the first article immediately.
+   - List and review all active campaigns with `cora_list_campaigns` and `cora_get_campaign`.
+   - On-demand generation: Trigger any campaign run instantly with `cora_trigger_campaign_run`.
+   - Monitor publication history and score metrics with `cora_get_autonomous_activity_log`.
+
+3. IMMEDIATE CONTENT, CREATIVES & SINGLE ARTICLE PUBLISHING:
+   - When asked to write and publish an article:
+     * Custom Thumbnail & Creatives: Generate a striking, high-resolution editorial graphic/creative thumbnail matching the article topic. Pass the image URL via `thumbnail_url` in `create_article` (or upload using `upload_media`). Cora automatically downloads and attaches the creative to the workspace Media Vault and sets it as the official featured thumbnail.
+     * Content Quality: Draft rich, in-depth content (800+ words) with structured H2/H3 subheadings, direct answer callout, key takeaways, and FAQ JSON-LD schema.
+     * SEO & GEO Audit: Run `audit_article_seo` and `improve_content` to elevate SEO and AI visibility scores to 90+.
+     * Publication: Set `status: 'publish'` in `create_article`, or call `publish_article` with `{ id: article_id }`.
+     * Confirmation: Always present the live public permalink, the custom creative thumbnail, and the quality assessment scores directly to the user.
+
+4. WORKSPACE OPERATIONS:
+   - You also have full read/write access to CRM leads (`list_leads`, `create_lead`), media assets (`list_media`, `upload_media`), tasks (`list_tasks`), invoices, and operational reports.
+
+Always confirm actions clearly with direct links, custom thumbnails, scheduled times, and quality scores.";
     }
 
     /**
@@ -200,7 +240,7 @@ class Cora_Universal_MCP_Server {
                 'tools'     => array( 'listChanged' => false ),
                 'logging'   => (object) array(),
                 'resources' => (object) array(),
-                'prompts'   => (object) array(),
+                'prompts'   => array( 'listChanged' => false ),
             ),
             'serverInfo'                => array(
                 'name'        => 'cla-workspace-' . $clean_host . ( $agency_id > 1 ? '-ws' . $agency_id : '' ),
@@ -213,7 +253,7 @@ class Cora_Universal_MCP_Server {
                 'resourceMetadata' => $meta_url,
                 'scopes'           => array_keys( Cora_OAuth_Server::get_supported_scopes() ),
             ),
-            'instructions'              => "You are CLA (Cora Living Agent), the authorized AI operator for the '{$workspace_name}' workspace on {$host} (Workspace ID: {$agency_id}). You have full read and write operational access across CRM leads, tasks, media vault, CMS articles, invoices, and analytics. All operations you execute MUST and CAN ONLY be performed within this specific workspace ({$workspace_name}).",
+            'instructions'              => self::get_agent_instructions( $workspace_name, $host, $agency_id ),
         ), $id );
     }
 
@@ -248,7 +288,7 @@ class Cora_Universal_MCP_Server {
                 'tools'     => array( 'listChanged' => false ),
                 'logging'   => (object) array(),
                 'resources' => (object) array(),
-                'prompts'   => (object) array(),
+                'prompts'   => array( 'listChanged' => false ),
             ),
             'serverInfo'      => array(
                 'name'        => 'cla-workspace-' . $clean_host . ( $agency_id > 1 ? '-ws' . $agency_id : '' ),
@@ -256,8 +296,144 @@ class Cora_Universal_MCP_Server {
                 'title'       => 'CLA Workspace - ' . $workspace_name . ' (' . $host . ')',
                 'description' => 'Standards-compliant remote MCP server for CLA autonomous workspace operations and growth publishing.',
             ),
-            'instructions'    => "You are CLA (Cora Living Agent), the authorized AI operator for the '{$workspace_name}' workspace on {$host} (Workspace ID: {$agency_id}). You have full read and write operational access across CRM leads, tasks, media vault, CMS articles, invoices, and analytics. All operations you execute MUST and CAN ONLY be performed within this specific workspace ({$workspace_name}).",
+            'instructions'    => self::get_agent_instructions( $workspace_name, $host, $agency_id ),
         ), $id );
+    }
+
+    /**
+     * Handle prompts/list method
+     */
+    private static function handle_list_prompts( $params, $id, $auth ) {
+        $prompts = array(
+            array(
+                'name'        => 'content_production_agent',
+                'description' => 'Autonomous Content Production & Campaign Assistant. Manages strategy, flexible cadences (seconds, minutes, hours, days, weeks), and quality-gated auto-publishing based on your preferences.',
+                'arguments'   => array(
+                    array(
+                        'name'        => 'preferences',
+                        'description' => 'Target topics, keywords, desired tone, audience profile, and publishing cadence (e.g. "daily articles on studio lighting", "hourly market updates").',
+                        'required'    => false,
+                    ),
+                    array(
+                        'name'        => 'auto_publish',
+                        'description' => 'Whether to auto-publish upon passing 80+ SEO/GEO quality score (true/false, default: true).',
+                        'required'    => false,
+                    ),
+                ),
+            ),
+            array(
+                'name'        => 'create_autonomous_publishing_campaign',
+                'description' => 'Launch an autonomous scheduled publishing campaign with custom cadence (every minute, hourly, daily, weekly) and AI quality gates.',
+                'arguments'   => array(
+                    array(
+                        'name'        => 'campaign_name',
+                        'description' => 'Campaign name (e.g. "Architectural Photography Insights").',
+                        'required'    => true,
+                    ),
+                    array(
+                        'name'        => 'keywords',
+                        'description' => 'Comma-separated target keywords or topic clusters.',
+                        'required'    => true,
+                    ),
+                    array(
+                        'name'        => 'cadence',
+                        'description' => 'Cadence: e.g. "every_minute", "hourly", "daily", "weekly", "monthly", or "every 2 hours".',
+                        'required'    => false,
+                    ),
+                    array(
+                        'name'        => 'auto_publish',
+                        'description' => 'Auto-publish when quality threshold is met (true/false).',
+                        'required'    => false,
+                    ),
+                    array(
+                        'name'        => 'tone',
+                        'description' => 'Tone: editorial, executive, conversational, technical.',
+                        'required'    => false,
+                    ),
+                ),
+            ),
+            array(
+                'name'        => 'audit_and_improve_article',
+                'description' => 'Execute an 11-point algorithmic SEO & GEO audit on an existing article and autonomously enhance it to 90+ quality with direct answer blocks, takeaways, and FAQ schema.',
+                'arguments'   => array(
+                    array(
+                        'name'        => 'article_id',
+                        'description' => 'Post ID of the article to audit and optimize.',
+                        'required'    => true,
+                    ),
+                ),
+            ),
+        );
+
+        return self::success_response( array(
+            'prompts' => $prompts,
+        ), $id );
+    }
+
+    /**
+     * Handle prompts/get method
+     */
+    private static function handle_get_prompt( $params, $id, $auth ) {
+        $prompt_name = isset( $params['name'] ) ? sanitize_text_field( $params['name'] ) : '';
+        $arguments   = isset( $params['arguments'] ) && is_array( $params['arguments'] ) ? $params['arguments'] : array();
+
+        if ( 'content_production_agent' === $prompt_name ) {
+            $prefs = ! empty( $arguments['preferences'] ) ? sanitize_text_field( $arguments['preferences'] ) : 'Maximize organic growth and AI search visibility with high-impact authoritative articles.';
+            $auto  = isset( $arguments['auto_publish'] ) ? ( $arguments['auto_publish'] ? 'true' : 'false' ) : 'true';
+
+            return self::success_response( array(
+                'description' => 'Autonomous Content Production & Campaign Assistant',
+                'messages'    => array(
+                    array(
+                        'role'    => 'user',
+                        'content' => array(
+                            'type' => 'text',
+                            'text' => "You are CLA, my autonomous Content Director and Production Assistant for this workspace. I want you to manage content production based on my preferences:\n\nUser Preferences: {$prefs}\nAuto-Publish Mode: {$auto}\n\nPlease inspect the workspace keyword opportunities via `cora_list_keyword_opportunities` or current articles with `cora_list_articles`, propose or configure an optimal autonomous campaign using `cora_create_campaign` (with `run_now: true` for the initial article), and summarize the publication cadence and schedule for my workspace.",
+                        ),
+                    ),
+                ),
+            ), $id );
+        }
+
+        if ( 'create_autonomous_publishing_campaign' === $prompt_name ) {
+            $name     = ! empty( $arguments['campaign_name'] ) ? sanitize_text_field( $arguments['campaign_name'] ) : 'Content Growth Campaign';
+            $keywords = ! empty( $arguments['keywords'] ) ? sanitize_text_field( $arguments['keywords'] ) : 'growth, insights, industry trends';
+            $cadence  = ! empty( $arguments['cadence'] ) ? sanitize_text_field( $arguments['cadence'] ) : 'daily';
+            $auto     = isset( $arguments['auto_publish'] ) ? ( $arguments['auto_publish'] ? 'true' : 'false' ) : 'true';
+            $tone     = ! empty( $arguments['tone'] ) ? sanitize_text_field( $arguments['tone'] ) : 'editorial';
+
+            return self::success_response( array(
+                'description' => 'Create an Autonomous Content Campaign',
+                'messages'    => array(
+                    array(
+                        'role'    => 'user',
+                        'content' => array(
+                            'type' => 'text',
+                            'text' => "Please create and activate an autonomous content campaign for this workspace with the following configuration:\n\nCampaign Name: {$name}\nKeywords: {$keywords}\nCadence: {$cadence}\nAuto Publish: {$auto}\nTone: {$tone}\n\nPlease execute `cora_create_campaign` with these parameters and `run_now: true` to generate the first article immediately, then confirm the schedule and publication status.",
+                        ),
+                    ),
+                ),
+            ), $id );
+        }
+
+        if ( 'audit_and_improve_article' === $prompt_name ) {
+            $article_id = ! empty( $arguments['article_id'] ) ? intval( $arguments['article_id'] ) : 0;
+
+            return self::success_response( array(
+                'description' => 'Audit and Enhance Article SEO/GEO Quality',
+                'messages'    => array(
+                    array(
+                        'role'    => 'user',
+                        'content' => array(
+                            'type' => 'text',
+                            'text' => "Please inspect article #{$article_id} using `cora_get_article`, run an SEO/GEO audit using `cora_audit_article_seo`, and apply quality optimizations using `cora_improve_content` to elevate its SEO and GEO scores to 90+. Report the before and after scores.",
+                        ),
+                    ),
+                ),
+            ), $id );
+        }
+
+        return self::error_response( -32602, "Prompt not found: {$prompt_name}", $id, 404 );
     }
 
     /**
@@ -267,28 +443,123 @@ class Cora_Universal_MCP_Server {
         $all_tools = Cora_MCP_Tool_Registry::get_tools();
 
         $formatted_tools = array();
+        $seen = array();
+
+        $is_chatgpt = ( ( $auth['client_name'] ?? '' ) === 'ChatGPT' )
+            || ( strpos( (string)( $auth['client_id'] ?? '' ), 'chatgpt' ) !== false )
+            || ( strpos( (string)( $_SERVER['HTTP_USER_AGENT'] ?? '' ), 'ChatGPT' ) !== false )
+            || ( strpos( (string)( $_SERVER['HTTP_USER_AGENT'] ?? '' ), 'OpenAI' ) !== false );
+
+        $all_requested = isset( $params['all'] ) || isset( $_GET['all'] ) || ( isset( $params['limit'] ) && $params['limit'] === 'all' ) || ( isset( $_GET['limit'] ) && $_GET['limit'] === 'all' );
+
+        // Top 30 curated priority operational tools for OpenAI Custom GPT / App 30-action ceiling compliance
+        $curated_priority_names = array(
+            'list_workspaces',
+            'get_workspace',
+            'get_authenticated_account',
+            'upload_media',
+            'list_media',
+            'list_articles',
+            'get_article',
+            'create_article',
+            'update_article',
+            'publish_article',
+            'delete_article',
+            'audit_article_seo',
+            'improve_content',
+            'list_leads',
+            'get_lead',
+            'create_lead',
+            'update_lead',
+            'list_tasks',
+            'get_task',
+            'create_task',
+            'update_task',
+            'list_clients',
+            'create_client',
+            'get_financial_summary',
+            'query_financials',
+            'get_analytics',
+            'list_campaigns',
+            'create_campaign',
+            'trigger_campaign_run',
+            'get_autonomous_activity_log',
+        );
+
         foreach ( $all_tools as $tool_key => $tool ) {
-            $tool_name = str_replace( '.', '_', $tool['name'] );
+            $raw_name = $tool['name'] ?? $tool_key;
+            $base_name = $raw_name;
+            if ( strpos( $base_name, 'cora_' ) === 0 ) {
+                $base_name = substr( $base_name, 5 );
+            } elseif ( strpos( $base_name, 'cla_' ) === 0 ) {
+                $base_name = substr( $base_name, 4 );
+            }
+
+            if ( isset( $seen[ $base_name ] ) ) {
+                continue;
+            }
+            $seen[ $base_name ] = true;
+
+            $tool_name = str_replace( '.', '_', $base_name );
             $schema    = $tool['inputSchema'] ?? array( 'type' => 'object', 'properties' => (object) array() );
             if ( ! isset( $schema['type'] ) ) {
                 $schema['type'] = 'object';
             }
             if ( ! isset( $schema['properties'] ) || empty( $schema['properties'] ) || ( is_array( $schema['properties'] ) && empty( $schema['properties'] ) ) ) {
                 $schema['properties'] = (object) array();
+            } else {
+                // Strict schema sanitization: ensure every property is valid JSON Schema / OpenAPI 3.0
+                foreach ( $schema['properties'] as $pk => &$pv ) {
+                    if ( is_array( $pv ) ) {
+                        if ( ! isset( $pv['type'] ) ) {
+                            $pv['type'] = 'string';
+                        }
+                        if ( $pv['type'] === 'array' && ( ! isset( $pv['items'] ) || empty( $pv['items'] ) ) ) {
+                            $pv['items'] = array( 'type' => 'string' );
+                        }
+                        if ( $pv['type'] === 'object' && ( ! isset( $pv['properties'] ) || empty( $pv['properties'] ) ) ) {
+                            $pv['properties'] = (object) array();
+                        }
+                    }
+                }
+                unset( $pv );
             }
+
             if ( isset( $schema['required'] ) && empty( $schema['required'] ) ) {
                 unset( $schema['required'] );
             }
 
-            $formatted_tools[] = array(
+            $formatted_tools[ $tool_name ] = array(
                 'name'        => $tool_name,
                 'description' => $tool['description'] ?? '',
                 'inputSchema' => $schema,
             );
         }
 
+        // If client is ChatGPT or 30-action ceiling enforced, strictly return the top 30 tools
+        if ( $is_chatgpt || ! $all_requested ) {
+            $filtered_tools = array();
+            foreach ( $curated_priority_names as $pname ) {
+                if ( isset( $formatted_tools[ $pname ] ) && count( $filtered_tools ) < 30 ) {
+                    $filtered_tools[] = $formatted_tools[ $pname ];
+                }
+            }
+            // If some prioritized tools weren't found, fill up to 30 from remaining tools
+            if ( count( $filtered_tools ) < 30 ) {
+                $filtered_keys = array_column( $filtered_tools, 'name' );
+                foreach ( $formatted_tools as $tk => $tv ) {
+                    if ( ! in_array( $tk, $filtered_keys, true ) && count( $filtered_tools ) < 30 ) {
+                        $filtered_tools[] = $tv;
+                    }
+                }
+            }
+            $tools_to_return = $filtered_tools;
+        } else {
+            $tools_to_return = array_values( $formatted_tools );
+        }
+
         return self::success_response( array(
-            'tools' => $formatted_tools,
+            'tools' => $tools_to_return,
         ), $id );
     }
 
@@ -306,25 +577,57 @@ class Cora_Universal_MCP_Server {
         // Enforce Plan Eligibility Check (Paid Workspaces Only)
         $target_workspace_id = ! empty( $auth['workspace_id'] ) ? $auth['workspace_id'] : ( $_REQUEST['cora_agency_id'] ?? 1 );
         if ( function_exists( 'cora_is_workspace_mcp_eligible' ) && ! cora_is_workspace_mcp_eligible( $target_workspace_id ) ) {
-            return self::error_response( -32001, 'Plan Upgrade Required: The Model Context Protocol (MCP) and Developer Gateway is restricted to Professional and Scale workspaces.', $id, 403 );
+            return self::success_response( array(
+                'content' => array(
+                    array(
+                        'type' => 'text',
+                        'text' => 'Plan Upgrade Required: The Model Context Protocol (MCP) and Developer Gateway is restricted to Professional and Scale workspaces.',
+                    ),
+                ),
+                'isError' => true,
+            ), $id );
         }
 
         $tool_name = isset( $params['name'] ) ? sanitize_text_field( $params['name'] ) : '';
         $arguments = isset( $params['arguments'] ) && is_array( $params['arguments'] ) ? $params['arguments'] : array();
 
         if ( empty( $tool_name ) ) {
-            return self::error_response( -32602, 'Invalid params: Missing tool name.', $id, 400 );
+            return self::success_response( array(
+                'content' => array(
+                    array(
+                        'type' => 'text',
+                        'text' => 'Error: Missing tool name.',
+                    ),
+                ),
+                'isError' => true,
+            ), $id );
         }
 
         $tool = Cora_MCP_Tool_Registry::get_tool( $tool_name );
         if ( ! $tool ) {
-            return self::error_response( -32601, "Tool not found: {$tool_name}", $id, 404 );
+            return self::success_response( array(
+                'content' => array(
+                    array(
+                        'type' => 'text',
+                        'text' => "Error: Tool not found: {$tool_name}",
+                    ),
+                ),
+                'isError' => true,
+            ), $id );
         }
 
         // 1. Verify Scope
         if ( ! Cora_OAuth_Server::has_scope( $auth, $tool['requiredScope'] ) ) {
             self::log_audit( $auth, $tool_name, $tool, 'forbidden', 'Insufficient scope: requires ' . $tool['requiredScope'], $arguments, 0 );
-            return self::error_response( -32003, "Forbidden: This tool requires the '{$tool['requiredScope']}' scope.", $id, 403 );
+            return self::success_response( array(
+                'content' => array(
+                    array(
+                        'type' => 'text',
+                        'text' => "Forbidden: This tool requires the '{$tool['requiredScope']}' scope.",
+                    ),
+                ),
+                'isError' => true,
+            ), $id );
         }
 
         // 2. Strict Multi-Tenant Isolation
@@ -504,7 +807,7 @@ class Cora_Universal_MCP_Server {
     /**
      * Helper to return standard JSON-RPC error response
      */
-    private static function error_response( $code, $message, $id = null, $http_status = 400 ) {
+    private static function error_response( $code, $message, $id = null, $http_status = 200 ) {
         return new WP_REST_Response( array(
             'jsonrpc' => '2.0',
             'error'   => array(

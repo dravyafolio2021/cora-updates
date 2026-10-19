@@ -737,6 +737,8 @@ class Cora_MCP_Tool_Registry {
                         'faq_schema'     => array( 'type' => 'string', 'description' => 'JSON-LD FAQ Schema markup string or definition.' ),
                         'seo_score'      => array( 'type' => 'integer', 'description' => 'Explicit SEO score override (0-100).' ),
                         'geo_score'      => array( 'type' => 'integer', 'description' => 'Explicit AI Visibility / GEO score override (0-100).' ),
+                        'thumbnail_url'  => array( 'type' => 'string', 'description' => 'Featured creative image or thumbnail URL (e.g. DALL-E, Unsplash, or CDN). Automatically sideloaded to WordPress media library and set as featured image.' ),
+                        'thumbnail_id'   => array( 'type' => 'integer', 'description' => 'Existing attachment ID from Media Vault to set as featured image.' ),
                         'category'       => array( 'type' => 'string', 'description' => 'Primary category name or slug.' ),
                         'categories'     => array( 'type' => 'array', 'items' => array( 'type' => 'integer' ), 'description' => 'Array of category IDs.' ),
                         'tags'           => array( 'type' => 'array', 'items' => array( 'type' => 'string' ), 'description' => 'Array of tag names.' ),
@@ -767,6 +769,8 @@ class Cora_MCP_Tool_Registry {
                         'focus_keyword'  => array( 'type' => 'string', 'description' => 'Updated primary SEO focus keyword.' ),
                         'meta_title'     => array( 'type' => 'string', 'description' => 'Updated search engine meta title.' ),
                         'meta_desc'      => array( 'type' => 'string', 'description' => 'Updated search engine meta description.' ),
+                        'thumbnail_url'  => array( 'type' => 'string', 'description' => 'Updated featured creative image or thumbnail URL.' ),
+                        'thumbnail_id'   => array( 'type' => 'integer', 'description' => 'Updated attachment ID from Media Vault.' ),
                         'faq_schema'     => array( 'type' => 'string', 'description' => 'Updated JSON-LD FAQ Schema markup string or definition.' ),
                         'seo_score'      => array( 'type' => 'integer', 'description' => 'Explicit SEO score override (0-100).' ),
                         'geo_score'      => array( 'type' => 'integer', 'description' => 'Explicit AI Visibility / GEO score override (0-100).' ),
@@ -938,31 +942,35 @@ class Cora_MCP_Tool_Registry {
                 'inputSchema'   => array(
                     'type'       => 'object',
                     'properties' => array(
-                        'name'           => array( 'type' => 'string', 'description' => 'Campaign title / name (e.g. Studio Architecture & Lighting Insights).' ),
-                        'topic_keywords' => array(
+                        'name'             => array( 'type' => 'string', 'description' => 'Campaign title / name (e.g. Studio Architecture & Lighting Insights).' ),
+                        'topic_keywords'   => array(
                             'type'        => 'array',
                             'items'       => array( 'type' => 'string' ),
                             'description' => 'Target keywords or topic clusters for autonomous generation.',
                         ),
-                        'cadence'        => array(
+                        'cadence'          => array(
                             'type'        => 'string',
-                            'enum'        => array( 'daily', '3x_week', 'weekly', 'bi_weekly' ),
-                            'description' => 'Autonomous publishing cadence (default: weekly).',
+                            'description' => 'Autonomous publishing cadence. Supports: "every_second", "every_minute", "every_5_minutes", "hourly", "every_6_hours", "daily", "3x_week", "weekly", "bi_weekly", "monthly", or natural phrases like "every 10 minutes", "every 2 hours", "every 3 days".',
                         ),
-                        'auto_publish'   => array( 'type' => 'boolean', 'description' => 'Auto-publish when quality threshold is met (true) or draft for review (false).' ),
-                        'min_seo_score'  => array( 'type' => 'integer', 'description' => 'Minimum 11-point algorithmic SEO score threshold (default: 80).' ),
-                        'min_geo_score'  => array( 'type' => 'integer', 'description' => 'Minimum GEO local intent engine score threshold (default: 85).' ),
-                        'tone'           => array(
+                        'interval_seconds' => array( 'type' => 'integer', 'description' => 'Optional explicit cadence interval in seconds (e.g. 10, 30, 60, 3600).' ),
+                        'interval_minutes' => array( 'type' => 'integer', 'description' => 'Optional explicit cadence interval in minutes (e.g. 1, 5, 15, 60).' ),
+                        'interval_hours'   => array( 'type' => 'integer', 'description' => 'Optional explicit cadence interval in hours (e.g. 1, 2, 6, 24).' ),
+                        'interval_days'    => array( 'type' => 'integer', 'description' => 'Optional explicit cadence interval in days (e.g. 1, 7, 30).' ),
+                        'run_now'          => array( 'type' => 'boolean', 'description' => 'If true, triggers the first autonomous article generation run immediately upon creation.' ),
+                        'auto_publish'     => array( 'type' => 'boolean', 'description' => 'Auto-publish when quality threshold is met (true) or draft for review (false).' ),
+                        'min_seo_score'    => array( 'type' => 'integer', 'description' => 'Minimum 11-point algorithmic SEO score threshold (default: 80).' ),
+                        'min_geo_score'    => array( 'type' => 'integer', 'description' => 'Minimum GEO local intent engine score threshold (default: 85).' ),
+                        'tone'             => array(
                             'type'        => 'string',
                             'enum'        => array( 'editorial', 'executive', 'technical', 'conversational' ),
                             'description' => 'Editorial tone and voice (default: editorial).',
                         ),
-                        'assigned_ai'    => array(
+                        'assigned_ai'      => array(
                             'type'        => 'string',
                             'enum'        => array( 'claude', 'gemini', 'chatgpt', 'cora_ai' ),
                             'description' => 'Generative AI model assigned to write articles (default: claude).',
                         ),
-                        'status'         => array(
+                        'status'           => array(
                             'type'        => 'string',
                             'enum'        => array( 'active', 'paused' ),
                             'description' => 'Initial campaign status (default: active).',
@@ -1008,7 +1016,7 @@ class Cora_MCP_Tool_Registry {
 
             'cora_update_campaign' => array(
                 'name'          => 'cora_update_campaign',
-                'description'   => 'Update an existing autonomous content campaign: cadence, keywords, auto-publishing rules, quality thresholds, or AI model.',
+                'description'   => 'Update an existing autonomous content campaign: cadence schedule, custom interval seconds/minutes, keywords, auto-publishing rules, quality thresholds, or AI model.',
                 'readOnly'      => false,
                 'destructive'   => false,
                 'openWorld'     => false,
@@ -1016,16 +1024,19 @@ class Cora_MCP_Tool_Registry {
                 'inputSchema'   => array(
                     'type'       => 'object',
                     'properties' => array(
-                        'id'             => array( 'type' => 'string', 'description' => 'Campaign ID to update.' ),
-                        'name'           => array( 'type' => 'string', 'description' => 'Updated campaign name.' ),
-                        'topic_keywords' => array( 'type' => 'array', 'items' => array( 'type' => 'string' ), 'description' => 'Updated keywords.' ),
-                        'cadence'        => array( 'type' => 'string', 'enum' => array( 'daily', '3x_week', 'weekly', 'bi_weekly' ) ),
-                        'auto_publish'   => array( 'type' => 'boolean', 'description' => 'Auto-publish toggle.' ),
-                        'min_seo_score'  => array( 'type' => 'integer', 'description' => 'Minimum SEO score threshold.' ),
-                        'min_geo_score'  => array( 'type' => 'integer', 'description' => 'Minimum GEO score threshold.' ),
-                        'tone'           => array( 'type' => 'string', 'enum' => array( 'editorial', 'executive', 'technical', 'conversational' ) ),
-                        'assigned_ai'    => array( 'type' => 'string', 'enum' => array( 'claude', 'gemini', 'chatgpt', 'cora_ai' ) ),
-                        'status'         => array( 'type' => 'string', 'enum' => array( 'active', 'paused' ) ),
+                        'id'               => array( 'type' => 'string', 'description' => 'Campaign ID to update.' ),
+                        'name'             => array( 'type' => 'string', 'description' => 'Updated campaign name.' ),
+                        'topic_keywords'   => array( 'type' => 'array', 'items' => array( 'type' => 'string' ), 'description' => 'Updated keywords.' ),
+                        'cadence'          => array( 'type' => 'string', 'description' => 'Updated cadence schedule (e.g. every_minute, hourly, daily, weekly, monthly).' ),
+                        'interval_seconds' => array( 'type' => 'integer', 'description' => 'Explicit interval in seconds.' ),
+                        'interval_minutes' => array( 'type' => 'integer', 'description' => 'Explicit interval in minutes.' ),
+                        'interval_hours'   => array( 'type' => 'integer', 'description' => 'Explicit interval in hours.' ),
+                        'auto_publish'     => array( 'type' => 'boolean', 'description' => 'Auto-publish toggle.' ),
+                        'min_seo_score'    => array( 'type' => 'integer', 'description' => 'Minimum SEO score threshold.' ),
+                        'min_geo_score'    => array( 'type' => 'integer', 'description' => 'Minimum GEO score threshold.' ),
+                        'tone'             => array( 'type' => 'string', 'enum' => array( 'editorial', 'executive', 'technical', 'conversational' ) ),
+                        'assigned_ai'      => array( 'type' => 'string', 'enum' => array( 'claude', 'gemini', 'chatgpt', 'cora_ai' ) ),
+                        'status'           => array( 'type' => 'string', 'enum' => array( 'active', 'paused' ) ),
                     ),
                     'required'   => array( 'id' ),
                 ),
@@ -1098,8 +1109,21 @@ class Cora_MCP_Tool_Registry {
                         'title'            => array( 'type' => 'string', 'description' => 'Guide title.' ),
                         'slug'             => array( 'type' => 'string', 'description' => 'URL slug.' ),
                         'primary_category' => array( 'type' => 'string', 'description' => 'Canonical category.' ),
-                        'chapters'         => array( 'type' => 'array', 'description' => 'List of chapter objects with title, slug, and blocks.' ),
-                        'sources'          => array( 'type' => 'array', 'description' => 'Structured sources.' ),
+                        'chapters'         => array(
+                            'type'        => 'array',
+                            'description' => 'List of chapter objects with title, slug, and blocks.',
+                            'items'       => array(
+                                'type'        => 'object',
+                                'description' => 'Chapter definition object.',
+                            ),
+                        ),
+                        'sources'          => array(
+                            'type'        => 'array',
+                            'description' => 'Structured sources.',
+                            'items'       => array(
+                                'type' => 'string',
+                            ),
+                        ),
                     ),
                     'required'   => array( 'title' ),
                 ),
@@ -1696,6 +1720,94 @@ class Cora_MCP_Tool_Registry {
             'cora_update_website_settings'      => 'cora_update_website_settings',
             'update_website_settings'           => 'cora_update_website_settings',
             'update_site_settings'              => 'cora_update_website_settings',
+
+            // Workspace & Account Discovery Aliases
+            'workspaces'                        => 'list_workspaces',
+            'list_workspaces'                   => 'list_workspaces',
+            'get_workspaces'                    => 'list_workspaces',
+            'cora_list_workspaces'              => 'list_workspaces',
+            'cla_list_workspaces'               => 'list_workspaces',
+            'get_workspace'                     => 'get_workspace',
+            'cora_get_workspace'               => 'get_workspace',
+            'cla_get_workspace'                => 'get_workspace',
+            'inspect_workspace'                 => 'get_workspace',
+            'get_authenticated_account'         => 'get_authenticated_account',
+            'cora_get_authenticated_account'    => 'get_authenticated_account',
+            'cla_get_authenticated_account'     => 'get_authenticated_account',
+            'whoami'                            => 'get_authenticated_account',
+            'current_user'                      => 'get_authenticated_account',
+            'account'                           => 'get_authenticated_account',
+            'userinfo'                          => 'get_authenticated_account',
+            'authenticated_account'             => 'get_authenticated_account',
+
+            // Media Vault Aliases
+            'upload_media'                      => 'upload_media',
+            'cora_upload_media'                 => 'upload_media',
+            'cla_upload_media'                  => 'upload_media',
+            'upload_thumbnail'                  => 'upload_media',
+            'upload_thumbnails'                 => 'upload_media',
+            'create_thumbnail'                  => 'upload_media',
+            'upload_image'                      => 'upload_media',
+            'upload_asset'                      => 'upload_media',
+            'list_media'                        => 'list_media',
+            'cora_list_media'                   => 'list_media',
+            'cla_list_media'                    => 'list_media',
+            'get_media'                         => 'get_media',
+            'cora_get_media'                    => 'get_media',
+            'cla_get_media'                     => 'get_media',
+            'delete_media'                      => 'delete_media',
+            'cora_delete_media'                 => 'delete_media',
+            'cla_delete_media'                  => 'delete_media',
+
+            // Operational Analytics & Financial Summary
+            'get_analytics'                     => 'get_analytics',
+            'cora_get_analytics'                => 'get_analytics',
+            'cla_get_analytics'                 => 'get_analytics',
+            'analytics'                         => 'get_analytics',
+            'metrics'                           => 'get_analytics',
+            'get_financial_summary'             => 'get_financial_summary',
+            'cora_get_financial_summary'        => 'get_financial_summary',
+            'cla_get_financial_summary'         => 'get_financial_summary',
+            'financial_summary'                 => 'get_financial_summary',
+            'revenue_summary'                   => 'get_financial_summary',
+
+            // Autonomous Campaigns Aliases
+            'create_campaign'                   => 'cora_create_campaign',
+            'cora_create_campaign'              => 'cora_create_campaign',
+            'cla_create_campaign'               => 'cora_create_campaign',
+            'new_campaign'                      => 'cora_create_campaign',
+            'add_campaign'                      => 'cora_create_campaign',
+
+            'list_campaigns'                    => 'cora_list_campaigns',
+            'cora_list_campaigns'               => 'cora_list_campaigns',
+            'cla_list_campaigns'                => 'cora_list_campaigns',
+            'get_campaigns'                     => 'cora_list_campaigns',
+
+            'get_campaign'                      => 'cora_get_campaign',
+            'cora_get_campaign'                 => 'cora_get_campaign',
+            'cla_get_campaign'                  => 'cora_get_campaign',
+
+            'update_campaign'                   => 'cora_update_campaign',
+            'cora_update_campaign'              => 'cora_update_campaign',
+            'cla_update_campaign'               => 'cora_update_campaign',
+
+            'trigger_campaign_run'              => 'cora_trigger_campaign_run',
+            'cora_trigger_campaign_run'         => 'cora_trigger_campaign_run',
+            'cla_trigger_campaign_run'          => 'cora_trigger_campaign_run',
+            'run_campaign'                      => 'cora_trigger_campaign_run',
+            'trigger_campaign'                  => 'cora_trigger_campaign_run',
+
+            'improve_content'                   => 'cora_improve_content',
+            'cora_improve_content'              => 'cora_improve_content',
+            'cla_improve_content'               => 'cora_improve_content',
+            'enhance_content'                   => 'cora_improve_content',
+            'improve_article'                   => 'cora_improve_content',
+
+            'get_autonomous_activity_log'       => 'cora_get_autonomous_activity_log',
+            'cora_get_autonomous_activity_log'  => 'cora_get_autonomous_activity_log',
+            'cla_get_autonomous_activity_log'   => 'cora_get_autonomous_activity_log',
+            'activity_log'                      => 'cora_get_autonomous_activity_log',
+            'autonomous_log'                    => 'cora_get_autonomous_activity_log',
         );
 
         if ( isset( $map[ $normalized ] ) ) {
@@ -1724,6 +1836,12 @@ class Cora_MCP_Tool_Registry {
         $tools = self::get_tools();
         if ( isset( $tools[ $canonical ] ) ) {
             return $tools[ $canonical ];
+        }
+        if ( isset( $tools[ 'cora_' . $canonical ] ) ) {
+            return $tools[ 'cora_' . $canonical ];
+        }
+        if ( isset( $tools[ 'cla_' . $canonical ] ) ) {
+            return $tools[ 'cla_' . $canonical ];
         }
         $dotted = str_replace( '_', '.', $canonical );
         if ( isset( $tools[ $dotted ] ) ) {
@@ -3125,14 +3243,14 @@ class Cora_MCP_Tool_Registry {
         if ( isset( $args['source'] ) && $args['source'] === 'growth' ) {
             return self::handle_growth_tool( $args, $auth, 'cora_update_article' );
         }
-        $id  = $args['id'] ?? $args['slug'] ?? 0;
+        $id  = $args['id'] ?? $args['post_id'] ?? $args['article_id'] ?? $args['slug'] ?? 0;
         $req = self::dispatch_content_rest( 'POST', '/cora/v1/content/' . $id, $args, $auth );
         $res = Cora_Workspace_Content_REST_Controller::update_article( $req );
         return self::unwrap_rest_response( $res );
     }
 
     public static function handle_delete_article( $args, $auth ) {
-        $id  = $args['id'] ?? 0;
+        $id  = $args['id'] ?? $args['post_id'] ?? $args['article_id'] ?? $args['slug'] ?? 0;
         $req = self::dispatch_content_rest( 'DELETE', '/cora/v1/content/' . $id, $args, $auth );
         $res = Cora_Workspace_Content_REST_Controller::delete_article( $req );
         return self::unwrap_rest_response( $res );
@@ -3142,14 +3260,14 @@ class Cora_MCP_Tool_Registry {
         if ( isset( $args['source'] ) && $args['source'] === 'growth' ) {
             return self::handle_growth_tool( $args, $auth, 'cora_publish_content' );
         }
-        $id  = $args['id'] ?? $args['slug'] ?? 0;
+        $id  = $args['id'] ?? $args['post_id'] ?? $args['article_id'] ?? $args['slug'] ?? 0;
         $req = self::dispatch_content_rest( 'POST', '/cora/v1/content/' . $id . '/publish', $args, $auth );
         $res = Cora_Workspace_Content_REST_Controller::publish_article( $req );
         return self::unwrap_rest_response( $res );
     }
 
     public static function handle_unpublish_article( $args, $auth ) {
-        $id  = $args['id'] ?? $args['slug'] ?? 0;
+        $id  = $args['id'] ?? $args['post_id'] ?? $args['article_id'] ?? $args['slug'] ?? 0;
         $req = self::dispatch_content_rest( 'POST', '/cora/v1/content/' . $id . '/unpublish', $args, $auth );
         $res = Cora_Workspace_Content_REST_Controller::unpublish_article( $req );
         return self::unwrap_rest_response( $res );
@@ -3195,7 +3313,29 @@ class Cora_MCP_Tool_Registry {
         }
         $agency_id = self::get_agency_id( $auth, $args );
         $camp = Cora_Autonomous_Campaigns::create_campaign( $args, $agency_id );
-        return array( 'success' => true, 'campaign' => $camp );
+        if ( is_wp_error( $camp ) ) {
+            return $camp;
+        }
+        $resp = array(
+            'success'     => true,
+            'campaign_id' => $camp['id'] ?? '',
+            'id'          => $camp['id'] ?? '',
+            'name'        => $camp['name'] ?? '',
+            'cadence'     => $camp['cadence'] ?? '',
+            'status'      => $camp['status'] ?? 'active',
+            'next_run_at' => $camp['next_run_at'] ?? '',
+            'message'     => "Autonomous campaign '{$camp['name']}' created successfully.",
+            'campaign'    => $camp,
+        );
+        if ( ! empty( $camp['immediate_run'] ) ) {
+            $resp['first_article'] = $camp['immediate_run'];
+            $resp['post_id']       = $camp['immediate_run']['post_id'] ?? 0;
+            $resp['url']           = $camp['immediate_run']['url'] ?? ( $camp['immediate_run']['public_url'] ?? '' );
+            $resp['permalink']     = $resp['url'];
+            $resp['live_url']      = $resp['url'];
+            $resp['status']        = $camp['immediate_run']['status'] ?? 'published';
+        }
+        return $resp;
     }
 
     public static function handle_list_campaigns( $args, $auth ) {
@@ -3218,7 +3358,7 @@ class Cora_MCP_Tool_Registry {
             require_once dirname( __DIR__ ) . '/class-cora-autonomous-campaigns.php';
         }
         $agency_id = self::get_agency_id( $auth, $args );
-        $id        = sanitize_text_field( $args['id'] ?? '' );
+        $id        = sanitize_text_field( $args['id'] ?? ( $args['campaign_id'] ?? '' ) );
         $camp      = Cora_Autonomous_Campaigns::get_campaign( $id, $agency_id );
         if ( ! $camp ) {
             return new WP_Error( 'not_found', "Campaign '{$id}' not found." );
@@ -3231,7 +3371,7 @@ class Cora_MCP_Tool_Registry {
             require_once dirname( __DIR__ ) . '/class-cora-autonomous-campaigns.php';
         }
         $agency_id = self::get_agency_id( $auth, $args );
-        $id        = sanitize_text_field( $args['id'] ?? '' );
+        $id        = sanitize_text_field( $args['id'] ?? ( $args['campaign_id'] ?? '' ) );
         $res       = Cora_Autonomous_Campaigns::update_campaign( $id, $args, $agency_id );
         if ( is_wp_error( $res ) ) {
             return $res;
@@ -3244,7 +3384,7 @@ class Cora_MCP_Tool_Registry {
             require_once dirname( __DIR__ ) . '/class-cora-autonomous-campaigns.php';
         }
         $agency_id = self::get_agency_id( $auth, $args );
-        $id        = sanitize_text_field( $args['id'] ?? '' );
+        $id        = sanitize_text_field( $args['id'] ?? ( $args['campaign_id'] ?? '' ) );
         $kw        = sanitize_text_field( $args['keyword_override'] ?? '' );
         $res       = Cora_Autonomous_Campaigns::trigger_campaign( $id, $agency_id, 'mcp', $kw );
         if ( is_wp_error( $res ) ) {
@@ -4014,9 +4154,10 @@ class Cora_MCP_Tool_Registry {
         $agency_id = self::get_agency_id( $auth, $args );
         $user_id   = intval( $auth['user_id'] ?? 1 ) ?: 1;
 
-        $url         = ! empty( $args['url'] ) ? esc_url_raw( trim( $args['url'] ) ) : '';
-        $file_base64 = ! empty( $args['file_base64'] ) ? trim( $args['file_base64'] ) : '';
-        $title       = sanitize_text_field( $args['title'] ?? ( $args['file_name'] ?? 'Uploaded Asset' ) );
+        $url         = ! empty( $args['url'] ) ? esc_url_raw( trim( $args['url'] ) ) : ( ! empty( $args['file_url'] ) ? esc_url_raw( trim( $args['file_url'] ) ) : ( ! empty( $args['image_url'] ) ? esc_url_raw( trim( $args['image_url'] ) ) : ( ! empty( $args['src'] ) ? esc_url_raw( trim( $args['src'] ) ) : '' ) ) );
+        $file_base64 = ! empty( $args['file_base64'] ) ? trim( $args['file_base64'] ) : ( ! empty( $args['base64'] ) ? trim( $args['base64'] ) : ( ! empty( $args['data'] ) ? trim( $args['data'] ) : ( ! empty( $args['file_data'] ) ? trim( $args['file_data'] ) : ( ! empty( $args['image'] ) ? trim( $args['image'] ) : '' ) ) ) );
+        $filename_in = ! empty( $args['file_name'] ) ? $args['file_name'] : ( ! empty( $args['filename'] ) ? $args['filename'] : ( ! empty( $args['name'] ) ? $args['name'] : '' ) );
+        $title       = sanitize_text_field( $args['title'] ?? ( ! empty( $filename_in ) ? $filename_in : 'Uploaded Asset' ) );
         $alt_text    = sanitize_text_field( $args['alt_text'] ?? $title );
         $caption     = sanitize_text_field( $args['caption'] ?? '' );
         $folder_id   = ! empty( $args['folder_id'] ) ? intval( $args['folder_id'] ) : null;
@@ -4029,7 +4170,7 @@ class Cora_MCP_Tool_Registry {
         require_once ABSPATH . 'wp-admin/includes/image.php';
         require_once ABSPATH . 'wp-admin/includes/media.php';
 
-        $filename = ! empty( $args['file_name'] ) ? sanitize_file_name( $args['file_name'] ) : '';
+        $filename = ! empty( $filename_in ) ? sanitize_file_name( $filename_in ) : '';
         $file_content = '';
 
         if ( ! empty( $file_base64 ) ) {

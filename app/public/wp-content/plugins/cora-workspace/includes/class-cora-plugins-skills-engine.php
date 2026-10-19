@@ -2509,7 +2509,13 @@ Return ONLY raw JSON with keys:
                     'category'    => array( 'type' => 'string', 'description' => 'Category: Integrations, Financials, Operations, Productivity' ),
                     'type'        => array( 'type' => 'string', 'description' => 'custom, webhook, or mcp_bridge' ),
                     'config'      => array( 'type' => 'object', 'description' => 'Key-value configuration and settings' ),
-                    'mcp_tools'   => array( 'type' => 'array', 'description' => 'Array of MCP tools this plugin exposes' ),
+                    'mcp_tools'   => array(
+                        'type'        => 'array',
+                        'description' => 'Array of MCP tools this plugin exposes',
+                        'items'       => array(
+                            'type' => 'string',
+                        ),
+                    ),
                 ),
                 'required'   => array( 'name', 'description' )
             ),
@@ -2567,7 +2573,13 @@ Return ONLY raw JSON with keys:
                     'instruction_prompt' => array( 'type' => 'string', 'description' => 'Detailed system prompt instructions guiding AI behavior' ),
                     'trigger_phrases'    => array( 'type' => 'string', 'description' => 'Comma-separated trigger keywords or intent phrases' ),
                     'parameters_schema'  => array( 'type' => 'object', 'description' => 'JSON schema of inputs' ),
-                    'bound_mcp_tools'    => array( 'type' => 'array', 'description' => 'List of tool names this skill can access' )
+                    'bound_mcp_tools'    => array(
+                        'type'        => 'array',
+                        'description' => 'List of tool names this skill can access',
+                        'items'       => array(
+                            'type' => 'string',
+                        ),
+                    ),
                 ),
                 'required'   => array( 'name', 'instruction_prompt' )
             ),
