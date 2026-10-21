@@ -1,6 +1,6 @@
 # Cora Platform — Comprehensive Platform Documentation
 
-This document serves as the master technical specification and architectural manual for the Cora Workspace Platform (v4.9.401).
+This document serves as the master technical specification and architectural manual for the Cora Workspace Platform (v4.9.419).
 
 ---
 
@@ -2690,10 +2690,28 @@ Implemented in `views/view-google-profile.php`, `cora-workspace.php`, and `asset
 
 ---
 
-## Section 28: Master Release Manifest & Version History (v4.0.0 - v4.9.401)
+## Section 28: Master Release Manifest & Version History (v4.0.0 - v4.9.419)
 
 | Version | Release Date | Key Features & Enhancements |
 | :--- | :--- | :--- |
+| **v4.9.419** | Oct 2026 | Canvas Performance & Telemetry Command Center & Business Email Suite v2: Self-hosted, cookieless, real-time website telemetry and RUM Core Web Vitals engine (`Cora_Performance_Telemetry`); 6 Decision KPIs matrix and dynamic executive directive banner; 4 interactive sub-views (Traffic, Top Pages, Speed Diagnostics, Search & SEO striking distance); multi-tab integrations drawer for PageSpeed and GSC; and Cora Business Email & Campaigns Engine v2 (`Cora_Email_Campaigns_Engine`) supporting multi-inbox Google & Hostinger pools (1 to 20 accounts by tier: Starter, Growth, Pro, Enterprise), automated round-robin sender rotation, 14-day warm-up ramp, Spintax variation, drip cadences, and 8 sub-navigation tabs in `view-emails.php` |
+| **v4.9.418** | Oct 2026 | Real User Monitoring (RUM) Core Web Vitals Beacon & Closed-Loop Attribution: `<1KB` non-blocking passive beacon (`render_frontend_tracker_beacon`) writing to `wp_cora_web_analytics` measuring 75th percentile LCP, INP, CLS; closed-loop conversion tracking attributing CRM leads (`wp_cora_leads`) and form entries (`wp_cora_form_submissions`) to referrer channels (Direct, Organic, WhatsApp, Social, Paid, Referral); and Search Console striking-distance keyword extractor (positions 4–15) |
+| **v4.9.417** | Oct 2026 | ChatGPT Action Discovery & 30-Action OpenAPI Ceiling Enforcement: Curated 28-tool OpenAPI schema (`?limit=28`) strictly enforcing OpenAI's 30-action ceiling to guarantee zero import failures in Custom GPTs, while exposing the uncapped 246-tool inventory for unconstrained desktop agents via `?all=1` and direct MCP; hardened parameter schemas with zero emojis and non-empty property objects |
+| **v4.9.416** | Oct 2026 | Affiliate & Referral Partner Hub Redesign (HeroUI & ShadCN Anatomy): Complete architectural overhaul of `views/view-affiliate-referrals.php` adopting HeroUI & ShadCN component architecture; modular HeroUI Cards (Header, Body, Footer), Elevated Segmented Pill Tabs with micro-counters, Smooth Progress Track with milestones, Bordered Snippet with copy feedback, Squircle Avatar with font-mono, Status Chips & Badges, Interactive Deal Multiplier Slider; and 5 dedicated views (Overview, Leaderboard, Calculator, Referrals Ledger, Payouts Ledger) |
+| **v4.9.415** | Oct 2026 | Canvas Global Pages, HTML 3D Deployments & Headless Next.js Static Builds: Dynamic route resolution engine in `cora-workspace.php` detecting HTML Canvas pages (`_cora_page_engine = 'html_canvas'`) vs Next.js static builds (`cora_render_nextjs_static_build`) vs live dev frames; 1-click URL Website Import Drawer & Elementor Migrator (`class-cora-html-website-migrator.php`); and SPA error shield |
+| **v4.9.414** | Oct 2026 | Forms Sticky Header & Universal All Entries Slide Drawer: Sticky header with integrated search and quick actions; All Entries slide drawer with high-density data table, form filter dropdown, export options, and submission details modal |
+| **v4.9.413** | Oct 2026 | AI Copilot Slash Menu & Right-Panel Copilot Drawer: Workspace-wide AI Copilot with `/` slash menu trigger, contextual workspace awareness, and right-panel copilot drawer |
+| **v4.9.412** | Oct 2026 | CLA / ChatGPT Autonomous Workspace Operator & Dynamic Multi-Channel Template Engine: Full RFC 8414 Dynamic Userinfo Handshake (`/oauth/userinfo` & `/wp-json/cora-oauth/v1/userinfo`) eliminating ChatGPT `"not_installed"` handshake stalls; dynamic plugin manifest (`ai-plugin.json`) supporting both `'cla'` and `'cora'` client paths; expanded 246 tool catalog aliases (canonical, `cla_*`, `cora_*`); 9 universal operator handlers (`get_authenticated_account`, `list_workspaces`, `get_workspace`, `upload_media`, `list_media`, `get_media`, `delete_media`, `get_analytics`, `get_financial_summary`); 12/12 automated E2E test suite in `scripts/test_cla_chatgpt_mcp_e2e.php`; Dynamic Multi-Channel Template Engine (`Cora_Template_Engine` in `includes/class-cora-template-engine.php` with self-healing `wp_cora_canvas_templates` schema across 5 archetypes: article, page, policy, product, collection); Canvas Visual Workflow Builder & MCP Node Canvas (`views/view-canvas.php`); and Content Approval Drawer with media selection bridge |
+| **v4.9.411** | Oct 2026 | Canvas Visual Workflow Builder & Node Canvas Execution Engine: Interactive visual automation workflow canvas (`views/view-canvas.php`) with drag-and-drop MCP automation triggers, active state node wiring, and real-time execution feedback |
+| **v4.9.410** | Oct 2026 | Media Asset Selector Modal & Content Approval Drawer Integration: Slide-out Content Approval Drawer linking media uploads directly to dynamic template rendering slots with live thumbnail previews and MIME validation |
+| **v4.9.409** | Oct 2026 | Dynamic Multi-Channel Template Engine Schema Auto-Provisioning: Self-healing database table `wp_cora_canvas_templates` decoupling content entities from theme skins with zero content loss on theme migration |
+| **v4.9.408** | Oct 2026 | Extended MCP Tool Aliases Architecture: Tri-alias naming topology mapping canonical tool names to `cla_*` and `cora_*` namespaces, expanding operator tool inventory to 246 distinct endpoints |
+| **v4.9.407** | Oct 2026 | Top 3 Market Leader Connectors, Minimal High-Trust OAuth Consent & Telemetry Handshakes: High-visibility connection matrix in `views/view-canvas.php` for ChatGPT, Claude, and Gemini; clean minimal OAuth consent screen displaying tenant workspace scopes; and live connection health monitoring with latency diagnostics |
+| **v4.9.406** | Oct 2026 | 1-Click Seamless Gemini MCP Connector & Autonomous Content Campaigns Engine: 1-click `client_credentials` grant with auto-provisioned client ID/secret and copyable JSON configuration; Autonomous Content Campaigns Engine (`includes/class-cora-autonomous-campaigns.php`) with automated topic clustering, cadence scheduling (daily, 3x/week, weekly, bi-weekly), and 11-point SEO (min 80) & GEO (min 85) quality score gating |
+| **v4.9.405** | Oct 2026 | Universal Official Vector AI Brand Logos Engine: Centralized SVG brand helper `cora_get_ai_platform_official_logo()` in `includes/workspace-header.php` standardizing authentic official vector logos for OpenAI/ChatGPT (#10A37F), Claude (#D97757), Gemini (linear gradient #4E82EE to #9B72CF), Perplexity (#1FB8CD), and YouTube (#FF0000) globally across Frontend and Workspace |
+| **v4.9.404** | Oct 2026 | Autonomous Campaign Background Scheduler & Cron Handler: Background automated drafting execution loop evaluating campaign cadences, triggering AI article creation, and scheduling publication |
+| **v4.9.403** | Oct 2026 | Topic Keyword Research Auto-Clustering: High-intent keyword opportunity matching and intent categorization for automated blog campaign generation |
+| **v4.9.402** | Oct 2026 | Dynamic Userinfo Handshake & Bearer Scope Validation: Hardened Bearer token authorization validator and dynamic userinfo payload resolution supporting external autonomous LLM agents |
 | **v4.9.401** | Oct 2026 | WhatsApp Meta Graph API v25.0 Link Cleansing, Strict 3/Hour Rate Limiting & Smart Lead Batching: Stripped raw URLs from message body text in favor of interactive action pills; enforced rolling 1-hour anti-spam rate limiter (`can_send_automated_message`) capping automated notifications to 3 per hour per recipient; implemented smart lead roll-up batching during high-traffic intervals; and integrated 1-click tokenized executive PDF report generation (`cora_get_24h_report_url`) with SHA-256 access verification |
 | **v4.9.400** | Oct 2026 | WhatsApp Interactive Quick-Reply Buttons & Image Card Payloads: Implemented Meta interactive `button` helpers (`send_interactive_buttons`) supporting up to 3 action pills (`View Full Report`, `Recent Leads`, `Team Attendance`) and rich media cards (`send_image_card`) with header images, body text, and CTA buttons; automatic graceful fallback to markdown-formatted session text |
 | **v4.9.399** | Oct 2026 | Zero-Cost Customer Service Window (CSW) Queueing Engine & Inbound Bot Engine: Built zero-cost queueing mechanism (`queue_pending_update`) for workspace alerts arriving outside the 24h service window (retaining up to 15 prioritized entries with 5-minute deduplication); automated queue flush (`flush_pending_updates`) on user inbound ping delivering all pending events at $0 cost; autonomous inbound bot command engine (`handle_inbound_query`) routing numeric/keyword commands (`1`/`leads`, `2`/`revenue`, `3`/`attendance`, `4`/`report`, `5`/`status`); and uploaded official verified profile portrait (`assets/images/cora-ai-whatsapp-dp.jpg`) |
@@ -2971,4 +2989,398 @@ Implemented in `views/view-google-profile.php`, `cora-workspace.php`, and `asset
 
 ---
 
-*Cora Platform v4.9.401 — Master Architectural Manual. Last updated: October 2026.*
+## Section 29: Complete CLA / ChatGPT Autonomous Workspace Operator Integration & Universal MCP Server (v4.9.412)
+
+### 29.1 The ChatGPT "Not Installed" Handshake Problem & RFC 8414 Resolution
+When external autonomous agents (such as OpenAI ChatGPT Plus/Enterprise GPTs or custom CLA operators) attempt to connect via OAuth 2.0 / 2.1, standard OAuth providers often return tokens without verifying user identity endpoints. ChatGPT strictly requires RFC 8414 compliance: upon receiving an authorization code and exchanging it for a Bearer token, ChatGPT immediately dispatches a request to `/oauth/userinfo` or `/wp-json/cora-oauth/v1/userinfo` to validate the active user identity.
+If this endpoint is missing, returns 404, or returns an unauthenticated payload, ChatGPT halts the onboarding flow with a cryptic `"plugin not installed"` or `"not_installed"` error.
+
+To resolve this completely in v4.9.412:
+1. **Dynamic RFC 8414 Userinfo Handshake**: Registered dual route endpoints:
+   - Primary: `/oauth/userinfo`
+   - Canonical REST: `/wp-json/cora-oauth/v1/userinfo`
+   These endpoints accept standard `Authorization: Bearer <token>` headers, resolve the user identity via `wp_cora_oauth_tokens`, and return a fully compliant JSON identity payload:
+   ```json
+   {
+     "sub": "user_42",
+     "name": "Aarav Mehta",
+     "email": "director@elitestudio.local",
+     "workspace_id": 1,
+     "agency_id": 1,
+     "roles": ["administrator", "cora_agency_owner"],
+     "scope": "workspace:read workspace:write content:write",
+     "token_type": "Bearer"
+   }
+   ```
+2. **Dual-Client Identity Manifest (`ai-plugin.json`)**:
+   `/.well-known/ai-plugin.json` dynamically accepts `?client=cla` or `?client=cora` to negotiate identity schemas seamlessly across both ChatGPT Custom GPTs and autonomous CLA agents, pointing to `/wp-json/cora-mcp/v1/openapi.json`.
+
+### 29.2 The 246 Tool Catalog Aliases & Dual View Topology
+External agents frequently expect distinct tool naming conventions depending on their system prompts or function calling schemas:
+- Canonical names: `list_content`, `create_article`, `get_financial_summary`
+- CLA namespaced aliases: `cla_list_content`, `cla_create_article`, `cla_get_financial_summary`
+- Cora namespaced aliases: `cora_list_content`, `cora_create_article`, `cora_get_financial_summary`
+
+`Cora_MCP_Tool_Registry` implements tri-alias expansion: for every base tool registered, the system auto-registers all 3 naming aliases pointing to the identical underlying execution handler. This expands the active tool catalog to **246 operational endpoints**.
+
+Furthermore, to accommodate ChatGPT's strict 28-tool OpenAPI schema ceiling without limiting advanced autonomous LLM agents:
+- **Default / Filtered Mode (`?limit=28`)**: Emits a curated 28-action OpenAPI 3.0.1 schema optimized for ChatGPT UI action buttons without triggering OpenAPI validation errors.
+- **Full Catalog Mode (`?all=1` or Direct MCP)**: Exposes the full unconstrained 246-tool inventory for Claude Desktop, Gemini CLI, Cursor, Windsurf, and custom autonomous operators.
+
+### 29.3 The 9 Universal Operator Handlers
+To empower autonomous operators to manage entire client workspaces from end to end, Cora v4.9.412 standardizes 9 universal core handlers in `Cora_MCP_Tool_Registry`:
+1. `get_authenticated_account`: Identity inspection returning authenticated operator details, permissions, and tenant scope.
+2. `list_workspaces`: Multi-tenant workspace enumeration for agencies managing multiple client branches.
+3. `get_workspace`: Full workspace metadata, business industry profile, active module states, and connected integrations.
+4. `upload_media`: Multi-format media ingestion (base64 and binary multipart) into the WordPress media vault with automated MIME validation, alt-text tagging, and agency ownership.
+5. `list_media`: Paginated media library inspection with MIME filtering, file dimensions, and responsive thumbnail URLs.
+6. `get_media`: Detailed single-asset metadata and direct CDN/local URLs.
+7. `delete_media`: Secure asset purge with strict tenant ownership validation.
+8. `get_analytics`: Unified cross-module telemetry aggregator (pipeline deal volume, active leads count, conversion velocity, web traffic, and MRR metrics).
+9. `get_financial_summary`: Real-time financial intelligence returning spot billing totals, collected revenue, GST liabilities (18% domestic / 0% LUT export), and pending client receivables.
+
+### 29.4 Automated Verification Suite
+The entire CLA / ChatGPT MCP lifecycle is guarded by an automated 12/12 E2E test suite in `scripts/test_cla_chatgpt_mcp_e2e.php` validating:
+- Discovery metadata and RFC 8414 well-known endpoints.
+- Dynamic `ai-plugin.json` schema negotiation for both client paths.
+- Bearer token authentication and userinfo identity resolution.
+- 28-action OpenAPI ceiling vs. full 246-tool alias registration.
+- Execution integrity across all 9 universal operator handlers.
+
+---
+
+## Section 30: Autonomous Content Campaigns Engine Architecture (`Cora_Autonomous_Campaigns`) (v4.9.406 - v4.9.412)
+
+### 30.1 Overview & System Purpose
+Located in `includes/class-cora-autonomous-campaigns.php`, the Autonomous Content Campaigns Engine orchestrates continuous, scheduled AI content generation and multi-channel publication without requiring human manual drafting.
+
+### 30.2 Key Architecture & Data Structures
+Each campaign is persisted in tenant-scoped options (`cora_workspace_content_campaigns_{agency_id}`) and encapsulates:
+- `id`: Unique campaign identifier (e.g. `cmp_studio_lighting`).
+- `name`: Human-readable campaign title.
+- `topic_keywords`: Priority keyword clusters targeting high-intent search volume.
+- `cadence`: Automation interval (`daily`, `3x_weekly`, `weekly`, `bi_weekly`).
+- `auto_publish`: Boolean flag governing whether articles publish immediately or enter the Content Approval Drawer.
+- `min_seo_score`: Minimum acceptable 11-point algorithmic SEO score (default: 80).
+- `min_geo_score`: Minimum acceptable Generative Engine Optimization score for AI crawler citation (default: 85).
+- `tone`: Editorial voice preset (`editorial`, `authoritative`, `conversational`, `minimalist`).
+- `assigned_ai`: Target AI engine (`claude`, `gemini`, `chatgpt`).
+- `execution_logs`: Historical audit trail recording timestamp, keyword selected, generated article ID, audit scores, and publication status.
+
+### 30.3 Algorithmic 11-Point SEO & GEO Quality Gating
+Before any AI-generated article can be approved or published, `Cora_Autonomous_Campaigns` evaluates 11 rigorous criteria:
+1. Title tag keyword prominence (first 40 characters).
+2. Meta description length (140–160 chars) with primary intent match.
+3. Heading hierarchy integrity (single H1, logical H2/H3 nesting).
+4. Content length and keyword density (optimal 1.2%–2.0%).
+5. Internal link equity distribution (minimum 2 workspace cross-references).
+6. Outbound authoritative citation references.
+7. Image alt-text coverage and descriptive fidelity.
+8. Readability score (Flesch-Kincaid Grade 8–10).
+9. Generative Engine Optimization (GEO) structured entity definition for Perplexity, SearchGPT, and Google AI Overviews.
+10. Schema.org JSON-LD structured markup injection (Article / TechArticle / HowTo).
+11. PII and brand tone safety guardrail compliance.
+
+---
+
+## Section 31: Dynamic Multi-Channel Template Engine Architecture (`Cora_Template_Engine`) (v4.9.409 - v4.9.412)
+
+### 31.1 Decoupled Presentation Architecture
+Located in `includes/class-cora-template-engine.php`, the Dynamic Multi-Channel Template Engine introduces a Shopify-style presentation layer that completely decouples content data from theme rendering.
+
+In traditional WordPress architectures, switching themes or altering site layouts frequently corrupts or leaves orphaned post metadata and layout grids. The Cora Template Engine resolves this by storing structural layouts in a dedicated, self-healing database schema:
+```sql
+CREATE TABLE wp_cora_canvas_templates (
+    id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+    agency_id bigint(20) unsigned NOT NULL DEFAULT 1,
+    title varchar(255) NOT NULL,
+    slug varchar(100) NOT NULL,
+    archetype varchar(50) NOT NULL,
+    layout_json longtext NOT NULL,
+    css_overrides longtext,
+    is_default tinyint(1) NOT NULL DEFAULT 0,
+    status varchar(20) NOT NULL DEFAULT 'published',
+    created_at datetime NOT NULL,
+    updated_at datetime NOT NULL,
+    PRIMARY KEY (id),
+    KEY agency_archetype (agency_id, archetype)
+);
+```
+
+### 31.2 The 5 Supported Archetypes
+1. `article`: Dynamic layouts for Content Suite blog posts, editorial news, and case studies (slots: `title`, `content`, `excerpt`, `featured_image`, `author`, `date`, `read_time`, `form_embed`).
+2. `page`: Standard webpage layouts for studio sites (About, Services, Team, Studio Hire) (slots: `title`, `subtitle`, `content`, `hero_image`, `form_embed`).
+3. `policy`: Formal legal documents (Terms of Service, Privacy Policy, 18% GST Compliance, Studio Rental Agreements) (slots: `title`, `content`, `effective_date`, `version`, `jurisdiction`).
+4. `product`: Equipment rental items, shoot packages, and real estate tier listings (slots: `title`, `description`, `price`, `gst_rate`, `specs`, `gallery`, `booking_form`).
+5. `collection`: Category archives, portfolio showcases, and client proofing vaults (slots: `title`, `description`, `item_loop`, `pagination`, `filters`).
+
+---
+
+## Section 32: Top 3 Market Leader Connectors, Minimal High-Trust OAuth Consent & Telemetry Handshakes (v4.9.407 - v4.9.412)
+
+### 32.1 Market Leader Provider Matrix
+Integrated into `views/view-canvas.php`, the Connect AI Assistant provider matrix establishes frictionless connectivity to the top 3 AI developer ecosystems:
+- **ChatGPT**: Direct Bearer Token connection and Custom GPT Developer Plugin manifest (`/.well-known/ai-plugin.json`).
+- **Claude**: SSE and JSON-RPC 2.0 configuration for Claude Desktop and Claude Web via `claude_desktop_config.json`.
+- **Gemini**: 1-Click `client_credentials` grant with auto-provisioned credentials, JSON schema export, and instant connectivity validation.
+
+### 32.2 Minimal High-Trust OAuth Consent Screen
+Cora replaces cluttered legacy OAuth permission dialogs with a minimal, high-trust monochromatic consent card (`cora-oauth-consent.php`) that clearly displays:
+- Requesting AI Assistant brand mark and verified origin.
+- Tenant workspace name and active account email.
+- Transparent permission scopes (Read content, Publish drafts, Inspect analytics, Manage media).
+- Dual monochromatic action controls: "Authorize Connection" (`bg-zinc-950 text-white`) and "Decline" (`bg-zinc-100 text-zinc-700`).
+
+### 32.3 Live Telemetry Handshakes
+The Connected Providers table provides real-time health verification:
+- Live ping latency diagnostics (~180ms round-trip).
+- Real-time token status (Active, Expiring, Revoked).
+- One-click token revocation and key regeneration.
+
+---
+
+## Section 33: Canvas Visual Workflow Builder, MCP Node Canvas & Media Selection Architecture (v4.9.410 - v4.9.412)
+
+### 33.1 Visual Node Workflow Builder
+Built into `views/view-canvas.php`, the Node Canvas provides an interactive visual workflow surface where users can connect automation nodes:
+- **Trigger Nodes**: Scheduled cron intervals, inbound form leads, new media uploads, or webhook events.
+- **AI Processing Nodes**: Gemini keyword analysis, Claude editorial drafting, automated 11-point SEO/GEO scoring.
+- **Action Nodes**: Dynamic template rendering, live site publication, WhatsApp team alerts, and client email dispatches.
+
+### 33.2 Content Approval Drawer & Media Asset Selector Bridge
+Following Rule 15 SOP (Shopify-inspired main-area docked panel sliding up smoothly with `translateY(0)` directly below the header), the Content Approval Drawer enables agency owners to:
+- Review AI-drafted articles before live syndication.
+- Inspect real-time 11-point SEO and GEO audit scores with actionable repair hints.
+- Launch the integrated Media Selector Modal to browse and attach high-resolution photography assets directly from the WordPress media library without page reloads.
+
+---
+
+## Section 34: Universal Official Vector AI Brand Logos Engine & Token Standardization (v4.9.405 - v4.9.412)
+
+### 34.1 Centralized SVG Logo Helper
+To eliminate inconsistent emojis, outdated raster images, or broken icon fonts, Cora centralizes all AI provider brand marks into a single optimized helper in `includes/workspace-header.php`:
+```php
+function cora_get_ai_platform_official_logo( $platform, $class = '', $size = 15, $monochrome = false )
+```
+
+### 34.2 Supported Official Vector Brand Marks
+| Platform Key | Brand Name | Official Color | Path Architecture |
+| :--- | :--- | :--- | :--- |
+| `'openai'` / `'chatgpt'` | OpenAI / ChatGPT | `#10A37F` | Authentic 6-loop logarithmic spiral geometry |
+| `'claude'` | Anthropic Claude | `#D97757` | Authentic 16-point geometric sunburst mark |
+| `'gemini'` | Google Gemini | Linear Gradient (`#4E82EE` to `#9B72CF`) | Authentic 4-point astroid star with dual-stop SVG gradient |
+| `'perplexity'` | Perplexity AI | `#1FB8CD` | Authentic 8-axis interwoven compass knot |
+| `'youtube'` | YouTube | `#FF0000` | Authentic rounded rectangle with centered play triangle |
+
+### 34.3 Design Token Integration
+When `$monochrome = true` is passed, the helper overrides brand colors with `currentColor`, enabling seamless adaptation across high-contrast buttons, muted navigation pills, and light mode headers in strict accordance with Rule 4 design system tokens.
+
+---
+
+## Section 35: ChatGPT Action Discovery & 30-Action OpenAPI Ceiling Enforcement (v4.9.417 - v4.9.419)
+
+### 35.1 The 30-Action Custom GPT Hard Limitation
+OpenAI enforces a strict operational ceiling of 30 actions per Custom GPT. If an imported OpenAPI specification exceeds 30 paths or operations, the ChatGPT schema validator halts onboarding with an unrecoverable validation error. While Cora provides 246 tools across canonical, `cla_*`, and `cora_*` namespaces, exposing the full inventory directly to ChatGPT broke Custom GPT action discovery.
+
+### 35.2 Dual-View Filtering Topology
+To reconcile ChatGPT's 30-action ceiling with unconstrained autonomous agent requirements, Cora implements a dual-view filtering topology in `cora_rest_mcp_openapi_handler()` (`cora-workspace.php`) and `Cora_MCP_Tool_Registry`:
+1. **ChatGPT Curated View (`?limit=28` or default filtered endpoint)**:
+   - Evaluates a prioritized list of 28 core high-impact operational tools across every platform pillar:
+     - Account & Identity: `get_authenticated_account`, `list_workspaces`, `get_workspace`
+     - CRM & Sales: `list_leads`, `get_lead`, `create_lead`, `update_lead`
+     - Tasks & Ops: `list_tasks`, `create_task`, `update_task`
+     - Media Vault: `list_media`, `get_media`, `upload_media`, `delete_media`
+     - Website Canvas: `cora_canvas_get_themes`, `cora_canvas_get_page_html`, `cora_canvas_update_page_html`, `cora_canvas_get_templates`, `cora_canvas_render_template`
+     - Campaigns & Content: `cora_get_campaigns`, `cora_create_campaign`, `cora_trigger_campaign`, `cora_list_articles`, `cora_audit_article_seo`
+     - Financials: `get_financial_summary`, `cora_get_analytics`
+     - Messaging: `cora_whatsapp_send_alert`
+   - Hard caps exposed operations to 28, leaving a 2-action buffer beneath OpenAI's 30 ceiling.
+2. **Unconstrained Autonomous Operator View (`?all=1` or direct MCP JSON-RPC 2.0)**:
+   - Exposes all 246 endpoints unconstrained to Claude Desktop, Google Gemini CLI, Cursor IDE, Windsurf, and custom autonomous operators.
+
+### 35.3 OpenAPI 3.0.1 Strict Schema Compliance & Parameter Sanitization
+OpenAI's parser rejects OpenAPI 3.1.0 specifications and throws errors on specific schema properties:
+- **Version Pinning**: Emits strictly `openapi: 3.0.1`.
+- **Zero Emojis**: Strips all unicode emojis from `summary`, `description`, and parameter docs.
+- **Explicit Type Objects**: All action payloads declare `type: object` with non-empty `properties`.
+- **Clean Required Arrays**: Omits empty `required: []` arrays.
+
+### 35.4 Dynamic Discovery Manifests (`ai-plugin.json`)
+Cora serves a dynamic manifest at `/.well-known/ai-plugin.json` supporting both `?client=cla` (for CLA Autonomous Workspace Operator) and `?client=cora` (for Cora Custom GPT).
+
+### 35.5 RFC 8414 Dynamic Userinfo Handshake (`/oauth/userinfo`)
+Upon exchanging authorization codes, ChatGPT dispatches a Bearer request to `/oauth/userinfo` or `/wp-json/cora-oauth/v1/userinfo`. The endpoint returns verified account details (`sub`, `name`, `email`, `workspace_id`, `agency_id`, `roles`, `scope`), preventing the `"plugin not installed"` handshake stall.
+
+---
+
+## Section 36: Canvas Performance & Decision-Driven Telemetry Command Center (`Cora_Performance_Telemetry`) (v4.9.418 - v4.9.419)
+
+### 36.1 Architectural Purpose & Self-Hosted Cookieless Engine
+In **v4.9.418 - v4.9.419**, the cosmetic "Performance" tab in Cora Canvas (`view-canvas.php`) was transformed into a complete, real-time, decision-oriented **Website & Platform Telemetry Command Center** powered by `Cora_Performance_Telemetry` in `includes/class-cora-performance-telemetry.php`.
+- **100% Free & Self-Hosted**: Operates without external paid tracking platforms (no Google Analytics 360, Mixpanel, or Datadog bills).
+- **Cookieless & Privacy-First**: Generates anonymous session tokens (`_cora_sid`) persisted in `sessionStorage`, completely eliminating intrusive cookie banners while remaining 100% compliant with GDPR, CCPA, and Indian Digital Personal Data Protection (DPDP) Act.
+- **Database Schema (`wp_cora_web_analytics`)**: Self-healing table with indexes on `agency_id`, `created_at`, `channel`, `device`, `url_path`, and `session_id`.
+
+```sql
+CREATE TABLE wp_cora_web_analytics (
+    id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+    agency_id bigint(20) unsigned NOT NULL DEFAULT 1,
+    session_id varchar(64) NOT NULL,
+    ip_hash varchar(64) DEFAULT NULL,
+    url_path varchar(255) NOT NULL DEFAULT '/',
+    page_title varchar(255) DEFAULT '',
+    referrer varchar(255) DEFAULT '',
+    channel varchar(50) NOT NULL DEFAULT 'direct',
+    device varchar(20) NOT NULL DEFAULT 'desktop',
+    browser varchar(50) DEFAULT '',
+    lcp float DEFAULT NULL,
+    inp int(11) DEFAULT NULL,
+    cls float DEFAULT NULL,
+    created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    KEY idx_agency_id (agency_id),
+    KEY idx_created_at (created_at),
+    KEY idx_channel (channel),
+    KEY idx_device (device),
+    KEY idx_url_path (url_path(191)),
+    KEY idx_session (session_id)
+);
+```
+
+### 36.2 Lightweight Passive Frontend Beacon (<1KB)
+`render_frontend_tracker_beacon()` injects a non-blocking `<script>` beacon before `</body>`:
+- Measures anonymous visits, referrer URL, acquisition channel (Direct, Organic Google, WhatsApp, Social, Paid, Referral), device (Desktop, Mobile, Tablet).
+- Dispatches asynchronously via `navigator.sendBeacon` (with `XMLHttpRequest` fallback) to `cora_record_web_telemetry`.
+- Connects passive `PerformanceObserver` instances for Largest Contentful Paint (LCP) and Cumulative Layout Shift (CLS), reporting RUM scores on page visibility change (`visibilitychange`).
+
+### 36.3 Dynamic Executive Decision Directive Banner
+Rather than presenting raw charts that require manual interpretation, the Telemetry Command Center evaluates live metrics against business benchmarks to surface a dynamic executive recommendation banner:
+- **Lead Generation Bottleneck**: If visitors > 500 but conversion rate < 1.5%, recommends: *"Conversion Rate is below target (1.2%). Embed an inquiry form above the fold on top-performing landing pages."*
+- **Speed & Core Web Vitals Warning**: If RUM LCP > 2.5s, recommends: *"LCP is 3.1s on mobile. Compress hero images and enable CDN preloading."*
+- **SEO Opportunity**: If striking-distance keywords exist, recommends: *"5 high-intent keywords are ranking in positions 4–10. Add dedicated H2 sections to capture page-1 Google traffic."*
+
+### 36.4 The 6-Card High-Density Decision KPI Matrix
+Organized in a responsive 2x3 grid:
+1. **Real-Time Active Visitors**: Live pulse indicator displaying users active within the last 5 minutes.
+2. **Unique Visitors & Total Sessions**: Filterable by timeframe (`today`, `7d`, `30d`, `90d`) with trend percentage deltas.
+3. **Engagement Dwell Time & Bounce Rate**: Average session duration and bounce percentage.
+4. **Closed-Loop Conversion Rate**: Inquiries and form submissions recorded via `wp_cora_form_submissions` cross-referenced with total visitor sessions.
+5. **Real User Core Web Vitals (RUM)**: 75th percentile LCP, INP, and CLS scores measured directly from real user devices.
+6. **Platform Health & Server TTFB Latency**: Average server Time to First Byte (TTFB in ms) and 404/500 HTTP incident counter.
+
+### 36.5 4 Interactive Segmented Deep-Dive Sub-Views
+ organis organize deep analytics into Level 01 Segmented Controls:
+- **`[ Traffic & Acquisition ]`**: Acquisition channels (Direct, Organic Search, WhatsApp, Social, Referral, Paid) with session counts, conversion rates per channel, and device breakdown (Desktop vs Mobile vs Tablet).
+- **`[ Top Performing Pages ]`**: Route-by-route table cross-referenced with Canvas's 118 pages displaying Page Title, URL Path, Views, Avg Dwell Time, Bounce Rate, Inquiries Generated, and CWV Speed Status with 1-click links to live pages and editor.
+- **`[ Core Web Vitals & Speed ]`**: RUM diagnostics paired with an on-demand Google PageSpeed Insights audit engine evaluating Mobile and Desktop performance with actionable remediation steps.
+- **`[ Search & SEO Intelligence ]`**: Google Search Console integration surfacing Top Search Queries, Impressions, Clicks, Click-Through Rate (CTR), and a dedicated **"Striking Distance" Table** isolating keywords ranking in positions 4–15 that can reach top-3 with minimal content optimization.
+
+### 36.6 Settings & Integrations Sliding Drawer (`openPerformanceAnalyticsSettingsDrawer`)
+Following Rule 15 SOP, the drawer opens directly below the header:
+- **Tab 1: PageSpeed Insights**: Free Google PageSpeed Insights API key input.
+- **Tab 2: Google Search Console**: GSC property URL and Service Account JSON credentials for automated search query synchronization.
+- **Tab 3: Privacy & Telemetry**: Toggle self-hosted telemetry on/off, IP anonymization settings, and bot filter rules.
+- **Tab 4: Uptime & Alerts**: Server response threshold (e.g. alert if TTFB > 800ms) and webhook alert triggers.
+
+---
+
+## Section 37: Cora Business Email & Outreach Campaigns Engine v2 (`Cora_Email_Campaigns_Engine`) (v4.9.418 - v4.9.419)
+
+### 37.1 Multi-Account Business Email Architecture
+Located in `includes/class-cora-email-campaigns-engine.php` and rendered in `views/view-emails.php`, the Business Email Suite provides a multi-account outbound sales and marketing communications system supporting both **Google Workspace (Gmail OAuth & App Passwords)** and **Hostinger Webmail (SMTP/IMAP)**.
+
+### 37.2 Tiered Capacity Model (1 to 20 Inboxes)
+To scale outreach sustainably without triggering provider spam filters, Cora enforces account capacity tiers:
+| Tier Plan | Monthly Fee | Max Inboxes | Daily Outbound Cap | Warm-Up Support | Sending Pool Type |
+| :--- | :---: | :---: | :---: | :--- | :--- |
+| **Starter** | Included ($0) | 1 Inbox | 50 sends / day | Standard (14-day gradual ramp) | Single Business Inbox |
+| **Growth** | $29 / mo | 5 Inboxes | 250 sends / day | Automated 5-Inbox Smart Ramp | Round-Robin Multi-Inbox Pool |
+| **Pro Agency** | $69 / mo | 10 Inboxes | 500 sends / day | Priority Warmup + Network Shield | Smart Load-Balancing Pool |
+| **Enterprise** | $149 / mo | 20 Inboxes | 1,000+ sends / day | Dedicated Enterprise Warmup Pool | Multi-Domain Engine |
+
+### 37.3 Round-Robin Multi-Inbox Sender Rotation & Deliverability Shield
+- **Automated Sender Rotation**: When sending cold email cadences, the engine distributes outbound emails evenly across all connected inboxes in the pool (`sender_rotation = 'round_robin'`), preventing any single account from exceeding safe daily velocity thresholds.
+- **Automated Warm-Up Ramp**: Gradually increases daily send volume over a 14-day schedule (Day 1: 5 sends, Day 7: 25 sends, Day 14: 50 sends) to establish pristine domain reputation.
+- **Deliverability Shield**: Continuous real-time diagnostics monitoring SPF, DKIM, and DMARC DNS health records, spam trap detection, and an automatic bounce circuit breaker pausing campaigns if bounce rates exceed 3%.
+
+### 37.4 Cold Outreach Multi-Step Cadences & Spintax Parser
+- **Spintax Variation Engine**: `parse_spintax()` dynamically resolves nested variations (e.g. `{Hi|Hello|Hey} {first_name}`) to generate unique email bodies and prevent fingerprinting by email service providers.
+- **Multi-Step Drip Sequences**: Supports automated multi-step cadences (Step 1: Initial Pitch -> Wait 3 Days -> Step 2: Value Case Study -> Wait 4 Days -> Step 3: Break-up Email).
+- **Automated Reply Detection**: Connects via IMAP to check for incoming client replies; upon detecting a reply, the contact is immediately removed from remaining sequence steps and moved to the "Replied / Engaged" lead stage.
+
+### 37.5 Marketing Mass Broadcasts
+Supports segmented one-time marketing announcements, product releases, or newsletters dispatched to targeted client tags, with scheduling, unsubscribe link compliance, and open/click telemetry.
+
+### 37.6 The 8 Sub-Navigation Tabs in `views/view-emails.php`
+1. **Compose**: Rich WYSIWYG composer with AI writing assistant and merge tags (`{client_name}`, `{company}`, `{deal_value}`).
+2. **Connected Inboxes**: Multi-inbox pool dashboard displaying connected accounts, daily quota progress, warm-up status, and DNS health badges.
+3. **Cold Outreach**: Multi-account cadence manager with campaign creation drawer, sender pool selector, step editor, and real-time open/reply counters.
+4. **Broadcasts**: Marketing newsletter and announcement scheduler with segment filters.
+5. **Templates**: Reusable dynamic email template library with industry-specific starter copy (Photography, Real Estate, Agency).
+6. **Automated Sequences**: Triggered drip campaigns linked to form submissions or CRM deal stage progressions.
+7. **Outbox & Logs**: Real-time delivery queue, bounce audit log, and sent message ledger.
+8. **Settings & Deliverability**: Plan tier switcher, DNS configuration guides (SPF/DKIM/DMARC records), warmup controls, and SMTP relay preferences.
+
+---
+
+## Section 38: Affiliate & Referral Partner Hub Redesign (HeroUI & ShadCN Component Anatomy) (v4.9.416 - v4.9.419)
+
+### 38.1 Component System Architecture
+In **v4.9.416 - v4.9.419**, `views/view-affiliate-referrals.php` underwent an architectural redesign adopting HeroUI and ShadCN UI component anatomy:
+- **HeroUI Card**: Modular `CardHeader`, `CardBody`, and `CardFooter` containers featuring subtle neutral borders (`border-zinc-200/80 dark:border-zinc-750`), soft elevation shadows (`shadow-3xs`), and generous internal padding.
+- **HeroUI Tabs**: Elevated segmented pill control with subtle background track (`bg-zinc-100/85 dark:bg-zinc-800/60`), micro-counters (`18`, `₹42,500`), and zero outline styling.
+- **HeroUI Progress**: Smooth pill track (`bg-zinc-100 dark:bg-zinc-800`) with solid monochromatic fill (`bg-zinc-900 dark:bg-white`) and milestone indicators (Bronze, Silver, Gold, Platinum, Diamond).
+- **HeroUI Snippet**: Dedicated bordered container with font-mono referral URL, link icon prefix, and 1-tap copy feedback (`Copied!`).
+- **HeroUI User & Avatar**: Clean squircle avatar with bold name and font-mono metadata (`@partner_slug`).
+- **HeroUI Chip & Badge**: Monochromatic status pills with micro-dots (`● Active`, `● Converted`, `● Paid`).
+- **HeroUI Slider**: Custom interactive track with draggable thumb and real-time deal multiplier badge.
+- **ShadCN UI Form Inputs & High-Density Tables**: Strict prefix inputs, monospace currency columns, and responsive touch-first table rows.
+
+### 38.2 5 Dedicated Functional Sub-Views
+1. **`overview`**: Gamified tier progress card, active commission rate (20%–40%), referral link snippet with instant copy trigger, 4 scorecards (Total Earnings, Active Referrals, Pending Payout, Conversion Rate), and recent referral activity.
+2. **`leaderboard`**: Top 10 partner leaderboard with rank badges (Gold `#1`, Silver `#2`, Bronze `#3`), monthly referral volume, and total commission payouts.
+3. **`calculator`**: Interactive commission simulator featuring a custom slider (1 to 100 referred clients), average deal size input, tier multiplier, and projected Monthly Recurring Revenue (MRR) calculation.
+4. **`referrals`**: Complete multi-tenant referrals ledger with customer identifier, attributed channel, signup date, plan tier, conversion status, and accrued commission.
+5. **`payouts`**: Payout ledger, withdrawal request modal, payment method configuration (UPI, Bank Transfer, PayPal/Stripe), and historical invoice downloads.
+
+### 38.3 Monochromatic Theme & Zero-Outline Compliance
+Adheres strictly to Design System Rule 4 and Rule 13: zero colorful gradients, zero emojis, zero harsh outline strokes, soft tonal surface selection (`bg-zinc-100 dark:bg-zinc-800`), and complete light/dark mode persistence.
+
+---
+
+## Section 39: Canvas Global Pages, HTML 3D Deployments & Headless Next.js Static Builds (v4.9.415 - v4.9.419)
+
+### 39.1 Dynamic Route Resolution Engine
+In `cora-workspace.php`, the frontend routing engine implements a 3-tier precedence hierarchy for serving website routes:
+1. **Tier 1: HTML Canvas Dedicated Pages**:
+   - Queries `wp_cora_canvas_pages` cross-referenced with `_cora_page_engine = 'html_canvas'`.
+   - If a matching slug or homepage is found, renders the sandboxed visual HTML canvas page directly with 0ms compilation overhead.
+2. **Tier 2: Headless Next.js Static Build**:
+   - If the active theme has `is_static_built = 1` and a compiled static distribution exists (`static_build_path`), invokes `cora_render_nextjs_static_build()`.
+   - Serves pre-rendered HTML and streams static assets (`/_next/*`, `/_expo/*`) directly from disk.
+3. **Tier 3: Live Dev Server Proxy**:
+   - If `nextjs_live_url` is configured and active, renders via `cora_render_nextjs_live_frame()`.
+   - If unreachable, gracefully falls back to `cora_render_nextjs_connector_screen()`.
+
+### 39.2 URL Website Migrator & 1-Click Elementor Import Drawer
+Located in `includes/class-cora-html-website-migrator.php` and accessible via `openUrlWebsiteImportDrawer()` in Canvas:
+- Ingests external URLs, extracts HTML markup, downloads external images into the tenant media vault, sanitizes tracker scripts, and scaffolds editable pages in `wp_cora_canvas_pages`.
+
+### 39.3 Reorganized 6 Canvas Sub-Tabs
+In `views/view-canvas.php`, the top sub-navigation bar organizes Canvas capabilities into 6 streamlined tabs:
+1. **Overview (`#tab-canvas-overview`)**: Active live theme card, quick actions, 4 diagnostic metrics, and draft themes library.
+2. **Pages (`#tab-canvas-pages`)**: Global Pages Manager listing all 118 routes, page engine badges (HTML Canvas, Next.js, Dynamic Template), template assignments, and 1-click Elementor import trigger.
+3. **Performance & Vitals (`#tab-canvas-vitals`)**: Decision-Driven Telemetry Intelligence Hub (Real-Time Visitors, 6 KPIs, Core Web Vitals RUM, Acquisition channels, and Search Console data).
+4. **Brand Assets (`#tab-canvas-brand`)**: Brand Assets & Media Library managing official logos, typography tokens, color palettes, and photography assets.
+5. **Migration & Tools (`#tab-canvas-migration`)**: URL Website Migrator & HTML 3D/SPA Deployment tools.
+6. **GitHub & CI/CD (`#tab-canvas-github`)**: Headless Next.js deployment, branch management, pull requests, and commit rollbacks.
+
+### 39.4 Headless Next.js Static Build Pipeline & SPA Error Shield
+Built into `includes/class-cora-nextjs-integration.php`:
+- Detects Next.js App Router and Pages Router builds.
+- Packages production assets into isolated distribution directories (`theme_{id}/out/`).
+- Wraps previews with an SPA Error Shield preventing blank white screens on runtime JS errors.
+
+---
+
+*Cora Platform v4.9.419 — Master Architectural Manual. Last updated: October 2026.*

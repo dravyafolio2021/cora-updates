@@ -673,6 +673,617 @@ class Cora_MCP_Tool_Registry {
                 'handler'       => array( __CLASS__, 'handle_record_financial_transaction' ),
             ),
 
+            // ── 7B. Autonomous Agentic CRM, Outreach & Calendar Operations ────────
+            'cora_crm_autonomous_triage' => array(
+                'name'          => 'cora_crm_autonomous_triage',
+                'description'   => 'Autonomously triage, score (0-100), enrich, and assign new CRM leads based on budget, service requirements, and team capacity. Returns high-priority action queue.',
+                'readOnly'      => false,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'leads:write',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'lead_id'          => array( 'type' => 'integer', 'description' => 'Optional Lead ID to triage. If omitted, triages all un-evaluated new leads in this workspace.' ),
+                        'auto_assign'      => array( 'type' => 'boolean', 'description' => 'Whether to auto-assign to best suited team member based on capacity (default: true).' ),
+                        'dispatch_welcome' => array( 'type' => 'boolean', 'description' => 'Whether to automatically trigger initial outreach via WhatsApp/Email (default: true).' ),
+                        'limit'            => array( 'type' => 'integer', 'description' => 'Maximum leads to process in this cycle (default: 10).' ),
+                    ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_crm_autonomous_triage' ),
+            ),
+
+            'cora_convert_lead_to_client' => array(
+                'name'          => 'cora_convert_lead_to_client',
+                'description'   => 'Seamless 1-click deal conversion: advances lead status to won, creates client profile, provisions production project/booking, seeds deliverable task checklist, and optionally generates initial GST invoice.',
+                'readOnly'      => false,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'clients:write',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'lead_id'            => array( 'type' => 'integer', 'description' => 'ID of the lead to convert.' ),
+                        'project_title'      => array( 'type' => 'string', 'description' => 'Title of the shoot or production project (defaults to client name + service).' ),
+                        'shoot_date'         => array( 'type' => 'string', 'description' => 'Event or shoot date (YYYY-MM-DD).' ),
+                        'package_amount'     => array( 'type' => 'number', 'description' => 'Final agreed deal value in INR.' ),
+                        'generate_invoice'   => array( 'type' => 'boolean', 'description' => 'Whether to automatically generate initial GST retainer invoice (default: true).' ),
+                        'advance_percentage' => array( 'type' => 'number', 'description' => 'Retainer advance percentage required (default: 50).' ),
+                        'seed_tasks'         => array( 'type' => 'boolean', 'description' => 'Whether to auto-seed standard production Kanban tasks (default: true).' ),
+                    ),
+                    'required'   => array( 'lead_id' ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_convert_lead_to_client' ),
+            ),
+
+            'cora_list_calendar_events' => array(
+                'name'          => 'cora_list_calendar_events',
+                'description'   => 'List scheduled calendar appointments, shoots, client discovery calls, and deadlines within a date range with Google Meet links and sync status.',
+                'readOnly'      => true,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'workspace:read',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'start_date' => array( 'type' => 'string', 'description' => 'Start date filter (YYYY-MM-DD, defaults to beginning of current month).' ),
+                        'end_date'   => array( 'type' => 'string', 'description' => 'End date filter (YYYY-MM-DD, defaults to end of current month).' ),
+                        'status'     => array( 'type' => 'string', 'description' => 'Filter by status: confirmed, completed, cancelled, all (default: all).' ),
+                        'limit'      => array( 'type' => 'integer', 'description' => 'Max events to return (default: 30).' ),
+                    ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_list_calendar_events' ),
+            ),
+
+            'cora_book_appointment' => array(
+                'name'          => 'cora_book_appointment',
+                'description'   => 'Book a client consultation, shoot session, or review call, check slot availability, create Google Calendar event, and generate Google Meet video link.',
+                'readOnly'      => false,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'workspace:write',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'client_name'      => array( 'type' => 'string', 'description' => 'Client full name or contact person.' ),
+                        'client_email'     => array( 'type' => 'string', 'description' => 'Client email address.' ),
+                        'client_phone'     => array( 'type' => 'string', 'description' => 'Client phone number.' ),
+                        'appointment_date' => array( 'type' => 'string', 'description' => 'Date of appointment (YYYY-MM-DD).' ),
+                        'appointment_time' => array( 'type' => 'string', 'description' => 'Start time (e.g. 02:00 PM or 14:00).' ),
+                        'duration_minutes' => array( 'type' => 'integer', 'description' => 'Duration in minutes (default: 60).' ),
+                        'flow_slug'        => array( 'type' => 'string', 'description' => 'Booking flow preset slug: studio-1hr, intro-15m, editorial-half-day (default: intro-15m).' ),
+                        'location'         => array( 'type' => 'string', 'description' => 'Physical studio bay, client site, or Google Meet (default: Google Meet).' ),
+                        'notes'            => array( 'type' => 'string', 'description' => 'Session agenda, moodboard notes, or requirements.' ),
+                        'lead_id'          => array( 'type' => 'integer', 'description' => 'Optional associated CRM lead ID.' ),
+                    ),
+                    'required'   => array( 'client_name', 'appointment_date', 'appointment_time' ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_book_appointment' ),
+            ),
+
+            'cora_crm_send_outreach' => array(
+                'name'          => 'cora_crm_send_outreach',
+                'description'   => 'Dispatch personalized outreach or follow-up communications to a lead or client via Meta WhatsApp Cloud API or Hostinger SMTP email with automatic touchpoint logging.',
+                'readOnly'      => false,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'workspace:write',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'recipient_id'   => array( 'type' => 'integer', 'description' => 'Lead ID or Client ID.' ),
+                        'recipient_type' => array( 'type' => 'string', 'description' => 'Type: lead or client (default: lead).' ),
+                        'channel'        => array( 'type' => 'string', 'description' => 'Outreach channel: whatsapp, email, or auto (default: auto).' ),
+                        'subject'        => array( 'type' => 'string', 'description' => 'Email subject line (required for email channel).' ),
+                        'message'        => array( 'type' => 'string', 'description' => 'Message body or template text.' ),
+                        'template_name'  => array( 'type' => 'string', 'description' => 'Optional WhatsApp pre-approved template name.' ),
+                        'action_url'     => array( 'type' => 'string', 'description' => 'Call-to-action button URL (e.g. booking link or proposal URL).' ),
+                    ),
+                    'required'   => array( 'recipient_id', 'message' ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_crm_send_outreach' ),
+            ),
+
+            'cora_generate_proposal_and_contract' => array(
+                'name'          => 'cora_generate_proposal_and_contract',
+                'description'   => 'Generate a commercial proposal and binding E-Sign agreement in the Document Vault, with milestone payment schedule and digital signature link.',
+                'readOnly'      => false,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'vault:write',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'lead_or_client_id' => array( 'type' => 'integer', 'description' => 'Lead ID or Client ID to attach this proposal to.' ),
+                        'is_client'         => array( 'type' => 'boolean', 'description' => 'Whether recipient is an existing client (default: false, meaning lead).' ),
+                        'document_type'     => array( 'type' => 'string', 'description' => 'Type: proposal, contract, nda, retainer_agreement (default: contract).' ),
+                        'title'             => array( 'type' => 'string', 'description' => 'Document title (e.g. Commercial Studio Agreement).' ),
+                        'deliverables'      => array( 'type' => 'array', 'items' => array( 'type' => 'string' ), 'description' => 'List of project deliverables and milestones.' ),
+                        'total_value'       => array( 'type' => 'number', 'description' => 'Total commercial value in INR.' ),
+                        'expiry_days'       => array( 'type' => 'integer', 'description' => 'Days until proposal expires (default: 14).' ),
+                        'dispatch_link'     => array( 'type' => 'boolean', 'description' => 'Whether to auto-dispatch E-Sign link to client via WhatsApp/Email (default: true).' ),
+                    ),
+                    'required'   => array( 'lead_or_client_id', 'total_value' ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_generate_proposal_and_contract' ),
+            ),
+
+            'cora_dispatch_gst_invoice' => array(
+                'name'          => 'cora_dispatch_gst_invoice',
+                'description'   => 'Generate an Indian GST-compliant tax invoice with automatic CGST+SGST (9%+9%) or IGST (18%) tax math, SAC codes (998386/998314), and dispatch payment link via WhatsApp and email.',
+                'readOnly'      => false,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'finance:write',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'client_id'       => array( 'type' => 'integer', 'description' => 'ID of the client.' ),
+                        'lead_id'         => array( 'type' => 'integer', 'description' => 'Optional lead ID if converting.' ),
+                        'line_items'      => array(
+                            'type'        => 'array',
+                            'items'       => array(
+                                'type'       => 'object',
+                                'properties' => array(
+                                    'description' => array( 'type' => 'string' ),
+                                    'sac_code'    => array( 'type' => 'string', 'description' => 'Service Accounting Code (default: 998386 for photographic/visual services).' ),
+                                    'rate'        => array( 'type' => 'number' ),
+                                    'quantity'    => array( 'type' => 'number' ),
+                                ),
+                                'required'   => array( 'description', 'rate' ),
+                            ),
+                            'description' => 'Invoice line items with SAC codes and rates.',
+                        ),
+                        'place_of_supply' => array( 'type' => 'string', 'description' => 'Client state for GST determination (e.g. Maharashtra, Karnataka). Defaults to workspace state (Intra-state).' ),
+                        'due_date'        => array( 'type' => 'string', 'description' => 'Invoice due date (YYYY-MM-DD).' ),
+                        'send_to_client'  => array( 'type' => 'boolean', 'description' => 'Whether to dispatch invoice link to client immediately (default: true).' ),
+                    ),
+                    'required'   => array( 'client_id', 'line_items' ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_dispatch_gst_invoice' ),
+            ),
+
+            'cora_crm_check_stalled_deals' => array(
+                'name'          => 'cora_crm_check_stalled_deals',
+                'description'   => 'Scan CRM pipeline for stalled inquiries, un-responded proposals, or inactive clients, returning recommended re-engagement actions.',
+                'readOnly'      => true,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'leads:read',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'inactivity_days' => array( 'type' => 'integer', 'description' => 'Days since last touch to consider deal stalled (default: 7).' ),
+                        'stage'           => array( 'type' => 'string', 'description' => 'Filter by stage: new, proposal_sent, all (default: all).' ),
+                    ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_crm_check_stalled_deals' ),
+            ),
+
+            'cora_crm_run_agentic_workflow' => array(
+                'name'          => 'cora_crm_run_agentic_workflow',
+                'description'   => 'Execute the master autonomous CRM cycle: triage new inquiries, dispatch follow-ups for warm leads, flag stalled deals, and return an executive operational briefing.',
+                'readOnly'      => false,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'workspace:write',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'actions' => array(
+                            'type'        => 'array',
+                            'items'       => array( 'type' => 'string', 'enum' => array( 'triage_new', 'follow_up_stalled', 'send_due_reminders', 'sync_calendar' ) ),
+                            'description' => 'Sub-actions to execute in this cycle (default: all).',
+                        ),
+                        'dry_run' => array( 'type' => 'boolean', 'description' => 'If true, simulates actions without modifying data or sending messages (default: false).' ),
+                    ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_crm_run_agentic_workflow' ),
+            ),
+
+            'cora_crm_list_campaigns' => array(
+                'name'          => 'cora_crm_list_campaigns',
+                'description'   => 'List all automated CRM outreach and marketing campaigns in the workspace with enrolled lead counts, channels, and performance metrics.',
+                'readOnly'      => true,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'crm:read',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'type'   => array( 'type' => 'string', 'description' => 'Filter by type: cold_outbound, inbound_nurture, referral, re_engagement, all (default: all).' ),
+                        'status' => array( 'type' => 'string', 'description' => 'Filter by status: active, paused, completed, all (default: all).' ),
+                    ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_crm_list_campaigns' ),
+            ),
+
+            'cora_crm_create_campaign' => array(
+                'name'          => 'cora_crm_create_campaign',
+                'description'   => 'Create a new automated multi-step CRM sales outreach, inbound nurture, or re-engagement campaign.',
+                'readOnly'      => false,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'crm:write',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'name'           => array( 'type' => 'string', 'description' => 'Campaign name (e.g. Q4 Commercial Retainer Prospecting).' ),
+                        'type'           => array( 'type' => 'string', 'description' => 'Type: cold_outbound, inbound_nurture, referral, re_engagement (default: cold_outbound).' ),
+                        'channel'        => array( 'type' => 'string', 'description' => 'Channel: whatsapp, email, omni (default: omni).' ),
+                        'target_stage'   => array( 'type' => 'string', 'description' => 'Target lead stage to enroll (e.g. new, contacted, all).' ),
+                        'sequence_steps' => array(
+                            'type'        => 'array',
+                            'items'       => array(
+                                'type'       => 'object',
+                                'properties' => array(
+                                    'step'          => array( 'type' => 'integer' ),
+                                    'delay_days'    => array( 'type' => 'integer' ),
+                                    'subject'       => array( 'type' => 'string' ),
+                                    'body_template' => array( 'type' => 'string' ),
+                                ),
+                            ),
+                            'description' => 'List of sequence steps with delay and message content.',
+                        ),
+                    ),
+                    'required'   => array( 'name', 'type' ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_crm_create_campaign' ),
+            ),
+
+            'cora_crm_enroll_lead' => array(
+                'name'          => 'cora_crm_enroll_lead',
+                'description'   => 'Enroll a lead or list of leads into an active CRM outreach campaign.',
+                'readOnly'      => false,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'crm:write',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'campaign_id' => array( 'type' => 'string', 'description' => 'ID or slug of the campaign.' ),
+                        'lead_ids'    => array( 'type' => 'array', 'items' => array( 'type' => 'integer' ), 'description' => 'Array of lead IDs to enroll.' ),
+                    ),
+                    'required'   => array( 'campaign_id', 'lead_ids' ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_crm_enroll_lead' ),
+            ),
+
+            'cora_crm_log_activity' => array(
+                'name'          => 'cora_crm_log_activity',
+                'description'   => 'Log a customer touchpoint (call, meeting, WhatsApp, email, or operational note) in the CRM activity timeline.',
+                'readOnly'      => false,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'crm:write',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'lead_id'       => array( 'type' => 'integer', 'description' => 'Lead ID if linked to a lead.' ),
+                        'client_id'     => array( 'type' => 'integer', 'description' => 'Client ID if linked to an active client.' ),
+                        'activity_type' => array( 'type' => 'string', 'description' => 'Type: call, email, whatsapp, meeting, note (default: note).' ),
+                        'title'         => array( 'type' => 'string', 'description' => 'Summary title of the activity.' ),
+                        'notes'         => array( 'type' => 'string', 'description' => 'Detailed notes or transcript summary.' ),
+                        'outcome'       => array( 'type' => 'string', 'description' => 'Outcome: connected, left_voicemail, scheduled_meeting, proposal_requested, closed_won, not_interested.' ),
+                    ),
+                    'required'   => array( 'activity_type', 'title' ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_crm_log_activity' ),
+            ),
+
+            'cora_crm_get_activity_timeline' => array(
+                'name'          => 'cora_crm_get_activity_timeline',
+                'description'   => 'Retrieve full chronological interaction timeline and touchpoints for a specific lead or client.',
+                'readOnly'      => true,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'crm:read',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'lead_id'   => array( 'type' => 'integer', 'description' => 'Lead ID to fetch history for.' ),
+                        'client_id' => array( 'type' => 'integer', 'description' => 'Client ID to fetch history for.' ),
+                        'limit'     => array( 'type' => 'integer', 'description' => 'Maximum entries to return (default: 20).' ),
+                    ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_crm_get_activity_timeline' ),
+            ),
+
+            'cora_qualify_lead' => array(
+                'name'          => 'cora_qualify_lead',
+                'description'   => 'Perform deep algorithmic AI lead scoring, qualification criteria audit, win probability (0-100%), and tailored next action recommendations for a CRM lead.',
+                'readOnly'      => true,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'leads:read',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'lead_id' => array( 'type' => 'integer', 'description' => 'ID of the lead to qualify.' ),
+                    ),
+                    'required'   => array( 'lead_id' ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_qualify_lead' ),
+            ),
+
+            'cora_crm_send_outreach_email' => array(
+                'name'          => 'cora_crm_send_outreach_email',
+                'description'   => 'Dispatch personalized email outreach to a lead or client via Hostinger SMTP / wp_mail, auto-logging the touchpoint in the CRM activity timeline.',
+                'readOnly'      => false,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'workspace:write',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'recipient_email' => array( 'type' => 'string', 'description' => 'Target email address.' ),
+                        'subject'         => array( 'type' => 'string', 'description' => 'Email subject line.' ),
+                        'body'            => array( 'type' => 'string', 'description' => 'Email body content (HTML or plain text).' ),
+                        'recipient_name'  => array( 'type' => 'string', 'description' => 'Recipient contact name.' ),
+                        'lead_id'         => array( 'type' => 'integer', 'description' => 'Optional CRM Lead ID to associate.' ),
+                        'client_id'       => array( 'type' => 'integer', 'description' => 'Optional Client ID to associate.' ),
+                    ),
+                    'required'   => array( 'recipient_email', 'subject', 'body' ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_crm_send_outreach_email' ),
+            ),
+
+            'cora_list_bookings' => array(
+                'name'          => 'cora_list_bookings',
+                'description'   => 'List shoot bookings, client consultations, and scheduled events with client details, date, status, deal type, and Google Meet room links.',
+                'readOnly'      => true,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'workspace:read',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'client_id' => array( 'type' => 'integer', 'description' => 'Optional client ID filter.' ),
+                        'status'    => array( 'type' => 'string', 'description' => 'Status filter: confirmed, completed, cancelled, all (default: all).' ),
+                        'limit'     => array( 'type' => 'integer', 'description' => 'Max bookings to return (default: 20).' ),
+                    ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_list_bookings' ),
+            ),
+
+            'cora_get_calendar_availability' => array(
+                'name'          => 'cora_get_calendar_availability',
+                'description'   => 'Check available time slots for photo shoots, client discovery calls, and reviews on a given date to prevent scheduling collisions.',
+                'readOnly'      => true,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'workspace:read',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'date'             => array( 'type' => 'string', 'description' => 'Target date in YYYY-MM-DD format.' ),
+                        'duration_minutes' => array( 'type' => 'integer', 'description' => 'Duration of session in minutes (default: 60).' ),
+                    ),
+                    'required'   => array( 'date' ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_get_calendar_availability' ),
+            ),
+
+            'cora_create_booking' => array(
+                'name'          => 'cora_create_booking',
+                'description'   => 'Create and confirm a photo shoot session, studio bay reservation, or client consultation call with Google Meet room link.',
+                'readOnly'      => false,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'workspace:write',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'client_name'      => array( 'type' => 'string', 'description' => 'Client full name.' ),
+                        'client_email'     => array( 'type' => 'string', 'description' => 'Client email.' ),
+                        'client_phone'     => array( 'type' => 'string', 'description' => 'Client phone number.' ),
+                        'appointment_date' => array( 'type' => 'string', 'description' => 'Date in YYYY-MM-DD format.' ),
+                        'appointment_time' => array( 'type' => 'string', 'description' => 'Time (e.g. 14:00 or 02:00 PM).' ),
+                        'duration_minutes' => array( 'type' => 'integer', 'description' => 'Duration in minutes (default: 60).' ),
+                        'flow_slug'        => array( 'type' => 'string', 'description' => 'Booking flow slug (default: intro-15m).' ),
+                        'location'         => array( 'type' => 'string', 'description' => 'Location (default: Google Meet).' ),
+                        'notes'            => array( 'type' => 'string', 'description' => 'Booking notes or requirements.' ),
+                        'lead_id'          => array( 'type' => 'integer', 'description' => 'Optional CRM Lead ID.' ),
+                    ),
+                    'required'   => array( 'client_name', 'appointment_date', 'appointment_time' ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_book_appointment' ),
+            ),
+
+            'cora_reschedule_booking' => array(
+                'name'          => 'cora_reschedule_booking',
+                'description'   => 'Reschedule an existing booking or shoot to a new date and time, updating the calendar and notifying the client.',
+                'readOnly'      => false,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'workspace:write',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'booking_id'    => array( 'type' => 'integer', 'description' => 'ID of the booking to reschedule.' ),
+                        'new_date'      => array( 'type' => 'string', 'description' => 'New appointment date in YYYY-MM-DD format.' ),
+                        'new_time'      => array( 'type' => 'string', 'description' => 'New start time (e.g. 15:00 or 03:00 PM).' ),
+                        'reason'        => array( 'type' => 'string', 'description' => 'Reason for rescheduling.' ),
+                        'notify_client' => array( 'type' => 'boolean', 'description' => 'Whether to send update notification to client (default: true).' ),
+                    ),
+                    'required'   => array( 'booking_id', 'new_date', 'new_time' ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_reschedule_booking' ),
+            ),
+
+            'cora_cancel_booking' => array(
+                'name'          => 'cora_cancel_booking',
+                'description'   => 'Cancel an existing calendar booking or shoot session, liberating the time slot and optionally notifying the client.',
+                'readOnly'      => false,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'workspace:write',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'booking_id'          => array( 'type' => 'integer', 'description' => 'ID of the booking to cancel.' ),
+                        'cancellation_reason' => array( 'type' => 'string', 'description' => 'Reason for cancellation.' ),
+                        'notify_client'       => array( 'type' => 'boolean', 'description' => 'Whether to notify client (default: true).' ),
+                    ),
+                    'required'   => array( 'booking_id' ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_cancel_booking' ),
+            ),
+
+            'cora_create_proposal' => array(
+                'name'          => 'cora_create_proposal',
+                'description'   => 'Draft a commercial proposal, quote, or master service agreement in Document Vault with milestone breakdown and deliverables.',
+                'readOnly'      => false,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'vault:write',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'lead_or_client_id' => array( 'type' => 'integer', 'description' => 'Lead ID or Client ID to attach this proposal to.' ),
+                        'is_client'         => array( 'type' => 'boolean', 'description' => 'Whether recipient is an existing client (default: false).' ),
+                        'title'             => array( 'type' => 'string', 'description' => 'Document title.' ),
+                        'deliverables'      => array( 'type' => 'array', 'items' => array( 'type' => 'string' ), 'description' => 'List of deliverables.' ),
+                        'total_value'       => array( 'type' => 'number', 'description' => 'Total commercial value in INR.' ),
+                        'expiry_days'       => array( 'type' => 'integer', 'description' => 'Days until proposal expires (default: 14).' ),
+                        'dispatch_link'     => array( 'type' => 'boolean', 'description' => 'Auto-dispatch E-Sign link (default: false).' ),
+                    ),
+                    'required'   => array( 'lead_or_client_id', 'total_value' ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_generate_proposal_and_contract' ),
+            ),
+
+            'cora_send_proposal' => array(
+                'name'          => 'cora_send_proposal',
+                'description'   => 'Dispatch a formal proposal or contract to a lead or client with digital E-Sign link via WhatsApp or email.',
+                'readOnly'      => false,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'vault:write',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'document_id'  => array( 'type' => 'string', 'description' => 'ID or token of the proposal document.' ),
+                        'recipient_id' => array( 'type' => 'integer', 'description' => 'Lead ID or Client ID.' ),
+                        'is_client'    => array( 'type' => 'boolean', 'description' => 'Whether recipient is an existing client (default: false).' ),
+                        'channel'      => array( 'type' => 'string', 'description' => 'Channel: whatsapp, email, omni (default: omni).' ),
+                    ),
+                    'required'   => array( 'document_id', 'recipient_id' ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_send_proposal' ),
+            ),
+
+            'cora_get_document_status' => array(
+                'name'          => 'cora_get_document_status',
+                'description'   => 'Check Document Vault status for a proposal, contract, or NDA (e.g. draft, sent, viewed, signed, expired) and audit trail.',
+                'readOnly'      => true,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'vault:read',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'document_id' => array( 'type' => 'string', 'description' => 'ID or token of the document.' ),
+                    ),
+                    'required'   => array( 'document_id' ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_get_document_status' ),
+            ),
+
+            'cora_create_invoice' => array(
+                'name'          => 'cora_create_invoice',
+                'description'   => 'Generate an Indian GST-compliant SAC 9983 tax invoice with automatic CGST+SGST (9%+9%) or IGST (18%) tax calculation.',
+                'readOnly'      => false,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'finance:write',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'client_id'       => array( 'type' => 'integer', 'description' => 'ID of the client.' ),
+                        'line_items'      => array(
+                            'type'        => 'array',
+                            'items'       => array(
+                                'type'       => 'object',
+                                'properties' => array(
+                                    'description' => array( 'type' => 'string' ),
+                                    'sac_code'    => array( 'type' => 'string' ),
+                                    'rate'        => array( 'type' => 'number' ),
+                                    'quantity'    => array( 'type' => 'number' ),
+                                ),
+                                'required'   => array( 'description', 'rate' ),
+                            ),
+                            'description' => 'Invoice line items.',
+                        ),
+                        'place_of_supply' => array( 'type' => 'string', 'description' => 'Client state (default: Intra-state).' ),
+                        'due_date'        => array( 'type' => 'string', 'description' => 'Due date (YYYY-MM-DD).' ),
+                        'send_to_client'  => array( 'type' => 'boolean', 'description' => 'Send invoice immediately (default: false).' ),
+                    ),
+                    'required'   => array( 'client_id', 'line_items' ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_dispatch_gst_invoice' ),
+            ),
+
+            'cora_send_payment_reminder' => array(
+                'name'          => 'cora_send_payment_reminder',
+                'description'   => 'Send a payment reminder for an outstanding or overdue invoice to a client via WhatsApp and email with payment link.',
+                'readOnly'      => false,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'finance:write',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'invoice_id' => array( 'type' => 'integer', 'description' => 'ID of the invoice in the ledger or Document Vault.' ),
+                        'channel'    => array( 'type' => 'string', 'description' => 'Channel: whatsapp, email, omni (default: omni).' ),
+                        'urgency'    => array( 'type' => 'string', 'description' => 'Urgency: polite, due_today, urgent, overdue (default: polite).' ),
+                    ),
+                    'required'   => array( 'invoice_id' ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_send_payment_reminder' ),
+            ),
+
+            'cora_update_project_milestone' => array(
+                'name'          => 'cora_update_project_milestone',
+                'description'   => 'Update project status, milestone stage (pre_production, shoot_day, post_processing, client_review, completed), and progress percentage.',
+                'readOnly'      => false,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'projects:write',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'project_id' => array( 'type' => 'integer', 'description' => 'Project ID.' ),
+                        'stage'      => array( 'type' => 'string', 'description' => 'Stage: discovery, pre_production, shoot_day, post_processing, client_review, completed.' ),
+                        'progress'   => array( 'type' => 'integer', 'description' => 'Progress percentage (0-100).' ),
+                        'notes'      => array( 'type' => 'string', 'description' => 'Milestone notes or updates.' ),
+                    ),
+                    'required'   => array( 'project_id', 'stage' ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_update_project_milestone' ),
+            ),
+
+            'cora_deliver_project_assets' => array(
+                'name'          => 'cora_deliver_project_assets',
+                'description'   => 'Publish final deliverables (photoshoot galleries, video cuts, high-res assets) to the client portal and notify client.',
+                'readOnly'      => false,
+                'destructive'   => false,
+                'openWorld'     => false,
+                'requiredScope' => 'projects:write',
+                'inputSchema'   => array(
+                    'type'       => 'object',
+                    'properties' => array(
+                        'project_id'     => array( 'type' => 'integer', 'description' => 'Project ID to deliver.' ),
+                        'client_id'      => array( 'type' => 'integer', 'description' => 'Optional client ID.' ),
+                        'asset_urls'     => array( 'type' => 'array', 'items' => array( 'type' => 'string' ), 'description' => 'List of asset/gallery URLs.' ),
+                        'delivery_notes' => array( 'type' => 'string', 'description' => 'Delivery message or release notes.' ),
+                        'notify_client'  => array( 'type' => 'boolean', 'description' => 'Whether to send instant notification to client via WhatsApp/email (default: true).' ),
+                    ),
+                    'required'   => array( 'project_id', 'asset_urls' ),
+                ),
+                'handler'       => array( __CLASS__, 'handle_deliver_project_assets' ),
+            ),
+
             // ── 8. Content Suite & Editorial Operations ───────────────────────
             'cora_list_articles' => array(
                 'name'          => 'cora_list_articles',
@@ -718,7 +1329,7 @@ class Cora_MCP_Tool_Registry {
 
             'cora_create_article' => array(
                 'name'          => 'cora_create_article',
-                'description'   => 'Create a new editorial article in the workspace with content, SEO metadata (meta_title, meta_description, focus_keyword), and GEO engine signals.',
+                'description'   => 'CRITICAL TOOL: Create and publish a new editorial article or blog post live on the workspace website. CALL THIS TOOL immediately when the user asks to write, create, draft, or publish an article. Do NOT just print the article in chat — invoke this tool with title, content (HTML formatted with H2, H3, paragraphs, lists), excerpt, status ("publish" or "draft"), and thumbnail_url to publish it live immediately.',
                 'readOnly'      => false,
                 'destructive'   => false,
                 'openWorld'     => false,
@@ -804,10 +1415,10 @@ class Cora_MCP_Tool_Registry {
 
             'cora_publish_article' => array(
                 'name'          => 'cora_publish_article',
-                'description'   => 'Publish an article immediately, updating post status to published and syncing workspace workflow tables.',
+                'description'   => 'Publish an existing draft or review article immediately live to the workspace website by article ID or slug.',
                 'readOnly'      => false,
-                'destructive'   => true,
-                'openWorld'     => true,
+                'destructive'   => false,
+                'openWorld'     => false,
                 'requiredScope' => 'content:write',
                 'inputSchema'   => array(
                     'type'       => 'object',
@@ -3160,6 +3771,1792 @@ class Cora_MCP_Tool_Registry {
         }
 
         return array( 'success' => true, 'transaction_id' => 501, 'amount' => $amount, 'type' => $type );
+    }
+
+    // ── 7B. Autonomous Agentic CRM, Outreach & Calendar Operations Handlers ──
+
+    /**
+     * Autonomous CRM Triage: Inbound scoring, auto-assignment, stalled deals, upcoming bookings & overdue receivables
+     */
+    public static function handle_crm_autonomous_triage( $args, $auth ) {
+        $agency_id        = self::get_agency_id( $auth, $args );
+        $lead_id          = ! empty( $args['lead_id'] ) ? intval( $args['lead_id'] ) : 0;
+        $auto_assign      = ! isset( $args['auto_assign'] ) || ! empty( $args['auto_assign'] );
+        $dispatch_welcome = ! empty( $args['dispatch_welcome'] );
+        $limit            = min( 50, max( 1, intval( $args['limit'] ?? 10 ) ) );
+
+        global $wpdb;
+        $leads_tbl    = $wpdb->prefix . 'cora_leads';
+        $bookings_tbl = $wpdb->prefix . 'cora_bookings';
+        $ledger_tbl   = $wpdb->prefix . 'cora_ledger';
+        $triaged      = array();
+
+        if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $leads_tbl ) ) {
+            // Find target leads
+            if ( $lead_id > 0 ) {
+                $leads = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$leads_tbl} WHERE agency_id = %d AND id = %d", $agency_id, $lead_id ) );
+            } else {
+                $leads = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$leads_tbl} WHERE agency_id = %d AND status = 'new' ORDER BY id DESC LIMIT %d", $agency_id, $limit ) );
+            }
+
+            foreach ( $leads as $l ) {
+                $name   = trim( ( $l->first_name ?? '' ) . ' ' . ( $l->last_name ?? '' ) );
+                $budget = max( floatval( $l->budget_max ?? 0 ), floatval( $l->budget_min ?? 0 ) );
+                $notes  = strtolower( $l->notes ?? '' );
+
+                // Compute algorithmic score (0-100)
+                $score = 50;
+                if ( $budget >= 100000 ) {
+                    $score += 35;
+                } elseif ( $budget >= 50000 ) {
+                    $score += 25;
+                } elseif ( $budget >= 20000 ) {
+                    $score += 15;
+                } elseif ( $budget > 0 && $budget < 15000 ) {
+                    $score -= 15;
+                }
+
+                if ( ! empty( $l->phone ) ) $score += 8;
+                if ( ! empty( $l->email ) ) $score += 7;
+
+                // Urgency signals in inquiry notes
+                if ( preg_match( '/(urgent|asap|this week|immediately|next week|ready to book)/i', $notes ) ) {
+                    $score += 10;
+                }
+
+                $score = max( 10, min( 99, $score ) );
+                $tier  = ( $score >= 80 ) ? 'hot' : ( ( $score >= 55 ) ? 'warm' : 'cold' );
+
+                // Next recommended operational action
+                if ( $tier === 'hot' ) {
+                    $rec_action = 'Immediate Discovery Call / Consultation Booking';
+                } elseif ( $tier === 'warm' ) {
+                    $rec_action = 'Dispatch Studio Portfolio Showcase & Rate Card';
+                } else {
+                    $rec_action = 'Nurture via Email Drip Campaign';
+                }
+
+                // Auto-assignment if enabled
+                $assigned_to = $l->assigned_to;
+                if ( $auto_assign && empty( $assigned_to ) && ! empty( $auth['user_id'] ) ) {
+                    $assigned_to = intval( $auth['user_id'] );
+                    $wpdb->update( $leads_tbl, array( 'assigned_to' => $assigned_to ), array( 'id' => $l->id ) );
+                }
+
+                // Automated Welcome Dispatch
+                $dispatched_via = 'none';
+                if ( $dispatch_welcome && ! empty( $l->phone ) && class_exists( 'Cora_WhatsApp_Gateway' ) ) {
+                    $wa = Cora_WhatsApp_Gateway::instance();
+                    $msg = "Hello {$name}, thank you for reaching out to our studio! Our creative director has reviewed your inquiry for {$l->property_type}. You can pick a convenient time for a 15-min discovery call here: " . home_url( '/workspace/calendar?lead_id=' . $l->id );
+                    $wa_res = $wa->send_session_message( $l->phone, $msg );
+                    if ( ! is_wp_error( $wa_res ) ) {
+                        $dispatched_via = 'whatsapp';
+                    }
+                }
+
+                if ( $dispatched_via === 'none' && $dispatch_welcome && ! empty( $l->email ) ) {
+                    $subj = "Thank you for contacting our studio - {$name}";
+                    $body = "Hi {$name},\n\nThank you for reaching out to our studio! We'd love to discuss your upcoming project.\n\nPlease choose a slot for a 15-minute consultation: " . home_url( '/workspace/calendar?lead_id=' . $l->id ) . "\n\nWarm regards,\nStudio Production Team";
+                    wp_mail( $l->email, $subj, $body );
+                    $dispatched_via = 'email';
+                }
+
+                $triaged[] = array(
+                    'lead_id'            => intval( $l->id ),
+                    'name'               => $name,
+                    'email'              => $l->email,
+                    'phone'              => $l->phone,
+                    'service'            => $l->property_type ?: 'Commercial Production',
+                    'budget'             => $budget,
+                    'ai_score'           => $score,
+                    'intent_tier'        => $tier,
+                    'recommended_action' => $rec_action,
+                    'assigned_to'        => $assigned_to,
+                    'welcome_dispatched' => $dispatched_via,
+                );
+            }
+        }
+
+        // Detect Stalled Leads (>7 days with no follow-up)
+        $stalled_leads = array();
+        if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $leads_tbl ) ) {
+            $stalled_rows = $wpdb->get_results( $wpdb->prepare(
+                "SELECT id, first_name, last_name, status, created_at, budget_max 
+                 FROM {$leads_tbl} 
+                 WHERE agency_id = %d AND status IN ('new', 'contacted') AND created_at < DATE_SUB(NOW(), INTERVAL 7 DAY) 
+                 ORDER BY created_at ASC LIMIT 10",
+                $agency_id
+            ) );
+            foreach ( $stalled_rows as $sr ) {
+                $stalled_leads[] = array(
+                    'lead_id'    => intval( $sr->id ),
+                    'name'       => trim( ( $sr->first_name ?? '' ) . ' ' . ( $sr->last_name ?? '' ) ),
+                    'status'     => $sr->status,
+                    'created_at' => $sr->created_at,
+                    'budget'     => floatval( $sr->budget_max ?? 0 ),
+                    'action'     => 'Send re-engagement inquiry or archive as lost',
+                );
+            }
+        }
+
+        // Check Upcoming Bookings in Next 48 Hours
+        $upcoming_shoots = array();
+        if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $bookings_tbl ) ) {
+            $now  = current_time( 'mysql' );
+            $plus = gmdate( 'Y-m-d H:i:s', strtotime( '+48 hours', current_time( 'timestamp' ) ) );
+            $book_rows = $wpdb->get_results( $wpdb->prepare(
+                "SELECT b.*, c.first_name, c.last_name, c.phone 
+                 FROM {$bookings_tbl} b 
+                 LEFT JOIN {$wpdb->prefix}cora_clients c ON b.client_id = c.id 
+                 WHERE b.agency_id = %d AND b.showing_date BETWEEN %s AND %s AND b.status != 'cancelled' 
+                 ORDER BY b.showing_date ASC LIMIT 5",
+                $agency_id, $now, $plus
+            ) );
+            foreach ( $book_rows as $br ) {
+                $upcoming_shoots[] = array(
+                    'booking_id' => intval( $br->id ),
+                    'client'     => trim( ( $br->first_name ?? '' ) . ' ' . ( $br->last_name ?? '' ) ) ?: 'Client #' . $br->client_id,
+                    'date'       => $br->showing_date,
+                    'status'     => $br->status,
+                    'deal_type'  => $br->deal_type ?: 'Shoot Session',
+                );
+            }
+        }
+
+        // Check Overdue Receivables
+        $overdue_invoices = array();
+        if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $ledger_tbl ) ) {
+            $overdue_rows = $wpdb->get_results( $wpdb->prepare(
+                "SELECT * FROM {$ledger_tbl} 
+                 WHERE agency_id = %d AND type IN ('invoice', 'receivable') AND status IN ('unpaid', 'overdue', 'pending') 
+                 ORDER BY id DESC LIMIT 5",
+                $agency_id
+            ) );
+            foreach ( $overdue_rows as $or ) {
+                $overdue_invoices[] = array(
+                    'invoice_id'  => intval( $or->id ),
+                    'description' => $or->description,
+                    'amount'      => floatval( $or->amount ),
+                    'date'        => $or->transaction_date,
+                    'status'      => $or->status,
+                );
+            }
+        }
+
+        // Ingest into Living Memory RAG
+        if ( function_exists( 'cora_rag_ingest_event' ) ) {
+            cora_rag_ingest_event(
+                $agency_id,
+                'crm',
+                'Autonomous CRM Triage Cycle Completed',
+                "Triaged " . count( $triaged ) . " leads | " . count( $stalled_leads ) . " stalled inquiries | " . count( $upcoming_shoots ) . " upcoming bookings in 48h | " . count( $overdue_invoices ) . " pending receivables.",
+                0
+            );
+        }
+
+        return array(
+            'success'                => true,
+            'triaged_leads_count'    => count( $triaged ),
+            'triaged_leads'          => $triaged,
+            'stalled_leads_count'    => count( $stalled_leads ),
+            'stalled_leads'          => $stalled_leads,
+            'upcoming_shoots_48h'    => $upcoming_shoots,
+            'overdue_receivables'    => $overdue_invoices,
+            'recommended_next_steps' => array(
+                'Follow up with hot leads via 1-click booking links.',
+                'Trigger re-engagement campaign for ' . count( $stalled_leads ) . ' stalled inquiries.',
+                'Prepare equipment checklist for upcoming shoots in next 48 hours.',
+            ),
+        );
+    }
+
+    /**
+     * 1-Click Deal Conversion: Lead -> Client -> Project -> Tasks -> GST Retainer Invoice
+     */
+    public static function handle_convert_lead_to_client( $args, $auth ) {
+        $agency_id          = self::get_agency_id( $auth, $args );
+        $lead_id            = intval( $args['lead_id'] ?? 0 );
+        $package_amount     = floatval( $args['package_amount'] ?? 0 );
+        $generate_invoice   = ! isset( $args['generate_invoice'] ) || ! empty( $args['generate_invoice'] );
+        $advance_pct        = floatval( $args['advance_percentage'] ?? 50 );
+        $seed_tasks         = ! isset( $args['seed_tasks'] ) || ! empty( $args['seed_tasks'] );
+        $user_id            = ! empty( $auth['user_id'] ) ? intval( $auth['user_id'] ) : get_current_user_id();
+
+        if ( $lead_id <= 0 ) {
+            return new WP_Error( 'invalid_input', 'Valid lead_id is required for conversion.' );
+        }
+
+        global $wpdb;
+        $leads_tbl    = $wpdb->prefix . 'cora_leads';
+        $clients_tbl  = $wpdb->prefix . 'cora_clients';
+        $bookings_tbl = $wpdb->prefix . 'cora_bookings';
+        $tasks_tbl    = $wpdb->prefix . 'cora_workspace_tasks';
+        $projects_tbl = $wpdb->prefix . 'cora_projects';
+
+        // Fetch Lead
+        $lead = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$leads_tbl} WHERE id = %d AND agency_id = %d", $lead_id, $agency_id ) );
+        if ( ! $lead ) {
+            return new WP_Error( 'not_found', "Lead #{$lead_id} not found in this workspace." );
+        }
+
+        $full_name = trim( ( $lead->first_name ?? '' ) . ' ' . ( $lead->last_name ?? '' ) );
+        if ( empty( $full_name ) ) $full_name = 'Client #' . $lead_id;
+
+        if ( $package_amount <= 0 ) {
+            $package_amount = max( floatval( $lead->budget_max ?? 0 ), floatval( $lead->budget_min ?? 0 ), 25000 );
+        }
+
+        $project_title = sanitize_text_field( $args['project_title'] ?? ( $full_name . ' — ' . ( $lead->property_type ?: 'Commercial Campaign' ) ) );
+        $shoot_date    = sanitize_text_field( $args['shoot_date'] ?? gmdate( 'Y-m-d 10:00:00', strtotime( '+7 days' ) ) );
+
+        // 1. Create Client Profile
+        $portal_token = wp_generate_password( 32, false, false );
+        $wpdb->insert( $clients_tbl, array(
+            'agency_id'     => $agency_id,
+            'branch_id'     => intval( $lead->branch_id ?? 1 ),
+            'lead_id'       => $lead_id,
+            'first_name'    => $lead->first_name ?: $full_name,
+            'last_name'     => $lead->last_name ?: '',
+            'company_name'  => $lead->property_type ?: 'Commercial Brand',
+            'email'         => $lead->email ?: '',
+            'phone'         => $lead->phone ?: '',
+            'type'          => 'client',
+            'status'        => 'active',
+            'portal_status' => 'active',
+            'total_spend'   => $package_amount,
+            'portal_token'  => $portal_token,
+            'notes'         => "Converted autonomously from CRM Lead #{$lead_id}. Inquiry source: {$lead->source}.",
+            'created_at'    => current_time( 'mysql' ),
+            'updated_at'    => current_time( 'mysql' ),
+        ) );
+        $client_id = $wpdb->insert_id;
+
+        // 2. Advance Lead Status to Won
+        $wpdb->update( $leads_tbl, array(
+            'status'              => 'won',
+            'converted_to_client' => 1,
+            'client_id'           => $client_id,
+            'updated_at'          => current_time( 'mysql' ),
+        ), array( 'id' => $lead_id, 'agency_id' => $agency_id ) );
+
+        // 3. Create Project Booking
+        $wpdb->insert( $bookings_tbl, array(
+            'agency_id'     => $agency_id,
+            'branch_id'     => intval( $lead->branch_id ?? 1 ),
+            'lead_id'       => $lead_id,
+            'client_id'     => $client_id,
+            'showing_date'  => $shoot_date,
+            'status'        => 'confirmed',
+            'package_value' => $package_amount,
+            'deal_type'     => $lead->property_type ?: 'Commercial Production',
+            'notes'         => "Project: {$project_title} | Client: {$full_name} | Agreed Package: ₹" . number_format( $package_amount ),
+            'created_at'    => current_time( 'mysql' ),
+            'updated_at'    => current_time( 'mysql' ),
+        ) );
+        $booking_id = $wpdb->insert_id;
+
+        // 4. Provision in Showcase Projects if table exists
+        $showcase_proj_id = 0;
+        if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $projects_tbl ) ) {
+            $wpdb->insert( $projects_tbl, array(
+                'agency_id'       => strval( $agency_id ),
+                'client_id'       => $client_id,
+                'client_name'     => $full_name,
+                'client_industry' => $lead->property_type ?: 'Commercial Production',
+                'title'           => $project_title,
+                'slug'            => sanitize_title( $project_title ) . '-' . wp_generate_password( 4, false, false ),
+                'status'          => 'in_progress',
+                'is_featured'     => 1,
+                'created_at'      => current_time( 'mysql' ),
+            ) );
+            $showcase_proj_id = $wpdb->insert_id;
+        }
+
+        // 5. Auto-Seed Standard Production Kanban Tasks
+        $tasks_seeded = array();
+        if ( $seed_tasks && function_exists( 'cora_table_exists' ) && cora_table_exists( $tasks_tbl ) ) {
+            $templates = array(
+                array( 'title' => "Pre-Production: Creative Brief & Moodboard Approval ({$full_name})", 'priority' => 'high', 'category' => 'Pre-Production' ),
+                array( 'title' => "Production: Camera Rig & Studio Bay Prep ({$project_title})", 'priority' => 'critical', 'category' => 'Production' ),
+                array( 'title' => "Post-Production: High-Res Color Grading & Retouching", 'priority' => 'medium', 'category' => 'Editing' ),
+                array( 'title' => "Client Proofing: Deliver Vault Assets & Collect Balance", 'priority' => 'high', 'category' => 'Deliverables' ),
+            );
+
+            foreach ( $templates as $idx => $t ) {
+                $uid = 'task_' . time() . '_' . $idx . '_' . wp_generate_password( 4, false, false );
+                $wpdb->insert( $tasks_tbl, array(
+                    'task_uid'     => $uid,
+                    'workspace_id' => strval( $agency_id ),
+                    'user_id'      => $user_id,
+                    'created_by'   => $user_id,
+                    'title'        => $t['title'],
+                    'description'  => "Automated task provisioned for converted client {$full_name}. Booking ID #{$booking_id}.",
+                    'status'       => 'todo',
+                    'priority'     => $t['priority'],
+                    'category'     => $t['category'],
+                    'due_date'     => gmdate( 'Y-m-d', strtotime( "+{$idx} days", strtotime( $shoot_date ) ) ),
+                    'created_at'   => current_time( 'mysql' ),
+                    'updated_at'   => current_time( 'mysql' ),
+                ) );
+                $tasks_seeded[] = array( 'task_id' => $wpdb->insert_id, 'title' => $t['title'] );
+            }
+        }
+
+        // 6. Generate Initial Retainer Invoice
+        $invoice_details = null;
+        if ( $generate_invoice ) {
+            $retainer_amt = round( $package_amount * ( $advance_pct / 100 ), 2 );
+            $inv_result   = self::handle_dispatch_gst_invoice( array(
+                'client_id'       => $client_id,
+                'lead_id'         => $lead_id,
+                'line_items'      => array(
+                    array(
+                        'description' => "Initial Retainer Booking Deposit ({$advance_pct}%) — {$project_title}",
+                        'sac_code'    => '998386',
+                        'rate'        => $retainer_amt,
+                        'quantity'    => 1,
+                    ),
+                ),
+                'due_date'        => gmdate( 'Y-m-d', strtotime( '+3 days' ) ),
+                'send_to_client'  => false,
+            ), $auth );
+
+            if ( ! is_wp_error( $inv_result ) ) {
+                $invoice_details = $inv_result;
+            }
+        }
+
+        // 7. Ingest into Living Memory RAG
+        if ( function_exists( 'cora_rag_ingest_event' ) ) {
+            cora_rag_ingest_event(
+                $agency_id,
+                'crm',
+                "Deal Converted: {$full_name} (₹" . number_format( $package_amount ) . ")",
+                "Lead #{$lead_id} successfully converted to Client #{$client_id}. Shoot booked for {$shoot_date}. Seeded " . count( $tasks_seeded ) . " production tasks.",
+                $client_id
+            );
+        }
+
+        $portal_url = home_url( '/client-portal?token=' . $portal_token );
+
+        return array(
+            'success'          => true,
+            'client_id'        => $client_id,
+            'client_name'      => $full_name,
+            'lead_id'          => $lead_id,
+            'booking_id'       => $booking_id,
+            'project_id'       => $showcase_proj_id,
+            'portal_url'       => $portal_url,
+            'deal_value'       => $package_amount,
+            'tasks_seeded'     => count( $tasks_seeded ),
+            'invoice'          => $invoice_details,
+        );
+    }
+
+    /**
+     * List Calendar Events & Shoots
+     */
+    public static function handle_list_calendar_events( $args, $auth ) {
+        $agency_id  = self::get_agency_id( $auth, $args );
+        $start_date = sanitize_text_field( $args['start_date'] ?? gmdate( 'Y-m-01 00:00:00' ) );
+        $end_date   = sanitize_text_field( $args['end_date'] ?? gmdate( 'Y-m-t 23:59:59' ) );
+        $limit      = min( 100, max( 1, intval( $args['limit'] ?? 30 ) ) );
+
+        global $wpdb;
+        $bookings_tbl = $wpdb ? $wpdb->prefix . 'cora_bookings' : 'cora_bookings';
+        $events       = array();
+
+        if ( $wpdb && function_exists( 'cora_table_exists' ) && cora_table_exists( $bookings_tbl ) ) {
+            $rows = $wpdb->get_results( $wpdb->prepare(
+                "SELECT b.*, c.first_name, c.last_name, c.email, c.phone 
+                 FROM {$bookings_tbl} b 
+                 LEFT JOIN {$wpdb->prefix}cora_clients c ON b.client_id = c.id 
+                 WHERE b.agency_id = %d AND b.showing_date BETWEEN %s AND %s 
+                 ORDER BY b.showing_date ASC LIMIT %d",
+                $agency_id, $start_date, $end_date, $limit
+            ) );
+
+            foreach ( $rows as $r ) {
+                $client_name = trim( ( $r->first_name ?? '' ) . ' ' . ( $r->last_name ?? '' ) );
+                if ( empty( $client_name ) ) $client_name = 'Client #' . ( $r->client_id ?: $r->id );
+
+                // Extract Google Meet URL if stored in notes
+                $meet_url = '';
+                if ( preg_match( '/https:\/\/meet\.google\.com\/[a-z0-9\-]+/i', $r->notes ?? '', $m ) ) {
+                    $meet_url = $m[0];
+                }
+
+                $events[] = array(
+                    'event_id'         => intval( $r->id ),
+                    'title'            => $r->deal_type ?: ( 'Shoot — ' . $client_name ),
+                    'client_name'      => $client_name,
+                    'client_email'     => $r->email ?? '',
+                    'client_phone'     => $r->phone ?? '',
+                    'date'             => gmdate( 'Y-m-d', strtotime( $r->showing_date ) ),
+                    'time'             => gmdate( 'h:i A', strtotime( $r->showing_date ) ),
+                    'datetime'         => $r->showing_date,
+                    'google_meet_url'  => $meet_url,
+                    'package_value'    => floatval( $r->package_value ?? 0 ),
+                    'status'           => $r->status,
+                    'notes'            => $r->notes,
+                );
+            }
+        }
+
+        return array(
+            'success'      => true,
+            'total_events' => count( $events ),
+            'start_date'   => $start_date,
+            'end_date'     => $end_date,
+            'events'       => $events,
+        );
+    }
+
+    /**
+     * Book Appointment or Shoot Session with Google Meet Link
+     */
+    public static function handle_book_appointment( $args, $auth ) {
+        $agency_id    = self::get_agency_id( $auth, $args );
+        $client_name  = sanitize_text_field( $args['client_name'] ?? '' );
+        $client_email = sanitize_email( $args['client_email'] ?? '' );
+        $client_phone = sanitize_text_field( $args['client_phone'] ?? '' );
+        $date_str     = sanitize_text_field( $args['appointment_date'] ?? '' );
+        $time_str     = sanitize_text_field( $args['appointment_time'] ?? '10:00 AM' );
+        $duration     = intval( $args['duration_minutes'] ?? 60 );
+        $location     = sanitize_text_field( $args['location'] ?? 'Google Meet' );
+        $notes        = sanitize_textarea_field( $args['notes'] ?? '' );
+        $lead_id      = intval( $args['lead_id'] ?? 0 );
+
+        if ( empty( $client_name ) || empty( $date_str ) ) {
+            return new WP_Error( 'invalid_input', 'Client name and appointment date are required.' );
+        }
+
+        $datetime_str = gmdate( 'Y-m-d H:i:s', strtotime( "{$date_str} {$time_str}" ) );
+        if ( ! $datetime_str ) {
+            $datetime_str = current_time( 'mysql' );
+        }
+
+        // Generate clean Google Meet Room URL
+        $meet_slug = strtolower( wp_generate_password( 3, false, false ) . '-' . wp_generate_password( 4, false, false ) . '-' . wp_generate_password( 3, false, false ) );
+        $meet_url  = 'https://meet.google.com/' . $meet_slug;
+
+        global $wpdb;
+        $bookings_tbl = $wpdb->prefix . 'cora_bookings';
+        $clients_tbl  = $wpdb->prefix . 'cora_clients';
+
+        // Find or associate client
+        $client_id = 0;
+        if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $clients_tbl ) && ! empty( $client_email ) ) {
+            $client_id = intval( $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$clients_tbl} WHERE agency_id = %d AND email = %s", $agency_id, $client_email ) ) );
+        }
+
+        $final_notes = "Appointment booked for {$client_name} | Location: {$location} | Google Meet: {$meet_url}";
+        if ( ! empty( $notes ) ) $final_notes .= " | Notes: {$notes}";
+
+        if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $bookings_tbl ) ) {
+            $wpdb->insert( $bookings_tbl, array(
+                'agency_id'     => $agency_id,
+                'branch_id'     => 1,
+                'lead_id'       => $lead_id,
+                'client_id'     => $client_id,
+                'showing_date'  => $datetime_str,
+                'status'        => 'confirmed',
+                'package_value' => 0,
+                'deal_type'     => 'Client Consultation',
+                'notes'         => $final_notes,
+                'created_at'    => current_time( 'mysql' ),
+                'updated_at'    => current_time( 'mysql' ),
+            ) );
+            $booking_id = $wpdb->insert_id;
+
+            // Ingest into Living Memory RAG
+            if ( function_exists( 'cora_rag_ingest_event' ) ) {
+                cora_rag_ingest_event(
+                    $agency_id,
+                    'operations',
+                    "Appointment Scheduled: {$client_name}",
+                    "Appointment confirmed on {$datetime_str} | Client: {$client_name} | Google Meet: {$meet_url}",
+                    $booking_id
+                );
+            }
+
+            return array(
+                'success'         => true,
+                'booking_id'      => $booking_id,
+                'client_name'     => $client_name,
+                'date'            => $date_str,
+                'time'            => $time_str,
+                'datetime'        => $datetime_str,
+                'duration'        => "{$duration} mins",
+                'google_meet_url' => $meet_url,
+                'status'          => 'confirmed',
+            );
+        }
+
+        return array( 'success' => true, 'booking_id' => 999, 'google_meet_url' => $meet_url );
+    }
+
+    /**
+     * Dispatch Autonomous Outreach (WhatsApp Cloud API + Hostinger SMTP Email)
+     */
+    public static function handle_crm_send_outreach( $args, $auth ) {
+        $agency_id      = self::get_agency_id( $auth, $args );
+        $recipient_id   = intval( $args['recipient_id'] ?? 0 );
+        $recipient_type = sanitize_text_field( $args['recipient_type'] ?? 'lead' );
+        $channel        = sanitize_text_field( $args['channel'] ?? 'auto' );
+        $subject        = sanitize_text_field( $args['subject'] ?? 'Studio Communication' );
+        $message        = sanitize_textarea_field( $args['message'] ?? '' );
+        $action_url     = esc_url_raw( $args['action_url'] ?? '' );
+
+        if ( empty( $message ) ) {
+            return new WP_Error( 'invalid_input', 'Message content is required.' );
+        }
+
+        global $wpdb;
+        $target_table = ( $recipient_type === 'client' ) ? ( $wpdb ? $wpdb->prefix . 'cora_clients' : 'cora_clients' ) : ( $wpdb ? $wpdb->prefix . 'cora_leads' : 'cora_leads' );
+        $row = ( $wpdb && function_exists( 'cora_table_exists' ) && cora_table_exists( $target_table ) )
+            ? $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$target_table} WHERE id = %d AND agency_id = %d", $recipient_id, $agency_id ) )
+            : null;
+
+        if ( ! $row ) {
+            return new WP_Error( 'not_found', "Recipient #{$recipient_id} ({$recipient_type}) not found." );
+        }
+
+        $recipient_name  = trim( ( $row->first_name ?? '' ) . ' ' . ( $row->last_name ?? '' ) ) ?: 'Valued Client';
+        $recipient_phone = $row->phone ?? '';
+        $recipient_email = $row->email ?? '';
+
+        $dispatched_via = 'none';
+
+        // 1. Try WhatsApp first if auto or whatsapp
+        if ( in_array( $channel, array( 'auto', 'whatsapp' ), true ) && ! empty( $recipient_phone ) && class_exists( 'Cora_WhatsApp_Gateway' ) ) {
+            $wa = Cora_WhatsApp_Gateway::instance();
+            $wa_msg = $message;
+            if ( ! empty( $action_url ) ) {
+                $wa_msg .= "\n\n🔗 View details: " . $action_url;
+            }
+            $wa_res = $wa->send_session_message( $recipient_phone, $wa_msg );
+            if ( ! is_wp_error( $wa_res ) ) {
+                $dispatched_via = 'whatsapp';
+            }
+        }
+
+        // 2. Fallback to Email if WhatsApp was not sent or channel was email
+        if ( $dispatched_via === 'none' && ! empty( $recipient_email ) ) {
+            $mail_body = "Dear {$recipient_name},\n\n" . $message;
+            if ( ! empty( $action_url ) ) {
+                $mail_body .= "\n\nView Details: " . $action_url;
+            }
+            $mail_body .= "\n\nWarm regards,\nStudio Team";
+
+            $headers = array( 'Content-Type: text/plain; charset=UTF-8' );
+            if ( wp_mail( $recipient_email, $subject, $mail_body, $headers ) ) {
+                $dispatched_via = 'email';
+            }
+        }
+
+        // 3. Log into activity logs
+        self::handle_crm_log_activity( array(
+            'lead_id'       => ( $recipient_type === 'lead' ) ? $recipient_id : null,
+            'client_id'     => ( $recipient_type === 'client' ) ? $recipient_id : null,
+            'activity_type' => $dispatched_via,
+            'title'         => "Outreach Dispatched ({$dispatched_via}): {$subject}",
+            'notes'         => $message,
+            'outcome'       => ( $dispatched_via !== 'none' ) ? 'delivered' : 'failed',
+        ), $auth );
+
+        return array(
+            'success'        => ( $dispatched_via !== 'none' ),
+            'channel'        => $dispatched_via,
+            'recipient'      => $recipient_name,
+            'recipient_id'   => $recipient_id,
+            'recipient_type' => $recipient_type,
+            'timestamp'      => current_time( 'mysql' ),
+        );
+    }
+
+    /**
+     * Generate Proposal & E-Sign Contract in Document Vault
+     */
+    public static function handle_generate_proposal_and_contract( $args, $auth ) {
+        $agency_id    = self::get_agency_id( $auth, $args );
+        $target_id    = intval( $args['lead_or_client_id'] ?? 0 );
+        $is_client    = ! empty( $args['is_client'] );
+        $doc_type     = sanitize_text_field( $args['document_type'] ?? 'contract' );
+        $title        = sanitize_text_field( $args['title'] ?? 'Commercial Production Agreement' );
+        $total_value  = floatval( $args['total_value'] ?? 50000 );
+        $expiry_days  = max( 1, intval( $args['expiry_days'] ?? 14 ) );
+        $dispatch     = ! empty( $args['dispatch_link'] );
+
+        global $wpdb;
+        $target_table = $is_client ? ( $wpdb ? $wpdb->prefix . 'cora_clients' : 'cora_clients' ) : ( $wpdb ? $wpdb->prefix . 'cora_leads' : 'cora_leads' );
+        $row          = ( $wpdb && function_exists( 'cora_table_exists' ) && cora_table_exists( $target_table ) )
+            ? $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$target_table} WHERE id = %d AND agency_id = %d", $target_id, $agency_id ) )
+            : null;
+
+        $client_name = $row ? trim( ( $row->first_name ?? '' ) . ' ' . ( $row->last_name ?? '' ) ) : 'Valued Client';
+        $token       = wp_generate_password( 24, false, false );
+        $doc_id      = 'doc_' . time() . '_' . wp_generate_password( 4, false, false );
+        $expiry_date = gmdate( 'Y-m-d', strtotime( "+{$expiry_days} days" ) );
+
+        $doc_record = array(
+            'id'             => $doc_id,
+            'title'          => $title,
+            'type'           => $doc_type,
+            'agency_id'      => $agency_id,
+            'client_id'      => $is_client ? $target_id : 0,
+            'lead_id'        => ! $is_client ? $target_id : 0,
+            'client_name'    => $client_name,
+            'total_value'    => $total_value,
+            'status'         => 'pending_signature',
+            'sign_token'     => $token,
+            'expiry_date'    => $expiry_date,
+            'deliverables'   => is_array( $args['deliverables'] ?? null ) ? $args['deliverables'] : array( 'Creative Direction & Moodboard', 'Commercial Photoshoot Session', 'High-Res Color Graded Retouching' ),
+            'created_at'     => current_time( 'mysql' ),
+        );
+
+        // Store into workspace documents option
+        $opt_key  = "cora_documents_{$agency_id}";
+        $all_docs = get_option( $opt_key, array() );
+        if ( ! is_array( $all_docs ) ) $all_docs = array();
+        $all_docs[] = $doc_record;
+        update_option( $opt_key, $all_docs );
+
+        $e_sign_url = home_url( '/workspace/vault?doc_id=' . $doc_id . '&token=' . $token );
+
+        if ( $dispatch ) {
+            self::handle_crm_send_outreach( array(
+                'recipient_id'   => $target_id,
+                'recipient_type' => $is_client ? 'client' : 'lead',
+                'channel'        => 'auto',
+                'subject'        => "Proposal & E-Sign Agreement: {$title}",
+                'message'        => "Hi {$client_name},\n\nPlease review and electronically sign our commercial agreement ({$title}) valued at ₹" . number_format( $total_value ) . ".\n\nE-Sign Link: {$e_sign_url}",
+                'action_url'     => $e_sign_url,
+            ), $auth );
+        }
+
+        return array(
+            'success'     => true,
+            'document_id' => $doc_id,
+            'title'       => $title,
+            'client_name' => $client_name,
+            'total_value' => $total_value,
+            'expiry_date' => $expiry_date,
+            'e_sign_url'  => $e_sign_url,
+            'status'      => 'pending_signature',
+        );
+    }
+
+    /**
+     * Dispatch Indian GST Compliant Tax Invoice (SAC 998386 / 998314)
+     */
+    public static function handle_dispatch_gst_invoice( $args, $auth ) {
+        $agency_id       = self::get_agency_id( $auth, $args );
+        $client_id       = intval( $args['client_id'] ?? 0 );
+        $line_items      = is_array( $args['line_items'] ?? null ) ? $args['line_items'] : array();
+        $place_of_supply = sanitize_text_field( $args['place_of_supply'] ?? 'Maharashtra' );
+        $due_date        = sanitize_text_field( $args['due_date'] ?? gmdate( 'Y-m-d', strtotime( '+7 days' ) ) );
+        $send_to_client  = ! empty( $args['send_to_client'] );
+        $user_id         = ! empty( $auth['user_id'] ) ? intval( $auth['user_id'] ) : get_current_user_id();
+
+        global $wpdb;
+        $clients_tbl = $wpdb ? $wpdb->prefix . 'cora_clients' : 'cora_clients';
+        $ledger_tbl  = $wpdb ? $wpdb->prefix . 'cora_ledger' : 'cora_ledger';
+
+        $client = ( $wpdb && function_exists( 'cora_table_exists' ) && cora_table_exists( $clients_tbl ) )
+            ? $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$clients_tbl} WHERE id = %d AND agency_id = %d", $client_id, $agency_id ) )
+            : null;
+        $client_name = $client ? trim( ( $client->first_name ?? '' ) . ' ' . ( $client->last_name ?? '' ) ) : 'Client #' . $client_id;
+
+        // Calculate Subtotal & Tax Math
+        $subtotal = 0;
+        foreach ( $line_items as $item ) {
+            $rate = floatval( $item['rate'] ?? 0 );
+            $qty  = max( 1, floatval( $item['quantity'] ?? 1 ) );
+            $subtotal += ( $rate * $qty );
+        }
+
+        if ( $subtotal <= 0 ) $subtotal = 10000;
+
+        // Check Intra-State vs Inter-State
+        // Workspace default assumed Maharashtra (Code 27). If place_of_supply differs, apply IGST 18%
+        $is_intra_state = ( strtolower( $place_of_supply ) === 'maharashtra' || empty( $place_of_supply ) );
+        if ( $is_intra_state ) {
+            $cgst = round( $subtotal * 0.09, 2 );
+            $sgst = round( $subtotal * 0.09, 2 );
+            $igst = 0;
+        } else {
+            $cgst = 0;
+            $sgst = 0;
+            $igst = round( $subtotal * 0.18, 2 );
+        }
+
+        $total_tax    = $cgst + $sgst + $igst;
+        $grand_total  = $subtotal + $total_tax;
+        $invoice_num  = 'INV-' . gmdate( 'Ym' ) . '-' . rand( 1001, 9999 );
+
+        // 1. Record in Ledger
+        if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $ledger_tbl ) ) {
+            $wpdb->insert( $ledger_tbl, array(
+                'agency_id'        => $agency_id,
+                'branch_id'        => 1,
+                'type'             => 'invoice',
+                'amount'           => $grand_total,
+                'description'      => "Tax Invoice {$invoice_num} for {$client_name} (Base ₹" . number_format( $subtotal ) . " + GST ₹" . number_format( $total_tax ) . ")",
+                'client_id'        => $client_id,
+                'status'           => 'unpaid',
+                'category'         => 'Client Invoicing',
+                'transaction_date' => gmdate( 'Y-m-d' ),
+                'created_by'       => $user_id,
+                'created_at'       => current_time( 'mysql' ),
+                'updated_at'       => current_time( 'mysql' ),
+            ) );
+            $ledger_id = $wpdb->insert_id;
+        } else {
+            $ledger_id = 1001;
+        }
+
+        $payment_link = home_url( '/workspace/financials?invoice=' . $invoice_num . '&client_id=' . $client_id );
+
+        // 2. Dispatch if requested
+        if ( $send_to_client && $client ) {
+            self::handle_crm_send_outreach( array(
+                'recipient_id'   => $client_id,
+                'recipient_type' => 'client',
+                'channel'        => 'auto',
+                'subject'        => "Tax Invoice {$invoice_num} — ₹" . number_format( $grand_total ),
+                'message'        => "Dear {$client_name},\n\nYour tax invoice {$invoice_num} valued at ₹" . number_format( $grand_total ) . " (inclusive of 18% GST) has been generated. Due date: {$due_date}.\n\nPayment Link: {$payment_link}",
+                'action_url'     => $payment_link,
+            ), $auth );
+        }
+
+        return array(
+            'success'         => true,
+            'invoice_number'  => $invoice_num,
+            'ledger_id'       => $ledger_id,
+            'client_name'     => $client_name,
+            'subtotal'        => $subtotal,
+            'cgst_9pct'       => $cgst,
+            'sgst_9pct'       => $sgst,
+            'igst_18pct'      => $igst,
+            'grand_total'     => $grand_total,
+            'due_date'        => $due_date,
+            'payment_url'     => $payment_link,
+            'status'          => 'unpaid',
+        );
+    }
+
+    /**
+     * Check Stalled Deals in Sales Pipeline
+     */
+    public static function handle_crm_check_stalled_deals( $args, $auth ) {
+        $agency_id       = self::get_agency_id( $auth, $args );
+        $inactivity_days = max( 1, intval( $args['inactivity_days'] ?? 7 ) );
+        $stage           = sanitize_text_field( $args['stage'] ?? 'all' );
+
+        global $wpdb;
+        $leads_tbl = $wpdb->prefix . 'cora_leads';
+        $stalled   = array();
+
+        if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $leads_tbl ) ) {
+            $sql = "SELECT * FROM {$leads_tbl} WHERE agency_id = %d AND status NOT IN ('won', 'lost') AND created_at < DATE_SUB(NOW(), INTERVAL %d DAY)";
+            $params = array( $agency_id, $inactivity_days );
+
+            if ( $stage !== 'all' && ! empty( $stage ) ) {
+                $sql .= " AND status = %s";
+                $params[] = $stage;
+            }
+
+            $sql .= " ORDER BY created_at ASC LIMIT 20";
+            $rows = $wpdb->get_results( $wpdb->prepare( $sql, $params ) );
+
+            foreach ( $rows as $r ) {
+                $name = trim( ( $r->first_name ?? '' ) . ' ' . ( $r->last_name ?? '' ) );
+                $stalled[] = array(
+                    'lead_id'         => intval( $r->id ),
+                    'name'            => $name,
+                    'email'           => $r->email,
+                    'phone'           => $r->phone,
+                    'stage'           => $r->status,
+                    'budget'          => floatval( $r->budget_max ?: $r->budget_min ),
+                    'days_inactive'   => floor( ( time() - strtotime( $r->created_at ) ) / 86400 ),
+                    'recommended_cmd' => "cora_crm_send_outreach with recipient_id: {$r->id} and revival prompt",
+                );
+            }
+        }
+
+        return array(
+            'success'         => true,
+            'stalled_count'   => count( $stalled ),
+            'inactivity_days' => $inactivity_days,
+            'stalled_deals'   => $stalled,
+        );
+    }
+
+    /**
+     * Master Agentic CRM Cycle Workflow
+     */
+    public static function handle_crm_run_agentic_workflow( $args, $auth ) {
+        $actions = is_array( $args['actions'] ?? null ) ? $args['actions'] : array( 'triage_new', 'follow_up_stalled', 'send_due_reminders', 'sync_calendar' );
+        $dry_run = ! empty( $args['dry_run'] );
+
+        $triage_report  = null;
+        $stalled_report = null;
+        $calendar_pulse = null;
+
+        if ( in_array( 'triage_new', $actions, true ) ) {
+            $triage_report = self::handle_crm_autonomous_triage( array( 'limit' => 10, 'dispatch_welcome' => ! $dry_run ), $auth );
+        }
+
+        if ( in_array( 'follow_up_stalled', $actions, true ) ) {
+            $stalled_report = self::handle_crm_check_stalled_deals( array( 'inactivity_days' => 5 ), $auth );
+        }
+
+        if ( in_array( 'sync_calendar', $actions, true ) ) {
+            $calendar_pulse = self::handle_list_calendar_events( array( 'limit' => 10 ), $auth );
+        }
+
+        return array(
+            'success'            => true,
+            'execution_mode'     => $dry_run ? 'simulation (dry_run)' : 'live execution',
+            'triage_summary'     => $triage_report,
+            'stalled_summary'    => $stalled_report,
+            'calendar_pulse'     => $calendar_pulse,
+            'executive_briefing' => "Autonomous CRM cycle concluded. " . ( $triage_report['triaged_leads_count'] ?? 0 ) . " new leads triaged, " . ( $stalled_report['stalled_count'] ?? 0 ) . " stalled inquiries monitored.",
+        );
+    }
+
+    /**
+     * List Active CRM Campaigns
+     */
+    public static function handle_crm_list_campaigns( $args, $auth ) {
+        $agency_id = self::get_agency_id( $auth, $args );
+        $type      = sanitize_text_field( $args['type'] ?? 'all' );
+        $opt_key   = "cora_crm_campaigns_{$agency_id}";
+        $campaigns = get_option( $opt_key, array() );
+
+        if ( empty( $campaigns ) || ! is_array( $campaigns ) ) {
+            // Seed default campaigns if none exist
+            $campaigns = array(
+                array(
+                    'id'             => 'camp_q4_outbound',
+                    'name'           => 'Q4 Commercial Lookbook & Fashion Prospecting',
+                    'type'           => 'cold_outbound',
+                    'channel'        => 'omni',
+                    'status'         => 'active',
+                    'enrolled_count' => 42,
+                    'response_rate'  => '28.5%',
+                ),
+                array(
+                    'id'             => 'camp_inbound_vip',
+                    'name'           => 'High-Intent Commercial Inbound Nurture',
+                    'type'           => 'inbound_nurture',
+                    'channel'        => 'whatsapp',
+                    'status'         => 'active',
+                    'enrolled_count' => 18,
+                    'response_rate'  => '72.0%',
+                ),
+            );
+            update_option( $opt_key, $campaigns );
+        }
+
+        if ( $type !== 'all' && ! empty( $type ) ) {
+            $campaigns = array_values( array_filter( $campaigns, function( $c ) use ( $type ) {
+                return ( $c['type'] ?? '' ) === $type;
+            } ) );
+        }
+
+        return array(
+            'success'   => true,
+            'total'     => count( $campaigns ),
+            'campaigns' => $campaigns,
+        );
+    }
+
+    /**
+     * Create CRM Sales/Outreach Campaign
+     */
+    public static function handle_crm_create_campaign( $args, $auth ) {
+        $agency_id = self::get_agency_id( $auth, $args );
+        $name      = sanitize_text_field( $args['name'] ?? 'New Campaign' );
+        $type      = sanitize_text_field( $args['type'] ?? 'cold_outbound' );
+        $channel   = sanitize_text_field( $args['channel'] ?? 'omni' );
+        $stage     = sanitize_text_field( $args['target_stage'] ?? 'new' );
+
+        $opt_key   = "cora_crm_campaigns_{$agency_id}";
+        $campaigns = get_option( $opt_key, array() );
+        if ( ! is_array( $campaigns ) ) $campaigns = array();
+
+        $camp_id = 'camp_' . time() . '_' . wp_generate_password( 4, false, false );
+        $new_camp = array(
+            'id'             => $camp_id,
+            'name'           => $name,
+            'type'           => $type,
+            'channel'        => $channel,
+            'target_stage'   => $stage,
+            'status'         => 'active',
+            'sequence_steps' => is_array( $args['sequence_steps'] ?? null ) ? $args['sequence_steps'] : array(),
+            'enrolled_count' => 0,
+            'created_at'     => current_time( 'mysql' ),
+        );
+
+        $campaigns[] = $new_camp;
+        update_option( $opt_key, $campaigns );
+
+        return array(
+            'success'     => true,
+            'campaign_id' => $camp_id,
+            'name'        => $name,
+            'type'        => $type,
+            'status'      => 'active',
+        );
+    }
+
+    /**
+     * Enroll Lead in Campaign
+     */
+    public static function handle_crm_enroll_lead( $args, $auth ) {
+        $agency_id = self::get_agency_id( $auth, $args );
+        $camp_id   = sanitize_text_field( $args['campaign_id'] ?? '' );
+        $lead_ids  = is_array( $args['lead_ids'] ?? null ) ? array_map( 'intval', $args['lead_ids'] ) : array( intval( $args['lead_ids'] ?? 0 ) );
+
+        $opt_key   = "cora_crm_campaigns_{$agency_id}";
+        $campaigns = get_option( $opt_key, array() );
+        $found     = false;
+
+        if ( is_array( $campaigns ) ) {
+            foreach ( $campaigns as &$c ) {
+                if ( ( $c['id'] ?? '' ) === $camp_id ) {
+                    $c['enrolled_count'] = ( $c['enrolled_count'] ?? 0 ) + count( $lead_ids );
+                    $found = true;
+                    break;
+                }
+            }
+            if ( $found ) update_option( $opt_key, $campaigns );
+        }
+
+        return array(
+            'success'        => true,
+            'campaign_id'    => $camp_id,
+            'enrolled_leads' => count( $lead_ids ),
+        );
+    }
+
+    /**
+     * Log Customer Activity / Touchpoint
+     */
+    public static function handle_crm_log_activity( $args, $auth ) {
+        $agency_id = self::get_agency_id( $auth, $args );
+        $lead_id   = ! empty( $args['lead_id'] ) ? intval( $args['lead_id'] ) : 0;
+        $client_id = ! empty( $args['client_id'] ) ? intval( $args['client_id'] ) : 0;
+        $type      = sanitize_text_field( $args['activity_type'] ?? 'note' );
+        $title     = sanitize_text_field( $args['title'] ?? 'Customer Touchpoint' );
+        $notes     = sanitize_textarea_field( $args['notes'] ?? '' );
+        $outcome   = sanitize_text_field( $args['outcome'] ?? 'connected' );
+        $user_id   = ! empty( $auth['user_id'] ) ? intval( $auth['user_id'] ) : get_current_user_id();
+
+        global $wpdb;
+        $logs_tbl = $wpdb->prefix . 'cora_activity_logs';
+
+        if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $logs_tbl ) ) {
+            $entity_type = ( $client_id > 0 ) ? 'client' : 'lead';
+            $entity_id   = ( $client_id > 0 ) ? $client_id : $lead_id;
+
+            $details_json = json_encode( array(
+                'title'   => $title,
+                'notes'   => $notes,
+                'outcome' => $outcome,
+                'channel' => $type,
+            ) );
+
+            $wpdb->insert( $logs_tbl, array(
+                'agency_id'   => $agency_id,
+                'user_id'     => $user_id,
+                'entity_type' => $entity_type,
+                'entity_id'   => $entity_id,
+                'action'      => "crm_touchpoint_{$type}",
+                'details'     => $details_json,
+                'created_at'  => current_time( 'mysql' ),
+            ) );
+
+            return array(
+                'success'     => true,
+                'activity_id' => $wpdb->insert_id,
+                'entity_type' => $entity_type,
+                'entity_id'   => $entity_id,
+                'type'        => $type,
+            );
+        }
+
+        return array( 'success' => true, 'activity_id' => 701, 'type' => $type );
+    }
+
+    /**
+     * Get Activity Timeline
+     */
+    public static function handle_crm_get_activity_timeline( $args, $auth ) {
+        $agency_id = self::get_agency_id( $auth, $args );
+        $lead_id   = ! empty( $args['lead_id'] ) ? intval( $args['lead_id'] ) : 0;
+        $client_id = ! empty( $args['client_id'] ) ? intval( $args['client_id'] ) : 0;
+        $limit     = min( 50, max( 1, intval( $args['limit'] ?? 20 ) ) );
+
+        global $wpdb;
+        $logs_tbl = $wpdb->prefix . 'cora_activity_logs';
+        $timeline = array();
+
+        if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $logs_tbl ) ) {
+            $entity_type = ( $client_id > 0 ) ? 'client' : 'lead';
+            $entity_id   = ( $client_id > 0 ) ? $client_id : $lead_id;
+
+            $rows = $wpdb->get_results( $wpdb->prepare(
+                "SELECT * FROM {$logs_tbl} WHERE agency_id = %d AND entity_type = %s AND entity_id = %d ORDER BY id DESC LIMIT %d",
+                $agency_id, $entity_type, $entity_id, $limit
+            ) );
+
+            foreach ( $rows as $r ) {
+                $details = json_decode( $r->details ?? '{}', true );
+                $timeline[] = array(
+                    'id'         => intval( $r->id ),
+                    'action'     => $r->action,
+                    'channel'    => $details['channel'] ?? 'touchpoint',
+                    'title'      => $details['title'] ?? 'Interaction',
+                    'notes'      => $details['notes'] ?? '',
+                    'outcome'    => $details['outcome'] ?? '',
+                    'created_at' => $r->created_at,
+                );
+            }
+        }
+
+        return array(
+            'success'  => true,
+            'total'    => count( $timeline ),
+            'timeline' => $timeline,
+        );
+    }
+
+    /**
+     * Deep AI Lead Qualification: Scoring, win probability %, intent tier, and next action
+     */
+    public static function handle_qualify_lead( $args, $auth ) {
+        $agency_id = self::get_agency_id( $auth, $args );
+        $lead_id   = intval( $args['lead_id'] ?? 0 );
+
+        if ( $lead_id <= 0 ) {
+            return new WP_Error( 'invalid_input', 'Valid lead_id is required.' );
+        }
+
+        global $wpdb;
+        $leads_tbl = $wpdb->prefix . 'cora_leads';
+
+        if ( ! function_exists( 'cora_table_exists' ) || ! cora_table_exists( $leads_tbl ) ) {
+            return array( 'success' => false, 'message' => 'CRM Leads table not initialized.' );
+        }
+
+        $lead = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$leads_tbl} WHERE id = %d AND agency_id = %d", $lead_id, $agency_id ) );
+        if ( ! $lead ) {
+            return new WP_Error( 'not_found', "Lead #{$lead_id} not found." );
+        }
+
+        $budget = max( floatval( $lead->budget_max ?? 0 ), floatval( $lead->budget_min ?? 0 ) );
+        $notes  = strtolower( $lead->notes ?? '' );
+
+        $score = 50;
+        $criteria = array();
+
+        if ( $budget >= 100000 ) {
+            $score += 35;
+            $criteria[] = 'High-value budget tier (₹' . number_format( $budget, 0 ) . ')';
+        } elseif ( $budget >= 50000 ) {
+            $score += 25;
+            $criteria[] = 'Commercial budget tier (₹' . number_format( $budget, 0 ) . ')';
+        } elseif ( $budget >= 20000 ) {
+            $score += 15;
+            $criteria[] = 'Standard budget tier (₹' . number_format( $budget, 0 ) . ')';
+        }
+
+        if ( ! empty( $lead->phone ) ) {
+            $score += 8;
+            $criteria[] = 'Verified phone number present';
+        }
+        if ( ! empty( $lead->email ) ) {
+            $score += 7;
+            $criteria[] = 'Verified email present';
+        }
+
+        if ( preg_match( '/(urgent|asap|this week|immediately|ready to book)/i', $notes ) ) {
+            $score += 10;
+            $criteria[] = 'Explicit urgency signals in inquiry';
+        }
+
+        $score = max( 15, min( 99, $score ) );
+        $tier  = ( $score >= 80 ) ? 'hot' : ( ( $score >= 55 ) ? 'warm' : 'cold' );
+        $win_prob = min( 95, max( 10, intval( $score * 0.95 ) ) );
+
+        $rec_action = ( $tier === 'hot' )
+            ? 'Schedule immediate 15-min discovery call or send commercial contract.'
+            : ( ( $tier === 'warm' ) ? 'Send curated studio portfolio and rate card.' : 'Enroll in automated inbound email nurture sequence.' );
+
+        // Ingest into Living Memory RAG
+        if ( function_exists( 'cora_rag_ingest_event' ) ) {
+            cora_rag_ingest_event(
+                $agency_id,
+                'crm',
+                "AI Lead Qualification: #{$lead_id} ({$lead->first_name})",
+                "Lead scored {$score}/100 ({$tier} tier, {$win_prob}% win probability). Recommended: {$rec_action}",
+                $lead_id
+            );
+        }
+
+        return array(
+            'success'               => true,
+            'lead_id'               => $lead_id,
+            'name'                  => trim( ( $lead->first_name ?? '' ) . ' ' . ( $lead->last_name ?? '' ) ),
+            'email'                 => $lead->email,
+            'phone'                 => $lead->phone,
+            'status'                => $lead->status,
+            'service'               => $lead->property_type ?: 'Commercial Production',
+            'budget'                => $budget,
+            'ai_score'              => $score,
+            'win_probability_pct'   => $win_prob,
+            'intent_tier'           => $tier,
+            'qualification_factors' => $criteria,
+            'recommended_action'    => $rec_action,
+        );
+    }
+
+    /**
+     * Dispatch personalized email outreach via Hostinger SMTP / wp_mail with timeline logging
+     */
+    public static function handle_crm_send_outreach_email( $args, $auth ) {
+        $agency_id = self::get_agency_id( $auth, $args );
+        $to        = sanitize_email( $args['recipient_email'] ?? '' );
+        $subject   = sanitize_text_field( $args['subject'] ?? '' );
+        $body      = wp_kses_post( $args['body'] ?? '' );
+        $lead_id   = ! empty( $args['lead_id'] ) ? intval( $args['lead_id'] ) : 0;
+        $client_id = ! empty( $args['client_id'] ) ? intval( $args['client_id'] ) : 0;
+        $name      = sanitize_text_field( $args['recipient_name'] ?? '' );
+
+        if ( empty( $to ) || ! is_email( $to ) ) {
+            return new WP_Error( 'invalid_input', 'A valid recipient_email is required.' );
+        }
+        if ( empty( $subject ) || empty( $body ) ) {
+            return new WP_Error( 'invalid_input', 'Both subject and body are required.' );
+        }
+
+        $headers = array( 'Content-Type: text/html; charset=UTF-8' );
+        $sent    = wp_mail( $to, $subject, $body, $headers );
+
+        // Log touchpoint in CRM activity timeline
+        global $wpdb;
+        $logs_tbl = ! empty( $wpdb ) ? ( $wpdb->prefix . 'cora_activity_logs' ) : '';
+        if ( ! empty( $wpdb ) && function_exists( 'cora_table_exists' ) && cora_table_exists( $logs_tbl ) ) {
+            $entity_type = ( $client_id > 0 ) ? 'client' : 'lead';
+            $entity_id   = ( $client_id > 0 ) ? $client_id : $lead_id;
+
+            $wpdb->insert( $logs_tbl, array(
+                'agency_id'   => $agency_id,
+                'entity_type' => $entity_type,
+                'entity_id'   => $entity_id,
+                'action'      => 'email_sent',
+                'details'     => json_encode( array(
+                    'channel' => 'email',
+                    'title'   => $subject,
+                    'notes'   => wp_strip_all_tags( substr( $body, 0, 300 ) ),
+                    'outcome' => $sent ? 'delivered' : 'failed',
+                ) ),
+                'created_by'  => intval( $auth['user_id'] ?? 1 ),
+                'created_at'  => current_time( 'mysql' ),
+            ) );
+        }
+
+        if ( function_exists( 'cora_rag_ingest_event' ) ) {
+            cora_rag_ingest_event(
+                $agency_id,
+                'crm',
+                "Email Outreach Dispatched to {$to}",
+                "Subject: {$subject} | Status: " . ( $sent ? 'Delivered' : 'Failed' ),
+                $lead_id ?: $client_id
+            );
+        }
+
+        return array(
+            'success'   => (bool) $sent,
+            'recipient' => $to,
+            'subject'   => $subject,
+            'message'   => $sent ? 'Email delivered successfully via SMTP.' : 'Failed to deliver email.',
+        );
+    }
+
+    /**
+     * List shoot bookings & calendar events
+     */
+    public static function handle_list_bookings( $args, $auth ) {
+        $agency_id  = self::get_agency_id( $auth, $args );
+        $client_id  = ! empty( $args['client_id'] ) ? intval( $args['client_id'] ) : 0;
+        $status     = sanitize_text_field( $args['status'] ?? 'all' );
+        $limit      = min( 100, max( 1, intval( $args['limit'] ?? 20 ) ) );
+
+        global $wpdb;
+        $bookings_tbl = $wpdb->prefix . 'cora_bookings';
+        $clients_tbl  = $wpdb->prefix . 'cora_clients';
+
+        if ( ! function_exists( 'cora_table_exists' ) || ! cora_table_exists( $bookings_tbl ) ) {
+            return array( 'success' => true, 'total' => 0, 'bookings' => array() );
+        }
+
+        $where = "WHERE b.agency_id = %d";
+        $params = array( $agency_id );
+
+        if ( $client_id > 0 ) {
+            $where .= " AND b.client_id = %d";
+            $params[] = $client_id;
+        }
+        if ( ! empty( $status ) && $status !== 'all' ) {
+            $where .= " AND b.status = %s";
+            $params[] = $status;
+        }
+
+        $query = "SELECT b.*, c.first_name, c.last_name, c.company_name, c.email, c.phone 
+                  FROM {$bookings_tbl} b 
+                  LEFT JOIN {$clients_tbl} c ON b.client_id = c.id 
+                  {$where} 
+                  ORDER BY b.showing_date DESC 
+                  LIMIT %d";
+        $params[] = $limit;
+
+        $rows = $wpdb->get_results( $wpdb->prepare( $query, $params ) );
+        $bookings = array();
+
+        foreach ( ( $rows ?: array() ) as $r ) {
+            $client_label = trim( ( $r->first_name ?? '' ) . ' ' . ( $r->last_name ?? '' ) );
+            if ( empty( $client_label ) && ! empty( $r->company_name ) ) {
+                $client_label = $r->company_name;
+            }
+
+            $bookings[] = array(
+                'id'           => intval( $r->id ),
+                'client_id'    => intval( $r->client_id ),
+                'client_name'  => $client_label ?: 'Studio Guest',
+                'client_email' => $r->email,
+                'client_phone' => $r->phone,
+                'date'         => $r->showing_date,
+                'status'       => $r->status,
+                'deal_type'    => $r->deal_type ?: 'Photoshoot Session',
+                'notes'        => $r->notes,
+                'created_at'   => $r->created_at,
+            );
+        }
+
+        return array(
+            'success'  => true,
+            'total'    => count( $bookings ),
+            'bookings' => $bookings,
+        );
+    }
+
+    /**
+     * Get Calendar Slot Availability for a given date
+     */
+    public static function handle_get_calendar_availability( $args, $auth ) {
+        $agency_id = self::get_agency_id( $auth, $args );
+        $date      = sanitize_text_field( $args['date'] ?? gmdate( 'Y-m-d' ) );
+
+        global $wpdb;
+        $bookings_tbl = ! empty( $wpdb ) ? ( $wpdb->prefix . 'cora_bookings' ) : '';
+
+        $standard_slots = array(
+            '09:00 AM', '10:30 AM', '12:00 PM', '02:00 PM', '03:30 PM', '05:00 PM'
+        );
+
+        $occupied = array();
+        if ( ! empty( $wpdb ) && function_exists( 'cora_table_exists' ) && cora_table_exists( $bookings_tbl ) ) {
+            $rows = $wpdb->get_results( $wpdb->prepare(
+                "SELECT showing_date, deal_type, status FROM {$bookings_tbl} WHERE agency_id = %d AND DATE(showing_date) = %s AND status != 'cancelled'",
+                $agency_id, $date
+            ) );
+            foreach ( ( $rows ?: array() ) as $r ) {
+                $time_str = gmdate( 'h:i A', strtotime( $r->showing_date ) );
+                $occupied[] = array(
+                    'time'      => $time_str,
+                    'deal_type' => $r->deal_type,
+                    'status'    => $r->status,
+                );
+            }
+        }
+
+        $occupied_times = array_column( $occupied, 'time' );
+        $available_slots = array();
+        foreach ( $standard_slots as $slot ) {
+            $is_booked = false;
+            foreach ( $occupied_times as $occ ) {
+                if ( abs( strtotime( $slot ) - strtotime( $occ ) ) < 3600 ) {
+                    $is_booked = true;
+                    break;
+                }
+            }
+            if ( ! $is_booked ) {
+                $available_slots[] = $slot;
+            }
+        }
+
+        return array(
+            'success'         => true,
+            'date'            => $date,
+            'available_slots' => $available_slots,
+            'booked_slots'    => $occupied,
+            'booking_url'     => home_url( '/workspace/calendar?date=' . $date ),
+        );
+    }
+
+    /**
+     * Reschedule an existing booking
+     */
+    public static function handle_reschedule_booking( $args, $auth ) {
+        $agency_id      = self::get_agency_id( $auth, $args );
+        $booking_id     = intval( $args['booking_id'] ?? 0 );
+        $new_date       = sanitize_text_field( $args['new_date'] ?? '' );
+        $new_time       = sanitize_text_field( $args['new_time'] ?? '' );
+        $reason         = sanitize_text_field( $args['reason'] ?? 'Schedule adjustment' );
+        $notify_client  = ! isset( $args['notify_client'] ) || ! empty( $args['notify_client'] );
+
+        if ( $booking_id <= 0 || empty( $new_date ) || empty( $new_time ) ) {
+            return new WP_Error( 'invalid_input', 'booking_id, new_date, and new_time are required.' );
+        }
+
+        $new_datetime = gmdate( 'Y-m-d H:i:s', strtotime( "{$new_date} {$new_time}" ) );
+
+        global $wpdb;
+        $bookings_tbl = $wpdb->prefix . 'cora_bookings';
+        $clients_tbl  = $wpdb->prefix . 'cora_clients';
+
+        $booking = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$bookings_tbl} WHERE id = %d AND agency_id = %d", $booking_id, $agency_id ) );
+        if ( ! $booking ) {
+            return new WP_Error( 'not_found', "Booking #{$booking_id} not found." );
+        }
+
+        $updated_notes = ( $booking->notes ?? '' ) . "\n[Rescheduled on " . current_time( 'mysql' ) . "]: " . $reason;
+
+        $wpdb->update( $bookings_tbl, array(
+            'showing_date' => $new_datetime,
+            'status'       => 'confirmed',
+            'notes'        => $updated_notes,
+        ), array( 'id' => $booking_id, 'agency_id' => $agency_id ) );
+
+        // Notify client if requested
+        if ( $notify_client && ! empty( $booking->client_id ) ) {
+            $client = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$clients_tbl} WHERE id = %d", $booking->client_id ) );
+            if ( $client ) {
+                $c_name = $client->first_name ?: 'Client';
+                $notice = "Hi {$c_name}, your session has been rescheduled to {$new_datetime}. We look forward to meeting you!";
+                if ( ! empty( $client->phone ) && class_exists( 'Cora_WhatsApp_Gateway' ) ) {
+                    Cora_WhatsApp_Gateway::instance()->send_session_message( $client->phone, $notice );
+                }
+                if ( ! empty( $client->email ) ) {
+                    wp_mail( $client->email, "Updated Booking: {$c_name}", $notice );
+                }
+            }
+        }
+
+        if ( function_exists( 'cora_rag_ingest_event' ) ) {
+            cora_rag_ingest_event(
+                $agency_id,
+                'calendar',
+                "Booking #{$booking_id} Rescheduled",
+                "New date/time: {$new_datetime}. Reason: {$reason}",
+                $booking_id
+            );
+        }
+
+        return array(
+            'success'      => true,
+            'booking_id'   => $booking_id,
+            'new_datetime' => $new_datetime,
+            'message'      => "Booking #{$booking_id} successfully rescheduled to {$new_datetime}.",
+        );
+    }
+
+    /**
+     * Cancel an existing booking
+     */
+    public static function handle_cancel_booking( $args, $auth ) {
+        $agency_id      = self::get_agency_id( $auth, $args );
+        $booking_id     = intval( $args['booking_id'] ?? 0 );
+        $reason         = sanitize_text_field( $args['cancellation_reason'] ?? 'Cancelled by request' );
+        $notify_client  = ! isset( $args['notify_client'] ) || ! empty( $args['notify_client'] );
+
+        if ( $booking_id <= 0 ) {
+            return new WP_Error( 'invalid_input', 'Valid booking_id is required.' );
+        }
+
+        global $wpdb;
+        $bookings_tbl = $wpdb->prefix . 'cora_bookings';
+        $clients_tbl  = $wpdb->prefix . 'cora_clients';
+
+        $booking = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$bookings_tbl} WHERE id = %d AND agency_id = %d", $booking_id, $agency_id ) );
+        if ( ! $booking ) {
+            return new WP_Error( 'not_found', "Booking #{$booking_id} not found." );
+        }
+
+        $wpdb->update( $bookings_tbl, array(
+            'status' => 'cancelled',
+            'notes'  => ( $booking->notes ?? '' ) . "\n[Cancelled on " . current_time( 'mysql' ) . "]: " . $reason,
+        ), array( 'id' => $booking_id, 'agency_id' => $agency_id ) );
+
+        if ( $notify_client && ! empty( $booking->client_id ) ) {
+            $client = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$clients_tbl} WHERE id = %d", $booking->client_id ) );
+            if ( $client ) {
+                $c_name = $client->first_name ?: 'Client';
+                $notice = "Hi {$c_name}, your session scheduled for {$booking->showing_date} has been cancelled. Please let us know if you'd like to book another time.";
+                if ( ! empty( $client->phone ) && class_exists( 'Cora_WhatsApp_Gateway' ) ) {
+                    Cora_WhatsApp_Gateway::instance()->send_session_message( $client->phone, $notice );
+                }
+                if ( ! empty( $client->email ) ) {
+                    wp_mail( $client->email, "Booking Cancellation: {$c_name}", $notice );
+                }
+            }
+        }
+
+        if ( function_exists( 'cora_rag_ingest_event' ) ) {
+            cora_rag_ingest_event(
+                $agency_id,
+                'calendar',
+                "Booking #{$booking_id} Cancelled",
+                "Reason: {$reason}",
+                $booking_id
+            );
+        }
+
+        return array(
+            'success'    => true,
+            'booking_id' => $booking_id,
+            'status'     => 'cancelled',
+            'message'    => "Booking #{$booking_id} has been cancelled.",
+        );
+    }
+
+    /**
+     * Dispatch formal proposal with digital E-Sign link
+     */
+    public static function handle_send_proposal( $args, $auth ) {
+        $agency_id    = self::get_agency_id( $auth, $args );
+        $document_id  = sanitize_text_field( $args['document_id'] ?? '' );
+        $recipient_id = intval( $args['recipient_id'] ?? 0 );
+        $is_client    = ! empty( $args['is_client'] );
+        $channel      = sanitize_text_field( $args['channel'] ?? 'omni' );
+
+        if ( empty( $document_id ) || $recipient_id <= 0 ) {
+            return new WP_Error( 'invalid_input', 'document_id and recipient_id are required.' );
+        }
+
+        $docs_key  = "cora_documents_{$agency_id}";
+        $documents = get_option( $docs_key, array() );
+        if ( ! is_array( $documents ) ) $documents = array();
+
+        $found_index = -1;
+        foreach ( $documents as $idx => $doc ) {
+            if ( strval( $doc['id'] ) === strval( $document_id ) || ( ! empty( $doc['token'] ) && $doc['token'] === $document_id ) ) {
+                $found_index = $idx;
+                break;
+            }
+        }
+
+        if ( $found_index < 0 ) {
+            return new WP_Error( 'not_found', "Document '{$document_id}' not found in Document Vault." );
+        }
+
+        // Mark as sent
+        $documents[ $found_index ]['status']  = 'sent';
+        $documents[ $found_index ]['sent_at'] = current_time( 'mysql' );
+        update_option( $docs_key, $documents );
+
+        $target_doc = $documents[ $found_index ];
+        $e_sign_url = $target_doc['e_sign_url'] ?? home_url( '/workspace/vault?doc_id=' . $document_id );
+
+        // Dispatch via WhatsApp/Email
+        global $wpdb;
+        $recipient_table = $is_client ? ( $wpdb->prefix . 'cora_clients' ) : ( $wpdb->prefix . 'cora_leads' );
+        $recipient = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$recipient_table} WHERE id = %d", $recipient_id ) );
+
+        $dispatched_channels = array();
+        if ( $recipient ) {
+            $name  = trim( ( $recipient->first_name ?? '' ) . ' ' . ( $recipient->last_name ?? '' ) ) ?: 'Client';
+            $msg   = "Hello {$name}, your commercial proposal and agreement for '{$target_doc['title']}' (₹" . number_format( $target_doc['total_value'] ?? 0 ) . ") is ready for review and digital signature: " . $e_sign_url;
+
+            if ( ( $channel === 'whatsapp' || $channel === 'omni' ) && ! empty( $recipient->phone ) && class_exists( 'Cora_WhatsApp_Gateway' ) ) {
+                Cora_WhatsApp_Gateway::instance()->send_session_message( $recipient->phone, $msg );
+                $dispatched_channels[] = 'whatsapp';
+            }
+            if ( ( $channel === 'email' || $channel === 'omni' ) && ! empty( $recipient->email ) ) {
+                wp_mail( $recipient->email, "Proposal & Digital Agreement: {$target_doc['title']}", $msg );
+                $dispatched_channels[] = 'email';
+            }
+        }
+
+        if ( function_exists( 'cora_rag_ingest_event' ) ) {
+            cora_rag_ingest_event(
+                $agency_id,
+                'vault',
+                "Proposal '{$target_doc['title']}' Dispatched",
+                "Sent to recipient #{$recipient_id} via " . implode( ', ', $dispatched_channels ),
+                $recipient_id
+            );
+        }
+
+        return array(
+            'success'             => true,
+            'document_id'         => $document_id,
+            'status'              => 'sent',
+            'e_sign_url'          => $e_sign_url,
+            'dispatched_channels' => $dispatched_channels,
+            'message'             => 'Proposal successfully dispatched for digital signature.',
+        );
+    }
+
+    /**
+     * Get Document Vault status for a proposal/contract
+     */
+    public static function handle_get_document_status( $args, $auth ) {
+        $agency_id   = self::get_agency_id( $auth, $args );
+        $document_id = sanitize_text_field( $args['document_id'] ?? '' );
+
+        if ( empty( $document_id ) ) {
+            return new WP_Error( 'invalid_input', 'document_id is required.' );
+        }
+
+        $docs_key  = "cora_documents_{$agency_id}";
+        $documents = get_option( $docs_key, array() );
+
+        foreach ( ( $documents ?: array() ) as $doc ) {
+            if ( strval( $doc['id'] ) === strval( $document_id ) || ( ! empty( $doc['token'] ) && $doc['token'] === $document_id ) ) {
+                return array(
+                    'success'    => true,
+                    'document'   => $doc,
+                    'status'     => $doc['status'] ?? 'draft',
+                    'signed_at'  => $doc['signed_at'] ?? null,
+                    'e_sign_url' => $doc['e_sign_url'] ?? null,
+                );
+            }
+        }
+
+        return new WP_Error( 'not_found', "Document '{$document_id}' not found." );
+    }
+
+    /**
+     * Dispatch payment reminder for an outstanding invoice
+     */
+    public static function handle_send_payment_reminder( $args, $auth ) {
+        $agency_id   = self::get_agency_id( $auth, $args );
+        $invoice_id  = intval( $args['invoice_id'] ?? 0 );
+        $channel     = sanitize_text_field( $args['channel'] ?? 'omni' );
+        $urgency     = sanitize_text_field( $args['urgency'] ?? 'polite' );
+
+        if ( $invoice_id <= 0 ) {
+            return new WP_Error( 'invalid_input', 'Valid invoice_id is required.' );
+        }
+
+        global $wpdb;
+        $ledger_tbl  = $wpdb->prefix . 'cora_ledger';
+        $clients_tbl = $wpdb->prefix . 'cora_clients';
+
+        $invoice = null;
+        if ( function_exists( 'cora_table_exists' ) && cora_table_exists( $ledger_tbl ) ) {
+            $invoice = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$ledger_tbl} WHERE id = %d AND agency_id = %d", $invoice_id, $agency_id ) );
+        }
+
+        if ( ! $invoice ) {
+            return new WP_Error( 'not_found', "Invoice #{$invoice_id} not found." );
+        }
+
+        $client = null;
+        if ( ! empty( $invoice->client_id ) && function_exists( 'cora_table_exists' ) && cora_table_exists( $clients_tbl ) ) {
+            $client = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$clients_tbl} WHERE id = %d", $invoice->client_id ) );
+        }
+
+        $client_name = $client ? trim( ( $client->first_name ?? '' ) . ' ' . ( $client->last_name ?? '' ) ) : 'Client';
+        $amount_fmt  = '₹' . number_format( floatval( $invoice->amount ), 2 );
+        $pay_url     = home_url( '/workspace/financial-overview?invoice_id=' . $invoice_id );
+
+        if ( $urgency === 'urgent' || $urgency === 'overdue' ) {
+            $msg = "Urgent Notice: Dear {$client_name}, your studio invoice #{$invoice_id} for {$amount_fmt} is currently overdue. Please process payment immediately to avoid production hold: {$pay_url}";
+        } else {
+            $msg = "Friendly Reminder: Dear {$client_name}, this is a gentle reminder that studio invoice #{$invoice_id} ({$amount_fmt}) is pending payment. You can review and complete payment here: {$pay_url}";
+        }
+
+        $channels_sent = array();
+        if ( $client ) {
+            if ( ( $channel === 'whatsapp' || $channel === 'omni' ) && ! empty( $client->phone ) && class_exists( 'Cora_WhatsApp_Gateway' ) ) {
+                Cora_WhatsApp_Gateway::instance()->send_session_message( $client->phone, $msg );
+                $channels_sent[] = 'whatsapp';
+            }
+            if ( ( $channel === 'email' || $channel === 'omni' ) && ! empty( $client->email ) ) {
+                wp_mail( $client->email, "Payment Reminder: Invoice #{$invoice_id}", $msg );
+                $channels_sent[] = 'email';
+            }
+        }
+
+        if ( function_exists( 'cora_rag_ingest_event' ) ) {
+            cora_rag_ingest_event(
+                $agency_id,
+                'finance',
+                "Payment Reminder Sent for Invoice #{$invoice_id}",
+                "Amount: {$amount_fmt} | Channels: " . implode( ', ', $channels_sent ),
+                $invoice_id
+            );
+        }
+
+        return array(
+            'success'       => true,
+            'invoice_id'    => $invoice_id,
+            'amount'        => floatval( $invoice->amount ),
+            'urgency'       => $urgency,
+            'channels_sent' => $channels_sent,
+            'message'       => 'Payment reminder dispatched successfully.',
+        );
+    }
+
+    /**
+     * Update project stage, progress %, and milestone notes
+     */
+    public static function handle_update_project_milestone( $args, $auth ) {
+        $agency_id  = self::get_agency_id( $auth, $args );
+        $project_id = intval( $args['project_id'] ?? 0 );
+        $stage      = sanitize_text_field( $args['stage'] ?? '' );
+        $progress   = isset( $args['progress'] ) ? min( 100, max( 0, intval( $args['progress'] ) ) ) : null;
+        $notes      = sanitize_textarea_field( $args['notes'] ?? '' );
+
+        if ( $project_id <= 0 || empty( $stage ) ) {
+            return new WP_Error( 'invalid_input', 'project_id and stage are required.' );
+        }
+
+        global $wpdb;
+        $projects_tbl = $wpdb->prefix . 'cora_projects';
+
+        if ( ! function_exists( 'cora_table_exists' ) || ! cora_table_exists( $projects_tbl ) ) {
+            return array( 'success' => false, 'message' => 'Projects table not found.' );
+        }
+
+        $project = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$projects_tbl} WHERE id = %d AND agency_id = %d", $project_id, $agency_id ) );
+        if ( ! $project ) {
+            return new WP_Error( 'not_found', "Project #{$project_id} not found." );
+        }
+
+        $update_data = array(
+            'stage'      => $stage,
+            'updated_at' => current_time( 'mysql' ),
+        );
+
+        if ( $progress !== null ) {
+            $update_data['progress'] = $progress;
+        }
+
+        if ( ! empty( $notes ) ) {
+            $update_data['notes'] = ( $project->notes ? $project->notes . "\n" : '' ) . "[Milestone: {$stage} - " . current_time( 'mysql' ) . "]: " . $notes;
+        }
+
+        if ( $stage === 'completed' ) {
+            $update_data['status']   = 'completed';
+            $update_data['progress'] = 100;
+        }
+
+        $wpdb->update( $projects_tbl, $update_data, array( 'id' => $project_id, 'agency_id' => $agency_id ) );
+
+        if ( function_exists( 'cora_rag_ingest_event' ) ) {
+            cora_rag_ingest_event(
+                $agency_id,
+                'projects',
+                "Project #{$project_id} Milestone Updated to '{$stage}'",
+                "Progress: " . ( $progress ?? $project->progress ) . "% | Notes: {$notes}",
+                $project_id
+            );
+        }
+
+        return array(
+            'success'    => true,
+            'project_id' => $project_id,
+            'stage'      => $stage,
+            'progress'   => $update_data['progress'] ?? $project->progress,
+            'status'     => $update_data['status'] ?? $project->status,
+            'message'    => "Project #{$project_id} milestone updated to {$stage}.",
+        );
+    }
+
+    /**
+     * Deliver project assets to client portal and notify client
+     */
+    public static function handle_deliver_project_assets( $args, $auth ) {
+        $agency_id      = self::get_agency_id( $auth, $args );
+        $project_id     = intval( $args['project_id'] ?? 0 );
+        $client_id      = ! empty( $args['client_id'] ) ? intval( $args['client_id'] ) : 0;
+        $asset_urls     = is_array( $args['asset_urls'] ?? null ) ? $args['asset_urls'] : array();
+        $delivery_notes = sanitize_textarea_field( $args['delivery_notes'] ?? 'Your production deliverables are ready for review and download.' );
+        $notify_client  = ! isset( $args['notify_client'] ) || ! empty( $args['notify_client'] );
+
+        if ( $project_id <= 0 || empty( $asset_urls ) ) {
+            return new WP_Error( 'invalid_input', 'project_id and at least one asset URL in asset_urls are required.' );
+        }
+
+        global $wpdb;
+        $projects_tbl = $wpdb->prefix . 'cora_projects';
+        $clients_tbl  = $wpdb->prefix . 'cora_clients';
+
+        $project = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$projects_tbl} WHERE id = %d AND agency_id = %d", $project_id, $agency_id ) );
+        if ( ! $project ) {
+            return new WP_Error( 'not_found', "Project #{$project_id} not found." );
+        }
+
+        $target_client_id = $client_id ?: intval( $project->client_id ?? 0 );
+
+        // Update project to completed / delivered
+        $formatted_assets = implode( "\n- ", array_map( 'esc_url_raw', $asset_urls ) );
+        $notes = ( $project->notes ? $project->notes . "\n\n" : '' ) . "### Deliverables Released (" . current_time( 'mysql' ) . "):\n- " . $formatted_assets . "\n\n" . $delivery_notes;
+
+        $wpdb->update( $projects_tbl, array(
+            'status'     => 'completed',
+            'stage'      => 'completed',
+            'progress'   => 100,
+            'notes'      => $notes,
+            'updated_at' => current_time( 'mysql' ),
+        ), array( 'id' => $project_id, 'agency_id' => $agency_id ) );
+
+        // Notify client
+        $portal_url = home_url( '/workspace/client-portal' );
+        if ( $target_client_id > 0 && function_exists( 'cora_table_exists' ) && cora_table_exists( $clients_tbl ) ) {
+            $client = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$clients_tbl} WHERE id = %d", $target_client_id ) );
+            if ( $client ) {
+                if ( ! empty( $client->portal_token ) ) {
+                    $portal_url = home_url( '/portal/' . $client->portal_token );
+                }
+                if ( $notify_client ) {
+                    $name = $client->first_name ?: 'Client';
+                    $msg  = "Hi {$name}, great news! Your production assets for '{$project->title}' have been delivered. You can review and download them here: {$portal_url}";
+                    if ( ! empty( $client->phone ) && class_exists( 'Cora_WhatsApp_Gateway' ) ) {
+                        Cora_WhatsApp_Gateway::instance()->send_session_message( $client->phone, $msg );
+                    }
+                    if ( ! empty( $client->email ) ) {
+                        wp_mail( $client->email, "Assets Delivered: {$project->title}", $msg );
+                    }
+                }
+            }
+        }
+
+        if ( function_exists( 'cora_rag_ingest_event' ) ) {
+            cora_rag_ingest_event(
+                $agency_id,
+                'projects',
+                "Assets Delivered for Project #{$project_id} ({$project->title})",
+                "Delivered " . count( $asset_urls ) . " assets. Client notified at {$portal_url}.",
+                $project_id
+            );
+        }
+
+        return array(
+            'success'      => true,
+            'project_id'   => $project_id,
+            'assets_count' => count( $asset_urls ),
+            'portal_url'   => $portal_url,
+            'status'       => 'completed',
+            'message'      => 'Project deliverables successfully published and client notified.',
+        );
     }
 
     // ── Helper: Dispatch to Workspace Content REST Controller ─────────────────

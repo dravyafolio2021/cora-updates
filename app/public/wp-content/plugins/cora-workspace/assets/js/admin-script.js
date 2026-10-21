@@ -5173,6 +5173,80 @@ jQuery(document).ready(function($) {
                                         </div>
                                     </div>
                                 `;
+                            } else if (act.action === 'delete_draft_themes' || act.action === 'purge_draft_themes' || act.action === 'clean_draft_themes') {
+                                // 1. Remove all draft theme cards from the DOM immediately
+                                const draftCards = document.querySelectorAll('#canvas-draft-themes-list [data-draft-theme-id]');
+                                draftCards.forEach(c => c.remove());
+                                if (typeof window.coraSyncDraftThemesUI === 'function') {
+                                    window.coraSyncDraftThemesUI();
+                                }
+                                if (typeof window.loadGlobalPages === 'function') {
+                                    window.loadGlobalPages(true);
+                                }
+                                if (typeof window.coraShowToast === 'function') {
+                                    window.coraShowToast('Purged ' + (d.deleted_themes_count || 0) + ' draft themes permanently.', 'success');
+                                }
+                                cardHtml = `
+                                    <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800 shadow-sm space-y-3 self-start max-w-[95%] w-full">
+                                        <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-2.5">
+                                            <div class="flex items-center gap-2">
+                                                <div class="w-6 h-6 rounded-lg bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center font-bold text-[10px]">
+                                                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                                </div>
+                                                <span class="text-xs font-bold text-zinc-950 dark:text-zinc-100">Canvas Cleanup Completed</span>
+                                            </div>
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/50">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                                ${d.deleted_themes_count || 0} Drafts Purged
+                                            </span>
+                                        </div>
+                                        <div class="grid grid-cols-2 gap-2 text-[10.5px]">
+                                            <div class="p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800/60 space-y-0.5">
+                                                <div class="text-zinc-400 text-[9.5px]">Draft Pages Removed</div>
+                                                <div class="font-bold font-mono text-zinc-900 dark:text-zinc-100 text-xs">${d.deleted_pages_count || 0} Pages</div>
+                                            </div>
+                                            <div class="p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800/60 space-y-0.5">
+                                                <div class="text-zinc-400 text-[9.5px]">Active Live Theme</div>
+                                                <div class="font-bold text-zinc-900 dark:text-zinc-100 text-xs truncate">${$('<div>').text(d.live_theme_name || 'Active Live Theme').html()}</div>
+                                            </div>
+                                        </div>
+                                        <div class="text-[11px] text-zinc-500 dark:text-zinc-400">
+                                            Live theme <strong>#${d.live_theme_id || ''}</strong> is 100% intact with ${d.live_pages_count || 0} active pages.
+                                        </div>
+                                    </div>
+                                `;
+                            } else if (act.action === 'delete_theme' || act.action === 'trash_theme') {
+                                const thCard = document.querySelector(`[data-draft-theme-id="${d.theme_id}"]`);
+                                if (thCard) thCard.remove();
+                                if (typeof window.coraSyncDraftThemesUI === 'function') window.coraSyncDraftThemesUI();
+                                if (typeof window.coraShowToast === 'function') window.coraShowToast('Draft theme deleted.', 'success');
+                                cardHtml = `
+                                    <div class="p-3.5 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800 shadow-sm space-y-2 self-start max-w-[95%] w-full">
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-xs font-bold text-zinc-950 dark:text-zinc-100">Draft Theme Removed</span>
+                                            <span class="font-mono text-[9px] text-zinc-400">#${d.theme_id || ''}</span>
+                                        </div>
+                                        <div class="text-xs text-zinc-600 dark:text-zinc-400">${$('<div>').text(d.name || 'Theme').html()} and ${d.pages_count || 0} pages permanently removed.</div>
+                                    </div>
+                                `;
+                            } else if (act.action === 'activate_theme' || act.action === 'set_active_theme') {
+                                if (typeof window.coraShowToast === 'function') window.coraShowToast('Theme activated: ' + (d.name || ''), 'success');
+                                setTimeout(function() { if (typeof window.coraNavigateTo === 'function') window.coraNavigateTo('/workspace/canvas'); else window.location.reload(); }, 600);
+                            } else if (act.action === 'create_canvas_page') {
+                                if (typeof window.loadGlobalPages === 'function') window.loadGlobalPages(true);
+                                if (typeof window.coraShowToast === 'function') window.coraShowToast('Canvas page created: ' + (d.title || ''), 'success');
+                                cardHtml = `
+                                    <div class="p-3.5 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800 shadow-sm space-y-2 self-start max-w-[95%] w-full">
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-xs font-bold text-zinc-950 dark:text-zinc-100">Page Created</span>
+                                            <span class="font-mono text-[9px] text-zinc-400">#${d.page_id || ''}</span>
+                                        </div>
+                                        <div class="text-xs text-zinc-600 dark:text-zinc-400">${$('<div>').text(d.title || 'Page').html()} (${d.slug})</div>
+                                    </div>
+                                `;
+                            } else if (act.action === 'delete_canvas_page') {
+                                if (typeof window.loadGlobalPages === 'function') window.loadGlobalPages(true);
+                                if (typeof window.coraShowToast === 'function') window.coraShowToast('Canvas page deleted.', 'success');
                             }
                             if (cardHtml) {
                                 chat.append(cardHtml);
@@ -11123,6 +11197,39 @@ jQuery(document).ready(function($) {
                             });
 
                             if (hasVisible) {
+                                // Automatically hide category headers whose corresponding .cora-slash-item buttons are all hidden
+                                $('#cora-slash-main-panel .cora-slash-category-header').each(function() {
+                                    const $header = $(this);
+                                    const $items = $header.nextUntil('.cora-slash-category-header', '.cora-slash-item');
+                                    const hasVisibleItems = $items.filter(':not(.hidden)').length > 0;
+                                    if (hasVisibleItems) {
+                                        $header.removeClass('hidden');
+                                    } else {
+                                        $header.addClass('hidden');
+                                    }
+                                });
+
+                                // Clean up dividers between sections to prevent empty/duplicate/leading/trailing divider lines
+                                let hasVisibleItemAbove = false;
+                                $('#cora-slash-main-panel').children(':not(.hidden)').each(function() {
+                                    const $child = $(this);
+                                    if ($child.hasClass('cora-slash-item')) {
+                                        hasVisibleItemAbove = true;
+                                    } else if ($child.hasClass('cora-slash-divider')) {
+                                        if (!hasVisibleItemAbove) {
+                                            $child.addClass('hidden');
+                                        } else {
+                                            const hasVisibleBelow = $child.nextAll('.cora-slash-item:not(.hidden)').length > 0;
+                                            if (!hasVisibleBelow) {
+                                                $child.addClass('hidden');
+                                            } else {
+                                                $child.removeClass('hidden');
+                                                hasVisibleItemAbove = false;
+                                            }
+                                        }
+                                    }
+                                });
+
                                 $('#cora-editor-slash-menu').removeClass('hidden').css({
                                     top: (parentPosition.top + bounds.bottom + 8) + 'px',
                                     left: (parentPosition.left + bounds.left) + 'px'
@@ -11138,11 +11245,15 @@ jQuery(document).ready(function($) {
                         } else {
                             $('#cora-editor-slash-menu').addClass('hidden');
                             $('#cora-slash-main-panel .cora-slash-item').removeClass('hidden');
+                            $('#cora-slash-main-panel .cora-slash-category-header').removeClass('hidden');
+                            $('#cora-slash-main-panel .cora-slash-divider').removeClass('hidden');
                         }
                     }
                 } else {
                     $('#cora-editor-slash-menu').addClass('hidden');
                     $('#cora-slash-main-panel .cora-slash-item').removeClass('hidden');
+                    $('#cora-slash-main-panel .cora-slash-category-header').removeClass('hidden');
+                    $('#cora-slash-main-panel .cora-slash-divider').removeClass('hidden');
                 }
             }
 
@@ -11174,10 +11285,16 @@ jQuery(document).ready(function($) {
                 if (window.coraUpdateWordCount) {
                     window.coraUpdateWordCount();
                 }
+                if (typeof window.coraUpdateCopilotContextBadge === 'function') {
+                    window.coraUpdateCopilotContextBadge();
+                }
             });
 
             coraQuillListingCoordinator.on('selection-change', function(range) {
                 coraCheckSlashCommand(range);
+                if (typeof window.coraUpdateCopilotContextBadge === 'function') {
+                    window.coraUpdateCopilotContextBadge();
+                }
             });
 
             // Keyboard navigation for slash menu inside Quill
@@ -11610,6 +11727,12 @@ jQuery(document).ready(function($) {
     };
 
     window.coraOpenMediaLibrary = function(target) {
+        if (window.coraQuillListingCoordinator) {
+            const curSel = window.coraQuillListingCoordinator.getSelection();
+            if (curSel) {
+                window.coraLastQuillSelection = curSel;
+            }
+        }
         const mode = target || window.coraMediaSelectTarget || 'inline';
         window.coraMediaSelectTarget = mode;
         window.coraOpenWorkspaceMediaSelector(mode);
@@ -11939,6 +12062,9 @@ jQuery(document).ready(function($) {
                         if (typeof window.coraLoadSidebarRecentMedia === 'function') {
                             window.coraLoadSidebarRecentMedia(true);
                         }
+                        if (lastUploadedFile && window.coraMediaSelectTarget === 'inline' && $('#cora-workspace-media-selector-modal').hasClass('hidden')) {
+                            coraExecuteMediaInsertion('inline', [lastUploadedFile]);
+                        }
                     }
                 },
                 error: function() {
@@ -12051,14 +12177,16 @@ jQuery(document).ready(function($) {
         } else {
             // Default: 'inline' insertion into Quill
             if (window.coraQuillListingCoordinator) {
+                const range = window.coraQuillListingCoordinator.getSelection() || window.coraLastQuillSelection;
+                let curIndex = range ? range.index : window.coraQuillListingCoordinator.getLength();
                 selectedFiles.forEach(function(item) {
-                    const range = window.coraQuillListingCoordinator.getSelection();
-                    const index = range ? range.index : window.coraQuillListingCoordinator.getLength();
                     const isVideo = item.type_category === 'video';
-                    window.coraQuillListingCoordinator.insertEmbed(index, isVideo ? 'video' : 'image', item.url);
-                    window.coraQuillListingCoordinator.insertText(index + 1, '\n');
-                    window.coraQuillListingCoordinator.setSelection(index + 2, 0);
+                    window.coraQuillListingCoordinator.insertEmbed(curIndex, isVideo ? 'video' : 'image', item.url);
+                    window.coraQuillListingCoordinator.insertText(curIndex + 1, '\n');
+                    curIndex += 2;
                 });
+                window.coraQuillListingCoordinator.setSelection(curIndex, 0);
+                try { window.coraQuillListingCoordinator.focus(); } catch(e) {}
             }
 
             if (typeof window.coraUpdateWordCount === 'function') {
@@ -13429,27 +13557,472 @@ jQuery(document).ready(function($) {
         }, 800);
     };
 
-    // ── AI Writing Copilot Floating Command Palette (⌘K) ───────────────────
+    // ── AI Writing Copilot in Right Side Inspector (Real-Time Engagement) ───────────────────
     window.coraOpenAIWritingPalette = function() {
-        $('#cora-ai-writing-palette').removeClass('hidden');
+        if (typeof window.coraToggleArticleInspector === 'function') {
+            window.coraToggleArticleInspector(true);
+        }
+        if (typeof window.coraSwitchInspectorTab === 'function') {
+            window.coraSwitchInspectorTab('copilot');
+        }
+        if (typeof window.coraUpdateCopilotContextBadge === 'function') {
+            window.coraUpdateCopilotContextBadge();
+        }
         setTimeout(function() {
-            $('#cora-ai-prompt-input').focus().select();
+            $('#cora-copilot-chat-input').focus();
         }, 80);
     };
 
     window.coraCloseAIWritingPalette = function() {
-        $('#cora-ai-writing-palette').addClass('hidden');
-        if (window.coraQuillListingCoordinator) {
-            window.coraQuillListingCoordinator.focus();
+        const editor = window.coraQuillListingCoordinator || (typeof coraQuillListingCoordinator !== 'undefined' ? coraQuillListingCoordinator : null);
+        if (editor) {
+            editor.focus();
         }
     };
 
     window.coraToggleAIWritingPalette = function() {
-        if ($('#cora-ai-writing-palette').hasClass('hidden')) {
+        const $panel = $('#cora-article-inspector');
+        const isCollapsed = $panel.hasClass('collapsed-inspector') || $panel.hasClass('translate-y-full');
+        const isCopilotTab = $('#btn-sidebar-copilot').hasClass('tab-active');
+        
+        if (isCollapsed || !isCopilotTab) {
             window.coraOpenAIWritingPalette();
         } else {
-            window.coraCloseAIWritingPalette();
+            $('#cora-copilot-chat-input').focus().select();
         }
+    };
+
+    window.coraCancelAIGeneration = function() {
+        if (window.coraCurrentAIRequest && window.coraCurrentAIRequest.abort) {
+            try { window.coraCurrentAIRequest.abort(); } catch(e) {}
+            window.coraCurrentAIRequest = null;
+        }
+        $('#cora-copilot-panel-loading').addClass('hidden');
+        $('#cora-ai-generating-indicator').addClass('hidden');
+        $('#cora-copilot-chat-input, #cora-ai-prompt-input').prop('disabled', false).focus();
+        $('#cora-copilot-chat-submit-btn, #cora-ai-generate-btn').prop('disabled', false).removeClass('opacity-50 cursor-not-allowed');
+        if (typeof window.coraShowToast === 'function') {
+            window.coraShowToast('AI generation cancelled.', 'info');
+        }
+    };
+
+    window.coraCallWorkspaceAI = window.coraCallWorkspaceAI || function(message, systemPrompt, callback) {
+        const nonce = (window.coraREData && window.coraREData.ajaxNonce) || (window.coraREWPData && window.coraREWPData.ajaxNonce) || '';
+        const ajaxUrl = (window.coraREData && window.coraREData.ajaxUrl) || (window.coraREWPData && window.coraREWPData.ajaxUrl) || (typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php');
+        
+        // Get active model provider
+        const modelVal = $('#cora-ai-model-selector').val() || 'cora-core-v2';
+        let provider = 'openrouter';
+        let model = 'google/gemini-2.5-flash';
+        
+        if (modelVal === 'gpt-4o' || modelVal === 'openai') {
+            provider = 'openai';
+            model = 'gpt-4o-mini';
+        }
+
+        if (window.coraCurrentAIRequest && window.coraCurrentAIRequest.abort) {
+            try { window.coraCurrentAIRequest.abort(); } catch(e) {}
+        }
+
+        window.coraCurrentAIRequest = $.post(ajaxUrl, {
+            action: 'cora_ai_chat_query',
+            security: nonce,
+            message: message,
+            system_prompt: systemPrompt,
+            provider: provider,
+            model: model,
+            temperature: 0.7
+        }, function(response) {
+            window.coraCurrentAIRequest = null;
+            if (response && response.success && response.data && response.data.reply) {
+                callback(null, response.data.reply);
+            } else {
+                const failMsg = response && response.data && response.data.message ? response.data.message : ((response && response.data) ? response.data : 'AI model response error.');
+                callback(new Error(failMsg));
+            }
+        }).fail(function(xhr, statusText) {
+            window.coraCurrentAIRequest = null;
+            if (statusText === 'abort' || xhr.statusText === 'abort') {
+                return;
+            }
+            callback(new Error('Network connection failed.'));
+        });
+    };
+
+    window.coraGetRagBrainFacts = window.coraGetRagBrainFacts || function(callback) {
+        const nonce = (window.coraREData && window.coraREData.ajaxNonce) || (window.coraREWPData && window.coraREWPData.ajaxNonce) || '';
+        const ajaxUrl = (window.coraREData && window.coraREData.ajaxUrl) || (window.coraREWPData && window.coraREWPData.ajaxUrl) || (typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php');
+
+        $.post(ajaxUrl, {
+            action: 'cora_fetch_brain_items',
+            nonce: nonce
+        }, function(response) {
+            let factsText = '';
+            if (response && response.success && response.data && response.data.length > 0) {
+                factsText = "\n\nVerified business facts (RAG grounding):\n";
+                response.data.forEach(function(item) {
+                    factsText += `- [${item.source_type || 'Fact'}] ${item.title}: ${item.content}\n`;
+                });
+            }
+            callback(factsText);
+        }).fail(function() {
+            callback('');
+        });
+    };
+
+    window.coraUpdateCopilotContextBadge = function() {
+        const editor = window.coraQuillListingCoordinator || (typeof coraQuillListingCoordinator !== 'undefined' ? coraQuillListingCoordinator : null);
+        if (!editor) return;
+        const range = editor.getSelection();
+        const docText = editor.getText().trim();
+        const docWords = docText ? (docText.match(/\S+/g) || []).length : 0;
+        
+        if (range && range.length > 0) {
+            const selectedText = editor.getText(range.index, range.length).trim();
+            const selWords = selectedText ? (selectedText.match(/\S+/g) || []).length : 0;
+            const snippet = selectedText.length > 20 ? selectedText.substring(0, 18) + '...' : selectedText;
+            $('#cora-copilot-context-text').text(`Selection: "${snippet}" (${selWords} words)`);
+            $('#cora-copilot-btn-insert-replace').removeClass('hidden');
+        } else {
+            $('#cora-copilot-context-text').text(`Full Document (${docWords} words)`);
+            $('#cora-copilot-btn-insert-replace').addClass('hidden');
+        }
+    };
+
+    window.coraExecuteCopilotPanelPrompt = function() {
+        const editor = window.coraQuillListingCoordinator || (typeof coraQuillListingCoordinator !== 'undefined' ? coraQuillListingCoordinator : null);
+        if (!editor) {
+            if (typeof window.coraShowToast === 'function') {
+                window.coraShowToast('Editor is initializing, please wait...', 'warning');
+            }
+            return;
+        }
+        const $input = $('#cora-copilot-chat-input');
+        const $btn = $('#cora-copilot-chat-submit-btn');
+        const $loading = $('#cora-copilot-panel-loading');
+        const $outputCard = $('#cora-copilot-panel-output');
+        const prompt = ($input.val() || '').trim();
+
+        if (!prompt) {
+            if (typeof window.coraShowToast === 'function') {
+                window.coraShowToast('Please type an instruction or question first.', 'error');
+            }
+            $input.focus();
+            return;
+        }
+
+        // Cache active selection
+        const range = editor.getSelection();
+        window.coraLastCopilotSelection = range;
+        const hasSelection = range && range.length > 0;
+        const selectedText = hasSelection ? editor.getText(range.index, range.length).trim() : '';
+
+        // UI Loading state
+        $input.prop('disabled', true);
+        $btn.prop('disabled', true).addClass('opacity-50 cursor-not-allowed');
+        $('#cora-copilot-panel-loading-msg').text(hasSelection ? 'Cora AI is refining selection...' : 'Cora AI is generating content...');
+        $loading.removeClass('hidden');
+        $outputCard.addClass('hidden');
+
+        const fetchFacts = typeof window.coraGetRagBrainFacts === 'function' ? window.coraGetRagBrainFacts : function(cb) { cb(''); };
+
+        fetchFacts(function(facts) {
+            const title = $('#cora-article-title').val() || 'Untitled';
+            const keyword = $('#cora-seo-keyword').val() || 'None';
+            const currentText = editor.getText().trim();
+            
+            const systemPrompt = `You are a professional AI Writing Assistant for Cora Studio.
+Ground your writing and claims strictly in the provided business facts (RAG facts). Do not invent facts, pricing, packages, or office locations that contradict the RAG database.
+Output ONLY the requested content to be inserted. Do NOT include markdown code fences (like \`\`\`html or \`\`\`text), markdown wrappers around the whole thing, or conversational intros/outros (like "Sure, here is..."). Standard inline HTML formatting tags (like <p>, <h2>, <strong>, <em>, <ul>, <li>) are allowed.`;
+
+            let message = `Article Title: "${title}"
+Focus Keyword: "${keyword}"\n`;
+
+            if (hasSelection) {
+                message += `Selected Text:\n"${selectedText}"\n\n`;
+                message += `Instruction: "${prompt}"\n\nGenerate the revised, expanded, or answered content.`;
+            } else {
+                message += `Current Document Content:\n"${currentText.slice(-1200)}"\n\n`;
+                message += `Instruction: "${prompt}"\n\nGenerate the requested section or paragraph.`;
+            }
+
+            window.coraCallWorkspaceAI(message, systemPrompt, function(err, reply) {
+                $input.prop('disabled', false);
+                $btn.prop('disabled', false).removeClass('opacity-50 cursor-not-allowed');
+                $loading.addClass('hidden');
+
+                if (err) {
+                    if (typeof window.coraShowToast === 'function') {
+                        window.coraShowToast('AI generation failed: ' + err.message, 'error');
+                    }
+                    return;
+                }
+
+                let formattedReply = (reply || '').trim();
+                // Strip markdown code fences if model enclosed in ```html
+                if (formattedReply.startsWith('```')) {
+                    formattedReply = formattedReply.replace(/^```[a-z]*\s*/i, '').replace(/```\s*$/, '').trim();
+                }
+                if (!formattedReply.startsWith('<')) {
+                    formattedReply = '<p>' + formattedReply + '</p>';
+                }
+
+                window.coraLastCopilotOutput = formattedReply;
+                const plainText = formattedReply.replace(/<[^>]*>/g, ' ').trim();
+                const wordCount = (plainText.match(/\S+/g) || []).length;
+
+                $('#cora-copilot-output-preview').html(formattedReply);
+                $('#cora-copilot-output-wordcount').text(wordCount + ' words');
+
+                if (hasSelection) {
+                    $('#cora-copilot-btn-insert-replace').removeClass('hidden');
+                } else {
+                    $('#cora-copilot-btn-insert-replace').addClass('hidden');
+                }
+
+                $outputCard.removeClass('hidden');
+                if (typeof window.coraShowToast === 'function') {
+                    window.coraShowToast('AI response generated! Review and choose an insertion action.', 'success');
+                }
+            });
+        });
+    };
+
+    window.coraInsertCopilotOutput = function(mode) {
+        const editor = window.coraQuillListingCoordinator || (typeof coraQuillListingCoordinator !== 'undefined' ? coraQuillListingCoordinator : null);
+        if (!editor) return;
+
+        const content = window.coraLastCopilotOutput || '';
+        if (!content) {
+            if (typeof window.coraShowToast === 'function') {
+                window.coraShowToast('No generated content to insert.', 'warning');
+            }
+            return;
+        }
+
+        const sel = window.coraLastCopilotSelection || editor.getSelection();
+        const docLength = editor.getLength();
+
+        if (mode === 'replace' && sel && sel.length > 0) {
+            editor.deleteText(sel.index, sel.length, 'user');
+            editor.clipboard.dangerouslyPasteHTML(sel.index, content, 'user');
+            editor.setSelection(sel.index + content.length);
+        } else if (mode === 'append') {
+            const insertIndex = Math.max(0, docLength - 1);
+            editor.clipboard.dangerouslyPasteHTML(insertIndex, '<br>' + content, 'user');
+            editor.setSelection(insertIndex + content.length + 4);
+        } else { // cursor
+            const insertIndex = sel ? sel.index : Math.max(0, docLength - 1);
+            if (sel && sel.length > 0) {
+                editor.deleteText(sel.index, sel.length, 'user');
+            }
+            editor.clipboard.dangerouslyPasteHTML(insertIndex, content, 'user');
+            editor.setSelection(insertIndex + content.length);
+        }
+
+        editor.focus();
+        if (typeof window.coraShowToast === 'function') {
+            window.coraShowToast('Inserted into article! Press ⌘Z to undo.', 'success');
+        }
+        if (typeof window.coraUpdateWordCount === 'function') {
+            window.coraUpdateWordCount();
+        }
+        if (typeof window.coraTriggerEditorAutoSave === 'function') {
+            window.coraTriggerEditorAutoSave();
+        }
+        if (typeof window.coraUpdateCopilotContextBadge === 'function') {
+            window.coraUpdateCopilotContextBadge();
+        }
+    };
+
+    window.coraCopyCopilotOutput = function() {
+        const content = window.coraLastCopilotOutput || '';
+        if (!content) return;
+        const plainText = content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(plainText).then(function() {
+                if (typeof window.coraShowToast === 'function') {
+                    window.coraShowToast('Copied to clipboard.', 'success');
+                }
+            });
+        }
+    };
+
+    window.coraRunAICopilotQuick = function(action) {
+        let promptText = '';
+        if (action === 'shorten') {
+            promptText = 'Make the content more concise and punchy without losing key facts.';
+        } else if (action === 'grammar') {
+            promptText = 'Fix all grammar, spelling, punctuation, and readability issues.';
+        } else if (action === 'next_section') {
+            promptText = 'Draft the next logical section with a clear H2 heading and 2 informative paragraphs.';
+        } else if (action === 'takeaways') {
+            promptText = 'Extract 3 to 4 executive key takeaways formatted as a bulleted summary list.';
+        } else if (action === 'faq') {
+            promptText = 'Generate 3 frequently asked questions (FAQs) with concise, helpful answers.';
+        } else if (action === 'tone_executive') {
+            promptText = 'Rewrite in a formal, high-authority executive B2B tone.';
+        } else if (action === 'tone_conversational') {
+            promptText = 'Rewrite in a friendly, approachable, conversational tone.';
+        }
+
+        if (promptText) {
+            $('#cora-copilot-chat-input').val(promptText);
+            window.coraExecuteCopilotPanelPrompt();
+        }
+    };
+
+    window.coraRegenerateCopilotOutput = function() {
+        window.coraExecuteCopilotPanelPrompt();
+    };
+
+    // Global alias for compatibility
+    window.coraExecuteAIPrompt = function() {
+        const val = $('#cora-ai-prompt-input').val() || $('#cora-copilot-chat-input').val();
+        if (val) {
+            $('#cora-copilot-chat-input').val(val);
+        }
+        window.coraExecuteCopilotPanelPrompt();
+    };
+
+    window.coraRunAIAction = function(action) {
+        const editor = window.coraQuillListingCoordinator || (typeof coraQuillListingCoordinator !== 'undefined' ? coraQuillListingCoordinator : null);
+        if (!editor) {
+            if (typeof window.coraShowToast === 'function') {
+                window.coraShowToast('Editor is initializing, please wait...', 'warning');
+            }
+            return;
+        }
+        const range = editor.getSelection();
+        const hasSelection = range && range.length > 0;
+        let selectedText = '';
+        if (hasSelection) {
+            selectedText = editor.getText(range.index, range.length).trim();
+        }
+
+        if (action === 'clarity' && !hasSelection) {
+            if (typeof window.coraShowToast === 'function') {
+                window.coraShowToast('Please highlight/select the text you want to clarify first.', 'warning');
+            }
+            return;
+        }
+        if (action === 'expand' && !hasSelection) {
+            if (typeof window.coraShowToast === 'function') {
+                window.coraShowToast('Please highlight/select the section you want to expand first.', 'warning');
+            }
+            return;
+        }
+        if (action === 'examples' && !hasSelection) {
+            if (typeof window.coraShowToast === 'function') {
+                window.coraShowToast('Please highlight/select the statement you want to generate examples for.', 'warning');
+            }
+            return;
+        }
+
+        // Close palette smoothly when action starts
+        window.coraCloseAIWritingPalette();
+
+        const actionLabels = {
+            'outline': 'article outline',
+            'intro': 'introduction',
+            'continue': 'next paragraphs',
+            'expand': 'expansion',
+            'clarity': 'clarity rewrite',
+            'examples': 'examples'
+        };
+        const label = actionLabels[action] || action;
+        if (typeof window.coraShowToast === 'function') {
+            window.coraShowToast('Generating ' + label + ' with AI Copilot...', 'info');
+        }
+
+        const fetchFacts = typeof window.coraGetRagBrainFacts === 'function' ? window.coraGetRagBrainFacts : function(cb) { cb(''); };
+
+        fetchFacts(function(facts) {
+            const title = $('#cora-article-title').val() || 'Untitled';
+            const keyword = $('#cora-seo-keyword').val() || 'None';
+            const currentText = editor.getText().trim();
+            
+            const systemPrompt = `You are a professional AI Writing Assistant for Cora Studio.
+Ground your writing in these verified business facts if applicable: ${facts}
+Output ONLY the generated rich-text content to replace or insert. Do NOT include markdown code blocks, conversational comments, or notes. Use standard inline HTML tags (<p>, <h2>, <strong>, <em>, <ul>, <li>) for formatting.`;
+
+            let prompt = '';
+            if (action === 'outline') {
+                prompt = `Generate a comprehensive, well-structured article outline with 4-6 compelling H2 section headings, key bullet points (<ul><li>), and actionable takeaways for an article titled "${title}". Focus Keyword: "${keyword}". Output clean semantic HTML (<h2>, <p>, <ul>, <li>).`;
+            } else if (action === 'intro') {
+                prompt = `Generate a compelling, SEO-optimized introduction paragraph (about 80-120 words) for an article titled "${title}". Focus Keyword: "${keyword}".`;
+            } else if (action === 'continue') {
+                const contextSnippet = selectedText || (currentText.length > 800 ? currentText.slice(-800) : currentText);
+                prompt = `Continue writing the next 1-2 paragraphs smoothly, maintaining the style, tone, and logical narrative flow of the following content: "${contextSnippet}". Article title: "${title}".`;
+            } else if (action === 'expand') {
+                prompt = `Expand on the following section to add more detail, depth, and structural insights: "${selectedText}".`;
+            } else if (action === 'clarity') {
+                prompt = `Rewrite the following text to make it extremely clear, readable, and professional: "${selectedText}".`;
+            } else if (action === 'examples') {
+                prompt = `Generate 2-3 realistic examples or brief case studies to illustrate this point: "${selectedText}".`;
+            }
+
+            window.coraCallWorkspaceAI(prompt, systemPrompt, function(err, reply) {
+                if (err) {
+                    if (typeof window.coraShowToast === 'function') {
+                        window.coraShowToast('AI optimization failed: ' + err.message, 'error');
+                    }
+                    return;
+                }
+
+                const curRange = editor.getSelection();
+                const index = curRange ? curRange.index : (range ? range.index : editor.getLength());
+                const length = curRange ? curRange.length : (range ? range.length : 0);
+                
+                let insertedHtml = (reply || '').trim();
+                if (!insertedHtml.startsWith('<')) {
+                    insertedHtml = '<p>' + insertedHtml + '</p>';
+                }
+
+                if (action === 'outline') {
+                    if (hasSelection) {
+                        editor.deleteText(index, length, 'user');
+                        editor.clipboard.dangerouslyPasteHTML(index, insertedHtml + '<br>', 'user');
+                    } else {
+                        const targetIndex = editor.getLength() > 1 ? editor.getLength() : 0;
+                        editor.clipboard.dangerouslyPasteHTML(targetIndex, insertedHtml + '<br>', 'user');
+                    }
+                    if (typeof window.coraRebuildOutline === 'function') {
+                        setTimeout(window.coraRebuildOutline, 100);
+                    }
+                } else if (action === 'intro') {
+                    if (hasSelection) {
+                        editor.deleteText(index, length, 'user');
+                        editor.clipboard.dangerouslyPasteHTML(index, insertedHtml, 'user');
+                    } else {
+                        editor.clipboard.dangerouslyPasteHTML(0, insertedHtml + '<br><br>', 'user');
+                        editor.setSelection(0, insertedHtml.length);
+                    }
+                } else if (action === 'continue') {
+                    const targetIndex = editor.getLength();
+                    editor.clipboard.dangerouslyPasteHTML(targetIndex, '<br>' + insertedHtml, 'user');
+                    editor.setSelection(targetIndex + insertedHtml.length);
+                } else {
+                    if (hasSelection) {
+                        editor.deleteText(index, length, 'user');
+                        editor.clipboard.dangerouslyPasteHTML(index, insertedHtml, 'user');
+                    } else {
+                        editor.clipboard.dangerouslyPasteHTML(index, '<br>' + insertedHtml + '<br>', 'user');
+                    }
+                    editor.setSelection(index, insertedHtml.length);
+                }
+
+                if (typeof window.coraShowToast === 'function') {
+                    window.coraShowToast('AI content inserted successfully! Press ⌘Z to undo.', 'success');
+                }
+                if (typeof window.coraUpdateWordCount === 'function') {
+                    window.coraUpdateWordCount();
+                }
+                if (typeof window.coraTriggerEditorAutoSave === 'function') {
+                    window.coraTriggerEditorAutoSave();
+                }
+            });
+        });
     };
 
     // Attach global ⌘K / Ctrl+K keyboard shortcut for AI Writing Palette
@@ -13504,7 +14077,7 @@ jQuery(document).ready(function($) {
             html = `<div class="cora-neighborhood-guide-card" style="background:#ffffff;border:1px solid #e4e4e7;border-radius:12px;padding:24px;margin:24px 0;max-width:560px;font-family:system-ui,sans-serif;box-shadow:0 1px 3px rgba(0,0,0,0.05);" contenteditable="false"><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;"><span style="padding:6px;background:#f4f4f5;border-radius:6px;color:#09090b;display:inline-flex;"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></span><strong style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:#71717a;">Neighborhood Intelligence</strong></div><h3 style="font-size:17px;font-weight:800;color:#09090b;margin:0 0 6px;line-height:1.3;">Prime Enclave Lifestyle &amp; Connectivity</h3><p style="font-size:12px;color:#71717a;margin:0 0 16px;line-height:1.5;">Key neighborhood metrics, accessibility index, and capital appreciation trends.</p><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:14px;background:#fafafa;border:1px solid #f4f4f5;border-radius:8px;margin-bottom:14px;"><div style="text-align:center;"><span style="font-size:10px;color:#71717a;text-transform:uppercase;font-weight:700;display:block;">Schools</span><strong style="font-size:14px;color:#09090b;font-weight:800;display:block;margin-top:2px;">Top Tier</strong><span style="font-size:10px;color:#a1a1aa;">Within 4km</span></div><div style="text-align:center;border-left:1px solid #e4e4e7;border-right:1px solid #e4e4e7;"><span style="font-size:10px;color:#71717a;text-transform:uppercase;font-weight:700;display:block;">Transit</span><strong style="font-size:14px;color:#09090b;font-weight:800;display:block;margin-top:2px;">Express Hub</strong><span style="font-size:10px;color:#a1a1aa;">800m to Metro</span></div><div style="text-align:center;"><span style="font-size:10px;color:#71717a;text-transform:uppercase;font-weight:700;display:block;">YoY Growth</span><strong style="font-size:14px;color:#09090b;font-weight:800;display:block;margin-top:2px;">+14.2%</strong><span style="font-size:10px;color:#a1a1aa;">Capital Index</span></div></div><div style="font-size:11px;color:#71717a;display:flex;align-items:center;gap:6px;"><svg viewBox="0 0 24 24" width="14" height="14" stroke="#71717a" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg><span>Verified by Cora Local Market Intelligence data feed.</span></div></div>`;
 
         } else if (type === 'booking') {
-            html = `<div class="cora-studio-booking-card" style="background:#ffffff;border:1px solid #e4e4e7;border-radius:12px;padding:24px;margin:24px 0;max-width:560px;font-family:system-ui,sans-serif;box-shadow:0 1px 3px rgba(0,0,0,0.05);" contenteditable="false"><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;"><span style="padding:6px;background:#f4f4f5;border-radius:6px;color:#09090b;display:inline-flex;"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></span><strong style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:#71717a;">Studio Booking</strong></div><h3 style="font-size:17px;font-weight:800;color:#09090b;margin:0 0 6px;line-height:1.3;">Reserve a Production Studio Session</h3><p style="font-size:12px;color:#71717a;margin:0 0 16px;line-height:1.5;">Book studio stage time, lighting packages, and technical production support for your upcoming shoot.</p><form class="cora-blog-lead-form" onsubmit="event.preventDefault();window.coraSubmitBlogLeadForm(this,${postId});" style="display:grid;gap:10px;"><input type="text" name="first_name" placeholder="Producer / Client Name" required style="width:100%;border:1px solid #e4e4e7;border-radius:8px;padding:8px 12px;font-size:13px;box-sizing:border-box;"><input type="email" name="email" placeholder="Email Address" required style="width:100%;border:1px solid #e4e4e7;border-radius:8px;padding:8px 12px;font-size:13px;box-sizing:border-box;"><input type="text" name="phone" placeholder="Phone Number" required style="width:100%;border:1px solid #e4e4e7;border-radius:8px;padding:8px 12px;font-size:13px;box-sizing:border-box;"><input type="text" name="notes" placeholder="Shoot Type &amp; Preferred Dates (e.g. Fashion Editorial / Stage A)" required style="width:100%;border:1px solid #e4e4e7;border-radius:8px;padding:8px 12px;font-size:13px;box-sizing:border-box;"><button type="submit" style="width:100%;background:#09090b;color:#fff;font-weight:700;border:none;border-radius:8px;padding:10px;font-size:13px;cursor:pointer;">Request Session Hold</button></form></div>`;
+            html = `<div class="cora-studio-booking-card" style="background:#ffffff;border:1px solid #e4e4e7;border-radius:12px;padding:24px;margin:24px 0;max-width:560px;font-family:system-ui,sans-serif;box-shadow:0 1px 3px rgba(0,0,0,0.05);" contenteditable="false"><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;"><span style="padding:6px;background:#f4f4f5;border-radius:6px;color:#09090b;display:inline-flex;"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></span><strong style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:#71717a;">Studio Booking</strong></div><h3 style="font-size:17px;font-weight:800;color:#09090b;margin:0 0 6px;line-height:1.3;">Reserve a Session or Tour</h3><p style="font-size:12px;color:#71717a;margin:0 0 16px;line-height:1.5;">Schedule a dedicated session, private viewing, or consultation with our team.</p><form class="cora-blog-lead-form" onsubmit="event.preventDefault();window.coraSubmitBlogLeadForm(this,${postId});" style="display:grid;gap:10px;"><input type="text" name="first_name" placeholder="Full Name" required style="width:100%;border:1px solid #e4e4e7;border-radius:8px;padding:8px 12px;font-size:13px;box-sizing:border-box;"><input type="email" name="email" placeholder="Email Address" required style="width:100%;border:1px solid #e4e4e7;border-radius:8px;padding:8px 12px;font-size:13px;box-sizing:border-box;"><input type="text" name="phone" placeholder="Phone Number" required style="width:100%;border:1px solid #e4e4e7;border-radius:8px;padding:8px 12px;font-size:13px;box-sizing:border-box;"><input type="text" name="notes" placeholder="Preferred Dates &amp; Requirements" required style="width:100%;border:1px solid #e4e4e7;border-radius:8px;padding:8px 12px;font-size:13px;box-sizing:border-box;"><button type="submit" style="width:100%;background:#09090b;color:#fff;font-weight:700;border:none;border-radius:8px;padding:10px;font-size:13px;cursor:pointer;">Request Booking</button></form></div>`;
 
         } else if (type === 'rates') {
             html = `<div class="cora-rate-card-block" style="background:#ffffff;border:1px solid #e4e4e7;border-radius:12px;padding:24px;margin:24px 0;max-width:560px;font-family:system-ui,sans-serif;box-shadow:0 1px 3px rgba(0,0,0,0.05);" contenteditable="false"><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;"><span style="padding:6px;background:#f4f4f5;border-radius:6px;color:#09090b;display:inline-flex;"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v12M15 9.5H9.5a2.5 2.5 0 0 0 0 5h5a2.5 2.5 0 0 1 0 5H8"></path></svg></span><strong style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:#71717a;">Production Rates</strong></div><h3 style="font-size:17px;font-weight:800;color:#09090b;margin:0 0 6px;line-height:1.3;">Studio Stage &amp; Production Packages</h3><p style="font-size:12px;color:#71717a;margin:0 0 16px;line-height:1.5;">Transparent standard commercial rates including sound-treated space and power grid.</p><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;"><div style="padding:16px;background:#fafafa;border:1px solid #f4f4f5;border-radius:8px;"><span style="font-size:10px;font-weight:700;text-transform:uppercase;color:#71717a;display:block;">Half-Day (4 Hours)</span><strong style="font-size:18px;font-weight:800;color:#09090b;display:block;margin:4px 0;">₹28,000</strong><p style="font-size:11px;color:#71717a;margin:0;line-height:1.4;">Stage A or B, 3x C-Stands, Green room &amp; high-speed fiber uplink.</p></div><div style="padding:16px;background:#fafafa;border:1px solid #f4f4f5;border-radius:8px;"><span style="font-size:10px;font-weight:700;text-transform:uppercase;color:#71717a;display:block;">Full-Day (8 Hours)</span><strong style="font-size:18px;font-weight:800;color:#09090b;display:block;margin:4px 0;">₹48,000</strong><p style="font-size:11px;color:#71717a;margin:0;line-height:1.4;">Full stage buyout, standard grip package, styling lounge &amp; crew parking.</p></div></div><p style="font-size:11px;color:#71717a;margin:0;">Custom multi-day buyouts, overtime, and cinema camera gear packages available on request.</p></div>`;
@@ -13627,9 +14200,12 @@ jQuery(document).ready(function($) {
     window.coraSearchSlashItems = function(type, query) {
         $('#cora-slash-picker-results').html('<div class="px-3 py-4 text-[10px] text-zinc-400 text-center flex items-center justify-center gap-1.5"><svg class="animate-spin" viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg>Searching...</div>');
 
-        $.post(coraREWPData.ajaxUrl, {
+        const ajaxUrl = (window.coraREData && window.coraREData.ajaxUrl) || (window.coraREWPData && window.coraREWPData.ajaxUrl) || (typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php');
+        const ajaxNonce = (window.coraREData && window.coraREData.ajaxNonce) || (window.coraREWPData && window.coraREWPData.ajaxNonce) || '';
+
+        $.post(ajaxUrl, {
             action: 'cora_editor_search',
-            nonce:  coraREWPData.ajaxNonce,
+            nonce:  ajaxNonce,
             type:   type,
             q:      query
         }, function(resp) {
@@ -14067,75 +14643,111 @@ jQuery(document).ready(function($) {
     
     const tourSteps = [
         {
-            element: '.cora-dashboard-hero-card, .cora-telemetry-metrics-row, #cora-page-dashboard',
+            element: '.cora-dashboard-telemetry-wrapper, #cora-dashboard-telemetry-container, .cora-telemetry-metrics-row',
+            category: 'TELEMETRY & KPIS',
+            subtitle: 'Operational Telemetry',
             title: '1. Workspace Telemetry & KPIs',
-            description: 'Live operational pulse of your business. Monitor active deals, production schedules, client contracts, and monthly revenue.',
+            description: 'Real-time operational pulse of your studio. Monitor monthly revenue, active vault contracts, published articles, and customer submissions in real time.',
+            icon: '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 3v18h18"></path><path d="m19 9-5 5-4-4-3 3"></path></svg>',
             position: 'bottom'
         },
         {
-            element: '#cora-search-container',
+            element: '#cora-search-container, #cora-inline-command-input',
+            category: 'COMMAND & AI',
+            subtitle: 'Global Command Palette',
             title: '2. Universal Command Search & Voice AI',
-            description: 'Press ⌘K or tap the microphone to instantly search records, jump to workspace tools, draft documents, or run automated platform workflows.',
+            description: 'Press ⌘K or tap the microphone to instantly search records, jump across workspace tools, draft documents, or run automated platform workflows.',
+            icon: '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>',
             position: 'bottom'
         },
         {
-            element: '#cora-quick-actions-bar',
-            title: '3. Instant Quick Actions',
-            description: 'One-click shortcuts to upload media assets, create legal vault documents, draft articles, build intake forms, and record financial expenses.',
+            element: '#cora-quick-actions-bar, .cora-hero-center-block',
+            category: 'QUICK ACTIONS',
+            subtitle: 'Instant Workflows',
+            title: '3. Instant Action Shortcuts',
+            description: 'One-click shortcuts tailored to your industry. Quickly book shoots, upload media assets, add leads, record business expenses, or generate intake forms.',
+            icon: '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>',
             position: 'bottom'
         },
         {
-            element: '#cora-dashboard-todo-app',
+            element: '#cora-dashboard-todo-app, .cora-dashboard-todo-card',
+            category: 'PRODUCTIVITY',
+            subtitle: 'Milestones & Tasks',
             title: '4. Daily Agenda & Task Board',
-            description: 'Stay on top of high-priority daily deliverables, team checklists, and client milestones with instant one-click status updates.',
+            description: 'Stay on top of high-priority daily deliverables, production checklists, and client milestones with instant one-click status updates and deadline alerts.',
+            icon: '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>',
             position: 'top'
         },
         {
-            element: '.cora-sidebar [data-target="blogs"], .cora-sidebar [data-target="content-suite"], #cora-nav-item-blogs',
-            title: '5. Content Suite & Publishing',
-            description: 'Draft SEO-optimized articles, manage blog sprints, preview web articles, and automate content delivery pipelines.',
+            element: '.cora-sidebar [data-target="blogs"], .cora-sidebar [data-target="content-suite"], #cora-nav-item-blogs, a[href*="blogs"]',
+            category: 'CONTENT SUITE',
+            subtitle: 'Editorial Engine',
+            title: '5. Content Suite & SEO Publishing',
+            description: 'Full editorial studio for long-form blogs, SEO meta optimization, GEO content rankings, and automated publishing pipelines.',
+            icon: '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>',
             position: 'left'
         },
         {
-            element: '.cora-sidebar [data-target="financials"], #cora-nav-item-financials',
-            title: '6. Finance & GST Invoicing',
-            description: 'Manage cash flow, generate SAC-compliant tax invoices with 18% GST breakdown, log expenses, and consult the Cora CFO AI.',
+            element: '.cora-sidebar [data-target="financials"], #cora-nav-item-financials, a[href*="financials"]',
+            category: 'FINANCIALS',
+            subtitle: 'Enterprise Billing',
+            title: '6. Finance & GST Tax Invoicing',
+            description: 'Manage cash flow, generate SAC-compliant tax invoices with 18% GST breakdown, log operational expenses, and consult the Cora CFO AI.',
+            icon: '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>',
             position: 'left'
         },
         {
-            element: '.cora-sidebar [data-target="leads"], #cora-nav-item-leads',
-            title: '7. CRM Sales Pipeline',
-            description: 'Capture inbound client inquiries, qualify prospects with Speed-to-Lead AI, and advance deals through your pipeline funnel.',
+            element: '.cora-sidebar [data-target="leads"], #cora-nav-item-leads, a[href*="leads"]',
+            category: 'SALES CRM',
+            subtitle: 'Pipeline & Funnels',
+            title: '7. CRM Pipeline & Speed-to-Lead',
+            description: 'Capture inbound client inquiries, qualify prospects with Speed-to-Lead AI, track deal values, and advance opportunities through your pipeline.',
+            icon: '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>',
             position: 'left'
         },
         {
-            element: '.cora-sidebar [data-target="vault"], #cora-nav-item-vault',
-            title: '8. Document Vault & E-Sign',
-            description: 'Securely store and manage client contracts, NDAs, Master Services Agreements, proposals, and verified digital signatures.',
+            element: '.cora-sidebar [data-target="vault"], #cora-nav-item-vault, a[href*="vault"]',
+            category: 'LEGAL VAULT',
+            subtitle: 'Encrypted Repository',
+            title: '8. Document Vault & E-Sign Registry',
+            description: 'Securely store client service agreements, NDAs, shoot permits, and verified cryptographic digital signatures with complete tamper audit logs.',
+            icon: '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>',
             position: 'left'
         },
         {
-            element: '.cora-sidebar [data-target="canvas"], .cora-sidebar [data-target="forms"], #cora-nav-item-canvas',
+            element: '.cora-sidebar [data-target="canvas"], .cora-sidebar [data-target="forms"], #cora-nav-item-canvas, a[href*="canvas"]',
+            category: 'WEBSITE & FORMS',
+            subtitle: 'Visual Builder',
             title: '9. Visual Canvas & Intake Forms',
-            description: 'Build landing pages with drag-and-drop visual Canvas and create multi-step intake forms with real-time lead capture.',
+            description: 'Interactive visual site builder, GitHub repository sync, connected brand asset library, and responsive multi-step lead capture forms.',
+            icon: '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18"></path><path d="M9 21V9"></path></svg>',
             position: 'left'
         },
         {
-            element: '.cora-sidebar [data-target="team-roles"], .cora-sidebar [data-target="users"], #cora-nav-item-team-roles',
-            title: '10. Team Rosters & Permissions',
-            description: 'Invite collaborators, configure custom roles with granular capability matrices, and audit geofenced attendance punches.',
+            element: '.cora-sidebar [data-target="team-roles"], .cora-sidebar [data-target="users"], #cora-nav-item-team-roles, a[href*="team-roles"]',
+            category: 'TEAM & ROLES',
+            subtitle: 'Access Governance',
+            title: '10. Team Rosters & Granular Access',
+            description: 'Invite studio collaborators, configure fine-grained role capability matrices, and audit geofenced attendance punches.',
+            icon: '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>',
             position: 'left'
         },
         {
-            element: '#cora-floating-agent-btn, #cora-quick-ai-btn, #cora-ai-sidebar-btn, #cora-mobile-island-ai-btn',
-            title: '11. Autonomous AI Co-Founder',
-            description: 'Your 24/7 AI operational partner. Chat or speak naturally to execute multi-module tasks across your entire business.',
-            position: 'left'
+            element: '#cora-header-mcp-btn, #cora-quick-ai-btn, #cora-floating-agent-btn',
+            category: 'AI & MCP GATEWAY',
+            subtitle: 'Frontier AI Agents',
+            title: '11. Autonomous AI Co-Founder & MCP',
+            description: 'Frontier AI connected directly to your workspace tools. Connect Claude, ChatGPT, and Gemini via Model Context Protocol or speak with the local Co-Founder.',
+            icon: '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.2" fill="none"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path></svg>',
+            position: 'bottom'
         },
         {
-            element: '#cora-sidebar-bottom-user, .cora-user-profile, #cora-profile-avatar-btn',
-            title: '12. Admin Profile & AI Model Settings',
-            description: 'Manage workspace preferences, switch frontier AI models (Claude 3.5 Sonnet, GPT-4o, Gemini), and monitor execution quotas.',
+            element: '#cora-sidebar-bottom-user, .cora-header-profile-btn, #cora-profile-avatar-btn',
+            category: 'WORKSPACE CONFIG',
+            subtitle: 'Platform Settings',
+            title: '12. Studio Profile & Frontier AI Settings',
+            description: 'Access quick actions, configure workspace preferences, select active AI model engines (Gemini 3.5 Flash, Claude 3.5 Sonnet, GPT-4o), and monitor quotas.',
+            icon: '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>',
             position: 'left'
         }
     ];
@@ -14163,14 +14775,14 @@ jQuery(document).ready(function($) {
         const isMobile = $(window).width() < 640;
         const targetEl = $target[0];
         const rect = targetEl.getBoundingClientRect();
-        const popoverWidth = $popover.outerWidth() || 340;
-        const popoverHeight = $popover.outerHeight() || 180;
+        const popoverWidth = $popover.outerWidth() || 380;
+        const popoverHeight = $popover.outerHeight() || 220;
         const winWidth = $(window).width();
         const winHeight = $(window).height();
 
         // Update Spotlight element geometry around target
         if ($tourSpotlight && $tourSpotlight.length > 0) {
-            const pad = 6;
+            const pad = 8;
             const spotTop = Math.max(0, rect.top - pad);
             const spotLeft = Math.max(0, rect.left - pad);
             const spotWidth = Math.min(winWidth, rect.width + (pad * 2));
@@ -14193,7 +14805,7 @@ jQuery(document).ready(function($) {
                 left: '16px',
                 right: '16px',
                 width: 'calc(100vw - 32px)',
-                maxWidth: '360px',
+                maxWidth: '380px',
                 margin: '0 auto'
             });
             return;
@@ -14205,20 +14817,20 @@ jQuery(document).ready(function($) {
         $popover.removeClass('arrow-top arrow-bottom arrow-left arrow-right');
         
         if (arrowPosition === 'bottom') {
-            top = rect.bottom + 14;
+            top = rect.bottom + 16;
             left = rect.left + (rect.width / 2) - (popoverWidth / 2);
             $popover.addClass('arrow-top');
         } else if (arrowPosition === 'top') {
-            top = rect.top - popoverHeight - 14;
+            top = rect.top - popoverHeight - 16;
             left = rect.left + (rect.width / 2) - (popoverWidth / 2);
             $popover.addClass('arrow-bottom');
         } else if (arrowPosition === 'left') {
             top = rect.top + (rect.height / 2) - (popoverHeight / 2);
-            left = rect.right + 14;
+            left = rect.right + 16;
             $popover.addClass('arrow-left');
         } else if (arrowPosition === 'right') {
             top = rect.top + (rect.height / 2) - (popoverHeight / 2);
-            left = rect.left - popoverWidth - 14;
+            left = rect.left - popoverWidth - 16;
             $popover.addClass('arrow-right');
         }
         
@@ -14235,13 +14847,22 @@ jQuery(document).ready(function($) {
         if (top + popoverHeight > winHeight - 16) {
             top = winHeight - popoverHeight - 16;
         }
+
+        // Dynamically align arrow with target center
+        if (arrowPosition === 'left' || arrowPosition === 'right') {
+            const arrowTop = Math.max(16, Math.min(popoverHeight - 24, (rect.top + rect.height / 2) - top));
+            $popover.css('--cora-tour-arrow-top', arrowTop + 'px');
+        } else if (arrowPosition === 'top' || arrowPosition === 'bottom') {
+            const arrowLeft = Math.max(20, Math.min(popoverWidth - 28, (rect.left + rect.width / 2) - left));
+            $popover.css('--cora-tour-arrow-left', arrowLeft + 'px');
+        }
         
         $popover.css({
             top: top + 'px',
             left: left + 'px',
             bottom: 'auto',
             right: 'auto',
-            width: '340px',
+            width: '380px',
             maxWidth: 'calc(100vw - 32px)',
             margin: '0'
         });
@@ -14264,7 +14885,7 @@ jQuery(document).ready(function($) {
             $(document).on('keydown.coraTour', function(e) {
                 if (e.key === 'Escape') {
                     coraEndProductTour();
-                } else if (e.key === 'ArrowRight' || e.key === 'Enter') {
+                } else if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
                     if (currentTourStep < tourSteps.length - 1) {
                         coraRunTourEngine(currentTourStep + 1);
                     } else {
@@ -14289,17 +14910,53 @@ jQuery(document).ready(function($) {
         if (!$tourPopover || $tourPopover.length === 0) {
             const popoverHtml = `
                 <div id="cora-tour-popover" class="cora-tour-popover">
-                    <div class="flex items-center justify-between mb-2 select-none">
-                        <div class="flex items-center gap-1.5">
-                            <span class="text-[10px] font-mono font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-full">Step <span id="cora-tour-step-num">1</span> of 12</span>
-                        </div>
-                        <button id="cora-tour-skip" class="text-xs text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors font-medium cursor-pointer">Skip Tour</button>
+                    <!-- Progress Bar Track -->
+                    <div class="w-full h-1 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden mb-3.5 select-none">
+                        <div id="cora-tour-progress-bar" class="h-full bg-zinc-950 dark:bg-zinc-100 rounded-full transition-all duration-300 ease-out" style="width: 8.33%;"></div>
                     </div>
-                    <h4 id="cora-tour-title" class="text-sm font-bold text-zinc-950 dark:text-zinc-50 mb-1.5 select-none leading-snug">Title</h4>
-                    <p id="cora-tour-desc" class="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed mb-4 font-normal">Description goes here</p>
-                    <div class="flex items-center justify-between pt-2 border-t border-zinc-100 dark:border-zinc-800">
-                        <button id="cora-tour-back" class="border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all cursor-pointer select-none">Back</button>
-                        <button id="cora-tour-next" class="bg-zinc-950 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-950 text-xs font-bold px-4 py-1.5 rounded-lg transition-all cursor-pointer select-none shadow-xs">Next →</button>
+
+                    <!-- Header Row (Step Badge, Category Tag, Dismiss) -->
+                    <div class="flex items-center justify-between gap-2 mb-3 select-none">
+                        <div class="flex items-center gap-2">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border border-zinc-200/80 dark:border-zinc-700/80">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                <span>Step <span id="cora-tour-step-num">1</span> of 12</span>
+                            </span>
+                            <span id="cora-tour-category" class="text-[9.5px] font-mono font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">TELEMETRY</span>
+                        </div>
+                        <button id="cora-tour-skip" class="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 p-1 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer border-none bg-transparent flex items-center justify-center" title="Close Tour (Esc)">
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
+                    </div>
+
+                    <!-- Hero Identity Row (Icon Tile + Title) -->
+                    <div class="flex items-start gap-3 mb-2.5">
+                        <div id="cora-tour-icon-tile" class="w-9 h-9 rounded-xl bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 flex items-center justify-center shrink-0 shadow-2xs mt-0.5"></div>
+                        <div class="min-w-0 flex-1">
+                            <h4 id="cora-tour-title" class="text-[14px] font-bold text-zinc-950 dark:text-zinc-50 select-none leading-snug tracking-tight">Title</h4>
+                            <span id="cora-tour-subtitle" class="text-[10.5px] font-medium text-zinc-400 dark:text-zinc-500 block leading-tight mt-0.5">Core Workspace Module</span>
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <p id="cora-tour-desc" class="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed mb-3.5 font-normal">Description goes here</p>
+
+                    <!-- Interactive Step Dot Indicators -->
+                    <div class="flex items-center justify-between mb-3 px-0.5 select-none">
+                        <div id="cora-tour-dots" class="flex items-center gap-1"></div>
+                        <span class="text-[9.5px] font-mono text-zinc-400 dark:text-zinc-500">Press → to advance</span>
+                    </div>
+
+                    <!-- Footer Action Buttons -->
+                    <div class="flex items-center justify-between pt-3 border-t border-zinc-100 dark:border-zinc-800">
+                        <button id="cora-tour-back" class="border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold px-3 py-1.5 rounded-xl transition-all cursor-pointer select-none flex items-center gap-1">
+                            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                            <span>Back</span>
+                        </button>
+                        <button id="cora-tour-next" class="bg-zinc-950 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-950 text-xs font-bold px-4 py-2 rounded-xl transition-all active:scale-95 cursor-pointer select-none shadow-xs flex items-center gap-1.5 border-none">
+                            <span id="cora-tour-next-text">Next</span>
+                            <svg id="cora-tour-next-icon" viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                        </button>
                     </div>
                 </div>
             `;
@@ -14320,6 +14977,13 @@ jQuery(document).ready(function($) {
                 } else {
                     coraEndProductTour();
                     window.coraShowToast("Tour completed! Welcome aboard Cora Workspace.");
+                }
+            });
+            $(document).on('click', '.cora-tour-step-dot', function(e) {
+                e.preventDefault();
+                const targetIdx = parseInt($(this).data('step'), 10);
+                if (!isNaN(targetIdx) && targetIdx >= 0 && targetIdx < tourSteps.length) {
+                    coraRunTourEngine(targetIdx);
                 }
             });
         }
@@ -14358,9 +15022,26 @@ jQuery(document).ready(function($) {
         $tourSpotlight.addClass('active');
         $tourPopover.addClass('active');
         
+        // Update Step Content & Identity
+        const progressPct = (((stepIndex + 1) / tourSteps.length) * 100).toFixed(1);
+        $('#cora-tour-progress-bar').css('width', progressPct + '%');
         $('#cora-tour-step-num').text(stepIndex + 1);
+        $('#cora-tour-category').text(step.category || 'WORKSPACE');
+        $('#cora-tour-icon-tile').html(step.icon || '');
         $('#cora-tour-title').text(step.title);
+        $('#cora-tour-subtitle').text(step.subtitle || 'Core Workspace Module');
         $('#cora-tour-desc').text(step.description);
+
+        // Build interactive step dot tracker
+        let dotsHtml = '';
+        for (let i = 0; i < tourSteps.length; i++) {
+            if (i === stepIndex) {
+                dotsHtml += `<span class="cora-tour-step-dot inline-block h-1.5 w-4 rounded-full bg-zinc-950 dark:bg-zinc-100 transition-all cursor-pointer" data-step="${i}" title="Step ${i+1}"></span>`;
+            } else {
+                dotsHtml += `<span class="cora-tour-step-dot inline-block h-1.5 w-1.5 rounded-full bg-zinc-200 dark:bg-zinc-700 hover:bg-zinc-400 dark:hover:bg-zinc-500 transition-all cursor-pointer" data-step="${i}" title="Step ${i+1}"></span>`;
+            }
+        }
+        $('#cora-tour-dots').html(dotsHtml);
         
         if (stepIndex === 0) {
             $('#cora-tour-back').addClass('opacity-40 pointer-events-none cursor-not-allowed');
@@ -14369,9 +15050,11 @@ jQuery(document).ready(function($) {
         }
         
         if (stepIndex === tourSteps.length - 1) {
-            $('#cora-tour-next').text('Finish ✓');
+            $('#cora-tour-next-text').text('Finish Tour ✓');
+            $('#cora-tour-next-icon').addClass('hidden');
         } else {
-            $('#cora-tour-next').text('Next →');
+            $('#cora-tour-next-text').text('Next');
+            $('#cora-tour-next-icon').removeClass('hidden');
         }
         
         // Position popover with micro-timeout to guarantee accurate rendering geometry
@@ -17538,6 +18221,30 @@ jQuery(document).ready(function($) {
                     ${actionBtnHtml}
                 </div>`;
                 chatPane.appendChild(finalAiBubble);
+
+                // Synchronize Canvas & Workspace actions if action_results returned
+                if (res.data.action_results && Array.isArray(res.data.action_results)) {
+                    res.data.action_results.forEach(act => {
+                        if (!act || !act.success) return;
+                        const d = act.data || act;
+                        if (act.action === 'delete_draft_themes' || act.action === 'purge_draft_themes' || act.action === 'clean_draft_themes') {
+                            const draftCards = document.querySelectorAll('#canvas-draft-themes-list [data-draft-theme-id]');
+                            draftCards.forEach(c => c.remove());
+                            if (typeof window.coraSyncDraftThemesUI === 'function') window.coraSyncDraftThemesUI();
+                            if (typeof window.loadGlobalPages === 'function') window.loadGlobalPages(true);
+                            if (typeof window.coraShowToast === 'function') window.coraShowToast('Purged ' + (d.deleted_themes_count || 0) + ' draft themes permanently.', 'success');
+                        } else if (act.action === 'delete_theme' || act.action === 'trash_theme') {
+                            const thCard = document.querySelector(`[data-draft-theme-id="${d.theme_id}"]`);
+                            if (thCard) thCard.remove();
+                            if (typeof window.coraSyncDraftThemesUI === 'function') window.coraSyncDraftThemesUI();
+                            if (typeof window.coraShowToast === 'function') window.coraShowToast('Draft theme deleted.', 'success');
+                        } else if (act.action === 'activate_theme' || act.action === 'set_active_theme') {
+                            if (typeof window.coraShowToast === 'function') window.coraShowToast('Theme activated: ' + (d.name || ''), 'success');
+                            setTimeout(() => { if (typeof window.coraNavigateTo === 'function') window.coraNavigateTo('/workspace/canvas'); else window.location.reload(); }, 600);
+                        }
+                    });
+                }
+
                 chatPane.scrollTop = chatPane.scrollHeight;
             } else if (chatPane) {
                 const errMsg = (res && res.data && (res.data.message || res.data.reply || res.data)) || 'I encountered an issue processing your query. Please try again.';

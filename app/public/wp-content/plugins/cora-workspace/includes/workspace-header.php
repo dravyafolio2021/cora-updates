@@ -18,11 +18,22 @@ if ( ! function_exists( 'cora_get_mcp_button_html' ) ) {
      * Luminous frosted peach-to-lavender glassmorphism with warm orange typography
      * and plug vector icon, matching platform design system benchmark.
      */
-    function cora_get_mcp_button_html( $extra_class = '', $id = 'cora-btn-ai-mcp-gateway' ) {
-        if ( function_exists( 'cora_is_workspace_mcp_eligible' ) && ! cora_is_workspace_mcp_eligible() ) {
-            return '';
-        }
+    function cora_get_mcp_button_html( $extra_class = '', $id = 'cora-btn-ai-mcp-gateway', $agency_id = null ) {
+        $is_eligible = ( ! function_exists( 'cora_is_workspace_mcp_eligible' ) || cora_is_workspace_mcp_eligible( $agency_id ) );
         $btn_id = ! empty( $id ) ? ' id="' . esc_attr( $id ) . '"' : '';
+
+        if ( ! $is_eligible ) {
+            $locked_classes = 'cora-ai-locked-btn inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-zinc-150/80 dark:bg-zinc-800/80 text-zinc-400 dark:text-zinc-500 border border-zinc-200/70 dark:border-zinc-700/60 text-xs font-semibold select-none cursor-pointer hover:bg-zinc-200/80 dark:hover:bg-zinc-750 transition-all shadow-3xs' . ( ! empty( $extra_class ) ? ' ' . esc_attr( $extra_class ) : '' );
+            return '<button type="button"' . $btn_id . ' class="' . $locked_classes . '" onclick="if(typeof coraOpenWorkspaceDeveloperGateway === \'function\'){ coraOpenWorkspaceDeveloperGateway(); } else if(typeof coraShowToast === \'function\'){ coraShowToast(\'Developer API & MCP Gateway is a Pro feature. Please upgrade your workspace.\', \'neutral\'); }" title="MCP Gateway is locked for Free workspaces. Click to upgrade.">
+                <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 text-zinc-400 dark:text-zinc-500">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+                <span class="whitespace-nowrap font-medium text-[11px] text-zinc-500 dark:text-zinc-400">MCP</span>
+                <span class="text-[9px] font-bold uppercase tracking-wider px-1 py-0.2 rounded bg-zinc-200 dark:bg-zinc-700 text-zinc-500 dark:text-zinc-400 leading-tight">Pro</span>
+            </button>';
+        }
+
         $classes = 'cora-ai-alive-btn select-none' . ( ! empty( $extra_class ) ? ' ' . esc_attr( $extra_class ) : '' );
         
         return '<button type="button"' . $btn_id . ' class="' . $classes . '" onclick="if(typeof coraOpenWorkspaceDeveloperGateway === \'function\') coraOpenWorkspaceDeveloperGateway();" title="Workspace Model Context Protocol (MCP) &amp; Developer Gateway">
@@ -209,6 +220,25 @@ function cora_render_workspace_header( $args = array() ) {
     .cora-sub-tabs-container.has-extra-actions .cora-sub-tabs-nav::-webkit-scrollbar {
         display: none !important;
     }
+    /* Sticky sub-tabs stuck elevation and white frosted background */
+    .cora-sub-tabs-container.cora-tabs-stuck,
+    .cora-sticky-sub-tabs.cora-tabs-stuck {
+        background-color: #ffffff !important;
+        background-color: rgba(255, 255, 255, 0.98) !important;
+        backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
+        border-bottom-color: rgba(228, 228, 231, 0.95) !important;
+        box-shadow: 0 4px 14px -2px rgba(0, 0, 0, 0.06), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
+    }
+    .dark .cora-sub-tabs-container.cora-tabs-stuck,
+    .dark .cora-sticky-sub-tabs.cora-tabs-stuck {
+        background-color: #0c0c0e !important;
+        background-color: rgba(12, 12, 14, 0.98) !important;
+        backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
+        border-bottom-color: #27272a !important;
+        box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.5) !important;
+    }
     </style>
     <script>
     (function() {
@@ -293,6 +323,26 @@ function cora_render_workspace_header( $args = array() ) {
                 } else {
                     return "How do I configure the CRM lead funnel pipeline, drag-and-drop Kanban cards, and automate deal statuses in Cora?";
                 }
+            }
+
+            // 7B. Clients CRM
+            if (subPage === 'clients' || document.getElementById('cora-page-clients')) {
+                return "How do I manage client profiles, provision private client proofing portals, track retainer billing, and automate offboarding in Cora Workspace?";
+            }
+
+            // 7C. Portfolio / Projects
+            if (subPage === 'portfolio' || subPage === 'projects' || document.getElementById('cora-projects-module')) {
+                return "How do I curate client case studies, showcase deliverables, configure client portal access, and track shoot milestones in Cora Workspace?";
+            }
+
+            // 7D. Task Manager
+            if (subPage === 'tasks' || subPage === 'task-manager' || document.getElementById('cora-tasks-module')) {
+                return "How do I manage operational Kanban tasks, assign team deliverables, track SLA progress, and synchronize client checklist items in Cora Workspace?";
+            }
+
+            // 7E. Calendar & Scheduling
+            if (subPage === 'calendar' || document.getElementById('cora-calendar-module')) {
+                return "How do I configure 2-way Google Calendar sync, schedule shoot appointments with Google Meet links, and create public client booking links in Cora Workspace?";
             }
 
             // 8. Forms & Reviews
@@ -403,9 +453,14 @@ function cora_render_workspace_header( $args = array() ) {
                 // Stuck state handler for subtle elevation shadow and white frosted surface
                 var checkStuck = function() {
                     var rect = container.getBoundingClientRect();
-                    var topbarEl = document.getElementById('cora-global-topbar');
+                    var topbarEl = document.getElementById('cora-global-topbar') || document.getElementById('cora-header');
                     var topbarH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cora-topbar-height')) || 48;
-                    var topbarBottom = topbarEl ? topbarEl.getBoundingClientRect().bottom : topbarH;
+                    var topbarBottom = 0;
+                    if (topbarEl && topbarEl.offsetHeight > 0) {
+                        topbarBottom = topbarEl.getBoundingClientRect().bottom;
+                    } else if (window.innerWidth < 1024) {
+                        topbarBottom = topbarH;
+                    }
                     if (rect.top <= topbarBottom + 3) {
                         container.classList.add('cora-tabs-stuck');
                     } else {
@@ -413,6 +468,7 @@ function cora_render_workspace_header( $args = array() ) {
                     }
                 };
                 window.addEventListener('scroll', checkStuck, { passive: true });
+                document.addEventListener('scroll', checkStuck, { passive: true, capture: true });
                 var mainEl = document.querySelector('main.cora-main');
                 if (mainEl) mainEl.addEventListener('scroll', checkStuck, { passive: true });
                 checkStuck();
@@ -507,6 +563,10 @@ function cora_render_workspace_header( $args = array() ) {
                 </div>
                 <?php endif; ?>
 
+                <?php if ( empty( $args['tabs'] ) && $show_mcp && ( empty( $args['extra_actions_html'] ) || strpos( $args['extra_actions_html'], 'coraOpenWorkspaceDeveloperGateway' ) === false ) ) : ?>
+                    <?php echo cora_get_mcp_button_html(); ?>
+                <?php endif; ?>
+
                 <?php if ( ! empty( $args['extra_actions_html'] ) ) : ?>
                     <?php echo $args['extra_actions_html']; ?>
                 <?php endif; ?>
@@ -562,6 +622,13 @@ function cora_render_workspace_header( $args = array() ) {
                         <?php echo cora_get_ai_platform_official_logo( 'youtube', '', 13 ); ?>
                     </button>
                 </div>
+                <?php endif; ?>
+
+                <?php if ( empty( $args['tabs'] ) && $show_mcp && ( empty( $args['mobile_extra_actions_html'] ) || strpos( $args['mobile_extra_actions_html'], 'coraOpenWorkspaceDeveloperGateway' ) === false ) ) : ?>
+                    <button type="button" onclick="coraOpenWorkspaceDeveloperGateway()" class="h-6 px-1.5 rounded-lg border border-zinc-200/90 dark:border-zinc-700/80 bg-white dark:bg-zinc-800 text-[10px] font-bold text-zinc-800 dark:text-zinc-200 flex items-center gap-1 shadow-3xs cursor-pointer active:scale-95" title="Model Context Protocol &amp; Developer Gateway">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span class="font-mono text-[9px]">MCP</span>
+                    </button>
                 <?php endif; ?>
 
                 <?php if ( ! empty( $args['mobile_extra_actions_html'] ) ) : ?>

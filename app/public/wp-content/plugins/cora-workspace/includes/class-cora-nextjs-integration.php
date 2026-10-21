@@ -38,6 +38,8 @@ class Cora_NextJS_Integration {
             'cora_nextjs_sync_repo',
             'cora_nextjs_save_live_url',
             'cora_nextjs_build_repo',
+            'cora_canvas_deploy_nextjs_build',
+            'cora_canvas_deploy_nextjs_zip',
             'cora_nextjs_github_webhook'
         );
 
@@ -459,27 +461,31 @@ class Cora_NextJS_Integration {
             return new WP_Error( 'invalid_repo_format', 'Invalid repository format. Please enter owner/repo or full GitHub URL.' );
         }
 
-        if ( empty( $pat ) ) {
+        if ( empty( $pat ) && function_exists( 'cora_get_global_github_pat' ) ) {
+            $pat = cora_get_global_github_pat();
+        } elseif ( empty( $pat ) ) {
             $pat = get_user_meta( get_current_user_id(), 'cora_github_access_token', true ) ?: get_option( 'cora_git_sync_token', '' );
         }
 
-        if ( empty( $pat ) ) {
-            return new WP_Error( 'missing_pat', 'GitHub Personal Access Token (PAT) is required.' );
-        }
-
-        // Save token for workspace convenience
-        update_option( 'cora_git_sync_token', $pat );
-        $pat = trim( $pat );
         $headers = array(
-            'Authorization'        => ( str_starts_with( $pat, 'github_pat_' ) ? 'Bearer ' : 'token ' ) . $pat,
             'Accept'               => 'application/vnd.github+json',
             'User-Agent'           => 'Cora-Platform-NextJS/1.0',
             'X-GitHub-Api-Version' => '2022-11-28'
         );
 
+        if ( ! empty( $pat ) ) {
+            $pat = trim( $pat );
+            if ( function_exists( 'cora_save_global_github_pat' ) ) {
+                cora_save_global_github_pat( $pat );
+            } else {
+                update_option( 'cora_git_sync_token', $pat );
+            }
+            $headers['Authorization'] = ( str_starts_with( $pat, 'github_pat_' ) ? 'Bearer ' : 'token ' ) . $pat;
+        }
+
         // 1. Fetch Repository Info & Validate Access (with fallback auth header)
         $repo_resp = wp_remote_get( "https://api.github.com/repos/{$repo_slug}", array( 'headers' => $headers, 'timeout' => 15 ) );
-        if ( ! is_wp_error( $repo_resp ) && in_array( wp_remote_retrieve_response_code( $repo_resp ), array( 401, 404 ) ) ) {
+        if ( ! empty( $pat ) && ! is_wp_error( $repo_resp ) && in_array( wp_remote_retrieve_response_code( $repo_resp ), array( 401, 404 ) ) ) {
             // Try alternative Bearer format if token failed
             $alt_headers = $headers;
             $alt_headers['Authorization'] = ( str_starts_with( $headers['Authorization'], 'Bearer ' ) ? 'token ' : 'Bearer ' ) . $pat;
@@ -487,6 +493,15 @@ class Cora_NextJS_Integration {
             if ( ! is_wp_error( $alt_resp ) && wp_remote_retrieve_response_code( $alt_resp ) === 200 ) {
                 $repo_resp = $alt_resp;
                 $headers = $alt_headers;
+            } else {
+                // If token was rejected (401), try unauthenticated public request in case repo is public
+                $unauth_headers = $headers;
+                unset( $unauth_headers['Authorization'] );
+                $unauth_resp = wp_remote_get( "https://api.github.com/repos/{$repo_slug}", array( 'headers' => $unauth_headers, 'timeout' => 15 ) );
+                if ( ! is_wp_error( $unauth_resp ) && wp_remote_retrieve_response_code( $unauth_resp ) === 200 ) {
+                    $repo_resp = $unauth_resp;
+                    $headers   = $unauth_headers;
+                }
             }
         }
 
@@ -498,7 +513,7 @@ class Cora_NextJS_Integration {
         if ( $repo_code === 401 ) {
             return new WP_Error( 'github_unauthorized', 'Invalid or expired GitHub Personal Access Token (401 Unauthorized).' );
         } elseif ( $repo_code === 404 ) {
-            return new WP_Error( 'github_not_found', "Repository '{$repo_slug}' not found or is private. If it is private, please ensure your GitHub PAT has the 'repo' scope (Classic) or 'Contents: Read-only' (Fine-Grained)." );
+            return new WP_Error( 'github_not_found', empty( $pat ) ? "Repository '{$repo_slug}' not found or is private. If it is private, please enter your GitHub PAT with 'repo' scope." : "Repository '{$repo_slug}' not found or your token lacks permissions. Ensure your token has 'repo' (Classic) or 'Contents: Read-only' (Fine-Grained) access." );
         } elseif ( $repo_code === 403 ) {
             return new WP_Error( 'github_forbidden', 'Access denied by GitHub (403 Forbidden). Rate limit exceeded or token lacks required permissions.' );
         } elseif ( $repo_code !== 200 ) {
@@ -749,15 +764,25 @@ class Cora_NextJS_Integration {
      * AJAX: Scan GitHub Repository for Next.js Routes
      */
     public function cora_nextjs_scan_routes() {
-        check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+        $nonce = isset( $_REQUEST['nonce'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['nonce'] ) ) : ( isset( $_REQUEST['security'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['security'] ) ) : '' );
+        if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'wp_rest' ) && ! check_ajax_referer( 'cora_ajax_nonce', 'nonce', false ) && ! check_ajax_referer( 'cora_ajax_nonce', 'security', false ) ) {
+            wp_send_json_error( array( 'message' => 'Invalid security token or session expired.' ) );
+        }
 
-        if ( ! current_user_can( 'edit_theme_options' ) && ! current_user_can( 'manage_options' ) ) {
+        if ( function_exists( 'cora_canvas_ajax_permission_check' ) ) {
+            cora_canvas_ajax_permission_check( false );
+        } elseif ( ! is_user_logged_in() || ( ! current_user_can( 'edit_theme_options' ) && ! current_user_can( 'manage_options' ) && ! ( function_exists( 'cora_is_workspace_owner' ) && cora_is_workspace_owner() ) ) ) {
             wp_send_json_error( array( 'message' => 'Unauthorized capability.' ) );
         }
 
         $repo_raw = isset( $_POST['repo'] ) ? sanitize_text_field( wp_unslash( $_POST['repo'] ) ) : '';
         $branch   = isset( $_POST['branch'] ) ? sanitize_text_field( wp_unslash( $_POST['branch'] ) ) : 'main';
         $pat      = isset( $_POST['pat'] ) ? sanitize_text_field( wp_unslash( $_POST['pat'] ) ) : '';
+        if ( empty( $pat ) && function_exists( 'cora_get_global_github_pat' ) ) {
+            $pat = cora_get_global_github_pat();
+        } elseif ( empty( $pat ) ) {
+            $pat = get_option( 'cora_git_sync_token', '' ) ?: get_user_meta( get_current_user_id(), 'cora_github_access_token', true );
+        }
 
         $result = self::scan_repository_routes( $repo_raw, $branch, $pat );
 
@@ -785,9 +810,14 @@ class Cora_NextJS_Integration {
      * AJAX: Trigger ISR Revalidation from Canvas Workspace
      */
     public function cora_nextjs_trigger_isr() {
-        check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+        $nonce = isset( $_REQUEST['nonce'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['nonce'] ) ) : ( isset( $_REQUEST['security'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['security'] ) ) : '' );
+        if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'wp_rest' ) && ! check_ajax_referer( 'cora_ajax_nonce', 'nonce', false ) && ! check_ajax_referer( 'cora_ajax_nonce', 'security', false ) ) {
+            wp_send_json_error( array( 'message' => 'Invalid security token or session expired.' ) );
+        }
 
-        if ( ! current_user_can( 'edit_theme_options' ) && ! current_user_can( 'manage_options' ) ) {
+        if ( function_exists( 'cora_canvas_ajax_permission_check' ) ) {
+            cora_canvas_ajax_permission_check( true );
+        } elseif ( ! is_user_logged_in() || ( ! current_user_can( 'edit_theme_options' ) && ! current_user_can( 'manage_options' ) && ! ( function_exists( 'cora_is_workspace_owner' ) && cora_is_workspace_owner() ) ) ) {
             wp_send_json_error( array( 'message' => 'Unauthorized capability.' ) );
         }
 
@@ -865,9 +895,14 @@ class Cora_NextJS_Integration {
      * AJAX: Save Page Props & Headless Content Block
      */
     public function cora_nextjs_save_page_props() {
-        check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+        $nonce = isset( $_REQUEST['nonce'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['nonce'] ) ) : ( isset( $_REQUEST['security'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['security'] ) ) : '' );
+        if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'wp_rest' ) && ! check_ajax_referer( 'cora_ajax_nonce', 'nonce', false ) && ! check_ajax_referer( 'cora_ajax_nonce', 'security', false ) ) {
+            wp_send_json_error( array( 'message' => 'Invalid security token or session expired.' ) );
+        }
 
-        if ( ! current_user_can( 'edit_theme_options' ) && ! current_user_can( 'manage_options' ) ) {
+        if ( function_exists( 'cora_canvas_ajax_permission_check' ) ) {
+            cora_canvas_ajax_permission_check( true );
+        } elseif ( ! is_user_logged_in() || ( ! current_user_can( 'edit_theme_options' ) && ! current_user_can( 'manage_options' ) && ! ( function_exists( 'cora_is_workspace_owner' ) && cora_is_workspace_owner() ) ) ) {
             wp_send_json_error( array( 'message' => 'Unauthorized capability.' ) );
         }
 
@@ -921,7 +956,14 @@ class Cora_NextJS_Integration {
      * AJAX: Resync Next.js Routes from GitHub
      */
     public function cora_nextjs_sync_repo() {
-        check_ajax_referer( 'cora_ajax_nonce', 'nonce' );
+        $nonce = isset( $_REQUEST['nonce'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['nonce'] ) ) : ( isset( $_REQUEST['security'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['security'] ) ) : '' );
+        if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! wp_verify_nonce( $nonce, 'wp_rest' ) && ! check_ajax_referer( 'cora_ajax_nonce', 'nonce', false ) && ! check_ajax_referer( 'cora_ajax_nonce', 'security', false ) ) {
+            wp_send_json_error( array( 'message' => 'Invalid security token or session expired.' ) );
+        }
+
+        if ( function_exists( 'cora_canvas_ajax_permission_check' ) ) {
+            cora_canvas_ajax_permission_check( false );
+        }
 
         $theme_id = intval( $_POST['theme_id'] ?? 0 );
         if ( ! $theme_id ) {
@@ -938,7 +980,7 @@ class Cora_NextJS_Integration {
         $settings = json_decode( $theme['settings'] ?? '{}', true ) ?: array();
         $repo     = $settings['github_repo'] ?? '';
         $branch   = $settings['github_branch'] ?? 'main';
-        $pat      = $settings['lovable_pat'] ?? get_option( 'cora_git_sync_token', '' );
+        $pat      = $settings['lovable_pat'] ?? ( function_exists( 'cora_get_global_github_pat' ) ? cora_get_global_github_pat() : get_option( 'cora_git_sync_token', '' ) );
 
         if ( empty( $repo ) ) {
             wp_send_json_error( array( 'message' => 'No GitHub repository linked to this theme.' ) );
@@ -961,7 +1003,9 @@ class Cora_NextJS_Integration {
             wp_send_json_error( array( 'message' => 'Security check failed. Please refresh the page.' ) );
         }
 
-        if ( ! current_user_can( 'edit_theme_options' ) && ! current_user_can( 'manage_options' ) && ! is_user_logged_in() ) {
+        if ( function_exists( 'cora_canvas_ajax_permission_check' ) ) {
+            cora_canvas_ajax_permission_check( true );
+        } elseif ( ! is_user_logged_in() || ( ! current_user_can( 'edit_theme_options' ) && ! current_user_can( 'manage_options' ) && ! ( function_exists( 'cora_is_workspace_owner' ) && cora_is_workspace_owner() ) ) ) {
             wp_send_json_error( array( 'message' => 'Permission denied. Please log in.' ) );
         }
 
@@ -1029,7 +1073,9 @@ class Cora_NextJS_Integration {
             wp_send_json_error( array( 'message' => 'Security check failed. Please refresh the page.' ) );
         }
 
-        if ( ! current_user_can( 'edit_theme_options' ) && ! current_user_can( 'manage_options' ) && ! is_user_logged_in() ) {
+        if ( function_exists( 'cora_canvas_ajax_permission_check' ) ) {
+            cora_canvas_ajax_permission_check( true );
+        } elseif ( ! is_user_logged_in() || ( ! current_user_can( 'edit_theme_options' ) && ! current_user_can( 'manage_options' ) && ! ( function_exists( 'cora_is_workspace_owner' ) && cora_is_workspace_owner() ) ) ) {
             wp_send_json_error( array( 'message' => 'Permission denied. Please log in.' ) );
         }
 
@@ -1058,6 +1104,150 @@ class Cora_NextJS_Integration {
         }
 
         wp_send_json_success( $result );
+    }
+
+    /**
+     * AJAX: Deploy Next.js build (invoked from canvas theme overview and wizard)
+     */
+    public function cora_canvas_deploy_nextjs_build() {
+        return $this->cora_nextjs_build_repo();
+    }
+
+    /**
+     * AJAX: Deploy static Next.js out.zip file uploaded from workspace wizard
+     */
+    public function cora_canvas_deploy_nextjs_zip() {
+        $nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( $_POST['nonce'] ) : ( isset( $_POST['_wpnonce'] ) ? sanitize_text_field( $_POST['_wpnonce'] ) : '' );
+        if ( ! wp_verify_nonce( $nonce, 'cora_ajax_nonce' ) && ! check_ajax_referer( 'cora_ajax_nonce', 'nonce', false ) ) {
+            wp_send_json_error( array( 'message' => 'Security check failed. Please refresh the page.' ) );
+        }
+        if ( function_exists( 'cora_canvas_ajax_permission_check' ) ) {
+            cora_canvas_ajax_permission_check( true );
+        } elseif ( ! is_user_logged_in() || ( ! current_user_can( 'edit_theme_options' ) && ! current_user_can( 'manage_options' ) && ! ( function_exists( 'cora_is_workspace_owner' ) && cora_is_workspace_owner() ) ) ) {
+            wp_send_json_error( array( 'message' => 'Permission denied. Please log in.' ) );
+        }
+
+        if ( empty( $_FILES['zip_file'] ) || empty( $_FILES['zip_file']['tmp_name'] ) ) {
+            wp_send_json_error( array( 'message' => 'No ZIP file received for static export.' ) );
+        }
+
+        global $wpdb;
+        $theme_name = ! empty( $_POST['theme_name'] ) ? sanitize_text_field( $_POST['theme_name'] ) : 'Next.js Static Theme';
+        $agency_id = 1;
+        $context = function_exists( 'cora_get_current_workspace_context' ) ? cora_get_current_workspace_context() : array();
+        if ( ! empty( $context['agency_id'] ) ) {
+            $agency_id = intval( $context['agency_id'] );
+        }
+
+        // Set current active themes to draft
+        $wpdb->update(
+            "{$wpdb->prefix}cora_canvas_themes",
+            array( 'status' => 'draft' ),
+            array( 'agency_id' => $agency_id, 'status' => 'live' )
+        );
+
+        $initial_settings = array(
+            'source'          => 'nextjs',
+            'builder'         => 'nextjs',
+            'framework'       => 'nextjs',
+            'is_static_built' => true,
+            'static_built_at' => current_time( 'mysql' ),
+            'live_url'        => home_url( '/site/' ),
+            'nextjs_live_url' => home_url( '/site/' ),
+        );
+
+        $wpdb->insert(
+            "{$wpdb->prefix}cora_canvas_themes",
+            array(
+                'agency_id'   => $agency_id,
+                'name'        => $theme_name,
+                'version'     => '1.0.0',
+                'status'      => 'live',
+                'settings'    => wp_json_encode( $initial_settings ),
+                'created_by'  => get_current_user_id(),
+                'created_at'  => current_time( 'mysql' ),
+                'updated_at'  => current_time( 'mysql' )
+            ),
+            array( '%d', '%s', '%s', '%s', '%s', '%d', '%s', '%s' )
+        );
+
+        $theme_id = $wpdb->insert_id;
+        if ( ! $theme_id ) {
+            wp_send_json_error( array( 'message' => 'Failed to initialize theme workspace.' ) );
+        }
+
+        $upload_dir = wp_upload_dir();
+        $theme_build_dir = trailingslashit( $upload_dir['basedir'] ) . 'cora-nextjs-builds/theme_' . $theme_id;
+        $out_dir = $theme_build_dir . '/out';
+        wp_mkdir_p( $out_dir );
+
+        require_once ABSPATH . 'wp-admin/includes/file.php';
+        WP_Filesystem();
+        $unzip_res = unzip_file( $_FILES['zip_file']['tmp_name'], $out_dir );
+
+        if ( is_wp_error( $unzip_res ) ) {
+            wp_send_json_error( array( 'message' => 'Failed to extract Next.js ZIP: ' . $unzip_res->get_error_message() ) );
+        }
+
+        // Flatten nested out/ folder if created by zip
+        if ( is_dir( $out_dir . '/out' ) && ! file_exists( $out_dir . '/index.html' ) && file_exists( $out_dir . '/out/index.html' ) ) {
+            self::copy_dir_recursive( $out_dir . '/out', $out_dir );
+        }
+
+        // Count static files
+        $file_count = 0;
+        try {
+            $iter = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator( $out_dir, RecursiveDirectoryIterator::SKIP_DOTS ),
+                RecursiveIteratorIterator::SELF_FIRST
+            );
+            foreach ( $iter as $f ) {
+                if ( $f->isFile() ) $file_count++;
+            }
+        } catch ( Exception $e ) {}
+
+        $initial_settings['static_file_count'] = $file_count;
+        $initial_settings['static_build_path'] = $out_dir;
+        $wpdb->update(
+            "{$wpdb->prefix}cora_canvas_themes",
+            array( 'settings' => wp_json_encode( $initial_settings ) ),
+            array( 'id' => $theme_id )
+        );
+
+        // Insert homepage page record into cora_canvas_pages
+        $home_post_id = wp_insert_post( array(
+            'post_title'   => 'Home',
+            'post_name'    => 'home',
+            'post_type'    => 'page',
+            'post_status'  => 'publish',
+            'post_content' => '<!-- Next.js Static Export -->'
+        ) );
+        if ( ! is_wp_error( $home_post_id ) ) {
+            $wpdb->insert(
+                "{$wpdb->prefix}cora_canvas_pages",
+                array(
+                    'agency_id'   => $agency_id,
+                    'theme_id'    => $theme_id,
+                    'wp_post_id'  => $home_post_id,
+                    'title'       => 'Home',
+                    'slug'        => 'home',
+                    'status'      => 'publish',
+                    'is_homepage' => 1,
+                    'template'    => 'default',
+                    'created_by'  => get_current_user_id(),
+                    'created_at'  => current_time( 'mysql' ),
+                    'updated_at'  => current_time( 'mysql' )
+                ),
+                array( '%d', '%d', '%d', '%s', '%s', '%s', '%d', '%s', '%d', '%s', '%s' )
+            );
+        }
+
+        wp_send_json_success( array(
+            'theme_id'    => $theme_id,
+            'name'        => $theme_name,
+            'files_count' => $file_count,
+            'message'     => 'Static Next.js export uploaded and deployed successfully.'
+        ) );
     }
 
     /**
@@ -1144,7 +1334,7 @@ class Cora_NextJS_Integration {
         $settings = json_decode( $theme['settings'] ?? '{}', true ) ?: array();
         $repo_raw = $settings['github_repo'] ?? '';
         $branch   = $settings['github_branch'] ?? 'main';
-        $pat      = $settings['lovable_pat'] ?? ( $settings['github_pat'] ?? get_option( 'cora_git_sync_token', '' ) );
+        $pat      = ! empty( $settings['lovable_pat'] ) ? $settings['lovable_pat'] : ( ! empty( $settings['github_pat'] ) ? $settings['github_pat'] : ( function_exists( 'cora_get_global_github_pat' ) ? cora_get_global_github_pat() : get_option( 'cora_git_sync_token', '' ) ) );
 
         if ( empty( $repo_raw ) ) {
             return new WP_Error( 'missing_repo', 'No GitHub repository connected to this theme.' );
@@ -1212,6 +1402,16 @@ class Cora_NextJS_Integration {
                 $clone_cmd = "{$git_bin} clone --depth 1 -b " . escapeshellarg( $branch ) . " " . escapeshellarg( $auth_repo_url ) . " " . escapeshellarg( $repo_dir ) . " 2>&1";
                 $git_clone_res = self::run_command_process( $clone_cmd );
                 $git_log = $git_clone_res['output'];
+                if ( $git_clone_res['exit_code'] !== 0 && ! empty( $pat ) ) {
+                    // Try unauthenticated clone if auth clone failed (e.g. public repo with expired/dummy PAT)
+                    $pub_repo_url = "https://github.com/{$repo_slug}.git";
+                    $pub_clone_cmd = "{$git_bin} clone --depth 1 -b " . escapeshellarg( $branch ) . " " . escapeshellarg( $pub_repo_url ) . " " . escapeshellarg( $repo_dir ) . " 2>&1";
+                    $pub_clone_res = self::run_command_process( $pub_clone_cmd );
+                    if ( $pub_clone_res['exit_code'] === 0 ) {
+                        $git_clone_res = $pub_clone_res;
+                        $git_log = $pub_clone_res['output'];
+                    }
+                }
             }
         }
 
@@ -1227,6 +1427,14 @@ class Cora_NextJS_Integration {
             }
 
             $zip_res = wp_remote_get( $zip_url, array( 'headers' => $headers, 'timeout' => 60 ) );
+            if ( ! empty( $pat ) && ! is_wp_error( $zip_res ) && wp_remote_retrieve_response_code( $zip_res ) === 401 ) {
+                $unauth_headers = $headers;
+                unset( $unauth_headers['Authorization'] );
+                $unauth_zip = wp_remote_get( $zip_url, array( 'headers' => $unauth_headers, 'timeout' => 60 ) );
+                if ( ! is_wp_error( $unauth_zip ) && wp_remote_retrieve_response_code( $unauth_zip ) === 200 ) {
+                    $zip_res = $unauth_zip;
+                }
+            }
             if ( ! is_wp_error( $zip_res ) && wp_remote_retrieve_response_code( $zip_res ) === 200 ) {
                 require_once ABSPATH . 'wp-admin/includes/file.php';
                 WP_Filesystem();
@@ -1367,9 +1575,8 @@ class Cora_NextJS_Integration {
             $next_config_content = "/** @type {import('next').NextConfig} */\n"
                 . "const nextConfig = {\n"
                 . "  images: { unoptimized: true },\n"
-                . "  experimental: { cpus: 1, workerThreads: false },\n"
                 . "  typescript: { ignoreBuildErrors: true },\n"
-                . "  eslint: { ignoreDuringBuilds: true },\n"
+                . "  turbopack: {},\n"
                 . "  webpack: (config) => {\n"
                 . "    config.optimization = { ...config.optimization, splitChunks: false, minimize: false };\n"
                 . "    return config;\n"
@@ -1415,7 +1622,7 @@ class Cora_NextJS_Integration {
                 $tailwind_precompile = "npx @tailwindcss/cli -i {$found_css} -o {$found_css}.built.css --minify 2>&1 && mv {$found_css}.built.css {$found_css} && rm -f postcss.config.mjs postcss.config.js && ";
             }
 
-            $build_cmd = $resilient_npm_install . ' && ' . $tailwind_precompile . 'RAYON_NUM_THREADS=1 NEXT_CPU_COUNT=1 UV_THREADPOOL_SIZE=1 npx next build --no-lint 2>&1';
+            $build_cmd = $resilient_npm_install . ' && ' . $tailwind_precompile . 'NEXT_TELEMETRY_DISABLED=1 ESLINT_NO_DEV_ERRORS=true RAYON_NUM_THREADS=1 NEXT_CPU_COUNT=1 UV_THREADPOOL_SIZE=1 npx next build --webpack 2>&1';
         } elseif ( isset( $deps['vinext'] ) ) {
             $framework = 'vinext';
             $build_cmd = $resilient_npm_install . ' && npm run build 2>&1';
@@ -1722,14 +1929,14 @@ for (const route of routes) {
   }
 }
 NODEJS;
-        $export_file = $working_dir . '/cora_export_html.mjs';
-        @file_put_contents( $export_file, $export_script );
-        $export_res = self::run_command_process( "{$path_env} && cd " . escapeshellarg( $working_dir ) . " && node cora_export_html.mjs 2>&1" );
-        @unlink( $export_file );
-        $build_output = array_merge( $build_output, $export_res['output'] );
 
-        // Scan for static output directory
-        $candidate_dirs = array( 'out', 'dist/client', 'dist', 'build', 'web-build', '.next/server/pages', '.next/standalone/out' );
+        $final_static_dir = $theme_build_dir . '/out';
+        if ( ! file_exists( $final_static_dir ) ) {
+            wp_mkdir_p( $final_static_dir );
+        }
+
+        // 1. Scan for compiled static output directory from Next.js or build system
+        $candidate_dirs = array( 'out', '.next/server/app', '.next/server/pages', 'dist/client', 'dist', 'build', 'web-build', '.next/standalone/out' );
         $static_source_path = '';
 
         foreach ( $candidate_dirs as $cand ) {
@@ -1750,20 +1957,43 @@ NODEJS;
             }
         }
 
-        if ( empty( $static_source_path ) || ! is_dir( $static_source_path ) ) {
-            return new WP_Error( 'static_dir_missing', 'Build completed but no static output directory (dist/client, out, dist, build, web-build) was found.', $build_logs_str );
+        if ( ! empty( $static_source_path ) && is_dir( $static_source_path ) ) {
+            // First copy public/ directory if present (images, fonts, logos, icons)
+            $public_dir = is_dir( $working_dir . '/public' ) ? ( $working_dir . '/public' ) : ( is_dir( $repo_dir . '/public' ) ? ( $repo_dir . '/public' ) : '' );
+            if ( ! empty( $public_dir ) ) {
+                self::copy_dir_recursive( $public_dir, $final_static_dir );
+            }
+
+            // Copy compiled static files
+            self::copy_dir_recursive( $static_source_path, $final_static_dir );
+
+            // Ensure Next.js static asset chunks (_next/static) are copied into final static dir
+            $next_static_source = is_dir( $working_dir . '/.next/static' ) ? ( $working_dir . '/.next/static' ) : ( is_dir( $repo_dir . '/.next/static' ) ? ( $repo_dir . '/.next/static' ) : '' );
+            if ( ! empty( $next_static_source ) && is_dir( $next_static_source ) ) {
+                $final_next_static = $final_static_dir . '/_next/static';
+                if ( ! file_exists( $final_next_static ) ) {
+                    wp_mkdir_p( $final_next_static );
+                }
+                self::copy_dir_recursive( $next_static_source, $final_next_static );
+            }
         }
 
-        // Copy compiled static files into standard static output directory
-        $final_static_dir = $theme_build_dir . '/out';
-        if ( ! file_exists( $final_static_dir ) ) {
-            wp_mkdir_p( $final_static_dir );
+        // 2. Only if no index.html exists after checking compiled static sources, execute fallback route generator
+        if ( ! file_exists( $final_static_dir . '/index.html' ) ) {
+            $export_file = $working_dir . '/cora_export_html.mjs';
+            @file_put_contents( $export_file, $export_script );
+            $export_res = self::run_command_process( "{$path_env} && cd " . escapeshellarg( $working_dir ) . " && node cora_export_html.mjs 2>&1" );
+            @unlink( $export_file );
+            $build_output = array_merge( $build_output, $export_res['output'] );
         }
-        self::copy_dir_recursive( $static_source_path, $final_static_dir );
+
+        if ( ! file_exists( $final_static_dir . '/index.html' ) && ( empty( $static_source_path ) || ! is_dir( $static_source_path ) ) ) {
+            return new WP_Error( 'static_dir_missing', 'Build completed but no static output directory or index.html was found.', $build_logs_str );
+        }
 
         // Ensure Next.js static asset chunks (_next/static) are copied into final static dir
-        $next_static_source = $working_dir . '/.next/static';
-        if ( is_dir( $next_static_source ) ) {
+        $next_static_source = is_dir( $working_dir . '/.next/static' ) ? ( $working_dir . '/.next/static' ) : ( is_dir( $repo_dir . '/.next/static' ) ? ( $repo_dir . '/.next/static' ) : '' );
+        if ( ! empty( $next_static_source ) && is_dir( $next_static_source ) ) {
             $final_next_static = $final_static_dir . '/_next/static';
             if ( ! file_exists( $final_next_static ) ) {
                 wp_mkdir_p( $final_next_static );

@@ -24,6 +24,13 @@ class Cora_Autonomous_Campaigns {
     public static function init() {
         add_action( 'rest_api_init', array( __CLASS__, 'register_rest_routes' ) );
 
+        // Cron Schedules & Autonomous Recurring Runner Hook
+        add_filter( 'cron_schedules', array( __CLASS__, 'add_cron_intervals' ) );
+        add_action( 'cora_cron_run_autonomous_campaigns', array( __CLASS__, 'process_scheduled_campaigns' ) );
+        if ( ! wp_next_scheduled( 'cora_cron_run_autonomous_campaigns' ) ) {
+            wp_schedule_event( time(), 'cora_every_minute', 'cora_cron_run_autonomous_campaigns' );
+        }
+
         // AJAX Handlers
         add_action( 'wp_ajax_cora_ajax_get_campaigns', array( __CLASS__, 'ajax_get_campaigns' ) );
         add_action( 'wp_ajax_cora_get_campaigns', array( __CLASS__, 'ajax_get_campaigns' ) );
@@ -36,8 +43,80 @@ class Cora_Autonomous_Campaigns {
         add_action( 'wp_ajax_cora_ajax_trigger_campaign_run', array( __CLASS__, 'ajax_trigger_campaign' ) );
         add_action( 'wp_ajax_cora_trigger_campaign_run', array( __CLASS__, 'ajax_trigger_campaign' ) );
 
+        add_action( 'wp_ajax_cora_ajax_process_scheduled_campaigns', array( __CLASS__, 'ajax_process_scheduled' ) );
+
         add_action( 'wp_ajax_cora_ajax_improve_article', array( __CLASS__, 'ajax_improve_article' ) );
         add_action( 'wp_ajax_cora_improve_article', array( __CLASS__, 'ajax_improve_article' ) );
+    }
+
+    /**
+     * Add custom high-frequency cron intervals for autonomous campaign execution
+     */
+    public static function add_cron_intervals( $schedules ) {
+        $schedules['cora_every_minute'] = array(
+            'interval' => 60,
+            'display'  => 'Every Minute (Cora Autonomous Engine)',
+        );
+        $schedules['cora_every_5_minutes'] = array(
+            'interval' => 300,
+            'display'  => 'Every 5 Minutes (Cora Autonomous Engine)',
+        );
+        $schedules['cora_every_15_minutes'] = array(
+            'interval' => 900,
+            'display'  => 'Every 15 Minutes (Cora Autonomous Engine)',
+        );
+        return $schedules;
+    }
+
+    /**
+     * Autonomous Scheduler: Scan all active campaigns across workspaces and execute due runs
+     *
+     * @return array
+     */
+    public static function process_scheduled_campaigns() {
+        global $wpdb;
+        $opt_rows = $wpdb->get_results( "SELECT option_name, option_value FROM {$wpdb->options} WHERE option_name LIKE 'cora_workspace_content_campaigns_%'" );
+        if ( empty( $opt_rows ) ) {
+            return array( 'success' => true, 'processed' => 0 );
+        }
+
+        $processed = 0;
+        $now = time();
+
+        foreach ( $opt_rows as $row ) {
+            $agency_id = intval( str_replace( 'cora_workspace_content_campaigns_', '', $row->option_name ) );
+            if ( $agency_id <= 0 ) {
+                continue;
+            }
+
+            $campaigns = maybe_unserialize( $row->option_value );
+            if ( ! is_array( $campaigns ) ) {
+                continue;
+            }
+
+            foreach ( $campaigns as $camp ) {
+                if ( ( $camp['status'] ?? 'active' ) !== 'active' ) {
+                    continue;
+                }
+
+                $next_run = $camp['next_run_at'] ?? null;
+                // If next_run_at has arrived or passed, trigger an autonomous run
+                if ( empty( $next_run ) || strtotime( $next_run ) <= $now ) {
+                    self::trigger_campaign( $camp['id'], $agency_id, 'autonomous_scheduler' );
+                    $processed++;
+                }
+            }
+        }
+
+        return array( 'success' => true, 'processed' => $processed );
+    }
+
+    /**
+     * AJAX handler to process scheduled campaigns manually or via heartbeat
+     */
+    public static function ajax_process_scheduled() {
+        $result = self::process_scheduled_campaigns();
+        wp_send_json_success( $result );
     }
 
     /**
@@ -269,8 +348,9 @@ class Cora_Autonomous_Campaigns {
             $keywords = array( 'commercial photography', 'studio workflows', 'content optimization' );
         }
 
-        $cadence_allowed = array( 'daily', '3x_week', 'weekly', 'bi_weekly' );
-        $cadence = ( ! empty( $data['cadence'] ) && in_array( $data['cadence'], $cadence_allowed, true ) ) ? $data['cadence'] : 'weekly';
+        $cadence_raw = ! empty( $data['cadence'] ) ? sanitize_text_field( $data['cadence'] ) : 'weekly';
+        $interval_seconds = self::resolve_cadence_seconds( $cadence_raw, $data );
+        $cadence = $cadence_raw;
 
         $auto_publish = false;
         if ( isset( $data['auto_publish'] ) ) {
@@ -288,13 +368,21 @@ class Cora_Autonomous_Campaigns {
 
         $status = ( ! empty( $data['status'] ) && in_array( $data['status'], array( 'active', 'paused' ), true ) ) ? $data['status'] : 'active';
 
-        $next_run = self::calculate_next_run( $cadence );
+        $run_now = false;
+        if ( isset( $data['run_now'] ) ) {
+            $run_now = filter_var( $data['run_now'], FILTER_VALIDATE_BOOLEAN );
+        } elseif ( isset( $data['trigger_immediately'] ) ) {
+            $run_now = filter_var( $data['trigger_immediately'], FILTER_VALIDATE_BOOLEAN );
+        }
+
+        $next_run = self::calculate_next_run( $cadence, array( 'interval_seconds' => $interval_seconds ) );
 
         $new_campaign = array(
             'id'                       => $id,
             'name'                     => $name,
             'topic_keywords'           => $keywords,
             'cadence'                  => $cadence,
+            'interval_seconds'         => $interval_seconds,
             'auto_publish'             => $auto_publish,
             'min_seo_score'            => $min_seo,
             'min_geo_score'            => $min_geo,
@@ -310,6 +398,17 @@ class Cora_Autonomous_Campaigns {
 
         $campaigns[] = $new_campaign;
         update_option( $opt_key, $campaigns );
+
+        // If run_now is requested, trigger the first autonomous run immediately
+        if ( $run_now && $status === 'active' ) {
+            $run_result = self::trigger_campaign( $id, $agency_id, 'immediate_creation' );
+            if ( ! is_wp_error( $run_result ) ) {
+                $new_campaign['immediate_run']            = $run_result;
+                $new_campaign['articles_generated_count'] = 1;
+                $new_campaign['last_run_at']              = current_time( 'mysql' );
+                $new_campaign['next_run_at']              = gmdate( 'Y-m-d H:i:s', time() + $interval_seconds );
+            }
+        }
 
         return $new_campaign;
     }
@@ -352,9 +451,12 @@ class Cora_Autonomous_Campaigns {
                 $target['topic_keywords'] = array_values( array_filter( array_map( 'trim', $parts ) ) );
             }
         }
-        if ( isset( $data['cadence'] ) && in_array( $data['cadence'], array( 'daily', '3x_week', 'weekly', 'bi_weekly' ), true ) ) {
-            $target['cadence'] = $data['cadence'];
-            $target['next_run_at'] = self::calculate_next_run( $target['cadence'] );
+        if ( isset( $data['cadence'] ) || isset( $data['interval_seconds'] ) || isset( $data['interval_minutes'] ) || isset( $data['interval_hours'] ) || isset( $data['interval_value'] ) ) {
+            $cadence_val = isset( $data['cadence'] ) ? sanitize_text_field( $data['cadence'] ) : ( $target['cadence'] ?? 'weekly' );
+            $interval_sec = self::resolve_cadence_seconds( $cadence_val, $data );
+            $target['cadence']          = $cadence_val;
+            $target['interval_seconds'] = $interval_sec;
+            $target['next_run_at']      = self::calculate_next_run( $cadence_val, array( 'interval_seconds' => $interval_sec ) );
         }
         if ( isset( $data['auto_publish'] ) ) {
             $target['auto_publish'] = filter_var( $data['auto_publish'], FILTER_VALIDATE_BOOLEAN );
@@ -411,23 +513,138 @@ class Cora_Autonomous_Campaigns {
     }
 
     /**
-     * Calculate next run datetime based on cadence
+     * Resolve any cadence string or interval configuration into seconds
+     *
+     * Supports granular units: seconds, minutes, hours, days, weeks, months
      *
      * @param string $cadence
+     * @param array $data
+     * @return int
+     */
+    public static function resolve_cadence_seconds( $cadence, $data = array() ) {
+        // Direct second/minute/hour/day parameters
+        if ( ! empty( $data['interval_seconds'] ) && intval( $data['interval_seconds'] ) > 0 ) {
+            return intval( $data['interval_seconds'] );
+        }
+        if ( ! empty( $data['interval_minutes'] ) && intval( $data['interval_minutes'] ) > 0 ) {
+            return intval( $data['interval_minutes'] ) * 60;
+        }
+        if ( ! empty( $data['interval_hours'] ) && intval( $data['interval_hours'] ) > 0 ) {
+            return intval( $data['interval_hours'] ) * 3600;
+        }
+        if ( ! empty( $data['interval_days'] ) && intval( $data['interval_days'] ) > 0 ) {
+            return intval( $data['interval_days'] ) * DAY_IN_SECONDS;
+        }
+
+        // interval_value and interval_unit pair
+        if ( ! empty( $data['interval_value'] ) && ! empty( $data['interval_unit'] ) ) {
+            $val  = max( 1, intval( $data['interval_value'] ) );
+            $unit = strtolower( trim( (string) $data['interval_unit'] ) );
+            if ( strpos( $unit, 'sec' ) === 0 ) return $val;
+            if ( strpos( $unit, 'min' ) === 0 ) return $val * 60;
+            if ( strpos( $unit, 'hour' ) === 0 || strpos( $unit, 'hr' ) === 0 ) return $val * 3600;
+            if ( strpos( $unit, 'day' ) === 0 ) return $val * DAY_IN_SECONDS;
+            if ( strpos( $unit, 'week' ) === 0 || strpos( $unit, 'wk' ) === 0 ) return $val * 7 * DAY_IN_SECONDS;
+            if ( strpos( $unit, 'month' ) === 0 || strpos( $unit, 'mo' ) === 0 ) return $val * 30 * DAY_IN_SECONDS;
+        }
+
+        $c = strtolower( trim( (string) $cadence ) );
+
+        // Regex parse natural intervals e.g. "every 5 minutes", "every 30 seconds", "every 2 hours"
+        if ( preg_match( '/(?:every\s+)?(\d+)\s*(seconds?|secs?|minutes?|mins?|hours?|hrs?|days?|weeks?|months?)/i', $c, $m ) ) {
+            $num  = max( 1, intval( $m[1] ) );
+            $unit = strtolower( $m[2] );
+            if ( strpos( $unit, 'sec' ) === 0 ) return $num;
+            if ( strpos( $unit, 'min' ) === 0 ) return $num * 60;
+            if ( strpos( $unit, 'hour' ) === 0 || strpos( $unit, 'hr' ) === 0 ) return $num * 3600;
+            if ( strpos( $unit, 'day' ) === 0 ) return $num * DAY_IN_SECONDS;
+            if ( strpos( $unit, 'week' ) === 0 ) return $num * 7 * DAY_IN_SECONDS;
+            if ( strpos( $unit, 'month' ) === 0 ) return $num * 30 * DAY_IN_SECONDS;
+        }
+
+        switch ( $c ) {
+            case 'every_second':
+            case 'second':
+            case '1_second':
+                return 1;
+            case 'every_5_seconds':
+            case '5_seconds':
+                return 5;
+            case 'every_10_seconds':
+            case '10_seconds':
+                return 10;
+            case 'every_30_seconds':
+            case '30_seconds':
+                return 30;
+            case 'every_minute':
+            case 'minute':
+            case '1_minute':
+                return 60;
+            case 'every_2_minutes':
+            case '2_minutes':
+                return 120;
+            case 'every_5_minutes':
+            case '5_minutes':
+                return 300;
+            case 'every_10_minutes':
+            case '10_minutes':
+                return 600;
+            case 'every_15_minutes':
+            case '15_minutes':
+                return 900;
+            case 'every_30_minutes':
+            case '30_minutes':
+                return 1800;
+            case 'hourly':
+            case 'every_hour':
+            case 'hour':
+            case '1_hour':
+                return 3600;
+            case 'every_2_hours':
+            case '2_hours':
+                return 7200;
+            case 'every_6_hours':
+            case '6_hours':
+                return 21600;
+            case 'every_12_hours':
+            case '12_hours':
+                return 43200;
+            case 'daily':
+            case 'every_day':
+            case 'day':
+            case '1_day':
+                return DAY_IN_SECONDS;
+            case '3x_week':
+            case '3_per_week':
+                return intval( ( 7 * DAY_IN_SECONDS ) / 3 );
+            case 'bi_weekly':
+            case 'every_2_weeks':
+            case '2_weeks':
+                return 14 * DAY_IN_SECONDS;
+            case 'monthly':
+            case 'every_month':
+            case 'month':
+            case '1_month':
+                return 30 * DAY_IN_SECONDS;
+            case 'weekly':
+            case 'every_week':
+            case 'week':
+            case '1_week':
+            default:
+                return 7 * DAY_IN_SECONDS;
+        }
+    }
+
+    /**
+     * Calculate next run datetime based on cadence and interval configuration
+     *
+     * @param string $cadence
+     * @param array $data
      * @return string
      */
-    public static function calculate_next_run( $cadence ) {
-        switch ( $cadence ) {
-            case 'daily':
-                return gmdate( 'Y-m-d H:i:s', time() + DAY_IN_SECONDS );
-            case '3x_week':
-                return gmdate( 'Y-m-d H:i:s', time() + 2 * DAY_IN_SECONDS );
-            case 'bi_weekly':
-                return gmdate( 'Y-m-d H:i:s', time() + 14 * DAY_IN_SECONDS );
-            case 'weekly':
-            default:
-                return gmdate( 'Y-m-d H:i:s', time() + 7 * DAY_IN_SECONDS );
-        }
+    public static function calculate_next_run( $cadence, $data = array() ) {
+        $seconds = self::resolve_cadence_seconds( $cadence, $data );
+        return gmdate( 'Y-m-d H:i:s', time() + $seconds );
     }
 
     /**
@@ -630,7 +847,7 @@ class Cora_Autonomous_Campaigns {
             if ( $camp['id'] === $campaign_id ) {
                 $camp['articles_generated_count'] = intval( $camp['articles_generated_count'] ) + 1;
                 $camp['last_run_at']              = $timestamp;
-                $camp['next_run_at']              = self::calculate_next_run( $camp['cadence'] );
+                $camp['next_run_at']              = self::calculate_next_run( $camp['cadence'], $camp );
                 if ( empty( $camp['execution_logs'] ) || ! is_array( $camp['execution_logs'] ) ) {
                     $camp['execution_logs'] = array();
                 }
@@ -646,15 +863,19 @@ class Cora_Autonomous_Campaigns {
         return array(
             'success'       => true,
             'post_id'       => $post_id,
+            'id'            => $post_id,
             'title'         => $title,
             'status'        => $final_status,
             'is_published'  => ( $final_status === 'published' ),
+            'url'           => $public_url,
+            'permalink'     => $public_url,
+            'live_url'      => $public_url,
+            'public_url'    => $public_url,
             'seo_score'     => $seo_score,
             'geo_score'     => $geo_score,
             'keyword'       => $keyword,
             'campaign_id'   => $campaign_id,
             'campaign_name' => $campaign['name'],
-            'public_url'    => $public_url,
             'checks'        => $audit['checks'] ?? array(),
             'log'           => $log_entry,
             'message'       => $log_message,
@@ -822,10 +1043,18 @@ class Cora_Autonomous_Campaigns {
                 'status'    => $updated_post->post_status,
             );
 
+        $pub_url = function_exists( 'cora_get_article_public_url' ) ? cora_get_article_public_url( $post_id ) : get_permalink( $post_id );
+
         return array(
             'success'         => true,
             'post_id'         => $post_id,
+            'id'              => $post_id,
             'title'           => $title,
+            'url'             => $pub_url,
+            'permalink'       => $pub_url,
+            'live_url'        => $pub_url,
+            'public_url'      => $pub_url,
+            'status'          => $updated_post->post_status,
             'seo_score'       => $audit['seo_score'],
             'geo_score'       => $audit['geo_score'],
             'audit'           => $audit,

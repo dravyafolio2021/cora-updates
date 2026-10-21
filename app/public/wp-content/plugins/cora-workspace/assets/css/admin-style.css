@@ -10,12 +10,14 @@
 .cora-tour-backdrop {
     position: fixed;
     inset: 0;
-    background: rgba(9, 9, 11, 0.5); /* zinc-950 at 50% opacity */
+    background: rgba(9, 9, 11, 0.65); /* zinc-950 at 65% opacity */
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
     z-index: 99999980;
     opacity: 0;
     pointer-events: none !important;
     display: none;
-    transition: opacity 0.25s ease-in-out;
+    transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .cora-tour-backdrop.active {
@@ -24,16 +26,26 @@
     display: block !important;
 }
 
-/* Dedicated Fixed Viewport Spotlight (Never clipped by sidebar scroll or overflow-hidden) */
+/* Dedicated Fixed Viewport Spotlight (Prominent Radiant Frame & Breathing Glow) */
 .cora-tour-spotlight {
     position: fixed;
     z-index: 99999985;
-    border-radius: 12px;
+    border-radius: 16px;
     pointer-events: none !important;
-    box-shadow: 0 0 0 9999px rgba(9, 9, 11, 0.52), 0 0 0 2px #ffffff, 0 10px 30px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 0 0 9999px rgba(9, 9, 11, 0.70), 0 0 0 2px rgba(255, 255, 255, 0.95), 0 0 35px 2px rgba(255, 255, 255, 0.25);
     opacity: 0;
     display: none;
-    transition: top 0.25s cubic-bezier(0.16, 1, 0.3, 1), left 0.25s cubic-bezier(0.16, 1, 0.3, 1), width 0.25s cubic-bezier(0.16, 1, 0.3, 1), height 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
+    animation: coraTourSpotlightPulse 2.8s ease-in-out infinite;
+    transition: top 0.3s cubic-bezier(0.16, 1, 0.3, 1), left 0.3s cubic-bezier(0.16, 1, 0.3, 1), width 0.3s cubic-bezier(0.16, 1, 0.3, 1), height 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+}
+
+@keyframes coraTourSpotlightPulse {
+    0%, 100% {
+        box-shadow: 0 0 0 9999px rgba(9, 9, 11, 0.70), 0 0 0 2px rgba(255, 255, 255, 0.95), 0 0 25px rgba(255, 255, 255, 0.2);
+    }
+    50% {
+        box-shadow: 0 0 0 9999px rgba(9, 9, 11, 0.70), 0 0 0 2.5px #ffffff, 0 0 45px rgba(255, 255, 255, 0.45);
+    }
 }
 
 .cora-tour-spotlight.active {
@@ -42,7 +54,7 @@
 }
 
 .dark .cora-tour-spotlight {
-    box-shadow: 0 0 0 9999px rgba(9, 9, 11, 0.75), 0 0 0 2px #27272a, 0 10px 30px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 0 9999px rgba(9, 9, 11, 0.85), 0 0 0 2px rgba(255, 255, 255, 0.9), 0 0 35px rgba(255, 255, 255, 0.35);
 }
 
 /* Fallback Element highlight */
@@ -52,74 +64,74 @@
     pointer-events: auto !important;
 }
 
-/* Floating Tour Popover Box */
+/* Floating Tour Popover Box (High-End Monochromatic Architecture) */
 .cora-tour-popover {
     position: fixed;
-    width: 340px;
+    width: 380px;
     max-width: calc(100vw - 32px);
     background: #ffffff;
-    border: 1px solid #e4e4e7; /* zinc-200 */
-    border-radius: 16px;
-    padding: 18px;
-    box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.22), 0 0 1px 1px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(228, 228, 231, 0.9); /* zinc-200 */
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.35), 0 0 1px 1px rgba(0, 0, 0, 0.08);
     z-index: 99999999;
     font-family: Inter, system-ui, -apple-system, sans-serif;
     opacity: 0;
-    transform: translateY(6px);
-    transition: opacity 0.2s ease, transform 0.2s ease, top 0.25s cubic-bezier(0.16, 1, 0.3, 1), left 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: translateY(8px) scale(0.98);
+    transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), top 0.3s cubic-bezier(0.16, 1, 0.3, 1), left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     pointer-events: none;
     display: none;
 }
 
 .cora-tour-popover.active {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
     pointer-events: auto !important;
     display: block !important;
 }
 
 .dark .cora-tour-popover {
-    background: #18181b;
-    border-color: #27272a;
+    background: #121215;
+    border-color: rgba(39, 39, 42, 0.9);
     color: #f4f4f5;
-    box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.65), 0 0 1px 1px rgba(255, 255, 255, 0.08);
+    box-shadow: 0 30px 70px -15px rgba(0, 0, 0, 0.85), 0 0 1px 1px rgba(255, 255, 255, 0.1);
 }
 
-/* Arrow indicator on Popover */
+/* Dynamic arrow indicator on Popover */
 .cora-tour-popover::after {
     content: '';
     position: absolute;
-    border: 6px solid transparent;
+    border: 7px solid transparent;
 }
 
 .cora-tour-popover.arrow-top::after {
     bottom: 100%;
-    left: 24px;
+    left: var(--cora-tour-arrow-left, 28px);
     border-bottom-color: #ffffff;
 }
 
 .cora-tour-popover.arrow-bottom::after {
     top: 100%;
-    left: 24px;
+    left: var(--cora-tour-arrow-left, 28px);
     border-top-color: #ffffff;
 }
 
 .cora-tour-popover.arrow-left::after {
     right: 100%;
-    top: 24px;
+    top: var(--cora-tour-arrow-top, 28px);
     border-right-color: #ffffff;
 }
 
 .cora-tour-popover.arrow-right::after {
     left: 100%;
-    top: 24px;
+    top: var(--cora-tour-arrow-top, 28px);
     border-left-color: #ffffff;
 }
 
-.dark .cora-tour-popover.arrow-top::after { border-bottom-color: #18181b; }
-.dark .cora-tour-popover.arrow-bottom::after { border-top-color: #18181b; }
-.dark .cora-tour-popover.arrow-left::after { border-right-color: #18181b; }
-.dark .cora-tour-popover.arrow-right::after { border-left-color: #18181b; }
+.dark .cora-tour-popover.arrow-top::after { border-bottom-color: #121215; }
+.dark .cora-tour-popover.arrow-bottom::after { border-top-color: #121215; }
+.dark .cora-tour-popover.arrow-left::after { border-right-color: #121215; }
+.dark .cora-tour-popover.arrow-right::after { border-left-color: #121215; }
 
 /* =============================================================================
    2. COMPONENT-SCOPED DISPLAY GUARANTEES
@@ -2109,7 +2121,8 @@ body.cora-scroll-locked {
 #cora-canvas-subtabs.cora-tabs-stuck,
 .cora-sticky-sub-tabs.cora-tabs-stuck,
 .cora-sub-tabs-container.cora-tabs-stuck {
-    background-color: rgba(255, 255, 255, 0.96) !important;
+    background-color: #ffffff !important;
+    background-color: rgba(255, 255, 255, 0.98) !important;
     backdrop-filter: blur(12px) !important;
     -webkit-backdrop-filter: blur(12px) !important;
     border-bottom-color: rgba(228, 228, 231, 0.95) !important;
@@ -2124,7 +2137,8 @@ body.cora-scroll-locked {
 .dark #cora-canvas-subtabs.cora-tabs-stuck,
 .dark .cora-sticky-sub-tabs.cora-tabs-stuck,
 .dark .cora-sub-tabs-container.cora-tabs-stuck {
-    background-color: rgba(12, 12, 14, 0.96) !important;
+    background-color: #0c0c0e !important;
+    background-color: rgba(12, 12, 14, 0.98) !important;
     backdrop-filter: blur(12px) !important;
     -webkit-backdrop-filter: blur(12px) !important;
     border-bottom-color: #27272a !important;

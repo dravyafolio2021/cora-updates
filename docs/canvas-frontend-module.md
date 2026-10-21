@@ -1,14 +1,17 @@
-# Cora Platform — Canvas & Frontend Module Documentation (v4.9.384)
+# Cora Platform — Canvas & Frontend Module Documentation (v4.9.419)
 
 ## Section 1: Overview & Multi-Engine Architecture
 
-Cora Canvas is a unified frontend website and theme creation engine providing a 100% white-labeled builder experience for agencies and workspace owners. Hardened through **v4.9.384**, Canvas operates across five core architectural engines:
+Cora Canvas is a unified frontend website and theme creation engine providing a 100% white-labeled builder experience for agencies and workspace owners. Hardened through **v4.9.419**, Canvas operates across eight core architectural engines:
 
 1. **Engine A: White-Labeled Visual Drag-and-Drop Engine**: Operates within a sandboxed, two-row monochromatic toolbar (`cora-elementor-reskin.js` and `.css`), stripping out all CMS headers, admin chrome, upsell notices, and third-party references.
 2. **Engine B: Visual HTML Canvas Engine (Lovable-Compatible)**: In-browser visual HTML editor rendering semantic HTML5/Tailwind inside an isolated sandboxed iframe (`#cora-html-canvas-iframe`) with inline `contenteditable` editing, media inventory scanning, 1-click image swapping, code-split editing, URL edit state persistence, and AI rewriting.
-3. **Engine C: Universal Website Multi-Page Migrator Engine**: 1-click ingestion and crawler engine (`class-cora-html-website-migrator.php`) that scrapes external HTML/CSS/JS websites, downloads/isolates assets, sanitizes DOM code, and provisions editable draft themes.
+3. **Engine C: Universal Website Multi-Page Migrator Engine (`class-cora-html-website-migrator.php`)**: 1-click ingestion and crawler engine that scrapes external HTML/CSS/JS websites, downloads/isolates assets, sanitizes DOM code, and provisions editable draft themes.
 4. **Engine D: Next.js & Expo Headless Static Build Engine (`class-cora-nextjs-integration.php`)**: Connects modern Next.js (App/Pages Router) and Expo React Native Web repositories via Git, providing dynamic GitHub tree scanning, public/private PAT authorization with dual-header fallback, automated static compilation into standalone distributions (`out/`, `dist/`), on-demand ISR webhooks, sub-150ms dev server probe detection, and cookie-isolated live preview proxies.
 5. **Engine E: AI HTML & Tailwind Starter Engine (`cora_canvas_get_default_starter_html`)**: Delivers 6 production-calibrated industry landing page templates with 1-click prompt export for Claude & ChatGPT, dual-mode code connector (HTML paste / file dropzone), sandboxed live previews, and instant live launch with automatic CRM lead capture.
+6. **Engine F: Self-Hosted Performance & Telemetry Decision Engine (`class-cora-performance-telemetry.php`)**: Cookieless, privacy-first, real-time website telemetry hub with passive RUM Core Web Vitals monitoring, 6-card Decision KPI Matrix, dynamic executive directive banner, and Google Search Console striking-distance keyword extractor (positions 4–15).
+7. **Engine G: Dynamic Multi-Channel Template Engine (`class-cora-template-engine.php`)**: Decouples content entities from themes using `wp_cora_canvas_templates` across 5 fundamental archetypes: `article`, `page`, `policy`, `product`, and `collection` with structured layout slots.
+8. **Engine H: Visual Node Workflow Canvas & Content Approval Drawer**: Interactive visual workflow surface wiring automation trigger nodes, AI processing engines (Claude, Gemini, ChatGPT), dynamic template renderers, and slide-out Content Approval Drawer with media selection bridge.
 
 ---
 
@@ -961,4 +964,105 @@ Starting in **v4.9.384**, the workspace top header (`#cora-workspace-header` / `
 
 ---
 
-*Cora Canvas Documentation v4.9.384 — Last updated: October 2026.*
+## Section 34: Canvas Sub-Tabs Reorganization (6 Dedicated Command Centers) (v4.9.410 - v4.9.419)
+
+In **v4.9.410 - v4.9.419**, the top sub-navigation bar of Canvas in `views/view-canvas.php` was streamlined into 6 dedicated command centers:
+
+```mermaid
+graph LR
+    Canvas[Canvas Sub-Tabs Bar] --> Overview["1. Overview<br/>(#tab-canvas-overview)"]
+    Canvas --> Pages["2. Pages Manager<br/>(#tab-canvas-pages)"]
+    Canvas --> Vitals["3. Performance & Vitals<br/>(#tab-canvas-vitals)"]
+    Canvas --> Brand["4. Brand Assets<br/>(#tab-canvas-brand)"]
+    Canvas --> Migration["5. Migration & Tools<br/>(#tab-canvas-migration)"]
+    Canvas --> GitHub["6. GitHub CI/CD<br/>(#tab-canvas-github)"]
+```
+
+1. **`#tab-canvas-overview` (Themes & Visual Builder Overview)**:
+   - Live Active Theme showcase with direct "Edit Theme" (opens Level 2 live theme customizer) and "View Live Site" links.
+   - 4-Scorecard Quick Metrics bar (Core Web Vitals rating, LCP benchmark, total published pages, deployment capacity).
+   - Single-stream Themes Library consolidating draft and published themes with 1-click activation.
+2. **`#tab-canvas-pages` (Global Pages Manager)**:
+   - High-density table inventorying all 118 workspace routes across HTML Canvas pages, Next.js App Router paths, and dynamic archetype templates.
+   - Route-by-route search, status pills (Published, Draft), engine tag badges (`HTML Canvas`, `Next.js App Router`), and template assignment dropdowns.
+   - Integrated **"Import External Website"** button launching the Elementor / URL Website Migrator Drawer.
+3. **`#tab-canvas-vitals` (Website Telemetry & Decision Intelligence Hub)**:
+   - 100% self-hosted, cookieless telemetry command center powered by `Cora_Performance_Telemetry`.
+   - Real-time active visitors pulse, 6 Decision KPIs, dynamic executive recommendation banner, acquisition channels, route dwell metrics, and striking-distance SEO keywords.
+4. **`#tab-canvas-brand` (Brand Assets & Media Library)**:
+   - Central repository managing primary and inverted vector logos, typography font families (`Inter`, `JetBrains Mono`), color palettes (`zinc-50` to `zinc-950`), and photography assets.
+   - Integrated with the WordPress Media Selector modal bridge for instant slot attachment.
+5. **`#tab-canvas-migration` (Universal Migrator & HTML 3D/SPA Deployment)**:
+   - 1-click multi-page web crawler (`class-cora-html-website-migrator.php`) scraping external sites into editable draft themes.
+   - Sandboxed 3D canvas / WebGL deployment engine for advanced interactive agency showcases.
+6. **`#tab-canvas-github` (GitHub Sync & Headless Next.js Deployment)**:
+   - Full Git version control docked at the extreme right edge of the sub-tabs bar (`class-cora-github-integration.php`).
+   - Branch discovery, automated Pull Requests with visual diffs, 1-click merging, and 1-click snapshot commit rollbacks.
+
+---
+
+## Section 35: Canvas Decision-Driven Telemetry Command Center (`Cora_Performance_Telemetry`) (v4.9.418 - v4.9.419)
+
+### 35.1 Self-Hosted Cookieless Telemetry Engine
+Transforming `#tab-canvas-vitals` into an actionable command center, `Cora_Performance_Telemetry` (`includes/class-cora-performance-telemetry.php`) logs visits into `wp_cora_web_analytics` using anonymous session tokens (`_cora_sid`) with zero external cookie tracking:
+- **Backend AJAX Router**: Handles `cora_get_canvas_analytics` with timeframe filtering (`today`, `7d`, `30d`, `90d`).
+- **Passive Frontend Beacon (<1KB)**: Injected via `render_frontend_tracker_beacon()`, sending non-blocking payloads via `navigator.sendBeacon` to measure dwell time, bounce, device, channel, and RUM Web Vitals.
+
+### 35.2 Dynamic Executive Decision Directive Banner
+Calculates real-time business health and outputs targeted directives:
+- Lead Conversion Warning: *"Conversion Rate is below target (1.2%). Embed an inquiry form above the fold on top-performing landing pages."*
+- Speed Degradation Alert: *"Mobile 75th percentile LCP is 3.1s. Compress hero banners and eliminate render-blocking scripts."*
+- SEO Striking Distance: *"5 high-intent keywords are ranking in positions 4–10. Add dedicated H2 sections to capture page-1 Google traffic."*
+
+### 35.3 The 6 Real-Time Decision KPIs Matrix
+1. **Real-Time Active Visitors**: Live pulse indicator displaying users active within the last 5 minutes.
+2. **Unique Visitors & Total Sessions**: Filterable by timeframe (`today`, `7d`, `30d`, `90d`).
+3. **Engagement Dwell Time & Bounce Rate**: Average dwell time and bounce percentage.
+4. **Closed-Loop Conversion Rate**: Inquiries and form submissions recorded via `wp_cora_form_submissions` cross-referenced with total sessions.
+5. **Real User Core Web Vitals (RUM)**: Real device measurements of 75th percentile LCP, INP, and CLS.
+6. **Platform Health & Server TTFB Latency**: Average server TTFB (ms) and 404/500 HTTP incident log.
+
+### 35.4 4 Segmented Sub-Views
+Organized via Level 01 Segmented Controls:
+- **`[ Traffic & Acquisition ]`**: Acquisition channels (Direct, Organic Search, WhatsApp, Social, Referral, Paid) with conversion rate per channel and device breakdown.
+- **`[ Top Performing Pages ]`**: Route-by-route table cross-referenced with Canvas's 118 pages displaying Page Title, URL Path, Views, Avg Dwell Time, Bounce Rate, Inquiries Generated, and CWV Speed Status.
+- **`[ Core Web Vitals & Speed ]`**: RUM diagnostics paired with Google PageSpeed Insights API audits.
+- **`[ Search & SEO Intelligence ]`**: Top Google Search Queries, Impressions, Clicks, and Striking Distance Keywords (positions 4–15).
+
+### 35.5 Multi-Tab Settings Drawer (`openPerformanceAnalyticsSettingsDrawer`)
+Compliant with Rule 15 SOP:
+- **PageSpeed Tab**: Free Google PageSpeed Insights API key input.
+- **Search Console Tab**: Google Search Console property URL and Service Account JSON credentials.
+- **Privacy & Telemetry Tab**: Toggle self-hosted telemetry on/off, IP anonymization, and bot filters.
+- **Uptime & Alerts Tab**: Server response threshold (TTFB > 800ms) and webhook alert triggers.
+
+---
+
+## Section 36: Dynamic Multi-Channel Template Engine (`Cora_Template_Engine`) (v4.9.409 - v4.9.419)
+
+### 36.1 Content-Presentation Decoupling
+Located in `includes/class-cora-template-engine.php`, this engine decouples content data from theme presentation skins using the self-healing `wp_cora_canvas_templates` schema.
+
+### 36.2 The 5 Supported Archetypes & Slot Dictionaries
+1. `article`: Blog posts, editorial news, and case studies (slots: `title`, `content`, `excerpt`, `featured_image`, `author`, `date`, `read_time`, `form_embed`).
+2. `page`: Standard webpage layouts for studio sites (slots: `title`, `subtitle`, `content`, `hero_image`, `form_embed`).
+3. `policy`: Formal legal documents (slots: `title`, `content`, `effective_date`, `version`, `jurisdiction`).
+4. `product`: Equipment rental items, shoot packages, and real estate tier listings (slots: `title`, `description`, `price`, `gst_rate`, `specs`, `gallery`, `booking_form`).
+5. `collection`: Category archives, portfolio showcases, and client proofing vaults (slots: `title`, `description`, `item_loop`, `pagination`, `filters`).
+
+---
+
+## Section 37: Headless Next.js Static Builds & Dynamic Route Resolution (v4.9.415 - v4.9.419)
+
+### 37.1 3-Tier Dynamic Route Resolution Precedence
+In `cora-workspace.php`, requests are evaluated through a 3-tier precedence hierarchy:
+1. **Tier 1 (HTML Canvas Pages)**: Checks `wp_cora_canvas_pages` with `_cora_page_engine = 'html_canvas'`. If matched, renders directly from the database with 0ms compilation.
+2. **Tier 2 (Static Next.js Build)**: If compiled distribution exists (`static_build_path`), streams pre-rendered HTML and assets (`/_next/*`, `/_expo/*`) directly from disk via `cora_render_nextjs_static_build()`.
+3. **Tier 3 (Next.js Dev Server Live Frame)**: Proxies live local development frames (`http://localhost:3000`) via `cora_render_nextjs_live_frame()` with sub-150ms probe detection.
+
+### 37.2 SPA Error Shield
+Wraps preview frames in an error boundary shield, intercepting unhandled client-side runtime errors and preventing blank white screens during active development.
+
+---
+
+*Cora Canvas Documentation v4.9.419 — Last updated: October 2026.*

@@ -22,12 +22,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 ?>
 <!-- Unified Workspace Media Vault Selector Modal -->
-<div id="cora-workspace-media-selector-modal" class="hidden fixed inset-0 z-[1000050] font-sans select-none" role="dialog" aria-modal="true" aria-labelledby="cora-media-selector-title">
+<div id="cora-workspace-media-selector-modal" class="hidden fixed inset-0 font-sans select-none flex items-center justify-center p-3 sm:p-6" style="z-index: 10000000 !important;" role="dialog" aria-modal="true" aria-labelledby="cora-media-selector-title">
     <!-- Dark Blurred Backdrop Overlay (Rule 12 Standard) -->
-    <div id="cora-workspace-media-backdrop" class="fixed inset-0 bg-zinc-950/60 backdrop-blur-xs transition-opacity duration-200" onclick="coraCloseWorkspaceMediaSelector()"></div>
+    <div id="cora-workspace-media-backdrop" class="fixed inset-0 bg-zinc-950/60 backdrop-blur-xs transition-opacity duration-200" style="z-index: 10000000 !important;" onclick="coraCloseWorkspaceMediaSelector()"></div>
 
-    <!-- Modal Dialog Window (Mobile: Bottom Sheet | Desktop: Centered Dialog) -->
-    <div class="fixed inset-x-0 bottom-0 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 w-full sm:w-[94vw] sm:max-w-5xl h-[92vh] sm:h-[86vh] sm:max-h-[860px] bg-white dark:bg-zinc-900 rounded-t-3xl sm:rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col z-10 overflow-hidden transform transition-all duration-300">
+    <!-- Modal Dialog Window (Centered Dialog) -->
+    <div class="relative w-full max-w-5xl h-[88vh] max-h-[820px] bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col overflow-hidden" style="z-index: 10000001 !important;" onclick="event.stopPropagation();">
         
         <!-- Mobile Drag Indicator Handle (Rule 12 Standard) -->
         <div class="flex sm:hidden items-center justify-center pt-2.5 pb-1 cursor-pointer shrink-0" onclick="coraCloseWorkspaceMediaSelector()">

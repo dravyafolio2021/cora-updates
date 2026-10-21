@@ -23,6 +23,7 @@ class Cora_MCP_Loader {
         Cora_MCP_DB::init();
 
         add_action( 'init', array( __CLASS__, 'handle_cors_preflight' ), 0 );
+        add_action( 'init', array( __CLASS__, 'handle_pretty_endpoints' ), 0 );
         add_action( 'rest_api_init', array( __CLASS__, 'register_rest_routes' ) );
         add_action( 'init', array( __CLASS__, 'add_rewrite_rules' ) );
         add_filter( 'query_vars', array( __CLASS__, 'add_query_vars' ) );
@@ -252,18 +253,31 @@ class Cora_MCP_Loader {
         $first_seg  = $path_parts[0] ?? '';
         $second_seg = $path_parts[1] ?? '';
 
-        $is_mcp = get_query_var( 'cora_mcp_endpoint' ) || ( $first_seg === 'mcp' && empty( $second_seg ) );
-        $is_openapi = get_query_var( 'cora_openapi_spec' ) || ( $first_seg === 'mcp' && $second_seg === 'openapi.json' ) || ( $first_seg === '.well-known' && $second_seg === 'openapi.json' );
-        $is_ai_plugin = get_query_var( 'cora_ai_plugin_manifest' ) || ( $first_seg === '.well-known' && $second_seg === 'ai-plugin.json' );
+        $req_method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+        $req_accept = $_SERVER['HTTP_ACCEPT'] ?? '';
+        $req_ctype  = $_SERVER['CONTENT_TYPE'] ?? ( $_SERVER['HTTP_CONTENT_TYPE'] ?? '' );
+        $auth_hdr   = ! empty( $_SERVER['HTTP_AUTHORIZATION'] ) || ! empty( $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] );
+
+        // Detect root-domain automated capability / action discovery probes from AI clients (ChatGPT, Claude, etc.)
+        $is_root_path = empty( $first_seg );
+        $is_root_mcp  = $is_root_path && (
+            ( $req_method === 'POST' && ( stripos( $req_ctype, 'application/json' ) !== false || $auth_hdr ) )
+            || ( $req_method === 'GET' && ( stripos( $req_accept, 'text/event-stream' ) !== false || stripos( $req_accept, 'application/json' ) !== false || isset( $_GET['transport'] ) || isset( $_GET['session_id'] ) ) )
+        );
+
+        $is_mcp = get_query_var( 'cora_mcp_endpoint' ) || ( $first_seg === 'mcp' && empty( $second_seg ) ) || $is_root_mcp;
+        $is_openapi = get_query_var( 'cora_openapi_spec' ) || ( $first_seg === 'mcp' && $second_seg === 'openapi.json' ) || ( $first_seg === '.well-known' && $second_seg === 'openapi.json' ) || ( $first_seg === 'openapi.json' );
+        $is_ai_plugin = get_query_var( 'cora_ai_plugin_manifest' ) || ( $first_seg === '.well-known' && $second_seg === 'ai-plugin.json' ) || ( $first_seg === 'ai-plugin.json' );
         $is_oauth_auth = get_query_var( 'cora_oauth_authorize' ) || ( $first_seg === 'oauth' && $second_seg === 'authorize' );
         $is_oauth_token = get_query_var( 'cora_oauth_token' ) || ( $first_seg === 'oauth' && $second_seg === 'token' );
         $is_oauth_register = get_query_var( 'cora_oauth_register' ) || ( $first_seg === 'oauth' && $second_seg === 'register' );
         $is_oauth_revoke = get_query_var( 'cora_oauth_revoke' ) || ( $first_seg === 'oauth' && $second_seg === 'revoke' );
-        $is_oauth_userinfo = ( $first_seg === 'oauth' && $second_seg === 'userinfo' );
+        $is_oauth_userinfo = ( ( $first_seg === 'oauth' || empty( $second_seg ) ) && ( $second_seg === 'userinfo' || $first_seg === 'userinfo' ) );
         $is_oauth_discovery = get_query_var( 'cora_oauth_discovery' ) || ( $first_seg === '.well-known' && ( $second_seg === 'oauth-authorization-server' || $second_seg === 'openid-configuration' ) );
-        $is_oauth_protected_resource = get_query_var( 'cora_oauth_protected_resource' ) || ( $first_seg === '.well-known' && $second_seg === 'oauth-protected-resource' );
+        $is_oauth_protected_resource = get_query_var( 'cora_oauth_protected_resource' ) || ( $first_seg === '.well-known' && ( $second_seg === 'oauth-protected-resource' || $second_seg === 'oauth-protected-resource-metadata' ) );
+        $is_mcp_tool = ( $first_seg === 'mcp' && $second_seg === 'tool' && ! empty( $path_parts[2] ) );
 
-        $is_any_mcp = $is_mcp || $is_openapi || $is_ai_plugin || $is_oauth_auth || $is_oauth_token || $is_oauth_register || $is_oauth_revoke || $is_oauth_userinfo || $is_oauth_protected_resource || $is_oauth_discovery;
+        $is_any_mcp = $is_mcp || $is_mcp_tool || $is_openapi || $is_ai_plugin || $is_oauth_auth || $is_oauth_token || $is_oauth_register || $is_oauth_revoke || $is_oauth_userinfo || $is_oauth_protected_resource || $is_oauth_discovery;
 
         if ( ! $is_any_mcp ) {
             return;
@@ -285,6 +299,18 @@ class Cora_MCP_Loader {
             exit;
         }
 
+        if ( $is_mcp_tool ) {
+            $tool_name = sanitize_key( str_replace( '.', '_', $path_parts[2] ) );
+            $method = $_SERVER['REQUEST_METHOD'] ?? 'POST';
+            $request = self::create_request_from_globals( $method, '/cora/v1/mcp/tool/' . $tool_name );
+            $request->set_param( 'tool_name', $tool_name );
+            if ( function_exists( 'cora_rest_mcp_direct_tool_handler' ) ) {
+                $response = cora_rest_mcp_direct_tool_handler( $request );
+                self::send_rest_response( $response );
+            }
+            exit;
+        }
+
         if ( $is_openapi ) {
             if ( function_exists( 'cora_rest_mcp_openapi_handler' ) ) {
                 $response = cora_rest_mcp_openapi_handler();
@@ -295,10 +321,13 @@ class Cora_MCP_Loader {
 
         if ( $is_ai_plugin ) {
             header( 'Content-Type: application/json; charset=utf-8' );
-            header( 'Cache-Control: public, max-age=3600' );
+            header( 'Cache-Control: no-cache, no-store, must-revalidate' );
+            header( 'Pragma: no-cache' );
+            header( 'Expires: 0' );
             $base = home_url();
             $requested_model = sanitize_key( $_GET['model'] ?? ( $_GET['name'] ?? 'cla' ) );
             $name_for_model  = in_array( $requested_model, array( 'cora', 'cla' ), true ) ? $requested_model : 'cla';
+            $api_ver         = defined( 'CORA_WORKSPACE_VERSION' ) ? CORA_WORKSPACE_VERSION : time();
             $manifest = array(
                 'schema_version'        => 'v1',
                 'name_for_human'        => 'CLA (Cora Workspace OS)',
@@ -314,8 +343,8 @@ class Cora_MCP_Loader {
                 ),
                 'api'                   => array(
                     'type'                  => 'openapi',
-                    'url'                   => $base . '/mcp/openapi.json',
-                    'is_user_authenticated' => false,
+                    'url'                   => $base . '/mcp/openapi.json?v=' . $api_ver,
+                    'is_user_authenticated' => true,
                 ),
                 'logo_url'              => $base . '/wp-content/plugins/cora-workspace/assets/icons/cora-logo.svg',
                 'contact_email'         => 'support@heycora.in',

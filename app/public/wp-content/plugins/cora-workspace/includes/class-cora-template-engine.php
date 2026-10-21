@@ -356,6 +356,7 @@ class Cora_Template_Engine {
     public function resolve_template( $theme_id, $archetype, $requested_slug = 'default' ) {
         $theme_id = intval( $theme_id );
         $archetype = sanitize_key( $archetype );
+        $requested_slug = preg_replace( '/^' . preg_quote( $archetype, '/' ) . '[\.-]/', '', trim( $requested_slug ?: 'default' ) );
         $requested_slug = sanitize_title( $requested_slug ?: 'default' );
 
         // Auto-seed theme templates if empty
@@ -479,6 +480,7 @@ class Cora_Template_Engine {
 
     /**
      * Seed initial default templates for a theme across all 5 archetypes
+     * Guarantees every workspace comes with standard out-of-the-box templates
      */
     public function seed_default_templates_for_theme( $theme_id, $force = false ) {
         global $wpdb;
@@ -486,45 +488,87 @@ class Cora_Template_Engine {
         $theme_id = intval( $theme_id );
         if ( ! $theme_id ) return;
 
-        if ( ! $force ) {
-            $count = intval( $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table_name} WHERE theme_id = %d", $theme_id ) ) );
-            if ( $count >= 5 ) {
-                return; // Already seeded
-            }
-        }
-
         $theme = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d", $theme_id ), ARRAY_A );
         $settings = $theme ? ( json_decode( $theme['settings'], true ) ?: array() ) : array();
         $engine = ! empty( $settings['source'] ) ? $settings['source'] : 'html';
 
-        $defaults = array(
-            self::ARCHETYPE_ARTICLE => array(
-                'slug' => 'default',
-                'name' => 'Default Article Layout',
+        $standard_templates = array(
+            // --- Standard Pages Suite (Decoupled Shopify Model) ---
+            array(
+                'archetype'  => self::ARCHETYPE_PAGE,
+                'slug'       => 'default',
+                'name'       => 'Default Standard Page',
+                'is_default' => 1,
             ),
-            self::ARCHETYPE_PAGE => array(
-                'slug' => 'default',
-                'name' => 'Default Standard Page',
+            array(
+                'archetype'  => self::ARCHETYPE_PAGE,
+                'slug'       => 'contact',
+                'name'       => 'Contact & Studio Booking',
+                'is_default' => 0,
             ),
-            self::ARCHETYPE_POLICY => array(
-                'slug' => 'default',
-                'name' => 'Default Legal Policy',
+            array(
+                'archetype'  => self::ARCHETYPE_PAGE,
+                'slug'       => 'about',
+                'name'       => 'About Us & Studio Story',
+                'is_default' => 0,
             ),
-            self::ARCHETYPE_PRODUCT => array(
-                'slug' => 'default',
-                'name' => 'Default Package & Service',
+            array(
+                'archetype'  => self::ARCHETYPE_PAGE,
+                'slug'       => 'landing',
+                'name'       => 'Landing Page & Hero Showcase',
+                'is_default' => 0,
             ),
-            self::ARCHETYPE_COLLECTION => array(
-                'slug' => 'default',
-                'name' => 'Default Catalog Grid',
+            array(
+                'archetype'  => self::ARCHETYPE_PAGE,
+                'slug'       => 'fullwidth',
+                'name'       => 'Full-Width Clean Canvas',
+                'is_default' => 0,
+            ),
+
+            // --- Editorial & Case Studies Suite ---
+            array(
+                'archetype'  => self::ARCHETYPE_ARTICLE,
+                'slug'       => 'default',
+                'name'       => 'Default Article Layout',
+                'is_default' => 1,
+            ),
+            array(
+                'archetype'  => self::ARCHETYPE_ARTICLE,
+                'slug'       => 'case-study',
+                'name'       => 'Visual Case Study & Reel Breakdown',
+                'is_default' => 0,
+            ),
+
+            // --- Formal Legal Suite ---
+            array(
+                'archetype'  => self::ARCHETYPE_POLICY,
+                'slug'       => 'default',
+                'name'       => 'Default Legal Policy',
+                'is_default' => 1,
+            ),
+
+            // --- Products & Packages Suite ---
+            array(
+                'archetype'  => self::ARCHETYPE_PRODUCT,
+                'slug'       => 'default',
+                'name'       => 'Default Package & Service',
+                'is_default' => 1,
+            ),
+
+            // --- Catalogs & Archive Suite ---
+            array(
+                'archetype'  => self::ARCHETYPE_COLLECTION,
+                'slug'       => 'default',
+                'name'       => 'Default Catalog Grid',
+                'is_default' => 1,
             ),
         );
 
-        foreach ( $defaults as $arch => $def ) {
-            $exists = $this->get_template( $theme_id, $arch, $def['slug'] );
+        foreach ( $standard_templates as $tpl ) {
+            $exists = $this->get_template( $theme_id, $tpl['archetype'], $tpl['slug'] );
             if ( ! $exists ) {
-                $layout = $this->get_seed_blueprint( $arch, $def['slug'] );
-                $this->save_template( $theme_id, $arch, $def['slug'], $def['name'], $engine, $layout, 1 );
+                $layout = $this->get_seed_blueprint( $tpl['archetype'], $tpl['slug'] );
+                $this->save_template( $theme_id, $tpl['archetype'], $tpl['slug'], $tpl['name'], $engine, $layout, $tpl['is_default'] );
             }
         }
     }
@@ -668,22 +712,44 @@ class Cora_Template_Engine {
     public function format_page_entity( $page_row ) {
         $wp_post_id = ! empty( $page_row['wp_post_id'] ) ? intval( $page_row['wp_post_id'] ) : 0;
         $wp_post = $wp_post_id ? get_post( $wp_post_id ) : null;
-        $content = $wp_post ? apply_filters( 'the_content', $wp_post->post_content ) : '';
+        $content = '';
+        $elementor_css = '';
+
+        if ( $wp_post_id > 0 && class_exists( '\Elementor\Plugin' ) && ( get_post_meta( $wp_post_id, '_elementor_edit_mode', true ) === 'builder' || ! empty( get_post_meta( $wp_post_id, '_elementor_data', true ) ) ) ) {
+            $content = \Elementor\Plugin::instance()->frontend->get_builder_content_for_display( $wp_post_id );
+            $upload_dir = wp_upload_dir();
+            $post_css_file = $upload_dir['basedir'] . '/elementor/css/post-' . $wp_post_id . '.css';
+            $post_css_url  = $upload_dir['baseurl'] . '/elementor/css/post-' . $wp_post_id . '.css';
+            if ( file_exists( $post_css_file ) ) {
+                $elementor_css .= '<link rel="stylesheet" id="elementor-post-' . $wp_post_id . '-css" href="' . esc_url( $post_css_url ) . '" media="all" />' . "\n";
+            }
+            if ( defined( 'ELEMENTOR_ASSETS_URL' ) ) {
+                $elementor_css .= '<link rel="stylesheet" id="elementor-frontend-css" href="' . esc_url( ELEMENTOR_ASSETS_URL . 'css/frontend.min.css' ) . '" media="all" />' . "\n";
+            }
+        }
+        if ( empty( $content ) && $wp_post ) {
+            $content = apply_filters( 'the_content', $wp_post->post_content );
+        }
+
+        $page_id = ! empty( $page_row['id'] ) ? intval( $page_row['id'] ) : ( $wp_post ? $wp_post->ID : 0 );
+        $title = ! empty( $page_row['title'] ) ? $page_row['title'] : ( $wp_post ? $wp_post->post_title : '' );
+        $slug = ! empty( $page_row['slug'] ) ? $page_row['slug'] : ( $wp_post ? $wp_post->post_name : '' );
 
         return array(
-            'id'       => $page_row['id'],
-            'title'    => $page_row['title'],
-            'slug'     => $page_row['slug'],
-            'subtitle' => ! empty( $page_row['seo_description'] ) ? $page_row['seo_description'] : '',
-            'content'  => $content,
-            'page'     => array(
-                'title'    => $page_row['title'],
-                'slug'     => $page_row['slug'],
+            'id'            => $page_id,
+            'title'         => $title,
+            'slug'          => $slug,
+            'subtitle'      => ! empty( $page_row['seo_description'] ) ? $page_row['seo_description'] : '',
+            'content'       => $content,
+            'elementor_css' => $elementor_css,
+            'page'          => array(
+                'title'    => $title,
+                'slug'     => $slug,
                 'content'  => $content,
             ),
-            'entity'   => array(
-                'title'    => $page_row['title'],
-                'slug'     => $page_row['slug'],
+            'entity'        => array(
+                'title'    => $title,
+                'slug'     => $slug,
                 'content'  => $content,
             ),
         );
@@ -799,7 +865,13 @@ class Cora_Template_Engine {
         if ( empty( $layout ) ) {
             $layout = $this->get_seed_blueprint( $archetype, $template_slug );
         }
-        return $this->render_dynamic_slots( $layout, $entity_data, $context );
+        $compiled = $this->render_dynamic_slots( $layout, $entity_data, $context );
+
+        if ( ! empty( $entity_data['elementor_css'] ) && strpos( $compiled, '</head>' ) !== false ) {
+            $compiled = str_replace( '</head>', $entity_data['elementor_css'] . '</head>', $compiled );
+        }
+
+        return $compiled;
     }
 
     /**
@@ -808,6 +880,62 @@ class Cora_Template_Engine {
     public function get_seed_blueprint( $archetype, $slug = 'default' ) {
         switch ( $archetype ) {
             case self::ARCHETYPE_ARTICLE:
+                if ( $slug === 'case-study' ) {
+                    return '<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ article.title }} – Visual Production Case Study</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body class="bg-[#FBFaf7] text-zinc-900 font-sans antialiased">
+    <header class="border-b border-zinc-200/80 bg-white/80 backdrop-blur-md sticky top-0 z-40">
+        <div class="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
+            <a href="/" class="text-sm font-black uppercase tracking-tight text-zinc-950 no-underline">CORA STUDIO</a>
+            <nav class="flex items-center gap-4 text-xs font-semibold text-zinc-600">
+                <a href="/site" class="hover:text-zinc-950 no-underline">Home</a>
+                <a href="/site/case-studies" class="text-zinc-950 font-bold no-underline">Work</a>
+                <a href="/site/contact" class="px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg no-underline shadow-3xs">Inquire</a>
+            </nav>
+        </div>
+    </header>
+    <main class="max-w-4xl mx-auto px-4 py-12 sm:py-16">
+        <div class="mb-6">
+            <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-[10px] font-mono font-bold bg-zinc-950 text-white mb-3">
+                CASE STUDY BREAKDOWN
+            </div>
+            <h1 class="text-3xl sm:text-5xl font-black text-zinc-950 tracking-tight leading-tight">{{ article.title }}</h1>
+            <p class="text-sm sm:text-base text-zinc-500 mt-3 font-normal">{{ article.excerpt }}</p>
+        </div>
+        {{ #if article.featured_image }}
+        <div class="my-8 rounded-2xl overflow-hidden border border-zinc-200 shadow-sm">
+            <img src="{{ article.featured_image }}" alt="{{ article.title }}" class="w-full object-cover max-h-[500px]" />
+        </div>
+        {{ /if }}
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 my-8">
+            <div class="md:col-span-2 prose max-w-none text-sm text-zinc-700 leading-relaxed space-y-4">
+                {{ article.content }}
+            </div>
+            <div class="p-6 bg-white border border-zinc-200 rounded-2xl space-y-4 shadow-3xs">
+                <h3 class="text-xs font-bold text-zinc-950 uppercase tracking-wider font-mono">Production Specs</h3>
+                <div class="space-y-2 text-xs text-zinc-600">
+                    <div><strong class="text-zinc-900 block font-semibold">Format</strong> 4K ProRes 422 HQ / Stills</div>
+                    <div><strong class="text-zinc-900 block font-semibold">Soundstage</strong> Stage B (Cyclorama)</div>
+                    <div><strong class="text-zinc-900 block font-semibold">Lighting</strong> Profoto D2 &amp; Godox Skypanels</div>
+                    <div><strong class="text-zinc-900 block font-semibold">Post-Production</strong> Cora Native AI Grade</div>
+                </div>
+            </div>
+        </div>
+        {{ cora_form_embed }}
+    </main>
+    <footer class="border-t border-zinc-200 bg-white py-8 text-center text-xs text-zinc-500">
+        <p>© {{ current_year }} Cora Studio. All rights reserved.</p>
+    </footer>
+</body>
+</html>';
+                }
                 return '<!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
@@ -877,7 +1005,7 @@ class Cora_Template_Engine {
                 <div class="w-10 h-10 rounded-full bg-zinc-950 text-white font-bold text-xs flex items-center justify-center">S</div>
                 <div>
                     <strong class="block text-xs font-bold text-zinc-900">{{ article.author }}</strong>
-                    <span class="text-[11px] text-zinc-500">Editorial & Creative Direction</span>
+                    <span class="text-[11px] text-zinc-500">Editorial &amp; Creative Direction</span>
                 </div>
             </div>
             <a href="/site/blog" class="text-xs font-bold text-zinc-900 hover:underline">← Back to Articles</a>
@@ -892,6 +1020,250 @@ class Cora_Template_Engine {
 </html>';
 
             case self::ARCHETYPE_PAGE:
+                if ( $slug === 'contact' ) {
+                    return '<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ page.title }} – Contact &amp; Studio Hire</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body class="bg-[#FBFaf7] text-zinc-900 font-sans antialiased">
+    <header class="border-b border-zinc-200/80 bg-white/80 backdrop-blur-md sticky top-0 z-40">
+        <div class="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
+            <a href="/" class="text-sm font-black uppercase tracking-tight text-zinc-950 no-underline">CORA STUDIO</a>
+            <nav class="flex items-center gap-4 text-xs font-semibold text-zinc-600">
+                <a href="/site" class="hover:text-zinc-950 no-underline">Home</a>
+                <a href="/site/about" class="hover:text-zinc-950 no-underline">About</a>
+                <a href="/site/services" class="hover:text-zinc-950 no-underline">Services</a>
+                <a href="/site/contact" class="text-zinc-950 font-bold no-underline">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 py-12 sm:py-16">
+        <div class="text-center max-w-xl mx-auto mb-10 space-y-2">
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-zinc-950 tracking-tight">{{ page.title }}</h1>
+            <p class="text-xs sm:text-sm text-zinc-500">Get in touch with our studio team for commercial productions, soundstage bookings, and creative direction.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div class="bg-white border border-zinc-200 rounded-2xl p-6 text-center space-y-2 shadow-3xs">
+                <div class="w-8 h-8 rounded-lg bg-zinc-100 mx-auto flex items-center justify-center text-zinc-800">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                </div>
+                <h4 class="text-xs font-bold text-zinc-950">Studio Location</h4>
+                <p class="text-[11px] text-zinc-500 leading-relaxed">Indiranagar 100ft Road, Bengaluru, KA 560038</p>
+            </div>
+            <div class="bg-white border border-zinc-200 rounded-2xl p-6 text-center space-y-2 shadow-3xs">
+                <div class="w-8 h-8 rounded-lg bg-zinc-100 mx-auto flex items-center justify-center text-zinc-800">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                </div>
+                <h4 class="text-xs font-bold text-zinc-950">Direct Phone</h4>
+                <p class="text-[11px] text-zinc-500">+91 98765 43210 / +91 80 4123 4567</p>
+            </div>
+            <div class="bg-white border border-zinc-200 rounded-2xl p-6 text-center space-y-2 shadow-3xs">
+                <div class="w-8 h-8 rounded-lg bg-zinc-100 mx-auto flex items-center justify-center text-zinc-800">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                </div>
+                <h4 class="text-xs font-bold text-zinc-950">Call Times</h4>
+                <p class="text-[11px] text-zinc-500">Mon – Sat: 08:00 AM – 10:00 PM</p>
+            </div>
+        </div>
+
+        <div class="max-w-xl mx-auto">
+            {{ cora_form_embed }}
+        </div>
+
+        {{ #if page.content }}
+        <div class="cora-page-content bg-white border border-zinc-200/80 rounded-2xl p-6 sm:p-10 shadow-xs space-y-6 text-sm text-zinc-700 leading-relaxed mt-10">
+            {{ page.content }}
+        </div>
+        {{ /if }}
+    </main>
+
+    <footer class="border-t border-zinc-200 bg-white py-8 text-center text-xs text-zinc-500">
+        <p>© {{ current_year }} Cora Studio. All rights reserved.</p>
+    </footer>
+</body>
+</html>';
+                }
+
+                if ( $slug === 'about' ) {
+                    return '<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ page.title }} – About Our Studio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body class="bg-[#FBFaf7] text-zinc-900 font-sans antialiased">
+    <header class="border-b border-zinc-200/80 bg-white/80 backdrop-blur-md sticky top-0 z-40">
+        <div class="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
+            <a href="/" class="text-sm font-black uppercase tracking-tight text-zinc-950 no-underline">CORA STUDIO</a>
+            <nav class="flex items-center gap-4 text-xs font-semibold text-zinc-600">
+                <a href="/site" class="hover:text-zinc-950 no-underline">Home</a>
+                <a href="/site/about" class="text-zinc-950 font-bold no-underline">About</a>
+                <a href="/site/services" class="hover:text-zinc-950 no-underline">Services</a>
+                <a href="/site/contact" class="px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg no-underline shadow-3xs">Inquire</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 py-12 sm:py-16 space-y-12">
+        <div class="max-w-3xl space-y-4">
+            <span class="text-xs font-mono font-bold uppercase tracking-wider text-zinc-400">OUR STORY &amp; ETHOS</span>
+            <h1 class="text-3xl sm:text-5xl font-black text-zinc-950 tracking-tight leading-tight">{{ page.title }}</h1>
+            <p class="text-sm sm:text-base text-zinc-600 leading-relaxed">
+                Founded with a mission to craft world-class visual narratives, Cora Studio blends commercial cinema craftsmanship with cutting-edge real-time virtual production.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 py-6 border-y border-zinc-200/80">
+            <div class="space-y-1">
+                <div class="text-3xl font-black text-zinc-950 font-mono">500+</div>
+                <div class="text-[11px] text-zinc-500 font-medium">Productions Completed</div>
+            </div>
+            <div class="space-y-1">
+                <div class="text-3xl font-black text-zinc-950 font-mono">10+</div>
+                <div class="text-[11px] text-zinc-500 font-medium">Years in Business</div>
+            </div>
+            <div class="space-y-1">
+                <div class="text-3xl font-black text-zinc-950 font-mono">4</div>
+                <div class="text-[11px] text-zinc-500 font-medium">Dedicated Soundstages</div>
+            </div>
+            <div class="space-y-1">
+                <div class="text-3xl font-black text-zinc-950 font-mono">98%</div>
+                <div class="text-[11px] text-zinc-500 font-medium">Client Retention Rate</div>
+            </div>
+        </div>
+
+        <div class="cora-page-content bg-white border border-zinc-200/80 rounded-2xl p-6 sm:p-10 shadow-xs space-y-6 text-sm text-zinc-700 leading-relaxed">
+            {{ page.content }}
+        </div>
+
+        {{ cora_form_embed }}
+    </main>
+
+    <footer class="border-t border-zinc-200 bg-white py-8 text-center text-xs text-zinc-500">
+        <p>© {{ current_year }} Cora Studio. All rights reserved.</p>
+    </footer>
+</body>
+</html>';
+                }
+
+                if ( $slug === 'landing' ) {
+                    return '<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ page.title }} – Next-Gen Studio Productions</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body class="bg-[#FBFaf7] text-zinc-900 font-sans antialiased">
+    <header class="border-b border-zinc-200/80 bg-white/80 backdrop-blur-md sticky top-0 z-40">
+        <div class="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
+            <a href="/" class="text-sm font-black uppercase tracking-tight text-zinc-950 no-underline">CORA STUDIO</a>
+            <nav class="flex items-center gap-4 text-xs font-semibold text-zinc-600">
+                <a href="/site" class="hover:text-zinc-950 no-underline">Home</a>
+                <a href="#inquiry" class="px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg no-underline shadow-3xs">Book Shoot</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 py-16 sm:py-24 space-y-16">
+        <div class="text-center max-w-3xl mx-auto space-y-4">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-mono font-semibold bg-zinc-100 border border-zinc-200 text-zinc-800">
+                <span>✦</span> High-Precision Commercial Media Production
+            </div>
+            <h1 class="text-4xl sm:text-6xl font-black text-zinc-950 tracking-tight leading-none">{{ page.title }}</h1>
+            <p class="text-base sm:text-lg text-zinc-500 font-normal max-w-2xl mx-auto">{{ page.subtitle }}</p>
+            <div class="pt-4 flex items-center justify-center gap-3">
+                <a href="#inquiry" class="px-5 py-2.5 bg-zinc-950 hover:bg-zinc-800 text-white font-bold rounded-xl text-xs transition-all shadow-sm no-underline">
+                    Book Studio Session →
+                </a>
+                <a href="/site/services" class="px-5 py-2.5 bg-white hover:bg-zinc-50 text-zinc-900 font-bold rounded-xl text-xs transition-all border border-zinc-200 no-underline">
+                    View Studio Rates
+                </a>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white border border-zinc-200/80 rounded-2xl p-6 space-y-3 shadow-3xs">
+                <div class="w-9 h-9 rounded-xl bg-zinc-950 text-white flex items-center justify-center font-bold text-xs">01</div>
+                <h3 class="text-sm font-bold text-zinc-950">Pre-Light Cyclorama</h3>
+                <p class="text-xs text-zinc-500 leading-relaxed">Turnkey corner cyclorama with overhead DMX motorized grid and zero-reflection seamless matte finish.</p>
+            </div>
+            <div class="bg-white border border-zinc-200/80 rounded-2xl p-6 space-y-3 shadow-3xs">
+                <div class="w-9 h-9 rounded-xl bg-zinc-950 text-white flex items-center justify-center font-bold text-xs">02</div>
+                <h3 class="text-sm font-bold text-zinc-950">Cinema Gear Included</h3>
+                <p class="text-xs text-zinc-500 leading-relaxed">ARRI, RED, and Sony FX cinema packages on-site with wireless monitoring and live director feed.</p>
+            </div>
+            <div class="bg-white border border-zinc-200/80 rounded-2xl p-6 space-y-3 shadow-3xs">
+                <div class="w-9 h-9 rounded-xl bg-zinc-950 text-white flex items-center justify-center font-bold text-xs">03</div>
+                <h3 class="text-sm font-bold text-zinc-950">Turnaround in 48 Hours</h3>
+                <p class="text-xs text-zinc-500 leading-relaxed">Dedicated in-house post-production pipeline delivering graded dailies and finished cutdowns with zero latency.</p>
+            </div>
+        </div>
+
+        {{ #if page.content }}
+        <div class="cora-page-content bg-white border border-zinc-200/80 rounded-2xl p-6 sm:p-10 shadow-xs space-y-6 text-sm text-zinc-700 leading-relaxed">
+            {{ page.content }}
+        </div>
+        {{ /if }}
+
+        <div id="inquiry" class="scroll-mt-20">
+            {{ cora_form_embed }}
+        </div>
+    </main>
+
+    <footer class="border-t border-zinc-200 bg-white py-8 text-center text-xs text-zinc-500">
+        <p>© {{ current_year }} Cora Studio. All rights reserved.</p>
+    </footer>
+</body>
+</html>';
+                }
+
+                if ( $slug === 'fullwidth' ) {
+                    return '<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ page.title }} – Cora Studio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="bg-[#FBFaf7] text-zinc-900 font-sans antialiased">
+    <header class="border-b border-zinc-200/80 bg-white/80 backdrop-blur-md sticky top-0 z-40">
+        <div class="w-full px-6 sm:px-12 h-14 flex items-center justify-between">
+            <a href="/" class="text-sm font-black uppercase tracking-tight text-zinc-950 no-underline">CORA STUDIO</a>
+            <nav class="flex items-center gap-4 text-xs font-semibold text-zinc-600">
+                <a href="/site" class="hover:text-zinc-950 no-underline">Home</a>
+                <a href="/site/contact" class="px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg no-underline shadow-3xs">Inquire</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="w-full px-4 sm:px-10 py-8">
+        <div class="cora-page-content w-full space-y-6">
+            {{ page.content }}
+        </div>
+    </main>
+
+    <footer class="border-t border-zinc-200 bg-white py-8 text-center text-xs text-zinc-500">
+        <p>© {{ current_year }} Cora Studio. All rights reserved.</p>
+    </footer>
+</body>
+</html>';
+                }
+
                 return '<!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>

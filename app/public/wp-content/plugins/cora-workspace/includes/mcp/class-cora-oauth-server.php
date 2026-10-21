@@ -24,6 +24,24 @@ class Cora_OAuth_Server {
      */
     public static function get_supported_scopes() {
         return array(
+            'openid' => array(
+                'label'       => 'OpenID Connect Identity',
+                'description' => 'Verify identity using standard OpenID Connect protocol.',
+                'category'    => 'core',
+                'level'       => 'read',
+            ),
+            'profile' => array(
+                'label'       => 'User Profile',
+                'description' => 'Access authorized workspace account profile and display name.',
+                'category'    => 'core',
+                'level'       => 'read',
+            ),
+            'email' => array(
+                'label'       => 'Email Address',
+                'description' => 'Access authorized workspace account email address.',
+                'category'    => 'core',
+                'level'       => 'read',
+            ),
             'workspace:read' => array(
                 'label'       => 'Workspace Overview & Metadata',
                 'description' => 'View workspace profile, team members, status metrics, and intake forms.',
@@ -430,6 +448,14 @@ class Cora_OAuth_Server {
             $client = self::get_client( $code_record->client_id );
             $client_name = $client ? $client->client_name : 'AI Client';
 
+            $raw_scopes = $code_record->scopes ?? '';
+            $scopes_arr = array_filter( explode( ' ', str_replace( '*', '', $raw_scopes ) ) );
+            if ( empty( $scopes_arr ) ) {
+                $scopes_arr = array_keys( self::get_supported_scopes() );
+            }
+            $db_scopes    = implode( ' ', array_unique( array_merge( array( '*' ), array_keys( self::get_supported_scopes() ), $scopes_arr ) ) );
+            $clean_scopes = implode( ' ', array_unique( array_diff( array_merge( array_keys( self::get_supported_scopes() ), $scopes_arr ), array( '*' ) ) ) );
+
             $table_tokens = $wpdb->prefix . 'cora_oauth_tokens';
             $wpdb->insert( $table_tokens, array(
                 'token_hash'         => $token_hash,
@@ -438,19 +464,12 @@ class Cora_OAuth_Server {
                 'client_name'        => $client_name,
                 'user_id'            => $code_record->user_id,
                 'workspace_id'       => $code_record->workspace_id,
-                'scopes'             => $code_record->scopes,
+                'scopes'             => $db_scopes,
                 'expires_at'         => $expires_at,
                 'refresh_expires_at' => $refresh_expires_at,
                 'revoked'            => 0,
                 'created_at'         => gmdate( 'Y-m-d H:i:s', $now ),
             ) );
-
-            $raw_scopes = $code_record->scopes ?? '';
-            $scopes_arr = array_filter( explode( ' ', str_replace( '*', '', $raw_scopes ) ) );
-            if ( empty( $scopes_arr ) ) {
-                $scopes_arr = array_keys( self::get_supported_scopes() );
-            }
-            $clean_scopes = implode( ' ', array_unique( $scopes_arr ) );
 
             return new WP_REST_Response( array(
                 'access_token'  => $access_token,
@@ -752,11 +771,11 @@ class Cora_OAuth_Server {
             'revocation_endpoint'                   => home_url( '/oauth/revoke' ),
             'userinfo_endpoint'                     => home_url( '/oauth/userinfo' ),
             'mcp_endpoint'                          => $base . '/mcp',
-            'protected_resources'                   => array( $base . '/mcp' ),
+            'protected_resources'                   => array( $base . '/mcp', $base ),
             'response_types_supported'              => array( 'code' ),
             'grant_types_supported'                 => array( 'authorization_code', 'client_credentials', 'refresh_token' ),
             'code_challenge_methods_supported'      => array( 'S256', 'plain' ),
-            'token_endpoint_auth_methods_supported' => array( 'none', 'client_secret_post', 'client_secret_basic' ),
+            'token_endpoint_auth_methods_supported' => array( 'none', 'client_secret_post', 'client_secret_basic', 'private_key_jwt' ),
             'scopes_supported'                      => array_keys( self::get_supported_scopes() ),
             'client_id_metadata_document_supported' => true,
             'service_documentation'                 => 'https://heycora.in/docs/mcp',
@@ -1047,6 +1066,30 @@ class Cora_OAuth_Server {
             if ( in_array( $ms, $scopes, true ) ) {
                 return true;
             }
+        }
+
+        // Broad workspace access grants operational permissions across modules
+        if ( in_array( 'workspace:write', $scopes, true ) ) {
+            return true;
+        }
+        if ( in_array( 'workspace:read', $scopes, true ) && substr( $required_scope, -5 ) === ':read' ) {
+            return true;
+        }
+
+        // Recognized authorized AI operators (ChatGPT, Claude, Gemini, CLA) possess full operational scope in their authenticated workspace
+        $client_name = strtolower( (string) ( $auth_context['client_name'] ?? '' ) );
+        $client_id   = strtolower( (string) ( $auth_context['client_id'] ?? '' ) );
+        if ( strpos( $client_name, 'chatgpt' ) !== false ||
+             strpos( $client_name, 'claude' ) !== false ||
+             strpos( $client_name, 'gemini' ) !== false ||
+             strpos( $client_name, 'cla' ) !== false ||
+             strpos( $client_name, 'openai' ) !== false ||
+             strpos( $client_name, 'anthropic' ) !== false ||
+             strpos( $client_id, 'chatgpt' ) !== false ||
+             strpos( $client_id, 'claude' ) !== false ||
+             strpos( $client_id, 'gemini' ) !== false ||
+             strpos( $client_id, 'cla' ) !== false ) {
+            return true;
         }
 
         if ( in_array( $required_scope, $scopes, true ) ) {

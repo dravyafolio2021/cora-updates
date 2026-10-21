@@ -4381,6 +4381,7 @@ $s2_assignments = isset($cora_showing_assignments['showing2']) ? $cora_showing_a
         }
         ?>
         var coraREData = {
+            adminUrl: "<?php echo esc_url( cora_get_origin_relative_url( admin_url() ) ); ?>",
             ajaxUrl: "<?php echo esc_url( cora_get_origin_relative_url( admin_url( 'admin-ajax.php' ) ) ); ?>",
             siteUrl: "<?php echo esc_url( cora_get_origin_relative_url( get_site_url() ) ); ?>",
             restUrl: "<?php echo esc_url( cora_get_origin_relative_url( rest_url() ) ); ?>",
@@ -5206,7 +5207,7 @@ textarea,
 
     <!-- Global Brand & Customized Blocks Top Navbar (Shopify Style Unified Header) -->
     <header id="cora-global-topbar" class="cora-topbar bg-[#09090b] text-white px-4 md:px-6 py-2 flex items-center justify-between border-b border-zinc-800/80 sticky top-0 z-50 shrink-0 select-none" style="position: sticky !important; top: 0 !important; background-color: #09090b !important; z-index: 100020 !important; min-height: 48px;">
-        <div class="cora-topbar-desktop w-full items-center justify-between gap-4">
+        <div class="cora-topbar-desktop w-full items-center justify-between gap-4 relative" style="position: relative !important;">
             <!-- Universal Driver Topbar Strip (Desktop) -->
             <div class="cora-driver-topbar-strip <?php echo ( ! empty( $is_driver_user ) || $is_driver_url_param ) ? 'flex' : 'hidden'; ?> items-center justify-between w-full">
                 <a href="<?php echo esc_url( home_url( $cora_nav_prefix . '/dashboard' ) ); ?>" onclick="if(typeof window.coraNavigateTo==='function' && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0){ event.preventDefault(); window.coraNavigateTo('dashboard'); }" class="flex items-center gap-2.5 min-w-0 shrink-0 cursor-pointer hover:opacity-85 transition-opacity text-decoration-none" title="Go to Dashboard">
@@ -5241,9 +5242,9 @@ textarea,
                 <?php endif; ?>
             </div>
 
-            <!-- Center Section: Command Palette / Smart Search Trigger -->
-            <div class="flex-1 max-w-xl mx-auto flex items-center justify-center">
-                <div onclick="event.stopPropagation(); window.coraOpenCommandPalette();" class="w-full max-w-md px-3.5 py-1.5 flex items-center justify-between text-zinc-400 hover:text-zinc-200 bg-zinc-900/90 hover:bg-zinc-850 border border-zinc-800 hover:border-zinc-700 rounded-lg cursor-pointer transition-all shadow-2xs select-none" style="height: 32px;">
+            <!-- Center Section: Command Palette / Smart Search Trigger (Dead-Center Alignment) -->
+            <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-sm xl:max-w-md flex items-center justify-center px-4 pointer-events-none z-10">
+                <div onclick="event.stopPropagation(); window.coraOpenCommandPalette();" class="w-full px-3.5 py-1.5 flex items-center justify-between text-zinc-400 hover:text-zinc-200 bg-zinc-900/90 hover:bg-zinc-850 border border-zinc-800 hover:border-zinc-700 rounded-lg cursor-pointer transition-all shadow-2xs select-none pointer-events-auto" style="height: 32px;">
                     <div class="flex items-center gap-2.5 text-xs font-medium">
                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-500"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                         <span class="text-zinc-400 text-xs">Search anything or jump to...</span>
@@ -5255,23 +5256,9 @@ textarea,
             </div>
 
             <!-- Right Section: Actions & User Profile on the Edge -->
-            <div class="cora-topbar-actions flex items-center gap-2.5 shrink-0">
+            <div class="cora-topbar-actions flex items-center gap-2.5 shrink-0 ml-auto">
                 <!-- Standard Workspace MCP Button (Platform-Wide Global Header) -->
-                <?php if ( function_exists('cora_is_workspace_mcp_eligible') && cora_is_workspace_mcp_eligible() ) : ?>
-                <button type="button" 
-                        id="cora-header-mcp-btn" 
-                        class="cora-ai-alive-btn select-none hidden sm:inline-flex shrink-0" 
-                        onclick="if(typeof coraOpenWorkspaceDeveloperGateway === 'function') coraOpenWorkspaceDeveloperGateway();" 
-                        title="Workspace Model Context Protocol (MCP) &amp; Developer Gateway">
-                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="cora-ai-plug-icon shrink-0">
-                        <path d="M12 22v-5"></path>
-                        <path d="M9 8V2"></path>
-                        <path d="M15 8V2"></path>
-                        <path d="M18 8v5a6 6 0 0 1-12 0V8z"></path>
-                    </svg>
-                    <span class="whitespace-nowrap font-semibold">MCP</span>
-                </button>
-                <?php endif; ?>
+                <?php echo function_exists( 'cora_get_mcp_button_html' ) ? cora_get_mcp_button_html( 'hidden sm:inline-flex', 'cora-header-mcp-btn' ) : ''; ?>
 
                 <!-- Cora AI Copilot Shortcut -->
                 <button id="cora-quick-ai-btn" onclick="if(event){event.stopPropagation();event.preventDefault();} if(typeof window.coraToggleSidebar==='function'){ window.coraToggleSidebar(); }" class="w-8 h-8 flex items-center justify-center border border-zinc-800 rounded-lg hover:bg-zinc-800 bg-zinc-900 text-zinc-300 hover:text-white transition-all active:scale-[0.98] shadow-2xs cursor-pointer shrink-0" title="Cora AI Copilot">
@@ -6050,7 +6037,6 @@ textarea,
                         <span class="text-[10px] text-zinc-400 font-mono px-1 py-0.2 rounded bg-zinc-100 dark:bg-zinc-800">⌘.</span>
                     </button>
 
-                    <!-- Workspace API & MCP Gateway (Rule 15 Docked Panel) -->
                     <?php if ( function_exists('cora_is_workspace_mcp_eligible') && cora_is_workspace_mcp_eligible() ) : ?>
                     <button type="button" class="w-full text-left px-2.5 py-1.5 text-xs text-zinc-700 dark:text-zinc-300 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100 font-medium flex items-center justify-between cursor-pointer transition-colors" onclick="$('#cora-profile-popover').addClass('hidden'); if(typeof coraOpenWorkspaceDeveloperGateway === 'function') coraOpenWorkspaceDeveloperGateway();">
                         <div class="flex items-center gap-2.5">
@@ -6058,6 +6044,17 @@ textarea,
                             <span>Workspace API &amp; MCP</span>
                         </div>
                         <span class="text-[9px] font-semibold text-emerald-600 dark:text-emerald-400 px-1.5 py-0.2 bg-emerald-50 dark:bg-emerald-950/40 rounded border border-emerald-200/50 dark:border-emerald-800/50">MCP 2.0</span>
+                    </button>
+                    <?php else : ?>
+                    <button type="button" class="w-full text-left px-2.5 py-1.5 text-xs text-zinc-400 dark:text-zinc-500 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 font-medium flex items-center justify-between cursor-pointer transition-colors" onclick="$('#cora-profile-popover').addClass('hidden'); if(typeof coraOpenWorkspaceDeveloperGateway === 'function') coraOpenWorkspaceDeveloperGateway();" title="Model Context Protocol is available on Pro &amp; Scale plans. Click to upgrade.">
+                        <div class="flex items-center gap-2.5">
+                            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-400 dark:text-zinc-500 shrink-0">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                            </svg>
+                            <span>Workspace API &amp; MCP</span>
+                        </div>
+                        <span class="text-[9px] font-bold text-zinc-500 dark:text-zinc-400 px-1.5 py-0.2 bg-zinc-200 dark:bg-zinc-700 rounded border border-zinc-300 dark:border-zinc-600 uppercase tracking-wider">Locked (Pro)</span>
                     </button>
                     <?php endif; ?>
 
@@ -11712,10 +11709,13 @@ textarea,
             </section>
             <?php endif; ?>
 
-            <!-- SECTION: STATIC PAGES & LANDING PAGES -->
+            <!-- SECTION: STATIC PAGES & CANVAS GLOBAL PAGES (Shopify Architecture) -->
             <?php if ( $sub_page === 'pages' ) : ?>
-            <section id="cora-page-pages" class="cora-page-section cora-active space-y-6">
-                <?php include CORA_WORKSPACE_PATH . 'views/view-pages.php'; ?>
+            <section id="cora-page-canvas" class="cora-page-section cora-active space-y-6">
+                <script>
+                    window.coraCanvasDefaultSubTab = 'tab-canvas-pages';
+                </script>
+                <?php include CORA_WORKSPACE_PATH . 'views/view-canvas.php'; ?>
             </section>
             <?php endif; ?>
 
@@ -11825,16 +11825,6 @@ textarea,
 
             <!-- SECTION: EMAILS COMPOSER -->
             <?php if ( $sub_page === 'emails' ) : ?>
-            <?php
-            echo '<style>
-                .cora-content-wrapper {
-                    padding: 0 !important;
-                    gap: 0 !important;
-                }
-                /* Remove Tailwind space-y-6 between sections */
-                .cora-content-wrapper > * + * { margin-top: 0 !important; }
-            </style>';
-            ?>
             <section id="cora-page-emails" class="cora-page-section cora-active" style="padding:0;margin:0;overflow:visible;flex:1;display:flex;flex-direction:column;height:auto;">
                 <?php include CORA_WORKSPACE_PATH . 'views/view-emails.php'; ?>
             </section>
@@ -13874,6 +13864,15 @@ textarea,
         margin: 0 !important;
         padding: 0 !important;
     }
+    #cora-workspace-media-selector-modal {
+        z-index: 10000000 !important;
+    }
+    #cora-workspace-media-selector-modal #cora-workspace-media-backdrop {
+        z-index: 10000000 !important;
+    }
+    #cora-workspace-media-selector-modal > div:last-child {
+        z-index: 10000001 !important;
+    }
     #cora-full-page-editor main { background-color: #ffffff !important; padding: 0 !important; }
 
     @keyframes coraHeadingHighlight {
@@ -14361,13 +14360,13 @@ textarea,
                         </div>
                         <div class="grid grid-cols-2 gap-2" id="left-sidebar-media-grid">
                             <!-- Populated dynamically via JS: coraUpdateLeftSidebarMediaGrid() -->
-                            <div class="col-span-2 border border-dashed border-zinc-200 bg-zinc-50/50 rounded-xl p-5 text-center select-none mt-1">
-                                <div class="inline-flex p-2.5 bg-zinc-100 rounded-full text-zinc-400 mb-2 border border-zinc-200/50">
+                            <div class="col-span-2 border border-dashed border-zinc-200 hover:border-zinc-400 bg-zinc-50/50 hover:bg-zinc-100/70 rounded-xl p-5 text-center select-none mt-1 transition-all cursor-pointer group" onclick="coraOpenMediaLibrary('inline')" ondragover="event.preventDefault(); this.classList.add('border-violet-500','bg-violet-50/40');" ondragleave="this.classList.remove('border-violet-500','bg-violet-50/40');" ondrop="event.preventDefault(); this.classList.remove('border-violet-500','bg-violet-50/40'); if(window.coraHandleSidebarMediaDrop) coraHandleSidebarMediaDrop(event.dataTransfer.files);">
+                                <div class="inline-flex p-2.5 bg-zinc-100 group-hover:bg-white rounded-full text-zinc-400 group-hover:text-zinc-700 mb-2 border border-zinc-200/50 transition-colors shadow-3xs">
                                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
                                 </div>
                                 <span class="block text-xs font-bold text-zinc-800 mb-0.5">No Embedded Media</span>
-                                <span class="block text-[10px] text-zinc-450 leading-relaxed max-w-[170px] mx-auto mb-3">Add images to your article to see them mapped here.</span>
-                                <button type="button" class="w-full inline-flex items-center justify-center gap-1.5 py-1.5 px-3 border border-zinc-200 hover:border-zinc-350 hover:bg-zinc-50 rounded-lg text-[10px] font-bold text-zinc-700 bg-white transition-all cursor-pointer shadow-3xs" onclick="coraOpenMediaLibrary('inline')">
+                                <span class="block text-[10px] text-zinc-450 leading-relaxed max-w-[170px] mx-auto mb-3">Click or drop images here to map to your article.</span>
+                                <button type="button" class="w-full inline-flex items-center justify-center gap-1.5 py-1.5 px-3 border border-zinc-200 hover:border-zinc-350 hover:bg-zinc-50 rounded-lg text-[10px] font-bold text-zinc-700 bg-white transition-all cursor-pointer shadow-3xs" onclick="event.stopPropagation(); coraOpenMediaLibrary('inline');">
                                     <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                                     Add Image
                                 </button>
@@ -14427,7 +14426,7 @@ textarea,
                         </button>
                         <button type="button" id="cora-ambient-subtitle-btn" onclick="jQuery('#cora-article-subtitle').removeClass('hidden').focus()" class="text-xs text-zinc-400 hover:text-zinc-800 font-medium inline-flex items-center gap-1.5 py-1 px-2.5 rounded-lg hover:bg-zinc-100 transition-all cursor-pointer border-none bg-transparent">
                             <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                            <span>+ Add subtitle</span>
+                            <span>Add subtitle</span>
                         </button>
                     </div>
 
@@ -14478,7 +14477,10 @@ textarea,
 
                             <!-- Ambient AI Trigger in Typography Bar -->
                             <button type="button" id="cora-ai-palette-btn" onclick="coraOpenAIWritingPalette()" class="px-3 py-1 rounded-md text-xs font-medium text-zinc-700 bg-white border border-zinc-200/80 shadow-3xs hover:bg-zinc-50 flex items-center gap-1.5 cursor-pointer transition-all active:scale-95">
-                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none" class="text-violet-600"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L12 3Z"></path></svg>
+                                <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" class="shrink-0 text-violet-600 dark:text-violet-400" style="overflow: visible;">
+                                    <path d="M10 2c0 4.418-3.582 8-8 8 4.418 0 8 3.582 8 8 0-4.418 3.582-8 8-8-4.418 0-8-3.582-8-8z"/>
+                                    <path d="M19 13c0 2.209-1.791 4-4 4 2.209 0 4 1.791 4 4 0-2.209 1.791-4 4-4-2.209 0-4-1.791-4-4z"/>
+                                </svg>
                                 <span>AI Copilot (⌘K)</span>
                             </button>
                         </div>
@@ -14488,68 +14490,7 @@ textarea,
                         </span>
                     </div>
 
-                    <!-- AI Writing Copilot Floating Command Palette (⌘K) -->
-                    <div id="cora-ai-writing-palette" class="hidden fixed inset-0 z-[1000] bg-zinc-950/40 backdrop-blur-xs flex items-start justify-center pt-24 px-4 select-none" onclick="if(event.target === this) coraCloseAIWritingPalette();">
-                        <div class="w-full max-w-xl bg-white rounded-2xl shadow-2xl border border-zinc-200 overflow-hidden font-sans" onclick="event.stopPropagation();">
-                            <!-- Palette Header & Prompt Input -->
-                            <div class="p-3.5 border-b border-zinc-150 flex items-center gap-3">
-                                <span class="p-2 rounded-xl bg-violet-50 text-violet-600 border border-violet-100 shrink-0 flex items-center justify-center">
-                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L12 3Z"></path></svg>
-                                </span>
-                                <div class="flex-1 min-w-0">
-                                    <input type="text" id="cora-ai-prompt-input" placeholder="Ask AI Copilot to write, expand, summarize, or polish..." class="w-full text-xs font-medium text-zinc-900 placeholder:text-zinc-400 bg-transparent border-none outline-none focus:ring-0 focus:outline-none" onkeydown="if(event.key === 'Enter') coraExecuteAIPrompt()">
-                                </div>
-                                <button type="button" onclick="coraExecuteAIPrompt()" class="px-3 py-1.5 bg-zinc-950 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold transition-all shadow-3xs cursor-pointer flex items-center gap-1 active:scale-95">
-                                    <span>Generate</span>
-                                    <kbd class="text-[9px] font-mono text-zinc-400 bg-zinc-800 px-1 py-0.5 rounded leading-none">↵</kbd>
-                                </button>
-                                <button type="button" onclick="coraCloseAIWritingPalette()" class="p-1.5 text-zinc-400 hover:text-zinc-800 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer border-none bg-transparent" title="Close (Esc)">
-                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                                </button>
-                            </div>
 
-                            <!-- Quick Action Chips -->
-                            <div class="p-3 bg-zinc-50/70 border-b border-zinc-150">
-                                <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block mb-2">Instant Editorial Actions</span>
-                                <div class="flex flex-wrap gap-1.5">
-                                    <button type="button" onclick="coraRunAIAction('intro')" class="px-2.5 py-1.5 border border-zinc-200 hover:border-zinc-350 hover:bg-white rounded-lg text-xs font-medium text-zinc-700 bg-white shadow-3xs transition-all cursor-pointer flex items-center gap-1.5">
-                                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-                                        <span>Write Intro</span>
-                                    </button>
-                                    <button type="button" onclick="coraRunAIAction('expand')" class="px-2.5 py-1.5 border border-zinc-200 hover:border-zinc-350 hover:bg-white rounded-lg text-xs font-medium text-zinc-700 bg-white shadow-3xs transition-all cursor-pointer flex items-center gap-1.5">
-                                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
-                                        <span>Expand Selection</span>
-                                    </button>
-                                    <button type="button" onclick="coraRunAIAction('clarity')" class="px-2.5 py-1.5 border border-zinc-200 hover:border-zinc-350 hover:bg-white rounded-lg text-xs font-medium text-zinc-700 bg-white shadow-3xs transition-all cursor-pointer flex items-center gap-1.5">
-                                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
-                                        <span>Improve Clarity</span>
-                                    </button>
-                                    <button type="button" onclick="coraRunAIAction('examples')" class="px-2.5 py-1.5 border border-zinc-200 hover:border-zinc-350 hover:bg-white rounded-lg text-xs font-medium text-zinc-700 bg-white shadow-3xs transition-all cursor-pointer flex items-center gap-1.5">
-                                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line><line x1="9" y1="17" x2="11" y2="17"></line></svg>
-                                        <span>Add Examples</span>
-                                    </button>
-                                    <button type="button" onclick="coraCloseAIWritingPalette(); coraAIToneImprove();" class="px-2.5 py-1.5 border border-zinc-200 hover:border-zinc-350 hover:bg-white rounded-lg text-xs font-medium text-zinc-700 bg-white shadow-3xs transition-all cursor-pointer flex items-center gap-1.5">
-                                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
-                                        <span>Tone Presets...</span>
-                                    </button>
-                                    <button type="button" onclick="coraCloseAIWritingPalette(); coraAIFixGrammar();" class="px-2.5 py-1.5 border border-zinc-200 hover:border-zinc-350 hover:bg-white rounded-lg text-xs font-medium text-zinc-700 bg-white shadow-3xs transition-all cursor-pointer flex items-center gap-1.5">
-                                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                        <span>Fix Grammar</span>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Palette Footer -->
-                            <div class="px-4 py-2 bg-white flex items-center justify-between text-[11px] text-zinc-400">
-                                <span class="flex items-center gap-1.5">
-                                    <kbd class="font-mono bg-zinc-100 border border-zinc-200 px-1.5 py-0.5 rounded text-[10px] text-zinc-600">Enter</kbd> to generate
-                                </span>
-                                <span class="flex items-center gap-1.5">
-                                    <kbd class="font-mono bg-zinc-100 border border-zinc-200 px-1.5 py-0.5 rounded text-[10px] text-zinc-600">Esc</kbd> to close
-                                </span>
-                            </div>
-                        </div>
-                    </div>
 
                     <!-- Notion-Style Slash Commands Menu -->
                     <div id="cora-editor-slash-menu" class="hidden absolute bg-white border border-zinc-200 rounded-xl shadow-xl w-[300px] z-[999] select-none text-zinc-800 font-sans text-xs overflow-hidden">
@@ -14557,8 +14498,23 @@ textarea,
                         <!-- Main menu panel -->
                         <div id="cora-slash-main-panel" class="py-2 max-h-[360px] overflow-y-auto">
 
-                            <?php if ( $is_re ): ?>
-                                <div class="px-3 py-1.5 text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Listings &amp; Real Estate</div>
+                            <?php
+                            $active_features = function_exists('cora_get_custom_enabled_features') ? cora_get_custom_enabled_features() : array();
+                            $has_module_feature = function($mod_keys) use ($active_features, $cora_active_modules_map, $is_re, $is_studio) {
+                                if (!is_array($mod_keys)) $mod_keys = array($mod_keys);
+                                foreach ($mod_keys as $k) {
+                                    if (in_array($k, $active_features, true) || (isset($cora_active_modules_map) && is_array($cora_active_modules_map) && isset($cora_active_modules_map[$k]))) return true;
+                                }
+                                return false;
+                            };
+                            $slash_has_rendered_section = false;
+                            ?>
+
+                            <?php if ( $has_module_feature(array('properties', 'listings', 'showings')) || $is_re ): ?>
+                                <?php if ( $slash_has_rendered_section ): ?>
+                                    <div class="cora-slash-divider h-px bg-zinc-100 mx-3 my-1.5"></div>
+                                <?php endif; $slash_has_rendered_section = true; ?>
+                                <div class="cora-slash-category-header px-3 py-1.5 text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Listings &amp; Real Estate</div>
                                 <button type="button" onclick="coraOpenSlashPicker('listing')" class="cora-slash-item w-full text-left px-3 py-2 hover:bg-zinc-50 flex items-center gap-2.5 transition-colors cursor-pointer border-none bg-transparent">
                                     <span class="p-1.5 bg-zinc-100 rounded-md text-zinc-700 shrink-0"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></span>
                                     <div class="flex-1 min-w-0">
@@ -14581,8 +14537,13 @@ textarea,
                                         <span class="text-[9px] text-zinc-400 block leading-none mt-0.5 truncate">Local schools &amp; transit stats</span>
                                     </div>
                                 </button>
-                            <?php elseif ( $is_studio ): ?>
-                                <div class="px-3 py-1.5 text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Studio &amp; Production</div>
+                            <?php endif; ?>
+
+                            <?php if ( $has_module_feature(array('equipment', 'inventory')) || $is_studio ): ?>
+                                <?php if ( $slash_has_rendered_section ): ?>
+                                    <div class="cora-slash-divider h-px bg-zinc-100 mx-3 my-1.5"></div>
+                                <?php endif; $slash_has_rendered_section = true; ?>
+                                <div class="cora-slash-category-header px-3 py-1.5 text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Studio &amp; Equipment</div>
                                 <button type="button" onclick="coraOpenSlashPicker('equipment')" class="cora-slash-item w-full text-left px-3 py-2 hover:bg-zinc-50 flex items-center gap-2.5 transition-colors cursor-pointer border-none bg-transparent">
                                     <span class="p-1.5 bg-zinc-100 rounded-md text-zinc-700 shrink-0"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></span>
                                     <div class="flex-1 min-w-0">
@@ -14591,36 +14552,48 @@ textarea,
                                     </div>
                                     <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0 text-zinc-300"><polyline points="9 18 15 12 9 6"></polyline></svg>
                                 </button>
+                            <?php endif; ?>
+
+                            <?php if ( $has_module_feature(array('bookings', 'calendar', 'scheduler', 'crew_scheduler')) ): ?>
+                                <?php if ( $slash_has_rendered_section ): ?>
+                                    <div class="cora-slash-divider h-px bg-zinc-100 mx-3 my-1.5"></div>
+                                <?php endif; $slash_has_rendered_section = true; ?>
+                                <div class="cora-slash-category-header px-3 py-1.5 text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Bookings &amp; Calendar</div>
                                 <button type="button" onclick="coraInsertSlashWidget('booking')" class="cora-slash-item w-full text-left px-3 py-2 hover:bg-zinc-50 flex items-center gap-2.5 transition-colors cursor-pointer border-none bg-transparent">
                                     <span class="p-1.5 bg-zinc-100 rounded-md text-zinc-700 shrink-0"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></span>
                                     <div class="flex-1 min-w-0">
-                                        <span class="font-semibold block text-[11px] text-zinc-800">Studio Session Booking</span>
-                                        <span class="text-[9px] text-zinc-400 block leading-none mt-0.5 truncate">Consultation &amp; shoot booking form</span>
+                                        <span class="font-semibold block text-[11px] text-zinc-800">Session / Tour Booking Form</span>
+                                        <span class="text-[9px] text-zinc-400 block leading-none mt-0.5 truncate">Consultation &amp; booking form</span>
                                     </div>
                                 </button>
+                            <?php endif; ?>
+
+                            <?php if ( $has_module_feature(array('financials', 'finance', 'invoices', 'billing')) ): ?>
+                                <?php if ( $slash_has_rendered_section ): ?>
+                                    <div class="cora-slash-divider h-px bg-zinc-100 mx-3 my-1.5"></div>
+                                <?php endif; $slash_has_rendered_section = true; ?>
+                                <div class="cora-slash-category-header px-3 py-1.5 text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Rates &amp; Financials</div>
                                 <button type="button" onclick="coraInsertSlashWidget('rates')" class="cora-slash-item w-full text-left px-3 py-2 hover:bg-zinc-50 flex items-center gap-2.5 transition-colors cursor-pointer border-none bg-transparent">
                                     <span class="p-1.5 bg-zinc-100 rounded-md text-zinc-700 shrink-0"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v12M15 9.5H9.5a2.5 2.5 0 0 0 0 5h5a2.5 2.5 0 0 1 0 5H8"></path></svg></span>
                                     <div class="flex-1 min-w-0">
-                                        <span class="font-semibold block text-[11px] text-zinc-800">Rate Card / Pricing</span>
-                                        <span class="text-[9px] text-zinc-400 block leading-none mt-0.5 truncate">Half-day &amp; full-day rates card</span>
-                                    </div>
-                                </button>
-                            <?php else: ?>
-                                <div class="px-3 py-1.5 text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Agency &amp; Projects</div>
-                                <button type="button" onclick="coraInsertSlashWidget('casestudy')" class="cora-slash-item w-full text-left px-3 py-2 hover:bg-zinc-50 flex items-center gap-2.5 transition-colors cursor-pointer border-none bg-transparent">
-                                    <span class="p-1.5 bg-zinc-100 rounded-md text-zinc-700 shrink-0"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg></span>
-                                    <div class="flex-1 min-w-0">
-                                        <span class="font-semibold block text-[11px] text-zinc-800">Case Study Showcase</span>
-                                        <span class="text-[9px] text-zinc-400 block leading-none mt-0.5 truncate">Embed portfolio project card</span>
+                                        <span class="font-semibold block text-[11px] text-zinc-800">Production Rate Card</span>
+                                        <span class="text-[9px] text-zinc-400 block leading-none mt-0.5 truncate">Rates &amp; pricing breakdown</span>
                                     </div>
                                 </button>
                                 <button type="button" onclick="coraInsertSlashWidget('package')" class="cora-slash-item w-full text-left px-3 py-2 hover:bg-zinc-50 flex items-center gap-2.5 transition-colors cursor-pointer border-none bg-transparent">
                                     <span class="p-1.5 bg-zinc-100 rounded-md text-zinc-700 shrink-0"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg></span>
                                     <div class="flex-1 min-w-0">
-                                        <span class="font-semibold block text-[11px] text-zinc-800">Service Retainer / Rates</span>
-                                        <span class="text-[9px] text-zinc-400 block leading-none mt-0.5 truncate">Deliverables &amp; pricing card</span>
+                                        <span class="font-semibold block text-[11px] text-zinc-800">Service Retainer / Packages</span>
+                                        <span class="text-[9px] text-zinc-400 block leading-none mt-0.5 truncate">Deliverables &amp; retainer card</span>
                                     </div>
                                 </button>
+                            <?php endif; ?>
+
+                            <?php if ( $has_module_feature(array('leads', 'forms')) ): ?>
+                                <?php if ( $slash_has_rendered_section ): ?>
+                                    <div class="cora-slash-divider h-px bg-zinc-100 mx-3 my-1.5"></div>
+                                <?php endif; $slash_has_rendered_section = true; ?>
+                                <div class="cora-slash-category-header px-3 py-1.5 text-[9px] font-bold text-zinc-400 uppercase tracking-wider">CRM Leads &amp; Intake</div>
                                 <button type="button" onclick="coraInsertSlashWidget('consultation')" class="cora-slash-item w-full text-left px-3 py-2 hover:bg-zinc-50 flex items-center gap-2.5 transition-colors cursor-pointer border-none bg-transparent">
                                     <span class="p-1.5 bg-zinc-100 rounded-md text-zinc-700 shrink-0"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg></span>
                                     <div class="flex-1 min-w-0">
@@ -14630,8 +14603,24 @@ textarea,
                                 </button>
                             <?php endif; ?>
 
-                            <div class="h-px bg-zinc-100 mx-3 my-1.5"></div>
-                            <div class="px-3 py-1.5 text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Universal Blocks</div>
+                            <?php if ( $has_module_feature(array('projects', 'proposals', 'contracts')) ): ?>
+                                <?php if ( $slash_has_rendered_section ): ?>
+                                    <div class="cora-slash-divider h-px bg-zinc-100 mx-3 my-1.5"></div>
+                                <?php endif; $slash_has_rendered_section = true; ?>
+                                <div class="cora-slash-category-header px-3 py-1.5 text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Projects &amp; Case Studies</div>
+                                <button type="button" onclick="coraInsertSlashWidget('casestudy')" class="cora-slash-item w-full text-left px-3 py-2 hover:bg-zinc-50 flex items-center gap-2.5 transition-colors cursor-pointer border-none bg-transparent">
+                                    <span class="p-1.5 bg-zinc-100 rounded-md text-zinc-700 shrink-0"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg></span>
+                                    <div class="flex-1 min-w-0">
+                                        <span class="font-semibold block text-[11px] text-zinc-800">Case Study Showcase</span>
+                                        <span class="text-[9px] text-zinc-400 block leading-none mt-0.5 truncate">Embed portfolio project card</span>
+                                    </div>
+                                </button>
+                            <?php endif; ?>
+
+                            <?php if ( $slash_has_rendered_section ): ?>
+                                <div class="cora-slash-divider h-px bg-zinc-100 mx-3 my-1.5"></div>
+                            <?php endif; ?>
+                            <div class="cora-slash-category-header px-3 py-1.5 text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Universal Blocks</div>
                             <button type="button" onclick="coraOpenSlashPicker('article')" class="cora-slash-item w-full text-left px-3 py-2 hover:bg-zinc-50 flex items-center gap-2.5 transition-colors cursor-pointer border-none bg-transparent">
                                 <span class="p-1.5 bg-zinc-100 rounded-md text-zinc-700 shrink-0"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line></svg></span>
                                 <div class="flex-1 min-w-0">
@@ -14641,7 +14630,7 @@ textarea,
                                 <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none" class="shrink-0 text-zinc-300"><polyline points="9 18 15 12 9 6"></polyline></svg>
                             </button>
                             <button type="button" onclick="coraInsertSlashWidget('media')" class="cora-slash-item w-full text-left px-3 py-2 hover:bg-zinc-50 flex items-center gap-2.5 transition-colors cursor-pointer border-none bg-transparent">
-                                <span class="p-1.5 bg-zinc-100 rounded-md text-zinc-700 shrink-0"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></span>
+                                <span class="p-1.5 bg-zinc-100 rounded-md text-zinc-700 shrink-0"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></span>
                                 <div class="flex-1 min-w-0">
                                     <span class="font-semibold block text-[11px] text-zinc-800">Media Vault Asset</span>
                                     <span class="text-[9px] text-zinc-400 block leading-none mt-0.5 truncate">Embed single image from Vault</span>
@@ -14738,28 +14727,213 @@ textarea,
                 
                 <!-- Inspector Navigation Tabs -->
                 <div class="flex border-b border-zinc-200 bg-zinc-50 dark:bg-zinc-900 sticky top-0 z-10 text-[10px] font-bold uppercase tracking-wider inspector-tabs-container select-none font-sans">
-                    <button type="button" id="btn-sidebar-seo" onclick="coraSwitchInspectorTab('seo')" class="flex-1 py-3 px-2 text-center border-b-2 border-zinc-950 text-zinc-900 cursor-pointer transition-all flex items-center justify-center gap-1.5 inspector-tab-btn tab-active font-bold">
-                        <span>SEO</span>
+                    <button type="button" id="btn-sidebar-copilot" onclick="coraSwitchInspectorTab('copilot')" class="flex-1 py-3 px-2 text-center border-b-2 border-transparent text-zinc-400 hover:text-zinc-700 cursor-pointer transition-all flex items-center justify-center gap-1.5 inspector-tab-btn font-bold">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" class="shrink-0 text-violet-600 dark:text-violet-400" style="overflow: visible !important;">
+                            <path d="M10 2c0 4.418-3.582 8-8 8 4.418 0 8 3.582 8 8 0-4.418 3.582-8 8-8-4.418 0-8-3.582-8-8z"/>
+                            <path d="M19 13c0 2.209-1.791 4-4 4 2.209 0 4 1.791 4 4 0-2.209 1.791-4 4-4-2.209 0-4-1.791-4-4z"/>
+                        </svg>
+                        <span class="inspector-tab-label">Copilot</span>
                     </button>
-                    <button type="button" id="btn-sidebar-geo" onclick="coraSwitchInspectorTab('copilot')" class="flex-1 py-3 px-2 text-center border-b-2 border-transparent text-zinc-400 hover:text-zinc-700 cursor-pointer transition-all flex items-center justify-center gap-1.5 inspector-tab-btn font-bold">
-                        <span>AI Visibility</span>
+                    <button type="button" id="btn-sidebar-seo" onclick="coraSwitchInspectorTab('seo')" class="flex-1 py-3 px-1 text-center border-b-2 border-zinc-950 text-zinc-900 cursor-pointer transition-all flex items-center justify-center gap-1 inspector-tab-btn tab-active font-bold">
+                        <span class="inspector-tab-label">SEO</span>
                     </button>
-                    <button type="button" id="btn-sidebar-meta" onclick="coraSwitchInspectorTab('meta')" class="flex-1 py-3 px-2 text-center border-b-2 border-transparent text-zinc-400 hover:text-zinc-700 cursor-pointer transition-all flex items-center justify-center gap-1.5 inspector-tab-btn font-bold">
-                        <span>Details</span>
+                    <button type="button" id="btn-sidebar-geo" onclick="coraSwitchInspectorTab('geo')" class="flex-1 py-3 px-1 text-center border-b-2 border-transparent text-zinc-400 hover:text-zinc-700 cursor-pointer transition-all flex items-center justify-center gap-1 inspector-tab-btn font-bold">
+                        <span class="inspector-tab-label">AI Visibility</span>
                     </button>
-                    <button type="button" id="tab-inspector-claims" onclick="coraSwitchInspectorTab('claims')" class="px-4 py-3 text-center border-b-2 border-transparent text-zinc-400 hover:text-zinc-700 cursor-pointer transition-all flex items-center justify-center shrink-0 inspector-tab-btn font-bold" title="Compliance & Trust">
+                    <button type="button" id="btn-sidebar-meta" onclick="coraSwitchInspectorTab('meta')" class="flex-1 py-3 px-1 text-center border-b-2 border-transparent text-zinc-400 hover:text-zinc-700 cursor-pointer transition-all flex items-center justify-center gap-1 inspector-tab-btn font-bold">
+                        <span class="inspector-tab-label">Details</span>
+                    </button>
+                    <button type="button" id="tab-inspector-claims" onclick="coraSwitchInspectorTab('claims')" class="px-2.5 py-3 text-center border-b-2 border-transparent text-zinc-400 hover:text-zinc-700 cursor-pointer transition-all flex items-center justify-center shrink-0 inspector-tab-btn font-bold" title="Compliance & Trust">
                         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
                     </button>
                 </div>
 
                 <!-- Sticky Header Meta Bar (Assignee Select) -->
-                <div class="p-3 bg-zinc-50/80 border-b border-zinc-200 space-y-1 shrink-0 font-sans">
+                <div id="cora-assignee-container" class="p-3 bg-zinc-50/80 border-b border-zinc-200 space-y-1 shrink-0 font-sans">
                     <span class="text-[10px] font-extrabold text-zinc-400 uppercase tracking-wider block">Assignee / Author</span>
                     <select id="cora-article-assignee" class="w-full text-xs border border-zinc-200 rounded-lg p-2.5 bg-white text-zinc-800 focus:outline-none focus:border-zinc-400 shadow-3xs cursor-pointer">
                         <?php foreach($cora_users as $usr): ?>
                             <option value="<?php echo $usr->ID; ?>"><?php echo esc_html($usr->display_name); ?></option>
                         <?php endforeach; ?>
                     </select>
+                </div>
+
+                <!-- TAB 0: Real-Time AI Copilot Panel (In-Sidebar Real-Time Workspace Assistant) -->
+                <div id="panel-inspector-copilot-chat" class="hidden p-4 space-y-4 font-sans">
+                    <!-- Copilot Header Strip & Model Badge -->
+                    <div class="p-3 bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800 rounded-xl shadow-3xs space-y-2.5">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <span class="w-6 h-6 rounded-lg bg-violet-50 dark:bg-violet-950/40 text-violet-600 dark:text-violet-400 flex items-center justify-center border border-violet-100 dark:border-violet-900/50 shrink-0">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" class="shrink-0" style="overflow: visible;">
+                                        <path d="M10 2c0 4.418-3.582 8-8 8 4.418 0 8 3.582 8 8 0-4.418 3.582-8 8-8-4.418 0-8-3.582-8-8z"/>
+                                        <path d="M19 13c0 2.209-1.791 4-4 4 2.209 0 4 1.791 4 4 0-2.209 1.791-4 4-4-2.209 0-4-1.791-4-4z"/>
+                                    </svg>
+                                </span>
+                                <div>
+                                    <span class="text-xs font-bold text-zinc-900 dark:text-white leading-tight block">AI Copilot</span>
+                                    <span class="text-[9.5px] text-zinc-400 block leading-tight">Live contextual writing &amp; editing</span>
+                                </div>
+                            </div>
+                            <span class="text-[9.5px] font-bold text-violet-700 dark:text-violet-300 bg-violet-50 dark:bg-violet-950/60 border border-violet-200/60 dark:border-violet-800/60 px-2 py-0.5 rounded-full flex items-center gap-1 shrink-0">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                <span>Active</span>
+                            </span>
+                        </div>
+
+                        <!-- Real-time Context Pill -->
+                        <div id="cora-copilot-context-badge" class="px-3 py-1.5 bg-zinc-100/70 dark:bg-zinc-800/60 rounded-lg flex items-center justify-between text-[11px] text-zinc-600 dark:text-zinc-400 select-none border border-zinc-200/50 dark:border-zinc-700/50">
+                            <span class="flex items-center gap-1.5 truncate">
+                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none" class="text-zinc-400 shrink-0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                                <span id="cora-copilot-context-text" class="font-medium truncate">Full Document</span>
+                            </span>
+                            <span class="text-[9px] font-bold text-emerald-600 dark:text-emerald-400 shrink-0">✦ RAG Grounded</span>
+                        </div>
+                    </div>
+
+                    <!-- Prompt Input Card -->
+                    <div class="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-xl p-3 shadow-3xs space-y-2.5 focus-within:border-zinc-400 dark:focus-within:border-zinc-600 transition-all">
+                        <textarea id="cora-copilot-chat-input" rows="3" placeholder="Ask AI Copilot to write, continue, refine, rephrase, expand, or format..." class="w-full text-xs text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 bg-transparent border-none outline-none resize-none leading-relaxed p-0 focus:ring-0" onkeydown="if((event.metaKey || event.ctrlKey || (!event.shiftKey && event.key === 'Enter')) && event.key === 'Enter'){ event.preventDefault(); coraExecuteCopilotPanelPrompt(); }"></textarea>
+
+                        <div class="flex items-center justify-between pt-1 border-t border-zinc-100 dark:border-zinc-800 select-none">
+                            <span class="text-[9.5px] text-zinc-400 flex items-center gap-1">
+                                <span>Press</span>
+                                <kbd class="px-1 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 font-mono text-[9px] rounded leading-none border border-zinc-200/70 dark:border-zinc-700">↵</kbd>
+                                <span>to generate</span>
+                            </span>
+                            <button type="button" id="cora-copilot-chat-submit-btn" onclick="coraExecuteCopilotPanelPrompt()" class="px-3 py-1.5 bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 text-xs font-bold rounded-lg transition-all shadow-xs cursor-pointer flex items-center gap-1.5 active:scale-95 shrink-0 hover:opacity-90">
+                                <span>Generate</span>
+                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Shimmering Generating Progress Indicator -->
+                    <div id="cora-copilot-panel-loading" class="hidden p-3 bg-violet-50/70 dark:bg-violet-950/30 border border-violet-100 dark:border-violet-900/50 rounded-xl space-y-2 animate-fade-in select-none">
+                        <div class="flex items-center justify-between text-xs text-violet-700 dark:text-violet-300">
+                            <div class="flex items-center gap-2">
+                                <svg class="animate-spin shrink-0" viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg>
+                                <span class="font-medium text-[11px]" id="cora-copilot-panel-loading-msg">Cora AI is generating content...</span>
+                            </div>
+                            <button type="button" onclick="coraCancelAIGeneration()" class="text-[10px] font-bold text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 cursor-pointer border-none bg-transparent">Cancel</button>
+                        </div>
+                        <div class="space-y-1 pt-1">
+                            <div class="h-1.5 bg-violet-200/60 dark:bg-violet-800/40 rounded-full animate-pulse w-3/4"></div>
+                            <div class="h-1.5 bg-violet-200/40 dark:bg-violet-800/30 rounded-full animate-pulse w-1/2"></div>
+                        </div>
+                    </div>
+
+                    <!-- Generated Output Card (Real-Time Preview & 1-Click Insert) -->
+                    <div id="cora-copilot-panel-output" class="hidden border border-zinc-200/80 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-900 shadow-3xs overflow-hidden animate-fade-in">
+                        <div class="px-3.5 py-2.5 bg-zinc-50 dark:bg-zinc-800/50 border-b border-zinc-200/60 dark:border-zinc-800 flex items-center justify-between select-none">
+                            <span class="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
+                                <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" class="shrink-0 text-violet-600 dark:text-violet-400" style="overflow: visible;">
+                                    <path d="M10 2c0 4.418-3.582 8-8 8 4.418 0 8 3.582 8 8 0-4.418 3.582-8 8-8-4.418 0-8-3.582-8-8z"/>
+                                    <path d="M19 13c0 2.209-1.791 4-4 4 2.209 0 4 1.791 4 4 0-2.209 1.791-4 4-4-2.209 0-4-1.791-4-4z"/>
+                                </svg>
+                                <span>Generated Response</span>
+                            </span>
+                            <span id="cora-copilot-output-wordcount" class="text-[10px] font-mono text-zinc-400 font-semibold">0 words</span>
+                        </div>
+                        <div id="cora-copilot-output-preview" class="p-3 text-xs text-zinc-800 dark:text-zinc-200 leading-relaxed max-h-56 overflow-y-auto bg-white dark:bg-zinc-900 font-sans space-y-2"></div>
+                        
+                        <!-- Output Actions Strip -->
+                        <div class="p-2.5 bg-zinc-50/80 dark:bg-zinc-800/40 border-t border-zinc-200/60 dark:border-zinc-800 flex items-center gap-1.5 select-none">
+                            <button type="button" id="cora-copilot-btn-insert-cursor" onclick="coraInsertCopilotOutput('cursor')" class="flex-1 py-1.5 px-2 bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer shadow-3xs active:scale-95 hover:opacity-90">
+                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                <span>Insert at Cursor</span>
+                            </button>
+                            <button type="button" id="cora-copilot-btn-insert-replace" onclick="coraInsertCopilotOutput('replace')" class="hidden flex-1 py-1.5 px-2 bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer shadow-3xs active:scale-95 hover:opacity-90">
+                                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                                <span>Replace Selection</span>
+                            </button>
+                            <button type="button" onclick="coraInsertCopilotOutput('append')" class="py-1.5 px-2.5 bg-zinc-100/80 dark:bg-zinc-800 hover:bg-zinc-200/80 text-zinc-700 dark:text-zinc-300 rounded-lg text-xs font-semibold transition-all cursor-pointer border border-zinc-200/50 dark:border-zinc-700/50" title="Append to end of document">
+                                Append
+                            </button>
+                            <button type="button" onclick="coraCopyCopilotOutput()" class="p-1.5 bg-zinc-100/80 dark:bg-zinc-800 hover:bg-zinc-200/80 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 rounded-lg text-xs transition-all cursor-pointer border border-zinc-200/50 dark:border-zinc-700/50" title="Copy text">
+                                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Quick Action Chips (Drafting & Refinement) -->
+                    <div class="border border-zinc-200/80 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-900 p-3.5 shadow-3xs space-y-3">
+                        <div class="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-2">
+                            <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Quick Copilot Actions</span>
+                            <span class="text-[9.5px] text-zinc-400 font-medium">1-Click Drafting</span>
+                        </div>
+
+                        <!-- Section: Writing & Expanding -->
+                        <div class="space-y-1.5">
+                            <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider block">Draft &amp; Expand</span>
+
+                            <!-- Hero Outline Generator Action -->
+                            <button type="button" onclick="coraRunAIAction('outline')" class="w-full text-left p-2.5 bg-zinc-100/80 dark:bg-zinc-800/70 hover:bg-zinc-200/70 dark:hover:bg-zinc-700/60 rounded-xl text-xs font-semibold text-zinc-900 dark:text-zinc-100 transition-all cursor-pointer flex items-center justify-between group border border-zinc-200/50 dark:border-zinc-700/50 active:scale-97">
+                                <div class="flex items-center gap-2">
+                                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" class="text-violet-600 dark:text-violet-400 shrink-0"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                                    <span class="font-bold">Generate Article Outline</span>
+                                </div>
+                                <span class="text-[10px] text-zinc-400 group-hover:text-zinc-700 dark:group-hover:text-zinc-200 font-normal">H2/H3 Structure →</span>
+                            </button>
+
+                            <div class="grid grid-cols-2 gap-1.5">
+                                <button type="button" onclick="coraRunAIAction('intro')" class="w-full text-left p-2 bg-zinc-100/75 dark:bg-zinc-800/60 hover:bg-zinc-200/80 dark:hover:bg-zinc-700/60 rounded-lg text-xs transition-all cursor-pointer flex items-center gap-1.5 border border-zinc-200/50 dark:border-zinc-700/40 group active:scale-97">
+                                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 group-hover:text-zinc-900 shrink-0"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                                    <span class="font-medium text-zinc-800 dark:text-zinc-200 truncate">Write Intro</span>
+                                </button>
+                                <button type="button" onclick="coraRunAIAction('continue')" class="w-full text-left p-2 bg-zinc-100/75 dark:bg-zinc-800/60 hover:bg-zinc-200/80 dark:hover:bg-zinc-700/60 rounded-lg text-xs transition-all cursor-pointer flex items-center gap-1.5 border border-zinc-200/50 dark:border-zinc-700/40 group active:scale-97">
+                                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 group-hover:text-zinc-900 shrink-0"><polyline points="13 17 18 12 13 7"></polyline><polyline points="6 17 11 12 6 7"></polyline></svg>
+                                    <span class="font-medium text-zinc-800 dark:text-zinc-200 truncate">Continue</span>
+                                </button>
+                                <button type="button" onclick="coraRunAIAction('expand')" class="w-full text-left p-2 bg-zinc-100/75 dark:bg-zinc-800/60 hover:bg-zinc-200/80 dark:hover:bg-zinc-700/60 rounded-lg text-xs transition-all cursor-pointer flex items-center gap-1.5 border border-zinc-200/50 dark:border-zinc-700/40 group active:scale-97">
+                                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 group-hover:text-zinc-900 shrink-0"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                                    <span class="font-medium text-zinc-800 dark:text-zinc-200 truncate">Expand Section</span>
+                                </button>
+                                <button type="button" onclick="coraRunAIAction('examples')" class="w-full text-left p-2 bg-zinc-100/75 dark:bg-zinc-800/60 hover:bg-zinc-200/80 dark:hover:bg-zinc-700/60 rounded-lg text-xs transition-all cursor-pointer flex items-center gap-1.5 border border-zinc-200/50 dark:border-zinc-700/40 group active:scale-97">
+                                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 group-hover:text-zinc-900 shrink-0"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                                    <span class="font-medium text-zinc-800 dark:text-zinc-200 truncate">Add Examples</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Section: Polish & Refine -->
+                        <div class="space-y-1.5 pt-2 border-t border-zinc-100 dark:border-zinc-800">
+                            <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider block">Polish &amp; Transform</span>
+                            <div class="grid grid-cols-2 gap-1.5">
+                                <button type="button" onclick="coraRunAIAction('clarity')" class="w-full text-left p-2 bg-zinc-100/75 dark:bg-zinc-800/60 hover:bg-zinc-200/80 dark:hover:bg-zinc-700/60 rounded-lg text-xs transition-all cursor-pointer flex items-center gap-1.5 border border-zinc-200/50 dark:border-zinc-700/40 group active:scale-97">
+                                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 group-hover:text-zinc-900 shrink-0"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+                                    <span class="font-medium text-zinc-800 dark:text-zinc-200 truncate">Improve Clarity</span>
+                                </button>
+                                <button type="button" onclick="coraRunAICopilotQuick('shorten')" class="w-full text-left p-2 bg-zinc-100/75 dark:bg-zinc-800/60 hover:bg-zinc-200/80 dark:hover:bg-zinc-700/60 rounded-lg text-xs transition-all cursor-pointer flex items-center gap-1.5 border border-zinc-200/50 dark:border-zinc-700/40 group active:scale-97">
+                                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 group-hover:text-zinc-900 shrink-0"><line x1="4" y1="12" x2="20" y2="12"></line></svg>
+                                    <span class="font-medium text-zinc-800 dark:text-zinc-200 truncate">Make Concise</span>
+                                </button>
+                                <button type="button" onclick="coraRunAICopilotQuick('grammar')" class="w-full text-left p-2 bg-zinc-100/75 dark:bg-zinc-800/60 hover:bg-zinc-200/80 dark:hover:bg-zinc-700/60 rounded-lg text-xs transition-all cursor-pointer flex items-center gap-1.5 border border-zinc-200/50 dark:border-zinc-700/40 group active:scale-97">
+                                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 group-hover:text-zinc-900 shrink-0"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                    <span class="font-medium text-zinc-800 dark:text-zinc-200 truncate">Fix Grammar</span>
+                                </button>
+                                <button type="button" onclick="coraRunAICopilotQuick('tone_executive')" class="w-full text-left p-2 bg-zinc-100/75 dark:bg-zinc-800/60 hover:bg-zinc-200/80 dark:hover:bg-zinc-700/60 rounded-lg text-xs transition-all cursor-pointer flex items-center gap-1.5 border border-zinc-200/50 dark:border-zinc-700/40 group active:scale-97">
+                                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 group-hover:text-zinc-900 shrink-0"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                                    <span class="font-medium text-zinc-800 dark:text-zinc-200 truncate">Executive Tone</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Section: Search & GEO -->
+                        <div class="space-y-1.5 pt-2 border-t border-zinc-100 dark:border-zinc-800">
+                            <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-wider block">Search &amp; AI Visibility</span>
+                            <div class="grid grid-cols-2 gap-1.5">
+                                <button type="button" onclick="coraAIGenerateExcerpt()" class="w-full text-left p-2 bg-zinc-100/75 dark:bg-zinc-800/60 hover:bg-zinc-200/80 dark:hover:bg-zinc-700/60 rounded-lg text-xs transition-all cursor-pointer flex items-center gap-1.5 border border-zinc-200/50 dark:border-zinc-700/40 group active:scale-97">
+                                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 group-hover:text-zinc-900 shrink-0"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                                    <span class="font-medium text-zinc-800 dark:text-zinc-200 truncate">Auto Excerpt</span>
+                                </button>
+                                <button type="button" onclick="window.coraInjectGeoBlock('answer')" class="w-full text-left p-2 bg-zinc-100/75 dark:bg-zinc-800/60 hover:bg-zinc-200/80 dark:hover:bg-zinc-700/60 rounded-lg text-xs transition-all cursor-pointer flex items-center gap-1.5 border border-zinc-200/50 dark:border-zinc-700/40 group active:scale-97">
+                                    <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none" class="text-zinc-400 group-hover:text-zinc-900 shrink-0"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                                    <span class="font-medium text-zinc-800 dark:text-zinc-200 truncate">GEO Answer</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div id="panel-inspector-copilot" class="hidden p-4 space-y-4 font-sans">
@@ -15280,6 +15454,9 @@ textarea,
                 </div>
             </aside>
         </div>
+
+        <!-- AI Writing Copilot Legacy Modal Fallback (Hidden - integrated into Right Side Inspector) -->
+        <div id="cora-ai-writing-palette" class="hidden" style="display: none !important;" aria-hidden="true"></div>
     </div>
 
         <script>
@@ -15422,21 +15599,35 @@ textarea,
             if (typeof window.coraToggleArticleInspector === 'function') {
                 window.coraToggleArticleInspector(true);
             }
-            jQuery('#tab-inspector-copilot, #btn-sidebar-geo, #tab-inspector-meta, #btn-sidebar-meta, #tab-inspector-seo, #btn-sidebar-seo, #tab-inspector-claims').removeClass('border-zinc-950 text-zinc-900 tab-active').addClass('border-transparent text-zinc-400');
-            jQuery('#panel-inspector-copilot, #panel-sidebar-geo, #panel-inspector-meta, #panel-sidebar-meta, #panel-inspector-seo, #panel-sidebar-seo, #panel-inspector-claims').addClass('hidden');
+            jQuery('#btn-sidebar-copilot, #tab-inspector-copilot, #btn-sidebar-geo, #tab-inspector-meta, #btn-sidebar-meta, #tab-inspector-seo, #btn-sidebar-seo, #tab-inspector-claims').removeClass('border-zinc-950 text-zinc-900 tab-active').addClass('border-transparent text-zinc-400');
+            jQuery('#panel-inspector-copilot-chat, #panel-inspector-copilot, #panel-sidebar-geo, #panel-inspector-meta, #panel-sidebar-meta, #panel-inspector-seo, #panel-sidebar-seo, #panel-inspector-claims').addClass('hidden');
             
-            if (tab === 'copilot' || tab === 'geo') {
-                jQuery('#tab-inspector-copilot, #btn-sidebar-geo').removeClass('border-transparent text-zinc-400').addClass('border-zinc-950 text-zinc-900 tab-active');
+            if (tab === 'copilot') {
+                jQuery('#btn-sidebar-copilot, #tab-inspector-copilot').removeClass('border-transparent text-zinc-400').addClass('border-zinc-950 text-zinc-900 tab-active');
+                jQuery('#panel-inspector-copilot-chat').removeClass('hidden');
+                jQuery('#cora-assignee-container').addClass('hidden');
+                if (typeof window.coraUpdateCopilotContextBadge === 'function') {
+                    window.coraUpdateCopilotContextBadge();
+                }
+                setTimeout(function() {
+                    jQuery('#cora-copilot-chat-input').focus();
+                }, 80);
+            } else if (tab === 'geo' || tab === 'visibility') {
+                jQuery('#btn-sidebar-geo').removeClass('border-transparent text-zinc-400').addClass('border-zinc-950 text-zinc-900 tab-active');
                 jQuery('#panel-inspector-copilot, #panel-sidebar-geo').removeClass('hidden');
+                jQuery('#cora-assignee-container').removeClass('hidden');
             } else if (tab === 'meta' || tab === 'details') {
                 jQuery('#tab-inspector-meta, #btn-sidebar-meta').removeClass('border-transparent text-zinc-400').addClass('border-zinc-950 text-zinc-900 tab-active');
                 jQuery('#panel-inspector-meta, #panel-sidebar-meta').removeClass('hidden');
+                jQuery('#cora-assignee-container').removeClass('hidden');
             } else if (tab === 'claims') {
                 jQuery('#tab-inspector-claims').removeClass('border-transparent text-zinc-400').addClass('border-zinc-950 text-zinc-900 tab-active');
                 jQuery('#panel-inspector-claims').removeClass('hidden');
+                jQuery('#cora-assignee-container').removeClass('hidden');
             } else {
                 jQuery('#tab-inspector-seo, #btn-sidebar-seo').removeClass('border-transparent text-zinc-400').addClass('border-zinc-950 text-zinc-900 tab-active');
                 jQuery('#panel-inspector-seo, #panel-sidebar-seo').removeClass('hidden');
+                jQuery('#cora-assignee-container').removeClass('hidden');
             }
         };
         window.coraSwitchSidebarTab = window.coraSwitchInspectorTab;
@@ -15659,13 +15850,13 @@ textarea,
             if (images.length === 0) {
                 jQuery('#cora-left-embedded-count').text('0');
                 grid.html(`
-                    <div class="col-span-2 border border-dashed border-zinc-200 bg-zinc-50/50 rounded-xl p-5 text-center select-none mt-1">
-                        <div class="inline-flex p-2.5 bg-zinc-100 rounded-full text-zinc-400 mb-2 border border-zinc-200/50">
+                    <div class="col-span-2 border border-dashed border-zinc-200 hover:border-zinc-400 bg-zinc-50/50 hover:bg-zinc-100/70 rounded-xl p-5 text-center select-none mt-1 transition-all cursor-pointer group" onclick="coraOpenMediaLibrary('inline')" ondragover="event.preventDefault(); this.classList.add('border-violet-500','bg-violet-50/40');" ondragleave="this.classList.remove('border-violet-500','bg-violet-50/40');" ondrop="event.preventDefault(); this.classList.remove('border-violet-500','bg-violet-50/40'); if(window.coraHandleSidebarMediaDrop) coraHandleSidebarMediaDrop(event.dataTransfer.files);">
+                        <div class="inline-flex p-2.5 bg-zinc-100 group-hover:bg-white rounded-full text-zinc-400 group-hover:text-zinc-700 mb-2 border border-zinc-200/50 transition-colors shadow-3xs">
                             <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="1.8" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
                         </div>
                         <span class="block text-xs font-bold text-zinc-800 mb-0.5">No Embedded Media</span>
-                        <span class="block text-[10px] text-zinc-450 leading-relaxed max-w-[170px] mx-auto mb-3">Add images to your article to see them mapped here.</span>
-                        <button type="button" class="w-full inline-flex items-center justify-center gap-1.5 py-1.5 px-3 border border-zinc-200 hover:border-zinc-350 hover:bg-zinc-50 rounded-lg text-[10px] font-bold text-zinc-700 bg-white transition-all cursor-pointer shadow-3xs" onclick="coraOpenMediaLibrary('inline')">
+                        <span class="block text-[10px] text-zinc-450 leading-relaxed max-w-[170px] mx-auto mb-3">Click or drop images here to map to your article.</span>
+                        <button type="button" class="w-full inline-flex items-center justify-center gap-1.5 py-1.5 px-3 border border-zinc-200 hover:border-zinc-350 hover:bg-zinc-50 rounded-lg text-[10px] font-bold text-zinc-700 bg-white transition-all cursor-pointer shadow-3xs" onclick="event.stopPropagation(); coraOpenMediaLibrary('inline');">
                             <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                             Add Image
                         </button>
@@ -15733,19 +15924,35 @@ textarea,
                     e.stopPropagation();
                     try {
                         const Q = window.Quill || (typeof Quill !== 'undefined' ? Quill : null);
+                        let deleted = false;
                         if (Q) {
                             const blot = Q.find(img);
                             if (blot) {
                                 const index = window.coraQuillListingCoordinator.getIndex(blot);
                                 window.coraQuillListingCoordinator.deleteText(index, 1);
-                                if (window.coraShowToast) {
-                                    window.coraShowToast('Image removed. Press Cmd+Z to undo.', 'success');
-                                }
+                                deleted = true;
                             }
                         }
-                    } catch(err) {
+                        if (!deleted) {
+                            img.remove();
+                        }
+                        if (window.coraUpdateLeftSidebarMediaGrid) {
+                            window.coraUpdateLeftSidebarMediaGrid();
+                        }
+                        if (window.coraUpdateWordCount) {
+                            window.coraUpdateWordCount();
+                        }
+                        if (window.coraTriggerEditorAutoSave) {
+                            window.coraTriggerEditorAutoSave();
+                        }
                         if (window.coraShowToast) {
-                            window.coraShowToast('Failed to delete image.', 'error');
+                            window.coraShowToast('Image removed from article.', 'success');
+                        }
+                    } catch(err) {
+                        img.remove();
+                        if (window.coraUpdateLeftSidebarMediaGrid) window.coraUpdateLeftSidebarMediaGrid();
+                        if (window.coraShowToast) {
+                            window.coraShowToast('Image removed.', 'info');
                         }
                     }
                 });
@@ -15757,6 +15964,17 @@ textarea,
                 
                 grid.append(card);
             });
+        };
+
+        // Handle desktop file drag-and-drop directly onto sidebar media area
+        window.coraHandleSidebarMediaDrop = function(files) {
+            if (!files || files.length === 0) return;
+            if (typeof window.coraMediaSelectorHandleUpload === 'function') {
+                // Set target mode to inline before uploading so it gets embedded
+                window.coraMediaSelectTarget = 'inline';
+                if (window.coraShowToast) window.coraShowToast(`Uploading ${files.length} asset(s) to Vault...`, 'info');
+                window.coraMediaSelectorHandleUpload(files);
+            }
         };
 
 
@@ -15787,8 +16005,8 @@ textarea,
 
         // Call workspace AI query proxy
         window.coraCallWorkspaceAI = function(message, systemPrompt, callback) {
-            const nonce = typeof coraREData !== 'undefined' ? coraREData.ajaxNonce : (typeof coraREWPData !== 'undefined' ? coraREWPData.ajaxNonce : '');
-            const ajaxUrl = typeof ajaxurl !== 'undefined' ? ajaxurl : (typeof coraREWPData !== 'undefined' ? coraREWPData.ajaxUrl : '/wp-admin/admin-ajax.php');
+            const nonce = (window.coraREData && window.coraREData.ajaxNonce) || (window.coraREWPData && window.coraREWPData.ajaxNonce) || '';
+            const ajaxUrl = (window.coraREData && window.coraREData.ajaxUrl) || (window.coraREWPData && window.coraREWPData.ajaxUrl) || (typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php');
             
             // Get active model provider
             const modelVal = jQuery('#cora-ai-model-selector').val() || 'cora-core-v2';
@@ -15800,7 +16018,11 @@ textarea,
                 model = 'gpt-4o-mini';
             }
 
-            jQuery.post(ajaxUrl, {
+            if (window.coraCurrentAIRequest && window.coraCurrentAIRequest.abort) {
+                try { window.coraCurrentAIRequest.abort(); } catch(e) {}
+            }
+
+            window.coraCurrentAIRequest = jQuery.post(ajaxUrl, {
                 action: 'cora_ai_chat_query',
                 security: nonce,
                 message: message,
@@ -15809,15 +16031,33 @@ textarea,
                 model: model,
                 temperature: 0.7
             }, function(response) {
-                if (response.success && response.data && response.data.reply) {
+                window.coraCurrentAIRequest = null;
+                if (response && response.success && response.data && response.data.reply) {
                     callback(null, response.data.reply);
                 } else {
-                    const failMsg = response.data && response.data.message ? response.data.message : (response.data ? response.data : 'AI model response error.');
+                    const failMsg = response && response.data && response.data.message ? response.data.message : ((response && response.data) ? response.data : 'AI model response error.');
                     callback(new Error(failMsg));
                 }
-            }).fail(function(xhr) {
+            }).fail(function(xhr, statusText) {
+                window.coraCurrentAIRequest = null;
+                if (statusText === 'abort' || xhr.statusText === 'abort') {
+                    return;
+                }
                 callback(new Error('Network connection failed.'));
             });
+        };
+
+        window.coraCancelAIGeneration = function() {
+            if (window.coraCurrentAIRequest && window.coraCurrentAIRequest.abort) {
+                try { window.coraCurrentAIRequest.abort(); } catch(e) {}
+                window.coraCurrentAIRequest = null;
+            }
+            jQuery('#cora-ai-generating-indicator').addClass('hidden');
+            jQuery('#cora-ai-prompt-input').prop('disabled', false).focus();
+            jQuery('#cora-ai-generate-btn').prop('disabled', false).removeClass('opacity-50 cursor-not-allowed');
+            if (typeof window.coraShowToast === 'function') {
+                window.coraShowToast('AI generation cancelled.', 'info');
+            }
         };
 
         // Excerpt AI generator
@@ -15869,28 +16109,41 @@ Output ONLY a concise, highly-engaging SEO meta description summary excerpt (max
 
         // Execute dynamic prompt from inline assistant card input
         window.coraExecuteAIPrompt = function() {
-            if (!window.coraQuillListingCoordinator) {
-                window.coraShowToast('Editor is initializing, please wait...', 'warning');
+            const editor = window.coraQuillListingCoordinator || (typeof coraQuillListingCoordinator !== 'undefined' ? coraQuillListingCoordinator : null);
+            if (!editor) {
+                if (typeof window.coraShowToast === 'function') {
+                    window.coraShowToast('Editor is initializing, please wait...', 'warning');
+                }
                 return;
             }
             const inputEl = jQuery('#cora-ai-prompt-input');
-            const prompt = inputEl.val().trim();
+            const generateBtn = jQuery('#cora-ai-generate-btn');
+            const indicator = jQuery('#cora-ai-generating-indicator');
+            const prompt = (inputEl.val() || '').trim();
             if (!prompt) {
-                window.coraShowToast('Please type a prompt first.', 'error');
+                if (typeof window.coraShowToast === 'function') {
+                    window.coraShowToast('Please type a prompt first.', 'error');
+                }
+                inputEl.focus();
                 return;
             }
 
+            // Show loading state & disable inputs
             inputEl.prop('disabled', true);
-            window.coraShowToast('AI is processing prompt: "' + prompt + '"...', 'info');
+            generateBtn.prop('disabled', true).addClass('opacity-50 cursor-not-allowed');
+            jQuery('#cora-ai-generating-msg').text('Cora AI is crafting content with workspace context...');
+            indicator.removeClass('hidden');
 
-            window.coraGetRagBrainFacts(function(facts) {
+            const fetchFacts = typeof window.coraGetRagBrainFacts === 'function' ? window.coraGetRagBrainFacts : function(cb) { cb(''); };
+
+            fetchFacts(function(facts) {
                 const title = jQuery('#cora-article-title').val() || 'Untitled';
                 const keyword = jQuery('#cora-seo-keyword').val() || 'None';
-                const currentText = window.coraQuillListingCoordinator.getText().trim();
+                const currentText = editor.getText().trim();
                 
-                const systemPrompt = `You are Myra, a sharp, action-oriented Indian AI Writing Assistant and editor at Cora Studio.
+                const systemPrompt = `You are a professional AI Writing Assistant for Cora Studio.
 Ground your writing and claims strictly in the provided business facts (RAG facts). Do not invent facts, pricing, packages, or office locations that contradict the RAG database.
-Output ONLY the requested content to be inserted. Do NOT include markdown code blocks (like \`\`\`html or \`\`\`text), HTML wrappers around the whole thing, or conversational intros/outros (like "Sure, here is...", "Okay boss"). Standard inline HTML formatting tags (like <p>, <h2>, <strong>, <ul>) are allowed.`;
+Output ONLY the requested content to be inserted. Do NOT include markdown code blocks (like \`\`\`html or \`\`\`text), HTML wrappers around the whole thing, or conversational intros/outros (like "Sure, here is..."). Standard inline HTML formatting tags (like <p>, <h2>, <strong>, <em>, <ul>, <li>) are allowed.`;
 
                 const message = `Article Title: "${title}"
 Focus Keyword: "${keyword}"
@@ -15903,66 +16156,117 @@ Generate the requested paragraph or section.`;
 
                 window.coraCallWorkspaceAI(message, systemPrompt, function(err, reply) {
                     inputEl.prop('disabled', false);
+                    generateBtn.prop('disabled', false).removeClass('opacity-50 cursor-not-allowed');
+                    indicator.addClass('hidden');
+
                     if (err) {
-                        window.coraShowToast('AI Generation failed: ' + err.message, 'error');
+                        if (typeof window.coraShowToast === 'function') {
+                            window.coraShowToast('AI Generation failed: ' + err.message, 'error');
+                        }
                         return;
                     }
                     
-                    const range = window.coraQuillListingCoordinator.getSelection();
-                    const index = range ? range.index : window.coraQuillListingCoordinator.getLength();
+                    const range = editor.getSelection();
+                    const index = range ? range.index : editor.getLength();
+                    const length = range ? range.length : 0;
                     
-                    const insertedHtml = reply.trim();
-                    window.coraQuillListingCoordinator.clipboard.dangerouslyPasteHTML(index, insertedHtml, 'user');
-                    window.coraQuillListingCoordinator.setSelection(index + insertedHtml.length);
+                    let insertedHtml = (reply || '').trim();
+                    if (!insertedHtml.startsWith('<')) {
+                        insertedHtml = '<p>' + insertedHtml + '</p>';
+                    }
+
+                    if (length > 0) {
+                        editor.deleteText(index, length, 'user');
+                    }
+                    editor.clipboard.dangerouslyPasteHTML(index, insertedHtml, 'user');
+                    editor.setSelection(index + insertedHtml.length);
                     
                     inputEl.val('');
-                    window.coraShowToast('AI content inserted successfully!', 'success');
-                    window.coraUpdateWordCount();
-                    window.coraTriggerEditorAutoSave();
+                    if (typeof window.coraCloseAIWritingPalette === 'function') {
+                        window.coraCloseAIWritingPalette();
+                    }
+                    if (typeof window.coraShowToast === 'function') {
+                        window.coraShowToast('AI content inserted successfully! Press ⌘Z to undo.', 'success');
+                    }
+                    if (typeof window.coraUpdateWordCount === 'function') {
+                        window.coraUpdateWordCount();
+                    }
+                    if (typeof window.coraTriggerEditorAutoSave === 'function') {
+                        window.coraTriggerEditorAutoSave();
+                    }
                 });
             });
         };
 
         // Run predefined actions (chips) from inline assistant card
         window.coraRunAIAction = function(action) {
-            if (!window.coraQuillListingCoordinator) {
-                window.coraShowToast('Editor is initializing, please wait...', 'warning');
+            const editor = window.coraQuillListingCoordinator || (typeof coraQuillListingCoordinator !== 'undefined' ? coraQuillListingCoordinator : null);
+            if (!editor) {
+                if (typeof window.coraShowToast === 'function') {
+                    window.coraShowToast('Editor is initializing, please wait...', 'warning');
+                }
                 return;
             }
-            const range = window.coraQuillListingCoordinator.getSelection();
+            const range = editor.getSelection();
             const hasSelection = range && range.length > 0;
             let selectedText = '';
             if (hasSelection) {
-                selectedText = window.coraQuillListingCoordinator.getText(range.index, range.length).trim();
+                selectedText = editor.getText(range.index, range.length).trim();
             }
 
             if (action === 'clarity' && !hasSelection) {
-                window.coraShowToast('Please highlight/select the text you want to clarify first.', 'warning');
+                if (typeof window.coraShowToast === 'function') {
+                    window.coraShowToast('Please highlight/select the text you want to clarify first.', 'warning');
+                }
                 return;
             }
             if (action === 'expand' && !hasSelection) {
-                window.coraShowToast('Please highlight/select the section you want to expand first.', 'warning');
+                if (typeof window.coraShowToast === 'function') {
+                    window.coraShowToast('Please highlight/select the section you want to expand first.', 'warning');
+                }
                 return;
             }
             if (action === 'examples' && !hasSelection) {
-                window.coraShowToast('Please highlight/select the statement you want to generate examples for.', 'warning');
+                if (typeof window.coraShowToast === 'function') {
+                    window.coraShowToast('Please highlight/select the statement you want to generate examples for.', 'warning');
+                }
                 return;
             }
 
-            window.coraShowToast('Running AI ' + action + ' optimization...', 'info');
+            // Close palette smoothly when action starts
+            if (typeof window.coraCloseAIWritingPalette === 'function') {
+                window.coraCloseAIWritingPalette();
+            }
 
-            window.coraGetRagBrainFacts(function(facts) {
+            const actionLabels = {
+                'intro': 'introduction',
+                'continue': 'next paragraphs',
+                'expand': 'expansion',
+                'clarity': 'clarity rewrite',
+                'examples': 'examples'
+            };
+            const label = actionLabels[action] || action;
+            if (typeof window.coraShowToast === 'function') {
+                window.coraShowToast('Generating ' + label + ' with AI Copilot...', 'info');
+            }
+
+            const fetchFacts = typeof window.coraGetRagBrainFacts === 'function' ? window.coraGetRagBrainFacts : function(cb) { cb(''); };
+
+            fetchFacts(function(facts) {
                 const title = jQuery('#cora-article-title').val() || 'Untitled';
                 const keyword = jQuery('#cora-seo-keyword').val() || 'None';
-                const currentText = window.coraQuillListingCoordinator.getText().trim();
+                const currentText = editor.getText().trim();
                 
                 const systemPrompt = `You are a professional AI Writing Assistant for Cora Studio.
 Ground your writing in these verified business facts if applicable: ${facts}
-Output ONLY the generated rich-text content to replace or insert. Do NOT include markdown code blocks, conversational comments, or notes. Use inline HTML tags for formatting.`;
+Output ONLY the generated rich-text content to replace or insert. Do NOT include markdown code blocks, conversational comments, or notes. Use standard inline HTML tags (<p>, <h2>, <strong>, <em>, <ul>, <li>) for formatting.`;
 
                 let prompt = '';
                 if (action === 'intro') {
                     prompt = `Generate a compelling, SEO-optimized introduction paragraph (about 80-120 words) for an article titled "${title}". Focus Keyword: "${keyword}".`;
+                } else if (action === 'continue') {
+                    const contextSnippet = selectedText || (currentText.length > 800 ? currentText.slice(-800) : currentText);
+                    prompt = `Continue writing the next 1-2 paragraphs smoothly, maintaining the style, tone, and logical narrative flow of the following content: "${contextSnippet}". Article title: "${title}".`;
                 } else if (action === 'expand') {
                     prompt = `Expand on the following section to add more detail, depth, and structural insights: "${selectedText}".`;
                 } else if (action === 'clarity') {
@@ -15973,35 +16277,52 @@ Output ONLY the generated rich-text content to replace or insert. Do NOT include
 
                 window.coraCallWorkspaceAI(prompt, systemPrompt, function(err, reply) {
                     if (err) {
-                        window.coraShowToast('AI optimization failed: ' + err.message, 'error');
+                        if (typeof window.coraShowToast === 'function') {
+                            window.coraShowToast('AI optimization failed: ' + err.message, 'error');
+                        }
                         return;
                     }
 
-                    const index = range ? range.index : window.coraQuillListingCoordinator.getLength();
-                    const length = range ? range.length : 0;
-                    const insertedHtml = reply.trim();
+                    const curRange = editor.getSelection();
+                    const index = curRange ? curRange.index : (range ? range.index : editor.getLength());
+                    const length = curRange ? curRange.length : (range ? range.length : 0);
+                    
+                    let insertedHtml = (reply || '').trim();
+                    if (!insertedHtml.startsWith('<')) {
+                        insertedHtml = '<p>' + insertedHtml + '</p>';
+                    }
 
                     if (action === 'intro') {
                         if (hasSelection) {
-                            window.coraQuillListingCoordinator.deleteText(index, length, 'user');
-                            window.coraQuillListingCoordinator.clipboard.dangerouslyPasteHTML(index, insertedHtml, 'user');
+                            editor.deleteText(index, length, 'user');
+                            editor.clipboard.dangerouslyPasteHTML(index, insertedHtml, 'user');
                         } else {
-                            window.coraQuillListingCoordinator.clipboard.dangerouslyPasteHTML(0, insertedHtml + '<br><br>', 'user');
-                            window.coraQuillListingCoordinator.setSelection(0, insertedHtml.length);
+                            editor.clipboard.dangerouslyPasteHTML(0, insertedHtml + '<br><br>', 'user');
+                            editor.setSelection(0, insertedHtml.length);
                         }
+                    } else if (action === 'continue') {
+                        const targetIndex = editor.getLength();
+                        editor.clipboard.dangerouslyPasteHTML(targetIndex, '<br>' + insertedHtml, 'user');
+                        editor.setSelection(targetIndex + insertedHtml.length);
                     } else {
                         if (hasSelection) {
-                            window.coraQuillListingCoordinator.deleteText(index, length, 'user');
-                            window.coraQuillListingCoordinator.clipboard.dangerouslyPasteHTML(index, insertedHtml, 'user');
+                            editor.deleteText(index, length, 'user');
+                            editor.clipboard.dangerouslyPasteHTML(index, insertedHtml, 'user');
                         } else {
-                            window.coraQuillListingCoordinator.clipboard.dangerouslyPasteHTML(index, '<br>' + insertedHtml + '<br>', 'user');
+                            editor.clipboard.dangerouslyPasteHTML(index, '<br>' + insertedHtml + '<br>', 'user');
                         }
-                        window.coraQuillListingCoordinator.setSelection(index, insertedHtml.length);
+                        editor.setSelection(index, insertedHtml.length);
                     }
 
-                    window.coraShowToast('AI optimization complete! Press ⌘Z to undo.', 'success');
-                    window.coraUpdateWordCount();
-                    window.coraTriggerEditorAutoSave();
+                    if (typeof window.coraShowToast === 'function') {
+                        window.coraShowToast('AI content inserted successfully! Press ⌘Z to undo.', 'success');
+                    }
+                    if (typeof window.coraUpdateWordCount === 'function') {
+                        window.coraUpdateWordCount();
+                    }
+                    if (typeof window.coraTriggerEditorAutoSave === 'function') {
+                        window.coraTriggerEditorAutoSave();
+                    }
                 });
             });
         };
@@ -16307,6 +16628,9 @@ Output ONLY the rewritten text to replace the selection. Do NOT include markdown
                     if (!window.coraQuillListenersAttached) {
                         window.coraQuillListingCoordinator.on('text-change', function() {
                             window.coraUpdateWordCount();
+                            if (typeof window.coraUpdateLeftSidebarMediaGrid === 'function') {
+                                window.coraUpdateLeftSidebarMediaGrid();
+                            }
                             window.coraTriggerEditorAutoSave();
                         });
 
@@ -16330,9 +16654,12 @@ Output ONLY the rewritten text to replace the selection. Do NOT include markdown
                         window.coraQuillListenersAttached = true;
                     }
 
-                    // Update word count immediately once Quill is initialized
+                    // Update word count and media grid immediately once Quill is initialized
                     if (typeof window.coraUpdateWordCount === 'function') {
                         window.coraUpdateWordCount();
+                    }
+                    if (typeof window.coraUpdateLeftSidebarMediaGrid === 'function') {
+                        window.coraUpdateLeftSidebarMediaGrid();
                     }
                 }
             }, 100);

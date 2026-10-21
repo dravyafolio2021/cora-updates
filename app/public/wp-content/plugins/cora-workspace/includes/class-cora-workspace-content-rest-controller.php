@@ -343,9 +343,9 @@ class Cora_Workspace_Content_REST_Controller {
      * Resolve WP Post from either numeric ID or slug in request parameters
      */
     public static function resolve_post( $request ) {
-        $id_param   = $request->get_param( 'id' );
-        if ( empty( $id_param ) && method_exists( $request, 'get_route' ) ) {
-            if ( preg_match( '#/content/(\d+)#', $request->get_route(), $rm ) ) {
+        $id_param = $request->get_param( 'id' ) ?: $request->get_param( 'post_id' ) ?: $request->get_param( 'article_id' );
+        if ( ( empty( $id_param ) || $id_param === '0' || $id_param === 0 ) && method_exists( $request, 'get_route' ) ) {
+            if ( preg_match( '#/content/(\d+)#', $request->get_route(), $rm ) && intval( $rm[1] ) > 0 ) {
                 $id_param = $rm[1];
             }
         }
@@ -473,6 +473,27 @@ class Cora_Workspace_Content_REST_Controller {
         if ( ! empty( $tags ) ) {
             wp_set_post_tags( $new_id, $tags );
         }
+
+        // Handle Creative Thumbnail / Featured Image Sideloading
+        if ( empty( $thumb_id ) && ! empty( $thumb_url ) ) {
+            $found_thumb = attachment_url_to_postid( $thumb_url );
+            if ( $found_thumb > 0 ) {
+                $thumb_id = $found_thumb;
+            } else {
+                if ( ! class_exists( 'Cora_MCP_Tool_Registry' ) ) {
+                    require_once dirname( __DIR__ ) . '/mcp/class-cora-mcp-tool-registry.php';
+                }
+                $up_args = ( strpos( $thumb_url, 'data:' ) === 0 || strpos( $thumb_url, ';base64,' ) !== false )
+                    ? array( 'file_base64' => $thumb_url, 'title' => $title )
+                    : array( 'url' => $thumb_url, 'title' => $title );
+                $up_res = Cora_MCP_Tool_Registry::handle_upload_media( $up_args, array( 'workspace_id' => $agency_id, 'user_id' => $author_id ) );
+                if ( ! is_wp_error( $up_res ) && ! empty( $up_res['media_id'] ) ) {
+                    $thumb_id  = intval( $up_res['media_id'] );
+                    $thumb_url = $up_res['url'] ?? $thumb_url;
+                    update_post_meta( $new_id, '_cora_thumbnail_url', $thumb_url );
+                }
+            }
+        }
         if ( $thumb_id > 0 ) {
             set_post_thumbnail( $new_id, $thumb_id );
         }
@@ -510,11 +531,23 @@ class Cora_Workspace_Content_REST_Controller {
         }
 
         $created = get_post( $new_id );
+        $pub_url = function_exists( 'cora_get_article_public_url' ) ? cora_get_article_public_url( $new_id ) : get_permalink( $new_id );
+        $formatted = self::format_article( $created, true );
 
         return new WP_REST_Response( array(
-            'success' => true,
-            'message' => "Created article '{$title}' successfully.",
-            'article' => self::format_article( $created, true ),
+            'success'       => true,
+            'message'       => "Created article '{$title}' successfully.",
+            'post_id'       => $new_id,
+            'id'            => $new_id,
+            'url'           => $pub_url,
+            'permalink'     => $pub_url,
+            'live_url'      => $pub_url,
+            'public_url'    => $pub_url,
+            'status'        => $post_status,
+            'thumbnail_url' => $formatted['thumbnail_url'] ?? '',
+            'seo_score'     => $final_seo,
+            'geo_score'     => $final_geo,
+            'article'       => $formatted,
         ), 201 );
     }
 
@@ -569,6 +602,30 @@ class Cora_Workspace_Content_REST_Controller {
         }
         if ( $request->has_param( 'thumbnail_id' ) ) {
             set_post_thumbnail( $post_id, intval( $request->get_param( 'thumbnail_id' ) ) );
+        } elseif ( $request->has_param( 'thumbnail_url' ) ) {
+            $t_url = esc_url_raw( $request->get_param( 'thumbnail_url' ) );
+            if ( ! empty( $t_url ) ) {
+                $found_thumb = attachment_url_to_postid( $t_url );
+                if ( $found_thumb > 0 ) {
+                    set_post_thumbnail( $post_id, $found_thumb );
+                    update_post_meta( $post_id, '_cora_thumbnail_url', $t_url );
+                } else {
+                    if ( ! class_exists( 'Cora_MCP_Tool_Registry' ) ) {
+                        require_once dirname( __DIR__ ) . '/mcp/class-cora-mcp-tool-registry.php';
+                    }
+                    $t_agency = self::resolve_agency_id( $request );
+                    $up_args = ( strpos( $t_url, 'data:' ) === 0 || strpos( $t_url, ';base64,' ) !== false )
+                        ? array( 'file_base64' => $t_url, 'title' => $post->post_title ?? 'Thumbnail' )
+                        : array( 'url' => $t_url, 'title' => $post->post_title ?? 'Thumbnail' );
+                    $up_res = Cora_MCP_Tool_Registry::handle_upload_media( $up_args, array( 'workspace_id' => $t_agency ) );
+                    if ( ! is_wp_error( $up_res ) && ! empty( $up_res['media_id'] ) ) {
+                        set_post_thumbnail( $post_id, intval( $up_res['media_id'] ) );
+                        update_post_meta( $post_id, '_cora_thumbnail_url', $up_res['url'] ?? $t_url );
+                    } else {
+                        update_post_meta( $post_id, '_cora_thumbnail_url', $t_url );
+                    }
+                }
+            }
         }
         if ( $request->has_param( 'categories' ) ) {
             wp_set_post_categories( $post_id, array_map( 'intval', (array) $request->get_param( 'categories' ) ) );
@@ -596,10 +653,23 @@ class Cora_Workspace_Content_REST_Controller {
         update_post_meta( $post_id, '_cora_seo_score', $final_seo );
         update_post_meta( $post_id, '_cora_geo_score', $final_geo );
 
+        $pub_url = function_exists( 'cora_get_article_public_url' ) ? cora_get_article_public_url( $post_id ) : get_permalink( $post_id );
+        $formatted = self::format_article( $updated_post, true );
+
         return new WP_REST_Response( array(
-            'success' => true,
-            'message' => "Updated article #{$post_id} '{$updated_post->post_title}' successfully.",
-            'article' => self::format_article( $updated_post, true ),
+            'success'       => true,
+            'message'       => "Updated article #{$post_id} '{$updated_post->post_title}' successfully.",
+            'post_id'       => $post_id,
+            'id'            => $post_id,
+            'url'           => $pub_url,
+            'permalink'     => $pub_url,
+            'live_url'      => $pub_url,
+            'public_url'    => $pub_url,
+            'status'        => $updated_post->post_status,
+            'thumbnail_url' => $formatted['thumbnail_url'] ?? '',
+            'seo_score'     => $final_seo,
+            'geo_score'     => $final_geo,
+            'article'       => $formatted,
         ), 200 );
     }
 
@@ -660,15 +730,19 @@ class Cora_Workspace_Content_REST_Controller {
         update_post_meta( $post_id, '_cora_workflow_stage', 'published' );
 
         $pub_url = function_exists( 'cora_get_article_public_url' ) ? cora_get_article_public_url( $post_id ) : get_permalink( $post_id );
+        $formatted = self::format_article( $post, false );
 
         return new WP_REST_Response( array(
-            'success'    => true,
-            'message'    => "Published article #{$post_id} '{$post->post_title}' live.",
-            'post_id'    => $post_id,
-            'status'     => 'published',
-            'public_url' => $pub_url,
-            'live_url'   => $pub_url,
-            'url'        => $pub_url,
+            'success'       => true,
+            'message'       => "Published article #{$post_id} '{$post->post_title}' live.",
+            'post_id'       => $post_id,
+            'id'            => $post_id,
+            'status'        => 'published',
+            'public_url'    => $pub_url,
+            'live_url'      => $pub_url,
+            'url'           => $pub_url,
+            'permalink'     => $pub_url,
+            'thumbnail_url' => $formatted['thumbnail_url'] ?? '',
         ), 200 );
     }
 
@@ -960,7 +1034,7 @@ class Cora_Workspace_Content_REST_Controller {
         $meta_desc = get_post_meta( $post_id, '_cora_meta_desc', true ) ?: ( $post->post_excerpt ?: '' );
         $meta_title = get_post_meta( $post_id, '_cora_meta_title', true ) ?: '';
 
-        $thumb_url = get_the_post_thumbnail_url( $post_id, 'medium' ) ?: '';
+        $thumb_url = get_the_post_thumbnail_url( $post_id, 'large' ) ?: ( get_the_post_thumbnail_url( $post_id, 'medium' ) ?: ( get_post_meta( $post_id, '_cora_thumbnail_url', true ) ?: '' ) );
         $public_url = function_exists( 'cora_get_article_public_url' ) ? cora_get_article_public_url( $post_id ) : get_permalink( $post_id );
         $edit_url   = home_url( "/workspace/blogs?edit_post_id={$post_id}" );
 

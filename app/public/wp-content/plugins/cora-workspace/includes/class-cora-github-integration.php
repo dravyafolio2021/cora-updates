@@ -40,7 +40,8 @@ class Cora_GitHub_Integration {
 			"cora_github_revert_commit",
 			"cora_github_sync_entire_workspace",
 			"cora_github_save_preferences",
-			"cora_github_provision_org_repo"
+			"cora_github_provision_org_repo",
+			"cora_github_sync_theme_branch"
 		) as $action ) {
 			add_action( "wp_ajax_" . $action, array( $this, $action ) );
 		}
@@ -141,6 +142,21 @@ class Cora_GitHub_Integration {
 		if ( ! $page_id ) wp_send_json_error( array( "message" => "Invalid page ID." ) );
 		$repo = $this->get_repo();
 		if ( empty( $repo ) ) wp_send_json_error( array( "message" => "No repository connected." ) );
+
+		// Autonomous SOP: If committing to a draft branch, ensure the branch exists on GitHub
+		if ( $branch !== "main" && ! empty( $branch ) ) {
+			$ref_resp = $this->github_request( "GET", "/repos/{$repo}/git/ref/heads/{$branch}" );
+			if ( $ref_resp["code"] !== 200 ) {
+				$main_ref = $this->github_request( "GET", "/repos/{$repo}/git/ref/heads/main" );
+				if ( $main_ref["code"] === 200 && ! empty( $main_ref["data"]["object"]["sha"] ) ) {
+					$this->github_request( "POST", "/repos/{$repo}/git/refs", array(
+						"ref" => "refs/heads/{$branch}",
+						"sha" => $main_ref["data"]["object"]["sha"]
+					) );
+				}
+			}
+		}
+
 		$post      = get_post( $page_id );
 		$slug      = $post->post_name ?: sanitize_title( $post->post_title );
 		$snapshot  = array( "page_id" => $page_id, "title" => $post->post_title, "slug" => $slug, "status" => $post->post_status, "modified" => $post->post_modified_gmt, "committed_at" => gmdate( "c" ), "design" => json_decode( get_post_meta( $page_id, "_elementor_data", true ) ) );
@@ -153,7 +169,7 @@ class Cora_GitHub_Integration {
 		if ( $sha ) $body["sha"] = $sha;
 		$result = $this->github_request( "PUT", "/repos/{$repo}/contents/{$file_path}", $body );
 		if ( isset( $result["error"] ) || ! in_array( $result["code"], array( 200, 201 ), true ) ) wp_send_json_error( array( "message" => $result["data"]["message"] ?? "Commit failed." ) );
-		wp_send_json_success( array( "commit_url" => $result["data"]["commit"]["html_url"] ?? "", "message" => $msg ) );
+		wp_send_json_success( array( "commit_url" => $result["data"]["commit"]["html_url"] ?? "", "message" => $msg, "branch" => $branch ) );
 	}
 
 	public function cora_github_get_status() {
@@ -191,36 +207,83 @@ class Cora_GitHub_Integration {
 			$saved_username = get_option( "cora_git_sync_username", "" );
 		}
 		$user_data = $user_resp["data"] ?? array();
+
+		$branch = isset( $_POST["branch"] ) ? sanitize_text_field( wp_unslash( $_POST["branch"] ) ) : ( isset( $_GET["branch"] ) ? sanitize_text_field( wp_unslash( $_GET["branch"] ) ) : "main" );
+		if ( empty( $branch ) ) $branch = "main";
+
+		// Fetch all workspace themes (Live & Drafts) so user can see each draft theme by human name
+		global $wpdb;
+		$themes_tbl = $wpdb->prefix . 'cora_canvas_themes';
+		$workspace_themes = array();
+		if ( function_exists( 'cora_table_exists' ) ? cora_table_exists( $themes_tbl ) : true ) {
+			$raw_themes = $wpdb->get_results( "SELECT id, name, status, updated_at FROM {$themes_tbl} ORDER BY status = 'live' DESC, updated_at DESC, id DESC", ARRAY_A );
+			if ( is_array( $raw_themes ) ) {
+				foreach ( $raw_themes as $th_row ) {
+					$th_id     = intval( $th_row['id'] );
+					$th_name   = ! empty( $th_row['name'] ) ? sanitize_text_field( $th_row['name'] ) : 'Untitled Theme';
+					$is_live   = ( $th_row['status'] === 'live' );
+					$th_slug   = sanitize_title( $th_name ) ?: 'theme';
+					$th_branch = $is_live ? 'main' : ( 'draft/' . $th_id . '-' . $th_slug );
+
+					$workspace_themes[] = array(
+						'id'         => $th_id,
+						'name'       => $th_name,
+						'status'     => $th_row['status'],
+						'branch'     => $th_branch,
+						'updated_at' => $th_row['updated_at']
+					);
+				}
+			}
+		}
+
 		$payload = array(
-			"connected"     => true,
-			"username"      => $saved_username ?: ( $user_data["login"] ?? "" ),
-			"avatar_url"    => $user_data["avatar_url"] ?? "",
-			"name"          => $user_data["name"] ?? "",
-			"repo"          => $repo,
-			"has_repo"      => ! empty( $repo ),
-			"has_clientid"  => ! empty( $this->get_client_id() ),
-			"sync_mode"     => get_user_meta( $uid, "cora_github_sync_mode", true ) ?: "pr",
-			"auto_sync"     => get_user_meta( $uid, "cora_github_auto_sync", true ) !== "0",
-			"repo_mode"     => get_user_meta( $uid, "cora_github_repo_mode", true ) ?: "personal",
-			"org_name"      => get_option( "cora_github_org_name", "cora-platform" ),
-			"tenant_id"     => "ws-" . $uid,
-			"pull_requests" => array(),
-			"branches"      => array( "main" ),
-			"recent_commits"=> array()
+			"connected"        => true,
+			"username"         => $saved_username ?: ( $user_data["login"] ?? "" ),
+			"avatar_url"       => $user_data["avatar_url"] ?? "",
+			"name"             => $user_data["name"] ?? "",
+			"repo"             => $repo,
+			"has_repo"         => ! empty( $repo ),
+			"has_clientid"     => ! empty( $this->get_client_id() ),
+			"sync_mode"        => get_user_meta( $uid, "cora_github_sync_mode", true ) ?: "pr",
+			"auto_sync"        => get_user_meta( $uid, "cora_github_auto_sync", true ) !== "0",
+			"repo_mode"        => get_user_meta( $uid, "cora_github_repo_mode", true ) ?: "personal",
+			"org_name"         => get_option( "cora_github_org_name", "cora-platform" ),
+			"tenant_id"        => "ws-" . $uid,
+			"active_branch"    => $branch,
+			"workspace_themes" => $workspace_themes,
+			"pull_requests"    => array(),
+			"branches"         => array( "main" ),
+			"recent_commits"   => array()
 		);
 		if ( ! empty( $repo ) ) {
 			$br = $this->github_request( "GET", "/repos/{$repo}/branches?per_page=50" );
-			if ( $br["code"] === 200 ) $payload["branches"] = array_column( $br["data"], "name" );
-			$cr = $this->github_request( "GET", "/repos/{$repo}/commits?per_page=10" );
+			if ( $br["code"] === 200 && is_array( $br["data"] ) ) {
+				$payload["branches"] = array_column( $br["data"], "name" );
+			}
+
+			// Ensure all workspace draft theme branches are represented in branches array
+			foreach ( $workspace_themes as $wt ) {
+				if ( ! in_array( $wt['branch'], $payload['branches'], true ) ) {
+					$payload['branches'][] = $wt['branch'];
+				}
+			}
+
+			// Fetch branch-specific commits
+			$commit_url = "/repos/{$repo}/commits?per_page=20";
+			if ( ! empty( $branch ) && $branch !== "all" ) {
+				$commit_url .= "&sha=" . urlencode( $branch );
+			}
+			$cr = $this->github_request( "GET", $commit_url );
 			if ( $cr["code"] === 200 && is_array( $cr["data"] ) ) {
-				$payload["recent_commits"] = array_map( function( $c ) {
+				$payload["recent_commits"] = array_map( function( $c ) use ( $branch ) {
 					return array(
 						"sha"      => substr( $c["sha"], 0, 7 ),
 						"full_sha" => $c["sha"],
 						"message"  => $c["commit"]["message"] ?? "",
 						"date"     => $c["commit"]["committer"]["date"] ?? "",
 						"author"   => $c["commit"]["author"]["name"] ?? ( $c["author"]["login"] ?? "Studio Admin" ),
-						"url"      => $c["html_url"] ?? ""
+						"url"      => $c["html_url"] ?? "",
+						"branch"   => $branch
 					);
 				}, $cr["data"] );
 			}
@@ -694,6 +757,66 @@ class Cora_GitHub_Integration {
 		}
 
 		wp_send_json_error( array( "message" => $res["data"]["message"] ?? "Could not provision repository under organization." ) );
+	}
+
+	public function cora_github_sync_theme_branch() {
+		check_ajax_referer( "cora_ajax_nonce", "nonce" );
+		$theme_id = isset( $_POST["theme_id"] ) ? absint( $_POST["theme_id"] ) : 0;
+		if ( ! $theme_id ) wp_send_json_error( array( "message" => "Theme ID required." ) );
+		$repo = $this->get_repo();
+		if ( empty( $repo ) ) wp_send_json_error( array( "message" => "No GitHub repository connected." ) );
+
+		global $wpdb;
+		$theme = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_themes WHERE id = %d", $theme_id ), ARRAY_A );
+		if ( ! $theme ) wp_send_json_error( array( "message" => "Theme not found." ) );
+
+		$is_live = ( $theme["status"] === "live" );
+		$slug    = sanitize_title( $theme["name"] ?: "theme" );
+		$branch  = $is_live ? "main" : "draft/{$theme_id}-{$slug}";
+
+		// Ensure branch exists if it is a draft
+		if ( ! $is_live ) {
+			$ref_resp = $this->github_request( "GET", "/repos/{$repo}/git/ref/heads/{$branch}" );
+			if ( $ref_resp["code"] !== 200 ) {
+				$main_ref = $this->github_request( "GET", "/repos/{$repo}/git/ref/heads/main" );
+				if ( $main_ref["code"] === 200 && ! empty( $main_ref["data"]["object"]["sha"] ) ) {
+					$this->github_request( "POST", "/repos/{$repo}/git/refs", array(
+						"ref" => "refs/heads/{$branch}",
+						"sha" => $main_ref["data"]["object"]["sha"]
+					) );
+				}
+			}
+		}
+
+		// Retrieve all templates for this theme
+		$templates = array();
+		if ( class_exists( "Cora_Template_Engine" ) ) {
+			$templates = Cora_Template_Engine::instance()->get_theme_templates( $theme_id );
+		}
+
+		$committed_templates = 0;
+		foreach ( $templates as $t ) {
+			$file_path = "templates/" . $t["archetype"] . "." . $t["slug"] . ".html";
+			$content   = $t["layout_data"] ?: "";
+			$encoded   = base64_encode( $content );
+			$existing  = $this->github_request( "GET", "/repos/{$repo}/contents/{$file_path}?ref={$branch}" );
+			$sha       = ( $existing["code"] === 200 && ! empty( $existing["data"]["sha"] ) ) ? $existing["data"]["sha"] : null;
+			$body      = array(
+				"message" => "feat(template): sync " . $t["archetype"] . "." . $t["slug"] . " blueprint · " . gmdate( "Y-m-d H:i" ) . " UTC",
+				"content" => $encoded,
+				"branch"  => $branch
+			);
+			if ( $sha ) $body["sha"] = $sha;
+			$this->github_request( "PUT", "/repos/{$repo}/contents/{$file_path}", $body );
+			$committed_templates++;
+		}
+
+		wp_send_json_success( array(
+			"message"             => "Theme '" . $theme["name"] . "' synchronized with GitHub branch '" . $branch . "'.",
+			"branch"              => $branch,
+			"is_live"             => $is_live,
+			"committed_templates" => $committed_templates
+		) );
 	}
 }
 

@@ -30,6 +30,28 @@ $cora_team_users = get_users( array( 'fields' => array( 'ID', 'display_name', 'u
 #cora-forms-module { position: relative; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* Sticky sub-tabs stuck elevation and white frosted background */
+#cora-forms-tabs.cora-tabs-stuck,
+.cora-sub-tabs-container.cora-tabs-stuck,
+.cora-sticky-sub-tabs.cora-tabs-stuck {
+    background-color: #ffffff !important;
+    background-color: rgba(255, 255, 255, 0.98) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border-bottom-color: rgba(228, 228, 231, 0.95) !important;
+    box-shadow: 0 4px 14px -2px rgba(0, 0, 0, 0.06), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
+}
+.dark #cora-forms-tabs.cora-tabs-stuck,
+.dark .cora-sub-tabs-container.cora-tabs-stuck,
+.dark .cora-sticky-sub-tabs.cora-tabs-stuck {
+    background-color: #0c0c0e !important;
+    background-color: rgba(12, 12, 14, 0.98) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border-bottom-color: #27272a !important;
+    box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.5) !important;
+}
+
 /* Universal Entry Inspector Drawer - Starts from Screen Edge, Tab Menu Behind */
 #cora-entry-inspector {
     position: fixed !important;
@@ -44,15 +66,15 @@ $cora_team_users = get_users( array( 'fields' => array( 'ID', 'display_name', 'u
 }
 @media (min-width: 768px) {
     #cora-entry-inspector {
-        top: 0 !important;
+        top: var(--cora-main-top, var(--cora-topbar-height, 52px)) !important;
         right: 0 !important;
         bottom: 0 !important;
-        height: 100vh !important;
-        max-height: 100vh !important;
+        height: calc(100vh - var(--cora-main-top, var(--cora-topbar-height, 52px))) !important;
+        max-height: calc(100vh - var(--cora-main-top, var(--cora-topbar-height, 52px))) !important;
         width: 480px !important;
         max-width: 90vw !important;
         border-left: 1px solid rgba(228, 228, 231, 0.8) !important;
-        border-top: 0 !important;
+        border-top: 1px solid rgba(228, 228, 231, 0.8) !important;
         border-right: 0 !important;
         border-bottom: 0 !important;
         border-radius: 0 !important;
@@ -60,6 +82,7 @@ $cora_team_users = get_users( array( 'fields' => array( 'ID', 'display_name', 'u
     }
     .dark #cora-entry-inspector {
         border-left-color: #27272a !important;
+        border-top-color: #27272a !important;
     }
 }
 @media (max-width: 767px) {
@@ -2986,7 +3009,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (isMdBreakpoint()) {
             // Desktop side drawer
-            drawer.classList.add('inset-y-0', 'right-0', 'w-[450px]', 'border-l', 'translate-x-full');
+            const topbarEl = document.getElementById('cora-global-topbar') || document.getElementById('cora-header');
+            const topbarH = (topbarEl && topbarEl.offsetHeight > 0) ? topbarEl.offsetHeight : 52;
+            drawer.style.top = 'var(--cora-main-top, ' + topbarH + 'px)';
+            drawer.style.height = 'calc(100vh - var(--cora-main-top, ' + topbarH + 'px))';
+            drawer.style.bottom = '0px';
+            drawer.classList.add('right-0', 'w-[450px]', 'border-l', 'border-t', 'translate-x-full');
         } else {
             // Mobile bottom sheet
             drawer.classList.add('inset-x-0', 'bottom-0', 'max-h-[85vh]', 'rounded-t-2xl', 'border-t', 'translate-y-full');
@@ -4258,15 +4286,17 @@ function deleteForm(id) {
             inspector.className = 'fixed transition-transform duration-300 ease-out bg-white dark:bg-zinc-900 shadow-2xl border-zinc-200/80 dark:border-zinc-800 flex flex-col font-sans pointer-events-auto overflow-hidden';
 
             if (isMd) {
-                inspector.style.top = '0px';
+                const topbarEl = document.getElementById('cora-global-topbar') || document.getElementById('cora-header');
+                const topbarH = (topbarEl && topbarEl.offsetHeight > 0) ? topbarEl.offsetHeight : 52;
+                inspector.style.top = 'var(--cora-main-top, ' + topbarH + 'px)';
                 inspector.style.right = '0px';
                 inspector.style.bottom = '0px';
                 inspector.style.left = 'auto';
-                inspector.style.height = '100vh';
-                inspector.style.maxHeight = '100vh';
+                inspector.style.height = 'calc(100vh - var(--cora-main-top, ' + topbarH + 'px))';
+                inspector.style.maxHeight = 'calc(100vh - var(--cora-main-top, ' + topbarH + 'px))';
                 inspector.style.width = '480px';
                 inspector.style.maxWidth = '90vw';
-                inspector.classList.add('border-l', 'translate-x-full');
+                inspector.classList.add('border-l', 'border-t', 'translate-x-full');
             } else {
                 inspector.style.top = 'auto';
                 inspector.style.bottom = '0px';
@@ -5389,6 +5419,7 @@ let currentFormFilter = 'all';
             var topbar = document.getElementById('cora-global-topbar') || document.getElementById('cora-header');
             var h = topbar ? (topbar.offsetHeight || topbar.getBoundingClientRect().height || 48) : 48;
             document.documentElement.style.setProperty('--cora-topbar-height', h + 'px');
+            document.documentElement.style.setProperty('--cora-main-top', h + 'px');
             var stickyTop = (window.innerWidth >= 1024) ? '0px' : (h + 'px');
             document.documentElement.style.setProperty('--cora-sticky-tabs-top', stickyTop);
         }
@@ -5398,9 +5429,15 @@ let currentFormFilter = 'all';
 
         const onScroll = function() {
             const rect = tabs.getBoundingClientRect();
+            const topbarEl = document.getElementById('cora-global-topbar') || document.getElementById('cora-header');
             const topbarH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cora-topbar-height')) || 48;
-            const threshold = (window.innerWidth >= 1024) ? 2 : (topbarH + 2);
-            if (rect.top <= threshold) {
+            let topbarBottom = 0;
+            if (topbarEl && topbarEl.offsetHeight > 0) {
+                topbarBottom = topbarEl.getBoundingClientRect().bottom;
+            } else if (window.innerWidth < 1024) {
+                topbarBottom = topbarH;
+            }
+            if (rect.top <= topbarBottom + 3) {
                 tabs.classList.add('cora-tabs-stuck');
             } else {
                 tabs.classList.remove('cora-tabs-stuck');
@@ -5408,8 +5445,10 @@ let currentFormFilter = 'all';
         };
 
         window.addEventListener('scroll', onScroll, { passive: true });
+        document.addEventListener('scroll', onScroll, { passive: true, capture: true });
         const mainEl = document.querySelector('main.cora-main');
         if (mainEl) mainEl.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
     }
 
     window.addEventListener('hashchange', handleRouting);

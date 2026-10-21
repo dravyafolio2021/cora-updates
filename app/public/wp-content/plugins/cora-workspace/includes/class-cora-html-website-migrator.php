@@ -502,6 +502,18 @@ class Cora_HTML_Website_Migrator {
             }
         }
 
+        // Handle homepage conflict when targeting global_pages without overwrite
+        global $wpdb;
+        if ( $is_homepage ) {
+            $existing_home = $wpdb->get_var( "SELECT id FROM {$wpdb->prefix}cora_canvas_pages WHERE is_homepage = 1 LIMIT 1" );
+            if ( $existing_home && ! empty( $args['destination'] ) && $args['destination'] === 'global_pages' && empty( $args['overwrite_homepage'] ) ) {
+                $is_homepage = 0;
+                if ( $slug === 'home' || empty( $slug ) ) {
+                    $slug = 'imported-home';
+                }
+            }
+        }
+
         // Process and Compile Full-Fidelity HTML
         $compiled_html = $this->compile_full_fidelity_html( $raw_html, $page_url, array(
             'title'           => $title,
@@ -510,37 +522,58 @@ class Cora_HTML_Website_Migrator {
             'normalize_links' => ! empty( $args['normalize_links'] ),
         ) );
 
-        // Create or Ensure Draft Theme
-        global $wpdb;
-        if ( empty( $theme_id ) ) {
-            $parsed = parse_url( $page_url );
-            $host = ! empty( $parsed['host'] ) ? $parsed['host'] : 'Site';
-            $theme_name = 'Imported - ' . ucwords( str_replace( array( 'www.', '.com', '.in', '.org', '.net', '-', '_' ), ' ', $host ) ) . ' (HTML)';
-            $draft_id = $this->create_draft_html_theme( $theme_name, $agency_id, array(
-                'source_url' => $page_url,
-            ) );
-            if ( is_wp_error( $draft_id ) ) {
-                return $draft_id;
-            }
-            $theme_id = $draft_id;
+        if ( empty( trim( $compiled_html ) ) ) {
+            $compiled_html = $raw_html;
         }
 
-        // Provision Underlying WordPress Post
+        // Create or Ensure Draft Theme (Defaults to isolated Draft Theme sandbox)
+        $destination = ! empty( $args['destination'] ) ? $args['destination'] : 'draft_theme';
+        if ( empty( $theme_id ) ) {
+            if ( $destination === 'global_pages' ) {
+                $live_id = $wpdb->get_var( "SELECT id FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live' ORDER BY id DESC LIMIT 1" );
+                $theme_id = $live_id ? intval( $live_id ) : 0;
+            } else {
+                $parsed = parse_url( $page_url );
+                $host = ! empty( $parsed['host'] ) ? $parsed['host'] : 'Site';
+                $theme_name = 'Imported - ' . ucwords( str_replace( array( 'www.', '.com', '.in', '.org', '.net', '-', '_' ), ' ', $host ) ) . ' (HTML)';
+                $draft_id = $this->create_draft_html_theme( $theme_name, $agency_id, array(
+                    'source_url' => $page_url,
+                ) );
+                if ( is_wp_error( $draft_id ) ) {
+                    return $draft_id;
+                }
+                $theme_id = $draft_id;
+            }
+        }
+
+        $live_theme_id = intval( $wpdb->get_var( "SELECT id FROM {$wpdb->prefix}cora_canvas_themes WHERE status = 'live' ORDER BY id DESC LIMIT 1" ) );
+        $is_draft_mode = ( $destination === 'draft_theme' || ( $theme_id > 0 && $theme_id !== $live_theme_id ) );
+        $page_status   = $is_draft_mode ? 'draft' : 'published';
+        $wp_status     = $is_draft_mode ? 'draft' : 'publish';
+
+        // Provision Underlying WordPress Post without KSES stripping
+        kses_remove_filters();
         $post_id = wp_insert_post( array(
             'post_title'   => wp_strip_all_tags( $title ),
             'post_name'    => $slug,
-            'post_status'  => 'publish',
+            'post_status'  => $wp_status,
             'post_type'    => 'page',
             'post_content' => $compiled_html,
         ) );
+        kses_init_filters();
 
         if ( is_wp_error( $post_id ) ) {
             return $post_id;
         }
 
+        $actual_slug = get_post_field( 'post_name', $post_id );
+        if ( ! empty( $actual_slug ) && ( empty( $slug ) || $slug === 'home' || $slug === 'imported-home' ) ) {
+            $slug = $actual_slug;
+        }
+
         // Set Post Meta for Cora HTML Canvas Engine
         update_post_meta( $post_id, '_cora_page_engine', 'html_canvas' );
-        update_post_meta( $post_id, '_cora_canvas_html_compiled', $compiled_html );
+        update_post_meta( $post_id, '_cora_canvas_html_compiled', wp_slash( $compiled_html ) );
         update_post_meta( $post_id, '_wp_page_template', 'cora_canvas_standalone' );
         update_post_meta( $post_id, '_cora_canvas_theme_id', $theme_id );
         update_post_meta( $post_id, '_cora_migrated_from_url', $page_url );
@@ -557,11 +590,18 @@ class Cora_HTML_Website_Migrator {
         }
 
         // Check if page already exists in this theme
-        $existing_id = $wpdb->get_var( $wpdb->prepare(
-            "SELECT id FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d AND slug = %s LIMIT 1",
-            $theme_id,
-            $slug
-        ) );
+        if ( $theme_id > 0 ) {
+            $existing_id = $wpdb->get_var( $wpdb->prepare(
+                "SELECT id FROM {$wpdb->prefix}cora_canvas_pages WHERE theme_id = %d AND slug = %s LIMIT 1",
+                $theme_id,
+                $slug
+            ) );
+        } else {
+            $existing_id = $wpdb->get_var( $wpdb->prepare(
+                "SELECT id FROM {$wpdb->prefix}cora_canvas_pages WHERE slug = %s LIMIT 1",
+                $slug
+            ) );
+        }
 
         if ( $existing_id ) {
             $wpdb->update(
@@ -587,7 +627,7 @@ class Cora_HTML_Website_Migrator {
                     'wp_post_id'      => $post_id,
                     'title'           => $title,
                     'slug'            => $slug,
-                    'status'          => 'published',
+                    'status'          => $page_status,
                     'is_homepage'     => $is_homepage,
                     'template'        => 'cora_canvas_standalone',
                     'seo_title'       => $title,
@@ -600,6 +640,33 @@ class Cora_HTML_Website_Migrator {
                 array( '%d', '%d', '%d', '%s', '%s', '%s', '%d', '%s', '%s', '%s', '%s', '%d', '%s', '%s' )
             );
             $canvas_page_id = intval( $wpdb->insert_id );
+        }
+
+        // Register as a reusable template in Cora Canvas Templates table for this theme
+        if ( $theme_id > 0 ) {
+            $existing_tmpl = $wpdb->get_var( $wpdb->prepare(
+                "SELECT id FROM {$wpdb->prefix}cora_canvas_templates WHERE theme_id = %d AND slug = %s LIMIT 1",
+                $theme_id,
+                $slug
+            ) );
+            if ( ! $existing_tmpl ) {
+                $wpdb->insert(
+                    "{$wpdb->prefix}cora_canvas_templates",
+                    array(
+                        'agency_id'   => $agency_id,
+                        'theme_id'    => $theme_id,
+                        'archetype'   => 'page',
+                        'slug'        => $slug,
+                        'name'        => $title,
+                        'engine'      => 'html_canvas',
+                        'layout_data' => $compiled_html,
+                        'is_default'  => $is_homepage ? 1 : 0,
+                        'created_at'  => current_time( 'mysql' ),
+                        'updated_at'  => current_time( 'mysql' ),
+                    ),
+                    array( '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%s' )
+                );
+            }
         }
 
         return array(
@@ -616,7 +683,187 @@ class Cora_HTML_Website_Migrator {
     }
 
     /**
-     * Process and compile HTML to guarantee 100% styling fidelity and isolation.
+     * Check if the fetched HTML is an empty client-side shell (e.g. React/Vue SPA with no body content).
+     *
+     * @param string $html
+     * @return bool
+     */
+    public function is_empty_or_spa_shell( $html ) {
+        if ( empty( trim( $html ) ) ) {
+            return true;
+        }
+        if ( preg_match( '/<body[^>]*>(.*?)<\/body>/is', $html, $m ) ) {
+            $body_content = $m[1];
+        } else {
+            $body_content = $html;
+        }
+        $text_only = preg_replace( '/<script\b[^>]*>.*?<\/script>/is', '', $body_content );
+        $text_only = preg_replace( '/<style\b[^>]*>.*?<\/style>/is', '', $text_only );
+        $text_only = trim( strip_tags( $text_only ) );
+
+        if ( strlen( $text_only ) < 80 ) {
+            if ( preg_match( '/<div\s+id=["\'](?:root|app|__next)["\']\s*>\s*<\/div>/i', $body_content ) ||
+                 preg_match( '/<div\s+id=["\'](?:root|app|__next)["\']\s*><noscript>/i', $body_content ) ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Generate an AI-grade semantic fallback layout when a site is an empty SPA shell.
+     *
+     * @param string $raw_html
+     * @param string $page_url
+     * @param string $title
+     * @return string
+     */
+    public function generate_ai_semantic_fallback_html( $raw_html, $page_url, $title = '' ) {
+        $og_title = $title;
+        if ( preg_match( '/<meta[^>]*property=["\']og:title["\'][^>]*content=["\'](.*?)["\']/is', $raw_html, $m ) ) {
+            $og_title = html_entity_decode( trim( $m[1] ) );
+        } elseif ( empty( $og_title ) && preg_match( '/<title[^>]*>(.*?)<\/title>/is', $raw_html, $m ) ) {
+            $og_title = html_entity_decode( trim( $m[1] ) );
+        }
+        $og_desc = '';
+        if ( preg_match( '/<meta[^>]*property=["\']og:description["\'][^>]*content=["\'](.*?)["\']/is', $raw_html, $m ) ) {
+            $og_desc = html_entity_decode( trim( $m[1] ) );
+        } elseif ( preg_match( '/<meta[^>]*name=["\']description["\'][^>]*content=["\'](.*?)["\']/is', $raw_html, $m ) ) {
+            $og_desc = html_entity_decode( trim( $m[1] ) );
+        }
+        $og_image = '';
+        if ( preg_match( '/<meta[^>]*property=["\']og:image["\'][^>]*content=["\'](.*?)["\']/is', $raw_html, $m ) ) {
+            $og_image = $this->resolve_url( trim( $m[1] ), $page_url );
+        }
+
+        $parsed = parse_url( $page_url );
+        $brand_name = ! empty( $parsed['host'] ) ? ucwords( str_replace( array( 'www.', '.com', '.in', '.org', '.net', '-', '_' ), ' ', $parsed['host'] ) ) : 'Brand';
+
+        if ( empty( $og_desc ) ) {
+            $og_desc = sprintf( __( 'Experience modern, high-performance digital workflows with %s. Designed for speed, precision, and scale.', 'cora-workspace' ), $brand_name );
+        }
+
+        ob_start();
+        ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?php echo esc_html( $og_title ); ?></title>
+    <meta name="description" content="<?php echo esc_attr( $og_desc ); ?>">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body class="bg-zinc-50 text-zinc-900 font-sans antialiased min-h-screen flex flex-col justify-between selection:bg-zinc-900 selection:text-white">
+    <header class="w-full bg-white/80 backdrop-blur-md border-b border-zinc-200/80 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-zinc-900 text-white flex items-center justify-center font-bold text-sm">
+                    <?php echo esc_html( substr( $brand_name, 0, 1 ) ); ?>
+                </div>
+                <span class="font-bold text-base tracking-tight text-zinc-900"><?php echo esc_html( $brand_name ); ?></span>
+            </div>
+            <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-zinc-600">
+                <a href="#features" class="hover:text-zinc-950 transition-colors">Features</a>
+                <a href="#overview" class="hover:text-zinc-950 transition-colors">Overview</a>
+                <a href="#contact" class="hover:text-zinc-950 transition-colors">Contact</a>
+            </nav>
+            <div class="flex items-center gap-3">
+                <a href="<?php echo esc_url( $page_url ); ?>" target="_blank" rel="noopener noreferrer" class="px-4 py-2 text-xs font-semibold rounded-lg bg-zinc-900 text-white hover:bg-zinc-800 transition-colors">
+                    Visit Original Site &rarr;
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1">
+        <section class="max-w-5xl mx-auto px-6 py-20 text-center">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-100 border border-zinc-200/80 text-xs font-medium text-zinc-700 mb-8">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>AI Reconstructed Canvas Page</span>
+            </div>
+            <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-zinc-950 mb-6 max-w-3xl mx-auto leading-tight">
+                <?php echo esc_html( $og_title ); ?>
+            </h1>
+            <p class="text-lg text-zinc-600 max-w-2xl mx-auto mb-10 leading-relaxed">
+                <?php echo esc_html( $og_desc ); ?>
+            </p>
+            <div class="flex flex-wrap items-center justify-center gap-4 mb-16">
+                <a href="#overview" class="px-6 py-3 rounded-xl bg-zinc-900 text-white font-semibold text-sm hover:bg-zinc-800 transition-all shadow-sm">
+                    Explore Details
+                </a>
+                <a href="<?php echo esc_url( $page_url ); ?>" target="_blank" rel="noopener noreferrer" class="px-6 py-3 rounded-xl bg-white border border-zinc-300 font-semibold text-sm text-zinc-800 hover:bg-zinc-100 transition-all">
+                    Live Origin Source
+                </a>
+            </div>
+
+            <?php if ( ! empty( $og_image ) ) : ?>
+            <div class="relative rounded-2xl overflow-hidden border border-zinc-200 shadow-xl max-w-4xl mx-auto bg-zinc-100">
+                <img src="<?php echo esc_url( $og_image ); ?>" alt="<?php echo esc_attr( $og_title ); ?>" class="w-full h-auto object-cover max-h-[500px]">
+            </div>
+            <?php endif; ?>
+        </section>
+
+        <section id="features" class="max-w-6xl mx-auto px-6 py-16 border-t border-zinc-200/60">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="p-6 rounded-2xl bg-white border border-zinc-200/80">
+                    <div class="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center font-bold text-zinc-900 mb-4">
+                        01
+                    </div>
+                    <h3 class="font-bold text-lg text-zinc-900 mb-2">High Performance</h3>
+                    <p class="text-sm text-zinc-600 leading-relaxed">Engineered with static acceleration for instantaneous sub-100ms load times.</p>
+                </div>
+                <div class="p-6 rounded-2xl bg-white border border-zinc-200/80">
+                    <div class="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center font-bold text-zinc-900 mb-4">
+                        02
+                    </div>
+                    <h3 class="font-bold text-lg text-zinc-900 mb-2">Full Responsiveness</h3>
+                    <p class="text-sm text-zinc-600 leading-relaxed">Adapts seamlessly across mobile, tablet, desktop, and large displays with clean typography.</p>
+                </div>
+                <div class="p-6 rounded-2xl bg-white border border-zinc-200/80">
+                    <div class="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center font-bold text-zinc-900 mb-4">
+                        03
+                    </div>
+                    <h3 class="font-bold text-lg text-zinc-900 mb-2">Cora Visual Builder Ready</h3>
+                    <p class="text-sm text-zinc-600 leading-relaxed">Fully decoupled and editable directly inside Cora Canvas with instant 1-click publishing.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="w-full bg-white border-t border-zinc-200 py-8">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
+            <div>&copy; <?php echo date('Y'); ?> <?php echo esc_html( $brand_name ); ?>. All rights reserved.</div>
+            <div class="flex items-center gap-4">
+                <span>Migrated with Cora Canvas AI</span>
+                <span>&bull;</span>
+                <a href="<?php echo esc_url( $page_url ); ?>" target="_blank" rel="noopener noreferrer" class="hover:text-zinc-800 underline">Origin</a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
+        <?php
+        return ob_get_clean();
+    }
+
+    /**
+     * Process and compile HTML to guarantee 100% styling fidelity, error resilience, and isolation.
      *
      * @param string $html     Raw remote HTML.
      * @param string $base_url Page source URL.
@@ -624,7 +871,24 @@ class Cora_HTML_Website_Migrator {
      * @return string
      */
     public function compile_full_fidelity_html( $html, $base_url, $options = array() ) {
-        // 1. Remove Tracking Pixels & Disruptive Analytics Scripts
+        if ( empty( trim( $html ) ) ) {
+            return '';
+        }
+
+        // Check if fetched HTML is an empty SPA shell (client-side rendered)
+        if ( $this->is_empty_or_spa_shell( $html ) ) {
+            return $this->generate_ai_semantic_fallback_html( $html, $base_url, $options['title'] ?? '' );
+        }
+
+        $original_html = $html;
+
+        // Prevent PCRE catastrophic backtracking failure on large modern SPA/HTML bundles
+        if ( function_exists( 'ini_set' ) ) {
+            @ini_set( 'pcre.backtrack_limit', '10000000' );
+            @ini_set( 'pcre.recursion_limit', '500000' );
+        }
+
+        // 1. Remove Tracking Pixels, Disruptive Analytics & Cookie Banner Scripts safely
         $tracker_patterns = array(
             '/<script[^>]*google-analytics\.com\/analytics\.js[^>]*>.*?<\/script>/is',
             '/<script[^>]*googletagmanager\.com\/gtag\/js[^>]*>.*?<\/script>/is',
@@ -634,12 +898,39 @@ class Cora_HTML_Website_Migrator {
             '/<script[^>]*widget\.intercom\.io\/[^>]*>.*?<\/script>/is',
             '/<script[^>]*beacon\.min\.js[^>]*>.*?<\/script>/is',
             '/<script[^>]*email-decode\.min\.js[^>]*>.*?<\/script>/is',
+            '/<script[^>]*cdn\.cookielaw\.org\/[^>]*>.*?<\/script>/is',
+            '/<script[^>]*cookiebot\.com\/[^>]*>.*?<\/script>/is',
             '/<div[^>]*id=["\']wpadminbar["\'][^>]*>.*?<\/div>/is',
+            '/<div[^>]*id=["\']onetrust-[^"\']*["\'][^>]*>.*?<\/div>/is',
+            '/<div[^>]*id=["\']optanon-[^"\']*["\'][^>]*>.*?<\/div>/is',
         );
-        $html = preg_replace( $tracker_patterns, '', $html );
+        $res = preg_replace( $tracker_patterns, '', $html );
+        if ( null !== $res ) {
+            $html = $res;
+        }
+
+        // Remove anti-flicker prehiding styles and scripts that hide elements or fail on localhost
+        $res = preg_replace( '/<style[^>]*id=["\']alloy-prehiding["\'][^>]*>.*?<\/style>/is', '', $html );
+        if ( null !== $res ) {
+            $html = $res;
+        }
+
+        // Safely neutralize scripts containing disruptive prehiding or consent blockers without catastrophic backtracking
+        $res = preg_replace_callback( '/<script\b[^>]*>(.*?)<\/script>/is', function( $m ) {
+            $body = $m[1];
+            if ( stripos( $body, 'alloy-prehiding' ) !== false ||
+                 stripos( $body, 'OptanonConsent' ) !== false ||
+                 stripos( $body, 'Flicker Manager' ) !== false ) {
+                return '';
+            }
+            return $m[0];
+        }, $html );
+        if ( null !== $res ) {
+            $html = $res;
+        }
 
         // 2. Resolve Stylesheet Links to Absolute HTTPS URLs
-        $html = preg_replace_callback( '/<link\s+([^>]*?)href=["\']([^"\']+)["\']([^>]*?)>/is', function( $m ) use ( $base_url ) {
+        $res = preg_replace_callback( '/<link\s+([^>]*?)href=["\']([^"\']+)["\']([^>]*?)>/is', function( $m ) use ( $base_url ) {
             $attrs_before = $m[1];
             $href         = $m[2];
             $attrs_after  = $m[3];
@@ -647,9 +938,12 @@ class Cora_HTML_Website_Migrator {
             $abs_href = $this->resolve_url( $href, $base_url );
             return '<link ' . $attrs_before . 'href="' . esc_url( $abs_href ) . '"' . $attrs_after . '>';
         }, $html );
+        if ( null !== $res ) {
+            $html = $res;
+        }
 
         // 3. Resolve Script src to Absolute HTTPS URLs
-        $html = preg_replace_callback( '/<script\s+([^>]*?)src=["\']([^"\']+)["\']([^>]*?)>/is', function( $m ) use ( $base_url ) {
+        $res = preg_replace_callback( '/<script\s+([^>]*?)src=["\']([^"\']+)["\']([^>]*?)>/is', function( $m ) use ( $base_url ) {
             $attrs_before = $m[1];
             $src          = $m[2];
             $attrs_after  = $m[3];
@@ -657,9 +951,12 @@ class Cora_HTML_Website_Migrator {
             $abs_src = $this->resolve_url( $src, $base_url );
             return '<script ' . $attrs_before . 'src="' . esc_url( $abs_src ) . '"' . $attrs_after . '>';
         }, $html );
+        if ( null !== $res ) {
+            $html = $res;
+        }
 
         // 4. Resolve Images, SVGs, and Video Media Sources
-        $html = preg_replace_callback( '/<img\s+([^>]*?)src=["\']([^"\']+)["\']([^>]*?)>/is', function( $m ) use ( $base_url ) {
+        $res = preg_replace_callback( '/<img\s+([^>]*?)src=["\']([^"\']+)["\']([^>]*?)>/is', function( $m ) use ( $base_url ) {
             $attrs_before = $m[1];
             $src          = $m[2];
             $attrs_after  = $m[3];
@@ -667,9 +964,24 @@ class Cora_HTML_Website_Migrator {
             $abs_src = $this->resolve_url( $src, $base_url );
             return '<img ' . $attrs_before . 'src="' . esc_url( $abs_src ) . '"' . $attrs_after . '>';
         }, $html );
+        if ( null !== $res ) {
+            $html = $res;
+        }
+
+        // 4b. Resolve SVG <use href="..."> and <use xlink:href="...">
+        $res = preg_replace_callback( '/<use\s+([^>]*?)(?:xlink:)?href=["\']([^"\']+)["\']([^>]*?)>/is', function( $m ) use ( $base_url ) {
+            $attrs_before = $m[1];
+            $href         = $m[2];
+            $attrs_after  = $m[3];
+            $abs_href     = $this->resolve_url( $href, $base_url );
+            return '<use ' . $attrs_before . 'href="' . esc_url( $abs_href ) . '"' . $attrs_after . '>';
+        }, $html );
+        if ( null !== $res ) {
+            $html = $res;
+        }
 
         // srcset
-        $html = preg_replace_callback( '/srcset=["\']([^"\']+)["\']/is', function( $m ) use ( $base_url ) {
+        $res = preg_replace_callback( '/srcset=["\']([^"\']+)["\']/is', function( $m ) use ( $base_url ) {
             $raw_srcset = $m[1];
             $entries = explode( ',', $raw_srcset );
             $resolved_entries = array();
@@ -682,9 +994,12 @@ class Cora_HTML_Website_Migrator {
             }
             return 'srcset="' . esc_attr( implode( ', ', $resolved_entries ) ) . '"';
         }, $html );
+        if ( null !== $res ) {
+            $html = $res;
+        }
 
         // CSS inline background-image url(...)
-        $html = preg_replace_callback( '/url\(\s*[\'"]?([^\'")]+)[\'"]?\s*\)/is', function( $m ) use ( $base_url ) {
+        $res = preg_replace_callback( '/url\(\s*[\'"]?([^\'")]+)[\'"]?\s*\)/is', function( $m ) use ( $base_url ) {
             $url = trim( $m[1] );
             if ( preg_match( '/^(data:|#)/i', $url ) ) {
                 return $m[0];
@@ -692,10 +1007,50 @@ class Cora_HTML_Website_Migrator {
             $abs_url = $this->resolve_url( $url, $base_url );
             return 'url("' . esc_url( $abs_url ) . '")';
         }, $html );
+        if ( null !== $res ) {
+            $html = $res;
+        }
 
         // 5. Ensure Charset and Viewport are present in <head>
         if ( stripos( $html, '<meta name="viewport"' ) === false && stripos( $html, '<meta name=\'viewport\'' ) === false ) {
-            $html = preg_replace( '/<head[^>]*>/i', '$0' . "\n" . '<meta name="viewport" content="width=device-width, initial-scale=1.0">', $html, 1 );
+            $res = preg_replace( '/<head[^>]*>/i', '$0' . "\n" . '<meta name="viewport" content="width=device-width, initial-scale=1.0">', $html, 1 );
+            if ( null !== $res ) {
+                $html = $res;
+            }
+        }
+
+        // 6. Inject Cora Universal Error & Hydration Resilience Shield into <head>
+        $shield = '<script id="cora-resilience-shield">
+(function() {
+    window.__CORA_PAGE_ENGINE__ = "html_canvas";
+    // Universal Error & Rejection Shield: Prevents third-party scripts, hydration mismatches, and remote CORS errors from blanking or crashing the page
+    window.addEventListener("error", function(e) {
+        if (e && e.stopImmediatePropagation) e.stopImmediatePropagation();
+        if (e && e.preventDefault) e.preventDefault();
+        return true;
+    }, true);
+    window.addEventListener("unhandledrejection", function(e) {
+        if (e && e.stopImmediatePropagation) e.stopImmediatePropagation();
+        if (e && e.preventDefault) e.preventDefault();
+    }, true);
+    // Neutralize common tracking stubs
+    window.analytics = window.analytics || { track: function(){}, identify: function(){}, page: function(){}, ready: function(fn){ if(typeof fn==="function") fn(); }, reset: function(){} };
+    window.gtag = window.gtag || function(){};
+    window.dataLayer = window.dataLayer || [];
+})();
+</script>';
+
+        if ( preg_match( '/<head[^>]*>/i', $html ) ) {
+            $res = preg_replace( '/<head[^>]*>/i', '$0' . "\n" . $shield, $html, 1 );
+            if ( null !== $res ) {
+                $html = $res;
+            }
+        } else {
+            $html = $shield . "\n" . $html;
+        }
+
+        if ( empty( trim( $html ) ) ) {
+            $html = $original_html;
         }
 
         return $html;

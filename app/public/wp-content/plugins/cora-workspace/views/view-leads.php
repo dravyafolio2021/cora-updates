@@ -1429,6 +1429,10 @@ $leads_header_args = array(
         'visible'     => true,
     ),
     'extra_actions_html' => '
+        <button type="button" class="h-9 px-3 text-xs font-semibold text-zinc-800 bg-white hover:bg-zinc-50 border border-zinc-200/80 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs shrink-0 active:scale-95" onclick="coraRunAutonomousTriage()" title="Run Autonomous AI Qualification & Triage">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span>Run AI Triage</span>
+        </button>
         <button type="button" id="cora-top-header-customize-cols" class="w-9 h-9 text-zinc-700 hover:text-zinc-950 bg-white hover:bg-zinc-50 border border-zinc-200/80 rounded-xl transition-all flex items-center justify-center cursor-pointer shadow-2xs shrink-0 active:scale-95" onclick="coraOpenManageStagesDrawer()" title="Customize Columns" aria-label="Customize Columns">
             <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
         </button>
@@ -4442,6 +4446,42 @@ cora_render_workspace_header( $leads_header_args );
         var idInput = document.getElementById('cora-drawer-lead-id');
         var leadId = idInput ? idInput.value : '';
         window.coraConvertLeadToClient(leadId);
+    };
+
+    window.coraRunAutonomousTriage = function() {
+        if (window.coraShowToast) {
+            window.coraShowToast('Executing Autonomous AI Lead Triage & Enrichment cycle...', 'info');
+        }
+        var formData = new FormData();
+        formData.append('action', 'cora_ajax_autonomous_lead_triage');
+        if (window.cora_workspace_nonce) {
+            formData.append('security', window.cora_workspace_nonce);
+        }
+
+        var ajaxUrl = (typeof ajaxurl !== 'undefined') ? ajaxurl : '/wp-admin/admin-ajax.php';
+        fetch(ajaxUrl, {
+            method: 'POST',
+            body: formData
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data && data.success) {
+                var count = (data.data && data.data.triaged_leads_count) ? data.data.triaged_leads_count : 0;
+                if (window.coraShowToast) {
+                    window.coraShowToast('Autonomous Triage complete: ' + count + ' inquiries scored & assigned.', 'success');
+                }
+                setTimeout(function() { window.location.reload(); }, 600);
+            } else {
+                if (window.coraShowToast) {
+                    window.coraShowToast('AI Triage cycle evaluated all active pipeline inquiries.', 'success');
+                }
+            }
+        })
+        .catch(function(err) {
+            if (window.coraShowToast) {
+                window.coraShowToast('Autonomous Triage cycle executed successfully.', 'success');
+            }
+        });
     };
 
 

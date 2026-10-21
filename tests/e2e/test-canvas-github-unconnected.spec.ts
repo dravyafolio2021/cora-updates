@@ -39,16 +39,17 @@ test.describe('Canvas GitHub Integration - SaaS UX Unconnected State', () => {
     expect(href).toContain('scopes=repo,read:org');
     expect(href).toContain('description=Cora%20Studio%20Integration');
 
-    // 6. Verify 2 Distinct Connection Choices (Method A & Method B)
+    // 6. Verify Single Focused Connection Card (Personal GitHub) and Managed Card Removed
     const personalCard = unconnectedView.locator('#cora-gh-unconnected-choices').locator('div').filter({ hasText: 'Personal GitHub' }).first();
-    const managedCard = unconnectedView.locator('#cora-gh-unconnected-choices').locator('div').filter({ hasText: 'Instant Cloud Setup' }).first();
+    const managedCard = unconnectedView.locator('#cora-gh-unconnected-choices').locator('div').filter({ hasText: 'Instant Cloud Setup' });
     await expect(personalCard).toBeVisible();
-    await expect(managedCard).toBeVisible();
+    await expect(managedCard).toHaveCount(0);
 
-    // 7. Verify White Space & 3-Column Trust Bar
-    await expect(unconnectedView.locator('h4', { hasText: '1-Click Snapshot Rollbacks' })).toBeVisible();
-    await expect(unconnectedView.locator('h4', { hasText: 'Zero Data Loss Backups' })).toBeVisible();
-    await expect(unconnectedView.locator('h4', { hasText: 'Collaborative Pull Requests' })).toBeVisible();
+    // 7. Verify Trust Bar is removed for clean no-scroll UI & doc link exists
+    await expect(unconnectedView.locator('h4', { hasText: '1-Click Snapshot Rollbacks' })).toHaveCount(0);
+    await expect(unconnectedView.locator('h4', { hasText: 'Zero Data Loss Backups' })).toHaveCount(0);
+    await expect(unconnectedView.locator('h4', { hasText: 'Collaborative Pull Requests' })).toHaveCount(0);
+    await expect(unconnectedView.locator('a[href*="docs.github.com"]').first()).toBeVisible();
 
     // Capture screenshot of Unconnected View
     const outputDir = path.resolve(process.cwd(), 'test_output');
@@ -80,16 +81,22 @@ test.describe('Canvas GitHub Integration - SaaS UX Unconnected State', () => {
     });
     expect(isScrollLocked).toBe(true);
 
+    // Record scroll position before wheel
+    const scrollTopBefore = await page.evaluate(() => {
+      const mainEl = document.querySelector('main.cora-main');
+      return mainEl ? mainEl.scrollTop : window.scrollY;
+    });
+
     // Simulate mouse wheel scroll while modal is open
     await page.mouse.wheel(0, 500);
     await page.waitForTimeout(200);
 
     // Verify background page did NOT scroll
-    const scrollTop = await page.evaluate(() => {
+    const scrollTopAfter = await page.evaluate(() => {
       const mainEl = document.querySelector('main.cora-main');
       return mainEl ? mainEl.scrollTop : window.scrollY;
     });
-    expect(scrollTop).toBe(0);
+    expect(scrollTopAfter).toBe(scrollTopBefore);
 
     // Verify modal card remains centered in viewport
     const box = await modalContent.boundingBox();

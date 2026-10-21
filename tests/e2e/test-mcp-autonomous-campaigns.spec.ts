@@ -187,3 +187,47 @@ test('Verify Redesigned Minimal OAuth 2.1 Consent Screen', async ({ page }) => {
   // Capture screenshot
   await page.screenshot({ path: path.join(artifactDir, 'mcp_oauth_consent_screen_new.png') });
 });
+
+test('Verify Free Workspace MCP Button Lock and Paywall Drawer', async ({ page }) => {
+  const artifactDir = '/Users/shrutian/.gemini/antigravity/brain/58e87118-a119-4a20-9906-b30972fba7f6';
+  const exec = require('child_process').execSync;
+  const phpBin = '"/Users/shrutian/Library/Application Support/Local/lightning-services/php-8.2.29+0/bin/darwin-arm64/bin/php"';
+
+  try {
+    // 1. Temporarily set Studio agency (id 2) plan to 'free'
+    exec(`${phpBin} -r "require '/Users/shrutian/Desktop/cora/app/public/wp-load.php'; global \\$wpdb; \\$wpdb->update(\\$wpdb->prefix . 'cora_agencies', array('plan' => 'free'), array('id' => 2));"`);
+
+    await page.setViewportSize({ width: 1280, height: 850 });
+    await login(page, 'owner.studio@cora.local', 'cora_secure_pass_123');
+
+    // 2. Navigate to Content Suite
+    await page.goto('/workspace/blogs?ct=ct-library');
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(1000);
+
+    // 3. Assert MCP button is locked with lock icon and Pro badge
+    const lockedBtn = page.locator('#cora-btn-ai-mcp-gateway');
+    await expect(lockedBtn).toBeVisible();
+    await expect(lockedBtn).toHaveClass(/cora-ai-locked-btn/);
+    await expect(lockedBtn.locator('text=Pro')).toBeVisible();
+
+    await page.screenshot({ path: path.join(artifactDir, 'mcp_free_workspace_locked_button.png') });
+
+    // 4. Click locked button to open developer gateway drawer
+    await lockedBtn.click();
+    await page.waitForTimeout(600);
+
+    const drawer = page.locator('#cora-workspace-developer-gateway-drawer');
+    await expect(drawer).toBeVisible();
+    await expect(drawer).not.toHaveClass(/collapsed/);
+
+    // 5. Assert paywall upgrade card is displayed inside drawer
+    await expect(drawer.locator('text=Model Context Protocol & Developer Gateway (Pro Feature)').first()).toBeVisible();
+    await expect(drawer.locator('text=Upgrade to Professional').first()).toBeVisible();
+
+    await page.screenshot({ path: path.join(artifactDir, 'mcp_free_workspace_upgrade_paywall.png') });
+  } finally {
+    // Always restore Studio agency plan back to 'india_only'
+    exec(`${phpBin} -r "require '/Users/shrutian/Desktop/cora/app/public/wp-load.php'; global \\$wpdb; \\$wpdb->update(\\$wpdb->prefix . 'cora_agencies', array('plan' => 'india_only'), array('id' => 2));"`);
+  }
+});

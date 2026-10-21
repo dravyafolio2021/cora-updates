@@ -29,34 +29,52 @@ if ( ! $active_theme ) {
 
 $theme_settings = $active_theme ? ( json_decode( $active_theme['settings'], true ) ?: array() ) : array();
 
+$page_id = isset( $GLOBALS['cora_canvas_render_page_id'] ) ? intval( $GLOBALS['cora_canvas_render_page_id'] ) : get_the_ID();
+$target_route = '/';
+if ( $page_id > 0 ) {
+    $canvas_page_row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE wp_post_id = %d OR id = %d LIMIT 1", $page_id, $page_id ), ARRAY_A );
+    if ( $canvas_page_row ) {
+        $target_route = ( ! empty( $canvas_page_row['is_homepage'] ) || ( isset( $canvas_page_row['slug'] ) && $canvas_page_row['slug'] === 'home' ) ) ? '/' : '/' . ltrim( $canvas_page_row['slug'], '/' );
+    } else {
+        $p_obj = get_post( $page_id );
+        if ( $p_obj && ! empty( $p_obj->post_name ) && $p_obj->post_name !== 'home' ) {
+            $target_route = '/' . ltrim( $p_obj->post_name, '/' );
+        }
+    }
+}
+
 // Check if active or preview theme is Next.js
 $theme_source = isset( $theme_settings['source'] ) ? $theme_settings['source'] : ( isset( $active_theme['source'] ) ? $active_theme['source'] : '' );
 if ( 'nextjs' === $theme_source ) {
     $nextjs_live_url = ! empty( $theme_settings['nextjs_live_url'] ) ? trim( $theme_settings['nextjs_live_url'] ) : ( ! empty( $theme_settings['live_url'] ) ? trim( $theme_settings['live_url'] ) : '' );
     $nextjs_live_url = rtrim( $nextjs_live_url, '/' );
 
-    $page_id = isset( $GLOBALS['cora_canvas_render_page_id'] ) ? intval( $GLOBALS['cora_canvas_render_page_id'] ) : get_the_ID();
-    $target_route = '/';
-    if ( $page_id > 0 ) {
-        $canvas_page_row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}cora_canvas_pages WHERE wp_post_id = %d OR id = %d LIMIT 1", $page_id, $page_id ), ARRAY_A );
-        if ( $canvas_page_row ) {
-            $target_route = ( ! empty( $canvas_page_row['is_homepage'] ) || ( isset( $canvas_page_row['slug'] ) && $canvas_page_row['slug'] === 'home' ) ) ? '/' : '/' . ltrim( $canvas_page_row['slug'], '/' );
-        } else {
-            $p_obj = get_post( $page_id );
-            if ( $p_obj && ! empty( $p_obj->post_name ) && $p_obj->post_name !== 'home' ) {
-                $target_route = '/' . ltrim( $p_obj->post_name, '/' );
+    $is_preview = isset( $GLOBALS['cora_preview_bar_script'] ) || ( function_exists( 'cora_get_preview_theme_id' ) && cora_get_preview_theme_id() > 0 );
+
+    // 1. If static build is available on workspace disk, serve static export directly
+    if ( ! empty( $theme_settings['is_static_built'] ) && ! empty( $theme_settings['static_build_path'] ) && is_dir( $theme_settings['static_build_path'] ) ) {
+        if ( function_exists( 'cora_render_nextjs_static_build' ) ) {
+            $rendered = cora_render_nextjs_static_build( $theme_settings['static_build_path'], $target_route, $active_theme, $ws, $is_preview );
+            if ( $rendered !== false ) {
+                exit;
             }
         }
     }
 
-    $is_preview = isset( $GLOBALS['cora_preview_bar_script'] ) || ( function_exists( 'cora_get_preview_theme_id' ) && cora_get_preview_theme_id() > 0 );
-
-    if ( ! empty( $nextjs_live_url ) ) {
+    // 2. If external live URL is provided, serve live frame
+    if ( ! empty( $nextjs_live_url ) && ( $target_route === '/' || empty( $page_id ) ) ) {
         if ( function_exists( 'cora_render_nextjs_live_frame' ) ) {
             cora_render_nextjs_live_frame( $nextjs_live_url, $target_route, $active_theme, $ws, $is_preview );
             exit;
         }
-    } else {
+    }
+
+    // 3. If compiled HTML exists for this canvas page, do NOT intercept — let it fall through to render full HTML below
+    $existing_compiled = $page_id ? get_post_meta( $page_id, '_cora_canvas_html_compiled', true ) : '';
+    if ( ! empty( $existing_compiled ) ) {
+        // Fall through to regular canvas render below
+    } elseif ( $target_route === '/' || empty( $page_id ) ) {
+        // 4. Only if no static build, no live URL, and no compiled HTML, show connector screen
         if ( function_exists( 'cora_render_nextjs_connector_screen' ) ) {
             cora_render_nextjs_connector_screen( $active_theme, $ws, $target_route, $is_preview );
             exit;
@@ -73,9 +91,77 @@ $compiled_html = get_post_meta( $page_id, '_cora_canvas_html_compiled', true );
 if ( empty( $compiled_html ) && $page_engine === 'html_canvas' ) {
     $post = get_post( $page_id );
     $compiled_html = $post ? $post->post_content : '';
+
+    // Auto-heal on the fly if migrated URL is known
+    if ( empty( trim( $compiled_html ) ) ) {
+        $source_url = get_post_meta( $page_id, '_cora_migrated_from_url', true );
+        if ( ! empty( $source_url ) && class_exists( 'Cora_HTML_Website_Migrator' ) ) {
+            $migrator = Cora_HTML_Website_Migrator::get_instance();
+            $res = wp_safe_remote_get( $source_url, array(
+                'timeout'    => 35,
+                'sslverify'  => false,
+                'user-agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 CoraWebsiteMigrator/2.0'
+            ) );
+            if ( ! is_wp_error( $res ) ) {
+                $raw = wp_remote_retrieve_body( $res );
+                if ( ! empty( $raw ) ) {
+                    $compiled_html = $migrator->compile_full_fidelity_html( $raw, $source_url, array( 'title' => get_the_title( $page_id ) ) );
+                    if ( ! empty( $compiled_html ) ) {
+                        update_post_meta( $page_id, '_cora_canvas_html_compiled', wp_slash( $compiled_html ) );
+                        kses_remove_filters();
+                        wp_update_post( array( 'ID' => $page_id, 'post_content' => $compiled_html ) );
+                        kses_init_filters();
+                    }
+                }
+            }
+        }
+    }
+}
+
+if ( empty( trim( $compiled_html ) ) && $page_engine === 'html_canvas' ) {
+    // Elegant fallback card rather than an empty white screen
+    $page_title = get_the_title( $page_id ) ?: 'Imported Page';
+    ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title><?php echo esc_html( $page_title ); ?> — Canvas</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    </head>
+    <body class="bg-zinc-50 text-zinc-900 font-sans antialiased min-h-screen flex items-center justify-center p-6">
+        <div class="max-w-md w-full bg-white border border-zinc-200 rounded-2xl p-8 shadow-xs text-center">
+            <div class="w-12 h-12 rounded-xl bg-zinc-100 border border-zinc-200 text-zinc-800 flex items-center justify-center mx-auto mb-4 font-bold text-lg">
+                ⚡
+            </div>
+            <h1 class="text-xl font-bold tracking-tight text-zinc-900 mb-2"><?php echo esc_html( $page_title ); ?></h1>
+            <p class="text-xs text-zinc-500 mb-6 leading-relaxed">This page is registered as an HTML Canvas page, but its compiled content is currently pending or empty.</p>
+            <div class="flex flex-col gap-2">
+                <a href="<?php echo esc_url( admin_url( 'admin.php?page=cora-canvas' ) ); ?>" class="w-full py-2.5 px-4 rounded-xl bg-zinc-900 text-white font-semibold text-xs hover:bg-zinc-800 transition-colors">Open Cora Canvas Manager</a>
+                <a href="<?php echo esc_url( home_url( '/site/' ) ); ?>" class="w-full py-2.5 px-4 rounded-xl bg-zinc-100 text-zinc-700 font-semibold text-xs hover:bg-zinc-200 transition-colors">Return to Site Home</a>
+            </div>
+        </div>
+    </body>
+    </html>
+    <?php
+    exit;
 }
 
 if ( ! empty( $compiled_html ) && ( $page_engine === 'html_canvas' || $page_template === 'cora_canvas_standalone' || $page_template !== 'elementor_header_footer' ) ) {
+    if ( stripos( $compiled_html, 'cora-page-content' ) === false ) {
+        if ( stripos( $compiled_html, '<body' ) !== false ) {
+            $compiled_html = preg_replace( '#(<body[^>]*>)#i', '$1<div class="cora-page-content" style="display:contents;">', $compiled_html, 1 );
+            if ( stripos( $compiled_html, '</body>' ) !== false ) {
+                $compiled_html = str_ireplace( '</body>', '</div></body>', $compiled_html );
+            } else {
+                $compiled_html .= '</div>';
+            }
+        } else {
+            $compiled_html = '<div class="cora-page-content" style="display:contents;">' . $compiled_html . '</div>';
+        }
+    }
     echo $compiled_html;
     if ( isset( $GLOBALS['cora_preview_bar_script'] ) ) {
         echo $GLOBALS['cora_preview_bar_script'];

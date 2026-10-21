@@ -1,61 +1,37 @@
-# Task Tracker: Standardize & Update Official AI Tool Logos Globally
+# Task Tracker: Performance Audit, QA Verification & Release v4.9.420
 
-## Task Overview
-The user requested:
-> "Make it standard and update globally on all teh Commponent, 
-> I want to have Official logo instead of this customSVG icon of these AI tools"
-(Referencing the overlapping 5-icon stack showing ChatGPT/OpenAI, Claude, Gemini, Perplexity, YouTube).
-
-Replace all custom, inaccurate, and monochromatic placeholder SVGs across the platform with authentic, official vector brand logos and official brand colors (OpenAI green `#10A37F`, Claude terracotta/amber `#D97706`, Gemini Google gradient sparkle `#4E82EE`→`#9B72CB`→`#D96570`, Perplexity teal `#20808D`, and YouTube red `#FF0000` + `#FFFFFF` play button).
+## Overview
+Perform an exhaustive performance audit and automated QA across the Cora SaaS Workspace. Bump plugin version to **v4.9.420**, update changelog manifests, package distribution zip archive, commit & merge all changes to `main`, and execute deployment so the user can test the real workspace.
 
 ---
 
-## Subtasks & Execution Status
+## Development & Release Scope (v4.9.420)
+1. **Performance Audit**:
+   - Cookieless RUM telemetry verification (`class-cora-performance-telemetry.php`)
+   - Static asset delivery performance (ETags, 304 Not Modified caching, immutable headers)
+   - LCP, TTFB, and memory profiling on Workspace & Live Site routes
+   - Database query overhead analysis
+2. **Quality Assurance (QA)**:
+   - Next.js Workspace Deployment & Route Sync (`tests/e2e/test-canvas-nextjs-workspace-deployment.spec.ts`)
+   - Custom HTML & 3D WebGL Scene Execution (`tests/e2e/test-canvas-html-3d-deployment.spec.ts`)
+   - Multi-Account Business Email & Outreach Engine verification
+   - PHP 8.2 syntax verification across all modified files
+3. **Packaging & Versioning**:
+   - Bump plugin version to `4.9.420` in `cora-workspace.php`
+   - Update `updates/cora-workspace.json` with v4.9.420 release notes
+   - Build distribution zip archive `updates/cora-workspace.zip`
+4. **Git Commit, Merge & Deployment**:
+   - Stage all workspace updates (`git add`)
+   - Commit cleanly with comprehensive release notes
+   - Push to `origin main` and `updates-repo main`
+   - Deploy/sync updates for live testing
 
-- [x] **Subtask 1: Universal Official Brand Logos Engine (Frontend & TypeScript)**
-  - Status: Completed
-  - Target: `cora-frontend/components/features/OfficialBrandLogos.tsx`, `cora-frontend/components/features/CapabilityVisualCard.tsx`, `cora-frontend/components/showcase/ProductShowcase.tsx`
-  - Checklist:
-    - [x] `OpenAILogo` / `ChatGPTLogo`: Official OpenAI rosette in `#10A37F`
-    - [x] `ClaudeLogo`: Authentic Anthropic Claude asterisk burst in `#D97706` (replacing custom polygon)
-    - [x] `GeminiLogo`: Authentic Google Gemini 4-point sparkle with official multi-stop gradient
-    - [x] `PerplexityLogo`: Official Simple Icons Perplexity geometric knot in `#20808D` (replacing custom isometric cube)
-    - [x] `YouTubeLogo`: Official YouTube `#FF0000` rounded container with crisp `#FFFFFF` play triangle
-    - [x] Clean re-exports and import in `CapabilityVisualCard.tsx` and `ProductShowcase.tsx`
-    - [x] TypeScript compilation check passed (`npx tsc --noEmit` code 0)
-    - [x] Next.js production build check passed (`npm run build` code 0, 338 routes compiled)
+---
 
-- [x] **Subtask 2: Workspace PHP Universal Brand Logo Engine**
-  - Status: Completed
-  - Target: `app/public/wp-content/plugins/cora-workspace/includes/workspace-header.php`
-  - Checklist:
-    - [x] Define standard reusable function `cora_get_ai_platform_official_logo($platform, $class, $size, $monochrome)`
-    - [x] Support `'openai'`, `'chatgpt'`, `'claude'`, `'anthropic'`, `'gemini'`, `'google'`, `'perplexity'`, `'youtube'`
-    - [x] PHP syntax lint check passed (0 syntax errors)
+## Live Progress Status Tracker
 
-- [x] **Subtask 3: Update `.cora-platform-stack` in Workspace Header (Desktop & Mobile)**
-  - Status: Completed
-  - Target: `app/public/wp-content/plugins/cora-workspace/includes/workspace-header.php`, `assets/css/admin-style.css`
-  - Checklist:
-    - [x] Replace custom SVGs in desktop `.cora-platform-stack` (lines 460-504) with official brand logos
-    - [x] Replace custom SVGs in mobile `.cora-platform-stack` (lines 540-562) with official brand logos
-    - [x] Standardize circular button containers (`bg-white dark:bg-zinc-800`, subtle border `border-zinc-200/90 dark:border-zinc-700/80`, smooth hover scale, and z-index elevation)
-
-- [x] **Subtask 4: Update Global Components Across Workspace**
-  - Status: Completed
-  - Target: `views/view-mcp.php`, `views/view-canvas.php`, `views/view-settings-suite.php`, `admin-dashboard.php`
-  - Checklist:
-    - [x] `view-mcp.php`: Update Model Selector dropdown (Gemini, Claude, OpenAI) with official logos
-    - [x] `view-mcp.php`: Update "Connect AI Assistant" cards and modal JS (ChatGPT, Claude, Gemini) with official logos
-    - [x] `view-canvas.php`: Update MCP client connection cards and connect modal JS with official logos
-    - [x] `view-settings-suite.php`: Update Model Cards Grid (Gemini, Claude, ChatGPT 4o) with official logos
-    - [x] `admin-dashboard.php`: Replace emojis (`⚡`, `✦`, `⚙️`) in sidebar popover active AI model selector with official SVG logos
-    - [x] `admin-dashboard.php`: Add official SVG logos to Settings drawer active model radios
-
-- [x] **Subtask 5: Verification & Quality Assurance**
-  - Status: Completed
-  - Checklist:
-    - [x] PHP syntax check on all modified PHP files (`php -l` on all files: 0 errors)
-    - [x] TypeScript & Next.js production build verification (0 errors)
-    - [x] Rule 3 privacy compliance audit (zero owner name occurrences)
-    - [x] Rule 8 zero-regression verification across neighboring modules
+- [/] **Subtask 1: Performance Audit & Telemetry Validation** [Assigned: Performance Auditor]
+- [/] **Subtask 2: Automated QA & Regression Test Suite** [Assigned: QA Suite Engineer]
+- [ ] **Subtask 3: Version Bump to v4.9.420 & Manifest Synchronization**
+- [ ] **Subtask 4: Distribution Packaging (`updates/cora-workspace.zip`)**
+- [ ] **Subtask 5: Git Commit, Merge to Main & Remote Deployment**
