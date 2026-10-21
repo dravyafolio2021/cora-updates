@@ -727,7 +727,7 @@ function cora_get_sparkline_points( $history, $type ) {
                     <div class="min-w-0 pr-2">
                         <span class="text-[10px] font-bold tracking-wider text-zinc-400 uppercase block truncate">Published Pages</span>
                         <div class="text-base sm:text-lg font-bold text-zinc-900 mt-0.5 truncate"><?php echo esc_html($pub_count); ?> Pages Live</div>
-                        <span class="text-[10px] text-emerald-600 font-semibold block truncate mt-0.5"><?php echo $seo_issues === 0 ? '✓ 100% SEO Ready' : ($seo_issues . ' SEO warnings'); ?></span>
+                        <span class="text-[10px] text-emerald-600 font-semibold block truncate mt-0.5"><?php echo $seo_issues === 0 ? '100% SEO Ready' : ($seo_issues . ' SEO warnings'); ?></span>
                     </div>
                     <div class="w-7 h-7 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-700 shrink-0">
                         <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
@@ -1023,7 +1023,7 @@ function cora_get_sparkline_points( $history, $type ) {
                                     class="h-8 px-3.5 bg-zinc-950 hover:bg-zinc-900 text-white rounded-lg text-xs font-bold cursor-pointer transition-all flex items-center gap-1.5 border-none shadow-xs shrink-0 select-none"
                                     title="Fetch latest commits from GitHub and rebuild">
                                 <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                                <span>⚡ Sync from GitHub</span>
+                                <span>Sync from GitHub</span>
                             </button>
                             <?php endif; ?>
 
@@ -1031,7 +1031,7 @@ function cora_get_sparkline_points( $history, $type ) {
                                     class="h-8 px-3.5 bg-white hover:bg-zinc-50 border border-zinc-200/80 text-zinc-900 rounded-lg text-xs font-bold cursor-pointer transition-all flex items-center gap-1.5 shadow-3xs shrink-0 select-none"
                                     title="Recompile static build from source">
                                 <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
-                                <span>⚡ Re-deploy Build</span>
+                                <span>Re-deploy Build</span>
                             </button>
 
                             <a href="<?php echo esc_url( $canvas_preview_url ); ?>" target="_blank"
@@ -1964,11 +1964,11 @@ function cora_get_sparkline_points( $history, $type ) {
                                     <td class="py-3 text-right">
                                         <?php if ( ! empty($query['striking']) ) : ?>
                                             <span class="px-2 py-0.5 text-[8.5px] font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-200/50">
-                                                🔥 Striking Distance (Pos 4–15)
+                                                Striking Distance (Pos 4–15)
                                             </span>
                                         <?php else : ?>
                                             <span class="px-2 py-0.5 text-[8.5px] font-bold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/50">
-                                                ✓ Top 3 Ranking
+                                                Top 3 Ranking
                                             </span>
                                         <?php endif; ?>
                                     </td>
@@ -2398,12 +2398,12 @@ function cora_get_sparkline_points( $history, $type ) {
                     <div class="p-4 bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/80 rounded-xl space-y-3">
                         <div class="flex items-center justify-between">
                             <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider font-mono">Private Backup Repository Name</label>
-                            <span class="text-[10px] text-emerald-600 font-semibold">🔒 Private · Auto-Synced</span>
+                            <span class="text-[10px] text-emerald-600 font-semibold inline-flex items-center gap-1"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Private · Auto-Synced</span>
                         </div>
                         <input type="text" id="cora-gh-input-new-repo" value="cora-website-<?php echo sanitize_title( get_bloginfo( 'name' ) ?: 'site' ); ?>" class="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 py-2 text-xs font-mono text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-900 shadow-3xs">
                         <button type="button" onclick="coraCreateNewRepo()" id="cora-gh-btn-create-repo" class="w-full py-2.5 bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-950 rounded-xl text-xs font-bold shadow-3xs cursor-pointer transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
                             <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                            <span>⚡ Activate Autonomous Backup &amp; Protection</span>
+                            <span>Activate Autonomous Backup &amp; Protection</span>
                         </button>
                     </div>
 
@@ -2730,7 +2730,7 @@ function cora_get_sparkline_points( $history, $type ) {
                                 </div>
                                 <p class="text-[11px] text-zinc-500 leading-snug pt-0.5">Paste into the input and click <strong>Connect</strong>.</p>
                             </div>
-                            <div class="text-[10px] text-emerald-600 font-mono font-semibold text-center py-1">✓ Instant Rollback</div>
+                            <div class="text-[10px] text-emerald-600 font-mono font-semibold text-center py-1">Instant Rollback</div>
                         </div>
                     </div>
 
@@ -4810,7 +4810,7 @@ function cora_get_sparkline_points( $history, $type ) {
                         <!-- 3D & Advanced Libraries Dropdown -->
                         <div class="relative inline-block text-left" id="cora-html-libs-menu-wrapper">
                             <button type="button" onclick="toggleHtmlLibrariesDropdown()" class="px-2.5 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 hover:text-white rounded text-[10px] font-bold transition-colors flex items-center gap-1 cursor-pointer border border-zinc-700/80" title="Inject 3D & Advanced Frontend Libraries">
-                                <span class="text-emerald-400">⚡</span>
+                                <svg viewBox="0 0 24 24" width="10" height="10" class="text-emerald-400" fill="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
                                 <span>3D / Libraries</span>
                                 <svg viewBox="0 0 24 24" width="9" height="9" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
                             </button>
@@ -4853,15 +4853,15 @@ function cora_get_sparkline_points( $history, $type ) {
                                 </button>
                                 <div class="px-2 py-1 text-[9px] font-mono uppercase tracking-wider text-zinc-400 font-bold border-t border-zinc-800 pt-1 mt-1">Insert 3D Boilerplates</div>
                                 <button type="button" onclick="insert3dBoilerplateToCurrentEditor('torus')" class="w-full text-left px-2 py-1.5 text-xs text-zinc-200 hover:text-white hover:bg-zinc-800 rounded-lg flex items-center justify-between cursor-pointer border-none bg-transparent font-medium">
-                                    <span>⚡ 3D Interactive Torus</span>
+                                    <span>3D Interactive Torus</span>
                                     <span class="text-[9px] font-mono text-emerald-400">Full</span>
                                 </button>
                                 <button type="button" onclick="insert3dBoilerplateToCurrentEditor('particles')" class="w-full text-left px-2 py-1.5 text-xs text-zinc-200 hover:text-white hover:bg-zinc-800 rounded-lg flex items-center justify-between cursor-pointer border-none bg-transparent font-medium">
-                                    <span>⚡ 3D Particle Constellation</span>
+                                    <span>3D Particle Constellation</span>
                                     <span class="text-[9px] font-mono text-emerald-400">Full</span>
                                 </button>
                                 <button type="button" onclick="insert3dBoilerplateToCurrentEditor('kinetic')" class="w-full text-left px-2 py-1.5 text-xs text-zinc-200 hover:text-white hover:bg-zinc-800 rounded-lg flex items-center justify-between cursor-pointer border-none bg-transparent font-medium">
-                                    <span>⚡ Kinetic Dark Hero</span>
+                                    <span>Kinetic Dark Hero</span>
                                     <span class="text-[9px] font-mono text-emerald-400">Full</span>
                                 </button>
                             </div>
@@ -4901,11 +4901,11 @@ function cora_get_sparkline_points( $history, $type ) {
                     <!-- Quick Prompt Preset Chips -->
                     <div class="flex items-center gap-1.5 overflow-x-auto pt-2 text-[10px] select-none no-scrollbar">
                         <span class="text-zinc-500 font-semibold uppercase tracking-wider shrink-0 mr-1 text-[9px]">Suggestions:</span>
-                        <button type="button" onclick="setAndRunAiPrompt('Refine and polish all heading & paragraph copy with punchy modern tone')" class="px-2 py-0.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold cursor-pointer transition-colors shrink-0">✨ Polish Copy</button>
-                        <button type="button" onclick="setAndRunAiPrompt('Convert cards and background to a sleek dark monochromatic theme')" class="px-2 py-0.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold cursor-pointer transition-colors shrink-0">🎨 Dark Aesthetic</button>
-                        <button type="button" onclick="setAndRunAiPrompt('Add smooth hover elevation, shadows and transition micro-interactions to cards')" class="px-2 py-0.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold cursor-pointer transition-colors shrink-0">✨ Hover Animations</button>
-                        <button type="button" onclick="setAndRunAiPrompt('Optimize container padding, grid columns and typography for mobile responsiveness')" class="px-2 py-0.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold cursor-pointer transition-colors shrink-0">📱 Mobile Spacing</button>
-                        <button type="button" onclick="setAndRunAiPrompt('Update image placeholder URLs with high-quality architectural Unsplash photography')" class="px-2 py-0.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold cursor-pointer transition-colors shrink-0">🖼️ Swap Photos</button>
+                        <button type="button" onclick="setAndRunAiPrompt('Refine and polish all heading & paragraph copy with punchy modern tone')" class="px-2 py-0.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold cursor-pointer transition-colors shrink-0">Polish Copy</button>
+                        <button type="button" onclick="setAndRunAiPrompt('Convert cards and background to a sleek dark monochromatic theme')" class="px-2 py-0.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold cursor-pointer transition-colors shrink-0">Dark Aesthetic</button>
+                        <button type="button" onclick="setAndRunAiPrompt('Add smooth hover elevation, shadows and transition micro-interactions to cards')" class="px-2 py-0.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold cursor-pointer transition-colors shrink-0">Hover Animations</button>
+                        <button type="button" onclick="setAndRunAiPrompt('Optimize container padding, grid columns and typography for mobile responsiveness')" class="px-2 py-0.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold cursor-pointer transition-colors shrink-0">Mobile Spacing</button>
+                        <button type="button" onclick="setAndRunAiPrompt('Update image placeholder URLs with high-quality architectural Unsplash photography')" class="px-2 py-0.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold cursor-pointer transition-colors shrink-0">Swap Photos</button>
                     </div>
                 </div>
             </div>
@@ -4932,28 +4932,29 @@ function cora_get_sparkline_points( $history, $type ) {
         <!-- AI Polish Dropdown -->
         <div class="relative">
             <button type="button" onclick="toggleAiTextMenu(event)" class="px-2.5 py-1 bg-white text-zinc-950 font-bold rounded-lg text-[11px] flex items-center gap-1 hover:bg-zinc-100 cursor-pointer shadow-2xs">
-                <span>✨ AI Polish</span>
+                <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+                <span>AI Polish</span>
                 <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="2.5" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </button>
             <div id="cora-ai-text-menu" class="hidden absolute left-0 bottom-full mb-2 w-48 bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl py-1 z-50 text-left">
                 <button type="button" onclick="runAiTextRewrite('punchier')" class="w-full px-3 py-1.5 text-left text-[11px] text-zinc-200 hover:bg-zinc-800 hover:text-white flex items-center gap-2">
-                    <span>⚡</span>
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" fill="currentColor"/></svg>
                     <span>Make Punchier</span>
                 </button>
                 <button type="button" onclick="runAiTextRewrite('professional')" class="w-full px-3 py-1.5 text-left text-[11px] text-zinc-200 hover:bg-zinc-800 hover:text-white flex items-center gap-2">
-                    <span>👔</span>
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
                     <span>Executive / Corporate</span>
                 </button>
                 <button type="button" onclick="runAiTextRewrite('shorten')" class="w-full px-3 py-1.5 text-left text-[11px] text-zinc-200 hover:bg-zinc-800 hover:text-white flex items-center gap-2">
-                    <span>✂️</span>
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><line x1="20" y1="4" x2="8.12" y2="15.88"></line><line x1="14.47" y1="14.48" x2="20" y2="20"></line><line x1="8.12" y1="8.12" x2="12" y2="12"></line></svg>
                     <span>Shorten by 50%</span>
                 </button>
                 <button type="button" onclick="runAiTextRewrite('headline')" class="w-full px-3 py-1.5 text-left text-[11px] text-zinc-200 hover:bg-zinc-800 hover:text-white flex items-center gap-2">
-                    <span>🎯</span>
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
                     <span>Magnetic Headline</span>
                 </button>
                 <button type="button" onclick="runAiTextRewrite('fix_grammar')" class="w-full px-3 py-1.5 text-left text-[11px] text-zinc-200 hover:bg-zinc-800 hover:text-white flex items-center gap-2">
-                    <span>✨</span>
+                    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
                     <span>Fix Grammar &amp; Flow</span>
                 </button>
             </div>
@@ -5073,7 +5074,8 @@ function cora_get_sparkline_points( $history, $type ) {
                     </div>
                     <p class="text-[11px] text-zinc-300 leading-relaxed">Runs lazy-loading injection, viewport meta validation, semantic heading structure, and asset compression.</p>
                     <button type="button" onclick="triggerReRunAiOptimization()" class="w-full py-2 bg-white hover:bg-zinc-100 text-zinc-950 font-bold rounded-xl text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5">
-                        <span>✨ Re-Run AI Optimization</span>
+                        <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+                        <span>Re-Run AI Optimization</span>
                     </button>
                 </div>
 
@@ -5964,18 +5966,18 @@ function cora_get_sparkline_points( $history, $type ) {
                 <!-- 1-Click 3D & Advanced Boilerplate Presets -->
                 <div class="p-3 bg-zinc-50 border border-zinc-200 rounded-xl space-y-2">
                     <div class="flex items-center justify-between">
-                        <span class="text-[10px] font-bold text-zinc-900 uppercase tracking-wider font-mono">⚡ 1-Click Starter Boilerplates</span>
+                        <span class="text-[10px] font-bold text-zinc-900 uppercase tracking-wider font-mono">1-Click Starter Boilerplates</span>
                         <span class="text-[9px] font-mono text-zinc-500">Tailwind + Three.js</span>
                     </div>
                     <div class="flex flex-wrap gap-1.5">
                         <button type="button" onclick="window.coraLoad3dBoilerplateIntoDrawer('torus')" class="px-2.5 py-1 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg text-[10.5px] font-bold transition-all shadow-3xs cursor-pointer flex items-center gap-1 border-none">
-                            <span>⚡ 3D Torus (WebGL)</span>
+                            <span>3D Torus (WebGL)</span>
                         </button>
                         <button type="button" onclick="window.coraLoad3dBoilerplateIntoDrawer('particles')" class="px-2.5 py-1 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg text-[10.5px] font-bold transition-all shadow-3xs cursor-pointer flex items-center gap-1 border-none">
-                            <span>⚡ 3D Particles</span>
+                            <span>3D Particles</span>
                         </button>
                         <button type="button" onclick="window.coraLoad3dBoilerplateIntoDrawer('kinetic')" class="px-2.5 py-1 bg-zinc-700 hover:bg-zinc-600 text-white rounded-lg text-[10.5px] font-bold transition-all shadow-3xs cursor-pointer flex items-center gap-1 border-none">
-                            <span>⚡ Kinetic Hero</span>
+                            <span>Kinetic Hero</span>
                         </button>
                     </div>
                     <!-- Library Injectors -->
@@ -6014,7 +6016,7 @@ function cora_get_sparkline_points( $history, $type ) {
                             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                             <span class="text-xs font-bold tracking-tight" id="cora-html-detected-title">Page Title</span>
                         </div>
-                        <span class="px-2 py-0.5 bg-zinc-800 border border-zinc-700 rounded-md text-[9px] font-mono text-emerald-400 font-bold">✨ AI Optimization Ready</span>
+                        <span class="px-2 py-0.5 bg-zinc-800 border border-zinc-700 rounded-md text-[9px] font-mono text-emerald-400 font-bold">AI Optimization Ready</span>
                     </div>
                     <div class="flex items-center gap-4 text-[10px] text-zinc-300 pt-0.5 border-t border-zinc-800">
                         <span id="cora-html-stat-headings">0 Headings</span>
@@ -8496,17 +8498,17 @@ function cora_get_sparkline_points( $history, $type ) {
                     <div style="background:#fafafa;border:1px solid #e4e4e7;border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:10px;">
                         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
                             <div style="display:flex;align-items:center;gap:6px;">
-                                <span style="font-size:11px;font-weight:800;color:#18181b;">⚡ 1-Click 3D & Advanced Boilerplates:</span>
+                                <span style="font-size:11px;font-weight:800;color:#18181b;">1-Click 3D &amp; Advanced Boilerplates:</span>
                             </div>
                             <div style="display:flex;flex-wrap:wrap;gap:6px;">
                                 <button type="button" onclick="window.coraLoad3dBoilerplateIntoWiz('torus')" style="padding:4px 10px;background:#18181b;color:#ffffff;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;transition:all .15s;" onmouseover="this.style.background='#27272a'" onmouseout="this.style.background='#18181b'">
-                                    <span>⚡ 3D Torus (Three.js WebGL)</span>
+                                    <span>3D Torus (Three.js WebGL)</span>
                                 </button>
                                 <button type="button" onclick="window.coraLoad3dBoilerplateIntoWiz('particles')" style="padding:4px 10px;background:#27272a;color:#ffffff;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;transition:all .15s;" onmouseover="this.style.background='#3f3f46'" onmouseout="this.style.background='#27272a'">
-                                    <span>⚡ Particle Constellation</span>
+                                    <span>Particle Constellation</span>
                                 </button>
                                 <button type="button" onclick="window.coraLoad3dBoilerplateIntoWiz('kinetic')" style="padding:4px 10px;background:#3f3f46;color:#ffffff;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;transition:all .15s;" onmouseover="this.style.background='#52525b'" onmouseout="this.style.background='#3f3f46'">
-                                    <span>⚡ Kinetic Dark Hero</span>
+                                    <span>Kinetic Dark Hero</span>
                                 </button>
                             </div>
                         </div>
@@ -8658,7 +8660,7 @@ function cora_get_sparkline_points( $history, $type ) {
                                 <label style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#71717a;">Personal Access Token (PAT) <span style="font-weight:500;color:#a1a1aa;">(Required for private repositories)</span></label>
                                 <span id="wiz-nextjs-pat-status-pill" class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold <?php echo ! empty( $wiz_saved_pat ) ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20' : 'bg-zinc-500/10 text-zinc-500 dark:text-zinc-400 border border-zinc-500/20'; ?>">
                                     <span class="w-1.5 h-1.5 rounded-full <?php echo ! empty( $wiz_saved_pat ) ? 'bg-emerald-500' : 'bg-zinc-400'; ?>"></span>
-                                    <span><?php echo ! empty( $wiz_saved_pat ) ? '✓ Connected Globally' : 'Optional for public repos'; ?></span>
+                                    <span><?php echo ! empty( $wiz_saved_pat ) ? 'Connected Globally' : 'Optional for public repos'; ?></span>
                                 </span>
                             </div>
                             <div style="display:flex;gap:8px;align-items:center;">
@@ -8816,7 +8818,8 @@ function cora_get_sparkline_points( $history, $type ) {
                             <span id="wiz-nextjs-deploy-status-hint">Target: Self-hosted in workspace (/site/)</span>
                         </div>
                         <button type="button" onclick="window.createNextjsTheme()" id="btn-deploy-nextjs-theme" style="display:inline-flex;align-items:center;gap:6px;padding:10px 22px;background:#18181b;color:white;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;transition:all .18s;box-shadow:0 2px 8px rgba(0,0,0,.15);font-family:inherit;">
-                            <span>Import Next.js Project (Draft) ⚡</span>
+                            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                            <span>Import Next.js Project (Draft)</span>
                         </button>
                     </div>
 
@@ -9652,7 +9655,7 @@ function cora_get_sparkline_points( $history, $type ) {
                         <!-- Workspace Forms Dock Button -->
                         <button type="button" id="cora-form-picker-toggle-btn" onclick="window.toggleFormPickerPopover()" title="Pick and embed workspace lead forms" class="flex items-center gap-1 px-2.5 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700/60 rounded-lg text-[11px] font-medium transition-colors cursor-pointer shrink-0">
                             <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/><path d="M14 9h4"/><path d="M14 15h4"/></svg>
-                            <span>📋 Embed Form</span>
+                            <span>Embed Form</span>
                         </button>
 
                         <!-- Prompt Input -->
@@ -9947,17 +9950,21 @@ function cora_get_sparkline_points( $history, $type ) {
                             <div class="space-y-1.5">
                                 <span class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Quick Suggestions:</span>
                                 <div class="flex flex-wrap gap-1.5">
-                                    <button type="button" onclick="window.coraSetCanvasNLPrompt('Read my active template HTML code and give me a summary of sections.')" class="px-2.5 py-1 bg-zinc-950 hover:bg-zinc-800 text-zinc-300 rounded-lg text-[11px] font-medium transition-colors cursor-pointer border border-zinc-800">
-                                        📋 Read Template Code
+                                    <button type="button" onclick="window.coraSetCanvasNLPrompt('Read my active template HTML code and give me a summary of sections.')" class="px-2.5 py-1 bg-zinc-950 hover:bg-zinc-800 text-zinc-300 rounded-lg text-[11px] font-medium transition-colors cursor-pointer border border-zinc-800 flex items-center gap-1.5">
+                                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                                        <span>Read Template Code</span>
                                     </button>
-                                    <button type="button" onclick="window.coraSetCanvasNLPrompt('Add a modern dark mode testimonial section with 3 cards.')" class="px-2.5 py-1 bg-zinc-950 hover:bg-zinc-800 text-zinc-300 rounded-lg text-[11px] font-medium transition-colors cursor-pointer border border-zinc-800">
-                                        ⭐ Add Testimonials Section
+                                    <button type="button" onclick="window.coraSetCanvasNLPrompt('Add a modern dark mode testimonial section with 3 cards.')" class="px-2.5 py-1 bg-zinc-950 hover:bg-zinc-800 text-zinc-300 rounded-lg text-[11px] font-medium transition-colors cursor-pointer border border-zinc-800 flex items-center gap-1.5">
+                                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                                        <span>Add Testimonials Section</span>
                                     </button>
-                                    <button type="button" onclick="window.coraSetCanvasNLPrompt('Give me a full workspace health summary with total revenue, unpaid receivables, and active bookings.')" class="px-2.5 py-1 bg-zinc-950 hover:bg-zinc-800 text-zinc-300 rounded-lg text-[11px] font-medium transition-colors cursor-pointer border border-zinc-800">
-                                        📊 Revenue &amp; Health Snapshot
+                                    <button type="button" onclick="window.coraSetCanvasNLPrompt('Give me a full workspace health summary with total revenue, unpaid receivables, and active bookings.')" class="px-2.5 py-1 bg-zinc-950 hover:bg-zinc-800 text-zinc-300 rounded-lg text-[11px] font-medium transition-colors cursor-pointer border border-zinc-800 flex items-center gap-1.5">
+                                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                                        <span>Revenue &amp; Health Snapshot</span>
                                     </button>
-                                    <button type="button" onclick="window.coraSetCanvasNLPrompt('List all active CRM deals and highlight hot leads.')" class="px-2.5 py-1 bg-zinc-950 hover:bg-zinc-800 text-zinc-300 rounded-lg text-[11px] font-medium transition-colors cursor-pointer border border-zinc-800">
-                                        🎯 CRM Hot Leads
+                                    <button type="button" onclick="window.coraSetCanvasNLPrompt('List all active CRM deals and highlight hot leads.')" class="px-2.5 py-1 bg-zinc-950 hover:bg-zinc-800 text-zinc-300 rounded-lg text-[11px] font-medium transition-colors cursor-pointer border border-zinc-800 flex items-center gap-1.5">
+                                        <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+                                        <span>CRM Hot Leads</span>
                                     </button>
                                 </div>
                             </div>
@@ -10025,7 +10032,7 @@ echo esc_textarea( json_encode( array(
                             <label class="block text-xs font-bold text-zinc-300">Live Execution Response</label>
                             <button type="button" id="cora-canvas-apply-code-btn" onclick="window.coraApplyPlaygroundCodeToEditor()" class="hidden px-2.5 py-1 bg-emerald-950 text-emerald-300 border border-emerald-800 rounded-lg text-xs font-semibold hover:bg-emerald-900 transition-colors cursor-pointer flex items-center gap-1">
                                 <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2" fill="none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path></svg>
-                                <span>📥 Apply to Live Editor</span>
+                                <span>Apply to Live Editor</span>
                             </button>
                         </div>
 
@@ -14031,7 +14038,7 @@ echo esc_textarea( json_encode( array(
             htmlPanel.removeClass('hidden');
             jQuery('#cora-html-paste-box').removeClass('hidden');
             templateSelect.val('canvas'); // Default to standalone canvas for imported HTML
-            jQuery('#cora-create-edit-text').text('Deploy & Edit ✨');
+            jQuery('#cora-create-edit-text').text('Deploy & Edit');
         } else {
             btnElem.removeClass('text-zinc-600 font-semibold').addClass('bg-white text-zinc-950 font-bold shadow-2xs');
             btnHtml.removeClass('bg-white text-zinc-950 font-bold shadow-2xs').addClass('text-zinc-600 font-semibold');
@@ -16710,7 +16717,7 @@ echo esc_textarea( json_encode( array(
         }, function(res) {
             if (res && res.success && res.data && res.data.rewritten) {
                 htmlEditorState.activeElement.innerText = res.data.rewritten;
-                window.coraShowToast('Copy rewritten with AI ✨');
+                window.coraShowToast('Copy rewritten with AI');
                 const updatedHtml = getCleanIframeHtml();
                 jQuery('#cora-html-raw-editor-textarea').val(updatedHtml);
             } else {
@@ -16957,7 +16964,7 @@ echo esc_textarea( json_encode( array(
                 renderHtmlInIframe(newHtml);
                 renderHtmlInventoryList();
                 promptInput.val('');
-                window.coraShowToast('✨ AI modifications applied successfully!');
+                window.coraShowToast('AI modifications applied successfully!');
             } else {
                 const msg = (res && res.data && res.data.message) ? res.data.message : 'AI modification failed.';
                 window.coraShowToast(msg, 'error');
@@ -18586,7 +18593,7 @@ Return ONLY clean, standalone HTML in an <!DOCTYPE html> document.`
             }
             if (btnHover) {
                 var origHover = btnHover.innerHTML;
-                btnHover.innerHTML = '<span style="color:#34d399;">✓ Copied!</span>';
+                btnHover.innerHTML = '<span style="color:#34d399;">Copied!</span>';
                 setTimeout(function() {
                     btnHover.innerHTML = origHover;
                 }, 2000);
@@ -18700,7 +18707,8 @@ Return ONLY clean, standalone HTML in an <!DOCTYPE html> document.`
     <main class="flex-1 max-w-5xl w-full mx-auto px-6 py-12">
         <div class="text-center max-w-3xl mx-auto mb-12">
             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-[11px] text-zinc-300 font-mono mb-4">
-                <span>⚡ 100% Standalone HTML + Tailwind CSS CDN</span>
+                <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                <span>100% Standalone HTML + Tailwind CSS CDN</span>
             </div>
             <h1 class="text-3xl md:text-5xl font-black text-white tracking-tight leading-tight mb-4">
                 ${title}
@@ -20097,7 +20105,7 @@ Return ONLY clean, standalone HTML in an <!DOCTYPE html> document.`
                         if (el) el.value = pat;
                     });
                     document.querySelectorAll('#wiz-nextjs-pat-status-pill, .cora-pat-status-pill').forEach(function(pill) {
-                        pill.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> <span>✓ Connected Globally</span>';
+                        pill.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> <span>Connected Globally</span>';
                         pill.className = 'inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20';
                     });
                     showToast('Personal Access Token saved globally across workspace!', 'success');
@@ -20383,7 +20391,7 @@ Return ONLY clean, standalone HTML in an <!DOCTYPE html> document.`
                         }
                     }
 
-                    var privNote = res.data.is_private ? ' (Private Repo 🔒)' : '';
+                    var privNote = res.data.is_private ? ' (Private Repo)' : '';
                     showToast('Next.js project verified' + privNote + '! ' + routes.length + ' route' + (routes.length === 1 ? '' : 's') + ' found.', 'success');
                 } else {
                     var errMsg = (res && res.data && res.data.message) ? res.data.message : 'Could not scan Next.js repository.';
@@ -20504,14 +20512,14 @@ Return ONLY clean, standalone HTML in an <!DOCTYPE html> document.`
 
         function setButtonsDeploying() {
             window._isDeployingNextjs = true;
-            if (deployBtn) { deployBtn.disabled = true; deployBtn.innerHTML = '<span>Importing Project… ⚡</span>'; }
-            if (footerBtn) { footerBtn.disabled = true; footerBtn.innerHTML = 'Importing Project… ⚡'; }
+            if (deployBtn) { deployBtn.disabled = true; deployBtn.innerHTML = '<span>Importing Project…</span>'; }
+            if (footerBtn) { footerBtn.disabled = true; footerBtn.innerHTML = 'Importing Project…'; }
         }
 
         function resetButtons() {
             window._isDeployingNextjs = false;
-            if (deployBtn) { deployBtn.disabled = false; deployBtn.innerHTML = '<span>Import Next.js Project (Draft) ⚡</span>'; }
-            if (footerBtn) { footerBtn.disabled = false; footerBtn.innerHTML = 'Import Next.js Project (Draft) ⚡'; }
+            if (deployBtn) { deployBtn.disabled = false; deployBtn.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg><span>Import Next.js Project (Draft)</span>'; }
+            if (footerBtn) { footerBtn.disabled = false; footerBtn.innerHTML = 'Import Next.js Project (Draft) <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>'; }
         }
 
         if (subTab === 'zip') {
@@ -20803,7 +20811,7 @@ Return ONLY clean, standalone HTML in an <!DOCTYPE html> document.`
                 var ctaLabel = (_wizBuilder === 'html_ai') ? 'Launch Theme Live & Go to /site/' : ((_wizBuilder === 'nextjs') ? 'Create & Build Theme' : 'Save Theme');
                 nextBtn.innerHTML = ctaLabel + ' <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>';
             } else if (step === 2 && _wizBuilder === 'nextjs') {
-                nextBtn.innerHTML = 'Import Next.js Project (Draft) ⚡';
+                nextBtn.innerHTML = 'Import Next.js Project (Draft) <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>';
             } else {
                 nextBtn.innerHTML = 'Continue <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>';
             }
@@ -20989,7 +20997,7 @@ Return ONLY clean, standalone HTML in an <!DOCTYPE html> document.`
         if (nextBtn) {
             nextBtn.disabled = true;
             nextBtn.style.opacity = '0.5';
-            nextBtn.innerHTML = '<span class="spinning" style="display:inline-block;margin-right:6px;">⚙️</span> Building Static Site…';
+            nextBtn.innerHTML = '<svg class="animate-spin inline-block mr-1.5" viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle><path d="M12 2a10 10 0 0 1 10 10"></path></svg> Building Static Site…';
         }
 
         var headerTitle = document.getElementById('wiz-build-header-title');
@@ -21016,11 +21024,11 @@ Return ONLY clean, standalone HTML in an <!DOCTYPE html> document.`
         var s4 = document.getElementById('wiz-bstep-4');
         var s5 = document.getElementById('wiz-bstep-5');
 
-        if (s1) { s1.style.color = '#f4f4f5'; s1.textContent = '⏳ [1/5] Cloning repository & inspecting branch tree...'; }
-        if (s2) { s2.style.color = '#71717a'; s2.textContent = '[ ] 2. Resolving packages & framework dependencies...'; }
-        if (s3) { s3.style.color = '#71717a'; s3.textContent = '[ ] 3. Compiling Next.js App Router / React components...'; }
-        if (s4) { s4.style.color = '#71717a'; s4.textContent = '[ ] 4. Prerendering static HTML for all scanned routes...'; }
-        if (s5) { s5.style.color = '#71717a'; s5.textContent = '[ ] 5. Deploying static assets to web server...'; }
+        if (s1) { s1.style.color = '#f4f4f5'; s1.textContent = '[1/5] Cloning repository & inspecting branch tree...'; }
+        if (s2) { s2.style.color = '#71717a'; s2.textContent = '[2/5] Resolving packages & framework dependencies...'; }
+        if (s3) { s3.style.color = '#71717a'; s3.textContent = '[3/5] Compiling Next.js App Router / React components...'; }
+        if (s4) { s4.style.color = '#71717a'; s4.textContent = '[4/5] Prerendering static HTML for all scanned routes...'; }
+        if (s5) { s5.style.color = '#71717a'; s5.textContent = '[5/5] Deploying static assets to web server...'; }
 
         var errPanel = document.getElementById('wiz-build-error-panel');
         if (errPanel) errPanel.style.display = 'none';
@@ -21032,18 +21040,18 @@ Return ONLY clean, standalone HTML in an <!DOCTYPE html> document.`
         wizardClearBuildTimers();
 
         _wizBuildStepTimers.push(setTimeout(function() {
-            if (s1) { s1.style.color = '#10b981'; s1.textContent = '✓ [1/5] Repository cloned & branch verified.'; }
-            if (s2) { s2.style.color = '#f4f4f5'; s2.textContent = '⏳ [2/5] Resolving packages & framework dependencies...'; }
+            if (s1) { s1.style.color = '#10b981'; s1.textContent = '[1/5] Repository cloned & branch verified.'; }
+            if (s2) { s2.style.color = '#f4f4f5'; s2.textContent = '[2/5] Resolving packages & framework dependencies...'; }
         }, 1800));
 
         _wizBuildStepTimers.push(setTimeout(function() {
-            if (s2) { s2.style.color = '#10b981'; s2.textContent = '✓ [2/5] Packages & dependencies resolved.'; }
-            if (s3) { s3.style.color = '#f4f4f5'; s3.textContent = '⏳ [3/5] Compiling Next.js App Router / React components...'; }
+            if (s2) { s2.style.color = '#10b981'; s2.textContent = '[2/5] Packages & dependencies resolved.'; }
+            if (s3) { s3.style.color = '#f4f4f5'; s3.textContent = '[3/5] Compiling Next.js App Router / React components...'; }
         }, 4500));
 
         _wizBuildStepTimers.push(setTimeout(function() {
-            if (s3) { s3.style.color = '#10b981'; s3.textContent = '✓ [3/5] Next.js components compiled successfully.'; }
-            if (s4) { s4.style.color = '#f4f4f5'; s4.textContent = '⏳ [4/5] Prerendering static HTML for all scanned routes...'; }
+            if (s3) { s3.style.color = '#10b981'; s3.textContent = '[3/5] Next.js components compiled successfully.'; }
+            if (s4) { s4.style.color = '#f4f4f5'; s4.textContent = '[4/5] Prerendering static HTML for all scanned routes...'; }
         }, 9000));
     }
 
@@ -21055,14 +21063,14 @@ Return ONLY clean, standalone HTML in an <!DOCTYPE html> document.`
         var s4 = document.getElementById('wiz-bstep-4');
         var s5 = document.getElementById('wiz-bstep-5');
 
-        if (s1) { s1.style.color = '#10b981'; s1.textContent = '✓ [1/5] Repository cloned & branch verified.'; }
-        if (s2) { s2.style.color = '#10b981'; s2.textContent = '✓ [2/5] Packages & dependencies resolved.'; }
-        if (s3) { s3.style.color = '#10b981'; s3.textContent = '✓ [3/5] Next.js components compiled.'; }
-        if (s4) { s4.style.color = '#10b981'; s4.textContent = '✓ [4/5] Static HTML routes prerendered.'; }
-        if (s5) { s5.style.color = '#10b981'; s5.textContent = '✓ [5/5] Static site deployed & live on Cora!'; }
+        if (s1) { s1.style.color = '#10b981'; s1.textContent = '[1/5] Repository cloned & branch verified.'; }
+        if (s2) { s2.style.color = '#10b981'; s2.textContent = '[2/5] Packages & dependencies resolved.'; }
+        if (s3) { s3.style.color = '#10b981'; s3.textContent = '[3/5] Next.js components compiled.'; }
+        if (s4) { s4.style.color = '#10b981'; s4.textContent = '[4/5] Static HTML routes prerendered.'; }
+        if (s5) { s5.style.color = '#10b981'; s5.textContent = '[5/5] Static site deployed & live on Cora!'; }
 
         var headerTitle = document.getElementById('wiz-build-header-title');
-        if (headerTitle) headerTitle.innerHTML = '✓ ' + themeName + ' Live on Cora';
+        if (headerTitle) headerTitle.innerHTML = themeName + ' Live on Cora';
         var headerSub = document.getElementById('wiz-build-header-sub');
         if (headerSub) headerSub.textContent = 'Static build generated and ready for instant preview.';
 
@@ -21102,12 +21110,12 @@ Return ONLY clean, standalone HTML in an <!DOCTYPE html> document.`
 
         var s4 = document.getElementById('wiz-bstep-4');
         var s5 = document.getElementById('wiz-bstep-5');
-        if (s4 && s4.textContent.includes('⏳')) {
+        if (s4 && s4.textContent.includes('Prerendering')) {
             s4.style.color = '#f43f5e';
-            s4.textContent = '❌ [4/5] Prerendering halted.';
-        } else if (s5 && s5.textContent.includes('⏳')) {
+            s4.textContent = '[4/5] Prerendering halted.';
+        } else if (s5 && s5.textContent.includes('Deployment')) {
             s5.style.color = '#f43f5e';
-            s5.textContent = '❌ [5/5] Deployment halted.';
+            s5.textContent = '[5/5] Deployment halted.';
         }
 
         var headerTitle = document.getElementById('wiz-build-header-title');
@@ -22220,8 +22228,8 @@ Return ONLY clean, standalone HTML in an <!DOCTYPE html> document.`
                     let seoHtml = '';
                     d.search_queries.forEach(q => {
                         const tagHtml = q.striking 
-                            ? '<span class="px-2 py-0.5 text-[8.5px] font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-200/50">🔥 Striking Distance (Pos 4–15)</span>'
-                            : '<span class="px-2 py-0.5 text-[8.5px] font-bold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/50">✓ Top 3 Ranking</span>';
+                            ? '<span class="px-2 py-0.5 text-[8.5px] font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-200/50">Striking Distance (Pos 4–15)</span>'
+                            : '<span class="px-2 py-0.5 text-[8.5px] font-bold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/50">Top 3 Ranking</span>';
                         seoHtml += `
                             <tr class="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/40 transition-colors">
                                 <td class="py-3 font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
@@ -23249,7 +23257,7 @@ Return ONLY clean, standalone HTML in an <!DOCTYPE html> document.`
         if (!name) { window.coraShowToast('Repository name is required.', 'warning'); return; }
 
         const btn = document.getElementById('cora-gh-btn-create-repo');
-        const origHtml = btn ? btn.innerHTML : '<span>⚡ Activate Autonomous Backup &amp; Protection</span>';
+        const origHtml = btn ? btn.innerHTML : '<span>Activate Autonomous Backup &amp; Protection</span>';
         if (btn) {
             btn.disabled = true;
             btn.innerHTML = '<svg class="animate-spin mr-1.5 inline-block" viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle><path d="M12 2a10 10 0 0 1 10 10"></path></svg> <span>Activating Protection...</span>';
@@ -24764,7 +24772,7 @@ Please provide the complete, un-truncated index.html file ready to save and publ
         if (e.data && e.data.type === 'cora_preview_element_click') {
             window.jumpToPreviewElementInCode(e.data);
         } else if (e.data && e.data.type === 'cora_preview_form_submitted') {
-            window.coraShowToast('✓ Live form submission verified in sandbox preview!', 'success');
+            window.coraShowToast('Live form submission verified in sandbox preview!', 'success');
         }
     });
 
@@ -25013,7 +25021,8 @@ Please provide the complete, un-truncated index.html file ready to save and publ
                     <div class="space-y-1.5">
                         <div class="flex items-center justify-between">
                             <label class="text-xs font-semibold text-zinc-300 flex items-center gap-1.5">
-                                <span>⚡ 1-Click AI Setup Prompt</span>
+                                <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                                <span>1-Click AI Setup Prompt</span>
                             </label>
                             <button type="button" onclick="navigator.clipboard.writeText(document.getElementById('cora-connect-prompt-box').value); window.coraShowToast('AI prompt copied!', 'success');" class="text-xs font-semibold text-white hover:underline flex items-center gap-1 bg-transparent border-none cursor-pointer">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
@@ -25272,7 +25281,7 @@ Please provide the complete, un-truncated index.html file ready to save and publ
             if (data.result && data.result.content && data.result.content[0]) {
                 contentText = data.result.content[0].text || '';
             } else if (data.error) {
-                contentText = '❌ Error: ' + (data.error.message || JSON.stringify(data.error));
+                contentText = 'Error: ' + (data.error.message || JSON.stringify(data.error));
             } else {
                 contentText = JSON.stringify(data, null, 2);
             }
@@ -25346,7 +25355,7 @@ Please provide the complete, un-truncated index.html file ready to save and publ
             if (data.result && data.result.content && data.result.content[0]) {
                 contentText = data.result.content[0].text || '';
             } else if (data.error) {
-                contentText = '❌ Error: ' + (data.error.message || JSON.stringify(data.error));
+                contentText = 'Error: ' + (data.error.message || JSON.stringify(data.error));
             } else {
                 contentText = JSON.stringify(data, null, 2);
             }
